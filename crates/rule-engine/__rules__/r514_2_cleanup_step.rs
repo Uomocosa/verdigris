@@ -60,7 +60,7 @@ mod tests {
         game.act(p2, actions::Action::ChooseTargets(vec![bears]));
         game.pass_priority_all();
         game.pass_priority_all();
-        game.end_turn();
+        game.play([p1.end_turn(), p2.end_turn()]).unwrap();
 
         assert_eq!(game.zone_of(bears), BATTLEFIELD);
         assert_eq!(
@@ -77,7 +77,7 @@ mod tests {
 
     #[test]
     fn r514_2_until_end_of_turn_effect_expires_before_the_next_bolt() {
-        let (mut game, [p1, ..]) = MockGame::new([
+        let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([GIANT_GROWTH, LIGHTNING_BOLT])
                 .battlefield([GRIZZLY_BEARS])
                 .mana_pool(mana![G, R]),
@@ -94,8 +94,8 @@ mod tests {
         game.act(p1, actions::Action::Cast(growth));
         game.act(p1, actions::Action::ChooseTargets(vec![bears]));
         game.pass_priority_all();
-        game.end_turn();
-        game.end_turn();
+        game.play([p1.end_turn(), p2.end_turn()]).unwrap();
+        game.play([p1.end_turn(), p2.end_turn()]).unwrap();
         game.pass_priority();
         game.act(p1, actions::Action::Cast(bolt));
         game.act(p1, actions::Action::ChooseTargets(vec![bears]));

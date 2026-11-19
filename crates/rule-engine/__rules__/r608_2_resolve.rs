@@ -124,7 +124,8 @@ mod tests {
         let (mut game, [p1, p2]) =
             MockGame::new([P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]), P2]);
         let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
-        game.play(p1.cast(bolt).targeting(p2).resolve()).unwrap();
+        game.play([p1.cast(bolt).targeting(p2).end_turn(), p2.end_turn()])
+            .unwrap();
         assert_eq!(game.life(p2), 17);
     }
 
@@ -140,7 +141,8 @@ mod tests {
             .only()
             .unwrap();
         let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
-        game.play(p1.cast(bolt).targeting(bears).resolve()).unwrap();
+        game.play([p1.cast(bolt).targeting(bears).end_turn(), p2.end_turn()])
+            .unwrap();
         assert_eq!(game.zone_of(bears), GRAVEYARD);
         assert!(!game.player(p2).cards(GRAVEYARD, GRIZZLY_BEARS).is_empty());
         let bolt = game
@@ -163,7 +165,7 @@ mod tests {
             .only()
             .unwrap();
         let murder = game.player(p1).cards(HAND, MURDER).only().unwrap();
-        game.play(p1.cast(murder).targeting(bears).resolve())
+        game.play([p1.cast(murder).targeting(bears).end_turn(), p2.end_turn()])
             .unwrap();
         assert_eq!(game.zone_of(bears), GRAVEYARD);
     }
@@ -180,8 +182,11 @@ mod tests {
             .only()
             .unwrap();
         let doom_blade = game.player(p1).cards(HAND, DOOM_BLADE).only().unwrap();
-        game.play(p1.cast(doom_blade).targeting(bears).resolve())
-            .unwrap();
+        game.play([
+            p1.cast(doom_blade).targeting(bears).end_turn(),
+            p2.end_turn(),
+        ])
+        .unwrap();
         assert_eq!(game.zone_of(bears), GRAVEYARD);
         assert!(!game.player(p2).cards(GRAVEYARD, GRIZZLY_BEARS).is_empty());
         let blade = game.player(p1).cards(GRAVEYARD, DOOM_BLADE).only().unwrap();

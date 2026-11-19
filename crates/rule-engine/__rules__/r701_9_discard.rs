@@ -92,7 +92,7 @@ mod tests {
             P2.hand([GRIZZLY_BEARS]),
         ]);
         let mind_rot = game.player(p1).cards(HAND, MIND_ROT).only().unwrap();
-        game.play(p1.cast(mind_rot).targeting(p2).resolve())
+        game.play([p1.cast(mind_rot).targeting(p2).end_turn(), p2.end_turn()])
             .unwrap();
         assert!(!game.player(p2).cards(GRAVEYARD, GRIZZLY_BEARS).is_empty());
     }
@@ -104,7 +104,7 @@ mod tests {
             P2.hand([GRIZZLY_BEARS, LIGHTNING_BOLT, MURDER]),
         ]);
         let mind_rot = game.player(p1).cards(HAND, MIND_ROT).only().unwrap();
-        game.play(p1.cast(mind_rot).targeting(p2).resolve())
+        game.play([p1.cast(mind_rot).targeting(p2).end_turn(), p2.end_turn()])
             .unwrap();
 
         let bears = game.player(p2).cards(HAND, GRIZZLY_BEARS).only().unwrap();
@@ -123,7 +123,7 @@ mod tests {
             P2.hand([GRIZZLY_BEARS]),
         ]);
         let mind_rot = game.player(p1).cards(HAND, MIND_ROT).only().unwrap();
-        game.play(p1.cast(mind_rot).targeting(p2).resolve())
+        game.play([p1.cast(mind_rot).targeting(p2).end_turn(), p2.end_turn()])
             .unwrap();
 
         assert_eq!(

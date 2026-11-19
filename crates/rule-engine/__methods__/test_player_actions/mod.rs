@@ -1,4 +1,4 @@
-mod from_caster_and_spell;
-mod steps;
-pub use from_caster_and_spell::from_caster_and_spell;
-pub use steps::steps;
+mod from_cast;
+mod of;
+pub use from_cast::from_cast;
+pub use of::of;

@@ -29,8 +29,11 @@ mod tests {
         let (mut game, [p1, p2]) =
             MockGame::new([P1.hand([SIGN_IN_BLOOD]).mana_pool(mana![B, B]), P2]);
         let sign_in_blood = game.player(p1).cards(HAND, SIGN_IN_BLOOD).only().unwrap();
-        game.play(p1.cast(sign_in_blood).targeting(p2).resolve())
-            .unwrap();
+        game.play([
+            p1.cast(sign_in_blood).targeting(p2).end_turn(),
+            p2.end_turn(),
+        ])
+        .unwrap();
         assert_eq!(game.life(p2), 18);
     }
 
@@ -44,8 +47,11 @@ mod tests {
             ]),
         ]);
         let sign_in_blood = game.player(p1).cards(HAND, SIGN_IN_BLOOD).only().unwrap();
-        game.play(p1.cast(sign_in_blood).targeting(p2).resolve())
-            .unwrap();
+        game.play([
+            p1.cast(sign_in_blood).targeting(p2).end_turn(),
+            p2.end_turn(),
+        ])
+        .unwrap();
 
         assert_eq!(game.life(p2), 18);
         assert_eq!(game.life(p1), 20);
@@ -55,7 +61,7 @@ mod tests {
 
     #[test]
     fn sign_in_blood_can_target_its_controller() {
-        let (mut game, [p1, ..]) = MockGame::new([
+        let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([SIGN_IN_BLOOD])
                 .library([
                     cards::CardDefinition::from(LIGHTNING_BOLT),
@@ -65,8 +71,11 @@ mod tests {
             P2,
         ]);
         let sign_in_blood = game.player(p1).cards(HAND, SIGN_IN_BLOOD).only().unwrap();
-        game.play(p1.cast(sign_in_blood).targeting(p1).resolve())
-            .unwrap();
+        game.play([
+            p1.cast(sign_in_blood).targeting(p1).end_turn(),
+            p2.end_turn(),
+        ])
+        .unwrap();
 
         assert_eq!(game.life(p1), 18);
         assert!(!game.player(p1).cards(HAND, LIGHTNING_BOLT).is_empty());
@@ -80,8 +89,11 @@ mod tests {
             P2.library([]),
         ]);
         let sign_in_blood = game.player(p1).cards(HAND, SIGN_IN_BLOOD).only().unwrap();
-        game.play(p1.cast(sign_in_blood).targeting(p2).resolve())
-            .unwrap();
+        game.play([
+            p1.cast(sign_in_blood).targeting(p2).end_turn(),
+            p2.end_turn(),
+        ])
+        .unwrap();
         assert!(game.app.world().get::<players::Lost>(*p2).is_some());
     }
 }

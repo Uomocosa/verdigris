@@ -1,9 +1,21 @@
 use bevy::prelude::Entity;
 
 use crate::actions;
+use crate::turns;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum PlayStep {
     Act(Entity, actions::Action),
-    PassPriorityAll,
+    AutoPass {
+        player: Entity,
+        until: AutoPassUntil,
+    },
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AutoPassUntil {
+    StepStarts(turns::Step),
+    NextStep,
+    NextPhase,
+    OwnNextTurn,
 }

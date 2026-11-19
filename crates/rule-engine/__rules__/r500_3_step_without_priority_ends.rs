@@ -48,9 +48,9 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let (mut game, [_, _]) = MockGame::new([P1, P2]);
+        let (mut game, [p1, p2]) = MockGame::new([P1, P2]);
 
-        game.end_turn();
+        game.play([p1.end_turn(), p2.end_turn()]).unwrap();
 
         assert_eq!(game.app.world().resource::<turns::Turn>().number, 2);
     }
@@ -59,7 +59,7 @@ mod tests {
     fn cleanup_ends_the_turn_and_the_next_player_becomes_active() {
         let (mut game, [p1, p2]) = MockGame::new([P1, P2]);
 
-        game.end_turn();
+        game.play([p1.end_turn(), p2.end_turn()]).unwrap();
 
         let turn = *game.app.world().resource::<turns::Turn>();
         let priority = *game.app.world().resource::<turns::Priority>();

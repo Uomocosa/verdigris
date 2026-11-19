@@ -1,15 +1,8 @@
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum Step {
-    Untap,
-    Upkeep,
-    Draw,
+pub enum Phase {
+    Beginning,
     PrecombatMain,
-    BeginningOfCombat,
-    DeclareAttackers,
-    DeclareBlockers,
-    CombatDamage,
-    EndOfCombat,
+    Combat,
     PostcombatMain,
-    End,
-    Cleanup,
+    Ending,
 }

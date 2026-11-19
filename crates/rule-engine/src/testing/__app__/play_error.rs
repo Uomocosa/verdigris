@@ -9,4 +9,26 @@ pub enum PlayError {
         step: testing::PlayStep,
         rejection: actions::Rejected,
     },
+    #[error("game stalled: too many passes without progress")]
+    Stalled,
+}
+
+impl PlayError {
+    #[must_use]
+    pub const fn rejection(&self) -> Option<&actions::Rejected> {
+        match self {
+            Self::Rejected { rejection, .. } => Some(rejection),
+            Self::Stalled => None,
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::PlayError;
+
+    #[test]
+    fn test_usage() {
+        assert!(PlayError::Stalled.rejection().is_none());
+    }
 }

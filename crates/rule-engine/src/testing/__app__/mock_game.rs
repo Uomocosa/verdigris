@@ -65,8 +65,6 @@ impl MockGame {
 
 #[atomic_delegates]
 impl MockGame {
-    pub fn end_turn(&mut self) {}
-
     #[must_use]
     pub fn p(&self, seat: usize) -> Entity {}
 
@@ -87,7 +85,7 @@ impl MockGame {
 
     pub fn play(
         &mut self,
-        casts: impl IntoIterator<Item = testing::TestPlayerActions>,
+        actions: impl IntoIterator<Item = testing::TestPlayerActions>,
     ) -> Result<(), testing::PlayError> {
     }
 }

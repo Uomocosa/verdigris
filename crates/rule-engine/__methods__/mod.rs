@@ -10,6 +10,8 @@ pub mod mana_pool;
 pub mod mock_game;
 #[cfg(feature = "testing")]
 pub mod mock_game_builder;
+#[cfg(feature = "testing")]
+pub mod pass_budget;
 pub mod player_ref;
 pub mod rules_plugin;
 #[cfg(feature = "testing")]

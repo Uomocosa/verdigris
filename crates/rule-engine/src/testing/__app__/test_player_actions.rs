@@ -1,48 +1,83 @@
 use atomic_delegate_macros::atomic_delegates;
 use bevy::prelude::Entity;
 
+use crate::actions;
 use crate::testing;
+use crate::turns;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TestPlayerActions {
-    pub(crate) caster: Entity,
-    pub(crate) spell: Entity,
-    pub(crate) targets: Vec<Entity>,
-    pub(crate) should_resolve: bool,
+    pub(crate) player: testing::TestPlayer,
+    pub(crate) steps: Vec<testing::PlayStep>,
 }
 
 #[atomic_delegates]
 impl TestPlayerActions {
     #[must_use]
-    pub(crate) const fn from_caster_and_spell(caster: Entity, spell: Entity) -> Self {}
-}
+    pub const fn of(player: testing::TestPlayer) -> Self {}
 
-#[rustfmt::skip]
-impl IntoIterator for TestPlayerActions {
-    type Item = Self;
-    type IntoIter = std::iter::Once<Self>;
-
-    fn into_iter(self) -> Self::IntoIter { std::iter::once(self) }
+    #[must_use]
+    pub fn from_cast(player: testing::TestPlayer, spell: Entity) -> Self {}
 }
 
 impl TestPlayerActions {
     #[must_use]
-    pub fn targeting(mut self, targets: impl Into<testing::Targets>) -> Self {
-        self.targets = targets.into().into_entities();
-        self
+    pub fn targeting(self, targets: impl Into<testing::Targets>) -> Self {
+        let step = testing::PlayStep::Act(
+            *self.player,
+            actions::Action::ChooseTargets(targets.into().into_entities()),
+        );
+        self.with_step(step)
     }
 
     #[must_use]
-    pub const fn resolve(mut self) -> Self {
-        self.should_resolve = true;
-        self
+    pub fn pass_priority(self) -> Self {
+        let step = testing::PlayStep::Act(*self.player, actions::Action::PassPriority);
+        self.with_step(step)
+    }
+
+    #[must_use]
+    pub fn pass_to(self, step: turns::Step) -> Self {
+        let player = *self.player;
+        self.with_step(testing::PlayStep::AutoPass {
+            player,
+            until: testing::AutoPassUntil::StepStarts(step),
+        })
+    }
+
+    #[must_use]
+    pub fn end_current_step(self) -> Self {
+        let player = *self.player;
+        self.with_step(testing::PlayStep::AutoPass {
+            player,
+            until: testing::AutoPassUntil::NextStep,
+        })
+    }
+
+    #[must_use]
+    pub fn end_phase(self) -> Self {
+        let player = *self.player;
+        self.with_step(testing::PlayStep::AutoPass {
+            player,
+            until: testing::AutoPassUntil::NextPhase,
+        })
+    }
+
+    #[must_use]
+    pub fn end_turn(self) -> Self {
+        let player = *self.player;
+        self.with_step(testing::PlayStep::AutoPass {
+            player,
+            until: testing::AutoPassUntil::OwnNextTurn,
+        })
     }
 }
 
-#[atomic_delegates]
 impl TestPlayerActions {
-    #[must_use]
-    pub fn steps(&self) -> Vec<testing::PlayStep> {}
+    pub(crate) fn with_step(mut self, step: testing::PlayStep) -> Self {
+        self.steps.push(step);
+        self
+    }
 }
 
 #[cfg(test)]
@@ -51,6 +86,9 @@ mod tests {
 
     use crate::actions;
     use crate::testing;
+    use crate::turns;
+
+    use super::TestPlayerActions;
 
     #[test]
     fn test_usage() {
@@ -59,18 +97,26 @@ mod tests {
         let spell = world.spawn_empty().id();
         let target = world.spawn_empty().id();
 
-        let cast = testing::TestPlayer(caster)
+        let actions = testing::TestPlayer(caster)
             .cast(spell)
             .targeting(target)
-            .resolve();
+            .pass_to(turns::Step::PostcombatMain);
 
         assert_eq!(
-            cast.steps(),
+            actions.steps,
             vec![
                 testing::PlayStep::Act(caster, actions::Action::Cast(spell)),
                 testing::PlayStep::Act(caster, actions::Action::ChooseTargets(vec![target])),
-                testing::PlayStep::PassPriorityAll,
+                testing::PlayStep::AutoPass {
+                    player: caster,
+                    until: testing::AutoPassUntil::StepStarts(turns::Step::PostcombatMain),
+                },
             ]
+        );
+
+        assert_eq!(
+            TestPlayerActions::of(testing::TestPlayer(caster)).steps,
+            Vec::new()
         );
     }
 }

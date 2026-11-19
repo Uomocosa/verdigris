@@ -1,5 +1,6 @@
 use crate::cards;
 use crate::effects;
+use crate::turns;
 use crate::zones;
 
 pub const YOU: effects::PlayerRef = effects::PlayerRef::You;
@@ -12,6 +13,19 @@ pub const GRAVEYARD: zones::Zone = zones::Zone::Graveyard;
 pub const LIBRARY: zones::Zone = zones::Zone::Library;
 pub const EXILE: zones::Zone = zones::Zone::Exile;
 pub const STACK: zones::Zone = zones::Zone::Stack;
+
+pub const UNTAP: turns::Step = turns::Step::Untap;
+pub const UPKEEP: turns::Step = turns::Step::Upkeep;
+pub const DRAW: turns::Step = turns::Step::Draw;
+pub const MAIN_1: turns::Step = turns::Step::PrecombatMain;
+pub const BEGINNING_OF_COMBAT: turns::Step = turns::Step::BeginningOfCombat;
+pub const DECLARE_ATTACKERS: turns::Step = turns::Step::DeclareAttackers;
+pub const DECLARE_BLOCKERS: turns::Step = turns::Step::DeclareBlockers;
+pub const COMBAT_DAMAGE: turns::Step = turns::Step::CombatDamage;
+pub const END_OF_COMBAT: turns::Step = turns::Step::EndOfCombat;
+pub const MAIN_2: turns::Step = turns::Step::PostcombatMain;
+pub const END: turns::Step = turns::Step::End;
+pub const CLEANUP: turns::Step = turns::Step::Cleanup;
 
 pub const CREATURE: effects::Filter = effects::Filter {
     kind: effects::FilterKind::Creature,
