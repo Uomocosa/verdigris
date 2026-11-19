@@ -123,7 +123,10 @@ mod tests {
         assert_eq!(turn.number, 1);
         assert_eq!(turn.active, game.p1);
         assert_eq!(turn.phase, turns::Phase::PrecombatMain);
-        assert_eq!(**game.app.world().resource::<turns::Priority>(), game.p1);
+        assert_eq!(
+            game.app.world().resource::<turns::Priority>().player,
+            game.p1
+        );
     }
 
     #[test]
@@ -159,7 +162,10 @@ mod tests {
         assert_eq!(turn.number, 3);
         assert_eq!(turn.active, game.p(2));
         assert_eq!(turn.phase, turns::Phase::PostcombatMain);
-        assert_eq!(**game.app.world().resource::<turns::Priority>(), game.p(2));
+        assert_eq!(
+            game.app.world().resource::<turns::Priority>().player,
+            game.p(2)
+        );
     }
 
     #[test]

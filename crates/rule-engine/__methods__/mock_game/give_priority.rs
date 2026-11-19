@@ -4,9 +4,10 @@ use crate::testing;
 use crate::turns;
 
 pub fn give_priority(game: &mut testing::MockGame, player: Entity) {
-    game.app
-        .world_mut()
-        .insert_resource(turns::Priority(player));
+    game.app.world_mut().insert_resource(turns::Priority {
+        player,
+        consecutive_passes: 0,
+    });
 }
 
 #[cfg(test)]
@@ -21,6 +22,6 @@ mod tests {
         let mut game = testing::MockGame::builder().build();
         let p2 = game.p2;
         give_priority(&mut game, p2);
-        assert_eq!(**game.app.world().resource::<turns::Priority>(), p2);
+        assert_eq!(game.app.world().resource::<turns::Priority>().player, p2);
     }
 }

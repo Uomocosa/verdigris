@@ -27,7 +27,7 @@ pub fn r601_2a_cast(
             continue;
         };
         let spell = *spell;
-        if action.player != **priority {
+        if action.player != priority.player {
             rejected.write(actions::Rejected::CannotCast { spell });
             continue;
         }

@@ -109,7 +109,11 @@ pub fn build(builder: &testing::MockGameBuilder) -> testing::MockGame {
         active,
         phase: builder.phase,
     });
-    app.insert_resource(turns::Priority(active));
+    app.insert_resource(turns::Priority {
+        player: active,
+        consecutive_passes: 0,
+    });
+    app.insert_resource(turns::TurnOrder::from(players.clone()));
 
     let p1 = players.first().copied().unwrap_or(Entity::PLACEHOLDER);
     let p2 = players.get(1).copied().unwrap_or(Entity::PLACEHOLDER);

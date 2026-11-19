@@ -1,5 +1,4 @@
 use bevy::prelude::{Entity, Resource};
-use derive_more::Deref;
 
 use crate::turns;
 
@@ -10,5 +9,8 @@ pub struct Turn {
     pub phase: turns::Phase,
 }
 
-#[derive(Resource, Debug, Clone, Copy, PartialEq, Eq, Deref)]
-pub struct Priority(pub Entity);
+#[derive(Resource, Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Priority {
+    pub player: Entity,
+    pub consecutive_passes: u32,
+}
