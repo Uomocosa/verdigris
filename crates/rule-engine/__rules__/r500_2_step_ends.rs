@@ -46,9 +46,9 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let (mut game, [_, _]) = MockGame::new([P1, P2]);
+        let (mut game, [p1, p2]) = MockGame::new([P1, P2]);
 
-        game.pass_priority_all();
+        game.play([p1.pass_priority(), p2.pass_priority()]).unwrap();
 
         assert_eq!(
             game.app.world().resource::<turns::Turn>().step,
@@ -58,9 +58,9 @@ mod tests {
 
     #[test]
     fn all_players_passing_with_an_empty_stack_ends_the_step() {
-        let (mut game, [p1, ..]) = MockGame::new([P1, P2]);
+        let (mut game, [p1, p2]) = MockGame::new([P1, P2]);
 
-        game.pass_priority_all();
+        game.play([p1.pass_priority(), p2.pass_priority()]).unwrap();
 
         let priority = *game.app.world().resource::<turns::Priority>();
         let turn = *game.app.world().resource::<turns::Turn>();

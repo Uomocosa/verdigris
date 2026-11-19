@@ -52,8 +52,8 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let (mut game, [_, p2]) = MockGame::new([P1, P2]);
-        game.pass_priority();
+        let (mut game, [p1, p2]) = MockGame::new([P1, P2]);
+        game.play([p1.pass_priority()]).unwrap();
         assert_eq!(game.app.world().resource::<turns::Priority>().player, p2);
     }
 
@@ -61,7 +61,7 @@ mod tests {
     fn passing_moves_priority_to_the_next_player_in_turn_order() {
         let (mut game, [p1, p2]) = MockGame::new([P1, P2]);
 
-        game.pass_priority();
+        game.play([p1.pass_priority()]).unwrap();
 
         let priority = *game.app.world().resource::<turns::Priority>();
         assert_eq!(priority.player, p2);
@@ -71,23 +71,23 @@ mod tests {
 
     #[test]
     fn a_four_player_game_passes_priority_in_a_ring() {
-        let (mut game, [_, p2, p3, p4]) = MockGame::new([P1, P2, P3, P4]);
+        let (mut game, [p1, p2, p3, p4]) = MockGame::new([P1, P2, P3, P4]);
         let expected = [p2, p3, p4];
+        let holders = [p1, p2, p3];
 
-        for next in expected {
-            game.pass_priority();
+        for (holder, next) in holders.into_iter().zip(expected) {
+            game.play([holder.pass_priority()]).unwrap();
             assert_eq!(game.app.world().resource::<turns::Priority>().player, next);
         }
     }
 
     #[test]
     fn the_caster_keeps_priority_after_casting_a_spell() {
-        let (mut game, [_, p2]) =
+        let (mut game, [p1, p2]) =
             MockGame::new([P1, P2.hand([LIGHTNING_BOLT]).mana_pool(mana![R])]);
         let bolt = game.player(p2).cards(HAND, LIGHTNING_BOLT).only().unwrap();
 
-        game.pass_priority();
-        game.act(p2, actions::Action::Cast(bolt));
+        game.play([p1.pass_priority(), p2.cast(bolt)]).unwrap();
 
         let priority = *game.app.world().resource::<turns::Priority>();
         assert_eq!(priority.player, p2);
@@ -98,10 +98,10 @@ mod tests {
     fn a_player_without_priority_cannot_pass() {
         let (mut game, [p1, p2]) = MockGame::new([P1, P2]);
 
-        game.act(p2, actions::Action::PassPriority);
+        let err = game.play([p2.pass_priority()]).unwrap_err();
 
         assert_eq!(
-            game.last_rejection(),
+            err.rejection(),
             Some(&actions::Rejected::NoPriority { player: *p2 })
         );
         assert_eq!(game.app.world().resource::<turns::Priority>().player, p1);

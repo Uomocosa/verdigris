@@ -31,7 +31,6 @@ pub fn r701_6_counter(
 
 #[cfg(test)]
 mod tests {
-    use crate::actions;
     use crate::mana;
     use crate::testing::*;
     use crate::{GRAVEYARD, HAND};
@@ -45,12 +44,12 @@ mod tests {
         let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
         let cancel = game.player(p2).cards(HAND, CANCEL).only().unwrap();
 
-        game.act(p1, actions::Action::Cast(bolt));
-        game.act(p1, actions::Action::ChooseTargets(vec![*p2]));
-        game.pass_priority();
-        game.act(p2, actions::Action::Cast(cancel));
-        game.act(p2, actions::Action::ChooseTargets(vec![bolt]));
-        game.pass_priority_all();
+        game.play([
+            p1.cast(bolt).targeting(p2).pass_priority(),
+            p2.cast(cancel).targeting(bolt).pass_priority(),
+            p1.pass_priority(),
+        ])
+        .unwrap();
 
         assert_eq!(game.life(p2), 20);
         assert_eq!(game.zone_of(bolt), GRAVEYARD);
@@ -66,11 +65,12 @@ mod tests {
         let bears = game.player(p1).cards(HAND, GRIZZLY_BEARS).only().unwrap();
         let scatter = game.player(p2).cards(HAND, ESSENCE_SCATTER).only().unwrap();
 
-        game.act(p1, actions::Action::Cast(bears));
-        game.pass_priority();
-        game.act(p2, actions::Action::Cast(scatter));
-        game.act(p2, actions::Action::ChooseTargets(vec![bears]));
-        game.pass_priority_all();
+        game.play([
+            p1.cast(bears).pass_priority(),
+            p2.cast(scatter).targeting(bears).pass_priority(),
+            p1.pass_priority(),
+        ])
+        .unwrap();
 
         assert_eq!(game.zone_of(bears), GRAVEYARD);
         assert_eq!(game.zone_of(scatter), GRAVEYARD);
@@ -85,12 +85,12 @@ mod tests {
         let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
         let negate = game.player(p2).cards(HAND, NEGATE).only().unwrap();
 
-        game.act(p1, actions::Action::Cast(bolt));
-        game.act(p1, actions::Action::ChooseTargets(vec![*p2]));
-        game.pass_priority();
-        game.act(p2, actions::Action::Cast(negate));
-        game.act(p2, actions::Action::ChooseTargets(vec![bolt]));
-        game.pass_priority_all();
+        game.play([
+            p1.cast(bolt).targeting(p2).pass_priority(),
+            p2.cast(negate).targeting(bolt).pass_priority(),
+            p1.pass_priority(),
+        ])
+        .unwrap();
 
         assert_eq!(game.life(p2), 20);
         assert_eq!(game.zone_of(bolt), GRAVEYARD);
@@ -107,20 +107,17 @@ mod tests {
         let dispel = game.player(p1).cards(HAND, DISPEL).only().unwrap();
         let cancel = game.player(p2).cards(HAND, CANCEL).only().unwrap();
 
-        game.act(p1, actions::Action::Cast(bolt));
-        game.act(p1, actions::Action::ChooseTargets(vec![*p2]));
-        game.pass_priority();
-        game.act(p2, actions::Action::Cast(cancel));
-        game.act(p2, actions::Action::ChooseTargets(vec![bolt]));
-        game.pass_priority();
-        game.act(p1, actions::Action::Cast(dispel));
-        game.act(p1, actions::Action::ChooseTargets(vec![cancel]));
-
-        game.pass_priority_all();
+        game.play([
+            p1.cast(bolt).targeting(p2).pass_priority(),
+            p2.cast(cancel).targeting(bolt).pass_priority(),
+            p1.cast(dispel).targeting(cancel).pass_priority(),
+            p2.pass_priority(),
+        ])
+        .unwrap();
         assert_eq!(game.zone_of(cancel), GRAVEYARD);
         assert_eq!(game.life(p2), 20);
 
-        game.pass_priority_all();
+        game.play([p1.pass_priority(), p2.pass_priority()]).unwrap();
         assert_eq!(game.life(p2), 17);
         assert_eq!(game.zone_of(bolt), GRAVEYARD);
         assert_eq!(game.zone_of(dispel), GRAVEYARD);
@@ -137,20 +134,17 @@ mod tests {
         let p1_cancel = game.player(p1).cards(HAND, CANCEL).only().unwrap();
         let p2_cancel = game.player(p2).cards(HAND, CANCEL).only().unwrap();
 
-        game.act(p1, actions::Action::Cast(bolt));
-        game.act(p1, actions::Action::ChooseTargets(vec![*p2]));
-        game.pass_priority();
-        game.act(p2, actions::Action::Cast(p2_cancel));
-        game.act(p2, actions::Action::ChooseTargets(vec![bolt]));
-        game.pass_priority();
-        game.act(p1, actions::Action::Cast(p1_cancel));
-        game.act(p1, actions::Action::ChooseTargets(vec![p2_cancel]));
-
-        game.pass_priority_all();
+        game.play([
+            p1.cast(bolt).targeting(p2).pass_priority(),
+            p2.cast(p2_cancel).targeting(bolt).pass_priority(),
+            p1.cast(p1_cancel).targeting(p2_cancel).pass_priority(),
+            p2.pass_priority(),
+        ])
+        .unwrap();
         assert_eq!(game.zone_of(p2_cancel), GRAVEYARD);
         assert_eq!(game.life(p2), 20);
 
-        game.pass_priority_all();
+        game.play([p1.pass_priority(), p2.pass_priority()]).unwrap();
         assert_eq!(game.life(p2), 17);
         assert_eq!(game.zone_of(bolt), GRAVEYARD);
         assert_eq!(game.zone_of(p1_cancel), GRAVEYARD);

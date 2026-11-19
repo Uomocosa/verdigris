@@ -44,7 +44,6 @@ pub fn r117_4_priority(
 
 #[cfg(test)]
 mod tests {
-    use crate::actions;
     use crate::mana;
     use crate::testing::*;
     use crate::turns;
@@ -55,10 +54,11 @@ mod tests {
         let (mut game, [p1, p2]) =
             MockGame::new([P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]), P2]);
         let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
-        game.act(p1, actions::Action::Cast(bolt));
-        game.act(p1, actions::Action::ChooseTargets(vec![*p2]));
-        game.pass_priority();
-        game.pass_priority();
+        game.play([
+            p1.cast(bolt).targeting(p2).pass_priority(),
+            p2.pass_priority(),
+        ])
+        .unwrap();
         assert_eq!(game.zone_of(bolt), GRAVEYARD);
     }
 
@@ -70,14 +70,13 @@ mod tests {
             P2,
         ]);
         let first = game.player(p1).cards(HAND, LIGHTNING_BOLT).first().unwrap();
-        game.act(p1, actions::Action::Cast(first));
-        game.act(p1, actions::Action::ChooseTargets(vec![*p2]));
-        let second = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
-        game.act(p1, actions::Action::Cast(second));
-        game.act(p1, actions::Action::ChooseTargets(vec![*p2]));
-
-        game.pass_priority();
-        game.pass_priority();
+        let second = game.player(p1).cards(HAND, LIGHTNING_BOLT).nth(1).unwrap();
+        game.play([
+            p1.cast(first).targeting(p2),
+            p1.cast(second).targeting(p2).pass_priority(),
+            p2.pass_priority(),
+        ])
+        .unwrap();
 
         assert_eq!(game.zone_of(second), GRAVEYARD);
         assert_eq!(game.zone_of(first), STACK);
@@ -89,12 +88,11 @@ mod tests {
         let (mut game, [p1, p2]) =
             MockGame::new([P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]), P2]);
         let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
-        game.act(p1, actions::Action::Cast(bolt));
-        game.act(p1, actions::Action::ChooseTargets(vec![*p2]));
+        game.play([p1.cast(bolt).targeting(p2).pass_priority()])
+            .unwrap();
 
-        game.pass_priority();
         assert_ne!(game.app.world().resource::<turns::Priority>().player, p1);
-        game.pass_priority();
+        game.play([p2.pass_priority()]).unwrap();
 
         let priority = *game.app.world().resource::<turns::Priority>();
         assert_eq!(priority.player, p1);
