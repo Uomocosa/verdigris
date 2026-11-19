@@ -24,6 +24,9 @@ impl MockGame {
 impl MockGame {
     #[must_use]
     pub fn builder() -> testing::MockGameBuilder { testing::MockGameBuilder::default() }
+
+    #[must_use]
+    pub fn player(&self, player: Entity) -> testing::PlayerView<'_> { testing::PlayerView::from_game_and_player(self, player) }
 }
 
 impl MockGame {
@@ -81,6 +84,17 @@ impl MockGame {
 
     #[must_use]
     pub fn mana_pool(&self, player: Entity) -> cards::ManaPool {}
+}
+
+#[atomic_delegates]
+impl MockGame {
+    pub(crate) fn entities_in_zone_matching_card(
+        &self,
+        player: Entity,
+        zone: zones::Zone,
+        name: &str,
+    ) -> Vec<Entity> {
+    }
 }
 
 #[cfg(test)]

@@ -1,4 +1,6 @@
 pub mod card_definition;
+#[cfg(feature = "testing")]
+pub mod cards;
 pub mod effect;
 #[cfg(feature = "testing")]
 pub mod expected_targets;

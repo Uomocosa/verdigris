@@ -1,4 +1,5 @@
 mod end_turn;
+mod entities_in_zone_matching_card;
 mod find;
 mod last_rejection;
 mod life;
@@ -7,6 +8,7 @@ mod p;
 mod target_choice;
 mod zone_of;
 pub use end_turn::end_turn;
+pub use entities_in_zone_matching_card::entities_in_zone_matching_card;
 pub use find::find;
 pub use last_rejection::last_rejection;
 pub use life::life;

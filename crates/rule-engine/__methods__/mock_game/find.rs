@@ -1,6 +1,5 @@
 use bevy::prelude::Entity;
 
-use crate::cards;
 use crate::testing;
 use crate::zones;
 
@@ -10,29 +9,9 @@ pub fn find(
     zone: zones::Zone,
     name: &str,
 ) -> Option<Entity> {
-    let world = game.app.world();
-    let zone_entity = world
-        .iter_entities()
-        .find(|entity| {
-            entity
-                .get::<zones::Zone>()
-                .is_some_and(|found| *found == zone)
-                && entity
-                    .get::<cards::Owner>()
-                    .is_some_and(|owner| **owner == player)
-        })
-        .map(|entity| entity.id())?;
-    world
-        .iter_entities()
-        .find(|entity| {
-            entity
-                .get::<zones::InZone>()
-                .is_some_and(|in_zone| **in_zone == zone_entity)
-                && entity
-                    .get::<cards::CardDefinition>()
-                    .is_some_and(|definition| definition.name.as_str() == name)
-        })
-        .map(|entity| entity.id())
+    game.entities_in_zone_matching_card(player, zone, name)
+        .into_iter()
+        .next()
 }
 
 #[cfg(test)]
@@ -44,7 +23,7 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let (game, [p1, ..]) = MockGame::new([P1.hand([lightning_bolt()]), P2]);
+        let (game, [p1, ..]) = MockGame::new([P1.hand([LIGHTNING_BOLT]), P2]);
         let found = find(&game, p1, HAND, "Lightning Bolt");
         assert!(found.is_some());
         assert!(find(&game, p1, HAND, "Murder").is_none());
