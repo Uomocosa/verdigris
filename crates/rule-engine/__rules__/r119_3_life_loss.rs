@@ -19,32 +19,18 @@ pub fn r119_3_life_loss(
 #[cfg(test)]
 mod tests {
     use crate::HAND;
-    use bevy::prelude::Entity;
-
-    use crate::actions;
     use crate::mana;
     use crate::players;
+    use crate::testing::traits::Caster;
     use crate::testing::*;
-
-    fn cast_and_resolve(
-        game: &mut MockGame,
-        caster: Entity,
-        spell_name: &str,
-        target: Option<Entity>,
-    ) {
-        let spell = game.find(caster, HAND, spell_name).unwrap();
-        game.act(caster, actions::Action::Cast(spell));
-        if let Some(target) = target {
-            game.act(caster, actions::Action::ChooseTargets(vec![target]));
-        }
-        game.pass_priority_all();
-    }
 
     #[test]
     fn test_usage() {
         let (mut game, [p1, p2]) =
             MockGame::new([P1.hand([sign_in_blood()]).mana_pool(mana![B, B]), P2]);
-        cast_and_resolve(&mut game, p1, "Sign in Blood", Some(p2));
+        let sign_in_blood = game.player(p1).cards(HAND, SIGN_IN_BLOOD).only().unwrap();
+        game.play(p1.cast(sign_in_blood).targeting(p2).resolve())
+            .unwrap();
         assert_eq!(game.life(p2), 18);
     }
 
@@ -54,7 +40,9 @@ mod tests {
             P1.hand([sign_in_blood()]).mana_pool(mana![B, B]),
             P2.library([lightning_bolt(), murder()]),
         ]);
-        cast_and_resolve(&mut game, p1, "Sign in Blood", Some(p2));
+        let sign_in_blood = game.player(p1).cards(HAND, SIGN_IN_BLOOD).only().unwrap();
+        game.play(p1.cast(sign_in_blood).targeting(p2).resolve())
+            .unwrap();
 
         assert_eq!(game.life(p2), 18);
         assert_eq!(game.life(p1), 20);
@@ -70,7 +58,9 @@ mod tests {
                 .mana_pool(mana![B, B]),
             P2,
         ]);
-        cast_and_resolve(&mut game, p1, "Sign in Blood", Some(p1));
+        let sign_in_blood = game.player(p1).cards(HAND, SIGN_IN_BLOOD).only().unwrap();
+        game.play(p1.cast(sign_in_blood).targeting(p1).resolve())
+            .unwrap();
 
         assert_eq!(game.life(p1), 18);
         assert!(game.find(p1, HAND, "Lightning Bolt").is_some());
@@ -83,7 +73,9 @@ mod tests {
             P1.hand([sign_in_blood()]).mana_pool(mana![B, B]),
             P2.library([]),
         ]);
-        cast_and_resolve(&mut game, p1, "Sign in Blood", Some(p2));
+        let sign_in_blood = game.player(p1).cards(HAND, SIGN_IN_BLOOD).only().unwrap();
+        game.play(p1.cast(sign_in_blood).targeting(p2).resolve())
+            .unwrap();
         assert!(game.app.world().get::<players::Lost>(p2).is_some());
     }
 }

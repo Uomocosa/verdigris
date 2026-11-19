@@ -115,30 +115,17 @@ pub fn r608_2_resolve(
 
 #[cfg(test)]
 mod tests {
-    use crate::actions;
     use crate::mana;
+    use crate::testing::traits::Caster;
     use crate::testing::*;
     use crate::{BATTLEFIELD, GRAVEYARD, HAND};
-
-    fn cast_and_resolve(
-        game: &mut MockGame,
-        caster: bevy::prelude::Entity,
-        spell_name: &str,
-        target: Option<bevy::prelude::Entity>,
-    ) {
-        let spell = game.find(caster, HAND, spell_name).unwrap();
-        game.act(caster, actions::Action::Cast(spell));
-        if let Some(target) = target {
-            game.act(caster, actions::Action::ChooseTargets(vec![target]));
-        }
-        game.pass_priority_all();
-    }
 
     #[test]
     fn test_usage() {
         let (mut game, [p1, p2]) =
             MockGame::new([P1.hand([lightning_bolt()]).mana_pool(mana![R]), P2]);
-        cast_and_resolve(&mut game, p1, "Lightning Bolt", Some(p2));
+        let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
+        game.play(p1.cast(bolt).targeting(p2).resolve()).unwrap();
         assert_eq!(game.life(p2), 17);
     }
 
@@ -149,7 +136,8 @@ mod tests {
             P2.battlefield([grizzly_bears()]),
         ]);
         let bears = game.find(p2, BATTLEFIELD, "Grizzly Bears").unwrap();
-        cast_and_resolve(&mut game, p1, "Lightning Bolt", Some(bears));
+        let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
+        game.play(p1.cast(bolt).targeting(bears).resolve()).unwrap();
         assert_eq!(game.zone_of(bears), GRAVEYARD);
         assert!(game.find(p2, GRAVEYARD, "Grizzly Bears").is_some());
         let bolt = game.find(p1, GRAVEYARD, "Lightning Bolt").unwrap();
@@ -163,7 +151,9 @@ mod tests {
             P2.battlefield([grizzly_bears()]),
         ]);
         let bears = game.find(p2, BATTLEFIELD, "Grizzly Bears").unwrap();
-        cast_and_resolve(&mut game, p1, "Murder", Some(bears));
+        let murder = game.player(p1).cards(HAND, MURDER).only().unwrap();
+        game.play(p1.cast(murder).targeting(bears).resolve())
+            .unwrap();
         assert_eq!(game.zone_of(bears), GRAVEYARD);
     }
 
@@ -174,7 +164,9 @@ mod tests {
             P2.battlefield([grizzly_bears()]),
         ]);
         let bears = game.find(p2, BATTLEFIELD, "Grizzly Bears").unwrap();
-        cast_and_resolve(&mut game, p1, "Doom Blade", Some(bears));
+        let doom_blade = game.player(p1).cards(HAND, DOOM_BLADE).only().unwrap();
+        game.play(p1.cast(doom_blade).targeting(bears).resolve())
+            .unwrap();
         assert_eq!(game.zone_of(bears), GRAVEYARD);
         assert!(game.find(p2, GRAVEYARD, "Grizzly Bears").is_some());
         let blade = game.find(p1, GRAVEYARD, "Doom Blade").unwrap();
