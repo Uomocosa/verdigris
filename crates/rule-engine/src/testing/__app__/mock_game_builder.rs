@@ -1,0 +1,102 @@
+use std::collections::BTreeMap;
+
+use atomic_delegate_macros::atomic_delegates;
+
+use crate::cards;
+use crate::testing;
+use crate::turns;
+
+pub struct MockGameBuilder {
+    pub(crate) player_count: usize,
+    pub(crate) turn_number: u32,
+    pub(crate) active: testing::Seat,
+    pub(crate) phase: turns::Phase,
+    pub(crate) hands: BTreeMap<testing::Seat, Vec<cards::CardDefinition>>,
+    pub(crate) battlefields: BTreeMap<testing::Seat, Vec<cards::CardDefinition>>,
+    pub(crate) libraries: BTreeMap<testing::Seat, Vec<cards::CardDefinition>>,
+    pub(crate) mana_pools: BTreeMap<testing::Seat, cards::ManaPool>,
+}
+
+impl Default for MockGameBuilder {
+    fn default() -> Self {
+        Self {
+            player_count: 2,
+            turn_number: 1,
+            active: testing::Seat::P1,
+            phase: turns::Phase::PrecombatMain,
+            hands: BTreeMap::new(),
+            battlefields: BTreeMap::new(),
+            libraries: BTreeMap::new(),
+            mana_pools: BTreeMap::new(),
+        }
+    }
+}
+
+impl MockGameBuilder {
+    #[must_use]
+    pub const fn players(mut self, count: usize) -> Self {
+        self.player_count = count;
+        self
+    }
+
+    #[must_use]
+    pub fn hand(
+        mut self,
+        seat: testing::Seat,
+        definitions: impl IntoIterator<Item = cards::CardDefinition>,
+    ) -> Self {
+        self.hands.entry(seat).or_default().extend(definitions);
+        self
+    }
+
+    #[must_use]
+    pub fn battlefield(
+        mut self,
+        seat: testing::Seat,
+        definitions: impl IntoIterator<Item = cards::CardDefinition>,
+    ) -> Self {
+        self.battlefields
+            .entry(seat)
+            .or_default()
+            .extend(definitions);
+        self
+    }
+
+    #[must_use]
+    pub fn library(
+        mut self,
+        seat: testing::Seat,
+        definitions: impl IntoIterator<Item = cards::CardDefinition>,
+    ) -> Self {
+        self.libraries
+            .insert(seat, definitions.into_iter().collect());
+        self
+    }
+
+    #[must_use]
+    pub fn mana_pool(mut self, seat: testing::Seat, pool: cards::ManaPool) -> Self {
+        self.mana_pools.insert(seat, pool);
+        self
+    }
+}
+
+#[atomic_delegates]
+impl MockGameBuilder {
+    #[must_use]
+    pub fn turn(self, number: u32, active: testing::Seat, phase: turns::Phase) -> Self {}
+
+    #[must_use]
+    pub fn build(&self) -> testing::MockGame {}
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::testing;
+
+    #[test]
+    fn test_usage() {
+        let game = testing::MockGame::builder().players(3).build();
+        assert_eq!(game.life(game.p1), 20);
+        assert_eq!(game.life(game.p(3)), 20);
+    }
+}

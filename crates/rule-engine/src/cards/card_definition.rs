@@ -1,9 +1,10 @@
 use atomic_delegate_macros::atomic_delegates;
+use bevy::prelude::Component;
 
 use crate::cards;
 use crate::effects;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Component, Debug, Clone, PartialEq, Eq)]
 pub struct CardDefinition {
     pub name: cards::CardName,
     pub cost: cards::Cost,

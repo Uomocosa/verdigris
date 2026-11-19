@@ -1,6 +1,8 @@
+use bevy::prelude::Component;
+
 use crate::cards;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+#[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct ManaPool {
     pub white: u32,
     pub blue: u32,

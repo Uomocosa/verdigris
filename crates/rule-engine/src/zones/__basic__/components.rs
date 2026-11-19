@@ -1,7 +1,7 @@
 use bevy::prelude::{Component, Entity};
 use derive_more::Deref;
 
-#[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Component, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum Zone {
     Library,
     Hand,
