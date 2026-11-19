@@ -47,8 +47,10 @@ If a git hook fails, stop and report the root cause; never use `--no-verify`.
 4. Game state is absolute: a real card is in a real zone entity (`InZone(zone)` + `Owner(player)`), never a relative zone.
 5. A rule system only reads world state and writes messages/choices/components. No time, no randomness except a seeded `GameRng` resource, no input.
 6. Tests are mainly `MockGame` scenarios: defaults are 2 players, 20 life, 12 Grizzly Bears in each library, empty hand/graveyard/battlefield, turn 1 P1 precombat main. Tests override only what differs, perform player actions, and assert each state. Every behaviour change starts with a red MockGame test, named after the rule it checks.
-7. Test cards use their real MTG names and real Oracle text (Grizzly Bears, Lightning Bolt, Murder).
-8. verdigris-lint logic waits for the user's explicit go.
+7. Tests drive the game only through `MockGame` builder setup and player actions (`act`, `pass_priority`, `pass_priority_all`, `end_turn`). They never write messages or insert or change components with `app.world_mut()`; reading components in asserts is fine. When no action can reach a state yet, write the test as the real scenario and mark it `#[ignore = "needs <feature>: <why>"]`, never `todo!()`, a comment or a log. The one accepted exception is `r608_2b_illegal_targets.rs`.
+8. One behaviour, one test: before adding a test, search for an existing test of the same scenario; keep only one, preferably the one named after the rule.
+9. Test cards use their real MTG names and real Oracle text (Grizzly Bears, Lightning Bolt, Murder).
+10. verdigris-lint logic waits for the user's explicit go.
 
 ## Shared work directory
 
