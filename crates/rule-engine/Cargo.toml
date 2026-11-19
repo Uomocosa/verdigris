@@ -1,0 +1,12 @@
+[package]
+name = "verdigris-rule-engine"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Headless MTG Comprehensive Rules enforcer"
+
+[lints]
+workspace = true
+
+[dependencies]
+bevy.workspace = true

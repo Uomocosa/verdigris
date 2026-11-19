@@ -1,0 +1,11 @@
+[package]
+name = "verdigris-lint"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Verdigris rules for lele-lint"
+
+[lints]
+workspace = true
+
+[dependencies]

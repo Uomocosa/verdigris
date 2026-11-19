@@ -1,0 +1,59 @@
+[workspace]
+resolver = "3"
+members = [
+    "crates/rule-engine",
+    "crates/parser",
+    "crates/game",
+    "crates/verdigris-lint",
+]
+
+[workspace.package]
+edition = "2024"
+license = "MIT OR Apache-2.0"
+version = "0.0.1"
+
+[workspace.dependencies]
+bevy = { version = "=0.20.1", default-features = false }
+derive_more = { version = "=2.1.1" }
+rstest = { version = "=0.28.0" }
+thiserror = "=2.0.21"
+atomic-delegate-macros = { path = "../lele-rust-linter/crates/atomic-delegate-macros" }
+
+[workspace.lints.clippy]
+pedantic = { level = "deny", priority = -1 }
+nursery = { level = "deny", priority = -1 }
+unwrap_used = "deny"
+expect_used = "deny"
+indexing_slicing = "deny"
+arithmetic_side_effects = "deny"
+unreachable = "deny"
+unimplemented = "deny"
+unchecked_time_subtraction = "deny"
+todo = "deny"
+string_slice = "deny"
+panic_in_result_fn = "deny"
+panic = "deny"
+exit = "deny"
+as_conversions = "deny"
+module_inception = "allow"
+missing_errors_doc = "allow"
+
+# Early-phase profile: optimise for compile time and peak RAM, not runtime speed.
+# `opt-level = 3` on every dependency pushed cold builds into OOM on 14 GB machines.
+# Debug info is the other big RAM/disk cost; keep only line tables for our crate
+# (readable backtraces) and none for dependencies.
+[profile.dev]
+opt-level = 0
+debug = "line-tables-only"
+
+[profile.dev.package."*"]
+opt-level = 1
+debug = false
+
+# The heaviest rustc invocations on a cold build (peak RSS at opt-level 1 / 0:
+# bevy_pbr 6.9 / 6.4 GB, bevy_render 4.5 / 4.3 GB).
+[profile.dev.package.bevy_pbr]
+opt-level = 0
+
+[profile.dev.package.bevy_render]
+opt-level = 0

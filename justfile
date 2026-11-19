@@ -1,0 +1,96 @@
+[unix]
+set shell := ["bash", "-eu", "-o", "pipefail", "-c"]
+
+[windows]
+set shell := ["powershell.exe", "-NoLogo", "-Command"]
+
+# Build outside `[R] Rust` (the path has spaces); persistent, portable.
+export CARGO_TARGET_DIR := env("HOME") / ".cache/cargo-target/verdigris"
+
+# Toolchain: rust-toolchain.toml (nightly).
+# Extra tools: cargo-nextest, just, lele-lint / lele-bevy-lint, prek.
+
+[doc('Show this recipe list.')]
+default:
+    @just --list --unsorted
+
+[group('dev')]
+[doc('Build the whole workspace (all targets, all features).')]
+build:
+    cargo build --workspace --all-targets --all-features
+
+# PATTERN filters on the full test path; empty matches everything.
+[group('dev')]
+[doc('Run workspace tests matching PATTERN (nextest; empty matches all).')]
+t PATTERN="" *FLAGS:
+    cargo nextest run --workspace --all-targets --all-features --no-tests=pass -E 'test(/{{ PATTERN }}/)' {{ FLAGS }}
+
+[group('dev')]
+[doc('Clippy plus lele-lint for one package (e.g. just check-crate verdigris-game).')]
+check-crate CRATE:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    case "{{ CRATE }}" in
+        verdigris-rule-engine) dir=crates/rule-engine ;;
+        verdigris-parser) dir=crates/parser ;;
+        verdigris-game) dir=crates/game ;;
+        verdigris-lint) dir=crates/verdigris-lint ;;
+        *)
+            echo "check-crate: unknown crate '{{ CRATE }}'; known: verdigris-rule-engine verdigris-parser verdigris-game verdigris-lint" >&2
+            exit 1
+            ;;
+    esac
+    cargo clippy -p {{ CRATE }} --all-targets --all-features -- -D warnings
+    lele-lint --config lele.toml "$dir"
+
+[group('dev')]
+[doc('Check formatting (cargo fmt --all -- --check).')]
+fmt:
+    cargo fmt --all -- --check
+
+[group('dev')]
+[doc('Lint the whole workspace; warnings deny the gate.')]
+clippy:
+    cargo clippy --workspace --all-targets --all-features -- -D warnings
+
+[group('dev')]
+[doc('Run lele-lint over every workspace crate dir.')]
+lint:
+    lele-lint --config lele.toml crates/rule-engine
+    lele-lint --config lele.toml crates/parser
+    lele-lint --config lele.toml crates/game
+    lele-lint --config lele.toml crates/verdigris-lint
+
+[group('dev')]
+[doc('Run lele-bevy-lint over the Bevy crates.')]
+bevy-lint:
+    lele-bevy-lint --config lele.toml crates/rule-engine
+    lele-bevy-lint --config lele.toml crates/game
+
+# Regenerate the __methods__ indexes after adding or removing #[atomic_delegates] shells.
+[group('dev')]
+[doc('Regenerate __methods__ indexes after adding/removing atomic shells.')]
+sync-methods:
+    lele-lint --sync-methods --config lele.toml crates/rule-engine
+    lele-lint --sync-methods --config lele.toml crates/parser
+    lele-lint --sync-methods --config lele.toml crates/game
+    lele-lint --sync-methods --config lele.toml crates/verdigris-lint
+
+[group('gate')]
+[doc('Run the full workspace test suite (nextest).')]
+test:
+    cargo nextest run --workspace --all-targets --all-features --no-tests=pass
+
+[group('gate')]
+[doc('Run the full prek gate on all files (same as CI).')]
+check:
+    prek run --all-files
+
+[group('gate')]
+[doc('Full gate: build, check.')]
+ci: build check
+
+[group('gate')]
+[doc('Install the prek git hooks (one-time per clone).')]
+setup:
+    prek install -t pre-commit -t pre-push

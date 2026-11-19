@@ -1,0 +1,11 @@
+[package]
+name = "verdigris-parser"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Oracle text to CardDefinition parser"
+
+[lints]
+workspace = true
+
+[dependencies]

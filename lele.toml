@@ -1,0 +1,12 @@
+[lele.lint]
+
+[honesty]
+declared_honest = []
+declared_dishonest = ["std::time::SystemTime::now", "std::time::Instant::now", "rand::thread_rng", "rand::random", "getrandom::getrandom", "std::fs::read", "std::fs::write", "std::env::var"]
+
+[[lele.boundary]]
+name       = "rule-engine is headless"
+why        = "Rules read world state and write messages/choices/components; time, randomness and input arrive as resources, never as hidden I/O."
+folders    = ["crates/rule-engine/src"]
+cannot_use = ["bevy::render", "bevy::ui", "bevy::window", "std::time", "rand", "std::fs"]
+require    = "honest"
