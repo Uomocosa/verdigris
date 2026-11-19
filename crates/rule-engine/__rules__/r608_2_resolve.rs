@@ -15,6 +15,7 @@ pub fn r608_2_resolve(
     mut destructions: MessageWriter<zones::Destruction>,
     mut countered: MessageWriter<stack::Countered>,
     mut draws: MessageWriter<zones::DrawRequested>,
+    mut power_toughness_modified: MessageWriter<effects::PowerToughnessModified>,
     spells: Query<(
         &cards::CardDefinition,
         &zones::Owner,
@@ -74,6 +75,22 @@ pub fn r608_2_resolve(
                     player: **owner,
                     count,
                 });
+            }
+            effects::EffectKind::ModifyPowerToughness { power, toughness } => {
+                if let Some(target) = chosen_target
+                    && let Ok(target_zone) = targets.get(target)
+                    && helpers::is_card_in_zone(
+                        **target_zone,
+                        zones::Zone::Battlefield,
+                        &zone_entities,
+                    )
+                {
+                    power_toughness_modified.write(effects::PowerToughnessModified {
+                        target,
+                        power,
+                        toughness,
+                    });
+                }
             }
         }
     }

@@ -2,8 +2,10 @@ use bevy::prelude::{App, IntoScheduleConfigs, Update};
 
 use crate::RulesPlugin;
 use crate::actions;
+use crate::effects;
 use crate::rules;
 use crate::stack;
+use crate::turns;
 use crate::zones;
 
 pub fn plugin_build(_rules_plugin: &RulesPlugin, app: &mut App) {
@@ -13,7 +15,9 @@ pub fn plugin_build(_rules_plugin: &RulesPlugin, app: &mut App) {
         .add_message::<stack::Countered>()
         .add_message::<zones::DamageDealt>()
         .add_message::<zones::Destruction>()
-        .add_message::<zones::DrawRequested>();
+        .add_message::<zones::DrawRequested>()
+        .add_message::<effects::PowerToughnessModified>()
+        .add_message::<turns::CleanupStepStarted>();
     app.init_resource::<actions::PendingChoice>();
     app.configure_sets(
         Update,
@@ -21,6 +25,7 @@ pub fn plugin_build(_rules_plugin: &RulesPlugin, app: &mut App) {
             rules::RuleSet::Casting,
             rules::RuleSet::Resolution,
             rules::RuleSet::StateBased,
+            rules::RuleSet::Cleanup,
         )
             .chain(),
     );
@@ -40,6 +45,7 @@ pub fn plugin_build(_rules_plugin: &RulesPlugin, app: &mut App) {
             rules::r117_4_priority::r117_4_priority,
             rules::r608_2b_illegal_targets::r608_2b_illegal_targets,
             rules::r608_2_resolve::r608_2_resolve,
+            rules::r611_2a_continuous_effects::r611_2a_continuous_effects,
             rules::r121_1_draw::r121_1_draw,
             rules::r701_6_counter::r701_6_counter,
             rules::r120_3_damage_results::r120_3_damage_results,
@@ -59,6 +65,10 @@ pub fn plugin_build(_rules_plugin: &RulesPlugin, app: &mut App) {
         )
             .chain()
             .in_set(rules::RuleSet::StateBased),
+    );
+    app.add_systems(
+        Update,
+        rules::r514_2_cleanup_step::r514_2_cleanup_step.in_set(rules::RuleSet::Cleanup),
     );
 }
 

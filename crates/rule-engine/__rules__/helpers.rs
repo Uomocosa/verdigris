@@ -40,6 +40,21 @@ pub fn signed_damage(amount: u32) -> i32 {
 }
 
 #[must_use]
+pub fn effective_power_toughness(
+    definition: &cards::CardDefinition,
+    modifier: Option<&effects::PowerToughnessModifier>,
+) -> Option<cards::PowerToughness> {
+    let base = definition.power_toughness?;
+    let Some(modifier) = modifier else {
+        return Some(base);
+    };
+    Some(cards::PowerToughness {
+        power: base.power.saturating_add(modifier.power),
+        toughness: base.toughness.saturating_add(modifier.toughness),
+    })
+}
+
+#[must_use]
 pub fn does_creature_match_filter(
     definition: &cards::CardDefinition,
     filter: effects::Filter,

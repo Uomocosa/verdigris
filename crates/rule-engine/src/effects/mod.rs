@@ -1,8 +1,10 @@
 #[path = "__basic__/mod.rs"]
 mod basic;
 
-pub use basic::card_text::{counter, damage, destroy, draw, target};
+pub use basic::card_text::{counter, damage, destroy, draw, gets, target};
+pub use basic::components::PowerToughnessModifier;
 pub use basic::enums::{EffectKind, FilterKind};
+pub use basic::messages::PowerToughnessModified;
 pub use basic::structs::Target;
 
 mod effect;

@@ -1,6 +1,7 @@
 use bevy::prelude::{Entity, MessageWriter, Query};
 
 use crate::cards;
+use crate::effects;
 use crate::rules::helpers;
 use crate::zones;
 
@@ -14,14 +15,15 @@ pub fn r704_5g_lethal_damage(
         &cards::CardDefinition,
         &zones::Damage,
         &zones::InZone,
+        Option<&effects::PowerToughnessModifier>,
     )>,
     zone_entities: Query<(Entity, &zones::Zone, Option<&zones::Owner>)>,
 ) {
-    for (creature, definition, damage, in_zone) in cards.iter() {
+    for (creature, definition, damage, in_zone, modifier) in cards.iter() {
         if !helpers::is_card_in_zone(**in_zone, zones::Zone::Battlefield, &zone_entities) {
             continue;
         }
-        let Some(power_toughness) = definition.power_toughness else {
+        let Some(power_toughness) = helpers::effective_power_toughness(definition, modifier) else {
             continue;
         };
         let marked = helpers::signed_damage(**damage);

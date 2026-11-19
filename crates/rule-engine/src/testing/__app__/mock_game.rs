@@ -50,6 +50,8 @@ impl MockGame {
 
 #[atomic_delegates]
 impl MockGame {
+    pub fn cleanup(&mut self) {}
+
     #[must_use]
     pub fn find(&self, player: Entity, zone: zones::Zone, name: &str) -> Option<Entity> {}
 

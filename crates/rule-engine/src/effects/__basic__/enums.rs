@@ -4,6 +4,7 @@ pub enum EffectKind {
     Destroy,
     Counter,
     Draw(u32),
+    ModifyPowerToughness { power: i32, toughness: i32 },
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
