@@ -1,6 +1,7 @@
 use atomic_delegate_macros::atomic_delegates;
 use bevy::prelude::Entity;
 
+use crate::testing;
 use crate::zones;
 
 pub struct Cards {
@@ -32,45 +33,45 @@ impl Cards {
     pub fn all(&self) -> &[Entity] { &self.entities }
 
     #[must_use]
-    pub fn first(&self) -> Option<Entity> { self.entities.first().copied() }
-
-    #[must_use]
     pub const fn is_empty(&self) -> bool { self.entities.is_empty() }
 
     #[must_use]
     pub const fn len(&self) -> usize { self.entities.len() }
-
-    #[must_use]
-    pub fn nth(&self, index: usize) -> Option<Entity> { self.entities.get(index).copied() }
 }
 
 #[atomic_delegates]
 impl Cards {
-    pub fn only(&self) -> Entity {}
+    pub fn first(&self) -> Result<Entity, testing::CardsError> {}
+
+    pub fn nth(&self, index: usize) -> Result<Entity, testing::CardsError> {}
+}
+
+impl Cards {
+    pub const fn only(&self) -> Result<Entity, testing::CardsError> {
+        match self.entities.as_slice() {
+            [entity] => Ok(*entity),
+            [] => Err(testing::CardsError::Missing {
+                player: self.seat,
+                card: self.card_name,
+                zone: self.zone,
+            }),
+            _ => Err(testing::CardsError::NotOne {
+                player: self.seat,
+                card: self.card_name,
+                zone: self.zone,
+                count: self.entities.len(),
+            }),
+        }
+    }
 }
 
 #[rustfmt::skip]
 impl Cards {
-    pub(crate) fn assert_exactly_one(&self) { assert_eq!(self.entities.len(), 1, "{}", self.count_message()) }
-}
+    pub(crate) const fn card_name(&self) -> &'static str { self.card_name }
 
-impl Cards {
-    pub(crate) fn count_message(&self) -> String {
-        if self.entities.is_empty() {
-            format!(
-                "P{} has no {} in {:?}",
-                self.seat, self.card_name, self.zone
-            )
-        } else {
-            format!(
-                "P{} has {} {} in {:?}, expected exactly one",
-                self.seat,
-                self.entities.len(),
-                self.card_name,
-                self.zone
-            )
-        }
-    }
+    pub(crate) const fn seat(&self) -> usize { self.seat }
+
+    pub(crate) const fn zone(&self) -> zones::Zone { self.zone }
 }
 
 #[cfg(test)]
@@ -84,7 +85,7 @@ mod tests {
         let cards = game.player(p1).cards(HAND, LIGHTNING_BOLT);
         assert_eq!(cards.len(), 1);
         assert!(!cards.is_empty());
-        assert_eq!(cards.first(), Some(cards.only()));
+        assert_eq!(cards.first(), cards.only());
         assert_eq!(cards.nth(0), cards.first());
         assert_eq!(cards.all().len(), 1);
         assert!(game.player(p1).cards(HAND, MURDER).is_empty());
@@ -100,16 +101,64 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = "P1 has no Lightning Bolt in Hand")]
     fn only_rejects_no_matching_card() {
         let (game, [p1, ..]) = MockGame::new([P1, P2]);
-        let _ = game.player(p1).cards(HAND, LIGHTNING_BOLT).only();
+        let error = game
+            .player(p1)
+            .cards(HAND, LIGHTNING_BOLT)
+            .only()
+            .unwrap_err();
+        assert_eq!(
+            error,
+            CardsError::Missing {
+                player: 1,
+                card: "Lightning Bolt",
+                zone: HAND,
+            }
+        );
     }
 
     #[test]
-    #[should_panic(expected = "P1 has 2 Lightning Bolt in Hand, expected exactly one")]
     fn only_rejects_two_matching_cards() {
         let (game, [p1, ..]) = MockGame::new([P1.hand([LIGHTNING_BOLT, LIGHTNING_BOLT]), P2]);
-        let _ = game.player(p1).cards(HAND, LIGHTNING_BOLT).only();
+        let error = game
+            .player(p1)
+            .cards(HAND, LIGHTNING_BOLT)
+            .only()
+            .unwrap_err();
+        assert_eq!(
+            error,
+            CardsError::NotOne {
+                player: 1,
+                card: "Lightning Bolt",
+                zone: HAND,
+                count: 2,
+            }
+        );
+    }
+
+    #[test]
+    fn first_and_nth_report_a_missing_card() {
+        let (game, [p1, ..]) = MockGame::new([P1.hand([LIGHTNING_BOLT]), P2]);
+        let cards = game.player(p1).cards(HAND, LIGHTNING_BOLT);
+        assert_eq!(
+            cards.nth(3),
+            Err(CardsError::OutOfRange {
+                player: 1,
+                card: "Lightning Bolt",
+                zone: HAND,
+                count: 1,
+                index: 3,
+            })
+        );
+        let missing = game.player(p1).cards(HAND, MURDER);
+        assert_eq!(
+            missing.first(),
+            Err(CardsError::Missing {
+                player: 1,
+                card: "Murder",
+                zone: HAND,
+            })
+        );
     }
 }

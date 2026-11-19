@@ -1234,6 +1234,7 @@ dependencies = [
  "atomic-delegate-macros",
  "bevy",
  "derive_more",
+ "thiserror 2.0.21",
  "verdigris-rule-engine",
 ]
 

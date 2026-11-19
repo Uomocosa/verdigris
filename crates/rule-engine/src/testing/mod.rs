@@ -4,7 +4,8 @@ mod app;
 mod fixtures;
 
 pub use app::{
-    Card, Cards, MockGame, MockGameBuilder, P1, P2, P3, P4, P5, P6, P7, P8, PlayerSetup, PlayerView,
+    Card, Cards, CardsError, MockGame, MockGameBuilder, P1, P2, P3, P4, P5, P6, P7, P8,
+    PlayerSetup, PlayerView,
 };
 pub use fixtures::{
     CANCEL, DARKSTEEL_MYR, DISPEL, DIVINATION, DOOM_BLADE, ESSENCE_SCATTER, ExpectedTargets,
