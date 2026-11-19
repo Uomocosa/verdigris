@@ -25,6 +25,14 @@ pub const fn counter() -> effects::Effect {
 }
 
 #[must_use]
+pub const fn draw(count: u32) -> effects::Effect {
+    effects::Effect {
+        kind: effects::EffectKind::Draw(count),
+        target: None,
+    }
+}
+
+#[must_use]
 pub const fn target(count: u32, filter: effects::Filter) -> effects::Target {
     effects::Target { count, filter }
 }

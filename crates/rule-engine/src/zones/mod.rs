@@ -2,6 +2,7 @@
 mod basic;
 
 pub use basic::components::{
-    Damage, DealtByDeathtouch, InZone, Life, Lost, Owner, Player, Zone, ZoneContents,
+    AttemptedDrawFromEmptyLibrary, Damage, DealtByDeathtouch, InZone, Life, Lost, Owner, Player,
+    Zone, ZoneContents,
 };
-pub use basic::messages::{DamageDealt, Destruction};
+pub use basic::messages::{DamageDealt, Destruction, DrawRequested};

@@ -14,8 +14,10 @@ pub fn r608_2_resolve(
     mut damage_dealt: MessageWriter<zones::DamageDealt>,
     mut destructions: MessageWriter<zones::Destruction>,
     mut countered: MessageWriter<stack::Countered>,
+    mut draws: MessageWriter<zones::DrawRequested>,
     spells: Query<(
         &cards::CardDefinition,
+        &zones::Owner,
         &zones::InZone,
         Option<&stack::ChosenTarget>,
     )>,
@@ -25,7 +27,7 @@ pub fn r608_2_resolve(
 ) {
     for resolution in resolutions.read() {
         let spell = **resolution;
-        let Ok((definition, in_zone, chosen)) = spells.get(spell) else {
+        let Ok((definition, owner, in_zone, chosen)) = spells.get(spell) else {
             continue;
         };
         if !helpers::is_card_in_zone(**in_zone, zones::Zone::Stack, &zone_entities) {
@@ -34,12 +36,12 @@ pub fn r608_2_resolve(
         let Some(effect) = definition.effect else {
             continue;
         };
-        let Some(target) = chosen.map(|chosen| **chosen) else {
-            continue;
-        };
+        let chosen_target = chosen.map(|chosen| **chosen);
         match effect.kind {
             effects::EffectKind::Damage(amount) => {
-                if lives.get(target).is_ok() || targets.get(target).is_ok() {
+                if let Some(target) = chosen_target
+                    && (lives.get(target).is_ok() || targets.get(target).is_ok())
+                {
                     damage_dealt.write(zones::DamageDealt {
                         source: spell,
                         target,
@@ -48,7 +50,8 @@ pub fn r608_2_resolve(
                 }
             }
             effects::EffectKind::Destroy => {
-                if let Ok(target_zone) = targets.get(target)
+                if let Some(target) = chosen_target
+                    && let Ok(target_zone) = targets.get(target)
                     && helpers::is_card_in_zone(
                         **target_zone,
                         zones::Zone::Battlefield,
@@ -59,11 +62,18 @@ pub fn r608_2_resolve(
                 }
             }
             effects::EffectKind::Counter => {
-                if let Ok(target_zone) = targets.get(target)
+                if let Some(target) = chosen_target
+                    && let Ok(target_zone) = targets.get(target)
                     && helpers::is_card_in_zone(**target_zone, zones::Zone::Stack, &zone_entities)
                 {
                     countered.write(stack::Countered(target));
                 }
+            }
+            effects::EffectKind::Draw(count) => {
+                draws.write(zones::DrawRequested {
+                    player: **owner,
+                    count,
+                });
             }
         }
     }

@@ -41,6 +41,17 @@ pub fn instant(name: impl Into<cards::CardName>, cost: cards::Cost) -> cards::Ca
     }
 }
 
+pub fn sorcery(name: impl Into<cards::CardName>, cost: cards::Cost) -> cards::CardDefinition {
+    cards::CardDefinition {
+        name: name.into(),
+        cost,
+        types: vec![cards::CardType::Sorcery],
+        power_toughness: None,
+        effect: None,
+        keywords: Vec::new(),
+    }
+}
+
 #[must_use]
 pub const fn indestructible() -> cards::Keyword {
     cards::Keyword::Indestructible

@@ -12,7 +12,8 @@ pub fn plugin_build(_rules_plugin: &RulesPlugin, app: &mut App) {
         .add_message::<stack::Resolution>()
         .add_message::<stack::Countered>()
         .add_message::<zones::DamageDealt>()
-        .add_message::<zones::Destruction>();
+        .add_message::<zones::Destruction>()
+        .add_message::<zones::DrawRequested>();
     app.init_resource::<actions::PendingChoice>();
     app.configure_sets(
         Update,
@@ -39,6 +40,7 @@ pub fn plugin_build(_rules_plugin: &RulesPlugin, app: &mut App) {
             rules::r117_4_priority::r117_4_priority,
             rules::r608_2b_illegal_targets::r608_2b_illegal_targets,
             rules::r608_2_resolve::r608_2_resolve,
+            rules::r121_1_draw::r121_1_draw,
             rules::r701_6_counter::r701_6_counter,
             rules::r120_3_damage_results::r120_3_damage_results,
             rules::r608_2n_graveyard::r608_2n_graveyard,
@@ -53,6 +55,7 @@ pub fn plugin_build(_rules_plugin: &RulesPlugin, app: &mut App) {
             rules::r704_5h_deathtouch_damage::r704_5h_deathtouch_damage,
             rules::r702_12b_indestructible::r702_12b_indestructible,
             rules::r704_5a_zero_life::r704_5a_zero_life,
+            rules::r704_5b_empty_library::r704_5b_empty_library,
         )
             .chain()
             .in_set(rules::RuleSet::StateBased),

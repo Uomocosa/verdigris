@@ -1,7 +1,7 @@
 #[path = "__basic__/mod.rs"]
 mod basic;
 
-pub use basic::card_text::{counter, damage, destroy, target};
+pub use basic::card_text::{counter, damage, destroy, draw, target};
 pub use basic::enums::{EffectKind, FilterKind};
 pub use basic::structs::Target;
 

@@ -1,5 +1,6 @@
 mod cancel;
 mod darksteel_myr;
+mod divination;
 mod doom_blade;
 mod expected_targets;
 mod grizzly_bears;
@@ -12,6 +13,7 @@ mod walking_corpse;
 
 pub use cancel::cancel;
 pub use darksteel_myr::darksteel_myr;
+pub use divination::divination;
 pub use doom_blade::doom_blade;
 pub use expected_targets::ExpectedTargets;
 pub use grizzly_bears::grizzly_bears;

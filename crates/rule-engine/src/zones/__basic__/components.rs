@@ -36,3 +36,6 @@ pub struct Lost;
 
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct DealtByDeathtouch;
+
+#[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
+pub struct AttemptedDrawFromEmptyLibrary;

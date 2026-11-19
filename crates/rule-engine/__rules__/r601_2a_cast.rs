@@ -73,6 +73,7 @@ mod tests {
     use crate::actions;
     use crate::mana;
     use crate::testing;
+    use crate::turns;
     use crate::zones;
 
     #[test]
@@ -86,5 +87,46 @@ mod tests {
             .unwrap();
         game.act(game.p1, actions::Action::Cast(bolt));
         assert_eq!(game.zone_of(bolt), zones::Zone::Stack);
+    }
+
+    #[test]
+    fn sorcery_cannot_be_cast_on_an_opponents_turn() {
+        let mut game = testing::MockGame::builder()
+            .turn(2, testing::Seat::P2, turns::Phase::PrecombatMain)
+            .hand(testing::Seat::P1, [testing::divination()])
+            .mana_pool(testing::Seat::P1, mana![2, U])
+            .build();
+        let p1 = game.p1;
+        game.give_priority(p1);
+        let divination = game.find(p1, zones::Zone::Hand, "Divination").unwrap();
+        game.act(p1, actions::Action::Cast(divination));
+        assert_eq!(
+            game.last_rejection(),
+            Some(&actions::Rejected::CannotCast { spell: divination })
+        );
+        assert_eq!(game.zone_of(divination), zones::Zone::Hand);
+    }
+
+    #[test]
+    fn sorcery_cannot_be_cast_while_the_stack_is_not_empty() {
+        let mut game = testing::MockGame::builder()
+            .hand(
+                testing::Seat::P1,
+                [testing::lightning_bolt(), testing::divination()],
+            )
+            .mana_pool(testing::Seat::P1, mana![R, 2, U])
+            .build();
+        let bolt = game
+            .find(game.p1, zones::Zone::Hand, "Lightning Bolt")
+            .unwrap();
+        game.act(game.p1, actions::Action::Cast(bolt));
+        game.act(game.p1, actions::Action::ChooseTargets(vec![game.p2]));
+        let divination = game.find(game.p1, zones::Zone::Hand, "Divination").unwrap();
+        game.act(game.p1, actions::Action::Cast(divination));
+        assert_eq!(
+            game.last_rejection(),
+            Some(&actions::Rejected::CannotCast { spell: divination })
+        );
+        assert_eq!(game.zone_of(divination), zones::Zone::Hand);
     }
 }
