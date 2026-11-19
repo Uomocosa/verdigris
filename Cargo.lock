@@ -54,6 +54,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "atomic-delegate-macros"
+version = "0.0.14"
+dependencies = [
+ "lele-snake-case",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.119",
+]
+
+[[package]]
 name = "atomic-waker"
 version = "1.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -754,6 +764,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "lele-snake-case"
+version = "0.0.14"
+
+[[package]]
 name = "libc"
 version = "0.2.191"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1217,7 +1231,10 @@ version = "0.0.1"
 name = "verdigris-rule-engine"
 version = "0.0.1"
 dependencies = [
+ "atomic-delegate-macros",
  "bevy",
+ "derive_more",
+ "verdigris-rule-engine",
 ]
 
 [[package]]

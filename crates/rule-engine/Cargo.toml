@@ -9,4 +9,12 @@ description = "Headless MTG Comprehensive Rules enforcer"
 workspace = true
 
 [dependencies]
+atomic-delegate-macros.workspace = true
 bevy.workspace = true
+derive_more = { workspace = true, features = ["deref", "from"] }
+
+[features]
+testing = []
+
+[dev-dependencies]
+verdigris-rule-engine = { path = ".", features = ["testing"] }
