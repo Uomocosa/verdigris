@@ -110,11 +110,7 @@ pub fn spawn_game(
     });
     app.insert_resource(turns::TurnOrder::from(entities.clone()));
 
-    let p1 = entities.first().copied().unwrap_or(Entity::PLACEHOLDER);
-    let p2 = entities.get(1).copied().unwrap_or(Entity::PLACEHOLDER);
     let game = testing::MockGame {
-        p1,
-        p2,
         players: entities.clone(),
         app,
     };
@@ -133,13 +129,13 @@ mod tests {
         let builder = MockGameBuilder::default();
         let (game, entities) = spawn_game(&builder, &[P1, P2.active()]);
 
-        assert_eq!(game.life(game.p1), 20);
         assert_eq!(entities.len(), 2);
+        assert_eq!(game.life(entities[0]), 20);
         let turn = game.app.world().resource::<turns::Turn>();
-        assert_eq!(turn.active, game.p2);
+        assert_eq!(turn.active, entities[1]);
         assert_eq!(
             game.app.world().resource::<turns::Priority>().player,
-            game.p2
+            entities[1]
         );
         assert_eq!(game.app.world().resource::<turns::TurnOrder>().len(), 2);
     }

@@ -24,7 +24,7 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let game = MockGame::builder().build();
+        let (game, _) = MockGame::new([P1, P2]);
         assert!(target_choice(&game).is_none());
     }
 }

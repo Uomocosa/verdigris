@@ -18,7 +18,7 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let game = MockGame::builder().mana_pool(Seat::P1, mana![R]).build();
-        assert_eq!(mana_pool(&game, game.p1), mana![R]);
+        let (game, [p1, ..]) = MockGame::new([P1.mana_pool(mana![R]), P2]);
+        assert_eq!(mana_pool(&game, p1), mana![R]);
     }
 }

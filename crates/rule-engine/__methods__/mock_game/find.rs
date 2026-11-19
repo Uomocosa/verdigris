@@ -44,11 +44,9 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let game = MockGame::builder()
-            .hand(Seat::P1, [lightning_bolt()])
-            .build();
-        let found = find(&game, game.p1, HAND, "Lightning Bolt");
+        let (game, [p1, ..]) = MockGame::new([P1.hand([lightning_bolt()]), P2]);
+        let found = find(&game, p1, HAND, "Lightning Bolt");
         assert!(found.is_some());
-        assert!(find(&game, game.p1, HAND, "Murder").is_none());
+        assert!(find(&game, p1, HAND, "Murder").is_none());
     }
 }

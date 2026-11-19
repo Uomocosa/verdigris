@@ -8,8 +8,6 @@ use crate::turns;
 use crate::zones;
 
 pub struct MockGame {
-    pub p1: Entity,
-    pub p2: Entity,
     pub(crate) players: Vec<Entity>,
     pub(crate) app: App,
 }
@@ -57,15 +55,6 @@ impl MockGame {
             self.pass_priority();
         }
     }
-
-    #[must_use]
-    pub fn p(&self, seat: usize) -> Entity {
-        let index = seat.saturating_sub(1);
-        self.players
-            .get(index)
-            .copied()
-            .unwrap_or(Entity::PLACEHOLDER)
-    }
 }
 
 #[atomic_delegates]
@@ -74,6 +63,9 @@ impl MockGame {
 
     #[must_use]
     pub fn find(&self, player: Entity, zone: zones::Zone, name: &str) -> Option<Entity> {}
+
+    #[must_use]
+    pub fn p(&self, seat: usize) -> Entity {}
 
     #[must_use]
     pub fn zone_of(&self, card: Entity) -> zones::Zone {}
@@ -104,18 +96,18 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let game = MockGame::builder().build();
-        assert_eq!(game.life(game.p1), 20);
+        let (game, [p1, ..]) = MockGame::new([P1, P2]);
+        assert_eq!(game.life(p1), 20);
     }
 
     #[test]
     fn default_game_has_two_players_twenty_life_and_full_libraries() {
-        let game = MockGame::builder().build();
-        assert_eq!(game.life(game.p1), 20);
-        assert_eq!(game.life(game.p2), 20);
+        let (game, [p1, p2]) = MockGame::new([P1, P2]);
+        assert_eq!(game.life(p1), 20);
+        assert_eq!(game.life(p2), 20);
 
         let first_bear = game
-            .find(game.p1, LIBRARY, "Grizzly Bears")
+            .find(p1, LIBRARY, "Grizzly Bears")
             .expect("P1 library holds Grizzly Bears");
         let library = *game.app.world().get::<zones::InZone>(first_bear).unwrap();
         let bears_in_library = game
@@ -129,38 +121,37 @@ mod tests {
             })
             .count();
         assert_eq!(bears_in_library, 12);
-        assert!(game.find(game.p1, HAND, "Grizzly Bears").is_none());
-        assert!(game.find(game.p2, HAND, "Grizzly Bears").is_none());
+        assert!(game.find(p1, HAND, "Grizzly Bears").is_none());
+        assert!(game.find(p2, HAND, "Grizzly Bears").is_none());
 
         let turn = game.app.world().resource::<turns::Turn>();
         assert_eq!(turn.number, 1);
-        assert_eq!(turn.active, game.p1);
+        assert_eq!(turn.active, p1);
         assert_eq!(turn.step, turns::Step::PrecombatMain);
-        assert_eq!(
-            game.app.world().resource::<turns::Priority>().player,
-            game.p1
-        );
+        assert_eq!(game.app.world().resource::<turns::Priority>().player, p1);
     }
 
     #[test]
     fn overrides_place_cards_and_support_four_players() {
-        let game = MockGame::builder()
-            .player_count(4)
-            .turn_seat(3, Seat::P2, turns::Step::PostcombatMain)
-            .hand(Seat::P1, [lightning_bolt()])
-            .battlefield(Seat::P2, [grizzly_bears()])
-            .library(Seat::P2, [murder()])
-            .mana_pool(Seat::P1, mana![R])
-            .build();
+        let (game, [p1, p2, ..]) = MockGame::builder()
+            .turn(3, turns::Step::PostcombatMain)
+            .players([
+                P1.hand([lightning_bolt()]).mana_pool(mana![R]),
+                P2.active()
+                    .battlefield([grizzly_bears()])
+                    .library([murder()]),
+                P3,
+                P4,
+            ]);
 
         assert_ne!(game.p(3), game.p(4));
         assert!(game.app.world().get_entity(game.p(3)).is_ok());
         assert!(game.app.world().get_entity(game.p(4)).is_ok());
-        assert!(game.find(game.p1, HAND, "Lightning Bolt").is_some());
-        assert!(game.find(game.p2, BATTLEFIELD, "Grizzly Bears").is_some());
-        assert!(game.find(game.p2, LIBRARY, "Murder").is_some());
-        assert!(game.find(game.p2, LIBRARY, "Grizzly Bears").is_none());
-        assert_eq!(game.mana_pool(game.p1), mana![R]);
+        assert!(game.find(p1, HAND, "Lightning Bolt").is_some());
+        assert!(game.find(p2, BATTLEFIELD, "Grizzly Bears").is_some());
+        assert!(game.find(p2, LIBRARY, "Murder").is_some());
+        assert!(game.find(p2, LIBRARY, "Grizzly Bears").is_none());
+        assert_eq!(game.mana_pool(p1), mana![R]);
 
         let turn = game.app.world().resource::<turns::Turn>();
         assert_eq!(turn.number, 3);
@@ -176,8 +167,6 @@ mod tests {
     fn new_builds_the_described_players() {
         let (game, [p1, p2]) = MockGame::new([P1.hand([divination()]).mana_pool(mana![2, U]), P2]);
 
-        assert_eq!(game.p1, p1);
-        assert_eq!(game.p2, p2);
         assert!(game.find(p1, HAND, "Divination").is_some());
         assert!(game.find(p1, HAND, "Grizzly Bears").is_none());
         assert_eq!(game.life(p1), 20);
@@ -194,7 +183,7 @@ mod tests {
 
     #[test]
     fn builder_players_marks_the_active_setup_and_its_turn() {
-        let (game, [_, p2, _, _]) = MockGame::builder()
+        let (game, [_, p2, ..]) = MockGame::builder()
             .turn(3, turns::Step::PostcombatMain)
             .players([P1, P2.active().battlefield([grizzly_bears()]), P3, P4]);
 
@@ -221,16 +210,16 @@ mod tests {
 
     #[test]
     fn fresh_game_has_no_target_or_rejection() {
-        let game = MockGame::builder().build();
-        assert!(game.find(game.p1, HAND, "Lightning Bolt").is_none());
+        let (game, [p1, ..]) = MockGame::new([P1, P2]);
+        assert!(game.find(p1, HAND, "Lightning Bolt").is_none());
         assert!(game.target_choice().is_none());
         assert!(game.last_rejection().is_none());
     }
 
     #[test]
     fn act_and_pass_priority_advance_the_app() {
-        let mut game = MockGame::builder().build();
-        game.act(game.p1, actions::Action::PassPriority);
+        let (mut game, [p1, ..]) = MockGame::new([P1, P2]);
+        game.act(p1, actions::Action::PassPriority);
         game.pass_priority_all();
         assert!(game.last_rejection().is_none());
     }

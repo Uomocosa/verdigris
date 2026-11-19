@@ -16,7 +16,7 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let game = MockGame::builder().build();
-        assert_eq!(life(&game, game.p1), 20);
+        let (game, [p1, ..]) = MockGame::new([P1, P2]);
+        assert_eq!(life(&game, p1), 20);
     }
 }

@@ -22,8 +22,7 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let mut game = MockGame::builder().build();
-        let p2 = game.p2;
+        let (mut game, [_, p2, ..]) = MockGame::new([P1, P2]);
 
         end_turn(&mut game);
 
