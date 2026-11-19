@@ -46,7 +46,7 @@ mod tests {
         let cancel = game.player(p2).cards(HAND, CANCEL).only().unwrap();
 
         game.act(p1, actions::Action::Cast(bolt));
-        game.act(p1, actions::Action::ChooseTargets(vec![p2]));
+        game.act(p1, actions::Action::ChooseTargets(vec![*p2]));
         game.pass_priority();
         game.act(p2, actions::Action::Cast(cancel));
         game.act(p2, actions::Action::ChooseTargets(vec![bolt]));
@@ -86,7 +86,7 @@ mod tests {
         let negate = game.player(p2).cards(HAND, NEGATE).only().unwrap();
 
         game.act(p1, actions::Action::Cast(bolt));
-        game.act(p1, actions::Action::ChooseTargets(vec![p2]));
+        game.act(p1, actions::Action::ChooseTargets(vec![*p2]));
         game.pass_priority();
         game.act(p2, actions::Action::Cast(negate));
         game.act(p2, actions::Action::ChooseTargets(vec![bolt]));
@@ -108,7 +108,7 @@ mod tests {
         let cancel = game.player(p2).cards(HAND, CANCEL).only().unwrap();
 
         game.act(p1, actions::Action::Cast(bolt));
-        game.act(p1, actions::Action::ChooseTargets(vec![p2]));
+        game.act(p1, actions::Action::ChooseTargets(vec![*p2]));
         game.pass_priority();
         game.act(p2, actions::Action::Cast(cancel));
         game.act(p2, actions::Action::ChooseTargets(vec![bolt]));
@@ -138,7 +138,7 @@ mod tests {
         let p2_cancel = game.player(p2).cards(HAND, CANCEL).only().unwrap();
 
         game.act(p1, actions::Action::Cast(bolt));
-        game.act(p1, actions::Action::ChooseTargets(vec![p2]));
+        game.act(p1, actions::Action::ChooseTargets(vec![*p2]));
         game.pass_priority();
         game.act(p2, actions::Action::Cast(p2_cancel));
         game.act(p2, actions::Action::ChooseTargets(vec![bolt]));

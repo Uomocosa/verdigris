@@ -14,7 +14,9 @@ pub struct MockGame {
 
 impl MockGame {
     #[must_use]
-    pub fn new<const N: usize>(players: [testing::PlayerSetup; N]) -> (Self, [Entity; N]) {
+    pub fn new<const N: usize>(
+        players: [testing::PlayerSetup; N],
+    ) -> (Self, [testing::TestPlayer; N]) {
         let (game, entities) = Self::builder().players(players);
         (game, entities)
     }
@@ -26,11 +28,12 @@ impl MockGame {
     pub fn builder() -> testing::MockGameBuilder { testing::MockGameBuilder::default() }
 
     #[must_use]
-    pub fn player(&self, player: Entity) -> testing::PlayerView<'_> { testing::PlayerView::from_game_and_player(self, player) }
+    pub fn player(&self, player: impl Into<Entity>) -> testing::PlayerView<'_> { testing::PlayerView::from_game_and_player(self, player.into()) }
 }
 
 impl MockGame {
-    pub fn act(&mut self, player: Entity, action: actions::Action) {
+    pub fn act(&mut self, player: impl Into<Entity>, action: actions::Action) {
+        let player = player.into();
         let _ = self
             .app
             .world_mut()
@@ -77,14 +80,14 @@ impl MockGame {
     pub fn last_rejection(&self) -> Option<&actions::Rejected> {}
 
     #[must_use]
-    pub fn life(&self, player: Entity) -> i32 {}
+    pub fn life(&self, player: impl Into<Entity>) -> i32 {}
 
     #[must_use]
-    pub fn mana_pool(&self, player: Entity) -> cards::ManaPool {}
+    pub fn mana_pool(&self, player: impl Into<Entity>) -> cards::ManaPool {}
 
     pub fn play(
         &mut self,
-        casts: impl IntoIterator<Item = testing::Cast>,
+        casts: impl IntoIterator<Item = testing::TestPlayerActions>,
     ) -> Result<(), testing::PlayError> {
     }
 }

@@ -22,7 +22,6 @@ mod tests {
     use crate::cards;
     use crate::mana;
     use crate::players;
-    use crate::testing::traits::Caster;
     use crate::testing::*;
 
     #[test]
@@ -83,6 +82,6 @@ mod tests {
         let sign_in_blood = game.player(p1).cards(HAND, SIGN_IN_BLOOD).only().unwrap();
         game.play(p1.cast(sign_in_blood).targeting(p2).resolve())
             .unwrap();
-        assert!(game.app.world().get::<players::Lost>(p2).is_some());
+        assert!(game.app.world().get::<players::Lost>(*p2).is_some());
     }
 }

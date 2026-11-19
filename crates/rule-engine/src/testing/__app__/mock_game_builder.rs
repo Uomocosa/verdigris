@@ -30,10 +30,10 @@ impl MockGameBuilder {
     pub fn players<const N: usize>(
         self,
         players: [testing::PlayerSetup; N],
-    ) -> (testing::MockGame, [Entity; N]) {
+    ) -> (testing::MockGame, [testing::TestPlayer; N]) {
         let (game, entities) = self.spawn_game(&Vec::from(players));
         let spawned = std::array::from_fn(|index| {
-            entities.get(index).copied().unwrap_or(Entity::PLACEHOLDER)
+            testing::TestPlayer(entities.get(index).copied().unwrap_or(Entity::PLACEHOLDER))
         });
         (game, spawned)
     }

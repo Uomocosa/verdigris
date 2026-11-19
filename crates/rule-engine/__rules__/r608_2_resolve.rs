@@ -116,7 +116,6 @@ pub fn r608_2_resolve(
 #[cfg(test)]
 mod tests {
     use crate::mana;
-    use crate::testing::traits::Caster;
     use crate::testing::*;
     use crate::{BATTLEFIELD, GRAVEYARD, HAND};
 

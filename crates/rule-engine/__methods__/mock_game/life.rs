@@ -1,10 +1,10 @@
 use crate::players;
 use crate::testing;
 
-pub fn life(game: &testing::MockGame, player: bevy::prelude::Entity) -> i32 {
+pub fn life(game: &testing::MockGame, player: impl Into<bevy::prelude::Entity>) -> i32 {
     game.app
         .world()
-        .get::<players::Life>(player)
+        .get::<players::Life>(player.into())
         .map_or(0, |life| **life)
 }
 

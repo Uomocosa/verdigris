@@ -109,7 +109,7 @@ mod tests {
         ]);
         let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
         game.act(p1, actions::Action::Cast(bolt));
-        game.act(p1, actions::Action::ChooseTargets(vec![p2]));
+        game.act(p1, actions::Action::ChooseTargets(vec![*p2]));
         let divination = game.player(p1).cards(HAND, DIVINATION).only().unwrap();
         game.act(p1, actions::Action::Cast(divination));
         assert_eq!(

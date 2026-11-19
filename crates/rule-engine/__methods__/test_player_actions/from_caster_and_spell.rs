@@ -2,8 +2,8 @@ use bevy::prelude::Entity;
 
 use crate::testing;
 
-pub const fn from_caster_and_spell(caster: Entity, spell: Entity) -> testing::Cast {
-    testing::Cast {
+pub const fn from_caster_and_spell(caster: Entity, spell: Entity) -> testing::TestPlayerActions {
+    testing::TestPlayerActions {
         caster,
         spell,
         targets: Vec::new(),
@@ -15,7 +15,7 @@ pub const fn from_caster_and_spell(caster: Entity, spell: Entity) -> testing::Ca
 mod tests {
     use bevy::prelude::World;
 
-    use crate::testing::traits::Caster;
+    use crate::testing;
 
     use super::from_caster_and_spell;
 
@@ -27,7 +27,7 @@ mod tests {
 
         let cast = from_caster_and_spell(caster, spell);
 
-        assert_eq!(caster.cast(spell), cast);
+        assert_eq!(testing::TestPlayer(caster).cast(spell), cast);
         assert_eq!(cast.steps().len(), 1);
     }
 }

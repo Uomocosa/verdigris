@@ -1,10 +1,13 @@
 use crate::cards;
 use crate::testing;
 
-pub fn mana_pool(game: &testing::MockGame, player: bevy::prelude::Entity) -> cards::ManaPool {
+pub fn mana_pool(
+    game: &testing::MockGame,
+    player: impl Into<bevy::prelude::Entity>,
+) -> cards::ManaPool {
     game.app
         .world()
-        .get::<cards::ManaPool>(player)
+        .get::<cards::ManaPool>(player.into())
         .copied()
         .unwrap_or_default()
 }

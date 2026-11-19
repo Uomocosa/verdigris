@@ -1,19 +1,19 @@
 use crate::actions;
 use crate::testing;
 
-pub fn steps(cast: &testing::Cast) -> Vec<testing::Step> {
-    let mut steps = vec![testing::Step::Act(
+pub fn steps(cast: &testing::TestPlayerActions) -> Vec<testing::PlayStep> {
+    let mut steps = vec![testing::PlayStep::Act(
         cast.caster,
         actions::Action::Cast(cast.spell),
     )];
     if !cast.targets.is_empty() {
-        steps.push(testing::Step::Act(
+        steps.push(testing::PlayStep::Act(
             cast.caster,
             actions::Action::ChooseTargets(cast.targets.clone()),
         ));
     }
     if cast.should_resolve {
-        steps.push(testing::Step::PassPriorityAll);
+        steps.push(testing::PlayStep::PassPriorityAll);
     }
     steps
 }
@@ -32,11 +32,11 @@ mod tests {
         let mut world = World::new();
         let caster = world.spawn_empty().id();
         let spell = world.spawn_empty().id();
-        let cast = testing::Cast::from_caster_and_spell(caster, spell);
+        let cast = testing::TestPlayerActions::from_caster_and_spell(caster, spell);
 
         assert_eq!(
             steps(&cast),
-            vec![testing::Step::Act(caster, actions::Action::Cast(spell))]
+            vec![testing::PlayStep::Act(caster, actions::Action::Cast(spell))]
         );
     }
 }

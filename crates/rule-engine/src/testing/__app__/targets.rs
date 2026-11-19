@@ -1,5 +1,7 @@
 use bevy::prelude::Entity;
 
+use crate::testing;
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Targets {
     One(Entity),
@@ -12,8 +14,18 @@ impl From<Entity> for Targets {
 }
 
 #[rustfmt::skip]
+impl From<testing::TestPlayer> for Targets {
+    fn from(player: testing::TestPlayer) -> Self { Self::One(*player) }
+}
+
+#[rustfmt::skip]
 impl<const N: usize> From<[Entity; N]> for Targets {
     fn from(entities: [Entity; N]) -> Self { Self::Many(entities.into()) }
+}
+
+#[rustfmt::skip]
+impl<const N: usize> From<[testing::TestPlayer; N]> for Targets {
+    fn from(players: [testing::TestPlayer; N]) -> Self { Self::Many(players.map(Entity::from).into()) }
 }
 
 #[rustfmt::skip]

@@ -102,7 +102,7 @@ mod tests {
 
         assert_eq!(
             game.last_rejection(),
-            Some(&actions::Rejected::NoPriority { player: p2 })
+            Some(&actions::Rejected::NoPriority { player: *p2 })
         );
         assert_eq!(game.app.world().resource::<turns::Priority>().player, p1);
     }

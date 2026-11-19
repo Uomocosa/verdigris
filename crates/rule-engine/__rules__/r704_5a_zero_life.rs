@@ -28,8 +28,8 @@ mod tests {
             MockGame::new([P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]), P2.life(3)]);
         let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
         game.act(p1, actions::Action::Cast(bolt));
-        game.act(p1, actions::Action::ChooseTargets(vec![p2]));
+        game.act(p1, actions::Action::ChooseTargets(vec![*p2]));
         game.pass_priority_all();
-        assert!(game.app.world().get::<players::Lost>(p2).is_some());
+        assert!(game.app.world().get::<players::Lost>(*p2).is_some());
     }
 }

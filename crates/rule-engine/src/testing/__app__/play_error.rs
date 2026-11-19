@@ -6,7 +6,7 @@ pub enum PlayError {
     #[error("step {index} ({step:?}) was rejected: {rejection:?}")]
     Rejected {
         index: usize,
-        step: testing::Step,
+        step: testing::PlayStep,
         rejection: actions::Rejected,
     },
 }

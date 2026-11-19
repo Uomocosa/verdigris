@@ -4,7 +4,7 @@ use bevy::prelude::Entity;
 use crate::testing;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Cast {
+pub struct TestPlayerActions {
     pub(crate) caster: Entity,
     pub(crate) spell: Entity,
     pub(crate) targets: Vec<Entity>,
@@ -12,20 +12,20 @@ pub struct Cast {
 }
 
 #[atomic_delegates]
-impl Cast {
+impl TestPlayerActions {
     #[must_use]
-    pub(crate) fn from_caster_and_spell(caster: Entity, spell: Entity) -> Self {}
+    pub(crate) const fn from_caster_and_spell(caster: Entity, spell: Entity) -> Self {}
 }
 
 #[rustfmt::skip]
-impl IntoIterator for Cast {
+impl IntoIterator for TestPlayerActions {
     type Item = Self;
     type IntoIter = std::iter::Once<Self>;
 
     fn into_iter(self) -> Self::IntoIter { std::iter::once(self) }
 }
 
-impl Cast {
+impl TestPlayerActions {
     #[must_use]
     pub fn targeting(mut self, targets: impl Into<testing::Targets>) -> Self {
         self.targets = targets.into().into_entities();
@@ -40,9 +40,9 @@ impl Cast {
 }
 
 #[atomic_delegates]
-impl Cast {
+impl TestPlayerActions {
     #[must_use]
-    pub fn steps(&self) -> Vec<testing::Step> {}
+    pub fn steps(&self) -> Vec<testing::PlayStep> {}
 }
 
 #[cfg(test)]
@@ -51,7 +51,6 @@ mod tests {
 
     use crate::actions;
     use crate::testing;
-    use crate::testing::traits::Caster;
 
     #[test]
     fn test_usage() {
@@ -60,14 +59,17 @@ mod tests {
         let spell = world.spawn_empty().id();
         let target = world.spawn_empty().id();
 
-        let cast = caster.cast(spell).targeting(target).resolve();
+        let cast = testing::TestPlayer(caster)
+            .cast(spell)
+            .targeting(target)
+            .resolve();
 
         assert_eq!(
             cast.steps(),
             vec![
-                testing::Step::Act(caster, actions::Action::Cast(spell)),
-                testing::Step::Act(caster, actions::Action::ChooseTargets(vec![target])),
-                testing::Step::PassPriorityAll,
+                testing::PlayStep::Act(caster, actions::Action::Cast(spell)),
+                testing::PlayStep::Act(caster, actions::Action::ChooseTargets(vec![target])),
+                testing::PlayStep::PassPriorityAll,
             ]
         );
     }

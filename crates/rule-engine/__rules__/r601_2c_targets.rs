@@ -196,7 +196,7 @@ mod tests {
             .only()
             .unwrap();
         game.act(p1, actions::Action::Cast(bolt));
-        assert_eq!(game.target_choice(), Some(pick(1).from([bears, p1, p2])));
+        assert_eq!(game.target_choice(), Some(pick(1).from([bears, *p1, *p2])));
     }
 
     #[test]
@@ -278,7 +278,7 @@ mod tests {
             .unwrap();
 
         game.act(p1, actions::Action::Cast(bolt));
-        game.act(p1, actions::Action::ChooseTargets(vec![p2]));
+        game.act(p1, actions::Action::ChooseTargets(vec![*p2]));
         game.act(p1, actions::Action::Cast(cancel));
 
         assert_eq!(game.target_choice(), Some(pick(1).from([bolt])));
@@ -300,7 +300,7 @@ mod tests {
         let scatter = game.player(p2).cards(HAND, ESSENCE_SCATTER).only().unwrap();
 
         game.act(p1, actions::Action::Cast(bolt));
-        game.act(p1, actions::Action::ChooseTargets(vec![p2]));
+        game.act(p1, actions::Action::ChooseTargets(vec![*p2]));
         game.pass_priority();
         game.act(p2, actions::Action::Cast(scatter));
 
@@ -360,6 +360,9 @@ mod tests {
             MockGame::new([P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]), P2, P3, P4]);
         let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
         game.act(p1, actions::Action::Cast(bolt));
-        assert_eq!(game.target_choice(), Some(pick(1).from([p1, p2, p3, p4])));
+        assert_eq!(
+            game.target_choice(),
+            Some(pick(1).from([*p1, *p2, *p3, *p4]))
+        );
     }
 }

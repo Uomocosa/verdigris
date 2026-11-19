@@ -51,7 +51,7 @@ mod tests {
             MockGame::new([P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]), P2]);
         let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
         game.act(p1, actions::Action::Cast(bolt));
-        game.act(p1, actions::Action::ChooseTargets(vec![p2]));
+        game.act(p1, actions::Action::ChooseTargets(vec![*p2]));
         game.pass_priority_all();
         assert_eq!(game.zone_of(bolt), GRAVEYARD);
         assert!(!game.player(p1).cards(GRAVEYARD, LIGHTNING_BOLT).is_empty());

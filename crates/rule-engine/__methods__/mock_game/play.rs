@@ -2,13 +2,13 @@ use crate::testing;
 
 pub fn play(
     game: &mut testing::MockGame,
-    casts: impl IntoIterator<Item = testing::Cast>,
+    casts: impl IntoIterator<Item = testing::TestPlayerActions>,
 ) -> Result<(), testing::PlayError> {
     for (index, step) in casts.into_iter().flat_map(|cast| cast.steps()).enumerate() {
         let before = game.rejection_count();
         match &step {
-            testing::Step::Act(player, action) => game.act(*player, action.clone()),
-            testing::Step::PassPriorityAll => game.pass_priority_all(),
+            testing::PlayStep::Act(player, action) => game.act(*player, action.clone()),
+            testing::PlayStep::PassPriorityAll => game.pass_priority_all(),
         }
         let after = game.rejection_count();
         if after > before
@@ -29,7 +29,6 @@ mod tests {
     use crate::HAND;
     use crate::actions;
     use crate::mana;
-    use crate::testing::traits::Caster;
     use crate::testing::*;
 
     use super::play;
@@ -56,7 +55,7 @@ mod tests {
             error,
             PlayError::Rejected {
                 index: 1,
-                step: Step::Act(p1, actions::Action::ChooseTargets(vec![p2])),
+                step: PlayStep::Act(*p1, actions::Action::ChooseTargets(vec![*p2])),
                 rejection: actions::Rejected::CannotPay { spell: bolt },
             }
         );

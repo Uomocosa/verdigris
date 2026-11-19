@@ -1,8 +1,6 @@
 pub mod card_definition;
 #[cfg(feature = "testing")]
 pub mod cards;
-#[cfg(feature = "testing")]
-pub mod cast;
 pub mod effect;
 #[cfg(feature = "testing")]
 pub mod expected_targets;
@@ -14,4 +12,6 @@ pub mod mock_game;
 pub mod mock_game_builder;
 pub mod player_ref;
 pub mod rules_plugin;
+#[cfg(feature = "testing")]
+pub mod test_player_actions;
 pub mod zone_ref;

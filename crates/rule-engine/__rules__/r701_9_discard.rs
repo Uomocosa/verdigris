@@ -82,7 +82,6 @@ pub fn r701_9_discard(
 mod tests {
     use crate::actions;
     use crate::mana;
-    use crate::testing::traits::Caster;
     use crate::testing::*;
     use crate::{GRAVEYARD, HAND};
 

@@ -49,11 +49,11 @@ mod tests {
     #[test]
     fn test_usage() {
         let (game, [p1, ..]) = MockGame::new([P1.hand([LIGHTNING_BOLT, LIGHTNING_BOLT]), P2]);
-        let found = entities_in_zone_matching_card(&game, p1, HAND, "Lightning Bolt");
+        let found = entities_in_zone_matching_card(&game, *p1, HAND, "Lightning Bolt");
         assert_eq!(found.len(), 2);
         assert_eq!(
-            entities_in_zone_matching_card(&game, p1, HAND, "Murder"),
-            Vec::new()
+            entities_in_zone_matching_card(&game, *p1, HAND, "Murder"),
+            Vec::<bevy::prelude::Entity>::new()
         );
     }
 }
