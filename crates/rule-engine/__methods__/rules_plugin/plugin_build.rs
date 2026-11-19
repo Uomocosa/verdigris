@@ -22,12 +22,17 @@ pub fn plugin_build(_rules_plugin: &RulesPlugin, app: &mut App) {
     app.configure_sets(
         Update,
         (
+            rules::RuleSet::Turn,
             rules::RuleSet::Casting,
             rules::RuleSet::Resolution,
             rules::RuleSet::StateBased,
             rules::RuleSet::Cleanup,
         )
             .chain(),
+    );
+    app.add_systems(
+        Update,
+        rules::r117_3_priority::r117_3_priority.in_set(rules::RuleSet::Turn),
     );
     app.add_systems(
         Update,

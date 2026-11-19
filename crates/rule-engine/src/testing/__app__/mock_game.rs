@@ -4,6 +4,7 @@ use bevy::prelude::{App, Entity};
 use crate::actions;
 use crate::cards;
 use crate::testing;
+use crate::turns;
 use crate::zones;
 
 pub struct MockGame {
@@ -28,14 +29,25 @@ impl MockGame {
         self.app.update();
     }
 
-    pub fn pass_priority_all(&mut self) {
-        for player in self.players.clone() {
-            let _ = self.app.world_mut().write_message(actions::PlayerAction {
-                player,
-                action: actions::Action::PassPriority,
-            });
-        }
+    pub fn pass_priority(&mut self) {
+        let player = self.app.world().resource::<turns::Priority>().player;
+        let _ = self.app.world_mut().write_message(actions::PlayerAction {
+            player,
+            action: actions::Action::PassPriority,
+        });
         self.app.update();
+    }
+
+    pub fn pass_priority_all(&mut self) {
+        let passes = self
+            .app
+            .world()
+            .resource::<turns::Priority>()
+            .consecutive_passes;
+        let player_count = u32::try_from(self.players.len()).unwrap_or(u32::MAX);
+        for _ in passes..player_count {
+            self.pass_priority();
+        }
     }
 
     #[must_use]

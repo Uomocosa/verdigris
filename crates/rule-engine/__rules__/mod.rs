@@ -1,5 +1,6 @@
 mod helpers;
 
+pub mod r117_3_priority;
 pub mod r117_4_priority;
 pub mod r120_3_damage_results;
 pub mod r121_1_draw;
