@@ -6,6 +6,7 @@ mod lightning_bolt;
 mod murder;
 mod pick;
 mod seat;
+mod typhoid_rats;
 mod walking_corpse;
 
 pub use darksteel_myr::darksteel_myr;
@@ -16,4 +17,5 @@ pub use lightning_bolt::lightning_bolt;
 pub use murder::murder;
 pub use pick::pick;
 pub use seat::Seat;
+pub use typhoid_rats::typhoid_rats;
 pub use walking_corpse::walking_corpse;

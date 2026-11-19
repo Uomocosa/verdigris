@@ -3,3 +3,10 @@ use derive_more::Deref;
 
 #[derive(Message, Debug, Clone, Copy, PartialEq, Eq, Deref)]
 pub struct Destruction(pub Entity);
+
+#[derive(Message, Debug, Clone, Copy, PartialEq, Eq)]
+pub struct DamageDealt {
+    pub source: Entity,
+    pub target: Entity,
+    pub amount: u32,
+}

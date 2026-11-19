@@ -45,3 +45,8 @@ pub fn instant(name: impl Into<cards::CardName>, cost: cards::Cost) -> cards::Ca
 pub const fn indestructible() -> cards::Keyword {
     cards::Keyword::Indestructible
 }
+
+#[must_use]
+pub const fn deathtouch() -> cards::Keyword {
+    cards::Keyword::Deathtouch
+}

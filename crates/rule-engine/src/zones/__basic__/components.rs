@@ -33,3 +33,6 @@ pub struct Damage(pub u32);
 
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Lost;
+
+#[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
+pub struct DealtByDeathtouch;

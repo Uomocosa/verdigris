@@ -1,4 +1,4 @@
-use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query};
+use bevy::prelude::{Entity, MessageReader, MessageWriter, Query};
 
 use crate::cards;
 use crate::effects;
@@ -11,15 +11,15 @@ use crate::zones;
 /// last.
 pub fn r608_2_resolve(
     mut resolutions: MessageReader<stack::Resolution>,
-    mut commands: Commands,
+    mut damage_dealt: MessageWriter<zones::DamageDealt>,
     mut destructions: MessageWriter<zones::Destruction>,
     spells: Query<(
         &cards::CardDefinition,
         &zones::InZone,
         Option<&stack::ChosenTarget>,
     )>,
-    targets: Query<(&zones::InZone, Option<&zones::Damage>)>,
-    mut lives: Query<&mut zones::Life>,
+    targets: Query<&zones::InZone>,
+    lives: Query<&zones::Life>,
     zone_entities: Query<(Entity, &zones::Zone, Option<&zones::Owner>)>,
 ) {
     for resolution in resolutions.read() {
@@ -38,17 +38,16 @@ pub fn r608_2_resolve(
         };
         match effect.kind {
             effects::EffectKind::Damage(amount) => {
-                if let Ok(mut life) = lives.get_mut(target) {
-                    *life = zones::Life((**life).saturating_sub(helpers::signed_damage(amount)));
-                } else if let Ok((_, damage)) = targets.get(target) {
-                    let marked = damage.map_or(0, |damage| **damage);
-                    commands
-                        .entity(target)
-                        .insert(zones::Damage(marked.saturating_add(amount)));
+                if lives.get(target).is_ok() || targets.get(target).is_ok() {
+                    damage_dealt.write(zones::DamageDealt {
+                        source: spell,
+                        target,
+                        amount,
+                    });
                 }
             }
             effects::EffectKind::Destroy => {
-                if let Ok((target_zone, _)) = targets.get(target)
+                if let Ok(target_zone) = targets.get(target)
                     && helpers::is_card_in_zone(
                         **target_zone,
                         zones::Zone::Battlefield,

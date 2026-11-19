@@ -21,6 +21,7 @@ pub enum Color {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Keyword {
     Indestructible,
+    Deathtouch,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
