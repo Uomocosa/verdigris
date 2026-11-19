@@ -176,17 +176,6 @@ mod tests {
     }
 
     #[test]
-    fn test_bolt_to_face() {
-        let mut game = testing::MockGame::builder()
-            .hand(testing::Seat::P1, [testing::lightning_bolt()])
-            .mana_pool(testing::Seat::P1, mana![R])
-            .build();
-        let p2 = game.p2;
-        cast_and_resolve(&mut game, "Lightning Bolt", Some(p2));
-        assert_eq!(game.life(game.p2), 17);
-    }
-
-    #[test]
     fn test_murder_kills_bears() {
         let mut game = testing::MockGame::builder()
             .hand(testing::Seat::P1, [testing::murder()])

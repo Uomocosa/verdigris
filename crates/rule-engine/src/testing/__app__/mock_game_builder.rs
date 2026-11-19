@@ -15,6 +15,7 @@ pub struct MockGameBuilder {
     pub(crate) battlefields: BTreeMap<testing::Seat, Vec<cards::CardDefinition>>,
     pub(crate) libraries: BTreeMap<testing::Seat, Vec<cards::CardDefinition>>,
     pub(crate) mana_pools: BTreeMap<testing::Seat, cards::ManaPool>,
+    pub(crate) lives: BTreeMap<testing::Seat, i32>,
 }
 
 impl Default for MockGameBuilder {
@@ -28,6 +29,7 @@ impl Default for MockGameBuilder {
             battlefields: BTreeMap::new(),
             libraries: BTreeMap::new(),
             mana_pools: BTreeMap::new(),
+            lives: BTreeMap::new(),
         }
     }
 }
@@ -78,6 +80,12 @@ impl MockGameBuilder {
         self.mana_pools.insert(seat, pool);
         self
     }
+
+    #[must_use]
+    pub fn life(mut self, seat: testing::Seat, amount: i32) -> Self {
+        self.lives.insert(seat, amount);
+        self
+    }
 }
 
 #[atomic_delegates]
@@ -95,8 +103,12 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let game = testing::MockGame::builder().players(3).build();
+        let game = testing::MockGame::builder()
+            .players(3)
+            .life(testing::Seat::P2, 7)
+            .build();
         assert_eq!(game.life(game.p1), 20);
+        assert_eq!(game.life(game.p2), 7);
         assert_eq!(game.life(game.p(3)), 20);
     }
 }

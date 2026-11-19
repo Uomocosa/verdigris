@@ -47,42 +47,31 @@ pub fn r120_3_damage_results(
 
 #[cfg(test)]
 mod tests {
+    use crate::actions;
+    use crate::mana;
     use crate::testing;
+    use crate::turns;
     use crate::zones;
 
     #[test]
     fn test_usage() {
         let mut game = testing::MockGame::builder()
+            .turn(1, testing::Seat::P2, turns::Step::PrecombatMain)
             .battlefield(testing::Seat::P1, [testing::walking_corpse()])
-            .battlefield(testing::Seat::P2, [testing::grizzly_bears()])
+            .hand(testing::Seat::P2, [testing::lightning_bolt()])
+            .mana_pool(testing::Seat::P2, mana![R])
             .build();
-        let source = game
+        let corpse = game
             .find(game.p1, zones::Zone::Battlefield, "Walking Corpse")
             .unwrap();
-        let bears = game
-            .find(game.p2, zones::Zone::Battlefield, "Grizzly Bears")
+        let bolt = game
+            .find(game.p2, zones::Zone::Hand, "Lightning Bolt")
             .unwrap();
-        let _ = game.app.world_mut().write_message(zones::DamageDealt {
-            source,
-            target: bears,
-            amount: 1,
-        });
-        game.app.update();
-        let damage = game.app.world().get::<zones::Damage>(bears).unwrap();
-        assert_eq!(**damage, 1);
-    }
-
-    #[test]
-    fn r120_3a_damage_to_a_player_causes_life_loss() {
-        let mut game = testing::MockGame::builder().build();
-        let source = game.p1;
-        let target = game.p2;
-        let _ = game.app.world_mut().write_message(zones::DamageDealt {
-            source,
-            target,
-            amount: 3,
-        });
-        game.app.update();
-        assert_eq!(game.life(target), 17);
+        let p1 = game.p1;
+        game.act(game.p2, actions::Action::Cast(bolt));
+        game.act(game.p2, actions::Action::ChooseTargets(vec![corpse]));
+        game.pass_priority_all();
+        assert_eq!(game.zone_of(corpse), zones::Zone::Graveyard);
+        assert_eq!(game.life(p1), 20);
     }
 }

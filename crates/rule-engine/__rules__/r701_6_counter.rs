@@ -33,28 +33,11 @@ pub fn r701_6_counter(
 mod tests {
     use crate::actions;
     use crate::mana;
-    use crate::stack;
     use crate::testing;
     use crate::zones;
 
     #[test]
     fn test_usage() {
-        let mut game = testing::MockGame::builder()
-            .hand(testing::Seat::P1, [testing::lightning_bolt()])
-            .mana_pool(testing::Seat::P1, mana![R])
-            .build();
-        let bolt = game
-            .find(game.p1, zones::Zone::Hand, "Lightning Bolt")
-            .unwrap();
-        game.act(game.p1, actions::Action::Cast(bolt));
-        game.act(game.p1, actions::Action::ChooseTargets(vec![game.p2]));
-        let _ = game.app.world_mut().write_message(stack::Countered(bolt));
-        game.app.update();
-        assert_eq!(game.zone_of(bolt), zones::Zone::Graveyard);
-    }
-
-    #[test]
-    fn cancel_counters_a_target_spell() {
         let mut game = testing::MockGame::builder()
             .hand(testing::Seat::P1, [testing::lightning_bolt()])
             .hand(testing::Seat::P2, [testing::cancel()])

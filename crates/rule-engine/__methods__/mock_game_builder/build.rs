@@ -26,9 +26,10 @@ pub fn build(builder: &testing::MockGameBuilder) -> testing::MockGame {
     let players: Vec<Entity> = SEATS
         .iter()
         .take(builder.player_count)
-        .map(|_| {
+        .map(|seat| {
+            let life = builder.lives.get(seat).copied().unwrap_or(20);
             app.world_mut()
-                .spawn((zones::Player, zones::Life(20), cards::ManaPool::default()))
+                .spawn((zones::Player, zones::Life(life), cards::ManaPool::default()))
                 .id()
         })
         .collect();

@@ -39,34 +39,6 @@ mod tests {
     #[test]
     fn test_usage() {
         let mut game = testing::MockGame::builder()
-            .battlefield(testing::Seat::P1, [testing::grizzly_bears()])
-            .build();
-        let bears = game
-            .find(game.p1, zones::Zone::Battlefield, "Grizzly Bears")
-            .unwrap();
-        game.app.world_mut().entity_mut(bears).insert((
-            zones::Damage(2),
-            effects::PowerToughnessModifier {
-                power: 3,
-                toughness: 3,
-            },
-        ));
-        game.end_turn();
-        assert_eq!(
-            game.app.world().get::<zones::Damage>(bears).copied(),
-            Some(zones::Damage(0))
-        );
-        assert!(
-            game.app
-                .world()
-                .get::<effects::PowerToughnessModifier>(bears)
-                .is_none()
-        );
-    }
-
-    #[test]
-    fn r514_2_cleanup_removes_damage_and_ends_until_end_of_turn_effects() {
-        let mut game = testing::MockGame::builder()
             .hand(testing::Seat::P1, [testing::lightning_bolt()])
             .hand(testing::Seat::P2, [testing::giant_growth()])
             .battlefield(testing::Seat::P2, [testing::grizzly_bears()])
