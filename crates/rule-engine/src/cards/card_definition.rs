@@ -3,6 +3,8 @@ use bevy::prelude::Component;
 
 use crate::cards;
 use crate::effects;
+#[cfg(feature = "testing")]
+use crate::testing;
 
 #[derive(Component, Debug, Clone, PartialEq, Eq)]
 pub struct CardDefinition {
@@ -12,6 +14,12 @@ pub struct CardDefinition {
     pub power_toughness: Option<cards::PowerToughness>,
     pub effect: Option<effects::Effect>,
     pub keywords: Vec<cards::Keyword>,
+}
+
+#[cfg(feature = "testing")]
+#[rustfmt::skip]
+impl From<testing::Card> for CardDefinition {
+    fn from(card: testing::Card) -> Self { (card.definition)() }
 }
 
 #[atomic_delegates]

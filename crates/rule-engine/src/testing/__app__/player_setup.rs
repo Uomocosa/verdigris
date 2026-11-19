@@ -73,6 +73,7 @@ impl PlayerSetup {
 
 #[cfg(test)]
 mod tests {
+    use crate::HAND;
     use crate::mana;
     use crate::testing::*;
 
@@ -117,5 +118,12 @@ mod tests {
         for card in fixtures {
             assert_eq!(*((card.definition)()).name, card.name);
         }
+    }
+
+    #[test]
+    fn hand_places_a_card_constant_in_the_hand_zone() {
+        let (game, [p1, _]) = MockGame::new([P1.hand([LIGHTNING_BOLT]), P2]);
+
+        assert!(game.find(p1, HAND, LIGHTNING_BOLT.name).is_some());
     }
 }
