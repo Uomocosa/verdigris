@@ -18,16 +18,16 @@ pub fn r119_3_life_loss(
 
 #[cfg(test)]
 mod tests {
+    use crate::HAND;
     use bevy::prelude::Entity;
 
     use crate::actions;
     use crate::mana;
     use crate::players;
     use crate::testing::*;
-    use crate::zones;
 
     fn cast_and_resolve(game: &mut MockGame, spell_name: &str, target: Option<Entity>) {
-        let spell = game.find(game.p1, zones::Zone::Hand, spell_name).unwrap();
+        let spell = game.find(game.p1, HAND, spell_name).unwrap();
         game.act(game.p1, actions::Action::Cast(spell));
         if let Some(target) = target {
             game.act(game.p1, actions::Action::ChooseTargets(vec![target]));
@@ -58,8 +58,8 @@ mod tests {
 
         assert_eq!(game.life(p2), 18);
         assert_eq!(game.life(game.p1), 20);
-        assert!(game.find(p2, zones::Zone::Hand, "Lightning Bolt").is_some());
-        assert!(game.find(p2, zones::Zone::Hand, "Murder").is_some());
+        assert!(game.find(p2, HAND, "Lightning Bolt").is_some());
+        assert!(game.find(p2, HAND, "Murder").is_some());
     }
 
     #[test]
@@ -73,8 +73,8 @@ mod tests {
         cast_and_resolve(&mut game, "Sign in Blood", Some(p1));
 
         assert_eq!(game.life(p1), 18);
-        assert!(game.find(p1, zones::Zone::Hand, "Lightning Bolt").is_some());
-        assert!(game.find(p1, zones::Zone::Hand, "Murder").is_some());
+        assert!(game.find(p1, HAND, "Lightning Bolt").is_some());
+        assert!(game.find(p1, HAND, "Murder").is_some());
     }
 
     #[test]

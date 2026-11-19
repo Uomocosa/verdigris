@@ -90,6 +90,7 @@ mod tests {
     use crate::testing::*;
     use crate::turns;
     use crate::zones;
+    use crate::{BATTLEFIELD, HAND, LIBRARY};
 
     use super::MockGame;
 
@@ -106,7 +107,7 @@ mod tests {
         assert_eq!(game.life(game.p2), 20);
 
         let first_bear = game
-            .find(game.p1, zones::Zone::Library, "Grizzly Bears")
+            .find(game.p1, LIBRARY, "Grizzly Bears")
             .expect("P1 library holds Grizzly Bears");
         let library = *game.app.world().get::<zones::InZone>(first_bear).unwrap();
         let bears_in_library = game
@@ -120,14 +121,8 @@ mod tests {
             })
             .count();
         assert_eq!(bears_in_library, 12);
-        assert!(
-            game.find(game.p1, zones::Zone::Hand, "Grizzly Bears")
-                .is_none()
-        );
-        assert!(
-            game.find(game.p2, zones::Zone::Hand, "Grizzly Bears")
-                .is_none()
-        );
+        assert!(game.find(game.p1, HAND, "Grizzly Bears").is_none());
+        assert!(game.find(game.p2, HAND, "Grizzly Bears").is_none());
 
         let turn = game.app.world().resource::<turns::Turn>();
         assert_eq!(turn.number, 1);
@@ -153,19 +148,10 @@ mod tests {
         assert_ne!(game.p(3), game.p(4));
         assert!(game.app.world().get_entity(game.p(3)).is_ok());
         assert!(game.app.world().get_entity(game.p(4)).is_ok());
-        assert!(
-            game.find(game.p1, zones::Zone::Hand, "Lightning Bolt")
-                .is_some()
-        );
-        assert!(
-            game.find(game.p2, zones::Zone::Battlefield, "Grizzly Bears")
-                .is_some()
-        );
-        assert!(game.find(game.p2, zones::Zone::Library, "Murder").is_some());
-        assert!(
-            game.find(game.p2, zones::Zone::Library, "Grizzly Bears")
-                .is_none()
-        );
+        assert!(game.find(game.p1, HAND, "Lightning Bolt").is_some());
+        assert!(game.find(game.p2, BATTLEFIELD, "Grizzly Bears").is_some());
+        assert!(game.find(game.p2, LIBRARY, "Murder").is_some());
+        assert!(game.find(game.p2, LIBRARY, "Grizzly Bears").is_none());
         assert_eq!(game.mana_pool(game.p1), mana![R]);
 
         let turn = game.app.world().resource::<turns::Turn>();
@@ -181,10 +167,7 @@ mod tests {
     #[test]
     fn fresh_game_has_no_target_or_rejection() {
         let game = MockGame::builder().build();
-        assert!(
-            game.find(game.p1, zones::Zone::Hand, "Lightning Bolt")
-                .is_none()
-        );
+        assert!(game.find(game.p1, HAND, "Lightning Bolt").is_none());
         assert!(game.target_choice().is_none());
         assert!(game.last_rejection().is_none());
     }

@@ -1,3 +1,4 @@
+use crate::{GRAVEYARD, HAND};
 use std::collections::BTreeSet;
 
 use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query, ResMut};
@@ -22,13 +23,10 @@ pub fn r701_9_discard(
     zone_contents: Query<&zones::ZoneContents>,
 ) {
     for discard in discards.read() {
-        let Some(hand) =
-            helpers::find_zone(zones::Zone::Hand, Some(discard.player), &zone_entities)
-        else {
+        let Some(hand) = helpers::find_zone(HAND, Some(discard.player), &zone_entities) else {
             continue;
         };
-        let Some(graveyard) =
-            helpers::find_zone(zones::Zone::Graveyard, Some(discard.player), &zone_entities)
+        let Some(graveyard) = helpers::find_zone(GRAVEYARD, Some(discard.player), &zone_entities)
         else {
             continue;
         };
@@ -69,8 +67,7 @@ pub fn r701_9_discard(
             });
             continue;
         }
-        let Some(graveyard) =
-            helpers::find_zone(zones::Zone::Graveyard, Some(choice.player), &zone_entities)
+        let Some(graveyard) = helpers::find_zone(GRAVEYARD, Some(choice.player), &zone_entities)
         else {
             continue;
         };
@@ -86,10 +83,10 @@ mod tests {
     use crate::actions;
     use crate::mana;
     use crate::testing::*;
-    use crate::zones;
+    use crate::{GRAVEYARD, HAND};
 
     fn cast_and_resolve_mind_rot(game: &mut MockGame) {
-        let mind_rot = game.find(game.p1, zones::Zone::Hand, "Mind Rot").unwrap();
+        let mind_rot = game.find(game.p1, HAND, "Mind Rot").unwrap();
         game.act(game.p1, actions::Action::Cast(mind_rot));
         game.act(game.p1, actions::Action::ChooseTargets(vec![game.p2]));
         game.pass_priority_all();
@@ -103,10 +100,7 @@ mod tests {
             .mana_pool(Seat::P1, mana![2, B])
             .build();
         cast_and_resolve_mind_rot(&mut game);
-        assert!(
-            game.find(game.p2, zones::Zone::Graveyard, "Grizzly Bears")
-                .is_some()
-        );
+        assert!(game.find(game.p2, GRAVEYARD, "Grizzly Bears").is_some());
     }
 
     #[test]
@@ -118,17 +112,13 @@ mod tests {
             .build();
         cast_and_resolve_mind_rot(&mut game);
 
-        let bears = game
-            .find(game.p2, zones::Zone::Hand, "Grizzly Bears")
-            .unwrap();
-        let bolt = game
-            .find(game.p2, zones::Zone::Hand, "Lightning Bolt")
-            .unwrap();
+        let bears = game.find(game.p2, HAND, "Grizzly Bears").unwrap();
+        let bolt = game.find(game.p2, HAND, "Lightning Bolt").unwrap();
         game.act(game.p2, actions::Action::ChooseDiscard(vec![bears, bolt]));
 
-        assert_eq!(game.zone_of(bears), zones::Zone::Graveyard);
-        assert_eq!(game.zone_of(bolt), zones::Zone::Graveyard);
-        assert!(game.find(game.p2, zones::Zone::Hand, "Murder").is_some());
+        assert_eq!(game.zone_of(bears), GRAVEYARD);
+        assert_eq!(game.zone_of(bolt), GRAVEYARD);
+        assert!(game.find(game.p2, HAND, "Murder").is_some());
     }
 
     #[test]
@@ -141,15 +131,9 @@ mod tests {
         cast_and_resolve_mind_rot(&mut game);
 
         assert_eq!(
-            game.zone_of(
-                game.find(game.p2, zones::Zone::Graveyard, "Grizzly Bears")
-                    .unwrap()
-            ),
-            zones::Zone::Graveyard
+            game.zone_of(game.find(game.p2, GRAVEYARD, "Grizzly Bears").unwrap()),
+            GRAVEYARD
         );
-        assert!(
-            game.find(game.p2, zones::Zone::Hand, "Grizzly Bears")
-                .is_none()
-        );
+        assert!(game.find(game.p2, HAND, "Grizzly Bears").is_none());
     }
 }

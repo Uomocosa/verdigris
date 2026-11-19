@@ -21,11 +21,11 @@ pub fn r704_5b_empty_library(
 
 #[cfg(test)]
 mod tests {
+    use crate::HAND;
     use crate::actions;
     use crate::mana;
     use crate::players;
     use crate::testing::*;
-    use crate::zones;
 
     #[test]
     fn test_usage() {
@@ -34,7 +34,7 @@ mod tests {
             .library(Seat::P1, [])
             .mana_pool(Seat::P1, mana![2, U])
             .build();
-        let divination = game.find(game.p1, zones::Zone::Hand, "Divination").unwrap();
+        let divination = game.find(game.p1, HAND, "Divination").unwrap();
         game.act(game.p1, actions::Action::Cast(divination));
         game.pass_priority_all();
         assert!(game.app.world().get::<players::Lost>(game.p1).is_some());
@@ -47,7 +47,7 @@ mod tests {
             .library(Seat::P1, [])
             .mana_pool(Seat::P1, mana![2, U])
             .build();
-        let divination = game.find(game.p1, zones::Zone::Hand, "Divination").unwrap();
+        let divination = game.find(game.p1, HAND, "Divination").unwrap();
         game.act(game.p1, actions::Action::Cast(divination));
         assert!(game.app.world().get::<players::Lost>(game.p1).is_none());
         game.pass_priority_all();

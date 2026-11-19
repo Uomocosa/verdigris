@@ -1,3 +1,4 @@
+use crate::BATTLEFIELD;
 use bevy::prelude::{Entity, MessageWriter, Query};
 
 use crate::cards;
@@ -21,7 +22,7 @@ pub fn r704_5g_lethal_damage(
     zone_entities: Query<(Entity, &zones::Zone, Option<&cards::Owner>)>,
 ) {
     for (creature, definition, damage, in_zone, modifier) in cards.iter() {
-        if !helpers::is_card_in_zone(**in_zone, zones::Zone::Battlefield, &zone_entities) {
+        if !helpers::is_card_in_zone(**in_zone, BATTLEFIELD, &zone_entities) {
             continue;
         }
         let Some(power_toughness) = helpers::effective_power_toughness(definition, modifier) else {
@@ -42,7 +43,7 @@ mod tests {
     use crate::actions;
     use crate::mana;
     use crate::testing::*;
-    use crate::zones;
+    use crate::{BATTLEFIELD, GRAVEYARD, HAND};
 
     #[test]
     fn test_usage() {
@@ -51,15 +52,11 @@ mod tests {
             .battlefield(Seat::P2, [grizzly_bears()])
             .mana_pool(Seat::P1, mana![R])
             .build();
-        let bolt = game
-            .find(game.p1, zones::Zone::Hand, "Lightning Bolt")
-            .unwrap();
-        let bears = game
-            .find(game.p2, zones::Zone::Battlefield, "Grizzly Bears")
-            .unwrap();
+        let bolt = game.find(game.p1, HAND, "Lightning Bolt").unwrap();
+        let bears = game.find(game.p2, BATTLEFIELD, "Grizzly Bears").unwrap();
         game.act(game.p1, actions::Action::Cast(bolt));
         game.act(game.p1, actions::Action::ChooseTargets(vec![bears]));
         game.pass_priority_all();
-        assert_eq!(game.zone_of(bears), zones::Zone::Graveyard);
+        assert_eq!(game.zone_of(bears), GRAVEYARD);
     }
 }

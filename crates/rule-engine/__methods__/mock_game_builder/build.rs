@@ -1,3 +1,4 @@
+use crate::{BATTLEFIELD, EXILE, GRAVEYARD, HAND, LIBRARY, STACK};
 use std::collections::BTreeMap;
 
 use bevy::prelude::{App, Entity};
@@ -28,21 +29,15 @@ pub fn build(builder: &testing::MockGameBuilder) -> testing::MockGame {
 
     let mut zones_by_seat: BTreeMap<(testing::Seat, zones::Zone), Entity> = BTreeMap::new();
     for (seat, player) in SEATS.iter().zip(&players) {
-        for zone in [
-            zones::Zone::Library,
-            zones::Zone::Hand,
-            zones::Zone::Battlefield,
-            zones::Zone::Graveyard,
-            zones::Zone::Exile,
-        ] {
+        for zone in [LIBRARY, HAND, BATTLEFIELD, GRAVEYARD, EXILE] {
             let zone_entity = app.world_mut().spawn((zone, cards::Owner(*player))).id();
             zones_by_seat.insert((*seat, zone), zone_entity);
         }
     }
-    let _ = app.world_mut().spawn((zones::Zone::Stack,)).id();
+    let _ = app.world_mut().spawn((STACK,)).id();
     for (seat, player) in SEATS.iter().zip(&players) {
         let hand = zones_by_seat
-            .get(&(*seat, zones::Zone::Hand))
+            .get(&(*seat, HAND))
             .copied()
             .unwrap_or(Entity::PLACEHOLDER);
         for definition in builder.hands.get(seat).into_iter().flatten().cloned() {
@@ -52,7 +47,7 @@ pub fn build(builder: &testing::MockGameBuilder) -> testing::MockGame {
         }
 
         let battlefield = zones_by_seat
-            .get(&(*seat, zones::Zone::Battlefield))
+            .get(&(*seat, BATTLEFIELD))
             .copied()
             .unwrap_or(Entity::PLACEHOLDER);
         for definition in builder
@@ -71,7 +66,7 @@ pub fn build(builder: &testing::MockGameBuilder) -> testing::MockGame {
         }
 
         let library_zone = zones_by_seat
-            .get(&(*seat, zones::Zone::Library))
+            .get(&(*seat, LIBRARY))
             .copied()
             .unwrap_or(Entity::PLACEHOLDER);
         let library = builder
@@ -120,8 +115,8 @@ pub fn build(builder: &testing::MockGameBuilder) -> testing::MockGame {
 
 #[cfg(test)]
 mod tests {
+    use crate::LIBRARY;
     use crate::testing::*;
-    use crate::zones;
 
     use super::build;
 
@@ -129,9 +124,6 @@ mod tests {
     fn test_usage() {
         let game = build(&MockGameBuilder::default());
         assert_eq!(game.life(game.p1), 20);
-        assert!(
-            game.find(game.p1, zones::Zone::Library, "Grizzly Bears")
-                .is_some()
-        );
+        assert!(game.find(game.p1, LIBRARY, "Grizzly Bears").is_some());
     }
 }

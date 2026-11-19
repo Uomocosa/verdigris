@@ -52,7 +52,7 @@ mod tests {
     use crate::mana;
     use crate::testing::*;
     use crate::turns;
-    use crate::zones;
+    use crate::{BATTLEFIELD, GRAVEYARD, HAND};
 
     #[test]
     fn test_usage() {
@@ -62,17 +62,13 @@ mod tests {
             .hand(Seat::P2, [lightning_bolt()])
             .mana_pool(Seat::P2, mana![R])
             .build();
-        let corpse = game
-            .find(game.p1, zones::Zone::Battlefield, "Walking Corpse")
-            .unwrap();
-        let bolt = game
-            .find(game.p2, zones::Zone::Hand, "Lightning Bolt")
-            .unwrap();
+        let corpse = game.find(game.p1, BATTLEFIELD, "Walking Corpse").unwrap();
+        let bolt = game.find(game.p2, HAND, "Lightning Bolt").unwrap();
         let p1 = game.p1;
         game.act(game.p2, actions::Action::Cast(bolt));
         game.act(game.p2, actions::Action::ChooseTargets(vec![corpse]));
         game.pass_priority_all();
-        assert_eq!(game.zone_of(corpse), zones::Zone::Graveyard);
+        assert_eq!(game.zone_of(corpse), GRAVEYARD);
         assert_eq!(game.life(p1), 20);
     }
 }

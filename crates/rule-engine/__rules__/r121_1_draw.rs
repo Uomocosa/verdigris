@@ -1,3 +1,4 @@
+use crate::{HAND, LIBRARY};
 use bevy::prelude::{Commands, Entity, MessageReader, Query};
 
 use crate::cards;
@@ -21,9 +22,7 @@ pub fn r121_1_draw(
     zone_contents: Query<&zones::ZoneContents>,
 ) {
     for draw in draws.read() {
-        let Some(library) =
-            helpers::find_zone(zones::Zone::Library, Some(draw.player), &zone_entities)
-        else {
+        let Some(library) = helpers::find_zone(LIBRARY, Some(draw.player), &zone_entities) else {
             continue;
         };
         let drawn_from_top: Vec<Entity> = zone_contents
@@ -33,8 +32,7 @@ pub fn r121_1_draw(
                 contents.iter().take(requested).copied().collect()
             })
             .unwrap_or_default();
-        if let Some(hand) = helpers::find_zone(zones::Zone::Hand, Some(draw.player), &zone_entities)
-        {
+        if let Some(hand) = helpers::find_zone(HAND, Some(draw.player), &zone_entities) {
             for card in &drawn_from_top {
                 commands.entity(*card).insert(zones::InZone(hand));
             }
@@ -52,7 +50,7 @@ mod tests {
     use crate::actions;
     use crate::mana;
     use crate::testing::*;
-    use crate::zones;
+    use crate::{GRAVEYARD, HAND, LIBRARY};
 
     #[test]
     fn test_usage() {
@@ -60,14 +58,11 @@ mod tests {
             .hand(Seat::P1, [divination()])
             .mana_pool(Seat::P1, mana![2, U])
             .build();
-        let divination = game.find(game.p1, zones::Zone::Hand, "Divination").unwrap();
+        let divination = game.find(game.p1, HAND, "Divination").unwrap();
         game.act(game.p1, actions::Action::Cast(divination));
         game.pass_priority_all();
-        assert!(
-            game.find(game.p1, zones::Zone::Hand, "Grizzly Bears")
-                .is_some()
-        );
-        assert_eq!(game.zone_of(divination), zones::Zone::Graveyard);
+        assert!(game.find(game.p1, HAND, "Grizzly Bears").is_some());
+        assert_eq!(game.zone_of(divination), GRAVEYARD);
     }
 
     #[test]
@@ -77,20 +72,14 @@ mod tests {
             .library(Seat::P1, [grizzly_bears(), lightning_bolt(), murder()])
             .mana_pool(Seat::P1, mana![2, U])
             .build();
-        let divination = game.find(game.p1, zones::Zone::Hand, "Divination").unwrap();
+        let divination = game.find(game.p1, HAND, "Divination").unwrap();
         game.act(game.p1, actions::Action::Cast(divination));
         game.pass_priority_all();
-        assert!(
-            game.find(game.p1, zones::Zone::Hand, "Grizzly Bears")
-                .is_some()
-        );
-        assert!(
-            game.find(game.p1, zones::Zone::Hand, "Lightning Bolt")
-                .is_some()
-        );
+        assert!(game.find(game.p1, HAND, "Grizzly Bears").is_some());
+        assert!(game.find(game.p1, HAND, "Lightning Bolt").is_some());
         assert_eq!(
-            game.zone_of(game.find(game.p1, zones::Zone::Library, "Murder").unwrap()),
-            zones::Zone::Library
+            game.zone_of(game.find(game.p1, LIBRARY, "Murder").unwrap()),
+            LIBRARY
         );
     }
 }

@@ -1,3 +1,4 @@
+use crate::{BATTLEFIELD, GRAVEYARD};
 use bevy::prelude::{Commands, Entity, MessageReader, Query};
 
 use crate::cards;
@@ -25,12 +26,10 @@ pub fn r702_12b_indestructible(
         {
             continue;
         }
-        if !helpers::is_card_in_zone(**in_zone, zones::Zone::Battlefield, &zone_entities) {
+        if !helpers::is_card_in_zone(**in_zone, BATTLEFIELD, &zone_entities) {
             continue;
         }
-        if let Some(graveyard) =
-            helpers::find_zone(zones::Zone::Graveyard, Some(**owner), &zone_entities)
-        {
+        if let Some(graveyard) = helpers::find_zone(GRAVEYARD, Some(**owner), &zone_entities) {
             commands.entity(permanent).insert(zones::InZone(graveyard));
         }
     }
@@ -42,7 +41,7 @@ mod tests {
     use crate::damage;
     use crate::mana;
     use crate::testing::*;
-    use crate::zones;
+    use crate::{BATTLEFIELD, GRAVEYARD, HAND};
 
     #[test]
     fn test_usage() {
@@ -51,14 +50,12 @@ mod tests {
             .battlefield(Seat::P2, [darksteel_myr()])
             .mana_pool(Seat::P1, mana![1, B, B])
             .build();
-        let murder = game.find(game.p1, zones::Zone::Hand, "Murder").unwrap();
-        let myr = game
-            .find(game.p2, zones::Zone::Battlefield, "Darksteel Myr")
-            .unwrap();
+        let murder = game.find(game.p1, HAND, "Murder").unwrap();
+        let myr = game.find(game.p2, BATTLEFIELD, "Darksteel Myr").unwrap();
         game.act(game.p1, actions::Action::Cast(murder));
         game.act(game.p1, actions::Action::ChooseTargets(vec![myr]));
         game.pass_priority_all();
-        assert_eq!(game.zone_of(myr), zones::Zone::Battlefield);
+        assert_eq!(game.zone_of(myr), BATTLEFIELD);
     }
 
     #[test]
@@ -68,19 +65,14 @@ mod tests {
             .battlefield(Seat::P2, [darksteel_myr()])
             .mana_pool(Seat::P1, mana![1, B, B])
             .build();
-        let murder = game.find(game.p1, zones::Zone::Hand, "Murder").unwrap();
-        let myr = game
-            .find(game.p2, zones::Zone::Battlefield, "Darksteel Myr")
-            .unwrap();
+        let murder = game.find(game.p1, HAND, "Murder").unwrap();
+        let myr = game.find(game.p2, BATTLEFIELD, "Darksteel Myr").unwrap();
         game.act(game.p1, actions::Action::Cast(murder));
         game.act(game.p1, actions::Action::ChooseTargets(vec![myr]));
         game.pass_priority_all();
-        assert_eq!(game.zone_of(myr), zones::Zone::Battlefield);
-        assert_eq!(game.zone_of(murder), zones::Zone::Graveyard);
-        assert!(
-            game.find(game.p2, zones::Zone::Battlefield, "Darksteel Myr")
-                .is_some()
-        );
+        assert_eq!(game.zone_of(myr), BATTLEFIELD);
+        assert_eq!(game.zone_of(murder), GRAVEYARD);
+        assert!(game.find(game.p2, BATTLEFIELD, "Darksteel Myr").is_some());
     }
 
     #[test]
@@ -90,16 +82,12 @@ mod tests {
             .battlefield(Seat::P2, [darksteel_myr()])
             .mana_pool(Seat::P1, mana![R])
             .build();
-        let bolt = game
-            .find(game.p1, zones::Zone::Hand, "Lightning Bolt")
-            .unwrap();
-        let myr = game
-            .find(game.p2, zones::Zone::Battlefield, "Darksteel Myr")
-            .unwrap();
+        let bolt = game.find(game.p1, HAND, "Lightning Bolt").unwrap();
+        let myr = game.find(game.p2, BATTLEFIELD, "Darksteel Myr").unwrap();
         game.act(game.p1, actions::Action::Cast(bolt));
         game.act(game.p1, actions::Action::ChooseTargets(vec![myr]));
         game.pass_priority_all();
-        assert_eq!(game.zone_of(myr), zones::Zone::Battlefield);
+        assert_eq!(game.zone_of(myr), BATTLEFIELD);
         let damage = game.app.world().get::<damage::Damage>(myr).unwrap();
         assert_eq!(**damage, 3);
     }
@@ -111,14 +99,12 @@ mod tests {
             .battlefield(Seat::P2, [darksteel_myr()])
             .mana_pool(Seat::P1, mana![1, B])
             .build();
-        let blade = game.find(game.p1, zones::Zone::Hand, "Doom Blade").unwrap();
-        let myr = game
-            .find(game.p2, zones::Zone::Battlefield, "Darksteel Myr")
-            .unwrap();
+        let blade = game.find(game.p1, HAND, "Doom Blade").unwrap();
+        let myr = game.find(game.p2, BATTLEFIELD, "Darksteel Myr").unwrap();
         game.act(game.p1, actions::Action::Cast(blade));
         game.act(game.p1, actions::Action::ChooseTargets(vec![myr]));
         game.pass_priority_all();
-        assert_eq!(game.zone_of(myr), zones::Zone::Battlefield);
-        assert_eq!(game.zone_of(blade), zones::Zone::Graveyard);
+        assert_eq!(game.zone_of(myr), BATTLEFIELD);
+        assert_eq!(game.zone_of(blade), GRAVEYARD);
     }
 }

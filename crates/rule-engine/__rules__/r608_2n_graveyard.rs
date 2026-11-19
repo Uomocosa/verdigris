@@ -1,3 +1,4 @@
+use crate::{GRAVEYARD, STACK};
 use bevy::prelude::{Commands, Entity, MessageReader, Query};
 
 use crate::cards;
@@ -19,7 +20,7 @@ pub fn r608_2n_graveyard(
         let Ok((definition, owner, in_zone)) = cards.get(spell) else {
             continue;
         };
-        if !helpers::is_card_in_zone(**in_zone, zones::Zone::Stack, &zone_entities) {
+        if !helpers::is_card_in_zone(**in_zone, STACK, &zone_entities) {
             continue;
         }
         let is_instant_or_sorcery = definition.types.iter().any(|card_type| {
@@ -31,9 +32,7 @@ pub fn r608_2n_graveyard(
         if !is_instant_or_sorcery {
             continue;
         }
-        if let Some(graveyard) =
-            helpers::find_zone(zones::Zone::Graveyard, Some(**owner), &zone_entities)
-        {
+        if let Some(graveyard) = helpers::find_zone(GRAVEYARD, Some(**owner), &zone_entities) {
             commands.entity(spell).insert(zones::InZone(graveyard));
         }
     }
@@ -44,7 +43,7 @@ mod tests {
     use crate::actions;
     use crate::mana;
     use crate::testing::*;
-    use crate::zones;
+    use crate::{GRAVEYARD, HAND};
 
     #[test]
     fn test_usage() {
@@ -52,16 +51,11 @@ mod tests {
             .hand(Seat::P1, [lightning_bolt()])
             .mana_pool(Seat::P1, mana![R])
             .build();
-        let bolt = game
-            .find(game.p1, zones::Zone::Hand, "Lightning Bolt")
-            .unwrap();
+        let bolt = game.find(game.p1, HAND, "Lightning Bolt").unwrap();
         game.act(game.p1, actions::Action::Cast(bolt));
         game.act(game.p1, actions::Action::ChooseTargets(vec![game.p2]));
         game.pass_priority_all();
-        assert_eq!(game.zone_of(bolt), zones::Zone::Graveyard);
-        assert!(
-            game.find(game.p1, zones::Zone::Graveyard, "Lightning Bolt")
-                .is_some()
-        );
+        assert_eq!(game.zone_of(bolt), GRAVEYARD);
+        assert!(game.find(game.p1, GRAVEYARD, "Lightning Bolt").is_some());
     }
 }

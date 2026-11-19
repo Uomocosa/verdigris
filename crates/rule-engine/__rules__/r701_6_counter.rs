@@ -1,3 +1,4 @@
+use crate::{GRAVEYARD, STACK};
 use bevy::prelude::{Commands, Entity, MessageReader, Query};
 
 use crate::cards;
@@ -19,12 +20,10 @@ pub fn r701_6_counter(
         let Ok((owner, in_zone)) = spells.get(spell) else {
             continue;
         };
-        if !helpers::is_card_in_zone(**in_zone, zones::Zone::Stack, &zone_entities) {
+        if !helpers::is_card_in_zone(**in_zone, STACK, &zone_entities) {
             continue;
         }
-        if let Some(graveyard) =
-            helpers::find_zone(zones::Zone::Graveyard, Some(**owner), &zone_entities)
-        {
+        if let Some(graveyard) = helpers::find_zone(GRAVEYARD, Some(**owner), &zone_entities) {
             commands.entity(spell).insert(zones::InZone(graveyard));
         }
     }
@@ -35,7 +34,7 @@ mod tests {
     use crate::actions;
     use crate::mana;
     use crate::testing::*;
-    use crate::zones;
+    use crate::{GRAVEYARD, HAND};
 
     #[test]
     fn test_usage() {
@@ -45,10 +44,8 @@ mod tests {
             .mana_pool(Seat::P1, mana![R])
             .mana_pool(Seat::P2, mana![1, U, U])
             .build();
-        let bolt = game
-            .find(game.p1, zones::Zone::Hand, "Lightning Bolt")
-            .unwrap();
-        let cancel = game.find(game.p2, zones::Zone::Hand, "Cancel").unwrap();
+        let bolt = game.find(game.p1, HAND, "Lightning Bolt").unwrap();
+        let cancel = game.find(game.p2, HAND, "Cancel").unwrap();
         let p2 = game.p2;
 
         game.act(game.p1, actions::Action::Cast(bolt));
@@ -59,8 +56,8 @@ mod tests {
         game.pass_priority_all();
 
         assert_eq!(game.life(p2), 20);
-        assert_eq!(game.zone_of(bolt), zones::Zone::Graveyard);
-        assert_eq!(game.zone_of(cancel), zones::Zone::Graveyard);
+        assert_eq!(game.zone_of(bolt), GRAVEYARD);
+        assert_eq!(game.zone_of(cancel), GRAVEYARD);
     }
 
     #[test]
@@ -71,12 +68,8 @@ mod tests {
             .mana_pool(Seat::P1, mana![1, G])
             .mana_pool(Seat::P2, mana![1, U])
             .build();
-        let bears = game
-            .find(game.p1, zones::Zone::Hand, "Grizzly Bears")
-            .unwrap();
-        let scatter = game
-            .find(game.p2, zones::Zone::Hand, "Essence Scatter")
-            .unwrap();
+        let bears = game.find(game.p1, HAND, "Grizzly Bears").unwrap();
+        let scatter = game.find(game.p2, HAND, "Essence Scatter").unwrap();
 
         game.act(game.p1, actions::Action::Cast(bears));
         game.pass_priority();
@@ -84,8 +77,8 @@ mod tests {
         game.act(game.p2, actions::Action::ChooseTargets(vec![bears]));
         game.pass_priority_all();
 
-        assert_eq!(game.zone_of(bears), zones::Zone::Graveyard);
-        assert_eq!(game.zone_of(scatter), zones::Zone::Graveyard);
+        assert_eq!(game.zone_of(bears), GRAVEYARD);
+        assert_eq!(game.zone_of(scatter), GRAVEYARD);
     }
 
     #[test]
@@ -96,10 +89,8 @@ mod tests {
             .mana_pool(Seat::P1, mana![R])
             .mana_pool(Seat::P2, mana![1, U])
             .build();
-        let bolt = game
-            .find(game.p1, zones::Zone::Hand, "Lightning Bolt")
-            .unwrap();
-        let negate = game.find(game.p2, zones::Zone::Hand, "Negate").unwrap();
+        let bolt = game.find(game.p1, HAND, "Lightning Bolt").unwrap();
+        let negate = game.find(game.p2, HAND, "Negate").unwrap();
         let p2 = game.p2;
 
         game.act(game.p1, actions::Action::Cast(bolt));
@@ -110,8 +101,8 @@ mod tests {
         game.pass_priority_all();
 
         assert_eq!(game.life(p2), 20);
-        assert_eq!(game.zone_of(bolt), zones::Zone::Graveyard);
-        assert_eq!(game.zone_of(negate), zones::Zone::Graveyard);
+        assert_eq!(game.zone_of(bolt), GRAVEYARD);
+        assert_eq!(game.zone_of(negate), GRAVEYARD);
     }
 
     #[test]
@@ -122,11 +113,9 @@ mod tests {
             .mana_pool(Seat::P1, mana![R, U])
             .mana_pool(Seat::P2, mana![1, U, U])
             .build();
-        let bolt = game
-            .find(game.p1, zones::Zone::Hand, "Lightning Bolt")
-            .unwrap();
-        let dispel = game.find(game.p1, zones::Zone::Hand, "Dispel").unwrap();
-        let cancel = game.find(game.p2, zones::Zone::Hand, "Cancel").unwrap();
+        let bolt = game.find(game.p1, HAND, "Lightning Bolt").unwrap();
+        let dispel = game.find(game.p1, HAND, "Dispel").unwrap();
+        let cancel = game.find(game.p2, HAND, "Cancel").unwrap();
         let p1 = game.p1;
         let p2 = game.p2;
 
@@ -140,13 +129,13 @@ mod tests {
         game.act(p1, actions::Action::ChooseTargets(vec![cancel]));
 
         game.pass_priority_all();
-        assert_eq!(game.zone_of(cancel), zones::Zone::Graveyard);
+        assert_eq!(game.zone_of(cancel), GRAVEYARD);
         assert_eq!(game.life(p2), 20);
 
         game.pass_priority_all();
         assert_eq!(game.life(p2), 17);
-        assert_eq!(game.zone_of(bolt), zones::Zone::Graveyard);
-        assert_eq!(game.zone_of(dispel), zones::Zone::Graveyard);
+        assert_eq!(game.zone_of(bolt), GRAVEYARD);
+        assert_eq!(game.zone_of(dispel), GRAVEYARD);
     }
 
     #[test]
@@ -157,11 +146,9 @@ mod tests {
             .mana_pool(Seat::P1, mana![1, U, U, R])
             .mana_pool(Seat::P2, mana![1, U, U])
             .build();
-        let bolt = game
-            .find(game.p1, zones::Zone::Hand, "Lightning Bolt")
-            .unwrap();
-        let p1_cancel = game.find(game.p1, zones::Zone::Hand, "Cancel").unwrap();
-        let p2_cancel = game.find(game.p2, zones::Zone::Hand, "Cancel").unwrap();
+        let bolt = game.find(game.p1, HAND, "Lightning Bolt").unwrap();
+        let p1_cancel = game.find(game.p1, HAND, "Cancel").unwrap();
+        let p2_cancel = game.find(game.p2, HAND, "Cancel").unwrap();
         let p1 = game.p1;
         let p2 = game.p2;
 
@@ -175,12 +162,12 @@ mod tests {
         game.act(p1, actions::Action::ChooseTargets(vec![p2_cancel]));
 
         game.pass_priority_all();
-        assert_eq!(game.zone_of(p2_cancel), zones::Zone::Graveyard);
+        assert_eq!(game.zone_of(p2_cancel), GRAVEYARD);
         assert_eq!(game.life(p2), 20);
 
         game.pass_priority_all();
         assert_eq!(game.life(p2), 17);
-        assert_eq!(game.zone_of(bolt), zones::Zone::Graveyard);
-        assert_eq!(game.zone_of(p1_cancel), zones::Zone::Graveyard);
+        assert_eq!(game.zone_of(bolt), GRAVEYARD);
+        assert_eq!(game.zone_of(p1_cancel), GRAVEYARD);
     }
 }

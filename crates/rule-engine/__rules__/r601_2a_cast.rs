@@ -1,3 +1,4 @@
+use crate::{HAND, STACK};
 use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query, Res};
 
 use crate::actions;
@@ -38,14 +39,13 @@ pub fn r601_2a_cast(
         let is_in_casters_hand = zone_entities
             .get(**in_zone)
             .is_ok_and(|(_, zone, zone_owner)| {
-                *zone == zones::Zone::Hand
-                    && zone_owner.is_some_and(|zone_owner| **zone_owner == action.player)
+                *zone == HAND && zone_owner.is_some_and(|zone_owner| **zone_owner == action.player)
             });
         if **owner != action.player || !is_in_casters_hand {
             rejected.write(actions::Rejected::CannotCast { spell });
             continue;
         }
-        let Some(stack) = helpers::find_zone(zones::Zone::Stack, None, &zone_entities) else {
+        let Some(stack) = helpers::find_zone(STACK, None, &zone_entities) else {
             rejected.write(actions::Rejected::CannotCast { spell });
             continue;
         };
@@ -74,7 +74,7 @@ mod tests {
     use crate::mana;
     use crate::testing::*;
     use crate::turns;
-    use crate::zones;
+    use crate::{HAND, STACK};
 
     #[test]
     fn test_usage() {
@@ -82,11 +82,9 @@ mod tests {
             .hand(Seat::P1, [lightning_bolt()])
             .mana_pool(Seat::P1, mana![R])
             .build();
-        let bolt = game
-            .find(game.p1, zones::Zone::Hand, "Lightning Bolt")
-            .unwrap();
+        let bolt = game.find(game.p1, HAND, "Lightning Bolt").unwrap();
         game.act(game.p1, actions::Action::Cast(bolt));
-        assert_eq!(game.zone_of(bolt), zones::Zone::Stack);
+        assert_eq!(game.zone_of(bolt), STACK);
     }
 
     #[test]
@@ -98,13 +96,13 @@ mod tests {
             .build();
         let p1 = game.p1;
         game.pass_priority();
-        let divination = game.find(p1, zones::Zone::Hand, "Divination").unwrap();
+        let divination = game.find(p1, HAND, "Divination").unwrap();
         game.act(p1, actions::Action::Cast(divination));
         assert_eq!(
             game.last_rejection(),
             Some(&actions::Rejected::CannotCast { spell: divination })
         );
-        assert_eq!(game.zone_of(divination), zones::Zone::Hand);
+        assert_eq!(game.zone_of(divination), HAND);
     }
 
     #[test]
@@ -113,17 +111,15 @@ mod tests {
             .hand(Seat::P1, [lightning_bolt(), divination()])
             .mana_pool(Seat::P1, mana![R, 2, U])
             .build();
-        let bolt = game
-            .find(game.p1, zones::Zone::Hand, "Lightning Bolt")
-            .unwrap();
+        let bolt = game.find(game.p1, HAND, "Lightning Bolt").unwrap();
         game.act(game.p1, actions::Action::Cast(bolt));
         game.act(game.p1, actions::Action::ChooseTargets(vec![game.p2]));
-        let divination = game.find(game.p1, zones::Zone::Hand, "Divination").unwrap();
+        let divination = game.find(game.p1, HAND, "Divination").unwrap();
         game.act(game.p1, actions::Action::Cast(divination));
         assert_eq!(
             game.last_rejection(),
             Some(&actions::Rejected::CannotCast { spell: divination })
         );
-        assert_eq!(game.zone_of(divination), zones::Zone::Hand);
+        assert_eq!(game.zone_of(divination), HAND);
     }
 }

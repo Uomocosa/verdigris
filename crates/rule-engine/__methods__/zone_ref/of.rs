@@ -9,15 +9,15 @@ pub const fn of(zone_ref: effects::ZoneRef, player: effects::PlayerRef) -> effec
 
 #[cfg(test)]
 mod tests {
+    use crate::HAND;
     use crate::effects;
-    use crate::zones;
 
     use super::of;
 
     #[test]
     fn test_usage() {
         let hand = effects::ZoneRef {
-            zone: zones::Zone::Hand,
+            zone: HAND,
             of: effects::PlayerRef::Any,
         };
         assert_eq!(

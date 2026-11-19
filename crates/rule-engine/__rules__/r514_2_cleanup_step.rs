@@ -35,7 +35,7 @@ mod tests {
     use crate::effects;
     use crate::mana;
     use crate::testing::*;
-    use crate::zones;
+    use crate::{BATTLEFIELD, GRAVEYARD, HAND};
 
     #[test]
     fn test_usage() {
@@ -46,15 +46,9 @@ mod tests {
             .mana_pool(Seat::P1, mana![R])
             .mana_pool(Seat::P2, mana![G])
             .build();
-        let bolt = game
-            .find(game.p1, zones::Zone::Hand, "Lightning Bolt")
-            .unwrap();
-        let growth = game
-            .find(game.p2, zones::Zone::Hand, "Giant Growth")
-            .unwrap();
-        let bears = game
-            .find(game.p2, zones::Zone::Battlefield, "Grizzly Bears")
-            .unwrap();
+        let bolt = game.find(game.p1, HAND, "Lightning Bolt").unwrap();
+        let growth = game.find(game.p2, HAND, "Giant Growth").unwrap();
+        let bears = game.find(game.p2, BATTLEFIELD, "Grizzly Bears").unwrap();
         let p2 = game.p2;
 
         game.act(game.p1, actions::Action::Cast(bolt));
@@ -66,7 +60,7 @@ mod tests {
         game.pass_priority_all();
         game.end_turn();
 
-        assert_eq!(game.zone_of(bears), zones::Zone::Battlefield);
+        assert_eq!(game.zone_of(bears), BATTLEFIELD);
         assert_eq!(
             game.app.world().get::<damage::Damage>(bears).copied(),
             Some(damage::Damage(0))
@@ -86,15 +80,9 @@ mod tests {
             .battlefield(Seat::P1, [grizzly_bears()])
             .mana_pool(Seat::P1, mana![G, R])
             .build();
-        let growth = game
-            .find(game.p1, zones::Zone::Hand, "Giant Growth")
-            .unwrap();
-        let bolt = game
-            .find(game.p1, zones::Zone::Hand, "Lightning Bolt")
-            .unwrap();
-        let bears = game
-            .find(game.p1, zones::Zone::Battlefield, "Grizzly Bears")
-            .unwrap();
+        let growth = game.find(game.p1, HAND, "Giant Growth").unwrap();
+        let bolt = game.find(game.p1, HAND, "Lightning Bolt").unwrap();
+        let bears = game.find(game.p1, BATTLEFIELD, "Grizzly Bears").unwrap();
 
         game.act(game.p1, actions::Action::Cast(growth));
         game.act(game.p1, actions::Action::ChooseTargets(vec![bears]));
@@ -106,6 +94,6 @@ mod tests {
         game.act(game.p1, actions::Action::ChooseTargets(vec![bears]));
         game.pass_priority_all();
 
-        assert_eq!(game.zone_of(bears), zones::Zone::Graveyard);
+        assert_eq!(game.zone_of(bears), GRAVEYARD);
     }
 }

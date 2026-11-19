@@ -1,3 +1,4 @@
+use crate::{BATTLEFIELD, STACK};
 use bevy::prelude::{Entity, MessageReader, MessageWriter, ParamSet, Query};
 
 use crate::cards;
@@ -38,7 +39,7 @@ pub fn r608_2_resolve(
         let Ok((definition, owner, in_zone, chosen)) = spells.get(spell) else {
             continue;
         };
-        if !helpers::is_card_in_zone(**in_zone, zones::Zone::Stack, &zone_entities) {
+        if !helpers::is_card_in_zone(**in_zone, STACK, &zone_entities) {
             continue;
         }
         let Some(effect) = definition.effect else {
@@ -62,11 +63,7 @@ pub fn r608_2_resolve(
                 effects::EffectKind::Destroy => {
                     if let Some(target) = chosen_target
                         && let Ok((_, _, target_zone, _)) = spells.get(target)
-                        && helpers::is_card_in_zone(
-                            **target_zone,
-                            zones::Zone::Battlefield,
-                            &zone_entities,
-                        )
+                        && helpers::is_card_in_zone(**target_zone, BATTLEFIELD, &zone_entities)
                     {
                         destructions.write(damage::Destruction(target));
                     }
@@ -74,11 +71,7 @@ pub fn r608_2_resolve(
                 effects::EffectKind::Counter => {
                     if let Some(target) = chosen_target
                         && let Ok((_, _, target_zone, _)) = spells.get(target)
-                        && helpers::is_card_in_zone(
-                            **target_zone,
-                            zones::Zone::Stack,
-                            &zone_entities,
-                        )
+                        && helpers::is_card_in_zone(**target_zone, STACK, &zone_entities)
                     {
                         countered.write(stack::Countered(target));
                     }
@@ -106,11 +99,7 @@ pub fn r608_2_resolve(
                 effects::EffectKind::ModifyPowerToughness { power, toughness } => {
                     if let Some(target) = chosen_target
                         && let Ok((_, _, target_zone, _)) = spells.get(target)
-                        && helpers::is_card_in_zone(
-                            **target_zone,
-                            zones::Zone::Battlefield,
-                            &zone_entities,
-                        )
+                        && helpers::is_card_in_zone(**target_zone, BATTLEFIELD, &zone_entities)
                     {
                         power_toughness_modified.write(effects::PowerToughnessModified {
                             target,
@@ -129,14 +118,14 @@ mod tests {
     use crate::actions;
     use crate::mana;
     use crate::testing::*;
-    use crate::zones;
+    use crate::{BATTLEFIELD, GRAVEYARD, HAND};
 
     fn cast_and_resolve(
         game: &mut MockGame,
         spell_name: &str,
         target: Option<bevy::prelude::Entity>,
     ) {
-        let spell = game.find(game.p1, zones::Zone::Hand, spell_name).unwrap();
+        let spell = game.find(game.p1, HAND, spell_name).unwrap();
         game.act(game.p1, actions::Action::Cast(spell));
         if let Some(target) = target {
             game.act(game.p1, actions::Action::ChooseTargets(vec![target]));
@@ -162,19 +151,12 @@ mod tests {
             .battlefield(Seat::P2, [grizzly_bears()])
             .mana_pool(Seat::P1, mana![R])
             .build();
-        let bears = game
-            .find(game.p2, zones::Zone::Battlefield, "Grizzly Bears")
-            .unwrap();
+        let bears = game.find(game.p2, BATTLEFIELD, "Grizzly Bears").unwrap();
         cast_and_resolve(&mut game, "Lightning Bolt", Some(bears));
-        assert_eq!(game.zone_of(bears), zones::Zone::Graveyard);
-        assert!(
-            game.find(game.p2, zones::Zone::Graveyard, "Grizzly Bears")
-                .is_some()
-        );
-        let bolt = game
-            .find(game.p1, zones::Zone::Graveyard, "Lightning Bolt")
-            .unwrap();
-        assert_eq!(game.zone_of(bolt), zones::Zone::Graveyard);
+        assert_eq!(game.zone_of(bears), GRAVEYARD);
+        assert!(game.find(game.p2, GRAVEYARD, "Grizzly Bears").is_some());
+        let bolt = game.find(game.p1, GRAVEYARD, "Lightning Bolt").unwrap();
+        assert_eq!(game.zone_of(bolt), GRAVEYARD);
     }
 
     #[test]
@@ -184,11 +166,9 @@ mod tests {
             .battlefield(Seat::P2, [grizzly_bears()])
             .mana_pool(Seat::P1, mana![1, B, B])
             .build();
-        let bears = game
-            .find(game.p2, zones::Zone::Battlefield, "Grizzly Bears")
-            .unwrap();
+        let bears = game.find(game.p2, BATTLEFIELD, "Grizzly Bears").unwrap();
         cast_and_resolve(&mut game, "Murder", Some(bears));
-        assert_eq!(game.zone_of(bears), zones::Zone::Graveyard);
+        assert_eq!(game.zone_of(bears), GRAVEYARD);
     }
 
     #[test]
@@ -198,18 +178,11 @@ mod tests {
             .battlefield(Seat::P2, [grizzly_bears()])
             .mana_pool(Seat::P1, mana![1, B])
             .build();
-        let bears = game
-            .find(game.p2, zones::Zone::Battlefield, "Grizzly Bears")
-            .unwrap();
+        let bears = game.find(game.p2, BATTLEFIELD, "Grizzly Bears").unwrap();
         cast_and_resolve(&mut game, "Doom Blade", Some(bears));
-        assert_eq!(game.zone_of(bears), zones::Zone::Graveyard);
-        assert!(
-            game.find(game.p2, zones::Zone::Graveyard, "Grizzly Bears")
-                .is_some()
-        );
-        let blade = game
-            .find(game.p1, zones::Zone::Graveyard, "Doom Blade")
-            .unwrap();
-        assert_eq!(game.zone_of(blade), zones::Zone::Graveyard);
+        assert_eq!(game.zone_of(bears), GRAVEYARD);
+        assert!(game.find(game.p2, GRAVEYARD, "Grizzly Bears").is_some());
+        let blade = game.find(game.p1, GRAVEYARD, "Doom Blade").unwrap();
+        assert_eq!(game.zone_of(blade), GRAVEYARD);
     }
 }

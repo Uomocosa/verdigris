@@ -1,3 +1,4 @@
+use crate::{BATTLEFIELD, HAND, STACK};
 use std::collections::BTreeSet;
 
 use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query, ResMut, With};
@@ -33,7 +34,7 @@ pub fn r601_2c_targets(
                 let Ok((_, definition, owner, in_zone)) = cards.get(spell) else {
                     continue;
                 };
-                if !helpers::is_card_in_zone(**in_zone, zones::Zone::Stack, &zone_entities) {
+                if !helpers::is_card_in_zone(**in_zone, STACK, &zone_entities) {
                     continue;
                 }
                 let controller = **owner;
@@ -59,9 +60,7 @@ pub fn r601_2c_targets(
                 );
                 if legal.is_empty() {
                     rejected.write(actions::Rejected::NoLegalTargets { spell });
-                    if let Some(hand) =
-                        helpers::find_zone(zones::Zone::Hand, Some(controller), &zone_entities)
-                    {
+                    if let Some(hand) = helpers::find_zone(HAND, Some(controller), &zone_entities) {
                         commands.entity(spell).insert(zones::InZone(hand));
                     }
                     commands.entity(spell).remove::<stack::CastingStage>();
@@ -150,12 +149,12 @@ fn legal_targets(
             | effects::FilterKind::CreatureSpell
             | effects::FilterKind::NoncreatureSpell
             | effects::FilterKind::InstantSpell => {
-                helpers::is_card_in_zone(**in_zone, zones::Zone::Stack, zone_entities)
+                helpers::is_card_in_zone(**in_zone, STACK, zone_entities)
                     && helpers::does_spell_match_filter(definition, filter)
             }
             effects::FilterKind::Creature | effects::FilterKind::AnyTarget => {
                 helpers::does_creature_match_filter(definition, filter)
-                    && helpers::is_card_in_zone(**in_zone, zones::Zone::Battlefield, zone_entities)
+                    && helpers::is_card_in_zone(**in_zone, BATTLEFIELD, zone_entities)
             }
             effects::FilterKind::Player => false,
         };
@@ -171,7 +170,7 @@ mod tests {
     use crate::actions;
     use crate::mana;
     use crate::testing::*;
-    use crate::zones;
+    use crate::{BATTLEFIELD, HAND, STACK};
 
     #[test]
     fn test_usage() {
@@ -180,9 +179,7 @@ mod tests {
             .battlefield(Seat::P2, [grizzly_bears()])
             .mana_pool(Seat::P1, mana![R])
             .build();
-        let bolt = game
-            .find(game.p1, zones::Zone::Hand, "Lightning Bolt")
-            .unwrap();
+        let bolt = game.find(game.p1, HAND, "Lightning Bolt").unwrap();
         game.act(game.p1, actions::Action::Cast(bolt));
         assert!(game.target_choice().is_some());
     }
@@ -194,12 +191,8 @@ mod tests {
             .battlefield(Seat::P2, [grizzly_bears()])
             .mana_pool(Seat::P1, mana![R])
             .build();
-        let bolt = game
-            .find(game.p1, zones::Zone::Hand, "Lightning Bolt")
-            .unwrap();
-        let bears = game
-            .find(game.p2, zones::Zone::Battlefield, "Grizzly Bears")
-            .unwrap();
+        let bolt = game.find(game.p1, HAND, "Lightning Bolt").unwrap();
+        let bears = game.find(game.p2, BATTLEFIELD, "Grizzly Bears").unwrap();
         game.act(game.p1, actions::Action::Cast(bolt));
         assert_eq!(
             game.target_choice(),
@@ -213,13 +206,13 @@ mod tests {
             .hand(Seat::P1, [murder()])
             .mana_pool(Seat::P1, mana![1, B, B])
             .build();
-        let murder = game.find(game.p1, zones::Zone::Hand, "Murder").unwrap();
+        let murder = game.find(game.p1, HAND, "Murder").unwrap();
         game.act(game.p1, actions::Action::Cast(murder));
         assert_eq!(
             game.last_rejection(),
             Some(&actions::Rejected::NoLegalTargets { spell: murder })
         );
-        assert_eq!(game.zone_of(murder), zones::Zone::Hand);
+        assert_eq!(game.zone_of(murder), HAND);
     }
 
     #[test]
@@ -229,10 +222,8 @@ mod tests {
             .battlefield(Seat::P2, [grizzly_bears(), walking_corpse()])
             .mana_pool(Seat::P1, mana![1, B])
             .build();
-        let blade = game.find(game.p1, zones::Zone::Hand, "Doom Blade").unwrap();
-        let bears = game
-            .find(game.p2, zones::Zone::Battlefield, "Grizzly Bears")
-            .unwrap();
+        let blade = game.find(game.p1, HAND, "Doom Blade").unwrap();
+        let bears = game.find(game.p2, BATTLEFIELD, "Grizzly Bears").unwrap();
         game.act(game.p1, actions::Action::Cast(blade));
         assert_eq!(game.target_choice(), Some(pick(1).from([bears])));
     }
@@ -244,10 +235,8 @@ mod tests {
             .battlefield(Seat::P2, [grizzly_bears(), walking_corpse()])
             .mana_pool(Seat::P1, mana![1, B])
             .build();
-        let blade = game.find(game.p1, zones::Zone::Hand, "Doom Blade").unwrap();
-        let corpse = game
-            .find(game.p2, zones::Zone::Battlefield, "Walking Corpse")
-            .unwrap();
+        let blade = game.find(game.p1, HAND, "Doom Blade").unwrap();
+        let corpse = game.find(game.p2, BATTLEFIELD, "Walking Corpse").unwrap();
         game.act(game.p1, actions::Action::Cast(blade));
         game.act(game.p1, actions::Action::ChooseTargets(vec![corpse]));
         assert_eq!(
@@ -263,13 +252,13 @@ mod tests {
             .battlefield(Seat::P2, [walking_corpse()])
             .mana_pool(Seat::P1, mana![1, B])
             .build();
-        let blade = game.find(game.p1, zones::Zone::Hand, "Doom Blade").unwrap();
+        let blade = game.find(game.p1, HAND, "Doom Blade").unwrap();
         game.act(game.p1, actions::Action::Cast(blade));
         assert_eq!(
             game.last_rejection(),
             Some(&actions::Rejected::NoLegalTargets { spell: blade })
         );
-        assert_eq!(game.zone_of(blade), zones::Zone::Hand);
+        assert_eq!(game.zone_of(blade), HAND);
     }
 
     #[test]
@@ -279,13 +268,9 @@ mod tests {
             .battlefield(Seat::P2, [grizzly_bears()])
             .mana_pool(Seat::P1, mana![1, U, U, R])
             .build();
-        let bolt = game
-            .find(game.p1, zones::Zone::Hand, "Lightning Bolt")
-            .unwrap();
-        let cancel = game.find(game.p1, zones::Zone::Hand, "Cancel").unwrap();
-        let bears = game
-            .find(game.p2, zones::Zone::Battlefield, "Grizzly Bears")
-            .unwrap();
+        let bolt = game.find(game.p1, HAND, "Lightning Bolt").unwrap();
+        let cancel = game.find(game.p1, HAND, "Cancel").unwrap();
+        let bears = game.find(game.p2, BATTLEFIELD, "Grizzly Bears").unwrap();
 
         game.act(game.p1, actions::Action::Cast(bolt));
         game.act(game.p1, actions::Action::ChooseTargets(vec![game.p2]));
@@ -308,12 +293,8 @@ mod tests {
             .mana_pool(Seat::P1, mana![R])
             .mana_pool(Seat::P2, mana![1, U])
             .build();
-        let bolt = game
-            .find(game.p1, zones::Zone::Hand, "Lightning Bolt")
-            .unwrap();
-        let scatter = game
-            .find(game.p2, zones::Zone::Hand, "Essence Scatter")
-            .unwrap();
+        let bolt = game.find(game.p1, HAND, "Lightning Bolt").unwrap();
+        let scatter = game.find(game.p2, HAND, "Essence Scatter").unwrap();
 
         game.act(game.p1, actions::Action::Cast(bolt));
         game.act(game.p1, actions::Action::ChooseTargets(vec![game.p2]));
@@ -324,8 +305,8 @@ mod tests {
             game.last_rejection(),
             Some(&actions::Rejected::NoLegalTargets { spell: scatter })
         );
-        assert_eq!(game.zone_of(scatter), zones::Zone::Hand);
-        assert_eq!(game.zone_of(bolt), zones::Zone::Stack);
+        assert_eq!(game.zone_of(scatter), HAND);
+        assert_eq!(game.zone_of(bolt), STACK);
     }
 
     #[test]
@@ -336,10 +317,8 @@ mod tests {
             .mana_pool(Seat::P1, mana![1, G])
             .mana_pool(Seat::P2, mana![1, U])
             .build();
-        let bears = game
-            .find(game.p1, zones::Zone::Hand, "Grizzly Bears")
-            .unwrap();
-        let negate = game.find(game.p2, zones::Zone::Hand, "Negate").unwrap();
+        let bears = game.find(game.p1, HAND, "Grizzly Bears").unwrap();
+        let negate = game.find(game.p2, HAND, "Negate").unwrap();
 
         game.act(game.p1, actions::Action::Cast(bears));
         game.pass_priority();
@@ -349,8 +328,8 @@ mod tests {
             game.last_rejection(),
             Some(&actions::Rejected::NoLegalTargets { spell: negate })
         );
-        assert_eq!(game.zone_of(negate), zones::Zone::Hand);
-        assert_eq!(game.zone_of(bears), zones::Zone::Stack);
+        assert_eq!(game.zone_of(negate), HAND);
+        assert_eq!(game.zone_of(bears), STACK);
     }
 
     #[test]
@@ -361,8 +340,8 @@ mod tests {
             .mana_pool(Seat::P1, mana![2, U])
             .mana_pool(Seat::P2, mana![U])
             .build();
-        let divination = game.find(game.p1, zones::Zone::Hand, "Divination").unwrap();
-        let dispel = game.find(game.p2, zones::Zone::Hand, "Dispel").unwrap();
+        let divination = game.find(game.p1, HAND, "Divination").unwrap();
+        let dispel = game.find(game.p2, HAND, "Dispel").unwrap();
 
         game.act(game.p1, actions::Action::Cast(divination));
         game.pass_priority();
@@ -372,8 +351,8 @@ mod tests {
             game.last_rejection(),
             Some(&actions::Rejected::NoLegalTargets { spell: dispel })
         );
-        assert_eq!(game.zone_of(dispel), zones::Zone::Hand);
-        assert_eq!(game.zone_of(divination), zones::Zone::Stack);
+        assert_eq!(game.zone_of(dispel), HAND);
+        assert_eq!(game.zone_of(divination), STACK);
     }
 
     #[test]
@@ -383,9 +362,7 @@ mod tests {
             .hand(Seat::P1, [lightning_bolt()])
             .mana_pool(Seat::P1, mana![R])
             .build();
-        let bolt = game
-            .find(game.p1, zones::Zone::Hand, "Lightning Bolt")
-            .unwrap();
+        let bolt = game.find(game.p1, HAND, "Lightning Bolt").unwrap();
         game.act(game.p1, actions::Action::Cast(bolt));
         assert_eq!(
             game.target_choice(),

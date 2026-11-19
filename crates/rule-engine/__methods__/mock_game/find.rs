@@ -37,8 +37,8 @@ pub fn find(
 
 #[cfg(test)]
 mod tests {
+    use crate::HAND;
     use crate::testing::*;
-    use crate::zones;
 
     use super::find;
 
@@ -47,8 +47,8 @@ mod tests {
         let game = MockGame::builder()
             .hand(Seat::P1, [lightning_bolt()])
             .build();
-        let found = find(&game, game.p1, zones::Zone::Hand, "Lightning Bolt");
+        let found = find(&game, game.p1, HAND, "Lightning Bolt");
         assert!(found.is_some());
-        assert!(find(&game, game.p1, zones::Zone::Hand, "Murder").is_none());
+        assert!(find(&game, game.p1, HAND, "Murder").is_none());
     }
 }

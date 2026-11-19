@@ -16,11 +16,11 @@ pub fn r704_5a_zero_life(
 
 #[cfg(test)]
 mod tests {
+    use crate::HAND;
     use crate::actions;
     use crate::mana;
     use crate::players;
     use crate::testing::*;
-    use crate::zones;
 
     #[test]
     fn test_usage() {
@@ -29,9 +29,7 @@ mod tests {
             .hand(Seat::P1, [lightning_bolt()])
             .mana_pool(Seat::P1, mana![R])
             .build();
-        let bolt = game
-            .find(game.p1, zones::Zone::Hand, "Lightning Bolt")
-            .unwrap();
+        let bolt = game.find(game.p1, HAND, "Lightning Bolt").unwrap();
         let p2 = game.p2;
         game.act(game.p1, actions::Action::Cast(bolt));
         game.act(game.p1, actions::Action::ChooseTargets(vec![p2]));

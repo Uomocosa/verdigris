@@ -1,3 +1,4 @@
+use crate::HAND;
 use bevy::prelude::{Commands, Entity, MessageWriter, Query};
 
 use crate::actions;
@@ -33,7 +34,7 @@ pub fn r601_2h_pay(
             continue;
         }
         rejected.write(actions::Rejected::CannotPay { spell });
-        if let Some(hand) = helpers::find_zone(zones::Zone::Hand, Some(**owner), &zone_entities) {
+        if let Some(hand) = helpers::find_zone(HAND, Some(**owner), &zone_entities) {
             commands.entity(spell).insert(zones::InZone(hand));
         }
         commands.entity(spell).remove::<stack::CastingStage>();
@@ -42,11 +43,11 @@ pub fn r601_2h_pay(
 
 #[cfg(test)]
 mod tests {
+    use crate::HAND;
     use crate::actions;
     use crate::cards;
     use crate::mana;
     use crate::testing::*;
-    use crate::zones;
 
     #[test]
     fn test_usage() {
@@ -54,9 +55,7 @@ mod tests {
             .hand(Seat::P1, [lightning_bolt()])
             .mana_pool(Seat::P1, mana![R])
             .build();
-        let bolt = game
-            .find(game.p1, zones::Zone::Hand, "Lightning Bolt")
-            .unwrap();
+        let bolt = game.find(game.p1, HAND, "Lightning Bolt").unwrap();
         game.act(game.p1, actions::Action::Cast(bolt));
         game.act(game.p1, actions::Action::ChooseTargets(vec![game.p2]));
         assert!(game.last_rejection().is_none());
@@ -68,15 +67,13 @@ mod tests {
         let mut game = MockGame::builder()
             .hand(Seat::P1, [lightning_bolt()])
             .build();
-        let bolt = game
-            .find(game.p1, zones::Zone::Hand, "Lightning Bolt")
-            .unwrap();
+        let bolt = game.find(game.p1, HAND, "Lightning Bolt").unwrap();
         game.act(game.p1, actions::Action::Cast(bolt));
         game.act(game.p1, actions::Action::ChooseTargets(vec![game.p2]));
         assert_eq!(
             game.last_rejection(),
             Some(&actions::Rejected::CannotPay { spell: bolt })
         );
-        assert_eq!(game.zone_of(bolt), zones::Zone::Hand);
+        assert_eq!(game.zone_of(bolt), HAND);
     }
 }

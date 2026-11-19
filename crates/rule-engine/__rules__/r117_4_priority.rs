@@ -1,3 +1,4 @@
+use crate::STACK;
 use bevy::prelude::{Entity, MessageWriter, Query, Res, ResMut};
 
 use crate::cards;
@@ -26,7 +27,7 @@ pub fn r117_4_priority(
         return;
     }
     priority.consecutive_passes = 0;
-    let top = helpers::find_zone(zones::Zone::Stack, None, &zone_entities)
+    let top = helpers::find_zone(STACK, None, &zone_entities)
         .and_then(|stack| stack_contents.get(stack).ok())
         .and_then(|contents| contents.last().copied());
     let Some(top) = top else {
@@ -47,7 +48,7 @@ mod tests {
     use crate::mana;
     use crate::testing::*;
     use crate::turns;
-    use crate::zones;
+    use crate::{GRAVEYARD, HAND, STACK};
 
     #[test]
     fn test_usage() {
@@ -55,14 +56,12 @@ mod tests {
             .hand(Seat::P1, [lightning_bolt()])
             .mana_pool(Seat::P1, mana![R])
             .build();
-        let bolt = game
-            .find(game.p1, zones::Zone::Hand, "Lightning Bolt")
-            .unwrap();
+        let bolt = game.find(game.p1, HAND, "Lightning Bolt").unwrap();
         game.act(game.p1, actions::Action::Cast(bolt));
         game.act(game.p1, actions::Action::ChooseTargets(vec![game.p2]));
         game.pass_priority();
         game.pass_priority();
-        assert_eq!(game.zone_of(bolt), zones::Zone::Graveyard);
+        assert_eq!(game.zone_of(bolt), GRAVEYARD);
     }
 
     #[test]
@@ -71,22 +70,18 @@ mod tests {
             .hand(Seat::P1, [lightning_bolt(), lightning_bolt()])
             .mana_pool(Seat::P1, mana![R, R])
             .build();
-        let first = game
-            .find(game.p1, zones::Zone::Hand, "Lightning Bolt")
-            .unwrap();
+        let first = game.find(game.p1, HAND, "Lightning Bolt").unwrap();
         game.act(game.p1, actions::Action::Cast(first));
         game.act(game.p1, actions::Action::ChooseTargets(vec![game.p2]));
-        let second = game
-            .find(game.p1, zones::Zone::Hand, "Lightning Bolt")
-            .unwrap();
+        let second = game.find(game.p1, HAND, "Lightning Bolt").unwrap();
         game.act(game.p1, actions::Action::Cast(second));
         game.act(game.p1, actions::Action::ChooseTargets(vec![game.p2]));
 
         game.pass_priority();
         game.pass_priority();
 
-        assert_eq!(game.zone_of(second), zones::Zone::Graveyard);
-        assert_eq!(game.zone_of(first), zones::Zone::Stack);
+        assert_eq!(game.zone_of(second), GRAVEYARD);
+        assert_eq!(game.zone_of(first), STACK);
         assert_eq!(game.life(game.p2), 17);
     }
 
@@ -97,7 +92,7 @@ mod tests {
             .mana_pool(Seat::P1, mana![R])
             .build();
         let p1 = game.p1;
-        let bolt = game.find(p1, zones::Zone::Hand, "Lightning Bolt").unwrap();
+        let bolt = game.find(p1, HAND, "Lightning Bolt").unwrap();
         game.act(p1, actions::Action::Cast(bolt));
         game.act(p1, actions::Action::ChooseTargets(vec![game.p2]));
 

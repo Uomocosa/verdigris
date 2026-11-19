@@ -1,3 +1,4 @@
+use crate::BATTLEFIELD;
 use bevy::prelude::{Commands, Entity, MessageWriter, Query};
 
 use crate::cards;
@@ -23,7 +24,7 @@ pub fn r704_5h_deathtouch_damage(
         commands
             .entity(creature)
             .remove::<damage::DealtByDeathtouch>();
-        if !helpers::is_card_in_zone(**in_zone, zones::Zone::Battlefield, &zone_entities) {
+        if !helpers::is_card_in_zone(**in_zone, BATTLEFIELD, &zone_entities) {
             continue;
         }
         let Some(power_toughness) = definition.power_toughness else {
@@ -37,8 +38,8 @@ pub fn r704_5h_deathtouch_damage(
 
 #[cfg(test)]
 mod tests {
+    use crate::BATTLEFIELD;
     use crate::testing::*;
-    use crate::zones;
 
     #[test]
     #[ignore = "needs combat: Typhoid Rats deals damage by attacking or blocking"]
@@ -47,14 +48,8 @@ mod tests {
             .battlefield(Seat::P1, [typhoid_rats()])
             .battlefield(Seat::P2, [grizzly_bears()])
             .build();
-        assert!(
-            game.find(game.p1, zones::Zone::Battlefield, "Typhoid Rats")
-                .is_some()
-        );
-        assert!(
-            game.find(game.p2, zones::Zone::Battlefield, "Grizzly Bears")
-                .is_some()
-        );
+        assert!(game.find(game.p1, BATTLEFIELD, "Typhoid Rats").is_some());
+        assert!(game.find(game.p2, BATTLEFIELD, "Grizzly Bears").is_some());
     }
 
     #[test]
@@ -64,14 +59,8 @@ mod tests {
             .battlefield(Seat::P1, [typhoid_rats()])
             .battlefield(Seat::P2, [grizzly_bears()])
             .build();
-        assert!(
-            game.find(game.p1, zones::Zone::Battlefield, "Typhoid Rats")
-                .is_some()
-        );
-        assert!(
-            game.find(game.p2, zones::Zone::Battlefield, "Grizzly Bears")
-                .is_some()
-        );
+        assert!(game.find(game.p1, BATTLEFIELD, "Typhoid Rats").is_some());
+        assert!(game.find(game.p2, BATTLEFIELD, "Grizzly Bears").is_some());
     }
 
     #[test]
@@ -81,10 +70,7 @@ mod tests {
             .battlefield(Seat::P1, [typhoid_rats()])
             .battlefield(Seat::P2, [darksteel_myr()])
             .build();
-        assert!(
-            game.find(game.p2, zones::Zone::Battlefield, "Darksteel Myr")
-                .is_some()
-        );
+        assert!(game.find(game.p2, BATTLEFIELD, "Darksteel Myr").is_some());
     }
 
     #[test]
@@ -94,9 +80,6 @@ mod tests {
             .battlefield(Seat::P1, [walking_corpse()])
             .battlefield(Seat::P2, [grizzly_bears()])
             .build();
-        assert!(
-            game.find(game.p2, zones::Zone::Battlefield, "Grizzly Bears")
-                .is_some()
-        );
+        assert!(game.find(game.p2, BATTLEFIELD, "Grizzly Bears").is_some());
     }
 }

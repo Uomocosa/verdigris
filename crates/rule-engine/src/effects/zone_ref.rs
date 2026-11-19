@@ -10,6 +10,11 @@ pub struct ZoneRef {
 }
 
 #[atomic_delegates]
+impl From<zones::Zone> for ZoneRef {
+    fn from(zone: zones::Zone) -> Self {}
+}
+
+#[atomic_delegates]
 impl ZoneRef {
     #[must_use]
     pub fn of(self, player: effects::PlayerRef) -> Self {}
@@ -17,19 +22,19 @@ impl ZoneRef {
 
 #[cfg(test)]
 mod tests {
+    use crate::HAND;
     use crate::effects;
-    use crate::zones;
 
     #[test]
     fn test_usage() {
         let hand = effects::ZoneRef {
-            zone: zones::Zone::Hand,
+            zone: HAND,
             of: effects::PlayerRef::Any,
         };
         assert_eq!(
             hand.of(effects::PlayerRef::You),
             effects::ZoneRef {
-                zone: zones::Zone::Hand,
+                zone: HAND,
                 of: effects::PlayerRef::You,
             }
         );

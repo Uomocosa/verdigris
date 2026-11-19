@@ -24,7 +24,7 @@ pub fn r504_1_draw_step(
 mod tests {
     use crate::testing::*;
     use crate::turns;
-    use crate::zones;
+    use crate::{HAND, LIBRARY};
 
     #[test]
     fn test_usage() {
@@ -47,18 +47,12 @@ mod tests {
             .turn(1, Seat::P1, turns::Step::Upkeep)
             .library(Seat::P1, [grizzly_bears(), lightning_bolt()])
             .build();
-        let top = game
-            .find(game.p1, zones::Zone::Library, "Grizzly Bears")
-            .unwrap();
+        let top = game.find(game.p1, LIBRARY, "Grizzly Bears").unwrap();
 
         game.pass_priority_all();
         game.pass_priority();
 
-        assert_eq!(game.zone_of(top), zones::Zone::Hand);
-        assert_eq!(
-            game.find(game.p1, zones::Zone::Hand, "Grizzly Bears")
-                .unwrap(),
-            top
-        );
+        assert_eq!(game.zone_of(top), HAND);
+        assert_eq!(game.find(game.p1, HAND, "Grizzly Bears").unwrap(), top);
     }
 }

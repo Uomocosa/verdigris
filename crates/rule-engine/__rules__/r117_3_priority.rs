@@ -44,11 +44,11 @@ pub fn r117_3_priority(
 
 #[cfg(test)]
 mod tests {
+    use crate::HAND;
     use crate::actions;
     use crate::mana;
     use crate::testing::*;
     use crate::turns;
-    use crate::zones;
 
     #[test]
     fn test_usage() {
@@ -90,7 +90,7 @@ mod tests {
             .mana_pool(Seat::P2, mana![R])
             .build();
         let p2 = game.p2;
-        let bolt = game.find(p2, zones::Zone::Hand, "Lightning Bolt").unwrap();
+        let bolt = game.find(p2, HAND, "Lightning Bolt").unwrap();
 
         game.pass_priority();
         game.act(p2, actions::Action::Cast(bolt));
