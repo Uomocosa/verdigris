@@ -1,4 +1,3 @@
-mod cleanup;
 mod end_turn;
 mod find;
 mod last_rejection;
@@ -6,7 +5,6 @@ mod life;
 mod mana_pool;
 mod target_choice;
 mod zone_of;
-pub use cleanup::cleanup;
 pub use end_turn::end_turn;
 pub use find::find;
 pub use last_rejection::last_rejection;

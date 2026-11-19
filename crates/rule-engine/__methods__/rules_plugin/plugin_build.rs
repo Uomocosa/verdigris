@@ -17,7 +17,6 @@ pub fn plugin_build(_rules_plugin: &RulesPlugin, app: &mut App) {
         .add_message::<zones::Destruction>()
         .add_message::<zones::DrawRequested>()
         .add_message::<effects::PowerToughnessModified>()
-        .add_message::<turns::CleanupStepStarted>()
         .add_message::<turns::StepStarted>()
         .add_message::<turns::AllPlayersPassed>();
     app.init_resource::<actions::PendingChoice>();

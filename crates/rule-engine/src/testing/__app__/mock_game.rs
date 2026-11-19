@@ -62,8 +62,6 @@ impl MockGame {
 
 #[atomic_delegates]
 impl MockGame {
-    pub fn cleanup(&mut self) {}
-
     pub fn end_turn(&mut self) {}
 
     #[must_use]
