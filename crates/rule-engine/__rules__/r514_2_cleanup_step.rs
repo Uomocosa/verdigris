@@ -45,9 +45,13 @@ mod tests {
                 .battlefield([grizzly_bears()])
                 .mana_pool(mana![G]),
         ]);
-        let bolt = game.find(p1, HAND, "Lightning Bolt").unwrap();
-        let growth = game.find(p2, HAND, "Giant Growth").unwrap();
-        let bears = game.find(p2, BATTLEFIELD, "Grizzly Bears").unwrap();
+        let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
+        let growth = game.player(p2).cards(HAND, GIANT_GROWTH).only().unwrap();
+        let bears = game
+            .player(p2)
+            .cards(BATTLEFIELD, GRIZZLY_BEARS)
+            .only()
+            .unwrap();
 
         game.act(p1, actions::Action::Cast(bolt));
         game.act(p1, actions::Action::ChooseTargets(vec![bears]));
@@ -79,9 +83,13 @@ mod tests {
                 .mana_pool(mana![G, R]),
             P2,
         ]);
-        let growth = game.find(p1, HAND, "Giant Growth").unwrap();
-        let bolt = game.find(p1, HAND, "Lightning Bolt").unwrap();
-        let bears = game.find(p1, BATTLEFIELD, "Grizzly Bears").unwrap();
+        let growth = game.player(p1).cards(HAND, GIANT_GROWTH).only().unwrap();
+        let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
+        let bears = game
+            .player(p1)
+            .cards(BATTLEFIELD, GRIZZLY_BEARS)
+            .only()
+            .unwrap();
 
         game.act(p1, actions::Action::Cast(growth));
         game.act(p1, actions::Action::ChooseTargets(vec![bears]));

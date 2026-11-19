@@ -46,8 +46,8 @@ mod tests {
 
         assert_eq!(game.life(p2), 18);
         assert_eq!(game.life(p1), 20);
-        assert!(game.find(p2, HAND, "Lightning Bolt").is_some());
-        assert!(game.find(p2, HAND, "Murder").is_some());
+        assert!(!game.player(p2).cards(HAND, LIGHTNING_BOLT).is_empty());
+        assert!(!game.player(p2).cards(HAND, MURDER).is_empty());
     }
 
     #[test]
@@ -63,8 +63,8 @@ mod tests {
             .unwrap();
 
         assert_eq!(game.life(p1), 18);
-        assert!(game.find(p1, HAND, "Lightning Bolt").is_some());
-        assert!(game.find(p1, HAND, "Murder").is_some());
+        assert!(!game.player(p1).cards(HAND, LIGHTNING_BOLT).is_empty());
+        assert!(!game.player(p1).cards(HAND, MURDER).is_empty());
     }
 
     #[test]

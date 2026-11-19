@@ -62,8 +62,12 @@ mod tests {
                 P1.battlefield([walking_corpse()]),
                 P2.active().hand([lightning_bolt()]).mana_pool(mana![R]),
             ]);
-        let corpse = game.find(p1, BATTLEFIELD, "Walking Corpse").unwrap();
-        let bolt = game.find(p2, HAND, "Lightning Bolt").unwrap();
+        let corpse = game
+            .player(p1)
+            .cards(BATTLEFIELD, WALKING_CORPSE)
+            .only()
+            .unwrap();
+        let bolt = game.player(p2).cards(HAND, LIGHTNING_BOLT).only().unwrap();
         game.act(p2, actions::Action::Cast(bolt));
         game.act(p2, actions::Action::ChooseTargets(vec![corpse]));
         game.pass_priority_all();

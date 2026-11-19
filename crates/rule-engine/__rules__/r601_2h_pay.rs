@@ -53,7 +53,7 @@ mod tests {
     fn test_usage() {
         let (mut game, [p1, p2]) =
             MockGame::new([P1.hand([lightning_bolt()]).mana_pool(mana![R]), P2]);
-        let bolt = game.find(p1, HAND, "Lightning Bolt").unwrap();
+        let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
         game.act(p1, actions::Action::Cast(bolt));
         game.act(p1, actions::Action::ChooseTargets(vec![p2]));
         assert!(game.last_rejection().is_none());
@@ -63,7 +63,7 @@ mod tests {
     #[test]
     fn test_cannot_cast_without_mana() {
         let (mut game, [p1, p2]) = MockGame::new([P1.hand([lightning_bolt()]), P2]);
-        let bolt = game.find(p1, HAND, "Lightning Bolt").unwrap();
+        let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
         game.act(p1, actions::Action::Cast(bolt));
         game.act(p1, actions::Action::ChooseTargets(vec![p2]));
         assert_eq!(

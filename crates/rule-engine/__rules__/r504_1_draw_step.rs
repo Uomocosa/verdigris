@@ -46,12 +46,19 @@ mod tests {
         let (mut game, [p1, ..]) = MockGame::builder()
             .turn(1, turns::Step::Upkeep)
             .players([P1.library([grizzly_bears(), lightning_bolt()]), P2]);
-        let top = game.find(p1, LIBRARY, "Grizzly Bears").unwrap();
+        let top = game
+            .player(p1)
+            .cards(LIBRARY, GRIZZLY_BEARS)
+            .only()
+            .unwrap();
 
         game.pass_priority_all();
         game.pass_priority();
 
         assert_eq!(game.zone_of(top), HAND);
-        assert_eq!(game.find(p1, HAND, "Grizzly Bears").unwrap(), top);
+        assert_eq!(
+            game.player(p1).cards(HAND, GRIZZLY_BEARS).only().unwrap(),
+            top
+        );
     }
 }

@@ -80,7 +80,7 @@ mod tests {
     fn test_usage() {
         let (mut game, [p1, ..]) =
             MockGame::new([P1.hand([lightning_bolt()]).mana_pool(mana![R]), P2]);
-        let bolt = game.find(p1, HAND, "Lightning Bolt").unwrap();
+        let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
         game.act(p1, actions::Action::Cast(bolt));
         assert_eq!(game.zone_of(bolt), STACK);
     }
@@ -91,7 +91,7 @@ mod tests {
             .turn(2, turns::Step::PrecombatMain)
             .players([P1.hand([divination()]).mana_pool(mana![2, U]), P2.active()]);
         game.pass_priority();
-        let divination = game.find(p1, HAND, "Divination").unwrap();
+        let divination = game.player(p1).cards(HAND, DIVINATION).only().unwrap();
         game.act(p1, actions::Action::Cast(divination));
         assert_eq!(
             game.last_rejection(),
@@ -107,10 +107,10 @@ mod tests {
                 .mana_pool(mana![R, 2, U]),
             P2,
         ]);
-        let bolt = game.find(p1, HAND, "Lightning Bolt").unwrap();
+        let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
         game.act(p1, actions::Action::Cast(bolt));
         game.act(p1, actions::Action::ChooseTargets(vec![p2]));
-        let divination = game.find(p1, HAND, "Divination").unwrap();
+        let divination = game.player(p1).cards(HAND, DIVINATION).only().unwrap();
         game.act(p1, actions::Action::Cast(divination));
         assert_eq!(
             game.last_rejection(),
