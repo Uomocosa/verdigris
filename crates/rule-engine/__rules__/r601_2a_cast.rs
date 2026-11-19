@@ -97,7 +97,7 @@ mod tests {
             .mana_pool(testing::Seat::P1, mana![2, U])
             .build();
         let p1 = game.p1;
-        game.give_priority(p1);
+        game.pass_priority();
         let divination = game.find(p1, zones::Zone::Hand, "Divination").unwrap();
         game.act(p1, actions::Action::Cast(divination));
         assert_eq!(

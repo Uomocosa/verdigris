@@ -1,6 +1,5 @@
 mod cleanup;
 mod find;
-mod give_priority;
 mod last_rejection;
 mod life;
 mod mana_pool;
@@ -8,7 +7,6 @@ mod target_choice;
 mod zone_of;
 pub use cleanup::cleanup;
 pub use find::find;
-pub use give_priority::give_priority;
 pub use last_rejection::last_rejection;
 pub use life::life;
 pub use mana_pool::mana_pool;

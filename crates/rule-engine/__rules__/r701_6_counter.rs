@@ -69,7 +69,7 @@ mod tests {
 
         game.act(game.p1, actions::Action::Cast(bolt));
         game.act(game.p1, actions::Action::ChooseTargets(vec![p2]));
-        game.give_priority(p2);
+        game.pass_priority();
         game.act(p2, actions::Action::Cast(cancel));
         game.act(p2, actions::Action::ChooseTargets(vec![bolt]));
         game.pass_priority_all();
@@ -100,10 +100,10 @@ mod tests {
 
         game.act(p1, actions::Action::Cast(bolt));
         game.act(p1, actions::Action::ChooseTargets(vec![p2]));
-        game.give_priority(p2);
+        game.pass_priority();
         game.act(p2, actions::Action::Cast(p2_cancel));
         game.act(p2, actions::Action::ChooseTargets(vec![bolt]));
-        game.give_priority(p1);
+        game.pass_priority();
         game.act(p1, actions::Action::Cast(p1_cancel));
         game.act(p1, actions::Action::ChooseTargets(vec![p2_cancel]));
 

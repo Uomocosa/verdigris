@@ -83,7 +83,7 @@ mod tests {
 
         game.act(game.p1, actions::Action::Cast(bolt));
         game.act(game.p1, actions::Action::ChooseTargets(vec![bears]));
-        game.give_priority(p2);
+        game.pass_priority();
         game.act(p2, actions::Action::Cast(growth));
         game.act(p2, actions::Action::ChooseTargets(vec![bears]));
         game.pass_priority_all();
