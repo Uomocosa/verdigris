@@ -53,6 +53,8 @@ impl MockGame {
     #[must_use]
     pub fn find(&self, player: Entity, zone: zones::Zone, name: &str) -> Option<Entity> {}
 
+    pub fn give_priority(&mut self, player: Entity) {}
+
     #[must_use]
     pub fn zone_of(&self, card: Entity) -> zones::Zone {}
 

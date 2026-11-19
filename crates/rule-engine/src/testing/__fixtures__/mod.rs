@@ -1,3 +1,4 @@
+mod cancel;
 mod darksteel_myr;
 mod doom_blade;
 mod expected_targets;
@@ -9,6 +10,7 @@ mod seat;
 mod typhoid_rats;
 mod walking_corpse;
 
+pub use cancel::cancel;
 pub use darksteel_myr::darksteel_myr;
 pub use doom_blade::doom_blade;
 pub use expected_targets::ExpectedTargets;

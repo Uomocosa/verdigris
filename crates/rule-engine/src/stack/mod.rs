@@ -2,4 +2,4 @@
 mod basic;
 
 pub use basic::components::{CastingStage, ChosenTarget};
-pub use basic::messages::Resolution;
+pub use basic::messages::{Countered, Resolution};

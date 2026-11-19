@@ -10,6 +10,7 @@ pub fn plugin_build(_rules_plugin: &RulesPlugin, app: &mut App) {
     app.add_message::<actions::PlayerAction>()
         .add_message::<actions::Rejected>()
         .add_message::<stack::Resolution>()
+        .add_message::<stack::Countered>()
         .add_message::<zones::DamageDealt>()
         .add_message::<zones::Destruction>();
     app.init_resource::<actions::PendingChoice>();
@@ -38,6 +39,7 @@ pub fn plugin_build(_rules_plugin: &RulesPlugin, app: &mut App) {
             rules::r117_4_priority::r117_4_priority,
             rules::r608_2b_illegal_targets::r608_2b_illegal_targets,
             rules::r608_2_resolve::r608_2_resolve,
+            rules::r701_6_counter::r701_6_counter,
             rules::r120_3_damage_results::r120_3_damage_results,
             rules::r608_2n_graveyard::r608_2n_graveyard,
         )

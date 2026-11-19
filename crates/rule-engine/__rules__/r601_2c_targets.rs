@@ -48,8 +48,14 @@ pub fn r601_2c_targets(
                         .insert(stack::CastingStage::AwaitingPayment);
                     continue;
                 };
-                let legal =
-                    legal_targets(target.filter, controller, &players, &cards, &zone_entities);
+                let legal = legal_targets(
+                    spell,
+                    target.filter,
+                    controller,
+                    &players,
+                    &cards,
+                    &zone_entities,
+                );
                 if legal.is_empty() {
                     rejected.write(actions::Rejected::NoLegalTargets { spell });
                     if let Some(hand) =
@@ -102,6 +108,7 @@ pub fn r601_2c_targets(
 }
 
 fn legal_targets(
+    casting_spell: Entity,
     filter: effects::Filter,
     controller: Entity,
     players: &Query<Entity, With<zones::Player>>,
@@ -125,10 +132,7 @@ fn legal_targets(
         legal.extend(all_players.iter().copied());
     }
     for (entity, definition, owner, in_zone) in cards.iter() {
-        if !helpers::does_creature_match_filter(definition, filter) {
-            continue;
-        }
-        if !helpers::is_card_in_zone(**in_zone, zones::Zone::Battlefield, zone_entities) {
+        if entity == casting_spell {
             continue;
         }
         if let Some(allowed) = &allowed_controllers
@@ -136,10 +140,16 @@ fn legal_targets(
         {
             continue;
         }
-        if matches!(
-            filter.kind,
-            effects::FilterKind::Creature | effects::FilterKind::AnyTarget
-        ) {
+        let is_legal = match filter.kind {
+            effects::FilterKind::Spell => {
+                helpers::is_card_in_zone(**in_zone, zones::Zone::Stack, zone_entities)
+            }
+            effects::FilterKind::Creature | effects::FilterKind::AnyTarget => {
+                helpers::does_creature_match_filter(definition, filter)
+                    && helpers::is_card_in_zone(**in_zone, zones::Zone::Battlefield, zone_entities)
+            }
+        };
+        if is_legal {
             legal.insert(entity);
         }
     }
@@ -256,6 +266,37 @@ mod tests {
             Some(&actions::Rejected::NoLegalTargets { spell: blade })
         );
         assert_eq!(game.zone_of(blade), zones::Zone::Hand);
+    }
+
+    #[test]
+    fn cancel_cannot_target_a_permanent() {
+        let mut game = testing::MockGame::builder()
+            .hand(
+                testing::Seat::P1,
+                [testing::lightning_bolt(), testing::cancel()],
+            )
+            .battlefield(testing::Seat::P2, [testing::grizzly_bears()])
+            .mana_pool(testing::Seat::P1, mana![1, U, U, R])
+            .build();
+        let bolt = game
+            .find(game.p1, zones::Zone::Hand, "Lightning Bolt")
+            .unwrap();
+        let cancel = game.find(game.p1, zones::Zone::Hand, "Cancel").unwrap();
+        let bears = game
+            .find(game.p2, zones::Zone::Battlefield, "Grizzly Bears")
+            .unwrap();
+
+        game.act(game.p1, actions::Action::Cast(bolt));
+        game.act(game.p1, actions::Action::ChooseTargets(vec![game.p2]));
+        game.act(game.p1, actions::Action::Cast(cancel));
+
+        assert_eq!(game.target_choice(), Some(testing::pick(1).from([bolt])));
+
+        game.act(game.p1, actions::Action::ChooseTargets(vec![bears]));
+        assert_eq!(
+            game.last_rejection(),
+            Some(&actions::Rejected::InvalidTargets { spell: cancel })
+        );
     }
 
     #[test]

@@ -15,7 +15,7 @@ pub use rules_plugin::RulesPlugin;
 mod constants;
 pub use constants::{
     ANY, ANY_TARGET, BATTLEFIELD, CREATURE, EXILE, GRAVEYARD, HAND, LIBRARY, NONBLACK_CREATURE,
-    OPPONENT, STACK, YOU,
+    OPPONENT, SPELL, STACK, YOU,
 };
 
 #[path = "../__methods__/mod.rs"]

@@ -17,6 +17,14 @@ pub const fn destroy() -> effects::Effect {
 }
 
 #[must_use]
+pub const fn counter() -> effects::Effect {
+    effects::Effect {
+        kind: effects::EffectKind::Counter,
+        target: None,
+    }
+}
+
+#[must_use]
 pub const fn target(count: u32, filter: effects::Filter) -> effects::Target {
     effects::Target { count, filter }
 }

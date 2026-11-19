@@ -70,6 +70,9 @@ fn target_is_legal(
     match requirement.filter.kind {
         effects::FilterKind::AnyTarget => is_player || creature_matches_filter,
         effects::FilterKind::Creature => creature_matches_filter,
+        effects::FilterKind::Spell => cards.get(target).is_ok_and(|(_, _, in_zone, _)| {
+            helpers::is_card_in_zone(**in_zone, zones::Zone::Stack, zone_entities)
+        }),
     }
 }
 

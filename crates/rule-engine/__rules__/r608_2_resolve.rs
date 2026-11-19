@@ -13,6 +13,7 @@ pub fn r608_2_resolve(
     mut resolutions: MessageReader<stack::Resolution>,
     mut damage_dealt: MessageWriter<zones::DamageDealt>,
     mut destructions: MessageWriter<zones::Destruction>,
+    mut countered: MessageWriter<stack::Countered>,
     spells: Query<(
         &cards::CardDefinition,
         &zones::InZone,
@@ -55,6 +56,13 @@ pub fn r608_2_resolve(
                     )
                 {
                     destructions.write(zones::Destruction(target));
+                }
+            }
+            effects::EffectKind::Counter => {
+                if let Ok(target_zone) = targets.get(target)
+                    && helpers::is_card_in_zone(**target_zone, zones::Zone::Stack, &zone_entities)
+                {
+                    countered.write(stack::Countered(target));
                 }
             }
         }
