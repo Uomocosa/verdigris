@@ -48,7 +48,6 @@ pub fn r120_3_damage_results(
 
 #[cfg(test)]
 mod tests {
-    use crate::actions;
     use crate::mana;
     use crate::testing::*;
     use crate::turns;
@@ -68,9 +67,11 @@ mod tests {
             .only()
             .unwrap();
         let bolt = game.player(p2).cards(HAND, LIGHTNING_BOLT).only().unwrap();
-        game.act(p2, actions::Action::Cast(bolt));
-        game.act(p2, actions::Action::ChooseTargets(vec![corpse]));
-        game.pass_priority_all();
+        game.play([
+            p2.cast(bolt).targeting(corpse).pass_priority(),
+            p1.pass_priority(),
+        ])
+        .unwrap();
         assert_eq!(game.zone_of(corpse), GRAVEYARD);
         assert_eq!(game.life(p1), 20);
     }

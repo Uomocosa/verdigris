@@ -40,7 +40,6 @@ pub fn r608_2n_graveyard(
 
 #[cfg(test)]
 mod tests {
-    use crate::actions;
     use crate::mana;
     use crate::testing::*;
     use crate::{GRAVEYARD, HAND};
@@ -50,9 +49,11 @@ mod tests {
         let (mut game, [p1, p2]) =
             MockGame::new([P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]), P2]);
         let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
-        game.act(p1, actions::Action::Cast(bolt));
-        game.act(p1, actions::Action::ChooseTargets(vec![*p2]));
-        game.pass_priority_all();
+        game.play([
+            p1.cast(bolt).targeting(p2).pass_priority(),
+            p2.pass_priority(),
+        ])
+        .unwrap();
         assert_eq!(game.zone_of(bolt), GRAVEYARD);
         assert!(!game.player(p1).cards(GRAVEYARD, LIGHTNING_BOLT).is_empty());
     }

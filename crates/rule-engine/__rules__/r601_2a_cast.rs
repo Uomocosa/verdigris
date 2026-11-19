@@ -81,20 +81,20 @@ mod tests {
         let (mut game, [p1, ..]) =
             MockGame::new([P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]), P2]);
         let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
-        game.act(p1, actions::Action::Cast(bolt));
+        game.play([p1.cast(bolt)]).unwrap();
         assert_eq!(game.zone_of(bolt), STACK);
     }
 
     #[test]
     fn sorcery_cannot_be_cast_on_an_opponents_turn() {
-        let (mut game, [p1, ..]) = MockGame::builder()
+        let (mut game, [p1, p2]) = MockGame::builder()
             .turn(2, turns::Step::PrecombatMain)
             .players([P1.hand([DIVINATION]).mana_pool(mana![2, U]), P2.active()]);
-        game.pass_priority();
+        game.play([p2.pass_priority()]).unwrap();
         let divination = game.player(p1).cards(HAND, DIVINATION).only().unwrap();
-        game.act(p1, actions::Action::Cast(divination));
+        let err = game.play([p1.cast(divination)]).unwrap_err();
         assert_eq!(
-            game.last_rejection(),
+            err.rejection(),
             Some(&actions::Rejected::CannotCast { spell: divination })
         );
         assert_eq!(game.zone_of(divination), HAND);
@@ -108,12 +108,11 @@ mod tests {
             P2,
         ]);
         let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
-        game.act(p1, actions::Action::Cast(bolt));
-        game.act(p1, actions::Action::ChooseTargets(vec![*p2]));
+        game.play([p1.cast(bolt).targeting(p2)]).unwrap();
         let divination = game.player(p1).cards(HAND, DIVINATION).only().unwrap();
-        game.act(p1, actions::Action::Cast(divination));
+        let err = game.play([p1.cast(divination)]).unwrap_err();
         assert_eq!(
-            game.last_rejection(),
+            err.rejection(),
             Some(&actions::Rejected::CannotCast { spell: divination })
         );
         assert_eq!(game.zone_of(divination), HAND);

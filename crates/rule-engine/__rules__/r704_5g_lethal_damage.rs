@@ -40,7 +40,6 @@ pub fn r704_5g_lethal_damage(
 
 #[cfg(test)]
 mod tests {
-    use crate::actions;
     use crate::mana;
     use crate::testing::*;
     use crate::{BATTLEFIELD, GRAVEYARD, HAND};
@@ -57,9 +56,11 @@ mod tests {
             .cards(BATTLEFIELD, GRIZZLY_BEARS)
             .only()
             .unwrap();
-        game.act(p1, actions::Action::Cast(bolt));
-        game.act(p1, actions::Action::ChooseTargets(vec![bears]));
-        game.pass_priority_all();
+        game.play([
+            p1.cast(bolt).targeting(bears).pass_priority(),
+            p2.pass_priority(),
+        ])
+        .unwrap();
         assert_eq!(game.zone_of(bears), GRAVEYARD);
     }
 }

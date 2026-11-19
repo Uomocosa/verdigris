@@ -17,7 +17,6 @@ pub fn r704_5a_zero_life(
 #[cfg(test)]
 mod tests {
     use crate::HAND;
-    use crate::actions;
     use crate::mana;
     use crate::players;
     use crate::testing::*;
@@ -27,9 +26,11 @@ mod tests {
         let (mut game, [p1, p2]) =
             MockGame::new([P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]), P2.life(3)]);
         let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
-        game.act(p1, actions::Action::Cast(bolt));
-        game.act(p1, actions::Action::ChooseTargets(vec![*p2]));
-        game.pass_priority_all();
+        game.play([
+            p1.cast(bolt).targeting(p2).pass_priority(),
+            p2.pass_priority(),
+        ])
+        .unwrap();
         assert!(game.app.world().get::<players::Lost>(*p2).is_some());
     }
 }

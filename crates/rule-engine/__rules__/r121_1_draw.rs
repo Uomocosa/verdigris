@@ -47,7 +47,6 @@ pub fn r121_1_draw(
 
 #[cfg(test)]
 mod tests {
-    use crate::actions;
     use crate::cards;
     use crate::mana;
     use crate::testing::*;
@@ -55,18 +54,18 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let (mut game, [p1, ..]) =
+        let (mut game, [p1, p2]) =
             MockGame::new([P1.hand([DIVINATION]).mana_pool(mana![2, U]), P2]);
         let divination = game.player(p1).cards(HAND, DIVINATION).only().unwrap();
-        game.act(p1, actions::Action::Cast(divination));
-        game.pass_priority_all();
+        game.play([p1.cast(divination).pass_priority(), p2.pass_priority()])
+            .unwrap();
         assert!(!game.player(p1).cards(HAND, GRIZZLY_BEARS).is_empty());
         assert_eq!(game.zone_of(divination), GRAVEYARD);
     }
 
     #[test]
     fn divination_draws_the_top_two_cards_of_the_library() {
-        let (mut game, [p1, ..]) = MockGame::new([
+        let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([DIVINATION])
                 .library([
                     cards::CardDefinition::from(GRIZZLY_BEARS),
@@ -77,8 +76,8 @@ mod tests {
             P2,
         ]);
         let divination = game.player(p1).cards(HAND, DIVINATION).only().unwrap();
-        game.act(p1, actions::Action::Cast(divination));
-        game.pass_priority_all();
+        game.play([p1.cast(divination).pass_priority(), p2.pass_priority()])
+            .unwrap();
         assert!(!game.player(p1).cards(HAND, GRIZZLY_BEARS).is_empty());
         assert!(!game.player(p1).cards(HAND, LIGHTNING_BOLT).is_empty());
         assert_eq!(

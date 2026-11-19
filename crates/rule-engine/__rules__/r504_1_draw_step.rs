@@ -29,12 +29,12 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let (mut game, [_, _]) = MockGame::builder()
+        let (mut game, [p1, p2]) = MockGame::builder()
             .turn(1, turns::Step::Upkeep)
             .players([P1, P2]);
 
-        game.pass_priority_all();
-        game.pass_priority();
+        game.play([p1.pass_priority(), p2.pass_priority(), p1.pass_priority()])
+            .unwrap();
 
         assert_eq!(
             game.app.world().resource::<turns::Turn>().step,
@@ -44,7 +44,7 @@ mod tests {
 
     #[test]
     fn the_active_player_draws_a_card_during_their_draw_step() {
-        let (mut game, [p1, ..]) = MockGame::builder().turn(1, turns::Step::Upkeep).players([
+        let (mut game, [p1, p2]) = MockGame::builder().turn(1, turns::Step::Upkeep).players([
             P1.library([
                 cards::CardDefinition::from(GRIZZLY_BEARS),
                 cards::CardDefinition::from(LIGHTNING_BOLT),
@@ -57,8 +57,8 @@ mod tests {
             .only()
             .unwrap();
 
-        game.pass_priority_all();
-        game.pass_priority();
+        game.play([p1.pass_priority(), p2.pass_priority(), p1.pass_priority()])
+            .unwrap();
 
         assert_eq!(game.zone_of(top), HAND);
         assert_eq!(

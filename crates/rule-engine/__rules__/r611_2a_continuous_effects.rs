@@ -28,7 +28,6 @@ pub fn r611_2a_continuous_effects(
 
 #[cfg(test)]
 mod tests {
-    use crate::actions;
     use crate::damage;
     use crate::effects;
     use crate::mana;
@@ -37,7 +36,7 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let (mut game, [p1, ..]) = MockGame::new([
+        let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([GIANT_GROWTH])
                 .battlefield([GRIZZLY_BEARS])
                 .mana_pool(mana![G]),
@@ -49,9 +48,11 @@ mod tests {
             .cards(BATTLEFIELD, GRIZZLY_BEARS)
             .only()
             .unwrap();
-        game.act(p1, actions::Action::Cast(growth));
-        game.act(p1, actions::Action::ChooseTargets(vec![bears]));
-        game.pass_priority_all();
+        game.play([
+            p1.cast(growth).targeting(bears).pass_priority(),
+            p2.pass_priority(),
+        ])
+        .unwrap();
         let modifier = game
             .app
             .world()
@@ -83,13 +84,14 @@ mod tests {
             .only()
             .unwrap();
 
-        game.act(p1, actions::Action::Cast(bolt));
-        game.act(p1, actions::Action::ChooseTargets(vec![bears]));
-        game.pass_priority();
-        game.act(p2, actions::Action::Cast(growth));
-        game.act(p2, actions::Action::ChooseTargets(vec![bears]));
-        game.pass_priority_all();
-        game.pass_priority_all();
+        game.play([
+            p1.cast(bolt).targeting(bears).pass_priority(),
+            p2.cast(growth).targeting(bears).pass_priority(),
+            p1.pass_priority(),
+            p1.pass_priority(),
+            p2.pass_priority(),
+        ])
+        .unwrap();
 
         assert_eq!(game.zone_of(bears), BATTLEFIELD);
         let damage = game.app.world().get::<damage::Damage>(bears).copied();
