@@ -94,6 +94,39 @@ mod tests {
     }
 
     #[test]
+    fn two_rounds_of_passing_resolves_both_spells() {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.hand([LIGHTNING_BOLT, LIGHTNING_BOLT])
+                .mana_pool(mana![R, R]),
+            P2,
+        ]);
+        let first = game
+            .player(p1)
+            .cards_in(HAND)
+            .matching(LIGHTNING_BOLT)
+            .first()
+            .unwrap();
+        let second = game
+            .player(p1)
+            .cards_in(HAND)
+            .matching(LIGHTNING_BOLT)
+            .nth(1)
+            .unwrap();
+        game.play([
+            p1.cast(first).targeting(p2),
+            p1.cast(second).targeting(p2).pass_priority(),
+            p2.pass_priority(),
+            p1.pass_priority(),
+            p2.pass_priority(),
+        ])
+        .unwrap();
+
+        assert_eq!(game.zone_of(second), GRAVEYARD);
+        assert_eq!(game.zone_of(first), GRAVEYARD);
+        assert_eq!(game.life(p2), 14);
+    }
+
+    #[test]
     fn priority_returns_to_the_active_player_after_a_spell_resolves() {
         let (mut game, [p1, p2]) =
             MockGame::new([P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]), P2]);
