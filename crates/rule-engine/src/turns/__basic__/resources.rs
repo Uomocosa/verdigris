@@ -6,7 +6,7 @@ use crate::turns;
 pub struct Turn {
     pub number: u32,
     pub active: Entity,
-    pub phase: turns::Phase,
+    pub step: turns::Step,
 }
 
 #[derive(Resource, Debug, Clone, Copy, PartialEq, Eq)]

@@ -53,8 +53,8 @@ pub fn r601_2a_cast(
         if !is_instant {
             let do_stack_is_empty = !cards.iter().any(|(_, _, zone)| **zone == stack);
             let is_main_phase = matches!(
-                turn.phase,
-                turns::Phase::PrecombatMain | turns::Phase::PostcombatMain
+                turn.step,
+                turns::Step::PrecombatMain | turns::Step::PostcombatMain
             );
             let is_active_player = turn.active == action.player;
             let do_sorcery_speed_conditions_hold =
@@ -92,7 +92,7 @@ mod tests {
     #[test]
     fn sorcery_cannot_be_cast_on_an_opponents_turn() {
         let mut game = testing::MockGame::builder()
-            .turn(2, testing::Seat::P2, turns::Phase::PrecombatMain)
+            .turn(2, testing::Seat::P2, turns::Step::PrecombatMain)
             .hand(testing::Seat::P1, [testing::divination()])
             .mana_pool(testing::Seat::P1, mana![2, U])
             .build();

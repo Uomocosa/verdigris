@@ -132,7 +132,7 @@ mod tests {
         let turn = game.app.world().resource::<turns::Turn>();
         assert_eq!(turn.number, 1);
         assert_eq!(turn.active, game.p1);
-        assert_eq!(turn.phase, turns::Phase::PrecombatMain);
+        assert_eq!(turn.step, turns::Step::PrecombatMain);
         assert_eq!(
             game.app.world().resource::<turns::Priority>().player,
             game.p1
@@ -143,7 +143,7 @@ mod tests {
     fn overrides_place_cards_and_support_four_players() {
         let game = MockGame::builder()
             .players(4)
-            .turn(3, testing::Seat::P2, turns::Phase::PostcombatMain)
+            .turn(3, testing::Seat::P2, turns::Step::PostcombatMain)
             .hand(testing::Seat::P1, [testing::lightning_bolt()])
             .battlefield(testing::Seat::P2, [testing::grizzly_bears()])
             .library(testing::Seat::P2, [testing::murder()])
@@ -171,7 +171,7 @@ mod tests {
         let turn = game.app.world().resource::<turns::Turn>();
         assert_eq!(turn.number, 3);
         assert_eq!(turn.active, game.p(2));
-        assert_eq!(turn.phase, turns::Phase::PostcombatMain);
+        assert_eq!(turn.step, turns::Step::PostcombatMain);
         assert_eq!(
             game.app.world().resource::<turns::Priority>().player,
             game.p(2)

@@ -10,7 +10,7 @@ pub struct MockGameBuilder {
     pub(crate) player_count: usize,
     pub(crate) turn_number: u32,
     pub(crate) active: testing::Seat,
-    pub(crate) phase: turns::Phase,
+    pub(crate) step: turns::Step,
     pub(crate) hands: BTreeMap<testing::Seat, Vec<cards::CardDefinition>>,
     pub(crate) battlefields: BTreeMap<testing::Seat, Vec<cards::CardDefinition>>,
     pub(crate) libraries: BTreeMap<testing::Seat, Vec<cards::CardDefinition>>,
@@ -23,7 +23,7 @@ impl Default for MockGameBuilder {
             player_count: 2,
             turn_number: 1,
             active: testing::Seat::P1,
-            phase: turns::Phase::PrecombatMain,
+            step: turns::Step::PrecombatMain,
             hands: BTreeMap::new(),
             battlefields: BTreeMap::new(),
             libraries: BTreeMap::new(),
@@ -83,7 +83,7 @@ impl MockGameBuilder {
 #[atomic_delegates]
 impl MockGameBuilder {
     #[must_use]
-    pub fn turn(self, number: u32, active: testing::Seat, phase: turns::Phase) -> Self {}
+    pub fn turn(self, number: u32, active: testing::Seat, step: turns::Step) -> Self {}
 
     #[must_use]
     pub fn build(&self) -> testing::MockGame {}

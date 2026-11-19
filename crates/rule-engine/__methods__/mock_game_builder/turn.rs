@@ -5,11 +5,11 @@ pub const fn turn(
     mut builder: testing::MockGameBuilder,
     number: u32,
     active: testing::Seat,
-    phase: turns::Phase,
+    step: turns::Step,
 ) -> testing::MockGameBuilder {
     builder.turn_number = number;
     builder.active = active;
-    builder.phase = phase;
+    builder.step = step;
     builder
 }
 
@@ -26,11 +26,11 @@ mod tests {
             testing::MockGameBuilder::default(),
             2,
             testing::Seat::P2,
-            turns::Phase::Combat,
+            turns::Step::CombatDamage,
         );
         let game = builder.build();
         let current = game.app.world().resource::<turns::Turn>();
         assert_eq!(current.number, 2);
-        assert_eq!(current.phase, turns::Phase::Combat);
+        assert_eq!(current.step, turns::Step::CombatDamage);
     }
 }

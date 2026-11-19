@@ -107,7 +107,7 @@ pub fn build(builder: &testing::MockGameBuilder) -> testing::MockGame {
     app.insert_resource(turns::Turn {
         number: builder.turn_number,
         active,
-        phase: builder.phase,
+        step: builder.step,
     });
     app.insert_resource(turns::Priority {
         player: active,
