@@ -1,15 +1,11 @@
+use atomic_delegate_macros::atomic_delegates;
 use bevy::prelude::{App, Plugin};
-
-use crate::actions;
 
 pub struct RulesPlugin;
 
+#[atomic_delegates]
 impl Plugin for RulesPlugin {
-    fn build(&self, app: &mut App) {
-        app.add_message::<actions::PlayerAction>()
-            .add_message::<actions::Rejected>();
-        app.init_resource::<actions::PendingChoice>();
-    }
+    fn build(&self, app: &mut App) {}
 }
 
 #[cfg(test)]

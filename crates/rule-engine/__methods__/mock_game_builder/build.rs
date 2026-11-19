@@ -73,6 +73,7 @@ pub fn build(builder: &testing::MockGameBuilder) -> testing::MockGame {
                 definition,
                 zones::InZone(battlefield),
                 zones::Owner(*player),
+                zones::Damage(0),
             ));
         }
 

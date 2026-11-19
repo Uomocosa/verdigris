@@ -27,3 +27,9 @@ pub struct Player;
 
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Deref)]
 pub struct Life(pub i32);
+
+#[derive(Component, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Deref)]
+pub struct Damage(pub u32);
+
+#[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Lost;

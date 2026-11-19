@@ -11,4 +11,7 @@ pub struct PlayerAction {
 #[derive(Message, Debug, Clone, PartialEq, Eq)]
 pub enum Rejected {
     NoLegalTargets { spell: Entity },
+    CannotCast { spell: Entity },
+    CannotPay { spell: Entity },
+    InvalidTargets { spell: Entity },
 }

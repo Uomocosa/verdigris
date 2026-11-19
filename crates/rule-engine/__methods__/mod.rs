@@ -3,9 +3,11 @@ pub mod effect;
 #[cfg(feature = "testing")]
 pub mod expected_targets;
 pub mod filter;
+pub mod mana_pool;
 #[cfg(feature = "testing")]
 pub mod mock_game;
 #[cfg(feature = "testing")]
 pub mod mock_game_builder;
 pub mod player_ref;
+pub mod rules_plugin;
 pub mod zone_ref;

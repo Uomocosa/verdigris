@@ -1,7 +1,10 @@
 pub mod actions;
 pub mod cards;
 pub mod effects;
+#[path = "../__rules__/mod.rs"]
+mod rules;
 mod rules_plugin;
+pub mod stack;
 #[cfg(feature = "testing")]
 pub mod testing;
 pub mod turns;

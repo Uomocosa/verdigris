@@ -1,3 +1,4 @@
+use atomic_delegate_macros::atomic_delegates;
 use bevy::prelude::Component;
 
 use crate::cards;
@@ -44,9 +45,16 @@ impl ManaPool {
     }
 }
 
+#[atomic_delegates]
+impl ManaPool {
+    #[must_use]
+    pub fn pay(&mut self, cost: cards::Cost) -> bool {}
+}
+
 #[cfg(test)]
 mod tests {
     use crate::cards;
+    use crate::cost;
     use crate::mana;
 
     #[test]
@@ -60,5 +68,8 @@ mod tests {
                 .blue,
             1
         );
+        let mut pool = mana![1, B, B];
+        assert!(pool.pay(cost![1, B, B]));
+        assert_eq!(pool, cards::ManaPool::default());
     }
 }
