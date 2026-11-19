@@ -88,14 +88,14 @@ mod tests {
     use crate::actions;
     use crate::cards;
     use crate::mana;
-    use crate::testing;
+    use crate::testing::*;
     use crate::zones;
 
     #[test]
     fn test_usage() {
-        let mut game = testing::MockGame::builder()
-            .hand(testing::Seat::P1, [testing::lightning_bolt()])
-            .mana_pool(testing::Seat::P1, mana![R])
+        let mut game = MockGame::builder()
+            .hand(Seat::P1, [lightning_bolt()])
+            .mana_pool(Seat::P1, mana![R])
             .build();
         let bolt = game
             .find(game.p1, zones::Zone::Hand, "Lightning Bolt")
@@ -108,13 +108,10 @@ mod tests {
 
     #[test]
     fn test_bolt_fizzles_when_target_gone() {
-        let mut game = testing::MockGame::builder()
-            .hand(
-                testing::Seat::P1,
-                [testing::lightning_bolt(), testing::murder()],
-            )
-            .battlefield(testing::Seat::P2, [testing::grizzly_bears()])
-            .mana_pool(testing::Seat::P1, mana![1, B, B, R])
+        let mut game = MockGame::builder()
+            .hand(Seat::P1, [lightning_bolt(), murder()])
+            .battlefield(Seat::P2, [grizzly_bears()])
+            .mana_pool(Seat::P1, mana![1, B, B, R])
             .build();
         let bolt = game
             .find(game.p1, zones::Zone::Hand, "Lightning Bolt")
@@ -140,10 +137,10 @@ mod tests {
 
     #[test]
     fn doom_blade_fizzles_when_its_target_becomes_black() {
-        let mut game = testing::MockGame::builder()
-            .hand(testing::Seat::P1, [testing::doom_blade()])
-            .battlefield(testing::Seat::P2, [testing::grizzly_bears()])
-            .mana_pool(testing::Seat::P1, mana![1, B])
+        let mut game = MockGame::builder()
+            .hand(Seat::P1, [doom_blade()])
+            .battlefield(Seat::P2, [grizzly_bears()])
+            .mana_pool(Seat::P1, mana![1, B])
             .build();
         let blade = game.find(game.p1, zones::Zone::Hand, "Doom Blade").unwrap();
         let bears = game

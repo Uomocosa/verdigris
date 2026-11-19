@@ -40,15 +40,15 @@ pub fn r704_5g_lethal_damage(
 mod tests {
     use crate::actions;
     use crate::mana;
-    use crate::testing;
+    use crate::testing::*;
     use crate::zones;
 
     #[test]
     fn test_usage() {
-        let mut game = testing::MockGame::builder()
-            .hand(testing::Seat::P1, [testing::lightning_bolt()])
-            .battlefield(testing::Seat::P2, [testing::grizzly_bears()])
-            .mana_pool(testing::Seat::P1, mana![R])
+        let mut game = MockGame::builder()
+            .hand(Seat::P1, [lightning_bolt()])
+            .battlefield(Seat::P2, [grizzly_bears()])
+            .mana_pool(Seat::P1, mana![R])
             .build();
         let bolt = game
             .find(game.p1, zones::Zone::Hand, "Lightning Bolt")

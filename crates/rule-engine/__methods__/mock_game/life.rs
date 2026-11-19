@@ -10,13 +10,13 @@ pub fn life(game: &testing::MockGame, player: bevy::prelude::Entity) -> i32 {
 
 #[cfg(test)]
 mod tests {
-    use crate::testing;
+    use crate::testing::*;
 
     use super::life;
 
     #[test]
     fn test_usage() {
-        let game = testing::MockGame::builder().build();
+        let game = MockGame::builder().build();
         assert_eq!(life(&game, game.p1), 20);
     }
 }

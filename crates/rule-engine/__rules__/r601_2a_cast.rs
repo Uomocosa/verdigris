@@ -72,15 +72,15 @@ pub fn r601_2a_cast(
 mod tests {
     use crate::actions;
     use crate::mana;
-    use crate::testing;
+    use crate::testing::*;
     use crate::turns;
     use crate::zones;
 
     #[test]
     fn test_usage() {
-        let mut game = testing::MockGame::builder()
-            .hand(testing::Seat::P1, [testing::lightning_bolt()])
-            .mana_pool(testing::Seat::P1, mana![R])
+        let mut game = MockGame::builder()
+            .hand(Seat::P1, [lightning_bolt()])
+            .mana_pool(Seat::P1, mana![R])
             .build();
         let bolt = game
             .find(game.p1, zones::Zone::Hand, "Lightning Bolt")
@@ -91,10 +91,10 @@ mod tests {
 
     #[test]
     fn sorcery_cannot_be_cast_on_an_opponents_turn() {
-        let mut game = testing::MockGame::builder()
-            .turn(2, testing::Seat::P2, turns::Step::PrecombatMain)
-            .hand(testing::Seat::P1, [testing::divination()])
-            .mana_pool(testing::Seat::P1, mana![2, U])
+        let mut game = MockGame::builder()
+            .turn(2, Seat::P2, turns::Step::PrecombatMain)
+            .hand(Seat::P1, [divination()])
+            .mana_pool(Seat::P1, mana![2, U])
             .build();
         let p1 = game.p1;
         game.pass_priority();
@@ -109,12 +109,9 @@ mod tests {
 
     #[test]
     fn sorcery_cannot_be_cast_while_the_stack_is_not_empty() {
-        let mut game = testing::MockGame::builder()
-            .hand(
-                testing::Seat::P1,
-                [testing::lightning_bolt(), testing::divination()],
-            )
-            .mana_pool(testing::Seat::P1, mana![R, 2, U])
+        let mut game = MockGame::builder()
+            .hand(Seat::P1, [lightning_bolt(), divination()])
+            .mana_pool(Seat::P1, mana![R, 2, U])
             .build();
         let bolt = game
             .find(game.p1, zones::Zone::Hand, "Lightning Bolt")

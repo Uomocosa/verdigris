@@ -43,14 +43,14 @@ pub fn r608_2n_graveyard(
 mod tests {
     use crate::actions;
     use crate::mana;
-    use crate::testing;
+    use crate::testing::*;
     use crate::zones;
 
     #[test]
     fn test_usage() {
-        let mut game = testing::MockGame::builder()
-            .hand(testing::Seat::P1, [testing::lightning_bolt()])
-            .mana_pool(testing::Seat::P1, mana![R])
+        let mut game = MockGame::builder()
+            .hand(Seat::P1, [lightning_bolt()])
+            .mana_pool(Seat::P1, mana![R])
             .build();
         let bolt = game
             .find(game.p1, zones::Zone::Hand, "Lightning Bolt")

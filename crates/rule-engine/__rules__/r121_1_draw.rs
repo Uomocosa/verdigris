@@ -49,14 +49,14 @@ pub fn r121_1_draw(
 mod tests {
     use crate::actions;
     use crate::mana;
-    use crate::testing;
+    use crate::testing::*;
     use crate::zones;
 
     #[test]
     fn test_usage() {
-        let mut game = testing::MockGame::builder()
-            .hand(testing::Seat::P1, [testing::divination()])
-            .mana_pool(testing::Seat::P1, mana![2, U])
+        let mut game = MockGame::builder()
+            .hand(Seat::P1, [divination()])
+            .mana_pool(Seat::P1, mana![2, U])
             .build();
         let divination = game.find(game.p1, zones::Zone::Hand, "Divination").unwrap();
         game.act(game.p1, actions::Action::Cast(divination));
@@ -70,17 +70,10 @@ mod tests {
 
     #[test]
     fn divination_draws_the_top_two_cards_of_the_library() {
-        let mut game = testing::MockGame::builder()
-            .hand(testing::Seat::P1, [testing::divination()])
-            .library(
-                testing::Seat::P1,
-                [
-                    testing::grizzly_bears(),
-                    testing::lightning_bolt(),
-                    testing::murder(),
-                ],
-            )
-            .mana_pool(testing::Seat::P1, mana![2, U])
+        let mut game = MockGame::builder()
+            .hand(Seat::P1, [divination()])
+            .library(Seat::P1, [grizzly_bears(), lightning_bolt(), murder()])
+            .mana_pool(Seat::P1, mana![2, U])
             .build();
         let divination = game.find(game.p1, zones::Zone::Hand, "Divination").unwrap();
         game.act(game.p1, actions::Action::Cast(divination));

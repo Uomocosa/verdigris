@@ -22,10 +22,10 @@ mod tests {
 
     use crate::actions;
     use crate::mana;
-    use crate::testing;
+    use crate::testing::*;
     use crate::zones;
 
-    fn cast_and_resolve(game: &mut testing::MockGame, spell_name: &str, target: Option<Entity>) {
+    fn cast_and_resolve(game: &mut MockGame, spell_name: &str, target: Option<Entity>) {
         let spell = game.find(game.p1, zones::Zone::Hand, spell_name).unwrap();
         game.act(game.p1, actions::Action::Cast(spell));
         if let Some(target) = target {
@@ -36,9 +36,9 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let mut game = testing::MockGame::builder()
-            .hand(testing::Seat::P1, [testing::sign_in_blood()])
-            .mana_pool(testing::Seat::P1, mana![B, B])
+        let mut game = MockGame::builder()
+            .hand(Seat::P1, [sign_in_blood()])
+            .mana_pool(Seat::P1, mana![B, B])
             .build();
         let p2 = game.p2;
         cast_and_resolve(&mut game, "Sign in Blood", Some(p2));
@@ -47,13 +47,10 @@ mod tests {
 
     #[test]
     fn sign_in_blood_makes_the_target_draw_two_cards_and_lose_two_life() {
-        let mut game = testing::MockGame::builder()
-            .hand(testing::Seat::P1, [testing::sign_in_blood()])
-            .library(
-                testing::Seat::P2,
-                [testing::lightning_bolt(), testing::murder()],
-            )
-            .mana_pool(testing::Seat::P1, mana![B, B])
+        let mut game = MockGame::builder()
+            .hand(Seat::P1, [sign_in_blood()])
+            .library(Seat::P2, [lightning_bolt(), murder()])
+            .mana_pool(Seat::P1, mana![B, B])
             .build();
         let p2 = game.p2;
         cast_and_resolve(&mut game, "Sign in Blood", Some(p2));
@@ -66,13 +63,10 @@ mod tests {
 
     #[test]
     fn sign_in_blood_can_target_its_controller() {
-        let mut game = testing::MockGame::builder()
-            .hand(testing::Seat::P1, [testing::sign_in_blood()])
-            .library(
-                testing::Seat::P1,
-                [testing::lightning_bolt(), testing::murder()],
-            )
-            .mana_pool(testing::Seat::P1, mana![B, B])
+        let mut game = MockGame::builder()
+            .hand(Seat::P1, [sign_in_blood()])
+            .library(Seat::P1, [lightning_bolt(), murder()])
+            .mana_pool(Seat::P1, mana![B, B])
             .build();
         let p1 = game.p1;
         cast_and_resolve(&mut game, "Sign in Blood", Some(p1));
@@ -84,10 +78,10 @@ mod tests {
 
     #[test]
     fn sign_in_blood_targeting_an_empty_library_loses_the_game_at_the_next_state_based_check() {
-        let mut game = testing::MockGame::builder()
-            .hand(testing::Seat::P1, [testing::sign_in_blood()])
-            .library(testing::Seat::P2, [])
-            .mana_pool(testing::Seat::P1, mana![B, B])
+        let mut game = MockGame::builder()
+            .hand(Seat::P1, [sign_in_blood()])
+            .library(Seat::P2, [])
+            .mana_pool(Seat::P1, mana![B, B])
             .build();
         let p2 = game.p2;
         cast_and_resolve(&mut game, "Sign in Blood", Some(p2));

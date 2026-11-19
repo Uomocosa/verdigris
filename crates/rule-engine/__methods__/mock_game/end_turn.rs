@@ -15,14 +15,14 @@ pub fn end_turn(game: &mut testing::MockGame) {
 
 #[cfg(test)]
 mod tests {
-    use crate::testing;
+    use crate::testing::*;
     use crate::turns;
 
     use super::end_turn;
 
     #[test]
     fn test_usage() {
-        let mut game = testing::MockGame::builder().build();
+        let mut game = MockGame::builder().build();
         let p2 = game.p2;
 
         end_turn(&mut game);

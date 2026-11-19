@@ -36,15 +36,15 @@ pub fn r704_5h_deathtouch_damage(
 
 #[cfg(test)]
 mod tests {
-    use crate::testing;
+    use crate::testing::*;
     use crate::zones;
 
     #[test]
     #[ignore = "needs combat: Typhoid Rats deals damage by attacking or blocking"]
     fn test_usage() {
-        let game = testing::MockGame::builder()
-            .battlefield(testing::Seat::P1, [testing::typhoid_rats()])
-            .battlefield(testing::Seat::P2, [testing::grizzly_bears()])
+        let game = MockGame::builder()
+            .battlefield(Seat::P1, [typhoid_rats()])
+            .battlefield(Seat::P2, [grizzly_bears()])
             .build();
         assert!(
             game.find(game.p1, zones::Zone::Battlefield, "Typhoid Rats")
@@ -59,9 +59,9 @@ mod tests {
     #[test]
     #[ignore = "needs combat: Typhoid Rats deals damage by attacking or blocking"]
     fn r704_5h_deathtouch_damage_destroys_a_larger_creature() {
-        let game = testing::MockGame::builder()
-            .battlefield(testing::Seat::P1, [testing::typhoid_rats()])
-            .battlefield(testing::Seat::P2, [testing::grizzly_bears()])
+        let game = MockGame::builder()
+            .battlefield(Seat::P1, [typhoid_rats()])
+            .battlefield(Seat::P2, [grizzly_bears()])
             .build();
         assert!(
             game.find(game.p1, zones::Zone::Battlefield, "Typhoid Rats")
@@ -76,9 +76,9 @@ mod tests {
     #[test]
     #[ignore = "needs combat: Typhoid Rats deals damage by attacking or blocking"]
     fn r704_5h_deathtouch_damage_does_not_destroy_indestructible() {
-        let game = testing::MockGame::builder()
-            .battlefield(testing::Seat::P1, [testing::typhoid_rats()])
-            .battlefield(testing::Seat::P2, [testing::darksteel_myr()])
+        let game = MockGame::builder()
+            .battlefield(Seat::P1, [typhoid_rats()])
+            .battlefield(Seat::P2, [darksteel_myr()])
             .build();
         assert!(
             game.find(game.p2, zones::Zone::Battlefield, "Darksteel Myr")
@@ -89,9 +89,9 @@ mod tests {
     #[test]
     #[ignore = "needs combat: Typhoid Rats deals damage by attacking or blocking"]
     fn r704_5h_damage_without_deathtouch_does_not_destroy_a_two_two() {
-        let game = testing::MockGame::builder()
-            .battlefield(testing::Seat::P1, [testing::walking_corpse()])
-            .battlefield(testing::Seat::P2, [testing::grizzly_bears()])
+        let game = MockGame::builder()
+            .battlefield(Seat::P1, [walking_corpse()])
+            .battlefield(Seat::P2, [grizzly_bears()])
             .build();
         assert!(
             game.find(game.p2, zones::Zone::Battlefield, "Grizzly Bears")

@@ -46,13 +46,13 @@ pub fn r117_3_priority(
 mod tests {
     use crate::actions;
     use crate::mana;
-    use crate::testing;
+    use crate::testing::*;
     use crate::turns;
     use crate::zones;
 
     #[test]
     fn test_usage() {
-        let mut game = testing::MockGame::builder().build();
+        let mut game = MockGame::builder().build();
         let p2 = game.p2;
         game.pass_priority();
         assert_eq!(game.app.world().resource::<turns::Priority>().player, p2);
@@ -60,7 +60,7 @@ mod tests {
 
     #[test]
     fn passing_moves_priority_to_the_next_player_in_turn_order() {
-        let mut game = testing::MockGame::builder().build();
+        let mut game = MockGame::builder().build();
         let p1 = game.p1;
         let p2 = game.p2;
 
@@ -74,7 +74,7 @@ mod tests {
 
     #[test]
     fn a_four_player_game_passes_priority_in_a_ring() {
-        let mut game = testing::MockGame::builder().players(4).build();
+        let mut game = MockGame::builder().players(4).build();
         let expected = [game.p(2), game.p(3), game.p(4)];
 
         for next in expected {
@@ -85,9 +85,9 @@ mod tests {
 
     #[test]
     fn the_caster_keeps_priority_after_casting_a_spell() {
-        let mut game = testing::MockGame::builder()
-            .hand(testing::Seat::P2, [testing::lightning_bolt()])
-            .mana_pool(testing::Seat::P2, mana![R])
+        let mut game = MockGame::builder()
+            .hand(Seat::P2, [lightning_bolt()])
+            .mana_pool(Seat::P2, mana![R])
             .build();
         let p2 = game.p2;
         let bolt = game.find(p2, zones::Zone::Hand, "Lightning Bolt").unwrap();
@@ -102,7 +102,7 @@ mod tests {
 
     #[test]
     fn a_player_without_priority_cannot_pass() {
-        let mut game = testing::MockGame::builder().build();
+        let mut game = MockGame::builder().build();
         let p2 = game.p2;
 
         game.act(p2, actions::Action::PassPriority);

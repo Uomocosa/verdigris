@@ -22,14 +22,14 @@ pub fn r504_1_draw_step(
 
 #[cfg(test)]
 mod tests {
-    use crate::testing;
+    use crate::testing::*;
     use crate::turns;
     use crate::zones;
 
     #[test]
     fn test_usage() {
-        let mut game = testing::MockGame::builder()
-            .turn(1, testing::Seat::P1, turns::Step::Upkeep)
+        let mut game = MockGame::builder()
+            .turn(1, Seat::P1, turns::Step::Upkeep)
             .build();
 
         game.pass_priority_all();
@@ -43,12 +43,9 @@ mod tests {
 
     #[test]
     fn the_active_player_draws_a_card_during_their_draw_step() {
-        let mut game = testing::MockGame::builder()
-            .turn(1, testing::Seat::P1, turns::Step::Upkeep)
-            .library(
-                testing::Seat::P1,
-                [testing::grizzly_bears(), testing::lightning_bolt()],
-            )
+        let mut game = MockGame::builder()
+            .turn(1, Seat::P1, turns::Step::Upkeep)
+            .library(Seat::P1, [grizzly_bears(), lightning_bolt()])
             .build();
         let top = game
             .find(game.p1, zones::Zone::Library, "Grizzly Bears")

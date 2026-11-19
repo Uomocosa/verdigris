@@ -99,14 +99,11 @@ impl MockGameBuilder {
 
 #[cfg(test)]
 mod tests {
-    use crate::testing;
+    use crate::testing::*;
 
     #[test]
     fn test_usage() {
-        let game = testing::MockGame::builder()
-            .players(3)
-            .life(testing::Seat::P2, 7)
-            .build();
+        let game = MockGame::builder().players(3).life(Seat::P2, 7).build();
         assert_eq!(game.life(game.p1), 20);
         assert_eq!(game.life(game.p2), 7);
         assert_eq!(game.life(game.p(3)), 20);

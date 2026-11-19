@@ -15,7 +15,7 @@ pub const fn turn(
 
 #[cfg(test)]
 mod tests {
-    use crate::testing;
+    use crate::testing::*;
     use crate::turns;
 
     use super::turn;
@@ -23,9 +23,9 @@ mod tests {
     #[test]
     fn test_usage() {
         let builder = turn(
-            testing::MockGameBuilder::default(),
+            MockGameBuilder::default(),
             2,
-            testing::Seat::P2,
+            Seat::P2,
             turns::Step::CombatDamage,
         );
         let game = builder.build();

@@ -126,11 +126,11 @@ pub fn r608_2_resolve(
 mod tests {
     use crate::actions;
     use crate::mana;
-    use crate::testing;
+    use crate::testing::*;
     use crate::zones;
 
     fn cast_and_resolve(
-        game: &mut testing::MockGame,
+        game: &mut MockGame,
         spell_name: &str,
         target: Option<bevy::prelude::Entity>,
     ) {
@@ -144,9 +144,9 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let mut game = testing::MockGame::builder()
-            .hand(testing::Seat::P1, [testing::lightning_bolt()])
-            .mana_pool(testing::Seat::P1, mana![R])
+        let mut game = MockGame::builder()
+            .hand(Seat::P1, [lightning_bolt()])
+            .mana_pool(Seat::P1, mana![R])
             .build();
         let p2 = game.p2;
         cast_and_resolve(&mut game, "Lightning Bolt", Some(p2));
@@ -155,10 +155,10 @@ mod tests {
 
     #[test]
     fn test_bolt_kills_bears() {
-        let mut game = testing::MockGame::builder()
-            .hand(testing::Seat::P1, [testing::lightning_bolt()])
-            .battlefield(testing::Seat::P2, [testing::grizzly_bears()])
-            .mana_pool(testing::Seat::P1, mana![R])
+        let mut game = MockGame::builder()
+            .hand(Seat::P1, [lightning_bolt()])
+            .battlefield(Seat::P2, [grizzly_bears()])
+            .mana_pool(Seat::P1, mana![R])
             .build();
         let bears = game
             .find(game.p2, zones::Zone::Battlefield, "Grizzly Bears")
@@ -177,10 +177,10 @@ mod tests {
 
     #[test]
     fn test_murder_kills_bears() {
-        let mut game = testing::MockGame::builder()
-            .hand(testing::Seat::P1, [testing::murder()])
-            .battlefield(testing::Seat::P2, [testing::grizzly_bears()])
-            .mana_pool(testing::Seat::P1, mana![1, B, B])
+        let mut game = MockGame::builder()
+            .hand(Seat::P1, [murder()])
+            .battlefield(Seat::P2, [grizzly_bears()])
+            .mana_pool(Seat::P1, mana![1, B, B])
             .build();
         let bears = game
             .find(game.p2, zones::Zone::Battlefield, "Grizzly Bears")
@@ -191,10 +191,10 @@ mod tests {
 
     #[test]
     fn doom_blade_destroys_a_green_creature() {
-        let mut game = testing::MockGame::builder()
-            .hand(testing::Seat::P1, [testing::doom_blade()])
-            .battlefield(testing::Seat::P2, [testing::grizzly_bears()])
-            .mana_pool(testing::Seat::P1, mana![1, B])
+        let mut game = MockGame::builder()
+            .hand(Seat::P1, [doom_blade()])
+            .battlefield(Seat::P2, [grizzly_bears()])
+            .mana_pool(Seat::P1, mana![1, B])
             .build();
         let bears = game
             .find(game.p2, zones::Zone::Battlefield, "Grizzly Bears")

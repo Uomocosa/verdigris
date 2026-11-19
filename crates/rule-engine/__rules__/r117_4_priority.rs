@@ -44,15 +44,15 @@ pub fn r117_4_priority(
 mod tests {
     use crate::actions;
     use crate::mana;
-    use crate::testing;
+    use crate::testing::*;
     use crate::turns;
     use crate::zones;
 
     #[test]
     fn test_usage() {
-        let mut game = testing::MockGame::builder()
-            .hand(testing::Seat::P1, [testing::lightning_bolt()])
-            .mana_pool(testing::Seat::P1, mana![R])
+        let mut game = MockGame::builder()
+            .hand(Seat::P1, [lightning_bolt()])
+            .mana_pool(Seat::P1, mana![R])
             .build();
         let bolt = game
             .find(game.p1, zones::Zone::Hand, "Lightning Bolt")
@@ -66,12 +66,9 @@ mod tests {
 
     #[test]
     fn all_players_passing_resolves_one_spell() {
-        let mut game = testing::MockGame::builder()
-            .hand(
-                testing::Seat::P1,
-                [testing::lightning_bolt(), testing::lightning_bolt()],
-            )
-            .mana_pool(testing::Seat::P1, mana![R, R])
+        let mut game = MockGame::builder()
+            .hand(Seat::P1, [lightning_bolt(), lightning_bolt()])
+            .mana_pool(Seat::P1, mana![R, R])
             .build();
         let first = game
             .find(game.p1, zones::Zone::Hand, "Lightning Bolt")
@@ -94,9 +91,9 @@ mod tests {
 
     #[test]
     fn priority_returns_to_the_active_player_after_a_spell_resolves() {
-        let mut game = testing::MockGame::builder()
-            .hand(testing::Seat::P1, [testing::lightning_bolt()])
-            .mana_pool(testing::Seat::P1, mana![R])
+        let mut game = MockGame::builder()
+            .hand(Seat::P1, [lightning_bolt()])
+            .mana_pool(Seat::P1, mana![R])
             .build();
         let p1 = game.p1;
         let bolt = game.find(p1, zones::Zone::Hand, "Lightning Bolt").unwrap();

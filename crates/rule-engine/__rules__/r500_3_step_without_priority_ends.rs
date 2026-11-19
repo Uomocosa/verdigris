@@ -43,12 +43,12 @@ pub fn r500_3_step_without_priority_ends(
 
 #[cfg(test)]
 mod tests {
-    use crate::testing;
+    use crate::testing::*;
     use crate::turns;
 
     #[test]
     fn test_usage() {
-        let mut game = testing::MockGame::builder().build();
+        let mut game = MockGame::builder().build();
 
         game.end_turn();
 
@@ -57,7 +57,7 @@ mod tests {
 
     #[test]
     fn cleanup_ends_the_turn_and_the_next_player_becomes_active() {
-        let mut game = testing::MockGame::builder().build();
+        let mut game = MockGame::builder().build();
         let p1 = game.p1;
         let p2 = game.p2;
 

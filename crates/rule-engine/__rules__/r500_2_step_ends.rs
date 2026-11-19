@@ -41,12 +41,12 @@ pub fn r500_2_step_ends(
 
 #[cfg(test)]
 mod tests {
-    use crate::testing;
+    use crate::testing::*;
     use crate::turns;
 
     #[test]
     fn test_usage() {
-        let mut game = testing::MockGame::builder().build();
+        let mut game = MockGame::builder().build();
 
         game.pass_priority_all();
 
@@ -58,7 +58,7 @@ mod tests {
 
     #[test]
     fn all_players_passing_with_an_empty_stack_ends_the_step() {
-        let mut game = testing::MockGame::builder().build();
+        let mut game = MockGame::builder().build();
         let p1 = game.p1;
 
         game.pass_priority_all();

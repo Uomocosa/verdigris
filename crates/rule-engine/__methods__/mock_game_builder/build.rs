@@ -128,14 +128,14 @@ pub fn build(builder: &testing::MockGameBuilder) -> testing::MockGame {
 
 #[cfg(test)]
 mod tests {
-    use crate::testing;
+    use crate::testing::*;
     use crate::zones;
 
     use super::build;
 
     #[test]
     fn test_usage() {
-        let game = build(&testing::MockGameBuilder::default());
+        let game = build(&MockGameBuilder::default());
         assert_eq!(game.life(game.p1), 20);
         assert!(
             game.find(game.p1, zones::Zone::Library, "Grizzly Bears")

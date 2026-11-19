@@ -33,17 +33,17 @@ mod tests {
     use crate::actions;
     use crate::effects;
     use crate::mana;
-    use crate::testing;
+    use crate::testing::*;
     use crate::zones;
 
     #[test]
     fn test_usage() {
-        let mut game = testing::MockGame::builder()
-            .hand(testing::Seat::P1, [testing::lightning_bolt()])
-            .hand(testing::Seat::P2, [testing::giant_growth()])
-            .battlefield(testing::Seat::P2, [testing::grizzly_bears()])
-            .mana_pool(testing::Seat::P1, mana![R])
-            .mana_pool(testing::Seat::P2, mana![G])
+        let mut game = MockGame::builder()
+            .hand(Seat::P1, [lightning_bolt()])
+            .hand(Seat::P2, [giant_growth()])
+            .battlefield(Seat::P2, [grizzly_bears()])
+            .mana_pool(Seat::P1, mana![R])
+            .mana_pool(Seat::P2, mana![G])
             .build();
         let bolt = game
             .find(game.p1, zones::Zone::Hand, "Lightning Bolt")
@@ -80,13 +80,10 @@ mod tests {
 
     #[test]
     fn r514_2_until_end_of_turn_effect_expires_before_the_next_bolt() {
-        let mut game = testing::MockGame::builder()
-            .hand(
-                testing::Seat::P1,
-                [testing::giant_growth(), testing::lightning_bolt()],
-            )
-            .battlefield(testing::Seat::P1, [testing::grizzly_bears()])
-            .mana_pool(testing::Seat::P1, mana![G, R])
+        let mut game = MockGame::builder()
+            .hand(Seat::P1, [giant_growth(), lightning_bolt()])
+            .battlefield(Seat::P1, [grizzly_bears()])
+            .mana_pool(Seat::P1, mana![G, R])
             .build();
         let growth = game
             .find(game.p1, zones::Zone::Hand, "Giant Growth")

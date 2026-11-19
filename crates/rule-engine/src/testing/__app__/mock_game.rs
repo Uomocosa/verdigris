@@ -87,7 +87,7 @@ impl MockGame {
 mod tests {
     use crate::actions;
     use crate::mana;
-    use crate::testing;
+    use crate::testing::*;
     use crate::turns;
     use crate::zones;
 
@@ -143,11 +143,11 @@ mod tests {
     fn overrides_place_cards_and_support_four_players() {
         let game = MockGame::builder()
             .players(4)
-            .turn(3, testing::Seat::P2, turns::Step::PostcombatMain)
-            .hand(testing::Seat::P1, [testing::lightning_bolt()])
-            .battlefield(testing::Seat::P2, [testing::grizzly_bears()])
-            .library(testing::Seat::P2, [testing::murder()])
-            .mana_pool(testing::Seat::P1, mana![R])
+            .turn(3, Seat::P2, turns::Step::PostcombatMain)
+            .hand(Seat::P1, [lightning_bolt()])
+            .battlefield(Seat::P2, [grizzly_bears()])
+            .library(Seat::P2, [murder()])
+            .mana_pool(Seat::P1, mana![R])
             .build();
 
         assert_ne!(game.p(3), game.p(4));

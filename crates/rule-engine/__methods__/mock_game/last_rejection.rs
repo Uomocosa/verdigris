@@ -17,13 +17,13 @@ pub fn last_rejection(game: &testing::MockGame) -> Option<&actions::Rejected> {
 
 #[cfg(test)]
 mod tests {
-    use crate::testing;
+    use crate::testing::*;
 
     use super::last_rejection;
 
     #[test]
     fn test_usage() {
-        let game = testing::MockGame::builder().build();
+        let game = MockGame::builder().build();
         assert!(last_rejection(&game).is_none());
     }
 }

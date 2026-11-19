@@ -83,10 +83,10 @@ pub fn r701_9_discard(
 mod tests {
     use crate::actions;
     use crate::mana;
-    use crate::testing;
+    use crate::testing::*;
     use crate::zones;
 
-    fn cast_and_resolve_mind_rot(game: &mut testing::MockGame) {
+    fn cast_and_resolve_mind_rot(game: &mut MockGame) {
         let mind_rot = game.find(game.p1, zones::Zone::Hand, "Mind Rot").unwrap();
         game.act(game.p1, actions::Action::Cast(mind_rot));
         game.act(game.p1, actions::Action::ChooseTargets(vec![game.p2]));
@@ -95,10 +95,10 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let mut game = testing::MockGame::builder()
-            .hand(testing::Seat::P1, [testing::mind_rot()])
-            .hand(testing::Seat::P2, [testing::grizzly_bears()])
-            .mana_pool(testing::Seat::P1, mana![2, B])
+        let mut game = MockGame::builder()
+            .hand(Seat::P1, [mind_rot()])
+            .hand(Seat::P2, [grizzly_bears()])
+            .mana_pool(Seat::P1, mana![2, B])
             .build();
         cast_and_resolve_mind_rot(&mut game);
         assert!(
@@ -109,17 +109,10 @@ mod tests {
 
     #[test]
     fn mind_rot_makes_the_target_choose_two_cards_to_discard() {
-        let mut game = testing::MockGame::builder()
-            .hand(testing::Seat::P1, [testing::mind_rot()])
-            .hand(
-                testing::Seat::P2,
-                [
-                    testing::grizzly_bears(),
-                    testing::lightning_bolt(),
-                    testing::murder(),
-                ],
-            )
-            .mana_pool(testing::Seat::P1, mana![2, B])
+        let mut game = MockGame::builder()
+            .hand(Seat::P1, [mind_rot()])
+            .hand(Seat::P2, [grizzly_bears(), lightning_bolt(), murder()])
+            .mana_pool(Seat::P1, mana![2, B])
             .build();
         cast_and_resolve_mind_rot(&mut game);
 
@@ -138,10 +131,10 @@ mod tests {
 
     #[test]
     fn mind_rot_discards_every_card_when_the_hand_holds_fewer_than_two() {
-        let mut game = testing::MockGame::builder()
-            .hand(testing::Seat::P1, [testing::mind_rot()])
-            .hand(testing::Seat::P2, [testing::grizzly_bears()])
-            .mana_pool(testing::Seat::P1, mana![2, B])
+        let mut game = MockGame::builder()
+            .hand(Seat::P1, [mind_rot()])
+            .hand(Seat::P2, [grizzly_bears()])
+            .mana_pool(Seat::P1, mana![2, B])
             .build();
         cast_and_resolve_mind_rot(&mut game);
 

@@ -18,13 +18,13 @@ pub fn target_choice(game: &testing::MockGame) -> Option<testing::ExpectedTarget
 
 #[cfg(test)]
 mod tests {
-    use crate::testing;
+    use crate::testing::*;
 
     use super::target_choice;
 
     #[test]
     fn test_usage() {
-        let game = testing::MockGame::builder().build();
+        let game = MockGame::builder().build();
         assert!(target_choice(&game).is_none());
     }
 }

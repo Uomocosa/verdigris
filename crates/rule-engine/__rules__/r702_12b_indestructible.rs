@@ -39,15 +39,15 @@ pub fn r702_12b_indestructible(
 mod tests {
     use crate::actions;
     use crate::mana;
-    use crate::testing;
+    use crate::testing::*;
     use crate::zones;
 
     #[test]
     fn test_usage() {
-        let mut game = testing::MockGame::builder()
-            .hand(testing::Seat::P1, [testing::murder()])
-            .battlefield(testing::Seat::P2, [testing::darksteel_myr()])
-            .mana_pool(testing::Seat::P1, mana![1, B, B])
+        let mut game = MockGame::builder()
+            .hand(Seat::P1, [murder()])
+            .battlefield(Seat::P2, [darksteel_myr()])
+            .mana_pool(Seat::P1, mana![1, B, B])
             .build();
         let murder = game.find(game.p1, zones::Zone::Hand, "Murder").unwrap();
         let myr = game
@@ -61,10 +61,10 @@ mod tests {
 
     #[test]
     fn r702_12b_indestructible_ignores_destroy_effects() {
-        let mut game = testing::MockGame::builder()
-            .hand(testing::Seat::P1, [testing::murder()])
-            .battlefield(testing::Seat::P2, [testing::darksteel_myr()])
-            .mana_pool(testing::Seat::P1, mana![1, B, B])
+        let mut game = MockGame::builder()
+            .hand(Seat::P1, [murder()])
+            .battlefield(Seat::P2, [darksteel_myr()])
+            .mana_pool(Seat::P1, mana![1, B, B])
             .build();
         let murder = game.find(game.p1, zones::Zone::Hand, "Murder").unwrap();
         let myr = game
@@ -83,10 +83,10 @@ mod tests {
 
     #[test]
     fn r702_12b_indestructible_survives_lethal_damage() {
-        let mut game = testing::MockGame::builder()
-            .hand(testing::Seat::P1, [testing::lightning_bolt()])
-            .battlefield(testing::Seat::P2, [testing::darksteel_myr()])
-            .mana_pool(testing::Seat::P1, mana![R])
+        let mut game = MockGame::builder()
+            .hand(Seat::P1, [lightning_bolt()])
+            .battlefield(Seat::P2, [darksteel_myr()])
+            .mana_pool(Seat::P1, mana![R])
             .build();
         let bolt = game
             .find(game.p1, zones::Zone::Hand, "Lightning Bolt")
@@ -104,10 +104,10 @@ mod tests {
 
     #[test]
     fn r702_12b_indestructible_survives_doom_blade() {
-        let mut game = testing::MockGame::builder()
-            .hand(testing::Seat::P1, [testing::doom_blade()])
-            .battlefield(testing::Seat::P2, [testing::darksteel_myr()])
-            .mana_pool(testing::Seat::P1, mana![1, B])
+        let mut game = MockGame::builder()
+            .hand(Seat::P1, [doom_blade()])
+            .battlefield(Seat::P2, [darksteel_myr()])
+            .mana_pool(Seat::P1, mana![1, B])
             .build();
         let blade = game.find(game.p1, zones::Zone::Hand, "Doom Blade").unwrap();
         let myr = game

@@ -49,17 +49,17 @@ pub fn r120_3_damage_results(
 mod tests {
     use crate::actions;
     use crate::mana;
-    use crate::testing;
+    use crate::testing::*;
     use crate::turns;
     use crate::zones;
 
     #[test]
     fn test_usage() {
-        let mut game = testing::MockGame::builder()
-            .turn(1, testing::Seat::P2, turns::Step::PrecombatMain)
-            .battlefield(testing::Seat::P1, [testing::walking_corpse()])
-            .hand(testing::Seat::P2, [testing::lightning_bolt()])
-            .mana_pool(testing::Seat::P2, mana![R])
+        let mut game = MockGame::builder()
+            .turn(1, Seat::P2, turns::Step::PrecombatMain)
+            .battlefield(Seat::P1, [walking_corpse()])
+            .hand(Seat::P2, [lightning_bolt()])
+            .mana_pool(Seat::P2, mana![R])
             .build();
         let corpse = game
             .find(game.p1, zones::Zone::Battlefield, "Walking Corpse")

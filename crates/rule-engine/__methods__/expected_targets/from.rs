@@ -16,7 +16,7 @@ mod tests {
 
     use bevy::prelude::World;
 
-    use crate::testing;
+    use crate::testing::*;
 
     use super::from;
 
@@ -25,7 +25,7 @@ mod tests {
         let mut world = World::new();
         let first = world.spawn_empty().id();
         let second = world.spawn_empty().id();
-        let targets = from(&testing::pick(1), [first, second]);
+        let targets = from(&pick(1), [first, second]);
         assert_eq!(targets.count, 1);
         assert_eq!(targets.legal, BTreeSet::from([first, second]));
     }
@@ -35,7 +35,7 @@ mod tests {
         let mut world = World::new();
         let first = world.spawn_empty().id();
         let second = world.spawn_empty().id();
-        let targets = testing::pick(1).from([first, second]);
+        let targets = pick(1).from([first, second]);
         assert_eq!(targets.count, 1);
         assert_eq!(targets.legal, BTreeSet::from([first, second]));
     }

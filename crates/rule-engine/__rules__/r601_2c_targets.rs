@@ -169,15 +169,15 @@ fn legal_targets(
 mod tests {
     use crate::actions;
     use crate::mana;
-    use crate::testing;
+    use crate::testing::*;
     use crate::zones;
 
     #[test]
     fn test_usage() {
-        let mut game = testing::MockGame::builder()
-            .hand(testing::Seat::P1, [testing::lightning_bolt()])
-            .battlefield(testing::Seat::P2, [testing::grizzly_bears()])
-            .mana_pool(testing::Seat::P1, mana![R])
+        let mut game = MockGame::builder()
+            .hand(Seat::P1, [lightning_bolt()])
+            .battlefield(Seat::P2, [grizzly_bears()])
+            .mana_pool(Seat::P1, mana![R])
             .build();
         let bolt = game
             .find(game.p1, zones::Zone::Hand, "Lightning Bolt")
@@ -188,10 +188,10 @@ mod tests {
 
     #[test]
     fn test_bolt_lists_every_legal_target() {
-        let mut game = testing::MockGame::builder()
-            .hand(testing::Seat::P1, [testing::lightning_bolt()])
-            .battlefield(testing::Seat::P2, [testing::grizzly_bears()])
-            .mana_pool(testing::Seat::P1, mana![R])
+        let mut game = MockGame::builder()
+            .hand(Seat::P1, [lightning_bolt()])
+            .battlefield(Seat::P2, [grizzly_bears()])
+            .mana_pool(Seat::P1, mana![R])
             .build();
         let bolt = game
             .find(game.p1, zones::Zone::Hand, "Lightning Bolt")
@@ -202,15 +202,15 @@ mod tests {
         game.act(game.p1, actions::Action::Cast(bolt));
         assert_eq!(
             game.target_choice(),
-            Some(testing::pick(1).from([bears, game.p1, game.p2]))
+            Some(pick(1).from([bears, game.p1, game.p2]))
         );
     }
 
     #[test]
     fn test_spell_with_no_legal_target_cannot_be_cast() {
-        let mut game = testing::MockGame::builder()
-            .hand(testing::Seat::P1, [testing::murder()])
-            .mana_pool(testing::Seat::P1, mana![1, B, B])
+        let mut game = MockGame::builder()
+            .hand(Seat::P1, [murder()])
+            .mana_pool(Seat::P1, mana![1, B, B])
             .build();
         let murder = game.find(game.p1, zones::Zone::Hand, "Murder").unwrap();
         game.act(game.p1, actions::Action::Cast(murder));
@@ -223,31 +223,25 @@ mod tests {
 
     #[test]
     fn doom_blade_lists_only_nonblack_creatures() {
-        let mut game = testing::MockGame::builder()
-            .hand(testing::Seat::P1, [testing::doom_blade()])
-            .battlefield(
-                testing::Seat::P2,
-                [testing::grizzly_bears(), testing::walking_corpse()],
-            )
-            .mana_pool(testing::Seat::P1, mana![1, B])
+        let mut game = MockGame::builder()
+            .hand(Seat::P1, [doom_blade()])
+            .battlefield(Seat::P2, [grizzly_bears(), walking_corpse()])
+            .mana_pool(Seat::P1, mana![1, B])
             .build();
         let blade = game.find(game.p1, zones::Zone::Hand, "Doom Blade").unwrap();
         let bears = game
             .find(game.p2, zones::Zone::Battlefield, "Grizzly Bears")
             .unwrap();
         game.act(game.p1, actions::Action::Cast(blade));
-        assert_eq!(game.target_choice(), Some(testing::pick(1).from([bears])));
+        assert_eq!(game.target_choice(), Some(pick(1).from([bears])));
     }
 
     #[test]
     fn doom_blade_rejects_a_black_creature_as_target() {
-        let mut game = testing::MockGame::builder()
-            .hand(testing::Seat::P1, [testing::doom_blade()])
-            .battlefield(
-                testing::Seat::P2,
-                [testing::grizzly_bears(), testing::walking_corpse()],
-            )
-            .mana_pool(testing::Seat::P1, mana![1, B])
+        let mut game = MockGame::builder()
+            .hand(Seat::P1, [doom_blade()])
+            .battlefield(Seat::P2, [grizzly_bears(), walking_corpse()])
+            .mana_pool(Seat::P1, mana![1, B])
             .build();
         let blade = game.find(game.p1, zones::Zone::Hand, "Doom Blade").unwrap();
         let corpse = game
@@ -263,10 +257,10 @@ mod tests {
 
     #[test]
     fn doom_blade_cannot_be_cast_with_only_black_creatures() {
-        let mut game = testing::MockGame::builder()
-            .hand(testing::Seat::P1, [testing::doom_blade()])
-            .battlefield(testing::Seat::P2, [testing::walking_corpse()])
-            .mana_pool(testing::Seat::P1, mana![1, B])
+        let mut game = MockGame::builder()
+            .hand(Seat::P1, [doom_blade()])
+            .battlefield(Seat::P2, [walking_corpse()])
+            .mana_pool(Seat::P1, mana![1, B])
             .build();
         let blade = game.find(game.p1, zones::Zone::Hand, "Doom Blade").unwrap();
         game.act(game.p1, actions::Action::Cast(blade));
@@ -279,13 +273,10 @@ mod tests {
 
     #[test]
     fn cancel_cannot_target_a_permanent() {
-        let mut game = testing::MockGame::builder()
-            .hand(
-                testing::Seat::P1,
-                [testing::lightning_bolt(), testing::cancel()],
-            )
-            .battlefield(testing::Seat::P2, [testing::grizzly_bears()])
-            .mana_pool(testing::Seat::P1, mana![1, U, U, R])
+        let mut game = MockGame::builder()
+            .hand(Seat::P1, [lightning_bolt(), cancel()])
+            .battlefield(Seat::P2, [grizzly_bears()])
+            .mana_pool(Seat::P1, mana![1, U, U, R])
             .build();
         let bolt = game
             .find(game.p1, zones::Zone::Hand, "Lightning Bolt")
@@ -299,7 +290,7 @@ mod tests {
         game.act(game.p1, actions::Action::ChooseTargets(vec![game.p2]));
         game.act(game.p1, actions::Action::Cast(cancel));
 
-        assert_eq!(game.target_choice(), Some(testing::pick(1).from([bolt])));
+        assert_eq!(game.target_choice(), Some(pick(1).from([bolt])));
 
         game.act(game.p1, actions::Action::ChooseTargets(vec![bears]));
         assert_eq!(
@@ -310,11 +301,11 @@ mod tests {
 
     #[test]
     fn essence_scatter_cannot_target_a_noncreature_spell() {
-        let mut game = testing::MockGame::builder()
-            .hand(testing::Seat::P1, [testing::lightning_bolt()])
-            .hand(testing::Seat::P2, [testing::essence_scatter()])
-            .mana_pool(testing::Seat::P1, mana![R])
-            .mana_pool(testing::Seat::P2, mana![1, U])
+        let mut game = MockGame::builder()
+            .hand(Seat::P1, [lightning_bolt()])
+            .hand(Seat::P2, [essence_scatter()])
+            .mana_pool(Seat::P1, mana![R])
+            .mana_pool(Seat::P2, mana![1, U])
             .build();
         let bolt = game
             .find(game.p1, zones::Zone::Hand, "Lightning Bolt")
@@ -338,11 +329,11 @@ mod tests {
 
     #[test]
     fn negate_cannot_target_a_creature_spell() {
-        let mut game = testing::MockGame::builder()
-            .hand(testing::Seat::P1, [testing::grizzly_bears()])
-            .hand(testing::Seat::P2, [testing::negate()])
-            .mana_pool(testing::Seat::P1, mana![1, G])
-            .mana_pool(testing::Seat::P2, mana![1, U])
+        let mut game = MockGame::builder()
+            .hand(Seat::P1, [grizzly_bears()])
+            .hand(Seat::P2, [negate()])
+            .mana_pool(Seat::P1, mana![1, G])
+            .mana_pool(Seat::P2, mana![1, U])
             .build();
         let bears = game
             .find(game.p1, zones::Zone::Hand, "Grizzly Bears")
@@ -363,11 +354,11 @@ mod tests {
 
     #[test]
     fn dispel_cannot_target_a_sorcery_spell() {
-        let mut game = testing::MockGame::builder()
-            .hand(testing::Seat::P1, [testing::divination()])
-            .hand(testing::Seat::P2, [testing::dispel()])
-            .mana_pool(testing::Seat::P1, mana![2, U])
-            .mana_pool(testing::Seat::P2, mana![U])
+        let mut game = MockGame::builder()
+            .hand(Seat::P1, [divination()])
+            .hand(Seat::P2, [dispel()])
+            .mana_pool(Seat::P1, mana![2, U])
+            .mana_pool(Seat::P2, mana![U])
             .build();
         let divination = game.find(game.p1, zones::Zone::Hand, "Divination").unwrap();
         let dispel = game.find(game.p2, zones::Zone::Hand, "Dispel").unwrap();
@@ -386,10 +377,10 @@ mod tests {
 
     #[test]
     fn test_any_target_in_multiplayer() {
-        let mut game = testing::MockGame::builder()
+        let mut game = MockGame::builder()
             .players(4)
-            .hand(testing::Seat::P1, [testing::lightning_bolt()])
-            .mana_pool(testing::Seat::P1, mana![R])
+            .hand(Seat::P1, [lightning_bolt()])
+            .mana_pool(Seat::P1, mana![R])
             .build();
         let bolt = game
             .find(game.p1, zones::Zone::Hand, "Lightning Bolt")
@@ -397,7 +388,7 @@ mod tests {
         game.act(game.p1, actions::Action::Cast(bolt));
         assert_eq!(
             game.target_choice(),
-            Some(testing::pick(1).from([game.p(1), game.p(2), game.p(3), game.p(4)]))
+            Some(pick(1).from([game.p(1), game.p(2), game.p(3), game.p(4)]))
         );
     }
 }

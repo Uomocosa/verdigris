@@ -11,15 +11,15 @@ pub fn zone_of(game: &testing::MockGame, card: bevy::prelude::Entity) -> zones::
 
 #[cfg(test)]
 mod tests {
-    use crate::testing;
+    use crate::testing::*;
     use crate::zones;
 
     use super::zone_of;
 
     #[test]
     fn test_usage() {
-        let game = testing::MockGame::builder()
-            .battlefield(testing::Seat::P2, [testing::grizzly_bears()])
+        let game = MockGame::builder()
+            .battlefield(Seat::P2, [grizzly_bears()])
             .build();
         let bears = game
             .find(game.p2, zones::Zone::Battlefield, "Grizzly Bears")

@@ -37,15 +37,15 @@ pub fn find(
 
 #[cfg(test)]
 mod tests {
-    use crate::testing;
+    use crate::testing::*;
     use crate::zones;
 
     use super::find;
 
     #[test]
     fn test_usage() {
-        let game = testing::MockGame::builder()
-            .hand(testing::Seat::P1, [testing::lightning_bolt()])
+        let game = MockGame::builder()
+            .hand(Seat::P1, [lightning_bolt()])
             .build();
         let found = find(&game, game.p1, zones::Zone::Hand, "Lightning Bolt");
         assert!(found.is_some());
