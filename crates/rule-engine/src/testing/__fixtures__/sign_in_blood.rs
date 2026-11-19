@@ -2,15 +2,18 @@ use crate::PLAYER;
 use crate::cards;
 use crate::cost;
 use crate::effects;
+use crate::testing;
 
-#[must_use]
-pub fn sign_in_blood() -> cards::CardDefinition {
-    cards::sorcery("Sign in Blood", cost![B, B]).spell(
-        effects::draw(2)
-            .and(effects::lose_life(2))
-            .to(effects::target(1, PLAYER)),
-    )
-}
+pub const SIGN_IN_BLOOD: testing::Card = testing::Card {
+    name: "Sign in Blood",
+    definition: || {
+        cards::sorcery("Sign in Blood", cost![B, B]).spell(
+            effects::draw(2)
+                .and(effects::lose_life(2))
+                .to(effects::target(1, PLAYER)),
+        )
+    },
+};
 
 #[cfg(test)]
 mod tests {
@@ -19,11 +22,11 @@ mod tests {
     use crate::cost;
     use crate::effects;
 
-    use super::sign_in_blood;
+    use super::SIGN_IN_BLOOD;
 
     #[test]
     fn test_usage() {
-        let spell = sign_in_blood();
+        let spell = (SIGN_IN_BLOOD.definition)();
         assert_eq!(*spell.name, "Sign in Blood");
         assert_eq!(spell.types, vec![cards::CardType::Sorcery]);
         assert_eq!(spell.cost, cost![B, B]);

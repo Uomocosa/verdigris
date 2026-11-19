@@ -2,12 +2,15 @@ use crate::NONCREATURE_SPELL;
 use crate::cards;
 use crate::cost;
 use crate::effects;
+use crate::testing;
 
-#[must_use]
-pub fn negate() -> cards::CardDefinition {
-    cards::instant("Negate", cost![1, U])
-        .spell(effects::counter().to(effects::target(1, NONCREATURE_SPELL)))
-}
+pub const NEGATE: testing::Card = testing::Card {
+    name: "Negate",
+    definition: || {
+        cards::instant("Negate", cost![1, U])
+            .spell(effects::counter().to(effects::target(1, NONCREATURE_SPELL)))
+    },
+};
 
 #[cfg(test)]
 mod tests {
@@ -16,11 +19,11 @@ mod tests {
     use crate::cost;
     use crate::effects;
 
-    use super::negate;
+    use super::NEGATE;
 
     #[test]
     fn test_usage() {
-        let counter = negate();
+        let counter = (NEGATE.definition)();
         assert_eq!(*counter.name, "Negate");
         assert_eq!(counter.types, vec![cards::CardType::Instant]);
         assert_eq!(counter.cost, cost![1, U]);

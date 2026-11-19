@@ -2,12 +2,15 @@ use crate::CREATURE_SPELL;
 use crate::cards;
 use crate::cost;
 use crate::effects;
+use crate::testing;
 
-#[must_use]
-pub fn essence_scatter() -> cards::CardDefinition {
-    cards::instant("Essence Scatter", cost![1, U])
-        .spell(effects::counter().to(effects::target(1, CREATURE_SPELL)))
-}
+pub const ESSENCE_SCATTER: testing::Card = testing::Card {
+    name: "Essence Scatter",
+    definition: || {
+        cards::instant("Essence Scatter", cost![1, U])
+            .spell(effects::counter().to(effects::target(1, CREATURE_SPELL)))
+    },
+};
 
 #[cfg(test)]
 mod tests {
@@ -16,11 +19,11 @@ mod tests {
     use crate::cost;
     use crate::effects;
 
-    use super::essence_scatter;
+    use super::ESSENCE_SCATTER;
 
     #[test]
     fn test_usage() {
-        let counter = essence_scatter();
+        let counter = (ESSENCE_SCATTER.definition)();
         assert_eq!(*counter.name, "Essence Scatter");
         assert_eq!(counter.types, vec![cards::CardType::Instant]);
         assert_eq!(counter.cost, cost![1, U]);

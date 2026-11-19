@@ -2,12 +2,15 @@ use crate::PLAYER;
 use crate::cards;
 use crate::cost;
 use crate::effects;
+use crate::testing;
 
-#[must_use]
-pub fn mind_rot() -> cards::CardDefinition {
-    cards::sorcery("Mind Rot", cost![2, B])
-        .spell(effects::discard(2).to(effects::target(1, PLAYER)))
-}
+pub const MIND_ROT: testing::Card = testing::Card {
+    name: "Mind Rot",
+    definition: || {
+        cards::sorcery("Mind Rot", cost![2, B])
+            .spell(effects::discard(2).to(effects::target(1, PLAYER)))
+    },
+};
 
 #[cfg(test)]
 mod tests {
@@ -16,11 +19,11 @@ mod tests {
     use crate::cost;
     use crate::effects;
 
-    use super::mind_rot;
+    use super::MIND_ROT;
 
     #[test]
     fn test_usage() {
-        let spell = mind_rot();
+        let spell = (MIND_ROT.definition)();
         assert_eq!(*spell.name, "Mind Rot");
         assert_eq!(spell.types, vec![cards::CardType::Sorcery]);
         assert_eq!(spell.cost, cost![2, B]);

@@ -2,12 +2,15 @@ use crate::CREATURE;
 use crate::cards;
 use crate::cost;
 use crate::effects;
+use crate::testing;
 
-#[must_use]
-pub fn murder() -> cards::CardDefinition {
-    cards::instant("Murder", cost![1, B, B])
-        .spell(effects::destroy().to(effects::target(1, CREATURE)))
-}
+pub const MURDER: testing::Card = testing::Card {
+    name: "Murder",
+    definition: || {
+        cards::instant("Murder", cost![1, B, B])
+            .spell(effects::destroy().to(effects::target(1, CREATURE)))
+    },
+};
 
 #[cfg(test)]
 mod tests {
@@ -15,11 +18,11 @@ mod tests {
     use crate::cards;
     use crate::effects;
 
-    use super::murder;
+    use super::MURDER;
 
     #[test]
     fn test_usage() {
-        let removal = murder();
+        let removal = (MURDER.definition)();
         assert_eq!(*removal.name, "Murder");
         assert_eq!(removal.types, vec![cards::CardType::Instant]);
         assert_eq!(

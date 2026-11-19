@@ -1,11 +1,14 @@
 use crate::cards;
 use crate::cost;
 use crate::pt;
+use crate::testing;
 
-#[must_use]
-pub fn typhoid_rats() -> cards::CardDefinition {
-    cards::creature("Typhoid Rats", cost![B], pt!(1, 1)).keyword(cards::deathtouch())
-}
+pub const TYPHOID_RATS: testing::Card = testing::Card {
+    name: "Typhoid Rats",
+    definition: || {
+        cards::creature("Typhoid Rats", cost![B], pt!(1, 1)).keyword(cards::deathtouch())
+    },
+};
 
 #[cfg(test)]
 mod tests {
@@ -13,11 +16,11 @@ mod tests {
     use crate::cost;
     use crate::pt;
 
-    use super::typhoid_rats;
+    use super::TYPHOID_RATS;
 
     #[test]
     fn test_usage() {
-        let rats = typhoid_rats();
+        let rats = (TYPHOID_RATS.definition)();
         assert_eq!(*rats.name, "Typhoid Rats");
         assert_eq!(rats.types, vec![cards::CardType::Creature]);
         assert_eq!(rats.cost, cost![B]);

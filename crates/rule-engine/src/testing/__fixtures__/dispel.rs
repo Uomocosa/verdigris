@@ -2,12 +2,15 @@ use crate::INSTANT_SPELL;
 use crate::cards;
 use crate::cost;
 use crate::effects;
+use crate::testing;
 
-#[must_use]
-pub fn dispel() -> cards::CardDefinition {
-    cards::instant("Dispel", cost![U])
-        .spell(effects::counter().to(effects::target(1, INSTANT_SPELL)))
-}
+pub const DISPEL: testing::Card = testing::Card {
+    name: "Dispel",
+    definition: || {
+        cards::instant("Dispel", cost![U])
+            .spell(effects::counter().to(effects::target(1, INSTANT_SPELL)))
+    },
+};
 
 #[cfg(test)]
 mod tests {
@@ -16,11 +19,11 @@ mod tests {
     use crate::cost;
     use crate::effects;
 
-    use super::dispel;
+    use super::DISPEL;
 
     #[test]
     fn test_usage() {
-        let counter = dispel();
+        let counter = (DISPEL.definition)();
         assert_eq!(*counter.name, "Dispel");
         assert_eq!(counter.types, vec![cards::CardType::Instant]);
         assert_eq!(counter.cost, cost![U]);

@@ -1,11 +1,15 @@
 use crate::cards;
 use crate::cost;
 use crate::pt;
+use crate::testing;
 
-#[must_use]
-pub fn darksteel_myr() -> cards::CardDefinition {
-    cards::artifact_creature("Darksteel Myr", cost![3], pt!(0, 1)).keyword(cards::indestructible())
-}
+pub const DARKSTEEL_MYR: testing::Card = testing::Card {
+    name: "Darksteel Myr",
+    definition: || {
+        cards::artifact_creature("Darksteel Myr", cost![3], pt!(0, 1))
+            .keyword(cards::indestructible())
+    },
+};
 
 #[cfg(test)]
 mod tests {
@@ -13,11 +17,11 @@ mod tests {
     use crate::cost;
     use crate::pt;
 
-    use super::darksteel_myr;
+    use super::DARKSTEEL_MYR;
 
     #[test]
     fn test_usage() {
-        let myr = darksteel_myr();
+        let myr = (DARKSTEEL_MYR.definition)();
         assert_eq!(*myr.name, "Darksteel Myr");
         assert_eq!(
             myr.types,
