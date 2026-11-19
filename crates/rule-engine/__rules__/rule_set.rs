@@ -6,5 +6,7 @@ pub enum RuleSet {
     Casting,
     Resolution,
     StateBased,
+    StepEnd,
+    StepStarted,
     Cleanup,
 }

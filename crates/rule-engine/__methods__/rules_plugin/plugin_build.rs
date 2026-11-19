@@ -17,7 +17,9 @@ pub fn plugin_build(_rules_plugin: &RulesPlugin, app: &mut App) {
         .add_message::<zones::Destruction>()
         .add_message::<zones::DrawRequested>()
         .add_message::<effects::PowerToughnessModified>()
-        .add_message::<turns::CleanupStepStarted>();
+        .add_message::<turns::CleanupStepStarted>()
+        .add_message::<turns::StepStarted>()
+        .add_message::<turns::AllPlayersPassed>();
     app.init_resource::<actions::PendingChoice>();
     app.configure_sets(
         Update,
@@ -26,6 +28,8 @@ pub fn plugin_build(_rules_plugin: &RulesPlugin, app: &mut App) {
             rules::RuleSet::Casting,
             rules::RuleSet::Resolution,
             rules::RuleSet::StateBased,
+            rules::RuleSet::StepEnd,
+            rules::RuleSet::StepStarted,
             rules::RuleSet::Cleanup,
         )
             .chain(),
@@ -70,6 +74,14 @@ pub fn plugin_build(_rules_plugin: &RulesPlugin, app: &mut App) {
         )
             .chain()
             .in_set(rules::RuleSet::StateBased),
+    );
+    app.add_systems(
+        Update,
+        rules::r500_2_step_ends::r500_2_step_ends.in_set(rules::RuleSet::StepEnd),
+    );
+    app.add_systems(
+        Update,
+        rules::r504_1_draw_step::r504_1_draw_step.in_set(rules::RuleSet::StepStarted),
     );
     app.add_systems(
         Update,

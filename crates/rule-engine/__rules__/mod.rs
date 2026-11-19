@@ -4,6 +4,8 @@ pub mod r117_3_priority;
 pub mod r117_4_priority;
 pub mod r120_3_damage_results;
 pub mod r121_1_draw;
+pub mod r500_2_step_ends;
+pub mod r504_1_draw_step;
 pub mod r514_2_cleanup_step;
 pub mod r601_2a_cast;
 pub mod r601_2c_targets;

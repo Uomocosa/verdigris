@@ -10,6 +10,7 @@ use crate::zones;
 /// stack is empty, the phase or step ends.
 pub fn r117_4_priority(
     mut resolutions: MessageWriter<stack::Resolution>,
+    mut all_players_passed: MessageWriter<turns::AllPlayersPassed>,
     mut priority: ResMut<turns::Priority>,
     turn: Res<turns::Turn>,
     turn_order: Res<turns::TurnOrder>,
@@ -24,14 +25,11 @@ pub fn r117_4_priority(
         return;
     }
     priority.consecutive_passes = 0;
-    let Some(stack) = helpers::find_zone(zones::Zone::Stack, None, &zone_entities) else {
-        return;
-    };
-    let Some(top) = stack_contents
-        .get(stack)
-        .ok()
-        .and_then(|contents| contents.last().copied())
-    else {
+    let top = helpers::find_zone(zones::Zone::Stack, None, &zone_entities)
+        .and_then(|stack| stack_contents.get(stack).ok())
+        .and_then(|contents| contents.last().copied());
+    let Some(top) = top else {
+        all_players_passed.write(turns::AllPlayersPassed);
         return;
     };
     let is_still_casting = cards.get(top).is_ok_and(|(_, stage)| stage.is_some());
