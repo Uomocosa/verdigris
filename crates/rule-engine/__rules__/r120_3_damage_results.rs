@@ -57,7 +57,7 @@ mod tests {
     #[test]
     fn test_usage() {
         let mut game = MockGame::builder()
-            .turn(1, Seat::P2, turns::Step::PrecombatMain)
+            .turn_seat(1, Seat::P2, turns::Step::PrecombatMain)
             .battlefield(Seat::P1, [walking_corpse()])
             .hand(Seat::P2, [lightning_bolt()])
             .mana_pool(Seat::P2, mana![R])

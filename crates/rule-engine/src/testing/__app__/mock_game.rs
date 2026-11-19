@@ -14,6 +14,14 @@ pub struct MockGame {
     pub(crate) app: App,
 }
 
+impl MockGame {
+    #[must_use]
+    pub fn new<const N: usize>(players: [testing::PlayerSetup; N]) -> (Self, [Entity; N]) {
+        let (game, entities) = Self::builder().players(players);
+        (game, entities)
+    }
+}
+
 #[rustfmt::skip]
 impl MockGame {
     #[must_use]
@@ -137,8 +145,8 @@ mod tests {
     #[test]
     fn overrides_place_cards_and_support_four_players() {
         let game = MockGame::builder()
-            .players(4)
-            .turn(3, Seat::P2, turns::Step::PostcombatMain)
+            .player_count(4)
+            .turn_seat(3, Seat::P2, turns::Step::PostcombatMain)
             .hand(Seat::P1, [lightning_bolt()])
             .battlefield(Seat::P2, [grizzly_bears()])
             .library(Seat::P2, [murder()])
@@ -162,6 +170,53 @@ mod tests {
             game.app.world().resource::<turns::Priority>().player,
             game.p(2)
         );
+    }
+
+    #[test]
+    fn new_builds_the_described_players() {
+        let (game, [p1, p2]) = MockGame::new([P1.hand([divination()]).mana_pool(mana![2, U]), P2]);
+
+        assert_eq!(game.p1, p1);
+        assert_eq!(game.p2, p2);
+        assert!(game.find(p1, HAND, "Divination").is_some());
+        assert!(game.find(p1, HAND, "Grizzly Bears").is_none());
+        assert_eq!(game.life(p1), 20);
+        assert_eq!(game.life(p2), 20);
+        assert_eq!(game.mana_pool(p1), mana![2, U]);
+        assert_eq!(game.mana_pool(p2), mana![]);
+
+        let turn = game.app.world().resource::<turns::Turn>();
+        assert_eq!(turn.number, 1);
+        assert_eq!(turn.step, turns::Step::PrecombatMain);
+        assert_eq!(turn.active, p1);
+        assert_eq!(game.app.world().resource::<turns::Priority>().player, p1);
+    }
+
+    #[test]
+    fn builder_players_marks_the_active_setup_and_its_turn() {
+        let (game, [_, p2, _, _]) = MockGame::builder()
+            .turn(3, turns::Step::PostcombatMain)
+            .players([P1, P2.active().battlefield([grizzly_bears()]), P3, P4]);
+
+        assert!(game.find(p2, BATTLEFIELD, "Grizzly Bears").is_some());
+
+        let turn = game.app.world().resource::<turns::Turn>();
+        assert_eq!(turn.number, 3);
+        assert_eq!(turn.step, turns::Step::PostcombatMain);
+        assert_eq!(turn.active, p2);
+        assert_eq!(game.app.world().resource::<turns::Priority>().player, p2);
+    }
+
+    #[test]
+    #[should_panic(expected = "MockGame: P2 listed in position 1")]
+    fn players_rejects_a_setup_out_of_seat_order() {
+        let _ = MockGame::new([P2, P1]);
+    }
+
+    #[test]
+    #[should_panic(expected = "MockGame: P1 and P2 are both marked .active()")]
+    fn players_rejects_two_active_setups() {
+        let _ = MockGame::new([P1.active(), P2.active()]);
     }
 
     #[test]

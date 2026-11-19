@@ -37,7 +37,7 @@ impl Default for MockGameBuilder {
 
 impl MockGameBuilder {
     #[must_use]
-    pub const fn players(mut self, count: usize) -> Self {
+    pub const fn player_count(mut self, count: usize) -> Self {
         self.player_count = count;
         self
     }
@@ -87,12 +87,31 @@ impl MockGameBuilder {
         self.lives.insert(seat, amount);
         self
     }
+
+    #[must_use]
+    pub const fn turn(mut self, number: u32, step: turns::Step) -> Self {
+        self.turn_number = number;
+        self.step = step;
+        self
+    }
+
+    #[must_use]
+    pub fn players<const N: usize>(
+        self,
+        players: [testing::PlayerSetup; N],
+    ) -> (testing::MockGame, [Entity; N]) {
+        let (game, entities) = self.spawn_game(&Vec::from(players));
+        let spawned = std::array::from_fn(|index| {
+            entities.get(index).copied().unwrap_or(Entity::PLACEHOLDER)
+        });
+        (game, spawned)
+    }
 }
 
 #[atomic_delegates]
 impl MockGameBuilder {
     #[must_use]
-    pub fn turn(self, number: u32, active: testing::Seat, step: turns::Step) -> Self {}
+    pub fn turn_seat(self, number: u32, active: testing::Seat, step: turns::Step) -> Self {}
 
     #[must_use]
     pub fn build(&self) -> testing::MockGame {}
@@ -100,8 +119,14 @@ impl MockGameBuilder {
 
 #[atomic_delegates]
 impl MockGameBuilder {
+    pub(crate) fn spawn_game(
+        &self,
+        players: &[testing::PlayerSetup],
+    ) -> (testing::MockGame, Vec<Entity>) {
+    }
+
     #[must_use]
-    pub(crate) fn spawn_players(&self, app: &mut App, seats: &[testing::Seat]) -> Vec<Entity> {}
+    pub(crate) fn spawn_players(app: &mut App, players: &[testing::PlayerSetup]) -> Vec<Entity> {}
 }
 
 #[cfg(test)]
@@ -110,7 +135,10 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let game = MockGame::builder().players(3).life(Seat::P2, 7).build();
+        let game = MockGame::builder()
+            .player_count(3)
+            .life(Seat::P2, 7)
+            .build();
         assert_eq!(game.life(game.p1), 20);
         assert_eq!(game.life(game.p2), 7);
         assert_eq!(game.life(game.p(3)), 20);

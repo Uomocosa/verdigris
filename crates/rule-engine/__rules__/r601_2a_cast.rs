@@ -90,7 +90,7 @@ mod tests {
     #[test]
     fn sorcery_cannot_be_cast_on_an_opponents_turn() {
         let mut game = MockGame::builder()
-            .turn(2, Seat::P2, turns::Step::PrecombatMain)
+            .turn_seat(2, Seat::P2, turns::Step::PrecombatMain)
             .hand(Seat::P1, [divination()])
             .mana_pool(Seat::P1, mana![2, U])
             .build();

@@ -358,7 +358,7 @@ mod tests {
     #[test]
     fn test_any_target_in_multiplayer() {
         let mut game = MockGame::builder()
-            .players(4)
+            .player_count(4)
             .hand(Seat::P1, [lightning_bolt()])
             .mana_pool(Seat::P1, mana![R])
             .build();

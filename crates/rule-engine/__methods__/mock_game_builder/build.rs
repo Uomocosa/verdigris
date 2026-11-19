@@ -1,14 +1,4 @@
-use crate::{BATTLEFIELD, EXILE, GRAVEYARD, HAND, LIBRARY, STACK};
-use std::collections::BTreeMap;
-
-use bevy::prelude::{App, Entity};
-
-use crate::RulesPlugin;
-use crate::cards;
-use crate::damage;
 use crate::testing;
-use crate::turns;
-use crate::zones;
 
 const SEATS: [testing::Seat; 8] = [
     testing::Seat::P1,
@@ -22,95 +12,22 @@ const SEATS: [testing::Seat; 8] = [
 ];
 
 pub fn build(builder: &testing::MockGameBuilder) -> testing::MockGame {
-    let mut app = App::new();
-    app.add_plugins(RulesPlugin);
-
-    let players: Vec<Entity> = builder.spawn_players(&mut app, &SEATS);
-
-    let mut zones_by_seat: BTreeMap<(testing::Seat, zones::Zone), Entity> = BTreeMap::new();
-    for (seat, player) in SEATS.iter().zip(&players) {
-        for zone in [LIBRARY, HAND, BATTLEFIELD, GRAVEYARD, EXILE] {
-            let zone_entity = app.world_mut().spawn((zone, cards::Owner(*player))).id();
-            zones_by_seat.insert((*seat, zone), zone_entity);
-        }
-    }
-    let _ = app.world_mut().spawn((STACK,)).id();
-    for (seat, player) in SEATS.iter().zip(&players) {
-        let hand = zones_by_seat
-            .get(&(*seat, HAND))
-            .copied()
-            .unwrap_or(Entity::PLACEHOLDER);
-        for definition in builder.hands.get(seat).into_iter().flatten().cloned() {
-            let _ = app
-                .world_mut()
-                .spawn((definition, zones::InZone(hand), cards::Owner(*player)));
-        }
-
-        let battlefield = zones_by_seat
-            .get(&(*seat, BATTLEFIELD))
-            .copied()
-            .unwrap_or(Entity::PLACEHOLDER);
-        for definition in builder
-            .battlefields
-            .get(seat)
-            .into_iter()
-            .flatten()
-            .cloned()
-        {
-            let _ = app.world_mut().spawn((
-                definition,
-                zones::InZone(battlefield),
-                cards::Owner(*player),
-                damage::Damage(0),
-            ));
-        }
-
-        let library_zone = zones_by_seat
-            .get(&(*seat, LIBRARY))
-            .copied()
-            .unwrap_or(Entity::PLACEHOLDER);
-        let library = builder
-            .libraries
-            .get(seat)
-            .cloned()
-            .unwrap_or_else(|| vec![testing::grizzly_bears(); 12]);
-        for definition in library {
-            let _ = app.world_mut().spawn((
-                definition,
-                zones::InZone(library_zone),
-                cards::Owner(*player),
-            ));
-        }
-
-        let pool = builder.mana_pools.get(seat).copied().unwrap_or_default();
-        let _ = app.world_mut().entity_mut(*player).insert(pool);
-    }
-
-    let active = SEATS
+    let players: Vec<testing::PlayerSetup> = SEATS
         .iter()
-        .position(|seat| *seat == builder.active)
-        .and_then(|index| players.get(index))
-        .copied()
-        .unwrap_or(Entity::PLACEHOLDER);
-    app.insert_resource(turns::Turn {
-        number: builder.turn_number,
-        active,
-        step: builder.step,
-    });
-    app.insert_resource(turns::Priority {
-        player: active,
-        consecutive_passes: 0,
-    });
-    app.insert_resource(turns::TurnOrder::from(players.clone()));
-
-    let p1 = players.first().copied().unwrap_or(Entity::PLACEHOLDER);
-    let p2 = players.get(1).copied().unwrap_or(Entity::PLACEHOLDER);
-    testing::MockGame {
-        p1,
-        p2,
-        players,
-        app,
-    }
+        .take(builder.player_count)
+        .enumerate()
+        .map(|(index, seat)| testing::PlayerSetup {
+            seat: index.saturating_add(1),
+            hand: builder.hands.get(seat).cloned().unwrap_or_default(),
+            battlefield: builder.battlefields.get(seat).cloned().unwrap_or_default(),
+            library: builder.libraries.get(seat).cloned(),
+            mana_pool: builder.mana_pools.get(seat).copied().unwrap_or_default(),
+            life: builder.lives.get(seat).copied().unwrap_or(20),
+            active: *seat == builder.active,
+        })
+        .collect();
+    let (game, _) = builder.spawn_game(&players);
+    game
 }
 
 #[cfg(test)]

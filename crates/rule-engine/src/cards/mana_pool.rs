@@ -14,6 +14,15 @@ pub struct ManaPool {
 }
 
 impl ManaPool {
+    pub const EMPTY: Self = Self {
+        white: 0,
+        blue: 0,
+        black: 0,
+        red: 0,
+        green: 0,
+        colorless: 0,
+    };
+
     #[must_use]
     pub const fn plus(self, symbol: cards::ManaSymbol) -> Self {
         match symbol {

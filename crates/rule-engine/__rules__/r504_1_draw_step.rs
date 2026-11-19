@@ -29,7 +29,7 @@ mod tests {
     #[test]
     fn test_usage() {
         let mut game = MockGame::builder()
-            .turn(1, Seat::P1, turns::Step::Upkeep)
+            .turn_seat(1, Seat::P1, turns::Step::Upkeep)
             .build();
 
         game.pass_priority_all();
@@ -44,7 +44,7 @@ mod tests {
     #[test]
     fn the_active_player_draws_a_card_during_their_draw_step() {
         let mut game = MockGame::builder()
-            .turn(1, Seat::P1, turns::Step::Upkeep)
+            .turn_seat(1, Seat::P1, turns::Step::Upkeep)
             .library(Seat::P1, [grizzly_bears(), lightning_bolt()])
             .build();
         let top = game.find(game.p1, LIBRARY, "Grizzly Bears").unwrap();

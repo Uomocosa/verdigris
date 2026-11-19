@@ -74,7 +74,7 @@ mod tests {
 
     #[test]
     fn a_four_player_game_passes_priority_in_a_ring() {
-        let mut game = MockGame::builder().players(4).build();
+        let mut game = MockGame::builder().player_count(4).build();
         let expected = [game.p(2), game.p(3), game.p(4)];
 
         for next in expected {

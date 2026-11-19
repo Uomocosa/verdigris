@@ -1,0 +1,146 @@
+use std::collections::BTreeMap;
+
+use bevy::prelude::{App, Entity};
+
+use crate::RulesPlugin;
+use crate::cards;
+use crate::damage;
+use crate::testing;
+use crate::turns;
+use crate::zones;
+use crate::{BATTLEFIELD, EXILE, GRAVEYARD, HAND, LIBRARY, STACK};
+
+pub fn spawn_game(
+    builder: &testing::MockGameBuilder,
+    players: &[testing::PlayerSetup],
+) -> (testing::MockGame, Vec<Entity>) {
+    for (index, setup) in players.iter().enumerate() {
+        assert!(
+            setup.seat == index.saturating_add(1),
+            "MockGame: P{} listed in position {}",
+            setup.seat,
+            index.saturating_add(1)
+        );
+    }
+    let active_seats: Vec<usize> = players
+        .iter()
+        .filter(|setup| setup.active)
+        .map(|setup| setup.seat)
+        .collect();
+    assert!(
+        active_seats.len() <= 1,
+        "MockGame: P{} and P{} are both marked .active(); mark at most one",
+        active_seats.first().copied().unwrap_or_default(),
+        active_seats.get(1).copied().unwrap_or_default()
+    );
+
+    let mut app = App::new();
+    app.add_plugins(RulesPlugin);
+    let entities = testing::MockGameBuilder::spawn_players(&mut app, players);
+
+    let zone_entities: Vec<BTreeMap<zones::Zone, Entity>> = entities
+        .iter()
+        .map(|player| {
+            [LIBRARY, HAND, BATTLEFIELD, GRAVEYARD, EXILE]
+                .into_iter()
+                .map(|zone| {
+                    let zone_entity = app.world_mut().spawn((zone, cards::Owner(*player))).id();
+                    (zone, zone_entity)
+                })
+                .collect()
+        })
+        .collect();
+    let _ = app.world_mut().spawn((STACK,)).id();
+
+    for (index, (player, setup)) in entities.iter().zip(players).enumerate() {
+        let Some(player_zones) = zone_entities.get(index) else {
+            continue;
+        };
+        let hand = player_zones
+            .get(&HAND)
+            .copied()
+            .unwrap_or(Entity::PLACEHOLDER);
+        for definition in setup.hand.iter().cloned() {
+            let _ = app
+                .world_mut()
+                .spawn((definition, zones::InZone(hand), cards::Owner(*player)));
+        }
+
+        let battlefield = player_zones
+            .get(&BATTLEFIELD)
+            .copied()
+            .unwrap_or(Entity::PLACEHOLDER);
+        for definition in setup.battlefield.iter().cloned() {
+            let _ = app.world_mut().spawn((
+                definition,
+                zones::InZone(battlefield),
+                cards::Owner(*player),
+                damage::Damage(0),
+            ));
+        }
+
+        let library = player_zones
+            .get(&LIBRARY)
+            .copied()
+            .unwrap_or(Entity::PLACEHOLDER);
+        let library_cards = setup
+            .library
+            .clone()
+            .unwrap_or_else(|| vec![testing::grizzly_bears(); 12]);
+        for definition in library_cards {
+            let _ =
+                app.world_mut()
+                    .spawn((definition, zones::InZone(library), cards::Owner(*player)));
+        }
+    }
+
+    let active_index = players.iter().position(|setup| setup.active).unwrap_or(0);
+    let active = entities
+        .get(active_index)
+        .copied()
+        .unwrap_or(Entity::PLACEHOLDER);
+    app.insert_resource(turns::Turn {
+        number: builder.turn_number,
+        active,
+        step: builder.step,
+    });
+    app.insert_resource(turns::Priority {
+        player: active,
+        consecutive_passes: 0,
+    });
+    app.insert_resource(turns::TurnOrder::from(entities.clone()));
+
+    let p1 = entities.first().copied().unwrap_or(Entity::PLACEHOLDER);
+    let p2 = entities.get(1).copied().unwrap_or(Entity::PLACEHOLDER);
+    let game = testing::MockGame {
+        p1,
+        p2,
+        players: entities.clone(),
+        app,
+    };
+    (game, entities)
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::testing::*;
+    use crate::turns;
+
+    use super::spawn_game;
+
+    #[test]
+    fn test_usage() {
+        let builder = MockGameBuilder::default();
+        let (game, entities) = spawn_game(&builder, &[P1, P2.active()]);
+
+        assert_eq!(game.life(game.p1), 20);
+        assert_eq!(entities.len(), 2);
+        let turn = game.app.world().resource::<turns::Turn>();
+        assert_eq!(turn.active, game.p2);
+        assert_eq!(
+            game.app.world().resource::<turns::Priority>().player,
+            game.p2
+        );
+        assert_eq!(game.app.world().resource::<turns::TurnOrder>().len(), 2);
+    }
+}

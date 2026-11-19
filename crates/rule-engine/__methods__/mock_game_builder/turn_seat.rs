@@ -1,7 +1,7 @@
 use crate::testing;
 use crate::turns;
 
-pub const fn turn(
+pub const fn turn_seat(
     mut builder: testing::MockGameBuilder,
     number: u32,
     active: testing::Seat,
@@ -18,11 +18,11 @@ mod tests {
     use crate::testing::*;
     use crate::turns;
 
-    use super::turn;
+    use super::turn_seat;
 
     #[test]
     fn test_usage() {
-        let builder = turn(
+        let builder = turn_seat(
             MockGameBuilder::default(),
             2,
             Seat::P2,
