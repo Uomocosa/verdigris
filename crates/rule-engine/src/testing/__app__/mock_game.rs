@@ -84,6 +84,12 @@ impl MockGame {
 
     #[must_use]
     pub fn mana_pool(&self, player: Entity) -> cards::ManaPool {}
+
+    pub fn play(
+        &mut self,
+        casts: impl IntoIterator<Item = testing::Cast>,
+    ) -> Result<(), testing::PlayError> {
+    }
 }
 
 #[atomic_delegates]
@@ -95,6 +101,8 @@ impl MockGame {
         name: &str,
     ) -> Vec<Entity> {
     }
+
+    pub(crate) fn rejection_count(&self) -> usize {}
 }
 
 #[cfg(test)]

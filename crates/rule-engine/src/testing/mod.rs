@@ -2,10 +2,12 @@
 mod app;
 #[path = "__fixtures__/mod.rs"]
 mod fixtures;
+#[path = "__app__/caster/__traits__/mod.rs"]
+pub mod traits;
 
 pub use app::{
-    Card, Cards, CardsError, MockGame, MockGameBuilder, P1, P2, P3, P4, P5, P6, P7, P8,
-    PlayerSetup, PlayerView,
+    Card, Cards, CardsError, Cast, MockGame, MockGameBuilder, P1, P2, P3, P4, P5, P6, P7, P8,
+    PlayError, PlayerSetup, PlayerView, Step, Targets,
 };
 pub use fixtures::{
     CANCEL, DARKSTEEL_MYR, DISPEL, DIVINATION, DOOM_BLADE, ESSENCE_SCATTER, ExpectedTargets,
