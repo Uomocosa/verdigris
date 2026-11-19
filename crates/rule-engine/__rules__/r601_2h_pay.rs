@@ -15,11 +15,11 @@ pub fn r601_2h_pay(
     cards: Query<(
         Entity,
         &cards::CardDefinition,
-        &zones::Owner,
+        &cards::Owner,
         &stack::CastingStage,
     )>,
     mut pools: Query<&mut cards::ManaPool>,
-    zone_entities: Query<(Entity, &zones::Zone, Option<&zones::Owner>)>,
+    zone_entities: Query<(Entity, &zones::Zone, Option<&cards::Owner>)>,
 ) {
     for (spell, definition, owner, stage) in cards.iter() {
         if *stage != stack::CastingStage::AwaitingPayment {

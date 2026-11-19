@@ -17,8 +17,8 @@ pub fn r601_2a_cast(
     mut commands: Commands,
     priority: Res<turns::Priority>,
     turn: Res<turns::Turn>,
-    cards: Query<(&cards::CardDefinition, &zones::Owner, &zones::InZone)>,
-    zone_entities: Query<(Entity, &zones::Zone, Option<&zones::Owner>)>,
+    cards: Query<(&cards::CardDefinition, &cards::Owner, &zones::InZone)>,
+    zone_entities: Query<(Entity, &zones::Zone, Option<&cards::Owner>)>,
 ) {
     let priority = priority.into_inner();
     let turn = turn.into_inner();

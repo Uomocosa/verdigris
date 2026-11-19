@@ -18,7 +18,7 @@ pub fn find(
                 .get::<zones::Zone>()
                 .is_some_and(|found| *found == zone)
                 && entity
-                    .get::<zones::Owner>()
+                    .get::<cards::Owner>()
                     .is_some_and(|owner| **owner == player)
         })
         .map(|entity| entity.id())?;

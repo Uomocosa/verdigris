@@ -1,8 +1,9 @@
 use bevy::prelude::{Commands, MessageReader, Query};
 
 use crate::cards;
+use crate::damage;
+use crate::players;
 use crate::rules::helpers;
-use crate::zones;
 
 /// 120.3 Damage may have one or more of the following results, depending on whether the recipient
 /// of the damage is a player or permanent, the characteristics of the damage's source, and the
@@ -12,18 +13,18 @@ use crate::zones;
 /// 120.3e Damage dealt to a creature by a source with neither wither nor infect causes that much
 /// damage to be marked on that creature.
 pub fn r120_3_damage_results(
-    mut damage_dealt: MessageReader<zones::DamageDealt>,
+    mut damage_dealt: MessageReader<damage::DamageDealt>,
     mut commands: Commands,
-    mut lives: Query<&mut zones::Life>,
+    mut lives: Query<&mut players::Life>,
     sources: Query<&cards::CardDefinition>,
-    targets: Query<Option<&zones::Damage>>,
+    targets: Query<Option<&damage::Damage>>,
 ) {
     for event in damage_dealt.read() {
         if event.amount == 0 {
             continue;
         }
         if let Ok(mut life) = lives.get_mut(event.target) {
-            *life = zones::Life((**life).saturating_sub(helpers::signed_damage(event.amount)));
+            *life = players::Life((**life).saturating_sub(helpers::signed_damage(event.amount)));
             continue;
         }
         let marked = targets
@@ -33,14 +34,14 @@ pub fn r120_3_damage_results(
             .map_or(0, |damage| **damage);
         commands
             .entity(event.target)
-            .insert(zones::Damage(marked.saturating_add(event.amount)));
+            .insert(damage::Damage(marked.saturating_add(event.amount)));
         let has_deathtouch = sources
             .get(event.source)
             .is_ok_and(|definition| definition.keywords.contains(&cards::Keyword::Deathtouch));
         if has_deathtouch {
             commands
                 .entity(event.target)
-                .insert(zones::DealtByDeathtouch);
+                .insert(damage::DealtByDeathtouch);
         }
     }
 }

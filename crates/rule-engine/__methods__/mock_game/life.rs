@@ -1,10 +1,10 @@
+use crate::players;
 use crate::testing;
-use crate::zones;
 
 pub fn life(game: &testing::MockGame, player: bevy::prelude::Entity) -> i32 {
     game.app
         .world()
-        .get::<zones::Life>(player)
+        .get::<players::Life>(player)
         .map_or(0, |life| **life)
 }
 

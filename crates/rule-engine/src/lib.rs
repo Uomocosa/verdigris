@@ -1,6 +1,8 @@
 pub mod actions;
 pub mod cards;
+pub mod damage;
 pub mod effects;
+pub mod players;
 #[path = "../__rules__/mod.rs"]
 mod rules;
 mod rules_plugin;

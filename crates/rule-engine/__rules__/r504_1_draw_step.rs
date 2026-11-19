@@ -1,18 +1,18 @@
 use bevy::prelude::{MessageReader, MessageWriter, Res};
 
+use crate::players;
 use crate::turns;
-use crate::zones;
 
 /// 504.1 First, the active player draws a card. This turn-based action doesn’t use the stack.
 pub fn r504_1_draw_step(
     mut step_started: MessageReader<turns::StepStarted>,
-    mut draws: MessageWriter<zones::DrawRequested>,
+    mut draws: MessageWriter<players::DrawRequested>,
     turn: Res<turns::Turn>,
 ) {
     let turn = turn.into_inner();
     for step in step_started.read() {
         if **step == turns::Step::Draw {
-            draws.write(zones::DrawRequested {
+            draws.write(players::DrawRequested {
                 player: turn.active,
                 count: 1,
             });

@@ -1,7 +1,9 @@
 use bevy::prelude::{Entity, MessageReader, MessageWriter, ParamSet, Query};
 
 use crate::cards;
+use crate::damage;
 use crate::effects;
+use crate::players;
 use crate::rules::helpers;
 use crate::stack;
 use crate::zones;
@@ -13,23 +15,23 @@ use crate::zones;
 /// 608.2c The controller of the spell or ability follows its instructions in the order written.
 pub fn r608_2_resolve(
     mut resolutions: MessageReader<stack::Resolution>,
-    mut damage_dealt: MessageWriter<zones::DamageDealt>,
-    mut destructions: MessageWriter<zones::Destruction>,
+    mut damage_dealt: MessageWriter<damage::DamageDealt>,
+    mut destructions: MessageWriter<damage::Destruction>,
     mut countered: MessageWriter<stack::Countered>,
-    mut draws: MessageWriter<zones::DrawRequested>,
+    mut draws: MessageWriter<players::DrawRequested>,
     mut player_effects: ParamSet<(
-        MessageWriter<zones::LifeLost>,
-        MessageWriter<zones::DiscardRequested>,
+        MessageWriter<players::LifeLost>,
+        MessageWriter<players::DiscardRequested>,
     )>,
     mut power_toughness_modified: MessageWriter<effects::PowerToughnessModified>,
     spells: Query<(
         &cards::CardDefinition,
-        &zones::Owner,
+        &cards::Owner,
         &zones::InZone,
         Option<&stack::ChosenTarget>,
     )>,
-    lives: Query<&zones::Life>,
-    zone_entities: Query<(Entity, &zones::Zone, Option<&zones::Owner>)>,
+    lives: Query<&players::Life>,
+    zone_entities: Query<(Entity, &zones::Zone, Option<&cards::Owner>)>,
 ) {
     for resolution in resolutions.read() {
         let spell = **resolution;
@@ -50,7 +52,7 @@ pub fn r608_2_resolve(
                     if let Some(target) = chosen_target
                         && (lives.get(target).is_ok() || spells.get(target).is_ok())
                     {
-                        damage_dealt.write(zones::DamageDealt {
+                        damage_dealt.write(damage::DamageDealt {
                             source: spell,
                             target,
                             amount,
@@ -66,7 +68,7 @@ pub fn r608_2_resolve(
                             &zone_entities,
                         )
                     {
-                        destructions.write(zones::Destruction(target));
+                        destructions.write(damage::Destruction(target));
                     }
                 }
                 effects::EffectKind::Counter => {
@@ -82,7 +84,7 @@ pub fn r608_2_resolve(
                     }
                 }
                 effects::EffectKind::Draw(count) => {
-                    draws.write(zones::DrawRequested {
+                    draws.write(players::DrawRequested {
                         player: player_target.unwrap_or(**owner),
                         count,
                     });
@@ -91,14 +93,14 @@ pub fn r608_2_resolve(
                     if let Some(player) = player_target {
                         player_effects
                             .p0()
-                            .write(zones::LifeLost { player, amount });
+                            .write(players::LifeLost { player, amount });
                     }
                 }
                 effects::EffectKind::Discard(count) => {
                     if let Some(player) = player_target {
                         player_effects
                             .p1()
-                            .write(zones::DiscardRequested { player, count });
+                            .write(players::DiscardRequested { player, count });
                     }
                 }
                 effects::EffectKind::ModifyPowerToughness { power, toughness } => {

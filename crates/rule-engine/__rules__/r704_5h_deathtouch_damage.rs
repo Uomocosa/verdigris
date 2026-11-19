@@ -1,6 +1,7 @@
 use bevy::prelude::{Commands, Entity, MessageWriter, Query};
 
 use crate::cards;
+use crate::damage;
 use crate::rules::helpers;
 use crate::zones;
 
@@ -8,20 +9,20 @@ use crate::zones;
 /// deathtouch since the last time state-based actions were checked, that creature is destroyed.
 /// Regeneration can replace this event.
 pub fn r704_5h_deathtouch_damage(
-    mut destructions: MessageWriter<zones::Destruction>,
+    mut destructions: MessageWriter<damage::Destruction>,
     mut commands: Commands,
     cards: Query<(
         Entity,
         &cards::CardDefinition,
-        &zones::DealtByDeathtouch,
+        &damage::DealtByDeathtouch,
         &zones::InZone,
     )>,
-    zone_entities: Query<(Entity, &zones::Zone, Option<&zones::Owner>)>,
+    zone_entities: Query<(Entity, &zones::Zone, Option<&cards::Owner>)>,
 ) {
     for (creature, definition, _, in_zone) in cards.iter() {
         commands
             .entity(creature)
-            .remove::<zones::DealtByDeathtouch>();
+            .remove::<damage::DealtByDeathtouch>();
         if !helpers::is_card_in_zone(**in_zone, zones::Zone::Battlefield, &zone_entities) {
             continue;
         }
@@ -29,7 +30,7 @@ pub fn r704_5h_deathtouch_damage(
             continue;
         };
         if power_toughness.toughness > 0 {
-            destructions.write(zones::Destruction(creature));
+            destructions.write(damage::Destruction(creature));
         }
     }
 }

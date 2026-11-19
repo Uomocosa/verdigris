@@ -1,6 +1,7 @@
 use std::collections::BTreeMap;
 
 use atomic_delegate_macros::atomic_delegates;
+use bevy::prelude::{App, Entity};
 
 use crate::cards;
 use crate::testing;
@@ -95,6 +96,12 @@ impl MockGameBuilder {
 
     #[must_use]
     pub fn build(&self) -> testing::MockGame {}
+}
+
+#[atomic_delegates]
+impl MockGameBuilder {
+    #[must_use]
+    pub(crate) fn spawn_players(&self, app: &mut App, seats: &[testing::Seat]) -> Vec<Entity> {}
 }
 
 #[cfg(test)]

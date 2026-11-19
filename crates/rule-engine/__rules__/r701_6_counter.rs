@@ -1,5 +1,6 @@
 use bevy::prelude::{Commands, Entity, MessageReader, Query};
 
+use crate::cards;
 use crate::rules::helpers;
 use crate::stack;
 use crate::zones;
@@ -10,8 +11,8 @@ use crate::zones;
 pub fn r701_6_counter(
     mut countered: MessageReader<stack::Countered>,
     mut commands: Commands,
-    spells: Query<(&zones::Owner, &zones::InZone)>,
-    zone_entities: Query<(Entity, &zones::Zone, Option<&zones::Owner>)>,
+    spells: Query<(&cards::Owner, &zones::InZone)>,
+    zone_entities: Query<(Entity, &zones::Zone, Option<&cards::Owner>)>,
 ) {
     for event in countered.read() {
         let spell = **event;

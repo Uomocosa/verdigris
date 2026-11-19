@@ -5,6 +5,7 @@ use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query, ResMu
 use crate::actions;
 use crate::cards;
 use crate::effects;
+use crate::players;
 use crate::rules::helpers;
 use crate::stack;
 use crate::zones;
@@ -16,14 +17,14 @@ pub fn r601_2c_targets(
     mut rejected: MessageWriter<actions::Rejected>,
     mut pending: ResMut<actions::PendingChoice>,
     mut commands: Commands,
-    players: Query<Entity, With<zones::Player>>,
+    players: Query<Entity, With<players::Player>>,
     cards: Query<(
         Entity,
         &cards::CardDefinition,
-        &zones::Owner,
+        &cards::Owner,
         &zones::InZone,
     )>,
-    zone_entities: Query<(Entity, &zones::Zone, Option<&zones::Owner>)>,
+    zone_entities: Query<(Entity, &zones::Zone, Option<&cards::Owner>)>,
 ) {
     for action in actions.read() {
         match &action.action {
@@ -112,14 +113,14 @@ fn legal_targets(
     casting_spell: Entity,
     filter: effects::Filter,
     controller: Entity,
-    players: &Query<Entity, With<zones::Player>>,
+    players: &Query<Entity, With<players::Player>>,
     cards: &Query<(
         Entity,
         &cards::CardDefinition,
-        &zones::Owner,
+        &cards::Owner,
         &zones::InZone,
     )>,
-    zone_entities: &Query<(Entity, &zones::Zone, Option<&zones::Owner>)>,
+    zone_entities: &Query<(Entity, &zones::Zone, Option<&cards::Owner>)>,
 ) -> BTreeSet<Entity> {
     let all_players: Vec<Entity> = players.iter().collect();
     let allowed_controllers: Option<BTreeSet<Entity>> = filter.controlled_by.map(|player| {

@@ -2,6 +2,7 @@ use bevy::prelude::{Commands, Entity, MessageReader, Query, With};
 
 use crate::cards;
 use crate::effects;
+use crate::players;
 use crate::rules::helpers;
 use crate::stack;
 use crate::zones;
@@ -15,12 +16,12 @@ pub fn r608_2b_illegal_targets(
     mut commands: Commands,
     cards: Query<(
         &cards::CardDefinition,
-        &zones::Owner,
+        &cards::Owner,
         &zones::InZone,
         Option<&stack::ChosenTarget>,
     )>,
-    players: Query<Entity, With<zones::Player>>,
-    zone_entities: Query<(Entity, &zones::Zone, Option<&zones::Owner>)>,
+    players: Query<Entity, With<players::Player>>,
+    zone_entities: Query<(Entity, &zones::Zone, Option<&cards::Owner>)>,
 ) {
     for resolution in resolutions.read() {
         let spell = **resolution;
@@ -53,14 +54,14 @@ pub fn r608_2b_illegal_targets(
 fn target_is_legal(
     target: Entity,
     requirement: effects::Target,
-    players: &Query<Entity, With<zones::Player>>,
+    players: &Query<Entity, With<players::Player>>,
     cards: &Query<(
         &cards::CardDefinition,
-        &zones::Owner,
+        &cards::Owner,
         &zones::InZone,
         Option<&stack::ChosenTarget>,
     )>,
-    zone_entities: &Query<(Entity, &zones::Zone, Option<&zones::Owner>)>,
+    zone_entities: &Query<(Entity, &zones::Zone, Option<&cards::Owner>)>,
 ) -> bool {
     let is_player = players.contains(target);
     let creature_matches_filter = cards.get(target).is_ok_and(|(definition, _, in_zone, _)| {

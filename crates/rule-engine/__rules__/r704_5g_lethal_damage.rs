@@ -1,6 +1,7 @@
 use bevy::prelude::{Entity, MessageWriter, Query};
 
 use crate::cards;
+use crate::damage;
 use crate::effects;
 use crate::rules::helpers;
 use crate::zones;
@@ -9,15 +10,15 @@ use crate::zones;
 /// damage marked on it is greater than or equal to its toughness, that creature has been dealt
 /// lethal damage and is destroyed. Regeneration can replace this event.
 pub fn r704_5g_lethal_damage(
-    mut destructions: MessageWriter<zones::Destruction>,
+    mut destructions: MessageWriter<damage::Destruction>,
     cards: Query<(
         Entity,
         &cards::CardDefinition,
-        &zones::Damage,
+        &damage::Damage,
         &zones::InZone,
         Option<&effects::PowerToughnessModifier>,
     )>,
-    zone_entities: Query<(Entity, &zones::Zone, Option<&zones::Owner>)>,
+    zone_entities: Query<(Entity, &zones::Zone, Option<&cards::Owner>)>,
 ) {
     for (creature, definition, damage, in_zone, modifier) in cards.iter() {
         if !helpers::is_card_in_zone(**in_zone, zones::Zone::Battlefield, &zone_entities) {
@@ -32,7 +33,7 @@ pub fn r704_5g_lethal_damage(
         if !is_lethal {
             continue;
         }
-        destructions.write(zones::Destruction(creature));
+        destructions.write(damage::Destruction(creature));
     }
 }
 

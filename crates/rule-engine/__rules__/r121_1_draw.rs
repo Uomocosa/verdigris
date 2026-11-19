@@ -1,5 +1,7 @@
 use bevy::prelude::{Commands, Entity, MessageReader, Query};
 
+use crate::cards;
+use crate::players;
 use crate::rules::helpers;
 use crate::zones;
 
@@ -13,9 +15,9 @@ use crate::zones;
 /// The top card of a library is the first card in its `ZoneContents`, and `MockGameBuilder` lists
 /// a library top first.
 pub fn r121_1_draw(
-    mut draws: MessageReader<zones::DrawRequested>,
+    mut draws: MessageReader<players::DrawRequested>,
     mut commands: Commands,
-    zone_entities: Query<(Entity, &zones::Zone, Option<&zones::Owner>)>,
+    zone_entities: Query<(Entity, &zones::Zone, Option<&cards::Owner>)>,
     zone_contents: Query<&zones::ZoneContents>,
 ) {
     for draw in draws.read() {
@@ -40,7 +42,7 @@ pub fn r121_1_draw(
         if u32::try_from(drawn_from_top.len()).unwrap_or(u32::MAX) < draw.count {
             commands
                 .entity(draw.player)
-                .insert(zones::AttemptedDrawFromEmptyLibrary);
+                .insert(players::AttemptedDrawFromEmptyLibrary);
         }
     }
 }

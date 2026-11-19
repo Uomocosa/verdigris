@@ -18,24 +18,3 @@ pub struct InZone(pub Entity);
 #[derive(Component, Debug, Clone, PartialEq, Eq, Deref)]
 #[relationship_target(relationship = InZone)]
 pub struct ZoneContents(Vec<Entity>);
-
-#[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Deref)]
-pub struct Owner(pub Entity);
-
-#[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
-pub struct Player;
-
-#[derive(Component, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Deref)]
-pub struct Life(pub i32);
-
-#[derive(Component, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Deref)]
-pub struct Damage(pub u32);
-
-#[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
-pub struct Lost;
-
-#[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
-pub struct DealtByDeathtouch;
-
-#[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
-pub struct AttemptedDrawFromEmptyLibrary;

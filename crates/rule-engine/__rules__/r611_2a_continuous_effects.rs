@@ -29,6 +29,7 @@ pub fn r611_2a_continuous_effects(
 #[cfg(test)]
 mod tests {
     use crate::actions;
+    use crate::damage;
     use crate::effects;
     use crate::mana;
     use crate::testing::*;
@@ -94,8 +95,8 @@ mod tests {
         game.pass_priority_all();
 
         assert_eq!(game.zone_of(bears), zones::Zone::Battlefield);
-        let damage = game.app.world().get::<zones::Damage>(bears).copied();
-        assert_eq!(damage, Some(zones::Damage(3)));
+        let damage = game.app.world().get::<damage::Damage>(bears).copied();
+        assert_eq!(damage, Some(damage::Damage(3)));
         let modifier = game
             .app
             .world()

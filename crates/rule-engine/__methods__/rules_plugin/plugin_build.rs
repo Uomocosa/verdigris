@@ -2,22 +2,23 @@ use bevy::prelude::{App, IntoScheduleConfigs, Update};
 
 use crate::RulesPlugin;
 use crate::actions;
+use crate::damage;
 use crate::effects;
+use crate::players;
 use crate::rules;
 use crate::stack;
 use crate::turns;
-use crate::zones;
 
 pub fn plugin_build(_rules_plugin: &RulesPlugin, app: &mut App) {
     app.add_message::<actions::PlayerAction>()
         .add_message::<actions::Rejected>()
         .add_message::<stack::Resolution>()
         .add_message::<stack::Countered>()
-        .add_message::<zones::DamageDealt>()
-        .add_message::<zones::Destruction>()
-        .add_message::<zones::DrawRequested>()
-        .add_message::<zones::LifeLost>()
-        .add_message::<zones::DiscardRequested>()
+        .add_message::<damage::DamageDealt>()
+        .add_message::<damage::Destruction>()
+        .add_message::<players::DrawRequested>()
+        .add_message::<players::LifeLost>()
+        .add_message::<players::DiscardRequested>()
         .add_message::<effects::PowerToughnessModified>()
         .add_message::<turns::StepStarted>()
         .add_message::<turns::AllPlayersPassed>();

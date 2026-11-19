@@ -11,8 +11,8 @@ use crate::zones;
 pub fn r608_2n_graveyard(
     mut resolutions: MessageReader<stack::Resolution>,
     mut commands: Commands,
-    cards: Query<(&cards::CardDefinition, &zones::Owner, &zones::InZone)>,
-    zone_entities: Query<(Entity, &zones::Zone, Option<&zones::Owner>)>,
+    cards: Query<(&cards::CardDefinition, &cards::Owner, &zones::InZone)>,
+    zone_entities: Query<(Entity, &zones::Zone, Option<&cards::Owner>)>,
 ) {
     for resolution in resolutions.read() {
         let spell = **resolution;

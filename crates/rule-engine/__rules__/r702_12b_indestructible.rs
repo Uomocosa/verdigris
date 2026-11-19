@@ -1,6 +1,7 @@
 use bevy::prelude::{Commands, Entity, MessageReader, Query};
 
 use crate::cards;
+use crate::damage;
 use crate::rules::helpers;
 use crate::zones;
 
@@ -8,10 +9,10 @@ use crate::zones;
 /// lethal damage, and they ignore the state-based action that checks for lethal damage (see rule
 /// 704.5g).
 pub fn r702_12b_indestructible(
-    mut destructions: MessageReader<zones::Destruction>,
+    mut destructions: MessageReader<damage::Destruction>,
     mut commands: Commands,
-    cards: Query<(&cards::CardDefinition, &zones::Owner, &zones::InZone)>,
-    zone_entities: Query<(Entity, &zones::Zone, Option<&zones::Owner>)>,
+    cards: Query<(&cards::CardDefinition, &cards::Owner, &zones::InZone)>,
+    zone_entities: Query<(Entity, &zones::Zone, Option<&cards::Owner>)>,
 ) {
     for destruction in destructions.read() {
         let permanent = **destruction;
@@ -38,6 +39,7 @@ pub fn r702_12b_indestructible(
 #[cfg(test)]
 mod tests {
     use crate::actions;
+    use crate::damage;
     use crate::mana;
     use crate::testing::*;
     use crate::zones;
@@ -98,7 +100,7 @@ mod tests {
         game.act(game.p1, actions::Action::ChooseTargets(vec![myr]));
         game.pass_priority_all();
         assert_eq!(game.zone_of(myr), zones::Zone::Battlefield);
-        let damage = game.app.world().get::<zones::Damage>(myr).unwrap();
+        let damage = game.app.world().get::<damage::Damage>(myr).unwrap();
         assert_eq!(**damage, 3);
     }
 

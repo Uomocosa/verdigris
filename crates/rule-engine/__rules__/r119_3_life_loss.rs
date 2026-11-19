@@ -1,17 +1,17 @@
 use bevy::prelude::{MessageReader, Query};
 
+use crate::players;
 use crate::rules::helpers;
-use crate::zones;
 
 /// 119.3 If an effect causes a player to gain life or lose life, that player's life total is
 /// adjusted accordingly.
 pub fn r119_3_life_loss(
-    mut life_lost: MessageReader<zones::LifeLost>,
-    mut lives: Query<&mut zones::Life>,
+    mut life_lost: MessageReader<players::LifeLost>,
+    mut lives: Query<&mut players::Life>,
 ) {
     for event in life_lost.read() {
         if let Ok(mut life) = lives.get_mut(event.player) {
-            *life = zones::Life((**life).saturating_sub(helpers::signed_damage(event.amount)));
+            *life = players::Life((**life).saturating_sub(helpers::signed_damage(event.amount)));
         }
     }
 }
@@ -22,6 +22,7 @@ mod tests {
 
     use crate::actions;
     use crate::mana;
+    use crate::players;
     use crate::testing::*;
     use crate::zones;
 
@@ -85,6 +86,6 @@ mod tests {
             .build();
         let p2 = game.p2;
         cast_and_resolve(&mut game, "Sign in Blood", Some(p2));
-        assert!(game.app.world().get::<zones::Lost>(p2).is_some());
+        assert!(game.app.world().get::<players::Lost>(p2).is_some());
     }
 }

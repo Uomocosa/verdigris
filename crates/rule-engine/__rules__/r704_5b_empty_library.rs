@@ -1,6 +1,6 @@
 use bevy::prelude::{Commands, Entity, Query, With, Without};
 
-use crate::zones;
+use crate::players;
 
 /// 704.5b If a player attempted to draw a card from a library with no cards in it since the last
 /// time state-based actions were checked, that player loses the game.
@@ -9,13 +9,13 @@ pub fn r704_5b_empty_library(
     players: Query<
         Entity,
         (
-            With<zones::AttemptedDrawFromEmptyLibrary>,
-            Without<zones::Lost>,
+            With<players::AttemptedDrawFromEmptyLibrary>,
+            Without<players::Lost>,
         ),
     >,
 ) {
     for player in players.iter() {
-        commands.entity(player).insert(zones::Lost);
+        commands.entity(player).insert(players::Lost);
     }
 }
 
@@ -23,6 +23,7 @@ pub fn r704_5b_empty_library(
 mod tests {
     use crate::actions;
     use crate::mana;
+    use crate::players;
     use crate::testing::*;
     use crate::zones;
 
@@ -36,7 +37,7 @@ mod tests {
         let divination = game.find(game.p1, zones::Zone::Hand, "Divination").unwrap();
         game.act(game.p1, actions::Action::Cast(divination));
         game.pass_priority_all();
-        assert!(game.app.world().get::<zones::Lost>(game.p1).is_some());
+        assert!(game.app.world().get::<players::Lost>(game.p1).is_some());
     }
 
     #[test]
@@ -48,8 +49,8 @@ mod tests {
             .build();
         let divination = game.find(game.p1, zones::Zone::Hand, "Divination").unwrap();
         game.act(game.p1, actions::Action::Cast(divination));
-        assert!(game.app.world().get::<zones::Lost>(game.p1).is_none());
+        assert!(game.app.world().get::<players::Lost>(game.p1).is_none());
         game.pass_priority_all();
-        assert!(game.app.world().get::<zones::Lost>(game.p1).is_some());
+        assert!(game.app.world().get::<players::Lost>(game.p1).is_some());
     }
 }

@@ -4,6 +4,7 @@ use bevy::prelude::{App, Entity};
 
 use crate::RulesPlugin;
 use crate::cards;
+use crate::damage;
 use crate::testing;
 use crate::turns;
 use crate::zones;
@@ -23,16 +24,7 @@ pub fn build(builder: &testing::MockGameBuilder) -> testing::MockGame {
     let mut app = App::new();
     app.add_plugins(RulesPlugin);
 
-    let players: Vec<Entity> = SEATS
-        .iter()
-        .take(builder.player_count)
-        .map(|seat| {
-            let life = builder.lives.get(seat).copied().unwrap_or(20);
-            app.world_mut()
-                .spawn((zones::Player, zones::Life(life), cards::ManaPool::default()))
-                .id()
-        })
-        .collect();
+    let players: Vec<Entity> = builder.spawn_players(&mut app, &SEATS);
 
     let mut zones_by_seat: BTreeMap<(testing::Seat, zones::Zone), Entity> = BTreeMap::new();
     for (seat, player) in SEATS.iter().zip(&players) {
@@ -43,7 +35,7 @@ pub fn build(builder: &testing::MockGameBuilder) -> testing::MockGame {
             zones::Zone::Graveyard,
             zones::Zone::Exile,
         ] {
-            let zone_entity = app.world_mut().spawn((zone, zones::Owner(*player))).id();
+            let zone_entity = app.world_mut().spawn((zone, cards::Owner(*player))).id();
             zones_by_seat.insert((*seat, zone), zone_entity);
         }
     }
@@ -56,7 +48,7 @@ pub fn build(builder: &testing::MockGameBuilder) -> testing::MockGame {
         for definition in builder.hands.get(seat).into_iter().flatten().cloned() {
             let _ = app
                 .world_mut()
-                .spawn((definition, zones::InZone(hand), zones::Owner(*player)));
+                .spawn((definition, zones::InZone(hand), cards::Owner(*player)));
         }
 
         let battlefield = zones_by_seat
@@ -73,8 +65,8 @@ pub fn build(builder: &testing::MockGameBuilder) -> testing::MockGame {
             let _ = app.world_mut().spawn((
                 definition,
                 zones::InZone(battlefield),
-                zones::Owner(*player),
-                zones::Damage(0),
+                cards::Owner(*player),
+                damage::Damage(0),
             ));
         }
 
@@ -91,7 +83,7 @@ pub fn build(builder: &testing::MockGameBuilder) -> testing::MockGame {
             let _ = app.world_mut().spawn((
                 definition,
                 zones::InZone(library_zone),
-                zones::Owner(*player),
+                cards::Owner(*player),
             ));
         }
 

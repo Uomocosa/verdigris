@@ -3,6 +3,8 @@ use std::collections::BTreeSet;
 use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query, ResMut};
 
 use crate::actions;
+use crate::cards;
+use crate::players;
 use crate::rules::helpers;
 use crate::zones;
 
@@ -11,12 +13,12 @@ use crate::zones;
 /// 701.9b By default, effects that cause a player to discard a card allow the affected player to
 /// choose which card to discard.
 pub fn r701_9_discard(
-    mut discards: MessageReader<zones::DiscardRequested>,
+    mut discards: MessageReader<players::DiscardRequested>,
     mut actions: MessageReader<actions::PlayerAction>,
     mut rejected: MessageWriter<actions::Rejected>,
     mut pending: ResMut<actions::PendingChoice>,
     mut commands: Commands,
-    zone_entities: Query<(Entity, &zones::Zone, Option<&zones::Owner>)>,
+    zone_entities: Query<(Entity, &zones::Zone, Option<&cards::Owner>)>,
     zone_contents: Query<&zones::ZoneContents>,
 ) {
     for discard in discards.read() {

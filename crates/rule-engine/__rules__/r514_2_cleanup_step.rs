@@ -1,8 +1,8 @@
 use bevy::prelude::{Commands, Entity, MessageReader, Query, With};
 
+use crate::damage;
 use crate::effects;
 use crate::turns;
-use crate::zones;
 
 /// 514.2 Second, the following actions happen simultaneously: all damage marked on permanents
 /// (including phased-out permanents) is removed and all "until end of turn" and "this turn"
@@ -10,7 +10,7 @@ use crate::zones;
 pub fn r514_2_cleanup_step(
     mut step_started: MessageReader<turns::StepStarted>,
     mut commands: Commands,
-    damaged: Query<(Entity, &zones::Damage)>,
+    damaged: Query<(Entity, &damage::Damage)>,
     modified: Query<Entity, With<effects::PowerToughnessModifier>>,
 ) {
     for step in step_started.read() {
@@ -18,7 +18,7 @@ pub fn r514_2_cleanup_step(
             continue;
         }
         for (entity, _) in damaged.iter() {
-            commands.entity(entity).insert(zones::Damage(0));
+            commands.entity(entity).insert(damage::Damage(0));
         }
         for entity in modified.iter() {
             commands
@@ -31,6 +31,7 @@ pub fn r514_2_cleanup_step(
 #[cfg(test)]
 mod tests {
     use crate::actions;
+    use crate::damage;
     use crate::effects;
     use crate::mana;
     use crate::testing::*;
@@ -67,8 +68,8 @@ mod tests {
 
         assert_eq!(game.zone_of(bears), zones::Zone::Battlefield);
         assert_eq!(
-            game.app.world().get::<zones::Damage>(bears).copied(),
-            Some(zones::Damage(0))
+            game.app.world().get::<damage::Damage>(bears).copied(),
+            Some(damage::Damage(0))
         );
         assert!(
             game.app

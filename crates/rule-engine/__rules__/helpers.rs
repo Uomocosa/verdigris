@@ -7,7 +7,7 @@ use crate::zones;
 pub fn find_zone(
     zone: zones::Zone,
     owner: Option<Entity>,
-    zone_entities: &Query<(Entity, &zones::Zone, Option<&zones::Owner>)>,
+    zone_entities: &Query<(Entity, &zones::Zone, Option<&cards::Owner>)>,
 ) -> Option<Entity> {
     for (entity, found_zone, found_owner) in zone_entities.iter() {
         if *found_zone != zone {
@@ -27,7 +27,7 @@ pub fn find_zone(
 pub fn is_card_in_zone(
     card_zone: Entity,
     zone: zones::Zone,
-    zone_entities: &Query<(Entity, &zones::Zone, Option<&zones::Owner>)>,
+    zone_entities: &Query<(Entity, &zones::Zone, Option<&cards::Owner>)>,
 ) -> bool {
     zone_entities
         .get(card_zone)

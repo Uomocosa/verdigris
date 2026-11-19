@@ -1,15 +1,15 @@
 use bevy::prelude::{Commands, Entity, Query, Without};
 
-use crate::zones;
+use crate::players;
 
 /// 704.5a If a player has 0 or less life, that player loses the game.
 pub fn r704_5a_zero_life(
     mut commands: Commands,
-    players: Query<(Entity, &zones::Life), Without<zones::Lost>>,
+    players: Query<(Entity, &players::Life), Without<players::Lost>>,
 ) {
     for (player, life) in players.iter() {
         if **life <= 0 {
-            commands.entity(player).insert(zones::Lost);
+            commands.entity(player).insert(players::Lost);
         }
     }
 }
@@ -18,6 +18,7 @@ pub fn r704_5a_zero_life(
 mod tests {
     use crate::actions;
     use crate::mana;
+    use crate::players;
     use crate::testing::*;
     use crate::zones;
 
@@ -35,6 +36,6 @@ mod tests {
         game.act(game.p1, actions::Action::Cast(bolt));
         game.act(game.p1, actions::Action::ChooseTargets(vec![p2]));
         game.pass_priority_all();
-        assert!(game.app.world().get::<zones::Lost>(p2).is_some());
+        assert!(game.app.world().get::<players::Lost>(p2).is_some());
     }
 }

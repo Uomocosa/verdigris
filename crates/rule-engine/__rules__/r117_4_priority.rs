@@ -1,5 +1,6 @@
 use bevy::prelude::{Entity, MessageWriter, Query, Res, ResMut};
 
+use crate::cards;
 use crate::rules::helpers;
 use crate::stack;
 use crate::turns;
@@ -15,7 +16,7 @@ pub fn r117_4_priority(
     turn: Res<turns::Turn>,
     turn_order: Res<turns::TurnOrder>,
     cards: Query<(&zones::InZone, Option<&stack::CastingStage>)>,
-    zone_entities: Query<(Entity, &zones::Zone, Option<&zones::Owner>)>,
+    zone_entities: Query<(Entity, &zones::Zone, Option<&cards::Owner>)>,
     stack_contents: Query<&zones::ZoneContents>,
 ) {
     let turn = turn.into_inner();
