@@ -80,6 +80,95 @@ mod tests {
     }
 
     #[test]
+    fn essence_scatter_counters_a_creature_spell() {
+        let mut game = testing::MockGame::builder()
+            .hand(testing::Seat::P1, [testing::grizzly_bears()])
+            .hand(testing::Seat::P2, [testing::essence_scatter()])
+            .mana_pool(testing::Seat::P1, mana![1, G])
+            .mana_pool(testing::Seat::P2, mana![1, U])
+            .build();
+        let bears = game
+            .find(game.p1, zones::Zone::Hand, "Grizzly Bears")
+            .unwrap();
+        let scatter = game
+            .find(game.p2, zones::Zone::Hand, "Essence Scatter")
+            .unwrap();
+
+        game.act(game.p1, actions::Action::Cast(bears));
+        game.pass_priority();
+        game.act(game.p2, actions::Action::Cast(scatter));
+        game.act(game.p2, actions::Action::ChooseTargets(vec![bears]));
+        game.pass_priority_all();
+
+        assert_eq!(game.zone_of(bears), zones::Zone::Graveyard);
+        assert_eq!(game.zone_of(scatter), zones::Zone::Graveyard);
+    }
+
+    #[test]
+    fn negate_counters_a_noncreature_spell() {
+        let mut game = testing::MockGame::builder()
+            .hand(testing::Seat::P1, [testing::lightning_bolt()])
+            .hand(testing::Seat::P2, [testing::negate()])
+            .mana_pool(testing::Seat::P1, mana![R])
+            .mana_pool(testing::Seat::P2, mana![1, U])
+            .build();
+        let bolt = game
+            .find(game.p1, zones::Zone::Hand, "Lightning Bolt")
+            .unwrap();
+        let negate = game.find(game.p2, zones::Zone::Hand, "Negate").unwrap();
+        let p2 = game.p2;
+
+        game.act(game.p1, actions::Action::Cast(bolt));
+        game.act(game.p1, actions::Action::ChooseTargets(vec![p2]));
+        game.pass_priority();
+        game.act(p2, actions::Action::Cast(negate));
+        game.act(p2, actions::Action::ChooseTargets(vec![bolt]));
+        game.pass_priority_all();
+
+        assert_eq!(game.life(p2), 20);
+        assert_eq!(game.zone_of(bolt), zones::Zone::Graveyard);
+        assert_eq!(game.zone_of(negate), zones::Zone::Graveyard);
+    }
+
+    #[test]
+    fn dispel_can_counter_a_cancel_so_the_outer_bolt_resolves() {
+        let mut game = testing::MockGame::builder()
+            .hand(
+                testing::Seat::P1,
+                [testing::lightning_bolt(), testing::dispel()],
+            )
+            .hand(testing::Seat::P2, [testing::cancel()])
+            .mana_pool(testing::Seat::P1, mana![R, U])
+            .mana_pool(testing::Seat::P2, mana![1, U, U])
+            .build();
+        let bolt = game
+            .find(game.p1, zones::Zone::Hand, "Lightning Bolt")
+            .unwrap();
+        let dispel = game.find(game.p1, zones::Zone::Hand, "Dispel").unwrap();
+        let cancel = game.find(game.p2, zones::Zone::Hand, "Cancel").unwrap();
+        let p1 = game.p1;
+        let p2 = game.p2;
+
+        game.act(p1, actions::Action::Cast(bolt));
+        game.act(p1, actions::Action::ChooseTargets(vec![p2]));
+        game.pass_priority();
+        game.act(p2, actions::Action::Cast(cancel));
+        game.act(p2, actions::Action::ChooseTargets(vec![bolt]));
+        game.pass_priority();
+        game.act(p1, actions::Action::Cast(dispel));
+        game.act(p1, actions::Action::ChooseTargets(vec![cancel]));
+
+        game.pass_priority_all();
+        assert_eq!(game.zone_of(cancel), zones::Zone::Graveyard);
+        assert_eq!(game.life(p2), 20);
+
+        game.pass_priority_all();
+        assert_eq!(game.life(p2), 17);
+        assert_eq!(game.zone_of(bolt), zones::Zone::Graveyard);
+        assert_eq!(game.zone_of(dispel), zones::Zone::Graveyard);
+    }
+
+    #[test]
     fn cancelled_cancel_does_not_stop_the_outer_bolt() {
         let mut game = testing::MockGame::builder()
             .hand(

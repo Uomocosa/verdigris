@@ -141,8 +141,12 @@ fn legal_targets(
             continue;
         }
         let is_legal = match filter.kind {
-            effects::FilterKind::Spell => {
+            effects::FilterKind::Spell
+            | effects::FilterKind::CreatureSpell
+            | effects::FilterKind::NoncreatureSpell
+            | effects::FilterKind::InstantSpell => {
                 helpers::is_card_in_zone(**in_zone, zones::Zone::Stack, zone_entities)
+                    && helpers::does_spell_match_filter(definition, filter)
             }
             effects::FilterKind::Creature | effects::FilterKind::AnyTarget => {
                 helpers::does_creature_match_filter(definition, filter)
@@ -297,6 +301,82 @@ mod tests {
             game.last_rejection(),
             Some(&actions::Rejected::InvalidTargets { spell: cancel })
         );
+    }
+
+    #[test]
+    fn essence_scatter_cannot_target_a_noncreature_spell() {
+        let mut game = testing::MockGame::builder()
+            .hand(testing::Seat::P1, [testing::lightning_bolt()])
+            .hand(testing::Seat::P2, [testing::essence_scatter()])
+            .mana_pool(testing::Seat::P1, mana![R])
+            .mana_pool(testing::Seat::P2, mana![1, U])
+            .build();
+        let bolt = game
+            .find(game.p1, zones::Zone::Hand, "Lightning Bolt")
+            .unwrap();
+        let scatter = game
+            .find(game.p2, zones::Zone::Hand, "Essence Scatter")
+            .unwrap();
+
+        game.act(game.p1, actions::Action::Cast(bolt));
+        game.act(game.p1, actions::Action::ChooseTargets(vec![game.p2]));
+        game.pass_priority();
+        game.act(game.p2, actions::Action::Cast(scatter));
+
+        assert_eq!(
+            game.last_rejection(),
+            Some(&actions::Rejected::NoLegalTargets { spell: scatter })
+        );
+        assert_eq!(game.zone_of(scatter), zones::Zone::Hand);
+        assert_eq!(game.zone_of(bolt), zones::Zone::Stack);
+    }
+
+    #[test]
+    fn negate_cannot_target_a_creature_spell() {
+        let mut game = testing::MockGame::builder()
+            .hand(testing::Seat::P1, [testing::grizzly_bears()])
+            .hand(testing::Seat::P2, [testing::negate()])
+            .mana_pool(testing::Seat::P1, mana![1, G])
+            .mana_pool(testing::Seat::P2, mana![1, U])
+            .build();
+        let bears = game
+            .find(game.p1, zones::Zone::Hand, "Grizzly Bears")
+            .unwrap();
+        let negate = game.find(game.p2, zones::Zone::Hand, "Negate").unwrap();
+
+        game.act(game.p1, actions::Action::Cast(bears));
+        game.pass_priority();
+        game.act(game.p2, actions::Action::Cast(negate));
+
+        assert_eq!(
+            game.last_rejection(),
+            Some(&actions::Rejected::NoLegalTargets { spell: negate })
+        );
+        assert_eq!(game.zone_of(negate), zones::Zone::Hand);
+        assert_eq!(game.zone_of(bears), zones::Zone::Stack);
+    }
+
+    #[test]
+    fn dispel_cannot_target_a_sorcery_spell() {
+        let mut game = testing::MockGame::builder()
+            .hand(testing::Seat::P1, [testing::divination()])
+            .hand(testing::Seat::P2, [testing::dispel()])
+            .mana_pool(testing::Seat::P1, mana![2, U])
+            .mana_pool(testing::Seat::P2, mana![U])
+            .build();
+        let divination = game.find(game.p1, zones::Zone::Hand, "Divination").unwrap();
+        let dispel = game.find(game.p2, zones::Zone::Hand, "Dispel").unwrap();
+
+        game.act(game.p1, actions::Action::Cast(divination));
+        game.pass_priority();
+        game.act(game.p2, actions::Action::Cast(dispel));
+
+        assert_eq!(
+            game.last_rejection(),
+            Some(&actions::Rejected::NoLegalTargets { spell: dispel })
+        );
+        assert_eq!(game.zone_of(dispel), zones::Zone::Hand);
+        assert_eq!(game.zone_of(divination), zones::Zone::Stack);
     }
 
     #[test]

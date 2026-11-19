@@ -65,3 +65,19 @@ pub fn does_creature_match_filter(
         .is_some_and(|excluded| definition.colors().contains(&excluded));
     is_creature && !has_excluded_color
 }
+
+#[must_use]
+pub fn does_spell_match_filter(
+    definition: &cards::CardDefinition,
+    filter: effects::Filter,
+) -> bool {
+    let is_creature = definition.types.contains(&cards::CardType::Creature);
+    let is_instant = definition.types.contains(&cards::CardType::Instant);
+    match filter.kind {
+        effects::FilterKind::Spell => true,
+        effects::FilterKind::CreatureSpell => is_creature,
+        effects::FilterKind::NoncreatureSpell => !is_creature,
+        effects::FilterKind::InstantSpell => is_instant,
+        effects::FilterKind::Creature | effects::FilterKind::AnyTarget => false,
+    }
+}

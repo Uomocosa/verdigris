@@ -52,6 +52,21 @@ pub const SPELL: effects::Filter = effects::Filter {
     controlled_by: None,
     excluded_color: None,
 };
+pub const CREATURE_SPELL: effects::Filter = effects::Filter {
+    kind: effects::FilterKind::CreatureSpell,
+    controlled_by: None,
+    excluded_color: None,
+};
+pub const NONCREATURE_SPELL: effects::Filter = effects::Filter {
+    kind: effects::FilterKind::NoncreatureSpell,
+    controlled_by: None,
+    excluded_color: None,
+};
+pub const INSTANT_SPELL: effects::Filter = effects::Filter {
+    kind: effects::FilterKind::InstantSpell,
+    controlled_by: None,
+    excluded_color: None,
+};
 
 /// 105.1 There are five colors in the Magic game: white, blue, black, red, and green.
 /// 202.2 An object is the color or colors of the mana symbols in its mana cost.

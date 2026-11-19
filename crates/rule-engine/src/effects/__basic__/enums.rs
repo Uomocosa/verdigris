@@ -12,4 +12,7 @@ pub enum FilterKind {
     Creature,
     AnyTarget,
     Spell,
+    CreatureSpell,
+    NoncreatureSpell,
+    InstantSpell,
 }
