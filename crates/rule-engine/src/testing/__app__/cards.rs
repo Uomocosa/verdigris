@@ -40,6 +40,8 @@ impl Cards {
 
 #[atomic_delegates]
 impl Cards {
+    pub fn expect_n<const N: usize>(&self) -> Result<[testing::TestCard; N], testing::CardsError> {}
+
     pub fn first(&self) -> Result<testing::TestCard, testing::CardsError> {}
 
     pub fn nth(&self, index: usize) -> Result<testing::TestCard, testing::CardsError> {}

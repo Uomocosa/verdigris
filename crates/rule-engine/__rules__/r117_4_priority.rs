@@ -69,14 +69,12 @@ mod tests {
                 .mana_pool(mana![R, R]),
             P2,
         ]);
-        let [first, second] = *game
+        let [first, second] = game
             .player(p1)
             .cards_in(HAND)
             .matching(LIGHTNING_BOLT)
-            .all()
-        else {
-            panic!("expected exactly 2 Lightning Bolts in hand");
-        };
+            .expect_n::<2>()
+            .unwrap();
         game.play([
             p1.cast(first).targeting(p2),
             p1.cast(second).targeting(p2).pass_priority(),
@@ -96,14 +94,12 @@ mod tests {
                 .mana_pool(mana![R, R]),
             P2,
         ]);
-        let [first, second] = *game
+        let [first, second] = game
             .player(p1)
             .cards_in(HAND)
             .matching(LIGHTNING_BOLT)
-            .all()
-        else {
-            panic!("expected exactly 2 Lightning Bolts in hand");
-        };
+            .expect_n::<2>()
+            .unwrap();
         game.play([
             p1.cast(first).targeting(p2),
             p1.cast(second).targeting(p2).pass_priority(),

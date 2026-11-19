@@ -1,0 +1,46 @@
+use crate::testing;
+
+pub fn expect_n<const N: usize>(
+    cards: &testing::Cards,
+) -> Result<[testing::TestCard; N], testing::CardsError> {
+    <[testing::TestCard; N]>::try_from(cards.all()).map_err(|_| testing::CardsError::WrongCount {
+        player: cards.seat(),
+        card: cards.card().to_string(),
+        zone: cards.zone(),
+        count: cards.len(),
+        expected: N,
+    })
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::HAND;
+    use crate::testing::*;
+
+    use super::expect_n;
+
+    #[test]
+    fn test_usage() {
+        let (game, [p1, ..]) = MockGame::new([P1.hand([LIGHTNING_BOLT, LIGHTNING_BOLT]), P2]);
+        let cards = game.player(p1).cards_in(HAND).matching(LIGHTNING_BOLT);
+        let [first, second] = expect_n(&cards).unwrap();
+        assert_eq!(Ok(first), cards.first());
+        assert_eq!(Ok(second), cards.nth(1));
+    }
+
+    #[test]
+    fn wrong_count_is_reported() {
+        let (game, [p1, ..]) = MockGame::new([P1.hand([LIGHTNING_BOLT]), P2]);
+        let cards = game.player(p1).cards_in(HAND).matching(LIGHTNING_BOLT);
+        assert_eq!(
+            expect_n::<2>(&cards),
+            Err(CardsError::WrongCount {
+                player: PlayerSeat(1),
+                card: "Lightning Bolt".to_string(),
+                zone: HAND,
+                count: 1,
+                expected: 2,
+            })
+        );
+    }
+}

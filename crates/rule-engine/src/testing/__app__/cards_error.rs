@@ -16,6 +16,14 @@ pub enum CardsError {
         zone: zones::Zone,
         count: usize,
     },
+    #[error("{player} has {count} {card} in {zone:?}, expected exactly {expected}")]
+    WrongCount {
+        player: testing::PlayerSeat,
+        card: String,
+        zone: zones::Zone,
+        count: usize,
+        expected: usize,
+    },
     #[error("{player} has {count} {card} in {zone:?}; index {index} is out of range")]
     OutOfRange {
         player: testing::PlayerSeat,
