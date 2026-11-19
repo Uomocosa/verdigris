@@ -19,6 +19,7 @@ pub fn r119_3_life_loss(
 #[cfg(test)]
 mod tests {
     use crate::HAND;
+    use crate::cards;
     use crate::mana;
     use crate::players;
     use crate::testing::traits::Caster;
@@ -27,7 +28,7 @@ mod tests {
     #[test]
     fn test_usage() {
         let (mut game, [p1, p2]) =
-            MockGame::new([P1.hand([sign_in_blood()]).mana_pool(mana![B, B]), P2]);
+            MockGame::new([P1.hand([SIGN_IN_BLOOD]).mana_pool(mana![B, B]), P2]);
         let sign_in_blood = game.player(p1).cards(HAND, SIGN_IN_BLOOD).only().unwrap();
         game.play(p1.cast(sign_in_blood).targeting(p2).resolve())
             .unwrap();
@@ -37,8 +38,11 @@ mod tests {
     #[test]
     fn sign_in_blood_makes_the_target_draw_two_cards_and_lose_two_life() {
         let (mut game, [p1, p2]) = MockGame::new([
-            P1.hand([sign_in_blood()]).mana_pool(mana![B, B]),
-            P2.library([lightning_bolt(), murder()]),
+            P1.hand([SIGN_IN_BLOOD]).mana_pool(mana![B, B]),
+            P2.library([
+                cards::CardDefinition::from(LIGHTNING_BOLT),
+                cards::CardDefinition::from(MURDER),
+            ]),
         ]);
         let sign_in_blood = game.player(p1).cards(HAND, SIGN_IN_BLOOD).only().unwrap();
         game.play(p1.cast(sign_in_blood).targeting(p2).resolve())
@@ -53,8 +57,11 @@ mod tests {
     #[test]
     fn sign_in_blood_can_target_its_controller() {
         let (mut game, [p1, ..]) = MockGame::new([
-            P1.hand([sign_in_blood()])
-                .library([lightning_bolt(), murder()])
+            P1.hand([SIGN_IN_BLOOD])
+                .library([
+                    cards::CardDefinition::from(LIGHTNING_BOLT),
+                    cards::CardDefinition::from(MURDER),
+                ])
                 .mana_pool(mana![B, B]),
             P2,
         ]);
@@ -70,7 +77,7 @@ mod tests {
     #[test]
     fn sign_in_blood_targeting_an_empty_library_loses_the_game_at_the_next_state_based_check() {
         let (mut game, [p1, p2]) = MockGame::new([
-            P1.hand([sign_in_blood()]).mana_pool(mana![B, B]),
+            P1.hand([SIGN_IN_BLOOD]).mana_pool(mana![B, B]),
             P2.library([]),
         ]);
         let sign_in_blood = game.player(p1).cards(HAND, SIGN_IN_BLOOD).only().unwrap();

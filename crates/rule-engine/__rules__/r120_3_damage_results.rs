@@ -59,8 +59,8 @@ mod tests {
         let (mut game, [p1, p2]) = MockGame::builder()
             .turn(1, turns::Step::PrecombatMain)
             .players([
-                P1.battlefield([walking_corpse()]),
-                P2.active().hand([lightning_bolt()]).mana_pool(mana![R]),
+                P1.battlefield([WALKING_CORPSE]),
+                P2.active().hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
             ]);
         let corpse = game
             .player(p1)

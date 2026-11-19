@@ -40,9 +40,9 @@ mod tests {
     #[test]
     fn test_usage() {
         let (mut game, [p1, p2]) = MockGame::new([
-            P1.hand([lightning_bolt()]).mana_pool(mana![R]),
-            P2.hand([giant_growth()])
-                .battlefield([grizzly_bears()])
+            P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
+            P2.hand([GIANT_GROWTH])
+                .battlefield([GRIZZLY_BEARS])
                 .mana_pool(mana![G]),
         ]);
         let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
@@ -78,8 +78,8 @@ mod tests {
     #[test]
     fn r514_2_until_end_of_turn_effect_expires_before_the_next_bolt() {
         let (mut game, [p1, ..]) = MockGame::new([
-            P1.hand([giant_growth(), lightning_bolt()])
-                .battlefield([grizzly_bears()])
+            P1.hand([GIANT_GROWTH, LIGHTNING_BOLT])
+                .battlefield([GRIZZLY_BEARS])
                 .mana_pool(mana![G, R]),
             P2,
         ]);

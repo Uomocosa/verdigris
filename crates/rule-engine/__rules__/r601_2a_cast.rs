@@ -79,7 +79,7 @@ mod tests {
     #[test]
     fn test_usage() {
         let (mut game, [p1, ..]) =
-            MockGame::new([P1.hand([lightning_bolt()]).mana_pool(mana![R]), P2]);
+            MockGame::new([P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]), P2]);
         let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
         game.act(p1, actions::Action::Cast(bolt));
         assert_eq!(game.zone_of(bolt), STACK);
@@ -89,7 +89,7 @@ mod tests {
     fn sorcery_cannot_be_cast_on_an_opponents_turn() {
         let (mut game, [p1, ..]) = MockGame::builder()
             .turn(2, turns::Step::PrecombatMain)
-            .players([P1.hand([divination()]).mana_pool(mana![2, U]), P2.active()]);
+            .players([P1.hand([DIVINATION]).mana_pool(mana![2, U]), P2.active()]);
         game.pass_priority();
         let divination = game.player(p1).cards(HAND, DIVINATION).only().unwrap();
         game.act(p1, actions::Action::Cast(divination));
@@ -103,7 +103,7 @@ mod tests {
     #[test]
     fn sorcery_cannot_be_cast_while_the_stack_is_not_empty() {
         let (mut game, [p1, p2]) = MockGame::new([
-            P1.hand([lightning_bolt(), divination()])
+            P1.hand([LIGHTNING_BOLT, DIVINATION])
                 .mana_pool(mana![R, 2, U]),
             P2,
         ]);

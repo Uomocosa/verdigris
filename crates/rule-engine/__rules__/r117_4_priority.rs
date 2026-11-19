@@ -53,7 +53,7 @@ mod tests {
     #[test]
     fn test_usage() {
         let (mut game, [p1, p2]) =
-            MockGame::new([P1.hand([lightning_bolt()]).mana_pool(mana![R]), P2]);
+            MockGame::new([P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]), P2]);
         let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
         game.act(p1, actions::Action::Cast(bolt));
         game.act(p1, actions::Action::ChooseTargets(vec![p2]));
@@ -65,7 +65,7 @@ mod tests {
     #[test]
     fn all_players_passing_resolves_one_spell() {
         let (mut game, [p1, p2]) = MockGame::new([
-            P1.hand([lightning_bolt(), lightning_bolt()])
+            P1.hand([LIGHTNING_BOLT, LIGHTNING_BOLT])
                 .mana_pool(mana![R, R]),
             P2,
         ]);
@@ -87,7 +87,7 @@ mod tests {
     #[test]
     fn priority_returns_to_the_active_player_after_a_spell_resolves() {
         let (mut game, [p1, p2]) =
-            MockGame::new([P1.hand([lightning_bolt()]).mana_pool(mana![R]), P2]);
+            MockGame::new([P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]), P2]);
         let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
         game.act(p1, actions::Action::Cast(bolt));
         game.act(p1, actions::Action::ChooseTargets(vec![p2]));

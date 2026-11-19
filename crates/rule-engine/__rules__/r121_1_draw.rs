@@ -48,6 +48,7 @@ pub fn r121_1_draw(
 #[cfg(test)]
 mod tests {
     use crate::actions;
+    use crate::cards;
     use crate::mana;
     use crate::testing::*;
     use crate::{GRAVEYARD, HAND, LIBRARY};
@@ -55,7 +56,7 @@ mod tests {
     #[test]
     fn test_usage() {
         let (mut game, [p1, ..]) =
-            MockGame::new([P1.hand([divination()]).mana_pool(mana![2, U]), P2]);
+            MockGame::new([P1.hand([DIVINATION]).mana_pool(mana![2, U]), P2]);
         let divination = game.player(p1).cards(HAND, DIVINATION).only().unwrap();
         game.act(p1, actions::Action::Cast(divination));
         game.pass_priority_all();
@@ -66,8 +67,12 @@ mod tests {
     #[test]
     fn divination_draws_the_top_two_cards_of_the_library() {
         let (mut game, [p1, ..]) = MockGame::new([
-            P1.hand([divination()])
-                .library([grizzly_bears(), lightning_bolt(), murder()])
+            P1.hand([DIVINATION])
+                .library([
+                    cards::CardDefinition::from(GRIZZLY_BEARS),
+                    cards::CardDefinition::from(LIGHTNING_BOLT),
+                    cards::CardDefinition::from(MURDER),
+                ])
                 .mana_pool(mana![2, U]),
             P2,
         ]);

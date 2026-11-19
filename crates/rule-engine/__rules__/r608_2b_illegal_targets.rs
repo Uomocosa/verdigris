@@ -94,7 +94,7 @@ mod tests {
     #[test]
     fn test_usage() {
         let (mut game, [p1, p2]) =
-            MockGame::new([P1.hand([lightning_bolt()]).mana_pool(mana![R]), P2]);
+            MockGame::new([P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]), P2]);
         let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
         game.act(p1, actions::Action::Cast(bolt));
         game.act(p1, actions::Action::ChooseTargets(vec![p2]));
@@ -105,9 +105,9 @@ mod tests {
     #[test]
     fn test_bolt_fizzles_when_target_gone() {
         let (mut game, [p1, p2]) = MockGame::new([
-            P1.hand([lightning_bolt(), murder()])
+            P1.hand([LIGHTNING_BOLT, MURDER])
                 .mana_pool(mana![1, B, B, R]),
-            P2.battlefield([grizzly_bears()]),
+            P2.battlefield([GRIZZLY_BEARS]),
         ]);
         let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
         let murder = game.player(p1).cards(HAND, MURDER).only().unwrap();
@@ -134,8 +134,8 @@ mod tests {
     #[test]
     fn doom_blade_fizzles_when_its_target_becomes_black() {
         let (mut game, [p1, p2]) = MockGame::new([
-            P1.hand([doom_blade()]).mana_pool(mana![1, B]),
-            P2.battlefield([grizzly_bears()]),
+            P1.hand([DOOM_BLADE]).mana_pool(mana![1, B]),
+            P2.battlefield([GRIZZLY_BEARS]),
         ]);
         let blade = game.player(p1).cards(HAND, DOOM_BLADE).only().unwrap();
         let bears = game

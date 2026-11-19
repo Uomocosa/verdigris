@@ -22,6 +22,7 @@ pub fn r504_1_draw_step(
 
 #[cfg(test)]
 mod tests {
+    use crate::cards;
     use crate::testing::*;
     use crate::turns;
     use crate::{HAND, LIBRARY};
@@ -43,9 +44,13 @@ mod tests {
 
     #[test]
     fn the_active_player_draws_a_card_during_their_draw_step() {
-        let (mut game, [p1, ..]) = MockGame::builder()
-            .turn(1, turns::Step::Upkeep)
-            .players([P1.library([grizzly_bears(), lightning_bolt()]), P2]);
+        let (mut game, [p1, ..]) = MockGame::builder().turn(1, turns::Step::Upkeep).players([
+            P1.library([
+                cards::CardDefinition::from(GRIZZLY_BEARS),
+                cards::CardDefinition::from(LIGHTNING_BOLT),
+            ]),
+            P2,
+        ]);
         let top = game
             .player(p1)
             .cards(LIBRARY, GRIZZLY_BEARS)
