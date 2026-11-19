@@ -2,15 +2,16 @@ use bevy::prelude::Entity;
 
 use crate::testing;
 
-pub fn p(game: &testing::MockGame, seat: usize) -> Entity {
+pub fn p(game: &testing::MockGame, seat: usize) -> testing::TestPlayer {
+    let player_seat = testing::PlayerSeat(seat);
     let index = seat.saturating_sub(1);
     let player = game.players.get(index).copied();
     assert!(
         player.is_some(),
-        "MockGame: P{seat} does not exist; the game has {} players",
+        "MockGame: {player_seat} does not exist; the game has {} players",
         game.players.len()
     );
-    player.unwrap_or(Entity::PLACEHOLDER)
+    testing::TestPlayer::from_entity_and_seat(player.unwrap_or(Entity::PLACEHOLDER), player_seat)
 }
 
 #[cfg(test)]
@@ -23,6 +24,7 @@ mod tests {
     fn test_usage() {
         let (game, [p1, ..]) = MockGame::new([P1, P2]);
         assert_eq!(p(&game, 1), p1);
+        assert_eq!(*p(&game, 1).seat, 1);
     }
 
     #[test]

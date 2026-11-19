@@ -6,25 +6,22 @@ use crate::zones;
 
 pub struct PlayerView<'g> {
     game: &'g testing::MockGame,
-    player: Entity,
-    seat: usize,
+    player: testing::TestPlayer,
 }
 
 impl<'g> PlayerView<'g> {
-    pub(crate) fn from_game_and_player(game: &'g testing::MockGame, player: Entity) -> Self {
-        let seat = game
-            .players
-            .iter()
-            .position(|each| *each == player)
-            .map_or(0, |index| index.saturating_add(1));
-        Self { game, player, seat }
+    pub(crate) const fn from_game_and_player(
+        game: &'g testing::MockGame,
+        player: testing::TestPlayer,
+    ) -> Self {
+        Self { game, player }
     }
 }
 
 #[rustfmt::skip]
 impl PlayerView<'_> {
     #[must_use]
-    pub const fn id(&self) -> Entity { self.player }
+    pub const fn id(&self) -> Entity { self.player.entity }
 
     #[must_use]
     pub fn life(&self) -> i32 { self.game.life(self.player) }
@@ -38,8 +35,8 @@ impl PlayerView<'_> {
     pub fn cards(&self, zone: zones::Zone, card: testing::Card) -> testing::Cards {
         let entities = self
             .game
-            .entities_in_zone_matching_card(self.player, zone, card.name);
-        testing::Cards::from_matches(entities, card.name, zone, self.seat)
+            .entities_in_zone_matching_card(*self.player, zone, card.name);
+        testing::Cards::from_matches(entities, card.name, zone, *self.player.seat)
     }
 }
 

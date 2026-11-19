@@ -27,6 +27,14 @@ mod tests {
         let caster = world.spawn_empty().id();
         let spell = world.spawn_empty().id();
 
-        assert_eq!(from_cast(testing::TestPlayer(caster), spell).steps.len(), 1);
+        assert_eq!(
+            from_cast(
+                testing::TestPlayer::from_entity_and_seat(caster, testing::PlayerSeat(1)),
+                spell
+            )
+            .steps
+            .len(),
+            1
+        );
     }
 }

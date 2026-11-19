@@ -11,7 +11,7 @@ workspace = true
 [dependencies]
 atomic-delegate-macros.workspace = true
 bevy.workspace = true
-derive_more = { workspace = true, features = ["deref", "from"] }
+derive_more = { workspace = true, features = ["deref", "display", "from"] }
 thiserror.workspace = true
 
 [features]

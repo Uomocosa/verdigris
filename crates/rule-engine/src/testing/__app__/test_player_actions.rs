@@ -97,7 +97,7 @@ mod tests {
         let spell = world.spawn_empty().id();
         let target = world.spawn_empty().id();
 
-        let actions = testing::TestPlayer(caster)
+        let actions = testing::TestPlayer::from_entity_and_seat(caster, testing::PlayerSeat(1))
             .cast(spell)
             .targeting(target)
             .pass_to(turns::Step::PostcombatMain);
@@ -115,7 +115,11 @@ mod tests {
         );
 
         assert_eq!(
-            TestPlayerActions::of(testing::TestPlayer(caster)).steps,
+            TestPlayerActions::of(testing::TestPlayer::from_entity_and_seat(
+                caster,
+                testing::PlayerSeat(1)
+            ))
+            .steps,
             Vec::new()
         );
     }

@@ -33,7 +33,9 @@ impl MockGameBuilder {
     ) -> (testing::MockGame, [testing::TestPlayer; N]) {
         let (game, entities) = self.spawn_game(&Vec::from(players));
         let spawned = std::array::from_fn(|index| {
-            testing::TestPlayer(entities.get(index).copied().unwrap_or(Entity::PLACEHOLDER))
+            let seat = testing::PlayerSeat(index.saturating_add(1));
+            let entity = entities.get(index).copied().unwrap_or(Entity::PLACEHOLDER);
+            testing::TestPlayer::from_entity_and_seat(entity, seat)
         });
         (game, spawned)
     }

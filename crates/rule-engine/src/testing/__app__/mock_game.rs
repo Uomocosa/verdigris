@@ -28,7 +28,7 @@ impl MockGame {
     pub fn builder() -> testing::MockGameBuilder { testing::MockGameBuilder::default() }
 
     #[must_use]
-    pub fn player(&self, player: impl Into<Entity>) -> testing::PlayerView<'_> { testing::PlayerView::from_game_and_player(self, player.into()) }
+    pub const fn player(&self, player: testing::TestPlayer) -> testing::PlayerView<'_> { testing::PlayerView::from_game_and_player(self, player) }
 }
 
 impl MockGame {
@@ -66,7 +66,7 @@ impl MockGame {
 #[atomic_delegates]
 impl MockGame {
     #[must_use]
-    pub fn p(&self, seat: usize) -> Entity {}
+    pub fn p(&self, seat: usize) -> testing::TestPlayer {}
 
     #[must_use]
     pub fn zone_of(&self, card: Entity) -> zones::Zone {}
@@ -105,6 +105,8 @@ impl MockGame {
 
 #[cfg(test)]
 mod tests {
+    use bevy::prelude::Entity;
+
     use crate::actions;
     use crate::cards;
     use crate::mana;
@@ -168,8 +170,8 @@ mod tests {
             ]);
 
         assert_ne!(game.p(3), game.p(4));
-        assert!(game.app.world().get_entity(game.p(3)).is_ok());
-        assert!(game.app.world().get_entity(game.p(4)).is_ok());
+        assert!(game.app.world().get_entity(Entity::from(game.p(3))).is_ok());
+        assert!(game.app.world().get_entity(Entity::from(game.p(4))).is_ok());
         assert!(!game.player(p1).cards(HAND, LIGHTNING_BOLT).is_empty());
         assert!(!game.player(p2).cards(BATTLEFIELD, GRIZZLY_BEARS).is_empty());
         assert!(!game.player(p2).cards(LIBRARY, MURDER).is_empty());

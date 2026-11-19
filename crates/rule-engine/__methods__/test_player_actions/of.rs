@@ -20,6 +20,13 @@ mod tests {
         let mut world = World::new();
         let entity = world.spawn_empty().id();
 
-        assert_eq!(of(testing::TestPlayer(entity)).steps, Vec::new());
+        assert_eq!(
+            of(testing::TestPlayer::from_entity_and_seat(
+                entity,
+                testing::PlayerSeat(1)
+            ))
+            .steps,
+            Vec::new()
+        );
     }
 }

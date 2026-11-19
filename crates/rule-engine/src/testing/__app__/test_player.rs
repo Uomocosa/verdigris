@@ -5,11 +5,22 @@ use crate::testing;
 use crate::turns;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Deref)]
-pub struct TestPlayer(pub(crate) Entity);
+pub struct TestPlayer {
+    #[deref]
+    pub(crate) entity: Entity,
+    pub(crate) seat: testing::PlayerSeat,
+}
+
+impl TestPlayer {
+    #[must_use]
+    pub(crate) const fn from_entity_and_seat(entity: Entity, seat: testing::PlayerSeat) -> Self {
+        Self { entity, seat }
+    }
+}
 
 #[rustfmt::skip]
 impl From<TestPlayer> for Entity {
-    fn from(player: TestPlayer) -> Self { *player }
+    fn from(player: TestPlayer) -> Self { player.entity }
 }
 
 #[rustfmt::skip]
@@ -50,10 +61,11 @@ mod tests {
         let mut world = World::new();
         let entity = world.spawn_empty().id();
         let spell = world.spawn_empty().id();
-        let player = testing::TestPlayer(entity);
+        let player = testing::TestPlayer::from_entity_and_seat(entity, testing::PlayerSeat(1));
 
         assert_eq!(Entity::from(player), entity);
         assert_eq!(*player, entity);
+        assert_eq!(*player.seat, 1);
         assert_eq!(player.cast(spell).steps.len(), 1);
         assert_eq!(
             player.pass_to(turns::Step::PostcombatMain).steps,
