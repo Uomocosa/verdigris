@@ -69,6 +69,7 @@ fn target_is_legal(
     });
     match requirement.filter.kind {
         effects::FilterKind::AnyTarget => is_player || creature_matches_filter,
+        effects::FilterKind::Player => is_player,
         effects::FilterKind::Creature => creature_matches_filter,
         effects::FilterKind::Spell
         | effects::FilterKind::CreatureSpell

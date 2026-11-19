@@ -16,3 +16,15 @@ pub struct DamageDealt {
     pub target: Entity,
     pub amount: u32,
 }
+
+#[derive(Message, Debug, Clone, Copy, PartialEq, Eq)]
+pub struct LifeLost {
+    pub player: Entity,
+    pub amount: u32,
+}
+
+#[derive(Message, Debug, Clone, Copy, PartialEq, Eq)]
+pub struct DiscardRequested {
+    pub player: Entity,
+    pub count: u32,
+}

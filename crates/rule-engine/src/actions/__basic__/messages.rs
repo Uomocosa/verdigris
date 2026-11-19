@@ -14,5 +14,6 @@ pub enum Rejected {
     CannotCast { spell: Entity },
     CannotPay { spell: Entity },
     InvalidTargets { spell: Entity },
+    InvalidDiscard { player: Entity },
     NoPriority { player: Entity },
 }

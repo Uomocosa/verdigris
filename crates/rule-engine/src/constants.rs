@@ -41,6 +41,11 @@ pub const ANY_TARGET: effects::Filter = effects::Filter {
     controlled_by: None,
     excluded_color: None,
 };
+pub const PLAYER: effects::Filter = effects::Filter {
+    kind: effects::FilterKind::Player,
+    controlled_by: None,
+    excluded_color: None,
+};
 
 /// 115.5 A spell or ability on the stack is an illegal target for itself.
 ///

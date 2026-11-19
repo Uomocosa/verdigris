@@ -78,6 +78,8 @@ pub fn does_spell_match_filter(
         effects::FilterKind::CreatureSpell => is_creature,
         effects::FilterKind::NoncreatureSpell => !is_creature,
         effects::FilterKind::InstantSpell => is_instant,
-        effects::FilterKind::Creature | effects::FilterKind::AnyTarget => false,
+        effects::FilterKind::Creature
+        | effects::FilterKind::Player
+        | effects::FilterKind::AnyTarget => false,
     }
 }

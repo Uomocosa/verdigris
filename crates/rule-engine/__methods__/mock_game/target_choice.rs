@@ -2,14 +2,18 @@ use crate::actions;
 use crate::testing;
 
 pub fn target_choice(game: &testing::MockGame) -> Option<testing::ExpectedTargets> {
-    game.app
+    let pending = game
+        .app
         .world()
         .get_resource::<actions::PendingChoice>()?
-        .as_ref()
-        .map(|choice| testing::ExpectedTargets {
+        .as_ref()?;
+    match pending {
+        actions::Choice::Target(choice) => Some(testing::ExpectedTargets {
             count: choice.count,
             legal: choice.legal.clone(),
-        })
+        }),
+        actions::Choice::Discard(_) => None,
+    }
 }
 
 #[cfg(test)]

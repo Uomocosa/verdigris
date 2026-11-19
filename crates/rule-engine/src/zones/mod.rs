@@ -5,4 +5,4 @@ pub use basic::components::{
     AttemptedDrawFromEmptyLibrary, Damage, DealtByDeathtouch, InZone, Life, Lost, Owner, Player,
     Zone, ZoneContents,
 };
-pub use basic::messages::{DamageDealt, Destruction, DrawRequested};
+pub use basic::messages::{DamageDealt, Destruction, DiscardRequested, DrawRequested, LifeLost};

@@ -2,6 +2,7 @@ mod helpers;
 
 pub mod r117_3_priority;
 pub mod r117_4_priority;
+pub mod r119_3_life_loss;
 pub mod r120_3_damage_results;
 pub mod r121_1_draw;
 pub mod r500_2_step_ends;
@@ -16,6 +17,7 @@ pub mod r608_2b_illegal_targets;
 pub mod r608_2n_graveyard;
 pub mod r611_2a_continuous_effects;
 pub mod r701_6_counter;
+pub mod r701_9_discard;
 pub mod r702_12b_indestructible;
 pub mod r704_5a_zero_life;
 pub mod r704_5b_empty_library;

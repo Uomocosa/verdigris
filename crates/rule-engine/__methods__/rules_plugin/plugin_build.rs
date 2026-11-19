@@ -16,6 +16,8 @@ pub fn plugin_build(_rules_plugin: &RulesPlugin, app: &mut App) {
         .add_message::<zones::DamageDealt>()
         .add_message::<zones::Destruction>()
         .add_message::<zones::DrawRequested>()
+        .add_message::<zones::LifeLost>()
+        .add_message::<zones::DiscardRequested>()
         .add_message::<effects::PowerToughnessModified>()
         .add_message::<turns::StepStarted>()
         .add_message::<turns::AllPlayersPassed>();
@@ -56,6 +58,8 @@ pub fn plugin_build(_rules_plugin: &RulesPlugin, app: &mut App) {
             rules::r608_2_resolve::r608_2_resolve,
             rules::r611_2a_continuous_effects::r611_2a_continuous_effects,
             rules::r121_1_draw::r121_1_draw,
+            rules::r119_3_life_loss::r119_3_life_loss,
+            rules::r701_9_discard::r701_9_discard,
             rules::r701_6_counter::r701_6_counter,
             rules::r120_3_damage_results::r120_3_damage_results,
             rules::r608_2n_graveyard::r608_2n_graveyard,

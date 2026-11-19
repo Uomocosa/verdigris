@@ -1,4 +1,4 @@
-use bevy::prelude::{Entity, MessageReader, MessageWriter, Query};
+use bevy::prelude::{Entity, MessageReader, MessageWriter, ParamSet, Query};
 
 use crate::cards;
 use crate::effects;
@@ -9,12 +9,18 @@ use crate::zones;
 /// 608.2 If the object that's resolving is an instant spell, a sorcery spell, or an ability, its
 /// resolution may involve several steps. ... The steps described in rule 608.2n are followed
 /// last.
+///
+/// 608.2c The controller of the spell or ability follows its instructions in the order written.
 pub fn r608_2_resolve(
     mut resolutions: MessageReader<stack::Resolution>,
     mut damage_dealt: MessageWriter<zones::DamageDealt>,
     mut destructions: MessageWriter<zones::Destruction>,
     mut countered: MessageWriter<stack::Countered>,
     mut draws: MessageWriter<zones::DrawRequested>,
+    mut player_effects: ParamSet<(
+        MessageWriter<zones::LifeLost>,
+        MessageWriter<zones::DiscardRequested>,
+    )>,
     mut power_toughness_modified: MessageWriter<effects::PowerToughnessModified>,
     spells: Query<(
         &cards::CardDefinition,
@@ -22,7 +28,6 @@ pub fn r608_2_resolve(
         &zones::InZone,
         Option<&stack::ChosenTarget>,
     )>,
-    targets: Query<&zones::InZone>,
     lives: Query<&zones::Life>,
     zone_entities: Query<(Entity, &zones::Zone, Option<&zones::Owner>)>,
 ) {
@@ -38,58 +43,79 @@ pub fn r608_2_resolve(
             continue;
         };
         let chosen_target = chosen.map(|chosen| **chosen);
-        match effect.kind {
-            effects::EffectKind::Damage(amount) => {
-                if let Some(target) = chosen_target
-                    && (lives.get(target).is_ok() || targets.get(target).is_ok())
-                {
-                    damage_dealt.write(zones::DamageDealt {
-                        source: spell,
-                        target,
-                        amount,
+        let player_target = chosen_target.filter(|target| lives.get(*target).is_ok());
+        for kind in [Some(effect.kind), effect.then].into_iter().flatten() {
+            match kind {
+                effects::EffectKind::Damage(amount) => {
+                    if let Some(target) = chosen_target
+                        && (lives.get(target).is_ok() || spells.get(target).is_ok())
+                    {
+                        damage_dealt.write(zones::DamageDealt {
+                            source: spell,
+                            target,
+                            amount,
+                        });
+                    }
+                }
+                effects::EffectKind::Destroy => {
+                    if let Some(target) = chosen_target
+                        && let Ok((_, _, target_zone, _)) = spells.get(target)
+                        && helpers::is_card_in_zone(
+                            **target_zone,
+                            zones::Zone::Battlefield,
+                            &zone_entities,
+                        )
+                    {
+                        destructions.write(zones::Destruction(target));
+                    }
+                }
+                effects::EffectKind::Counter => {
+                    if let Some(target) = chosen_target
+                        && let Ok((_, _, target_zone, _)) = spells.get(target)
+                        && helpers::is_card_in_zone(
+                            **target_zone,
+                            zones::Zone::Stack,
+                            &zone_entities,
+                        )
+                    {
+                        countered.write(stack::Countered(target));
+                    }
+                }
+                effects::EffectKind::Draw(count) => {
+                    draws.write(zones::DrawRequested {
+                        player: player_target.unwrap_or(**owner),
+                        count,
                     });
                 }
-            }
-            effects::EffectKind::Destroy => {
-                if let Some(target) = chosen_target
-                    && let Ok(target_zone) = targets.get(target)
-                    && helpers::is_card_in_zone(
-                        **target_zone,
-                        zones::Zone::Battlefield,
-                        &zone_entities,
-                    )
-                {
-                    destructions.write(zones::Destruction(target));
+                effects::EffectKind::LoseLife(amount) => {
+                    if let Some(player) = player_target {
+                        player_effects
+                            .p0()
+                            .write(zones::LifeLost { player, amount });
+                    }
                 }
-            }
-            effects::EffectKind::Counter => {
-                if let Some(target) = chosen_target
-                    && let Ok(target_zone) = targets.get(target)
-                    && helpers::is_card_in_zone(**target_zone, zones::Zone::Stack, &zone_entities)
-                {
-                    countered.write(stack::Countered(target));
+                effects::EffectKind::Discard(count) => {
+                    if let Some(player) = player_target {
+                        player_effects
+                            .p1()
+                            .write(zones::DiscardRequested { player, count });
+                    }
                 }
-            }
-            effects::EffectKind::Draw(count) => {
-                draws.write(zones::DrawRequested {
-                    player: **owner,
-                    count,
-                });
-            }
-            effects::EffectKind::ModifyPowerToughness { power, toughness } => {
-                if let Some(target) = chosen_target
-                    && let Ok(target_zone) = targets.get(target)
-                    && helpers::is_card_in_zone(
-                        **target_zone,
-                        zones::Zone::Battlefield,
-                        &zone_entities,
-                    )
-                {
-                    power_toughness_modified.write(effects::PowerToughnessModified {
-                        target,
-                        power,
-                        toughness,
-                    });
+                effects::EffectKind::ModifyPowerToughness { power, toughness } => {
+                    if let Some(target) = chosen_target
+                        && let Ok((_, _, target_zone, _)) = spells.get(target)
+                        && helpers::is_card_in_zone(
+                            **target_zone,
+                            zones::Zone::Battlefield,
+                            &zone_entities,
+                        )
+                    {
+                        power_toughness_modified.write(effects::PowerToughnessModified {
+                            target,
+                            power,
+                            toughness,
+                        });
+                    }
                 }
             }
         }

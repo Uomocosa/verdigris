@@ -66,17 +66,18 @@ pub fn r601_2c_targets(
                     commands.entity(spell).remove::<stack::CastingStage>();
                     continue;
                 }
-                *pending = actions::PendingChoice(Some(actions::TargetChoice {
-                    spell,
-                    count: target.count,
-                    legal,
-                }));
+                *pending =
+                    actions::PendingChoice(Some(actions::Choice::Target(actions::TargetChoice {
+                        spell,
+                        count: target.count,
+                        legal,
+                    })));
                 commands
                     .entity(spell)
                     .insert(stack::CastingStage::AwaitingTargets);
             }
             actions::Action::ChooseTargets(targets) => {
-                let Some(choice) = (*pending).as_ref().cloned() else {
+                let Some(actions::Choice::Target(choice)) = (*pending).as_ref().cloned() else {
                     continue;
                 };
                 let chosen: BTreeSet<Entity> = targets.iter().copied().collect();
@@ -102,7 +103,7 @@ pub fn r601_2c_targets(
                 ));
                 *pending = actions::PendingChoice(None);
             }
-            actions::Action::PassPriority => {}
+            actions::Action::ChooseDiscard(_) | actions::Action::PassPriority => {}
         }
     }
 }
@@ -128,7 +129,10 @@ fn legal_targets(
             .collect()
     });
     let mut legal = BTreeSet::new();
-    if filter.kind == effects::FilterKind::AnyTarget {
+    if matches!(
+        filter.kind,
+        effects::FilterKind::AnyTarget | effects::FilterKind::Player
+    ) {
         legal.extend(all_players.iter().copied());
     }
     for (entity, definition, owner, in_zone) in cards.iter() {
@@ -152,6 +156,7 @@ fn legal_targets(
                 helpers::does_creature_match_filter(definition, filter)
                     && helpers::is_card_in_zone(**in_zone, zones::Zone::Battlefield, zone_entities)
             }
+            effects::FilterKind::Player => false,
         };
         if is_legal {
             legal.insert(entity);

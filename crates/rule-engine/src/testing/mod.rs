@@ -6,6 +6,6 @@ mod fixtures;
 pub use app::{MockGame, MockGameBuilder};
 pub use fixtures::{
     ExpectedTargets, Seat, cancel, darksteel_myr, dispel, divination, doom_blade, essence_scatter,
-    giant_growth, grizzly_bears, lightning_bolt, murder, negate, pick, typhoid_rats,
-    walking_corpse,
+    giant_growth, grizzly_bears, lightning_bolt, mind_rot, murder, negate, pick, sign_in_blood,
+    typhoid_rats, walking_corpse,
 };

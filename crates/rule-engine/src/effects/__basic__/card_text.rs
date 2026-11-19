@@ -4,6 +4,7 @@ use crate::effects;
 pub const fn damage(amount: u32) -> effects::Effect {
     effects::Effect {
         kind: effects::EffectKind::Damage(amount),
+        then: None,
         target: None,
     }
 }
@@ -12,6 +13,7 @@ pub const fn damage(amount: u32) -> effects::Effect {
 pub const fn destroy() -> effects::Effect {
     effects::Effect {
         kind: effects::EffectKind::Destroy,
+        then: None,
         target: None,
     }
 }
@@ -20,6 +22,7 @@ pub const fn destroy() -> effects::Effect {
 pub const fn counter() -> effects::Effect {
     effects::Effect {
         kind: effects::EffectKind::Counter,
+        then: None,
         target: None,
     }
 }
@@ -28,6 +31,25 @@ pub const fn counter() -> effects::Effect {
 pub const fn draw(count: u32) -> effects::Effect {
     effects::Effect {
         kind: effects::EffectKind::Draw(count),
+        then: None,
+        target: None,
+    }
+}
+
+#[must_use]
+pub const fn lose_life(amount: u32) -> effects::Effect {
+    effects::Effect {
+        kind: effects::EffectKind::LoseLife(amount),
+        then: None,
+        target: None,
+    }
+}
+
+#[must_use]
+pub const fn discard(count: u32) -> effects::Effect {
+    effects::Effect {
+        kind: effects::EffectKind::Discard(count),
+        then: None,
         target: None,
     }
 }
@@ -36,6 +58,7 @@ pub const fn draw(count: u32) -> effects::Effect {
 pub const fn gets(power: i32, toughness: i32) -> effects::Effect {
     effects::Effect {
         kind: effects::EffectKind::ModifyPowerToughness { power, toughness },
+        then: None,
         target: None,
     }
 }
