@@ -1,4 +1,4 @@
-use bevy::prelude::{Commands, Entity, MessageReader, Query};
+use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query};
 
 use crate::cards;
 use crate::effects;
@@ -12,12 +12,13 @@ use crate::zones;
 pub fn r608_2_resolve(
     mut resolutions: MessageReader<stack::Resolution>,
     mut commands: Commands,
+    mut destructions: MessageWriter<zones::Destruction>,
     spells: Query<(
         &cards::CardDefinition,
         &zones::InZone,
         Option<&stack::ChosenTarget>,
     )>,
-    targets: Query<(&zones::Owner, &zones::InZone, Option<&zones::Damage>)>,
+    targets: Query<(&zones::InZone, Option<&zones::Damage>)>,
     mut lives: Query<&mut zones::Life>,
     zone_entities: Query<(Entity, &zones::Zone, Option<&zones::Owner>)>,
 ) {
@@ -39,7 +40,7 @@ pub fn r608_2_resolve(
             effects::EffectKind::Damage(amount) => {
                 if let Ok(mut life) = lives.get_mut(target) {
                     *life = zones::Life((**life).saturating_sub(helpers::signed_damage(amount)));
-                } else if let Ok((_, _, damage)) = targets.get(target) {
+                } else if let Ok((_, damage)) = targets.get(target) {
                     let marked = damage.map_or(0, |damage| **damage);
                     commands
                         .entity(target)
@@ -47,19 +48,14 @@ pub fn r608_2_resolve(
                 }
             }
             effects::EffectKind::Destroy => {
-                if let Ok((target_owner, target_zone, _)) = targets.get(target)
+                if let Ok((target_zone, _)) = targets.get(target)
                     && helpers::is_card_in_zone(
                         **target_zone,
                         zones::Zone::Battlefield,
                         &zone_entities,
                     )
-                    && let Some(graveyard) = helpers::find_zone(
-                        zones::Zone::Graveyard,
-                        Some(**target_owner),
-                        &zone_entities,
-                    )
                 {
-                    commands.entity(target).insert(zones::InZone(graveyard));
+                    destructions.write(zones::Destruction(target));
                 }
             }
         }

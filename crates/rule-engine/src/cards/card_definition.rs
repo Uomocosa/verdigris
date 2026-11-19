@@ -11,6 +11,7 @@ pub struct CardDefinition {
     pub types: Vec<cards::CardType>,
     pub power_toughness: Option<cards::PowerToughness>,
     pub effect: Option<effects::Effect>,
+    pub keywords: Vec<cards::Keyword>,
 }
 
 #[atomic_delegates]
@@ -20,6 +21,14 @@ impl CardDefinition {
 
     #[must_use]
     pub fn colors(&self) -> Vec<cards::Color> {}
+}
+
+impl CardDefinition {
+    #[must_use]
+    pub fn keyword(mut self, keyword: cards::Keyword) -> Self {
+        self.keywords.push(keyword);
+        self
+    }
 }
 
 #[cfg(test)]
@@ -34,6 +43,9 @@ mod tests {
         let bears = cards::creature("Grizzly Bears", cost![1, G], pt!(2, 2));
         assert_eq!(bears.types, vec![cards::CardType::Creature]);
         assert_eq!(bears.colors(), vec![cards::Color::Green]);
+        let myr = cards::artifact_creature("Darksteel Myr", cost![3], pt!(0, 1))
+            .keyword(cards::indestructible());
+        assert_eq!(myr.keywords, vec![cards::Keyword::Indestructible]);
         let spell = cards::instant("Murder", cards::Cost::default()).spell(effects::destroy());
         assert_eq!(spell.effect, Some(effects::destroy()));
     }

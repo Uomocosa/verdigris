@@ -4,11 +4,13 @@ use crate::RulesPlugin;
 use crate::actions;
 use crate::rules;
 use crate::stack;
+use crate::zones;
 
 pub fn plugin_build(_rules_plugin: &RulesPlugin, app: &mut App) {
     app.add_message::<actions::PlayerAction>()
         .add_message::<actions::Rejected>()
-        .add_message::<stack::Resolution>();
+        .add_message::<stack::Resolution>()
+        .add_message::<zones::Destruction>();
     app.init_resource::<actions::PendingChoice>();
     app.configure_sets(
         Update,
@@ -44,6 +46,7 @@ pub fn plugin_build(_rules_plugin: &RulesPlugin, app: &mut App) {
         Update,
         (
             rules::r704_5g_lethal_damage::r704_5g_lethal_damage,
+            rules::r702_12b_indestructible::r702_12b_indestructible,
             rules::r704_5a_zero_life::r704_5a_zero_life,
         )
             .chain()

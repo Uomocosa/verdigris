@@ -1,3 +1,4 @@
+mod darksteel_myr;
 mod doom_blade;
 mod expected_targets;
 mod grizzly_bears;
@@ -7,6 +8,7 @@ mod pick;
 mod seat;
 mod walking_corpse;
 
+pub use darksteel_myr::darksteel_myr;
 pub use doom_blade::doom_blade;
 pub use expected_targets::ExpectedTargets;
 pub use grizzly_bears::grizzly_bears;

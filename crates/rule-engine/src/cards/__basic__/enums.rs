@@ -19,6 +19,11 @@ pub enum Color {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum Keyword {
+    Indestructible,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum ManaSymbol {
     White,
     Blue,
