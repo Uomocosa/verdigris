@@ -17,18 +17,23 @@ pub struct CardDefinition {
 impl CardDefinition {
     #[must_use]
     pub fn spell(self, effect: effects::Effect) -> Self {}
+
+    #[must_use]
+    pub fn colors(&self) -> Vec<cards::Color> {}
 }
 
 #[cfg(test)]
 mod tests {
     use crate::cards;
+    use crate::cost;
     use crate::effects;
     use crate::pt;
 
     #[test]
     fn test_usage() {
-        let bears = cards::creature("Grizzly Bears", cards::Cost::default(), pt!(2, 2));
+        let bears = cards::creature("Grizzly Bears", cost![1, G], pt!(2, 2));
         assert_eq!(bears.types, vec![cards::CardType::Creature]);
+        assert_eq!(bears.colors(), vec![cards::Color::Green]);
         let spell = cards::instant("Murder", cards::Cost::default()).spell(effects::destroy());
         assert_eq!(spell.effect, Some(effects::destroy()));
     }

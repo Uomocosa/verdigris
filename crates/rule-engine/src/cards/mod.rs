@@ -2,7 +2,7 @@
 mod basic;
 
 pub use basic::card_text::{creature, instant};
-pub use basic::enums::{CardType, ManaSymbol};
+pub use basic::enums::{CardType, Color, ManaSymbol};
 pub use basic::newtypes::CardName;
 pub use basic::structs::PowerToughness;
 

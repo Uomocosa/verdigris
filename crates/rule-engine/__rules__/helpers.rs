@@ -1,5 +1,7 @@
 use bevy::prelude::{Entity, Query};
 
+use crate::cards;
+use crate::effects;
 use crate::zones;
 
 pub fn find_zone(
@@ -35,4 +37,16 @@ pub fn is_card_in_zone(
 #[must_use]
 pub fn signed_damage(amount: u32) -> i32 {
     i32::try_from(amount).unwrap_or(i32::MAX)
+}
+
+#[must_use]
+pub fn does_creature_match_filter(
+    definition: &cards::CardDefinition,
+    filter: effects::Filter,
+) -> bool {
+    let is_creature = definition.types.contains(&cards::CardType::Creature);
+    let has_excluded_color = filter
+        .excluded_color
+        .is_some_and(|excluded| definition.colors().contains(&excluded));
+    is_creature && !has_excluded_color
 }

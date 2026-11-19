@@ -4,4 +4,6 @@ mod app;
 mod fixtures;
 
 pub use app::{MockGame, MockGameBuilder};
-pub use fixtures::{ExpectedTargets, Seat, grizzly_bears, lightning_bolt, murder, pick};
+pub use fixtures::{
+    ExpectedTargets, Seat, doom_blade, grizzly_bears, lightning_bolt, murder, pick, walking_corpse,
+};

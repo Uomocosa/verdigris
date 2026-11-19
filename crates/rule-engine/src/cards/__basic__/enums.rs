@@ -10,6 +10,15 @@ pub enum CardType {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum Color {
+    White,
+    Blue,
+    Black,
+    Red,
+    Green,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum ManaSymbol {
     White,
     Blue,

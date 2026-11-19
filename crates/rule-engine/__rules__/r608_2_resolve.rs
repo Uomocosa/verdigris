@@ -143,4 +143,26 @@ mod tests {
         cast_and_resolve(&mut game, "Murder", Some(bears));
         assert_eq!(game.zone_of(bears), zones::Zone::Graveyard);
     }
+
+    #[test]
+    fn doom_blade_destroys_a_green_creature() {
+        let mut game = testing::MockGame::builder()
+            .hand(testing::Seat::P1, [testing::doom_blade()])
+            .battlefield(testing::Seat::P2, [testing::grizzly_bears()])
+            .mana_pool(testing::Seat::P1, mana![1, B])
+            .build();
+        let bears = game
+            .find(game.p2, zones::Zone::Battlefield, "Grizzly Bears")
+            .unwrap();
+        cast_and_resolve(&mut game, "Doom Blade", Some(bears));
+        assert_eq!(game.zone_of(bears), zones::Zone::Graveyard);
+        assert!(
+            game.find(game.p2, zones::Zone::Graveyard, "Grizzly Bears")
+                .is_some()
+        );
+        let blade = game
+            .find(game.p1, zones::Zone::Graveyard, "Doom Blade")
+            .unwrap();
+        assert_eq!(game.zone_of(blade), zones::Zone::Graveyard);
+    }
 }

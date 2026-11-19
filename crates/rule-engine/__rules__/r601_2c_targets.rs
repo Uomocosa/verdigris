@@ -125,7 +125,7 @@ fn legal_targets(
         legal.extend(all_players.iter().copied());
     }
     for (entity, definition, owner, in_zone) in cards.iter() {
-        if !definition.types.contains(&cards::CardType::Creature) {
+        if !helpers::does_creature_match_filter(definition, filter) {
             continue;
         }
         if !helpers::is_card_in_zone(**in_zone, zones::Zone::Battlefield, zone_entities) {
@@ -200,6 +200,62 @@ mod tests {
             Some(&actions::Rejected::NoLegalTargets { spell: murder })
         );
         assert_eq!(game.zone_of(murder), zones::Zone::Hand);
+    }
+
+    #[test]
+    fn doom_blade_lists_only_nonblack_creatures() {
+        let mut game = testing::MockGame::builder()
+            .hand(testing::Seat::P1, [testing::doom_blade()])
+            .battlefield(
+                testing::Seat::P2,
+                [testing::grizzly_bears(), testing::walking_corpse()],
+            )
+            .mana_pool(testing::Seat::P1, mana![1, B])
+            .build();
+        let blade = game.find(game.p1, zones::Zone::Hand, "Doom Blade").unwrap();
+        let bears = game
+            .find(game.p2, zones::Zone::Battlefield, "Grizzly Bears")
+            .unwrap();
+        game.act(game.p1, actions::Action::Cast(blade));
+        assert_eq!(game.target_choice(), Some(testing::pick(1).from([bears])));
+    }
+
+    #[test]
+    fn doom_blade_rejects_a_black_creature_as_target() {
+        let mut game = testing::MockGame::builder()
+            .hand(testing::Seat::P1, [testing::doom_blade()])
+            .battlefield(
+                testing::Seat::P2,
+                [testing::grizzly_bears(), testing::walking_corpse()],
+            )
+            .mana_pool(testing::Seat::P1, mana![1, B])
+            .build();
+        let blade = game.find(game.p1, zones::Zone::Hand, "Doom Blade").unwrap();
+        let corpse = game
+            .find(game.p2, zones::Zone::Battlefield, "Walking Corpse")
+            .unwrap();
+        game.act(game.p1, actions::Action::Cast(blade));
+        game.act(game.p1, actions::Action::ChooseTargets(vec![corpse]));
+        assert_eq!(
+            game.last_rejection(),
+            Some(&actions::Rejected::InvalidTargets { spell: blade })
+        );
+    }
+
+    #[test]
+    fn doom_blade_cannot_be_cast_with_only_black_creatures() {
+        let mut game = testing::MockGame::builder()
+            .hand(testing::Seat::P1, [testing::doom_blade()])
+            .battlefield(testing::Seat::P2, [testing::walking_corpse()])
+            .mana_pool(testing::Seat::P1, mana![1, B])
+            .build();
+        let blade = game.find(game.p1, zones::Zone::Hand, "Doom Blade").unwrap();
+        game.act(game.p1, actions::Action::Cast(blade));
+        assert_eq!(
+            game.last_rejection(),
+            Some(&actions::Rejected::NoLegalTargets { spell: blade })
+        );
+        assert_eq!(game.zone_of(blade), zones::Zone::Hand);
     }
 
     #[test]
