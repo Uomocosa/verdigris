@@ -51,8 +51,12 @@ mod tests {
             P1.hand([lightning_bolt()]).mana_pool(mana![R]),
             P2.battlefield([grizzly_bears()]),
         ]);
-        let bolt = game.find(p1, HAND, "Lightning Bolt").unwrap();
-        let bears = game.find(p2, BATTLEFIELD, "Grizzly Bears").unwrap();
+        let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
+        let bears = game
+            .player(p2)
+            .cards(BATTLEFIELD, GRIZZLY_BEARS)
+            .only()
+            .unwrap();
         game.act(p1, actions::Action::Cast(bolt));
         game.act(p1, actions::Action::ChooseTargets(vec![bears]));
         game.pass_priority_all();

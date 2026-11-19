@@ -49,8 +49,12 @@ mod tests {
             P1.hand([murder()]).mana_pool(mana![1, B, B]),
             P2.battlefield([darksteel_myr()]),
         ]);
-        let murder = game.find(p1, HAND, "Murder").unwrap();
-        let myr = game.find(p2, BATTLEFIELD, "Darksteel Myr").unwrap();
+        let murder = game.player(p1).cards(HAND, MURDER).only().unwrap();
+        let myr = game
+            .player(p2)
+            .cards(BATTLEFIELD, DARKSTEEL_MYR)
+            .only()
+            .unwrap();
         game.act(p1, actions::Action::Cast(murder));
         game.act(p1, actions::Action::ChooseTargets(vec![myr]));
         game.pass_priority_all();
@@ -63,14 +67,18 @@ mod tests {
             P1.hand([murder()]).mana_pool(mana![1, B, B]),
             P2.battlefield([darksteel_myr()]),
         ]);
-        let murder = game.find(p1, HAND, "Murder").unwrap();
-        let myr = game.find(p2, BATTLEFIELD, "Darksteel Myr").unwrap();
+        let murder = game.player(p1).cards(HAND, MURDER).only().unwrap();
+        let myr = game
+            .player(p2)
+            .cards(BATTLEFIELD, DARKSTEEL_MYR)
+            .only()
+            .unwrap();
         game.act(p1, actions::Action::Cast(murder));
         game.act(p1, actions::Action::ChooseTargets(vec![myr]));
         game.pass_priority_all();
         assert_eq!(game.zone_of(myr), BATTLEFIELD);
         assert_eq!(game.zone_of(murder), GRAVEYARD);
-        assert!(game.find(p2, BATTLEFIELD, "Darksteel Myr").is_some());
+        assert!(!game.player(p2).cards(BATTLEFIELD, DARKSTEEL_MYR).is_empty());
     }
 
     #[test]
@@ -79,8 +87,12 @@ mod tests {
             P1.hand([lightning_bolt()]).mana_pool(mana![R]),
             P2.battlefield([darksteel_myr()]),
         ]);
-        let bolt = game.find(p1, HAND, "Lightning Bolt").unwrap();
-        let myr = game.find(p2, BATTLEFIELD, "Darksteel Myr").unwrap();
+        let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
+        let myr = game
+            .player(p2)
+            .cards(BATTLEFIELD, DARKSTEEL_MYR)
+            .only()
+            .unwrap();
         game.act(p1, actions::Action::Cast(bolt));
         game.act(p1, actions::Action::ChooseTargets(vec![myr]));
         game.pass_priority_all();
@@ -95,8 +107,12 @@ mod tests {
             P1.hand([doom_blade()]).mana_pool(mana![1, B]),
             P2.battlefield([darksteel_myr()]),
         ]);
-        let blade = game.find(p1, HAND, "Doom Blade").unwrap();
-        let myr = game.find(p2, BATTLEFIELD, "Darksteel Myr").unwrap();
+        let blade = game.player(p1).cards(HAND, DOOM_BLADE).only().unwrap();
+        let myr = game
+            .player(p2)
+            .cards(BATTLEFIELD, DARKSTEEL_MYR)
+            .only()
+            .unwrap();
         game.act(p1, actions::Action::Cast(blade));
         game.act(p1, actions::Action::ChooseTargets(vec![myr]));
         game.pass_priority_all();

@@ -33,7 +33,7 @@ mod tests {
             P1.hand([divination()]).library([]).mana_pool(mana![2, U]),
             P2,
         ]);
-        let divination = game.find(p1, HAND, "Divination").unwrap();
+        let divination = game.player(p1).cards(HAND, DIVINATION).only().unwrap();
         game.act(p1, actions::Action::Cast(divination));
         game.pass_priority_all();
         assert!(game.app.world().get::<players::Lost>(p1).is_some());
@@ -45,7 +45,7 @@ mod tests {
             P1.hand([divination()]).library([]).mana_pool(mana![2, U]),
             P2,
         ]);
-        let divination = game.find(p1, HAND, "Divination").unwrap();
+        let divination = game.player(p1).cards(HAND, DIVINATION).only().unwrap();
         game.act(p1, actions::Action::Cast(divination));
         assert!(game.app.world().get::<players::Lost>(p1).is_none());
         game.pass_priority_all();

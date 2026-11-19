@@ -48,8 +48,8 @@ mod tests {
             P1.battlefield([typhoid_rats()]),
             P2.battlefield([grizzly_bears()]),
         ]);
-        assert!(game.find(p1, BATTLEFIELD, "Typhoid Rats").is_some());
-        assert!(game.find(p2, BATTLEFIELD, "Grizzly Bears").is_some());
+        assert!(!game.player(p1).cards(BATTLEFIELD, TYPHOID_RATS).is_empty());
+        assert!(!game.player(p2).cards(BATTLEFIELD, GRIZZLY_BEARS).is_empty());
     }
 
     #[test]
@@ -59,8 +59,8 @@ mod tests {
             P1.battlefield([typhoid_rats()]),
             P2.battlefield([grizzly_bears()]),
         ]);
-        assert!(game.find(p1, BATTLEFIELD, "Typhoid Rats").is_some());
-        assert!(game.find(p2, BATTLEFIELD, "Grizzly Bears").is_some());
+        assert!(!game.player(p1).cards(BATTLEFIELD, TYPHOID_RATS).is_empty());
+        assert!(!game.player(p2).cards(BATTLEFIELD, GRIZZLY_BEARS).is_empty());
     }
 
     #[test]
@@ -70,7 +70,7 @@ mod tests {
             P1.battlefield([typhoid_rats()]),
             P2.battlefield([darksteel_myr()]),
         ]);
-        assert!(game.find(p2, BATTLEFIELD, "Darksteel Myr").is_some());
+        assert!(!game.player(p2).cards(BATTLEFIELD, DARKSTEEL_MYR).is_empty());
     }
 
     #[test]
@@ -80,6 +80,6 @@ mod tests {
             P1.battlefield([walking_corpse()]),
             P2.battlefield([grizzly_bears()]),
         ]);
-        assert!(game.find(p2, BATTLEFIELD, "Grizzly Bears").is_some());
+        assert!(!game.player(p2).cards(BATTLEFIELD, GRIZZLY_BEARS).is_empty());
     }
 }

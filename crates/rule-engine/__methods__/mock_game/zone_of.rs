@@ -20,7 +20,11 @@ mod tests {
     #[test]
     fn test_usage() {
         let (game, [_, p2, ..]) = MockGame::new([P1, P2.battlefield([grizzly_bears()])]);
-        let bears = game.find(p2, BATTLEFIELD, "Grizzly Bears").unwrap();
+        let bears = game
+            .player(p2)
+            .cards(BATTLEFIELD, GRIZZLY_BEARS)
+            .only()
+            .unwrap();
         assert_eq!(zone_of(&game, bears), BATTLEFIELD);
     }
 }
