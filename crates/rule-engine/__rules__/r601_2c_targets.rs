@@ -179,7 +179,7 @@ mod tests {
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
         let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
-        game.act(p1, actions::Action::Cast(bolt));
+        game.play([p1.cast(bolt)]).unwrap();
         assert!(game.target_choice().is_some());
     }
 
@@ -195,7 +195,7 @@ mod tests {
             .cards(BATTLEFIELD, GRIZZLY_BEARS)
             .only()
             .unwrap();
-        game.act(p1, actions::Action::Cast(bolt));
+        game.play([p1.cast(bolt)]).unwrap();
         assert_eq!(game.target_choice(), Some(pick(1).from([bears, *p1, *p2])));
     }
 
@@ -203,9 +203,9 @@ mod tests {
     fn test_spell_with_no_legal_target_cannot_be_cast() {
         let (mut game, [p1, ..]) = MockGame::new([P1.hand([MURDER]).mana_pool(mana![1, B, B]), P2]);
         let murder = game.player(p1).cards(HAND, MURDER).only().unwrap();
-        game.act(p1, actions::Action::Cast(murder));
+        let err = game.play([p1.cast(murder)]).unwrap_err();
         assert_eq!(
-            game.last_rejection(),
+            err.rejection(),
             Some(&actions::Rejected::NoLegalTargets { spell: murder })
         );
         assert_eq!(game.zone_of(murder), HAND);
@@ -223,7 +223,7 @@ mod tests {
             .cards(BATTLEFIELD, GRIZZLY_BEARS)
             .only()
             .unwrap();
-        game.act(p1, actions::Action::Cast(blade));
+        game.play([p1.cast(blade)]).unwrap();
         assert_eq!(game.target_choice(), Some(pick(1).from([bears])));
     }
 
@@ -239,10 +239,9 @@ mod tests {
             .cards(BATTLEFIELD, WALKING_CORPSE)
             .only()
             .unwrap();
-        game.act(p1, actions::Action::Cast(blade));
-        game.act(p1, actions::Action::ChooseTargets(vec![corpse]));
+        let err = game.play([p1.cast(blade).targeting(corpse)]).unwrap_err();
         assert_eq!(
-            game.last_rejection(),
+            err.rejection(),
             Some(&actions::Rejected::InvalidTargets { spell: blade })
         );
     }
@@ -254,9 +253,9 @@ mod tests {
             P2.battlefield([WALKING_CORPSE]),
         ]);
         let blade = game.player(p1).cards(HAND, DOOM_BLADE).only().unwrap();
-        game.act(p1, actions::Action::Cast(blade));
+        let err = game.play([p1.cast(blade)]).unwrap_err();
         assert_eq!(
-            game.last_rejection(),
+            err.rejection(),
             Some(&actions::Rejected::NoLegalTargets { spell: blade })
         );
         assert_eq!(game.zone_of(blade), HAND);
@@ -277,9 +276,8 @@ mod tests {
             .only()
             .unwrap();
 
-        game.act(p1, actions::Action::Cast(bolt));
-        game.act(p1, actions::Action::ChooseTargets(vec![*p2]));
-        game.act(p1, actions::Action::Cast(cancel));
+        game.play([p1.cast(bolt).targeting(p2), p1.cast(cancel)])
+            .unwrap();
 
         assert_eq!(game.target_choice(), Some(pick(1).from([bolt])));
 
@@ -299,13 +297,15 @@ mod tests {
         let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
         let scatter = game.player(p2).cards(HAND, ESSENCE_SCATTER).only().unwrap();
 
-        game.act(p1, actions::Action::Cast(bolt));
-        game.act(p1, actions::Action::ChooseTargets(vec![*p2]));
-        game.pass_priority();
-        game.act(p2, actions::Action::Cast(scatter));
+        let err = game
+            .play([
+                p1.cast(bolt).targeting(p2).pass_priority(),
+                p2.cast(scatter),
+            ])
+            .unwrap_err();
 
         assert_eq!(
-            game.last_rejection(),
+            err.rejection(),
             Some(&actions::Rejected::NoLegalTargets { spell: scatter })
         );
         assert_eq!(game.zone_of(scatter), HAND);
@@ -321,12 +321,12 @@ mod tests {
         let bears = game.player(p1).cards(HAND, GRIZZLY_BEARS).only().unwrap();
         let negate = game.player(p2).cards(HAND, NEGATE).only().unwrap();
 
-        game.act(p1, actions::Action::Cast(bears));
-        game.pass_priority();
-        game.act(p2, actions::Action::Cast(negate));
+        let err = game
+            .play([p1.cast(bears).pass_priority(), p2.cast(negate)])
+            .unwrap_err();
 
         assert_eq!(
-            game.last_rejection(),
+            err.rejection(),
             Some(&actions::Rejected::NoLegalTargets { spell: negate })
         );
         assert_eq!(game.zone_of(negate), HAND);
@@ -342,12 +342,12 @@ mod tests {
         let divination = game.player(p1).cards(HAND, DIVINATION).only().unwrap();
         let dispel = game.player(p2).cards(HAND, DISPEL).only().unwrap();
 
-        game.act(p1, actions::Action::Cast(divination));
-        game.pass_priority();
-        game.act(p2, actions::Action::Cast(dispel));
+        let err = game
+            .play([p1.cast(divination).pass_priority(), p2.cast(dispel)])
+            .unwrap_err();
 
         assert_eq!(
-            game.last_rejection(),
+            err.rejection(),
             Some(&actions::Rejected::NoLegalTargets { spell: dispel })
         );
         assert_eq!(game.zone_of(dispel), HAND);
@@ -359,7 +359,7 @@ mod tests {
         let (mut game, [p1, p2, p3, p4]) =
             MockGame::new([P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]), P2, P3, P4]);
         let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
-        game.act(p1, actions::Action::Cast(bolt));
+        game.play([p1.cast(bolt)]).unwrap();
         assert_eq!(
             game.target_choice(),
             Some(pick(1).from([*p1, *p2, *p3, *p4]))

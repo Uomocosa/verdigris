@@ -85,7 +85,6 @@ fn target_is_legal(
 
 #[cfg(test)]
 mod tests {
-    use crate::actions;
     use crate::cards;
     use crate::mana;
     use crate::testing::*;
@@ -96,9 +95,11 @@ mod tests {
         let (mut game, [p1, p2]) =
             MockGame::new([P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]), P2]);
         let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
-        game.act(p1, actions::Action::Cast(bolt));
-        game.act(p1, actions::Action::ChooseTargets(vec![*p2]));
-        game.pass_priority_all();
+        game.play([
+            p1.cast(bolt).targeting(p2).pass_priority(),
+            p2.pass_priority(),
+        ])
+        .unwrap();
         assert_eq!(game.zone_of(bolt), GRAVEYARD);
     }
 
@@ -117,16 +118,16 @@ mod tests {
             .only()
             .unwrap();
 
-        game.act(p1, actions::Action::Cast(bolt));
-        game.act(p1, actions::Action::ChooseTargets(vec![bears]));
-        game.act(p1, actions::Action::Cast(murder));
-        game.act(p1, actions::Action::ChooseTargets(vec![bears]));
-
-        game.pass_priority_all();
+        game.play([
+            p1.cast(bolt).targeting(bears),
+            p1.cast(murder).targeting(bears).pass_priority(),
+            p2.pass_priority(),
+        ])
+        .unwrap();
         assert_eq!(game.zone_of(bears), GRAVEYARD);
         assert_eq!(game.zone_of(murder), GRAVEYARD);
 
-        game.pass_priority_all();
+        game.play([p1.pass_priority(), p2.pass_priority()]).unwrap();
         assert_eq!(game.zone_of(bolt), GRAVEYARD);
         assert_eq!(game.life(p2), 20);
     }
@@ -144,8 +145,7 @@ mod tests {
             .only()
             .unwrap();
 
-        game.act(p1, actions::Action::Cast(blade));
-        game.act(p1, actions::Action::ChooseTargets(vec![bears]));
+        game.play([p1.cast(blade).targeting(bears)]).unwrap();
 
         let mut definition = game
             .app
@@ -156,7 +156,7 @@ mod tests {
         definition.cost.black = definition.cost.black.saturating_add(1);
         game.app.world_mut().entity_mut(bears).insert(definition);
 
-        game.pass_priority_all();
+        game.play([p1.pass_priority(), p2.pass_priority()]).unwrap();
         assert_eq!(game.zone_of(bears), BATTLEFIELD);
         assert_eq!(game.zone_of(blade), GRAVEYARD);
     }

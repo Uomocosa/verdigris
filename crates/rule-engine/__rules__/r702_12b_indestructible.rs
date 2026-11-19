@@ -37,7 +37,6 @@ pub fn r702_12b_indestructible(
 
 #[cfg(test)]
 mod tests {
-    use crate::actions;
     use crate::damage;
     use crate::mana;
     use crate::testing::*;
@@ -55,9 +54,11 @@ mod tests {
             .cards(BATTLEFIELD, DARKSTEEL_MYR)
             .only()
             .unwrap();
-        game.act(p1, actions::Action::Cast(murder));
-        game.act(p1, actions::Action::ChooseTargets(vec![myr]));
-        game.pass_priority_all();
+        game.play([
+            p1.cast(murder).targeting(myr).pass_priority(),
+            p2.pass_priority(),
+        ])
+        .unwrap();
         assert_eq!(game.zone_of(myr), BATTLEFIELD);
     }
 
@@ -73,9 +74,11 @@ mod tests {
             .cards(BATTLEFIELD, DARKSTEEL_MYR)
             .only()
             .unwrap();
-        game.act(p1, actions::Action::Cast(murder));
-        game.act(p1, actions::Action::ChooseTargets(vec![myr]));
-        game.pass_priority_all();
+        game.play([
+            p1.cast(murder).targeting(myr).pass_priority(),
+            p2.pass_priority(),
+        ])
+        .unwrap();
         assert_eq!(game.zone_of(myr), BATTLEFIELD);
         assert_eq!(game.zone_of(murder), GRAVEYARD);
         assert!(!game.player(p2).cards(BATTLEFIELD, DARKSTEEL_MYR).is_empty());
@@ -93,9 +96,11 @@ mod tests {
             .cards(BATTLEFIELD, DARKSTEEL_MYR)
             .only()
             .unwrap();
-        game.act(p1, actions::Action::Cast(bolt));
-        game.act(p1, actions::Action::ChooseTargets(vec![myr]));
-        game.pass_priority_all();
+        game.play([
+            p1.cast(bolt).targeting(myr).pass_priority(),
+            p2.pass_priority(),
+        ])
+        .unwrap();
         assert_eq!(game.zone_of(myr), BATTLEFIELD);
         let damage = game.app.world().get::<damage::Damage>(myr).unwrap();
         assert_eq!(**damage, 3);
@@ -113,9 +118,11 @@ mod tests {
             .cards(BATTLEFIELD, DARKSTEEL_MYR)
             .only()
             .unwrap();
-        game.act(p1, actions::Action::Cast(blade));
-        game.act(p1, actions::Action::ChooseTargets(vec![myr]));
-        game.pass_priority_all();
+        game.play([
+            p1.cast(blade).targeting(myr).pass_priority(),
+            p2.pass_priority(),
+        ])
+        .unwrap();
         assert_eq!(game.zone_of(myr), BATTLEFIELD);
         assert_eq!(game.zone_of(blade), GRAVEYARD);
     }
