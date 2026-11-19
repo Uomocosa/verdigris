@@ -37,28 +37,6 @@ impl CardsInZone {
 }
 
 impl CardsInZone {
-    pub fn only(
-        &self,
-        card: impl Into<testing::CardQuery>,
-    ) -> Result<testing::TestCard, testing::CardsError> {
-        let card = card.into();
-        let matching = self.matching_cards(card);
-        match matching.as_slice() {
-            [found] => Ok(*found),
-            [] => Err(testing::CardsError::Missing {
-                player: self.player.seat,
-                card: card.label(),
-                zone: self.zone,
-            }),
-            _ => Err(testing::CardsError::NotOne {
-                player: self.player.seat,
-                card: card.label(),
-                zone: self.zone,
-                count: matching.len(),
-            }),
-        }
-    }
-
     #[must_use]
     pub fn matching(&self, card: impl Into<testing::CardQuery>) -> testing::Cards {
         let card = card.into();
@@ -94,19 +72,20 @@ mod tests {
         assert!(cards.has_no(MURDER));
         assert_eq!(cards.matching(LIGHTNING_BOLT).len(), 2);
         assert!(cards.matching(MURDER).is_empty());
-        assert!(cards.only(LIGHTNING_BOLT).is_err());
+        assert!(cards.matching(LIGHTNING_BOLT).expect_n::<1>().is_err());
     }
 
     #[test]
-    fn only_returns_the_single_matching_card() {
+    fn expect_n_returns_the_single_matching_card() {
         let (game, [p1, ..]) = MockGame::new([P1.hand([LIGHTNING_BOLT]), P2]);
         let cards = game.player(p1).cards_in(HAND);
-        let found = cards
-            .only(LIGHTNING_BOLT)
+        let [found] = cards
+            .matching(LIGHTNING_BOLT)
+            .expect_n::<1>()
             .expect("P1 holds one Lightning Bolt");
 
         assert!(cards.has(found));
-        assert_eq!(cards.only(found), Ok(found));
+        assert_eq!(cards.matching(found).expect_n::<1>(), Ok([found]));
     }
 
     #[test]
@@ -118,11 +97,13 @@ mod tests {
         assert_eq!(cards.len(), 0);
         assert!(cards.has_no(GRIZZLY_BEARS));
         assert_eq!(
-            cards.only(GRIZZLY_BEARS),
-            Err(CardsError::Missing {
+            cards.matching(GRIZZLY_BEARS).expect_n::<1>(),
+            Err(CardsError::WrongCount {
                 player: PlayerSeat(1),
                 card: "Grizzly Bears".to_string(),
                 zone: BATTLEFIELD,
+                count: 0,
+                expected: 1,
             })
         );
     }

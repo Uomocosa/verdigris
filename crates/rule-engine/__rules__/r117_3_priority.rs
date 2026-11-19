@@ -85,7 +85,12 @@ mod tests {
     fn the_caster_keeps_priority_after_casting_a_spell() {
         let (mut game, [p1, p2]) =
             MockGame::new([P1, P2.hand([LIGHTNING_BOLT]).mana_pool(mana![R])]);
-        let bolt = game.player(p2).cards_in(HAND).only(LIGHTNING_BOLT).unwrap();
+        let [bolt] = game
+            .player(p2)
+            .cards_in(HAND)
+            .matching(LIGHTNING_BOLT)
+            .expect_n::<1>()
+            .unwrap();
 
         game.play([p1.pass_priority(), p2.cast(bolt)]).unwrap();
 

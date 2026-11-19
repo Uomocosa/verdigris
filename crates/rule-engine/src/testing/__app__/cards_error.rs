@@ -9,13 +9,6 @@ pub enum CardsError {
         card: String,
         zone: zones::Zone,
     },
-    #[error("{player} has {count} {card} in {zone:?}, expected exactly one")]
-    NotOne {
-        player: testing::PlayerSeat,
-        card: String,
-        zone: zones::Zone,
-        count: usize,
-    },
     #[error("{player} has {count} {card} in {zone:?}, expected exactly {expected}")]
     WrongCount {
         player: testing::PlayerSeat,

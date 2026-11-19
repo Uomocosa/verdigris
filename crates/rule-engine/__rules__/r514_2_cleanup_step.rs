@@ -44,12 +44,23 @@ mod tests {
                 .battlefield([GRIZZLY_BEARS])
                 .mana_pool(mana![G]),
         ]);
-        let bolt = game.player(p1).cards_in(HAND).only(LIGHTNING_BOLT).unwrap();
-        let growth = game.player(p2).cards_in(HAND).only(GIANT_GROWTH).unwrap();
-        let bears = game
+        let [bolt] = game
+            .player(p1)
+            .cards_in(HAND)
+            .matching(LIGHTNING_BOLT)
+            .expect_n::<1>()
+            .unwrap();
+        let [growth] = game
+            .player(p2)
+            .cards_in(HAND)
+            .matching(GIANT_GROWTH)
+            .expect_n::<1>()
+            .unwrap();
+        let [bears] = game
             .player(p2)
             .cards_in(BATTLEFIELD)
-            .only(GRIZZLY_BEARS)
+            .matching(GRIZZLY_BEARS)
+            .expect_n::<1>()
             .unwrap();
 
         game.play([
@@ -86,12 +97,23 @@ mod tests {
                 .mana_pool(mana![G, R]),
             P2,
         ]);
-        let growth = game.player(p1).cards_in(HAND).only(GIANT_GROWTH).unwrap();
-        let bolt = game.player(p1).cards_in(HAND).only(LIGHTNING_BOLT).unwrap();
-        let bears = game
+        let [growth] = game
+            .player(p1)
+            .cards_in(HAND)
+            .matching(GIANT_GROWTH)
+            .expect_n::<1>()
+            .unwrap();
+        let [bolt] = game
+            .player(p1)
+            .cards_in(HAND)
+            .matching(LIGHTNING_BOLT)
+            .expect_n::<1>()
+            .unwrap();
+        let [bears] = game
             .player(p1)
             .cards_in(BATTLEFIELD)
-            .only(GRIZZLY_BEARS)
+            .matching(GRIZZLY_BEARS)
+            .expect_n::<1>()
             .unwrap();
 
         game.play([

@@ -51,10 +51,11 @@ mod tests {
             ]),
             P2,
         ]);
-        let top = game
+        let [top] = game
             .player(p1)
             .cards_in(LIBRARY)
-            .only(GRIZZLY_BEARS)
+            .matching(GRIZZLY_BEARS)
+            .expect_n::<1>()
             .unwrap();
 
         game.play([p1.pass_priority(), p2.pass_priority(), p1.pass_priority()])
@@ -62,7 +63,11 @@ mod tests {
 
         assert_eq!(game.zone_of(top), HAND);
         assert_eq!(
-            game.player(p1).cards_in(HAND).only(GRIZZLY_BEARS).unwrap(),
+            game.player(p1)
+                .cards_in(HAND)
+                .matching(GRIZZLY_BEARS)
+                .expect_n::<1>()
+                .unwrap()[0],
             top
         );
     }

@@ -61,12 +61,18 @@ mod tests {
                 P1.battlefield([WALKING_CORPSE]),
                 P2.active().hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
             ]);
-        let corpse = game
+        let [corpse] = game
             .player(p1)
             .cards_in(BATTLEFIELD)
-            .only(WALKING_CORPSE)
+            .matching(WALKING_CORPSE)
+            .expect_n::<1>()
             .unwrap();
-        let bolt = game.player(p2).cards_in(HAND).only(LIGHTNING_BOLT).unwrap();
+        let [bolt] = game
+            .player(p2)
+            .cards_in(HAND)
+            .matching(LIGHTNING_BOLT)
+            .expect_n::<1>()
+            .unwrap();
         game.play([
             p2.cast(bolt).targeting(corpse).pass_priority(),
             p1.pass_priority(),

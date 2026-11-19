@@ -47,25 +47,6 @@ impl Cards {
     pub fn nth(&self, index: usize) -> Result<testing::TestCard, testing::CardsError> {}
 }
 
-impl Cards {
-    pub fn only(&self) -> Result<testing::TestCard, testing::CardsError> {
-        match self.matches.as_slice() {
-            [card] => Ok(*card),
-            [] => Err(testing::CardsError::Missing {
-                player: self.player.seat,
-                card: self.card.clone(),
-                zone: self.zone,
-            }),
-            _ => Err(testing::CardsError::NotOne {
-                player: self.player.seat,
-                card: self.card.clone(),
-                zone: self.zone,
-                count: self.matches.len(),
-            }),
-        }
-    }
-}
-
 #[rustfmt::skip]
 impl Cards {
     pub(crate) fn card(&self) -> &str { &self.card }
@@ -86,7 +67,7 @@ mod tests {
         let cards = game.player(p1).cards_in(HAND).matching(LIGHTNING_BOLT);
         assert_eq!(cards.len(), 1);
         assert!(!cards.is_empty());
-        assert_eq!(cards.first(), cards.only());
+        assert_eq!(cards.first().map(|card| [card]), cards.expect_n::<1>());
         assert_eq!(cards.nth(0), cards.first());
         assert_eq!(cards.all().len(), 1);
         assert!(game.player(p1).cards_in(HAND).matching(MURDER).is_empty());
@@ -102,40 +83,43 @@ mod tests {
     }
 
     #[test]
-    fn only_rejects_no_matching_card() {
+    fn expect_n_rejects_no_matching_card() {
         let (game, [p1, ..]) = MockGame::new([P1, P2]);
         let error = game
             .player(p1)
             .cards_in(HAND)
             .matching(LIGHTNING_BOLT)
-            .only()
+            .expect_n::<1>()
             .unwrap_err();
         assert_eq!(
             error,
-            CardsError::Missing {
+            CardsError::WrongCount {
                 player: PlayerSeat(1),
                 card: "Lightning Bolt".to_string(),
                 zone: HAND,
+                count: 0,
+                expected: 1,
             }
         );
     }
 
     #[test]
-    fn only_rejects_two_matching_cards() {
+    fn expect_n_rejects_two_matching_cards() {
         let (game, [p1, ..]) = MockGame::new([P1.hand([LIGHTNING_BOLT, LIGHTNING_BOLT]), P2]);
         let error = game
             .player(p1)
             .cards_in(HAND)
             .matching(LIGHTNING_BOLT)
-            .only()
+            .expect_n::<1>()
             .unwrap_err();
         assert_eq!(
             error,
-            CardsError::NotOne {
+            CardsError::WrongCount {
                 player: PlayerSeat(1),
                 card: "Lightning Bolt".to_string(),
                 zone: HAND,
                 count: 2,
+                expected: 1,
             }
         );
     }

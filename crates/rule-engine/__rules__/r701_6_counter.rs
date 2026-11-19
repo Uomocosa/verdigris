@@ -41,8 +41,18 @@ mod tests {
             P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
             P2.hand([CANCEL]).mana_pool(mana![1, U, U]),
         ]);
-        let bolt = game.player(p1).cards_in(HAND).only(LIGHTNING_BOLT).unwrap();
-        let cancel = game.player(p2).cards_in(HAND).only(CANCEL).unwrap();
+        let [bolt] = game
+            .player(p1)
+            .cards_in(HAND)
+            .matching(LIGHTNING_BOLT)
+            .expect_n::<1>()
+            .unwrap();
+        let [cancel] = game
+            .player(p2)
+            .cards_in(HAND)
+            .matching(CANCEL)
+            .expect_n::<1>()
+            .unwrap();
 
         game.play([
             p1.cast(bolt).targeting(p2).pass_priority(),
@@ -62,11 +72,17 @@ mod tests {
             P1.hand([GRIZZLY_BEARS]).mana_pool(mana![1, G]),
             P2.hand([ESSENCE_SCATTER]).mana_pool(mana![1, U]),
         ]);
-        let bears = game.player(p1).cards_in(HAND).only(GRIZZLY_BEARS).unwrap();
-        let scatter = game
+        let [bears] = game
+            .player(p1)
+            .cards_in(HAND)
+            .matching(GRIZZLY_BEARS)
+            .expect_n::<1>()
+            .unwrap();
+        let [scatter] = game
             .player(p2)
             .cards_in(HAND)
-            .only(ESSENCE_SCATTER)
+            .matching(ESSENCE_SCATTER)
+            .expect_n::<1>()
             .unwrap();
 
         game.play([
@@ -86,8 +102,18 @@ mod tests {
             P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
             P2.hand([NEGATE]).mana_pool(mana![1, U]),
         ]);
-        let bolt = game.player(p1).cards_in(HAND).only(LIGHTNING_BOLT).unwrap();
-        let negate = game.player(p2).cards_in(HAND).only(NEGATE).unwrap();
+        let [bolt] = game
+            .player(p1)
+            .cards_in(HAND)
+            .matching(LIGHTNING_BOLT)
+            .expect_n::<1>()
+            .unwrap();
+        let [negate] = game
+            .player(p2)
+            .cards_in(HAND)
+            .matching(NEGATE)
+            .expect_n::<1>()
+            .unwrap();
 
         game.play([
             p1.cast(bolt).targeting(p2).pass_priority(),
@@ -107,9 +133,24 @@ mod tests {
             P1.hand([LIGHTNING_BOLT, DISPEL]).mana_pool(mana![R, U]),
             P2.hand([CANCEL]).mana_pool(mana![1, U, U]),
         ]);
-        let bolt = game.player(p1).cards_in(HAND).only(LIGHTNING_BOLT).unwrap();
-        let dispel = game.player(p1).cards_in(HAND).only(DISPEL).unwrap();
-        let cancel = game.player(p2).cards_in(HAND).only(CANCEL).unwrap();
+        let [bolt] = game
+            .player(p1)
+            .cards_in(HAND)
+            .matching(LIGHTNING_BOLT)
+            .expect_n::<1>()
+            .unwrap();
+        let [dispel] = game
+            .player(p1)
+            .cards_in(HAND)
+            .matching(DISPEL)
+            .expect_n::<1>()
+            .unwrap();
+        let [cancel] = game
+            .player(p2)
+            .cards_in(HAND)
+            .matching(CANCEL)
+            .expect_n::<1>()
+            .unwrap();
 
         game.play([
             p1.cast(bolt).targeting(p2).pass_priority(),
@@ -134,9 +175,24 @@ mod tests {
                 .mana_pool(mana![1, U, U, R]),
             P2.hand([CANCEL]).mana_pool(mana![1, U, U]),
         ]);
-        let bolt = game.player(p1).cards_in(HAND).only(LIGHTNING_BOLT).unwrap();
-        let p1_cancel = game.player(p1).cards_in(HAND).only(CANCEL).unwrap();
-        let p2_cancel = game.player(p2).cards_in(HAND).only(CANCEL).unwrap();
+        let [bolt] = game
+            .player(p1)
+            .cards_in(HAND)
+            .matching(LIGHTNING_BOLT)
+            .expect_n::<1>()
+            .unwrap();
+        let [p1_cancel] = game
+            .player(p1)
+            .cards_in(HAND)
+            .matching(CANCEL)
+            .expect_n::<1>()
+            .unwrap();
+        let [p2_cancel] = game
+            .player(p2)
+            .cards_in(HAND)
+            .matching(CANCEL)
+            .expect_n::<1>()
+            .unwrap();
 
         game.play([
             p1.cast(bolt).targeting(p2).pass_priority(),
