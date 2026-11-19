@@ -39,20 +39,18 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let mut game = MockGame::builder()
-            .hand(Seat::P1, [lightning_bolt()])
-            .hand(Seat::P2, [giant_growth()])
-            .battlefield(Seat::P2, [grizzly_bears()])
-            .mana_pool(Seat::P1, mana![R])
-            .mana_pool(Seat::P2, mana![G])
-            .build();
-        let bolt = game.find(game.p1, HAND, "Lightning Bolt").unwrap();
-        let growth = game.find(game.p2, HAND, "Giant Growth").unwrap();
-        let bears = game.find(game.p2, BATTLEFIELD, "Grizzly Bears").unwrap();
-        let p2 = game.p2;
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.hand([lightning_bolt()]).mana_pool(mana![R]),
+            P2.hand([giant_growth()])
+                .battlefield([grizzly_bears()])
+                .mana_pool(mana![G]),
+        ]);
+        let bolt = game.find(p1, HAND, "Lightning Bolt").unwrap();
+        let growth = game.find(p2, HAND, "Giant Growth").unwrap();
+        let bears = game.find(p2, BATTLEFIELD, "Grizzly Bears").unwrap();
 
-        game.act(game.p1, actions::Action::Cast(bolt));
-        game.act(game.p1, actions::Action::ChooseTargets(vec![bears]));
+        game.act(p1, actions::Action::Cast(bolt));
+        game.act(p1, actions::Action::ChooseTargets(vec![bears]));
         game.pass_priority();
         game.act(p2, actions::Action::Cast(growth));
         game.act(p2, actions::Action::ChooseTargets(vec![bears]));
@@ -75,23 +73,24 @@ mod tests {
 
     #[test]
     fn r514_2_until_end_of_turn_effect_expires_before_the_next_bolt() {
-        let mut game = MockGame::builder()
-            .hand(Seat::P1, [giant_growth(), lightning_bolt()])
-            .battlefield(Seat::P1, [grizzly_bears()])
-            .mana_pool(Seat::P1, mana![G, R])
-            .build();
-        let growth = game.find(game.p1, HAND, "Giant Growth").unwrap();
-        let bolt = game.find(game.p1, HAND, "Lightning Bolt").unwrap();
-        let bears = game.find(game.p1, BATTLEFIELD, "Grizzly Bears").unwrap();
+        let (mut game, [p1, ..]) = MockGame::new([
+            P1.hand([giant_growth(), lightning_bolt()])
+                .battlefield([grizzly_bears()])
+                .mana_pool(mana![G, R]),
+            P2,
+        ]);
+        let growth = game.find(p1, HAND, "Giant Growth").unwrap();
+        let bolt = game.find(p1, HAND, "Lightning Bolt").unwrap();
+        let bears = game.find(p1, BATTLEFIELD, "Grizzly Bears").unwrap();
 
-        game.act(game.p1, actions::Action::Cast(growth));
-        game.act(game.p1, actions::Action::ChooseTargets(vec![bears]));
+        game.act(p1, actions::Action::Cast(growth));
+        game.act(p1, actions::Action::ChooseTargets(vec![bears]));
         game.pass_priority_all();
         game.end_turn();
         game.end_turn();
         game.pass_priority();
-        game.act(game.p1, actions::Action::Cast(bolt));
-        game.act(game.p1, actions::Action::ChooseTargets(vec![bears]));
+        game.act(p1, actions::Action::Cast(bolt));
+        game.act(p1, actions::Action::ChooseTargets(vec![bears]));
         game.pass_priority_all();
 
         assert_eq!(game.zone_of(bears), GRAVEYARD);

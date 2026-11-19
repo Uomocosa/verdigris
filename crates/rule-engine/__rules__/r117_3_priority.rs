@@ -52,17 +52,14 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let mut game = MockGame::builder().build();
-        let p2 = game.p2;
+        let (mut game, [_, p2]) = MockGame::new([P1, P2]);
         game.pass_priority();
         assert_eq!(game.app.world().resource::<turns::Priority>().player, p2);
     }
 
     #[test]
     fn passing_moves_priority_to_the_next_player_in_turn_order() {
-        let mut game = MockGame::builder().build();
-        let p1 = game.p1;
-        let p2 = game.p2;
+        let (mut game, [p1, p2]) = MockGame::new([P1, P2]);
 
         game.pass_priority();
 
@@ -74,8 +71,8 @@ mod tests {
 
     #[test]
     fn a_four_player_game_passes_priority_in_a_ring() {
-        let mut game = MockGame::builder().player_count(4).build();
-        let expected = [game.p(2), game.p(3), game.p(4)];
+        let (mut game, [_, p2, p3, p4]) = MockGame::new([P1, P2, P3, P4]);
+        let expected = [p2, p3, p4];
 
         for next in expected {
             game.pass_priority();
@@ -85,11 +82,8 @@ mod tests {
 
     #[test]
     fn the_caster_keeps_priority_after_casting_a_spell() {
-        let mut game = MockGame::builder()
-            .hand(Seat::P2, [lightning_bolt()])
-            .mana_pool(Seat::P2, mana![R])
-            .build();
-        let p2 = game.p2;
+        let (mut game, [_, p2]) =
+            MockGame::new([P1, P2.hand([lightning_bolt()]).mana_pool(mana![R])]);
         let bolt = game.find(p2, HAND, "Lightning Bolt").unwrap();
 
         game.pass_priority();
@@ -102,8 +96,7 @@ mod tests {
 
     #[test]
     fn a_player_without_priority_cannot_pass() {
-        let mut game = MockGame::builder().build();
-        let p2 = game.p2;
+        let (mut game, [p1, p2]) = MockGame::new([P1, P2]);
 
         game.act(p2, actions::Action::PassPriority);
 
@@ -111,9 +104,6 @@ mod tests {
             game.last_rejection(),
             Some(&actions::Rejected::NoPriority { player: p2 })
         );
-        assert_eq!(
-            game.app.world().resource::<turns::Priority>().player,
-            game.p1
-        );
+        assert_eq!(game.app.world().resource::<turns::Priority>().player, p1);
     }
 }

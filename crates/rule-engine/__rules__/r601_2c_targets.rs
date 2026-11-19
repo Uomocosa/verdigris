@@ -174,40 +174,33 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let mut game = MockGame::builder()
-            .hand(Seat::P1, [lightning_bolt()])
-            .battlefield(Seat::P2, [grizzly_bears()])
-            .mana_pool(Seat::P1, mana![R])
-            .build();
-        let bolt = game.find(game.p1, HAND, "Lightning Bolt").unwrap();
-        game.act(game.p1, actions::Action::Cast(bolt));
+        let (mut game, [p1, ..]) = MockGame::new([
+            P1.hand([lightning_bolt()]).mana_pool(mana![R]),
+            P2.battlefield([grizzly_bears()]),
+        ]);
+        let bolt = game.find(p1, HAND, "Lightning Bolt").unwrap();
+        game.act(p1, actions::Action::Cast(bolt));
         assert!(game.target_choice().is_some());
     }
 
     #[test]
     fn test_bolt_lists_every_legal_target() {
-        let mut game = MockGame::builder()
-            .hand(Seat::P1, [lightning_bolt()])
-            .battlefield(Seat::P2, [grizzly_bears()])
-            .mana_pool(Seat::P1, mana![R])
-            .build();
-        let bolt = game.find(game.p1, HAND, "Lightning Bolt").unwrap();
-        let bears = game.find(game.p2, BATTLEFIELD, "Grizzly Bears").unwrap();
-        game.act(game.p1, actions::Action::Cast(bolt));
-        assert_eq!(
-            game.target_choice(),
-            Some(pick(1).from([bears, game.p1, game.p2]))
-        );
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.hand([lightning_bolt()]).mana_pool(mana![R]),
+            P2.battlefield([grizzly_bears()]),
+        ]);
+        let bolt = game.find(p1, HAND, "Lightning Bolt").unwrap();
+        let bears = game.find(p2, BATTLEFIELD, "Grizzly Bears").unwrap();
+        game.act(p1, actions::Action::Cast(bolt));
+        assert_eq!(game.target_choice(), Some(pick(1).from([bears, p1, p2])));
     }
 
     #[test]
     fn test_spell_with_no_legal_target_cannot_be_cast() {
-        let mut game = MockGame::builder()
-            .hand(Seat::P1, [murder()])
-            .mana_pool(Seat::P1, mana![1, B, B])
-            .build();
-        let murder = game.find(game.p1, HAND, "Murder").unwrap();
-        game.act(game.p1, actions::Action::Cast(murder));
+        let (mut game, [p1, ..]) =
+            MockGame::new([P1.hand([murder()]).mana_pool(mana![1, B, B]), P2]);
+        let murder = game.find(p1, HAND, "Murder").unwrap();
+        game.act(p1, actions::Action::Cast(murder));
         assert_eq!(
             game.last_rejection(),
             Some(&actions::Rejected::NoLegalTargets { spell: murder })
@@ -217,28 +210,26 @@ mod tests {
 
     #[test]
     fn doom_blade_lists_only_nonblack_creatures() {
-        let mut game = MockGame::builder()
-            .hand(Seat::P1, [doom_blade()])
-            .battlefield(Seat::P2, [grizzly_bears(), walking_corpse()])
-            .mana_pool(Seat::P1, mana![1, B])
-            .build();
-        let blade = game.find(game.p1, HAND, "Doom Blade").unwrap();
-        let bears = game.find(game.p2, BATTLEFIELD, "Grizzly Bears").unwrap();
-        game.act(game.p1, actions::Action::Cast(blade));
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.hand([doom_blade()]).mana_pool(mana![1, B]),
+            P2.battlefield([grizzly_bears(), walking_corpse()]),
+        ]);
+        let blade = game.find(p1, HAND, "Doom Blade").unwrap();
+        let bears = game.find(p2, BATTLEFIELD, "Grizzly Bears").unwrap();
+        game.act(p1, actions::Action::Cast(blade));
         assert_eq!(game.target_choice(), Some(pick(1).from([bears])));
     }
 
     #[test]
     fn doom_blade_rejects_a_black_creature_as_target() {
-        let mut game = MockGame::builder()
-            .hand(Seat::P1, [doom_blade()])
-            .battlefield(Seat::P2, [grizzly_bears(), walking_corpse()])
-            .mana_pool(Seat::P1, mana![1, B])
-            .build();
-        let blade = game.find(game.p1, HAND, "Doom Blade").unwrap();
-        let corpse = game.find(game.p2, BATTLEFIELD, "Walking Corpse").unwrap();
-        game.act(game.p1, actions::Action::Cast(blade));
-        game.act(game.p1, actions::Action::ChooseTargets(vec![corpse]));
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.hand([doom_blade()]).mana_pool(mana![1, B]),
+            P2.battlefield([grizzly_bears(), walking_corpse()]),
+        ]);
+        let blade = game.find(p1, HAND, "Doom Blade").unwrap();
+        let corpse = game.find(p2, BATTLEFIELD, "Walking Corpse").unwrap();
+        game.act(p1, actions::Action::Cast(blade));
+        game.act(p1, actions::Action::ChooseTargets(vec![corpse]));
         assert_eq!(
             game.last_rejection(),
             Some(&actions::Rejected::InvalidTargets { spell: blade })
@@ -247,13 +238,12 @@ mod tests {
 
     #[test]
     fn doom_blade_cannot_be_cast_with_only_black_creatures() {
-        let mut game = MockGame::builder()
-            .hand(Seat::P1, [doom_blade()])
-            .battlefield(Seat::P2, [walking_corpse()])
-            .mana_pool(Seat::P1, mana![1, B])
-            .build();
-        let blade = game.find(game.p1, HAND, "Doom Blade").unwrap();
-        game.act(game.p1, actions::Action::Cast(blade));
+        let (mut game, [p1, ..]) = MockGame::new([
+            P1.hand([doom_blade()]).mana_pool(mana![1, B]),
+            P2.battlefield([walking_corpse()]),
+        ]);
+        let blade = game.find(p1, HAND, "Doom Blade").unwrap();
+        game.act(p1, actions::Action::Cast(blade));
         assert_eq!(
             game.last_rejection(),
             Some(&actions::Rejected::NoLegalTargets { spell: blade })
@@ -263,22 +253,22 @@ mod tests {
 
     #[test]
     fn cancel_cannot_target_a_permanent() {
-        let mut game = MockGame::builder()
-            .hand(Seat::P1, [lightning_bolt(), cancel()])
-            .battlefield(Seat::P2, [grizzly_bears()])
-            .mana_pool(Seat::P1, mana![1, U, U, R])
-            .build();
-        let bolt = game.find(game.p1, HAND, "Lightning Bolt").unwrap();
-        let cancel = game.find(game.p1, HAND, "Cancel").unwrap();
-        let bears = game.find(game.p2, BATTLEFIELD, "Grizzly Bears").unwrap();
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.hand([lightning_bolt(), cancel()])
+                .mana_pool(mana![1, U, U, R]),
+            P2.battlefield([grizzly_bears()]),
+        ]);
+        let bolt = game.find(p1, HAND, "Lightning Bolt").unwrap();
+        let cancel = game.find(p1, HAND, "Cancel").unwrap();
+        let bears = game.find(p2, BATTLEFIELD, "Grizzly Bears").unwrap();
 
-        game.act(game.p1, actions::Action::Cast(bolt));
-        game.act(game.p1, actions::Action::ChooseTargets(vec![game.p2]));
-        game.act(game.p1, actions::Action::Cast(cancel));
+        game.act(p1, actions::Action::Cast(bolt));
+        game.act(p1, actions::Action::ChooseTargets(vec![p2]));
+        game.act(p1, actions::Action::Cast(cancel));
 
         assert_eq!(game.target_choice(), Some(pick(1).from([bolt])));
 
-        game.act(game.p1, actions::Action::ChooseTargets(vec![bears]));
+        game.act(p1, actions::Action::ChooseTargets(vec![bears]));
         assert_eq!(
             game.last_rejection(),
             Some(&actions::Rejected::InvalidTargets { spell: cancel })
@@ -287,19 +277,17 @@ mod tests {
 
     #[test]
     fn essence_scatter_cannot_target_a_noncreature_spell() {
-        let mut game = MockGame::builder()
-            .hand(Seat::P1, [lightning_bolt()])
-            .hand(Seat::P2, [essence_scatter()])
-            .mana_pool(Seat::P1, mana![R])
-            .mana_pool(Seat::P2, mana![1, U])
-            .build();
-        let bolt = game.find(game.p1, HAND, "Lightning Bolt").unwrap();
-        let scatter = game.find(game.p2, HAND, "Essence Scatter").unwrap();
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.hand([lightning_bolt()]).mana_pool(mana![R]),
+            P2.hand([essence_scatter()]).mana_pool(mana![1, U]),
+        ]);
+        let bolt = game.find(p1, HAND, "Lightning Bolt").unwrap();
+        let scatter = game.find(p2, HAND, "Essence Scatter").unwrap();
 
-        game.act(game.p1, actions::Action::Cast(bolt));
-        game.act(game.p1, actions::Action::ChooseTargets(vec![game.p2]));
+        game.act(p1, actions::Action::Cast(bolt));
+        game.act(p1, actions::Action::ChooseTargets(vec![p2]));
         game.pass_priority();
-        game.act(game.p2, actions::Action::Cast(scatter));
+        game.act(p2, actions::Action::Cast(scatter));
 
         assert_eq!(
             game.last_rejection(),
@@ -311,18 +299,16 @@ mod tests {
 
     #[test]
     fn negate_cannot_target_a_creature_spell() {
-        let mut game = MockGame::builder()
-            .hand(Seat::P1, [grizzly_bears()])
-            .hand(Seat::P2, [negate()])
-            .mana_pool(Seat::P1, mana![1, G])
-            .mana_pool(Seat::P2, mana![1, U])
-            .build();
-        let bears = game.find(game.p1, HAND, "Grizzly Bears").unwrap();
-        let negate = game.find(game.p2, HAND, "Negate").unwrap();
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.hand([grizzly_bears()]).mana_pool(mana![1, G]),
+            P2.hand([negate()]).mana_pool(mana![1, U]),
+        ]);
+        let bears = game.find(p1, HAND, "Grizzly Bears").unwrap();
+        let negate = game.find(p2, HAND, "Negate").unwrap();
 
-        game.act(game.p1, actions::Action::Cast(bears));
+        game.act(p1, actions::Action::Cast(bears));
         game.pass_priority();
-        game.act(game.p2, actions::Action::Cast(negate));
+        game.act(p2, actions::Action::Cast(negate));
 
         assert_eq!(
             game.last_rejection(),
@@ -334,18 +320,16 @@ mod tests {
 
     #[test]
     fn dispel_cannot_target_a_sorcery_spell() {
-        let mut game = MockGame::builder()
-            .hand(Seat::P1, [divination()])
-            .hand(Seat::P2, [dispel()])
-            .mana_pool(Seat::P1, mana![2, U])
-            .mana_pool(Seat::P2, mana![U])
-            .build();
-        let divination = game.find(game.p1, HAND, "Divination").unwrap();
-        let dispel = game.find(game.p2, HAND, "Dispel").unwrap();
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.hand([divination()]).mana_pool(mana![2, U]),
+            P2.hand([dispel()]).mana_pool(mana![U]),
+        ]);
+        let divination = game.find(p1, HAND, "Divination").unwrap();
+        let dispel = game.find(p2, HAND, "Dispel").unwrap();
 
-        game.act(game.p1, actions::Action::Cast(divination));
+        game.act(p1, actions::Action::Cast(divination));
         game.pass_priority();
-        game.act(game.p2, actions::Action::Cast(dispel));
+        game.act(p2, actions::Action::Cast(dispel));
 
         assert_eq!(
             game.last_rejection(),
@@ -357,16 +341,10 @@ mod tests {
 
     #[test]
     fn test_any_target_in_multiplayer() {
-        let mut game = MockGame::builder()
-            .player_count(4)
-            .hand(Seat::P1, [lightning_bolt()])
-            .mana_pool(Seat::P1, mana![R])
-            .build();
-        let bolt = game.find(game.p1, HAND, "Lightning Bolt").unwrap();
-        game.act(game.p1, actions::Action::Cast(bolt));
-        assert_eq!(
-            game.target_choice(),
-            Some(pick(1).from([game.p(1), game.p(2), game.p(3), game.p(4)]))
-        );
+        let (mut game, [p1, p2, p3, p4]) =
+            MockGame::new([P1.hand([lightning_bolt()]).mana_pool(mana![R]), P2, P3, P4]);
+        let bolt = game.find(p1, HAND, "Lightning Bolt").unwrap();
+        game.act(p1, actions::Action::Cast(bolt));
+        assert_eq!(game.target_choice(), Some(pick(1).from([p1, p2, p3, p4])));
     }
 }

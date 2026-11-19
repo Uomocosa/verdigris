@@ -24,15 +24,11 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let mut game = MockGame::builder()
-            .life(Seat::P2, 3)
-            .hand(Seat::P1, [lightning_bolt()])
-            .mana_pool(Seat::P1, mana![R])
-            .build();
-        let bolt = game.find(game.p1, HAND, "Lightning Bolt").unwrap();
-        let p2 = game.p2;
-        game.act(game.p1, actions::Action::Cast(bolt));
-        game.act(game.p1, actions::Action::ChooseTargets(vec![p2]));
+        let (mut game, [p1, p2]) =
+            MockGame::new([P1.hand([lightning_bolt()]).mana_pool(mana![R]), P2.life(3)]);
+        let bolt = game.find(p1, HAND, "Lightning Bolt").unwrap();
+        game.act(p1, actions::Action::Cast(bolt));
+        game.act(p1, actions::Action::ChooseTargets(vec![p2]));
         game.pass_priority_all();
         assert!(game.app.world().get::<players::Lost>(p2).is_some());
     }

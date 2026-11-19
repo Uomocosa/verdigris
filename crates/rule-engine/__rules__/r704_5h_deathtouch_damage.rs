@@ -44,42 +44,42 @@ mod tests {
     #[test]
     #[ignore = "needs combat: Typhoid Rats deals damage by attacking or blocking"]
     fn test_usage() {
-        let game = MockGame::builder()
-            .battlefield(Seat::P1, [typhoid_rats()])
-            .battlefield(Seat::P2, [grizzly_bears()])
-            .build();
-        assert!(game.find(game.p1, BATTLEFIELD, "Typhoid Rats").is_some());
-        assert!(game.find(game.p2, BATTLEFIELD, "Grizzly Bears").is_some());
+        let (game, [p1, p2]) = MockGame::new([
+            P1.battlefield([typhoid_rats()]),
+            P2.battlefield([grizzly_bears()]),
+        ]);
+        assert!(game.find(p1, BATTLEFIELD, "Typhoid Rats").is_some());
+        assert!(game.find(p2, BATTLEFIELD, "Grizzly Bears").is_some());
     }
 
     #[test]
     #[ignore = "needs combat: Typhoid Rats deals damage by attacking or blocking"]
     fn r704_5h_deathtouch_damage_destroys_a_larger_creature() {
-        let game = MockGame::builder()
-            .battlefield(Seat::P1, [typhoid_rats()])
-            .battlefield(Seat::P2, [grizzly_bears()])
-            .build();
-        assert!(game.find(game.p1, BATTLEFIELD, "Typhoid Rats").is_some());
-        assert!(game.find(game.p2, BATTLEFIELD, "Grizzly Bears").is_some());
+        let (game, [p1, p2]) = MockGame::new([
+            P1.battlefield([typhoid_rats()]),
+            P2.battlefield([grizzly_bears()]),
+        ]);
+        assert!(game.find(p1, BATTLEFIELD, "Typhoid Rats").is_some());
+        assert!(game.find(p2, BATTLEFIELD, "Grizzly Bears").is_some());
     }
 
     #[test]
     #[ignore = "needs combat: Typhoid Rats deals damage by attacking or blocking"]
     fn r704_5h_deathtouch_damage_does_not_destroy_indestructible() {
-        let game = MockGame::builder()
-            .battlefield(Seat::P1, [typhoid_rats()])
-            .battlefield(Seat::P2, [darksteel_myr()])
-            .build();
-        assert!(game.find(game.p2, BATTLEFIELD, "Darksteel Myr").is_some());
+        let (game, [_, p2]) = MockGame::new([
+            P1.battlefield([typhoid_rats()]),
+            P2.battlefield([darksteel_myr()]),
+        ]);
+        assert!(game.find(p2, BATTLEFIELD, "Darksteel Myr").is_some());
     }
 
     #[test]
     #[ignore = "needs combat: Typhoid Rats deals damage by attacking or blocking"]
     fn r704_5h_damage_without_deathtouch_does_not_destroy_a_two_two() {
-        let game = MockGame::builder()
-            .battlefield(Seat::P1, [walking_corpse()])
-            .battlefield(Seat::P2, [grizzly_bears()])
-            .build();
-        assert!(game.find(game.p2, BATTLEFIELD, "Grizzly Bears").is_some());
+        let (game, [_, p2]) = MockGame::new([
+            P1.battlefield([walking_corpse()]),
+            P2.battlefield([grizzly_bears()]),
+        ]);
+        assert!(game.find(p2, BATTLEFIELD, "Grizzly Bears").is_some());
     }
 }

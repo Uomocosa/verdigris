@@ -47,15 +47,13 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let mut game = MockGame::builder()
-            .hand(Seat::P1, [lightning_bolt()])
-            .mana_pool(Seat::P1, mana![R])
-            .build();
-        let bolt = game.find(game.p1, HAND, "Lightning Bolt").unwrap();
-        game.act(game.p1, actions::Action::Cast(bolt));
-        game.act(game.p1, actions::Action::ChooseTargets(vec![game.p2]));
+        let (mut game, [p1, p2]) =
+            MockGame::new([P1.hand([lightning_bolt()]).mana_pool(mana![R]), P2]);
+        let bolt = game.find(p1, HAND, "Lightning Bolt").unwrap();
+        game.act(p1, actions::Action::Cast(bolt));
+        game.act(p1, actions::Action::ChooseTargets(vec![p2]));
         game.pass_priority_all();
         assert_eq!(game.zone_of(bolt), GRAVEYARD);
-        assert!(game.find(game.p1, GRAVEYARD, "Lightning Bolt").is_some());
+        assert!(game.find(p1, GRAVEYARD, "Lightning Bolt").is_some());
     }
 }

@@ -29,28 +29,26 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let mut game = MockGame::builder()
-            .hand(Seat::P1, [divination()])
-            .library(Seat::P1, [])
-            .mana_pool(Seat::P1, mana![2, U])
-            .build();
-        let divination = game.find(game.p1, HAND, "Divination").unwrap();
-        game.act(game.p1, actions::Action::Cast(divination));
+        let (mut game, [p1, ..]) = MockGame::new([
+            P1.hand([divination()]).library([]).mana_pool(mana![2, U]),
+            P2,
+        ]);
+        let divination = game.find(p1, HAND, "Divination").unwrap();
+        game.act(p1, actions::Action::Cast(divination));
         game.pass_priority_all();
-        assert!(game.app.world().get::<players::Lost>(game.p1).is_some());
+        assert!(game.app.world().get::<players::Lost>(p1).is_some());
     }
 
     #[test]
     fn drawing_from_an_empty_library_loses_the_game_at_the_next_state_based_check() {
-        let mut game = MockGame::builder()
-            .hand(Seat::P1, [divination()])
-            .library(Seat::P1, [])
-            .mana_pool(Seat::P1, mana![2, U])
-            .build();
-        let divination = game.find(game.p1, HAND, "Divination").unwrap();
-        game.act(game.p1, actions::Action::Cast(divination));
-        assert!(game.app.world().get::<players::Lost>(game.p1).is_none());
+        let (mut game, [p1, ..]) = MockGame::new([
+            P1.hand([divination()]).library([]).mana_pool(mana![2, U]),
+            P2,
+        ]);
+        let divination = game.find(p1, HAND, "Divination").unwrap();
+        game.act(p1, actions::Action::Cast(divination));
+        assert!(game.app.world().get::<players::Lost>(p1).is_none());
         game.pass_priority_all();
-        assert!(game.app.world().get::<players::Lost>(game.p1).is_some());
+        assert!(game.app.world().get::<players::Lost>(p1).is_some());
     }
 }

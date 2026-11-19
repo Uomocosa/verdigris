@@ -47,15 +47,14 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let mut game = MockGame::builder()
-            .hand(Seat::P1, [lightning_bolt()])
-            .battlefield(Seat::P2, [grizzly_bears()])
-            .mana_pool(Seat::P1, mana![R])
-            .build();
-        let bolt = game.find(game.p1, HAND, "Lightning Bolt").unwrap();
-        let bears = game.find(game.p2, BATTLEFIELD, "Grizzly Bears").unwrap();
-        game.act(game.p1, actions::Action::Cast(bolt));
-        game.act(game.p1, actions::Action::ChooseTargets(vec![bears]));
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.hand([lightning_bolt()]).mana_pool(mana![R]),
+            P2.battlefield([grizzly_bears()]),
+        ]);
+        let bolt = game.find(p1, HAND, "Lightning Bolt").unwrap();
+        let bears = game.find(p2, BATTLEFIELD, "Grizzly Bears").unwrap();
+        game.act(p1, actions::Action::Cast(bolt));
+        game.act(p1, actions::Action::ChooseTargets(vec![bears]));
         game.pass_priority_all();
         assert_eq!(game.zone_of(bears), GRAVEYARD);
     }

@@ -37,15 +37,16 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let mut game = MockGame::builder()
-            .hand(Seat::P1, [giant_growth()])
-            .battlefield(Seat::P1, [grizzly_bears()])
-            .mana_pool(Seat::P1, mana![G])
-            .build();
-        let growth = game.find(game.p1, HAND, "Giant Growth").unwrap();
-        let bears = game.find(game.p1, BATTLEFIELD, "Grizzly Bears").unwrap();
-        game.act(game.p1, actions::Action::Cast(growth));
-        game.act(game.p1, actions::Action::ChooseTargets(vec![bears]));
+        let (mut game, [p1, ..]) = MockGame::new([
+            P1.hand([giant_growth()])
+                .battlefield([grizzly_bears()])
+                .mana_pool(mana![G]),
+            P2,
+        ]);
+        let growth = game.find(p1, HAND, "Giant Growth").unwrap();
+        let bears = game.find(p1, BATTLEFIELD, "Grizzly Bears").unwrap();
+        game.act(p1, actions::Action::Cast(growth));
+        game.act(p1, actions::Action::ChooseTargets(vec![bears]));
         game.pass_priority_all();
         let modifier = game
             .app
@@ -64,20 +65,18 @@ mod tests {
 
     #[test]
     fn r611_2a_giant_growth_saves_a_creature_from_lethal_damage() {
-        let mut game = MockGame::builder()
-            .hand(Seat::P1, [lightning_bolt()])
-            .hand(Seat::P2, [giant_growth()])
-            .battlefield(Seat::P2, [grizzly_bears()])
-            .mana_pool(Seat::P1, mana![R])
-            .mana_pool(Seat::P2, mana![G])
-            .build();
-        let bolt = game.find(game.p1, HAND, "Lightning Bolt").unwrap();
-        let growth = game.find(game.p2, HAND, "Giant Growth").unwrap();
-        let bears = game.find(game.p2, BATTLEFIELD, "Grizzly Bears").unwrap();
-        let p2 = game.p2;
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.hand([lightning_bolt()]).mana_pool(mana![R]),
+            P2.hand([giant_growth()])
+                .battlefield([grizzly_bears()])
+                .mana_pool(mana![G]),
+        ]);
+        let bolt = game.find(p1, HAND, "Lightning Bolt").unwrap();
+        let growth = game.find(p2, HAND, "Giant Growth").unwrap();
+        let bears = game.find(p2, BATTLEFIELD, "Grizzly Bears").unwrap();
 
-        game.act(game.p1, actions::Action::Cast(bolt));
-        game.act(game.p1, actions::Action::ChooseTargets(vec![bears]));
+        game.act(p1, actions::Action::Cast(bolt));
+        game.act(p1, actions::Action::ChooseTargets(vec![bears]));
         game.pass_priority();
         game.act(p2, actions::Action::Cast(growth));
         game.act(p2, actions::Action::ChooseTargets(vec![bears]));

@@ -28,9 +28,9 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let mut game = MockGame::builder()
-            .turn_seat(1, Seat::P1, turns::Step::Upkeep)
-            .build();
+        let (mut game, [_, _]) = MockGame::builder()
+            .turn(1, turns::Step::Upkeep)
+            .players([P1, P2]);
 
         game.pass_priority_all();
         game.pass_priority();
@@ -43,16 +43,15 @@ mod tests {
 
     #[test]
     fn the_active_player_draws_a_card_during_their_draw_step() {
-        let mut game = MockGame::builder()
-            .turn_seat(1, Seat::P1, turns::Step::Upkeep)
-            .library(Seat::P1, [grizzly_bears(), lightning_bolt()])
-            .build();
-        let top = game.find(game.p1, LIBRARY, "Grizzly Bears").unwrap();
+        let (mut game, [p1, ..]) = MockGame::builder()
+            .turn(1, turns::Step::Upkeep)
+            .players([P1.library([grizzly_bears(), lightning_bolt()]), P2]);
+        let top = game.find(p1, LIBRARY, "Grizzly Bears").unwrap();
 
         game.pass_priority_all();
         game.pass_priority();
 
         assert_eq!(game.zone_of(top), HAND);
-        assert_eq!(game.find(game.p1, HAND, "Grizzly Bears").unwrap(), top);
+        assert_eq!(game.find(p1, HAND, "Grizzly Bears").unwrap(), top);
     }
 }

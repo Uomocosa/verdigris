@@ -48,7 +48,7 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let mut game = MockGame::builder().build();
+        let (mut game, [_, _]) = MockGame::new([P1, P2]);
 
         game.end_turn();
 
@@ -57,9 +57,7 @@ mod tests {
 
     #[test]
     fn cleanup_ends_the_turn_and_the_next_player_becomes_active() {
-        let mut game = MockGame::builder().build();
-        let p1 = game.p1;
-        let p2 = game.p2;
+        let (mut game, [p1, p2]) = MockGame::new([P1, P2]);
 
         game.end_turn();
 

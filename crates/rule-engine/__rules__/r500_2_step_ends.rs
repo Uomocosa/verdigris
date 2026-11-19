@@ -46,7 +46,7 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let mut game = MockGame::builder().build();
+        let (mut game, [_, _]) = MockGame::new([P1, P2]);
 
         game.pass_priority_all();
 
@@ -58,8 +58,7 @@ mod tests {
 
     #[test]
     fn all_players_passing_with_an_empty_stack_ends_the_step() {
-        let mut game = MockGame::builder().build();
-        let p1 = game.p1;
+        let (mut game, [p1, ..]) = MockGame::new([P1, P2]);
 
         game.pass_priority_all();
 

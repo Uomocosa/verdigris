@@ -93,32 +93,30 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let mut game = MockGame::builder()
-            .hand(Seat::P1, [lightning_bolt()])
-            .mana_pool(Seat::P1, mana![R])
-            .build();
-        let bolt = game.find(game.p1, HAND, "Lightning Bolt").unwrap();
-        game.act(game.p1, actions::Action::Cast(bolt));
-        game.act(game.p1, actions::Action::ChooseTargets(vec![game.p2]));
+        let (mut game, [p1, p2]) =
+            MockGame::new([P1.hand([lightning_bolt()]).mana_pool(mana![R]), P2]);
+        let bolt = game.find(p1, HAND, "Lightning Bolt").unwrap();
+        game.act(p1, actions::Action::Cast(bolt));
+        game.act(p1, actions::Action::ChooseTargets(vec![p2]));
         game.pass_priority_all();
         assert_eq!(game.zone_of(bolt), GRAVEYARD);
     }
 
     #[test]
     fn test_bolt_fizzles_when_target_gone() {
-        let mut game = MockGame::builder()
-            .hand(Seat::P1, [lightning_bolt(), murder()])
-            .battlefield(Seat::P2, [grizzly_bears()])
-            .mana_pool(Seat::P1, mana![1, B, B, R])
-            .build();
-        let bolt = game.find(game.p1, HAND, "Lightning Bolt").unwrap();
-        let murder = game.find(game.p1, HAND, "Murder").unwrap();
-        let bears = game.find(game.p2, BATTLEFIELD, "Grizzly Bears").unwrap();
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.hand([lightning_bolt(), murder()])
+                .mana_pool(mana![1, B, B, R]),
+            P2.battlefield([grizzly_bears()]),
+        ]);
+        let bolt = game.find(p1, HAND, "Lightning Bolt").unwrap();
+        let murder = game.find(p1, HAND, "Murder").unwrap();
+        let bears = game.find(p2, BATTLEFIELD, "Grizzly Bears").unwrap();
 
-        game.act(game.p1, actions::Action::Cast(bolt));
-        game.act(game.p1, actions::Action::ChooseTargets(vec![bears]));
-        game.act(game.p1, actions::Action::Cast(murder));
-        game.act(game.p1, actions::Action::ChooseTargets(vec![bears]));
+        game.act(p1, actions::Action::Cast(bolt));
+        game.act(p1, actions::Action::ChooseTargets(vec![bears]));
+        game.act(p1, actions::Action::Cast(murder));
+        game.act(p1, actions::Action::ChooseTargets(vec![bears]));
 
         game.pass_priority_all();
         assert_eq!(game.zone_of(bears), GRAVEYARD);
@@ -126,21 +124,20 @@ mod tests {
 
         game.pass_priority_all();
         assert_eq!(game.zone_of(bolt), GRAVEYARD);
-        assert_eq!(game.life(game.p2), 20);
+        assert_eq!(game.life(p2), 20);
     }
 
     #[test]
     fn doom_blade_fizzles_when_its_target_becomes_black() {
-        let mut game = MockGame::builder()
-            .hand(Seat::P1, [doom_blade()])
-            .battlefield(Seat::P2, [grizzly_bears()])
-            .mana_pool(Seat::P1, mana![1, B])
-            .build();
-        let blade = game.find(game.p1, HAND, "Doom Blade").unwrap();
-        let bears = game.find(game.p2, BATTLEFIELD, "Grizzly Bears").unwrap();
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.hand([doom_blade()]).mana_pool(mana![1, B]),
+            P2.battlefield([grizzly_bears()]),
+        ]);
+        let blade = game.find(p1, HAND, "Doom Blade").unwrap();
+        let bears = game.find(p2, BATTLEFIELD, "Grizzly Bears").unwrap();
 
-        game.act(game.p1, actions::Action::Cast(blade));
-        game.act(game.p1, actions::Action::ChooseTargets(vec![bears]));
+        game.act(p1, actions::Action::Cast(blade));
+        game.act(p1, actions::Action::ChooseTargets(vec![bears]));
 
         let mut definition = game
             .app

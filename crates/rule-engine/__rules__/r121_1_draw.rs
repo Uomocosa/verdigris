@@ -54,31 +54,30 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let mut game = MockGame::builder()
-            .hand(Seat::P1, [divination()])
-            .mana_pool(Seat::P1, mana![2, U])
-            .build();
-        let divination = game.find(game.p1, HAND, "Divination").unwrap();
-        game.act(game.p1, actions::Action::Cast(divination));
+        let (mut game, [p1, ..]) =
+            MockGame::new([P1.hand([divination()]).mana_pool(mana![2, U]), P2]);
+        let divination = game.find(p1, HAND, "Divination").unwrap();
+        game.act(p1, actions::Action::Cast(divination));
         game.pass_priority_all();
-        assert!(game.find(game.p1, HAND, "Grizzly Bears").is_some());
+        assert!(game.find(p1, HAND, "Grizzly Bears").is_some());
         assert_eq!(game.zone_of(divination), GRAVEYARD);
     }
 
     #[test]
     fn divination_draws_the_top_two_cards_of_the_library() {
-        let mut game = MockGame::builder()
-            .hand(Seat::P1, [divination()])
-            .library(Seat::P1, [grizzly_bears(), lightning_bolt(), murder()])
-            .mana_pool(Seat::P1, mana![2, U])
-            .build();
-        let divination = game.find(game.p1, HAND, "Divination").unwrap();
-        game.act(game.p1, actions::Action::Cast(divination));
+        let (mut game, [p1, ..]) = MockGame::new([
+            P1.hand([divination()])
+                .library([grizzly_bears(), lightning_bolt(), murder()])
+                .mana_pool(mana![2, U]),
+            P2,
+        ]);
+        let divination = game.find(p1, HAND, "Divination").unwrap();
+        game.act(p1, actions::Action::Cast(divination));
         game.pass_priority_all();
-        assert!(game.find(game.p1, HAND, "Grizzly Bears").is_some());
-        assert!(game.find(game.p1, HAND, "Lightning Bolt").is_some());
+        assert!(game.find(p1, HAND, "Grizzly Bears").is_some());
+        assert!(game.find(p1, HAND, "Lightning Bolt").is_some());
         assert_eq!(
-            game.zone_of(game.find(game.p1, LIBRARY, "Murder").unwrap()),
+            game.zone_of(game.find(p1, LIBRARY, "Murder").unwrap()),
             LIBRARY
         );
     }

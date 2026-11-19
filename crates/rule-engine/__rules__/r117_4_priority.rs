@@ -52,13 +52,11 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let mut game = MockGame::builder()
-            .hand(Seat::P1, [lightning_bolt()])
-            .mana_pool(Seat::P1, mana![R])
-            .build();
-        let bolt = game.find(game.p1, HAND, "Lightning Bolt").unwrap();
-        game.act(game.p1, actions::Action::Cast(bolt));
-        game.act(game.p1, actions::Action::ChooseTargets(vec![game.p2]));
+        let (mut game, [p1, p2]) =
+            MockGame::new([P1.hand([lightning_bolt()]).mana_pool(mana![R]), P2]);
+        let bolt = game.find(p1, HAND, "Lightning Bolt").unwrap();
+        game.act(p1, actions::Action::Cast(bolt));
+        game.act(p1, actions::Action::ChooseTargets(vec![p2]));
         game.pass_priority();
         game.pass_priority();
         assert_eq!(game.zone_of(bolt), GRAVEYARD);
@@ -66,35 +64,33 @@ mod tests {
 
     #[test]
     fn all_players_passing_resolves_one_spell() {
-        let mut game = MockGame::builder()
-            .hand(Seat::P1, [lightning_bolt(), lightning_bolt()])
-            .mana_pool(Seat::P1, mana![R, R])
-            .build();
-        let first = game.find(game.p1, HAND, "Lightning Bolt").unwrap();
-        game.act(game.p1, actions::Action::Cast(first));
-        game.act(game.p1, actions::Action::ChooseTargets(vec![game.p2]));
-        let second = game.find(game.p1, HAND, "Lightning Bolt").unwrap();
-        game.act(game.p1, actions::Action::Cast(second));
-        game.act(game.p1, actions::Action::ChooseTargets(vec![game.p2]));
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.hand([lightning_bolt(), lightning_bolt()])
+                .mana_pool(mana![R, R]),
+            P2,
+        ]);
+        let first = game.find(p1, HAND, "Lightning Bolt").unwrap();
+        game.act(p1, actions::Action::Cast(first));
+        game.act(p1, actions::Action::ChooseTargets(vec![p2]));
+        let second = game.find(p1, HAND, "Lightning Bolt").unwrap();
+        game.act(p1, actions::Action::Cast(second));
+        game.act(p1, actions::Action::ChooseTargets(vec![p2]));
 
         game.pass_priority();
         game.pass_priority();
 
         assert_eq!(game.zone_of(second), GRAVEYARD);
         assert_eq!(game.zone_of(first), STACK);
-        assert_eq!(game.life(game.p2), 17);
+        assert_eq!(game.life(p2), 17);
     }
 
     #[test]
     fn priority_returns_to_the_active_player_after_a_spell_resolves() {
-        let mut game = MockGame::builder()
-            .hand(Seat::P1, [lightning_bolt()])
-            .mana_pool(Seat::P1, mana![R])
-            .build();
-        let p1 = game.p1;
+        let (mut game, [p1, p2]) =
+            MockGame::new([P1.hand([lightning_bolt()]).mana_pool(mana![R]), P2]);
         let bolt = game.find(p1, HAND, "Lightning Bolt").unwrap();
         game.act(p1, actions::Action::Cast(bolt));
-        game.act(p1, actions::Action::ChooseTargets(vec![game.p2]));
+        game.act(p1, actions::Action::ChooseTargets(vec![p2]));
 
         game.pass_priority();
         assert_ne!(game.app.world().resource::<turns::Priority>().player, p1);

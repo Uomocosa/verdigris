@@ -78,23 +78,18 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let mut game = MockGame::builder()
-            .hand(Seat::P1, [lightning_bolt()])
-            .mana_pool(Seat::P1, mana![R])
-            .build();
-        let bolt = game.find(game.p1, HAND, "Lightning Bolt").unwrap();
-        game.act(game.p1, actions::Action::Cast(bolt));
+        let (mut game, [p1, ..]) =
+            MockGame::new([P1.hand([lightning_bolt()]).mana_pool(mana![R]), P2]);
+        let bolt = game.find(p1, HAND, "Lightning Bolt").unwrap();
+        game.act(p1, actions::Action::Cast(bolt));
         assert_eq!(game.zone_of(bolt), STACK);
     }
 
     #[test]
     fn sorcery_cannot_be_cast_on_an_opponents_turn() {
-        let mut game = MockGame::builder()
-            .turn_seat(2, Seat::P2, turns::Step::PrecombatMain)
-            .hand(Seat::P1, [divination()])
-            .mana_pool(Seat::P1, mana![2, U])
-            .build();
-        let p1 = game.p1;
+        let (mut game, [p1, ..]) = MockGame::builder()
+            .turn(2, turns::Step::PrecombatMain)
+            .players([P1.hand([divination()]).mana_pool(mana![2, U]), P2.active()]);
         game.pass_priority();
         let divination = game.find(p1, HAND, "Divination").unwrap();
         game.act(p1, actions::Action::Cast(divination));
@@ -107,15 +102,16 @@ mod tests {
 
     #[test]
     fn sorcery_cannot_be_cast_while_the_stack_is_not_empty() {
-        let mut game = MockGame::builder()
-            .hand(Seat::P1, [lightning_bolt(), divination()])
-            .mana_pool(Seat::P1, mana![R, 2, U])
-            .build();
-        let bolt = game.find(game.p1, HAND, "Lightning Bolt").unwrap();
-        game.act(game.p1, actions::Action::Cast(bolt));
-        game.act(game.p1, actions::Action::ChooseTargets(vec![game.p2]));
-        let divination = game.find(game.p1, HAND, "Divination").unwrap();
-        game.act(game.p1, actions::Action::Cast(divination));
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.hand([lightning_bolt(), divination()])
+                .mana_pool(mana![R, 2, U]),
+            P2,
+        ]);
+        let bolt = game.find(p1, HAND, "Lightning Bolt").unwrap();
+        game.act(p1, actions::Action::Cast(bolt));
+        game.act(p1, actions::Action::ChooseTargets(vec![p2]));
+        let divination = game.find(p1, HAND, "Divination").unwrap();
+        game.act(p1, actions::Action::Cast(divination));
         assert_eq!(
             game.last_rejection(),
             Some(&actions::Rejected::CannotCast { spell: divination })

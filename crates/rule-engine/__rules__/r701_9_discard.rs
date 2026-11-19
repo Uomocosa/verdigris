@@ -80,60 +80,59 @@ pub fn r701_9_discard(
 
 #[cfg(test)]
 mod tests {
+    use bevy::prelude::Entity;
+
     use crate::actions;
     use crate::mana;
     use crate::testing::*;
     use crate::{GRAVEYARD, HAND};
 
-    fn cast_and_resolve_mind_rot(game: &mut MockGame) {
-        let mind_rot = game.find(game.p1, HAND, "Mind Rot").unwrap();
-        game.act(game.p1, actions::Action::Cast(mind_rot));
-        game.act(game.p1, actions::Action::ChooseTargets(vec![game.p2]));
+    fn cast_and_resolve_mind_rot(game: &mut MockGame, caster: Entity, target: Entity) {
+        let mind_rot = game.find(caster, HAND, "Mind Rot").unwrap();
+        game.act(caster, actions::Action::Cast(mind_rot));
+        game.act(caster, actions::Action::ChooseTargets(vec![target]));
         game.pass_priority_all();
     }
 
     #[test]
     fn test_usage() {
-        let mut game = MockGame::builder()
-            .hand(Seat::P1, [mind_rot()])
-            .hand(Seat::P2, [grizzly_bears()])
-            .mana_pool(Seat::P1, mana![2, B])
-            .build();
-        cast_and_resolve_mind_rot(&mut game);
-        assert!(game.find(game.p2, GRAVEYARD, "Grizzly Bears").is_some());
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.hand([mind_rot()]).mana_pool(mana![2, B]),
+            P2.hand([grizzly_bears()]),
+        ]);
+        cast_and_resolve_mind_rot(&mut game, p1, p2);
+        assert!(game.find(p2, GRAVEYARD, "Grizzly Bears").is_some());
     }
 
     #[test]
     fn mind_rot_makes_the_target_choose_two_cards_to_discard() {
-        let mut game = MockGame::builder()
-            .hand(Seat::P1, [mind_rot()])
-            .hand(Seat::P2, [grizzly_bears(), lightning_bolt(), murder()])
-            .mana_pool(Seat::P1, mana![2, B])
-            .build();
-        cast_and_resolve_mind_rot(&mut game);
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.hand([mind_rot()]).mana_pool(mana![2, B]),
+            P2.hand([grizzly_bears(), lightning_bolt(), murder()]),
+        ]);
+        cast_and_resolve_mind_rot(&mut game, p1, p2);
 
-        let bears = game.find(game.p2, HAND, "Grizzly Bears").unwrap();
-        let bolt = game.find(game.p2, HAND, "Lightning Bolt").unwrap();
-        game.act(game.p2, actions::Action::ChooseDiscard(vec![bears, bolt]));
+        let bears = game.find(p2, HAND, "Grizzly Bears").unwrap();
+        let bolt = game.find(p2, HAND, "Lightning Bolt").unwrap();
+        game.act(p2, actions::Action::ChooseDiscard(vec![bears, bolt]));
 
         assert_eq!(game.zone_of(bears), GRAVEYARD);
         assert_eq!(game.zone_of(bolt), GRAVEYARD);
-        assert!(game.find(game.p2, HAND, "Murder").is_some());
+        assert!(game.find(p2, HAND, "Murder").is_some());
     }
 
     #[test]
     fn mind_rot_discards_every_card_when_the_hand_holds_fewer_than_two() {
-        let mut game = MockGame::builder()
-            .hand(Seat::P1, [mind_rot()])
-            .hand(Seat::P2, [grizzly_bears()])
-            .mana_pool(Seat::P1, mana![2, B])
-            .build();
-        cast_and_resolve_mind_rot(&mut game);
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.hand([mind_rot()]).mana_pool(mana![2, B]),
+            P2.hand([grizzly_bears()]),
+        ]);
+        cast_and_resolve_mind_rot(&mut game, p1, p2);
 
         assert_eq!(
-            game.zone_of(game.find(game.p2, GRAVEYARD, "Grizzly Bears").unwrap()),
+            game.zone_of(game.find(p2, GRAVEYARD, "Grizzly Bears").unwrap()),
             GRAVEYARD
         );
-        assert!(game.find(game.p2, HAND, "Grizzly Bears").is_none());
+        assert!(game.find(p2, HAND, "Grizzly Bears").is_none());
     }
 }

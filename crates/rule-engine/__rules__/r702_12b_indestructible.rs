@@ -45,47 +45,44 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let mut game = MockGame::builder()
-            .hand(Seat::P1, [murder()])
-            .battlefield(Seat::P2, [darksteel_myr()])
-            .mana_pool(Seat::P1, mana![1, B, B])
-            .build();
-        let murder = game.find(game.p1, HAND, "Murder").unwrap();
-        let myr = game.find(game.p2, BATTLEFIELD, "Darksteel Myr").unwrap();
-        game.act(game.p1, actions::Action::Cast(murder));
-        game.act(game.p1, actions::Action::ChooseTargets(vec![myr]));
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.hand([murder()]).mana_pool(mana![1, B, B]),
+            P2.battlefield([darksteel_myr()]),
+        ]);
+        let murder = game.find(p1, HAND, "Murder").unwrap();
+        let myr = game.find(p2, BATTLEFIELD, "Darksteel Myr").unwrap();
+        game.act(p1, actions::Action::Cast(murder));
+        game.act(p1, actions::Action::ChooseTargets(vec![myr]));
         game.pass_priority_all();
         assert_eq!(game.zone_of(myr), BATTLEFIELD);
     }
 
     #[test]
     fn r702_12b_indestructible_ignores_destroy_effects() {
-        let mut game = MockGame::builder()
-            .hand(Seat::P1, [murder()])
-            .battlefield(Seat::P2, [darksteel_myr()])
-            .mana_pool(Seat::P1, mana![1, B, B])
-            .build();
-        let murder = game.find(game.p1, HAND, "Murder").unwrap();
-        let myr = game.find(game.p2, BATTLEFIELD, "Darksteel Myr").unwrap();
-        game.act(game.p1, actions::Action::Cast(murder));
-        game.act(game.p1, actions::Action::ChooseTargets(vec![myr]));
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.hand([murder()]).mana_pool(mana![1, B, B]),
+            P2.battlefield([darksteel_myr()]),
+        ]);
+        let murder = game.find(p1, HAND, "Murder").unwrap();
+        let myr = game.find(p2, BATTLEFIELD, "Darksteel Myr").unwrap();
+        game.act(p1, actions::Action::Cast(murder));
+        game.act(p1, actions::Action::ChooseTargets(vec![myr]));
         game.pass_priority_all();
         assert_eq!(game.zone_of(myr), BATTLEFIELD);
         assert_eq!(game.zone_of(murder), GRAVEYARD);
-        assert!(game.find(game.p2, BATTLEFIELD, "Darksteel Myr").is_some());
+        assert!(game.find(p2, BATTLEFIELD, "Darksteel Myr").is_some());
     }
 
     #[test]
     fn r702_12b_indestructible_survives_lethal_damage() {
-        let mut game = MockGame::builder()
-            .hand(Seat::P1, [lightning_bolt()])
-            .battlefield(Seat::P2, [darksteel_myr()])
-            .mana_pool(Seat::P1, mana![R])
-            .build();
-        let bolt = game.find(game.p1, HAND, "Lightning Bolt").unwrap();
-        let myr = game.find(game.p2, BATTLEFIELD, "Darksteel Myr").unwrap();
-        game.act(game.p1, actions::Action::Cast(bolt));
-        game.act(game.p1, actions::Action::ChooseTargets(vec![myr]));
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.hand([lightning_bolt()]).mana_pool(mana![R]),
+            P2.battlefield([darksteel_myr()]),
+        ]);
+        let bolt = game.find(p1, HAND, "Lightning Bolt").unwrap();
+        let myr = game.find(p2, BATTLEFIELD, "Darksteel Myr").unwrap();
+        game.act(p1, actions::Action::Cast(bolt));
+        game.act(p1, actions::Action::ChooseTargets(vec![myr]));
         game.pass_priority_all();
         assert_eq!(game.zone_of(myr), BATTLEFIELD);
         let damage = game.app.world().get::<damage::Damage>(myr).unwrap();
@@ -94,15 +91,14 @@ mod tests {
 
     #[test]
     fn r702_12b_indestructible_survives_doom_blade() {
-        let mut game = MockGame::builder()
-            .hand(Seat::P1, [doom_blade()])
-            .battlefield(Seat::P2, [darksteel_myr()])
-            .mana_pool(Seat::P1, mana![1, B])
-            .build();
-        let blade = game.find(game.p1, HAND, "Doom Blade").unwrap();
-        let myr = game.find(game.p2, BATTLEFIELD, "Darksteel Myr").unwrap();
-        game.act(game.p1, actions::Action::Cast(blade));
-        game.act(game.p1, actions::Action::ChooseTargets(vec![myr]));
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.hand([doom_blade()]).mana_pool(mana![1, B]),
+            P2.battlefield([darksteel_myr()]),
+        ]);
+        let blade = game.find(p1, HAND, "Doom Blade").unwrap();
+        let myr = game.find(p2, BATTLEFIELD, "Darksteel Myr").unwrap();
+        game.act(p1, actions::Action::Cast(blade));
+        game.act(p1, actions::Action::ChooseTargets(vec![myr]));
         game.pass_priority_all();
         assert_eq!(game.zone_of(myr), BATTLEFIELD);
         assert_eq!(game.zone_of(blade), GRAVEYARD);

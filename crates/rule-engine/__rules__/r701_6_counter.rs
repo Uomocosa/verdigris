@@ -38,18 +38,15 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let mut game = MockGame::builder()
-            .hand(Seat::P1, [lightning_bolt()])
-            .hand(Seat::P2, [cancel()])
-            .mana_pool(Seat::P1, mana![R])
-            .mana_pool(Seat::P2, mana![1, U, U])
-            .build();
-        let bolt = game.find(game.p1, HAND, "Lightning Bolt").unwrap();
-        let cancel = game.find(game.p2, HAND, "Cancel").unwrap();
-        let p2 = game.p2;
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.hand([lightning_bolt()]).mana_pool(mana![R]),
+            P2.hand([cancel()]).mana_pool(mana![1, U, U]),
+        ]);
+        let bolt = game.find(p1, HAND, "Lightning Bolt").unwrap();
+        let cancel = game.find(p2, HAND, "Cancel").unwrap();
 
-        game.act(game.p1, actions::Action::Cast(bolt));
-        game.act(game.p1, actions::Action::ChooseTargets(vec![p2]));
+        game.act(p1, actions::Action::Cast(bolt));
+        game.act(p1, actions::Action::ChooseTargets(vec![p2]));
         game.pass_priority();
         game.act(p2, actions::Action::Cast(cancel));
         game.act(p2, actions::Action::ChooseTargets(vec![bolt]));
@@ -62,19 +59,17 @@ mod tests {
 
     #[test]
     fn essence_scatter_counters_a_creature_spell() {
-        let mut game = MockGame::builder()
-            .hand(Seat::P1, [grizzly_bears()])
-            .hand(Seat::P2, [essence_scatter()])
-            .mana_pool(Seat::P1, mana![1, G])
-            .mana_pool(Seat::P2, mana![1, U])
-            .build();
-        let bears = game.find(game.p1, HAND, "Grizzly Bears").unwrap();
-        let scatter = game.find(game.p2, HAND, "Essence Scatter").unwrap();
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.hand([grizzly_bears()]).mana_pool(mana![1, G]),
+            P2.hand([essence_scatter()]).mana_pool(mana![1, U]),
+        ]);
+        let bears = game.find(p1, HAND, "Grizzly Bears").unwrap();
+        let scatter = game.find(p2, HAND, "Essence Scatter").unwrap();
 
-        game.act(game.p1, actions::Action::Cast(bears));
+        game.act(p1, actions::Action::Cast(bears));
         game.pass_priority();
-        game.act(game.p2, actions::Action::Cast(scatter));
-        game.act(game.p2, actions::Action::ChooseTargets(vec![bears]));
+        game.act(p2, actions::Action::Cast(scatter));
+        game.act(p2, actions::Action::ChooseTargets(vec![bears]));
         game.pass_priority_all();
 
         assert_eq!(game.zone_of(bears), GRAVEYARD);
@@ -83,18 +78,15 @@ mod tests {
 
     #[test]
     fn negate_counters_a_noncreature_spell() {
-        let mut game = MockGame::builder()
-            .hand(Seat::P1, [lightning_bolt()])
-            .hand(Seat::P2, [negate()])
-            .mana_pool(Seat::P1, mana![R])
-            .mana_pool(Seat::P2, mana![1, U])
-            .build();
-        let bolt = game.find(game.p1, HAND, "Lightning Bolt").unwrap();
-        let negate = game.find(game.p2, HAND, "Negate").unwrap();
-        let p2 = game.p2;
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.hand([lightning_bolt()]).mana_pool(mana![R]),
+            P2.hand([negate()]).mana_pool(mana![1, U]),
+        ]);
+        let bolt = game.find(p1, HAND, "Lightning Bolt").unwrap();
+        let negate = game.find(p2, HAND, "Negate").unwrap();
 
-        game.act(game.p1, actions::Action::Cast(bolt));
-        game.act(game.p1, actions::Action::ChooseTargets(vec![p2]));
+        game.act(p1, actions::Action::Cast(bolt));
+        game.act(p1, actions::Action::ChooseTargets(vec![p2]));
         game.pass_priority();
         game.act(p2, actions::Action::Cast(negate));
         game.act(p2, actions::Action::ChooseTargets(vec![bolt]));
@@ -107,17 +99,13 @@ mod tests {
 
     #[test]
     fn dispel_can_counter_a_cancel_so_the_outer_bolt_resolves() {
-        let mut game = MockGame::builder()
-            .hand(Seat::P1, [lightning_bolt(), dispel()])
-            .hand(Seat::P2, [cancel()])
-            .mana_pool(Seat::P1, mana![R, U])
-            .mana_pool(Seat::P2, mana![1, U, U])
-            .build();
-        let bolt = game.find(game.p1, HAND, "Lightning Bolt").unwrap();
-        let dispel = game.find(game.p1, HAND, "Dispel").unwrap();
-        let cancel = game.find(game.p2, HAND, "Cancel").unwrap();
-        let p1 = game.p1;
-        let p2 = game.p2;
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.hand([lightning_bolt(), dispel()]).mana_pool(mana![R, U]),
+            P2.hand([cancel()]).mana_pool(mana![1, U, U]),
+        ]);
+        let bolt = game.find(p1, HAND, "Lightning Bolt").unwrap();
+        let dispel = game.find(p1, HAND, "Dispel").unwrap();
+        let cancel = game.find(p2, HAND, "Cancel").unwrap();
 
         game.act(p1, actions::Action::Cast(bolt));
         game.act(p1, actions::Action::ChooseTargets(vec![p2]));
@@ -140,17 +128,14 @@ mod tests {
 
     #[test]
     fn cancelled_cancel_does_not_stop_the_outer_bolt() {
-        let mut game = MockGame::builder()
-            .hand(Seat::P1, [lightning_bolt(), cancel()])
-            .hand(Seat::P2, [cancel()])
-            .mana_pool(Seat::P1, mana![1, U, U, R])
-            .mana_pool(Seat::P2, mana![1, U, U])
-            .build();
-        let bolt = game.find(game.p1, HAND, "Lightning Bolt").unwrap();
-        let p1_cancel = game.find(game.p1, HAND, "Cancel").unwrap();
-        let p2_cancel = game.find(game.p2, HAND, "Cancel").unwrap();
-        let p1 = game.p1;
-        let p2 = game.p2;
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.hand([lightning_bolt(), cancel()])
+                .mana_pool(mana![1, U, U, R]),
+            P2.hand([cancel()]).mana_pool(mana![1, U, U]),
+        ]);
+        let bolt = game.find(p1, HAND, "Lightning Bolt").unwrap();
+        let p1_cancel = game.find(p1, HAND, "Cancel").unwrap();
+        let p2_cancel = game.find(p2, HAND, "Cancel").unwrap();
 
         game.act(p1, actions::Action::Cast(bolt));
         game.act(p1, actions::Action::ChooseTargets(vec![p2]));
