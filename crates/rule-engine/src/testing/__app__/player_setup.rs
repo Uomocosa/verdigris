@@ -28,17 +28,21 @@ impl PlayerSetup {
 
 impl PlayerSetup {
     #[must_use]
-    pub fn hand(mut self, definitions: impl IntoIterator<Item = cards::CardDefinition>) -> Self {
-        self.hand.extend(definitions);
+    pub fn hand(
+        mut self,
+        definitions: impl IntoIterator<Item = impl Into<cards::CardDefinition>>,
+    ) -> Self {
+        self.hand.extend(definitions.into_iter().map(Into::into));
         self
     }
 
     #[must_use]
     pub fn battlefield(
         mut self,
-        definitions: impl IntoIterator<Item = cards::CardDefinition>,
+        definitions: impl IntoIterator<Item = impl Into<cards::CardDefinition>>,
     ) -> Self {
-        self.battlefield.extend(definitions);
+        self.battlefield
+            .extend(definitions.into_iter().map(Into::into));
         self
     }
 
@@ -74,14 +78,44 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let setup = P3.life(7).mana_pool(mana![2, U]).hand([divination()]);
+        let setup = P3
+            .life(7)
+            .mana_pool(mana![2, U])
+            .hand([divination()])
+            .battlefield([grizzly_bears()])
+            .library([murder()]);
 
         assert_eq!(setup.seat, 3);
         assert_eq!(setup.life, 7);
         assert_eq!(setup.mana_pool, mana![2, U]);
         assert_eq!(setup.hand, vec![divination()]);
-        assert_eq!(setup.battlefield, vec![]);
-        assert!(setup.library.is_none());
+        assert_eq!(setup.battlefield, vec![grizzly_bears()]);
+        assert_eq!(setup.library, Some(vec![murder()]));
         assert!(!setup.active);
+    }
+
+    #[test]
+    fn card_constant_name_matches_its_definition() {
+        let fixtures = [
+            CANCEL,
+            DARKSTEEL_MYR,
+            DISPEL,
+            DIVINATION,
+            DOOM_BLADE,
+            ESSENCE_SCATTER,
+            GIANT_GROWTH,
+            GRIZZLY_BEARS,
+            LIGHTNING_BOLT,
+            MIND_ROT,
+            MURDER,
+            NEGATE,
+            SIGN_IN_BLOOD,
+            TYPHOID_RATS,
+            WALKING_CORPSE,
+        ];
+
+        for card in fixtures {
+            assert_eq!(*((card.definition)()).name, card.name);
+        }
     }
 }
