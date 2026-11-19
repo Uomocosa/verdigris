@@ -17,7 +17,7 @@ bevy = { version = "=0.20.1", default-features = false }
 derive_more = { version = "=2.1.1" }
 rstest = { version = "=0.28.0" }
 thiserror = "=2.0.21"
-atomic-delegate-macros = { path = "../lele-rust-linter/crates/atomic-delegate-macros" }
+atomic-delegate-macros = { git = "https://github.com/Uomocosa/lele-rust-linter", tag = "v0.0.14" }
 
 [workspace.lints.clippy]
 pedantic = { level = "deny", priority = -1 }
