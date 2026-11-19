@@ -105,6 +105,7 @@ impl MockGame {
 #[cfg(test)]
 mod tests {
     use crate::actions;
+    use crate::cards;
     use crate::mana;
     use crate::testing::*;
     use crate::turns;
@@ -157,10 +158,10 @@ mod tests {
         let (game, [p1, p2, ..]) = MockGame::builder()
             .turn(3, turns::Step::PostcombatMain)
             .players([
-                P1.hand([lightning_bolt()]).mana_pool(mana![R]),
+                P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
                 P2.active()
-                    .battlefield([grizzly_bears()])
-                    .library([murder()]),
+                    .battlefield([GRIZZLY_BEARS])
+                    .library([cards::CardDefinition::from(MURDER)]),
                 P3,
                 P4,
             ]);
@@ -186,7 +187,7 @@ mod tests {
 
     #[test]
     fn new_builds_the_described_players() {
-        let (game, [p1, p2]) = MockGame::new([P1.hand([divination()]).mana_pool(mana![2, U]), P2]);
+        let (game, [p1, p2]) = MockGame::new([P1.hand([DIVINATION]).mana_pool(mana![2, U]), P2]);
 
         assert!(!game.player(p1).cards(HAND, DIVINATION).is_empty());
         assert!(game.player(p1).cards(HAND, GRIZZLY_BEARS).is_empty());
@@ -206,7 +207,7 @@ mod tests {
     fn builder_players_marks_the_active_setup_and_its_turn() {
         let (game, [_, p2, ..]) = MockGame::builder()
             .turn(3, turns::Step::PostcombatMain)
-            .players([P1, P2.active().battlefield([grizzly_bears()]), P3, P4]);
+            .players([P1, P2.active().battlefield([GRIZZLY_BEARS]), P3, P4]);
 
         assert!(!game.player(p2).cards(BATTLEFIELD, GRIZZLY_BEARS).is_empty());
 

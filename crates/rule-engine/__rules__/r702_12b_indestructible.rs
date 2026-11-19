@@ -46,8 +46,8 @@ mod tests {
     #[test]
     fn test_usage() {
         let (mut game, [p1, p2]) = MockGame::new([
-            P1.hand([murder()]).mana_pool(mana![1, B, B]),
-            P2.battlefield([darksteel_myr()]),
+            P1.hand([MURDER]).mana_pool(mana![1, B, B]),
+            P2.battlefield([DARKSTEEL_MYR]),
         ]);
         let murder = game.player(p1).cards(HAND, MURDER).only().unwrap();
         let myr = game
@@ -64,8 +64,8 @@ mod tests {
     #[test]
     fn r702_12b_indestructible_ignores_destroy_effects() {
         let (mut game, [p1, p2]) = MockGame::new([
-            P1.hand([murder()]).mana_pool(mana![1, B, B]),
-            P2.battlefield([darksteel_myr()]),
+            P1.hand([MURDER]).mana_pool(mana![1, B, B]),
+            P2.battlefield([DARKSTEEL_MYR]),
         ]);
         let murder = game.player(p1).cards(HAND, MURDER).only().unwrap();
         let myr = game
@@ -84,8 +84,8 @@ mod tests {
     #[test]
     fn r702_12b_indestructible_survives_lethal_damage() {
         let (mut game, [p1, p2]) = MockGame::new([
-            P1.hand([lightning_bolt()]).mana_pool(mana![R]),
-            P2.battlefield([darksteel_myr()]),
+            P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
+            P2.battlefield([DARKSTEEL_MYR]),
         ]);
         let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
         let myr = game
@@ -104,8 +104,8 @@ mod tests {
     #[test]
     fn r702_12b_indestructible_survives_doom_blade() {
         let (mut game, [p1, p2]) = MockGame::new([
-            P1.hand([doom_blade()]).mana_pool(mana![1, B]),
-            P2.battlefield([darksteel_myr()]),
+            P1.hand([DOOM_BLADE]).mana_pool(mana![1, B]),
+            P2.battlefield([DARKSTEEL_MYR]),
         ]);
         let blade = game.player(p1).cards(HAND, DOOM_BLADE).only().unwrap();
         let myr = game

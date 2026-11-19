@@ -29,10 +29,8 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let (mut game, [p1, ..]) = MockGame::new([
-            P1.hand([divination()]).library([]).mana_pool(mana![2, U]),
-            P2,
-        ]);
+        let (mut game, [p1, ..]) =
+            MockGame::new([P1.hand([DIVINATION]).library([]).mana_pool(mana![2, U]), P2]);
         let divination = game.player(p1).cards(HAND, DIVINATION).only().unwrap();
         game.act(p1, actions::Action::Cast(divination));
         game.pass_priority_all();
@@ -41,10 +39,8 @@ mod tests {
 
     #[test]
     fn drawing_from_an_empty_library_loses_the_game_at_the_next_state_based_check() {
-        let (mut game, [p1, ..]) = MockGame::new([
-            P1.hand([divination()]).library([]).mana_pool(mana![2, U]),
-            P2,
-        ]);
+        let (mut game, [p1, ..]) =
+            MockGame::new([P1.hand([DIVINATION]).library([]).mana_pool(mana![2, U]), P2]);
         let divination = game.player(p1).cards(HAND, DIVINATION).only().unwrap();
         game.act(p1, actions::Action::Cast(divination));
         assert!(game.app.world().get::<players::Lost>(p1).is_none());

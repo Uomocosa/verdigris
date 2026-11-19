@@ -74,6 +74,7 @@ impl PlayerSetup {
 #[cfg(test)]
 mod tests {
     use crate::HAND;
+    use crate::cards;
     use crate::mana;
     use crate::testing::*;
 
@@ -82,16 +83,22 @@ mod tests {
         let setup = P3
             .life(7)
             .mana_pool(mana![2, U])
-            .hand([divination()])
-            .battlefield([grizzly_bears()])
-            .library([murder()]);
+            .hand([DIVINATION])
+            .battlefield([GRIZZLY_BEARS])
+            .library([cards::CardDefinition::from(MURDER)]);
 
         assert_eq!(setup.seat, 3);
         assert_eq!(setup.life, 7);
         assert_eq!(setup.mana_pool, mana![2, U]);
-        assert_eq!(setup.hand, vec![divination()]);
-        assert_eq!(setup.battlefield, vec![grizzly_bears()]);
-        assert_eq!(setup.library, Some(vec![murder()]));
+        assert_eq!(setup.hand, vec![cards::CardDefinition::from(DIVINATION)]);
+        assert_eq!(
+            setup.battlefield,
+            vec![cards::CardDefinition::from(GRIZZLY_BEARS)]
+        );
+        assert_eq!(
+            setup.library,
+            Some(vec![cards::CardDefinition::from(MURDER)])
+        );
         assert!(!setup.active);
     }
 

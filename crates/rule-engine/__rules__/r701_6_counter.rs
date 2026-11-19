@@ -39,8 +39,8 @@ mod tests {
     #[test]
     fn test_usage() {
         let (mut game, [p1, p2]) = MockGame::new([
-            P1.hand([lightning_bolt()]).mana_pool(mana![R]),
-            P2.hand([cancel()]).mana_pool(mana![1, U, U]),
+            P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
+            P2.hand([CANCEL]).mana_pool(mana![1, U, U]),
         ]);
         let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
         let cancel = game.player(p2).cards(HAND, CANCEL).only().unwrap();
@@ -60,8 +60,8 @@ mod tests {
     #[test]
     fn essence_scatter_counters_a_creature_spell() {
         let (mut game, [p1, p2]) = MockGame::new([
-            P1.hand([grizzly_bears()]).mana_pool(mana![1, G]),
-            P2.hand([essence_scatter()]).mana_pool(mana![1, U]),
+            P1.hand([GRIZZLY_BEARS]).mana_pool(mana![1, G]),
+            P2.hand([ESSENCE_SCATTER]).mana_pool(mana![1, U]),
         ]);
         let bears = game.player(p1).cards(HAND, GRIZZLY_BEARS).only().unwrap();
         let scatter = game.player(p2).cards(HAND, ESSENCE_SCATTER).only().unwrap();
@@ -79,8 +79,8 @@ mod tests {
     #[test]
     fn negate_counters_a_noncreature_spell() {
         let (mut game, [p1, p2]) = MockGame::new([
-            P1.hand([lightning_bolt()]).mana_pool(mana![R]),
-            P2.hand([negate()]).mana_pool(mana![1, U]),
+            P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
+            P2.hand([NEGATE]).mana_pool(mana![1, U]),
         ]);
         let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
         let negate = game.player(p2).cards(HAND, NEGATE).only().unwrap();
@@ -100,8 +100,8 @@ mod tests {
     #[test]
     fn dispel_can_counter_a_cancel_so_the_outer_bolt_resolves() {
         let (mut game, [p1, p2]) = MockGame::new([
-            P1.hand([lightning_bolt(), dispel()]).mana_pool(mana![R, U]),
-            P2.hand([cancel()]).mana_pool(mana![1, U, U]),
+            P1.hand([LIGHTNING_BOLT, DISPEL]).mana_pool(mana![R, U]),
+            P2.hand([CANCEL]).mana_pool(mana![1, U, U]),
         ]);
         let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
         let dispel = game.player(p1).cards(HAND, DISPEL).only().unwrap();
@@ -129,9 +129,9 @@ mod tests {
     #[test]
     fn cancelled_cancel_does_not_stop_the_outer_bolt() {
         let (mut game, [p1, p2]) = MockGame::new([
-            P1.hand([lightning_bolt(), cancel()])
+            P1.hand([LIGHTNING_BOLT, CANCEL])
                 .mana_pool(mana![1, U, U, R]),
-            P2.hand([cancel()]).mana_pool(mana![1, U, U]),
+            P2.hand([CANCEL]).mana_pool(mana![1, U, U]),
         ]);
         let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
         let p1_cancel = game.player(p1).cards(HAND, CANCEL).only().unwrap();

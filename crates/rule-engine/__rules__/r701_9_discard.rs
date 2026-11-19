@@ -89,8 +89,8 @@ mod tests {
     #[test]
     fn test_usage() {
         let (mut game, [p1, p2]) = MockGame::new([
-            P1.hand([mind_rot()]).mana_pool(mana![2, B]),
-            P2.hand([grizzly_bears()]),
+            P1.hand([MIND_ROT]).mana_pool(mana![2, B]),
+            P2.hand([GRIZZLY_BEARS]),
         ]);
         let mind_rot = game.player(p1).cards(HAND, MIND_ROT).only().unwrap();
         game.play(p1.cast(mind_rot).targeting(p2).resolve())
@@ -101,8 +101,8 @@ mod tests {
     #[test]
     fn mind_rot_makes_the_target_choose_two_cards_to_discard() {
         let (mut game, [p1, p2]) = MockGame::new([
-            P1.hand([mind_rot()]).mana_pool(mana![2, B]),
-            P2.hand([grizzly_bears(), lightning_bolt(), murder()]),
+            P1.hand([MIND_ROT]).mana_pool(mana![2, B]),
+            P2.hand([GRIZZLY_BEARS, LIGHTNING_BOLT, MURDER]),
         ]);
         let mind_rot = game.player(p1).cards(HAND, MIND_ROT).only().unwrap();
         game.play(p1.cast(mind_rot).targeting(p2).resolve())
@@ -120,8 +120,8 @@ mod tests {
     #[test]
     fn mind_rot_discards_every_card_when_the_hand_holds_fewer_than_two() {
         let (mut game, [p1, p2]) = MockGame::new([
-            P1.hand([mind_rot()]).mana_pool(mana![2, B]),
-            P2.hand([grizzly_bears()]),
+            P1.hand([MIND_ROT]).mana_pool(mana![2, B]),
+            P2.hand([GRIZZLY_BEARS]),
         ]);
         let mind_rot = game.player(p1).cards(HAND, MIND_ROT).only().unwrap();
         game.play(p1.cast(mind_rot).targeting(p2).resolve())

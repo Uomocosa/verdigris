@@ -38,8 +38,8 @@ mod tests {
     #[test]
     fn test_usage() {
         let (mut game, [p1, ..]) = MockGame::new([
-            P1.hand([giant_growth()])
-                .battlefield([grizzly_bears()])
+            P1.hand([GIANT_GROWTH])
+                .battlefield([GRIZZLY_BEARS])
                 .mana_pool(mana![G]),
             P2,
         ]);
@@ -70,9 +70,9 @@ mod tests {
     #[test]
     fn r611_2a_giant_growth_saves_a_creature_from_lethal_damage() {
         let (mut game, [p1, p2]) = MockGame::new([
-            P1.hand([lightning_bolt()]).mana_pool(mana![R]),
-            P2.hand([giant_growth()])
-                .battlefield([grizzly_bears()])
+            P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
+            P2.hand([GIANT_GROWTH])
+                .battlefield([GRIZZLY_BEARS])
                 .mana_pool(mana![G]),
         ]);
         let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();

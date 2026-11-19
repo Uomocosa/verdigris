@@ -45,8 +45,8 @@ mod tests {
     #[ignore = "needs combat: Typhoid Rats deals damage by attacking or blocking"]
     fn test_usage() {
         let (game, [p1, p2]) = MockGame::new([
-            P1.battlefield([typhoid_rats()]),
-            P2.battlefield([grizzly_bears()]),
+            P1.battlefield([TYPHOID_RATS]),
+            P2.battlefield([GRIZZLY_BEARS]),
         ]);
         assert!(!game.player(p1).cards(BATTLEFIELD, TYPHOID_RATS).is_empty());
         assert!(!game.player(p2).cards(BATTLEFIELD, GRIZZLY_BEARS).is_empty());
@@ -56,8 +56,8 @@ mod tests {
     #[ignore = "needs combat: Typhoid Rats deals damage by attacking or blocking"]
     fn r704_5h_deathtouch_damage_destroys_a_larger_creature() {
         let (game, [p1, p2]) = MockGame::new([
-            P1.battlefield([typhoid_rats()]),
-            P2.battlefield([grizzly_bears()]),
+            P1.battlefield([TYPHOID_RATS]),
+            P2.battlefield([GRIZZLY_BEARS]),
         ]);
         assert!(!game.player(p1).cards(BATTLEFIELD, TYPHOID_RATS).is_empty());
         assert!(!game.player(p2).cards(BATTLEFIELD, GRIZZLY_BEARS).is_empty());
@@ -67,8 +67,8 @@ mod tests {
     #[ignore = "needs combat: Typhoid Rats deals damage by attacking or blocking"]
     fn r704_5h_deathtouch_damage_does_not_destroy_indestructible() {
         let (game, [_, p2]) = MockGame::new([
-            P1.battlefield([typhoid_rats()]),
-            P2.battlefield([darksteel_myr()]),
+            P1.battlefield([TYPHOID_RATS]),
+            P2.battlefield([DARKSTEEL_MYR]),
         ]);
         assert!(!game.player(p2).cards(BATTLEFIELD, DARKSTEEL_MYR).is_empty());
     }
@@ -77,8 +77,8 @@ mod tests {
     #[ignore = "needs combat: Typhoid Rats deals damage by attacking or blocking"]
     fn r704_5h_damage_without_deathtouch_does_not_destroy_a_two_two() {
         let (game, [_, p2]) = MockGame::new([
-            P1.battlefield([walking_corpse()]),
-            P2.battlefield([grizzly_bears()]),
+            P1.battlefield([WALKING_CORPSE]),
+            P2.battlefield([GRIZZLY_BEARS]),
         ]);
         assert!(!game.player(p2).cards(BATTLEFIELD, GRIZZLY_BEARS).is_empty());
     }

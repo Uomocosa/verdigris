@@ -86,7 +86,7 @@ pub fn spawn_game(
         let library_cards = setup
             .library
             .clone()
-            .unwrap_or_else(|| vec![testing::grizzly_bears(); 12]);
+            .unwrap_or_else(|| vec![cards::CardDefinition::from(testing::GRIZZLY_BEARS); 12]);
         for definition in library_cards {
             let _ =
                 app.world_mut()

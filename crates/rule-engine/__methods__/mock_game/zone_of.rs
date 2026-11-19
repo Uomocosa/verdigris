@@ -19,7 +19,7 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let (game, [_, p2, ..]) = MockGame::new([P1, P2.battlefield([grizzly_bears()])]);
+        let (game, [_, p2, ..]) = MockGame::new([P1, P2.battlefield([GRIZZLY_BEARS])]);
         let bears = game
             .player(p2)
             .cards(BATTLEFIELD, GRIZZLY_BEARS)

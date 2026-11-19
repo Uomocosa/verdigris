@@ -25,7 +25,7 @@ mod tests {
     #[test]
     fn test_usage() {
         let (mut game, [p1, p2]) =
-            MockGame::new([P1.hand([lightning_bolt()]).mana_pool(mana![R]), P2.life(3)]);
+            MockGame::new([P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]), P2.life(3)]);
         let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
         game.act(p1, actions::Action::Cast(bolt));
         game.act(p1, actions::Action::ChooseTargets(vec![p2]));
