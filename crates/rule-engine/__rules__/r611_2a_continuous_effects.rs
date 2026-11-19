@@ -42,11 +42,11 @@ mod tests {
                 .mana_pool(mana![G]),
             P2,
         ]);
-        let growth = game.player(p1).cards(HAND, GIANT_GROWTH).only().unwrap();
+        let growth = game.player(p1).cards_in(HAND).only(GIANT_GROWTH).unwrap();
         let bears = game
             .player(p1)
-            .cards(BATTLEFIELD, GRIZZLY_BEARS)
-            .only()
+            .cards_in(BATTLEFIELD)
+            .only(GRIZZLY_BEARS)
             .unwrap();
         game.play([
             p1.cast(growth).targeting(bears).pass_priority(),
@@ -56,7 +56,7 @@ mod tests {
         let modifier = game
             .app
             .world()
-            .get::<effects::PowerToughnessModifier>(bears)
+            .get::<effects::PowerToughnessModifier>(bears.into())
             .copied();
         assert_eq!(
             modifier,
@@ -76,12 +76,12 @@ mod tests {
                 .battlefield([GRIZZLY_BEARS])
                 .mana_pool(mana![G]),
         ]);
-        let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
-        let growth = game.player(p2).cards(HAND, GIANT_GROWTH).only().unwrap();
+        let bolt = game.player(p1).cards_in(HAND).only(LIGHTNING_BOLT).unwrap();
+        let growth = game.player(p2).cards_in(HAND).only(GIANT_GROWTH).unwrap();
         let bears = game
             .player(p2)
-            .cards(BATTLEFIELD, GRIZZLY_BEARS)
-            .only()
+            .cards_in(BATTLEFIELD)
+            .only(GRIZZLY_BEARS)
             .unwrap();
 
         game.play([
@@ -94,12 +94,16 @@ mod tests {
         .unwrap();
 
         assert_eq!(game.zone_of(bears), BATTLEFIELD);
-        let damage = game.app.world().get::<damage::Damage>(bears).copied();
+        let damage = game
+            .app
+            .world()
+            .get::<damage::Damage>(bears.into())
+            .copied();
         assert_eq!(damage, Some(damage::Damage(3)));
         let modifier = game
             .app
             .world()
-            .get::<effects::PowerToughnessModifier>(bears)
+            .get::<effects::PowerToughnessModifier>(bears.into())
             .copied();
         assert_eq!(
             modifier,

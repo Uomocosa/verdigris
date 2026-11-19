@@ -4,7 +4,7 @@ use crate::effects;
 use crate::testing;
 
 pub const DIVINATION: testing::Card = testing::Card {
-    name: "Divination",
+    name: testing::TestCardName("Divination"),
     definition: || cards::sorcery("Divination", cost![2, U]).spell(effects::draw(2)),
 };
 

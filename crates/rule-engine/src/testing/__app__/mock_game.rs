@@ -69,7 +69,7 @@ impl MockGame {
     pub fn p(&self, seat: usize) -> testing::TestPlayer {}
 
     #[must_use]
-    pub fn zone_of(&self, card: Entity) -> zones::Zone {}
+    pub fn zone_of(&self, card: impl Into<Entity>) -> zones::Zone {}
 
     #[must_use]
     pub fn target_choice(&self) -> Option<testing::ExpectedTargets> {}
@@ -92,12 +92,11 @@ impl MockGame {
 
 #[atomic_delegates]
 impl MockGame {
-    pub(crate) fn entities_in_zone_matching_card(
+    pub(crate) fn cards_in_zone(
         &self,
         player: Entity,
         zone: zones::Zone,
-        name: &str,
-    ) -> Vec<Entity> {
+    ) -> Vec<(testing::TestCard, cards::CardName)> {
     }
 
     pub(crate) fn rejection_count(&self) -> usize {}
@@ -131,10 +130,15 @@ mod tests {
 
         let first_bear = game
             .player(p1)
-            .cards(LIBRARY, GRIZZLY_BEARS)
+            .cards_in(LIBRARY)
+            .matching(GRIZZLY_BEARS)
             .first()
             .expect("P1 library holds Grizzly Bears");
-        let library = *game.app.world().get::<zones::InZone>(first_bear).unwrap();
+        let library = *game
+            .app
+            .world()
+            .get::<zones::InZone>(Entity::from(first_bear))
+            .unwrap();
         let bears_in_library = game
             .app
             .world()
@@ -146,8 +150,8 @@ mod tests {
             })
             .count();
         assert_eq!(bears_in_library, 12);
-        assert!(game.player(p1).cards(HAND, GRIZZLY_BEARS).is_empty());
-        assert!(game.player(p2).cards(HAND, GRIZZLY_BEARS).is_empty());
+        assert!(game.player(p1).cards_in(HAND).has_no(GRIZZLY_BEARS));
+        assert!(game.player(p2).cards_in(HAND).has_no(GRIZZLY_BEARS));
 
         let turn = game.app.world().resource::<turns::Turn>();
         assert_eq!(turn.number, 1);
@@ -172,10 +176,10 @@ mod tests {
         assert_ne!(game.p(3), game.p(4));
         assert!(game.app.world().get_entity(Entity::from(game.p(3))).is_ok());
         assert!(game.app.world().get_entity(Entity::from(game.p(4))).is_ok());
-        assert!(!game.player(p1).cards(HAND, LIGHTNING_BOLT).is_empty());
-        assert!(!game.player(p2).cards(BATTLEFIELD, GRIZZLY_BEARS).is_empty());
-        assert!(!game.player(p2).cards(LIBRARY, MURDER).is_empty());
-        assert!(game.player(p2).cards(LIBRARY, GRIZZLY_BEARS).is_empty());
+        assert!(game.player(p1).cards_in(HAND).has(LIGHTNING_BOLT));
+        assert!(game.player(p2).cards_in(BATTLEFIELD).has(GRIZZLY_BEARS));
+        assert!(game.player(p2).cards_in(LIBRARY).has(MURDER));
+        assert!(game.player(p2).cards_in(LIBRARY).has_no(GRIZZLY_BEARS));
         assert_eq!(game.mana_pool(p1), mana![R]);
 
         let turn = game.app.world().resource::<turns::Turn>();
@@ -192,8 +196,8 @@ mod tests {
     fn new_builds_the_described_players() {
         let (game, [p1, p2]) = MockGame::new([P1.hand([DIVINATION]).mana_pool(mana![2, U]), P2]);
 
-        assert!(!game.player(p1).cards(HAND, DIVINATION).is_empty());
-        assert!(game.player(p1).cards(HAND, GRIZZLY_BEARS).is_empty());
+        assert!(game.player(p1).cards_in(HAND).has(DIVINATION));
+        assert!(game.player(p1).cards_in(HAND).has_no(GRIZZLY_BEARS));
         assert_eq!(game.life(p1), 20);
         assert_eq!(game.life(p2), 20);
         assert_eq!(game.mana_pool(p1), mana![2, U]);
@@ -212,7 +216,7 @@ mod tests {
             .turn(3, turns::Step::PostcombatMain)
             .players([P1, P2.active().battlefield([GRIZZLY_BEARS]), P3, P4]);
 
-        assert!(!game.player(p2).cards(BATTLEFIELD, GRIZZLY_BEARS).is_empty());
+        assert!(game.player(p2).cards_in(BATTLEFIELD).has(GRIZZLY_BEARS));
 
         let turn = game.app.world().resource::<turns::Turn>();
         assert_eq!(turn.number, 3);
@@ -236,7 +240,7 @@ mod tests {
     #[test]
     fn fresh_game_has_no_target_or_rejection() {
         let (game, [p1, ..]) = MockGame::new([P1, P2]);
-        assert!(game.player(p1).cards(HAND, LIGHTNING_BOLT).is_empty());
+        assert!(game.player(p1).cards_in(HAND).has_no(LIGHTNING_BOLT));
         assert!(game.target_choice().is_none());
         assert!(game.last_rejection().is_none());
     }

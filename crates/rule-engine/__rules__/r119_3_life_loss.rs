@@ -28,7 +28,7 @@ mod tests {
     fn test_usage() {
         let (mut game, [p1, p2]) =
             MockGame::new([P1.hand([SIGN_IN_BLOOD]).mana_pool(mana![B, B]), P2]);
-        let sign_in_blood = game.player(p1).cards(HAND, SIGN_IN_BLOOD).only().unwrap();
+        let sign_in_blood = game.player(p1).cards_in(HAND).only(SIGN_IN_BLOOD).unwrap();
         game.play([
             p1.cast(sign_in_blood).targeting(p2).end_turn(),
             p2.end_turn(),
@@ -46,7 +46,7 @@ mod tests {
                 cards::CardDefinition::from(MURDER),
             ]),
         ]);
-        let sign_in_blood = game.player(p1).cards(HAND, SIGN_IN_BLOOD).only().unwrap();
+        let sign_in_blood = game.player(p1).cards_in(HAND).only(SIGN_IN_BLOOD).unwrap();
         game.play([
             p1.cast(sign_in_blood).targeting(p2).end_turn(),
             p2.end_turn(),
@@ -55,8 +55,8 @@ mod tests {
 
         assert_eq!(game.life(p2), 18);
         assert_eq!(game.life(p1), 20);
-        assert!(!game.player(p2).cards(HAND, LIGHTNING_BOLT).is_empty());
-        assert!(!game.player(p2).cards(HAND, MURDER).is_empty());
+        assert!(game.player(p2).cards_in(HAND).has(LIGHTNING_BOLT));
+        assert!(game.player(p2).cards_in(HAND).has(MURDER));
     }
 
     #[test]
@@ -70,7 +70,7 @@ mod tests {
                 .mana_pool(mana![B, B]),
             P2,
         ]);
-        let sign_in_blood = game.player(p1).cards(HAND, SIGN_IN_BLOOD).only().unwrap();
+        let sign_in_blood = game.player(p1).cards_in(HAND).only(SIGN_IN_BLOOD).unwrap();
         game.play([
             p1.cast(sign_in_blood).targeting(p1).end_turn(),
             p2.end_turn(),
@@ -78,8 +78,8 @@ mod tests {
         .unwrap();
 
         assert_eq!(game.life(p1), 18);
-        assert!(!game.player(p1).cards(HAND, LIGHTNING_BOLT).is_empty());
-        assert!(!game.player(p1).cards(HAND, MURDER).is_empty());
+        assert!(game.player(p1).cards_in(HAND).has(LIGHTNING_BOLT));
+        assert!(game.player(p1).cards_in(HAND).has(MURDER));
     }
 
     #[test]
@@ -88,7 +88,7 @@ mod tests {
             P1.hand([SIGN_IN_BLOOD]).mana_pool(mana![B, B]),
             P2.library([]),
         ]);
-        let sign_in_blood = game.player(p1).cards(HAND, SIGN_IN_BLOOD).only().unwrap();
+        let sign_in_blood = game.player(p1).cards_in(HAND).only(SIGN_IN_BLOOD).unwrap();
         game.play([
             p1.cast(sign_in_blood).targeting(p2).end_turn(),
             p2.end_turn(),

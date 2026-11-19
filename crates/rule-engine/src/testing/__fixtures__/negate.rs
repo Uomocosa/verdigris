@@ -5,7 +5,7 @@ use crate::effects;
 use crate::testing;
 
 pub const NEGATE: testing::Card = testing::Card {
-    name: "Negate",
+    name: testing::TestCardName("Negate"),
     definition: || {
         cards::instant("Negate", cost![1, U])
             .spell(effects::counter().to(effects::target(1, NONCREATURE_SPELL)))

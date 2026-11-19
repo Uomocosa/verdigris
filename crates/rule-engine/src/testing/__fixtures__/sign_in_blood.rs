@@ -5,7 +5,7 @@ use crate::effects;
 use crate::testing;
 
 pub const SIGN_IN_BLOOD: testing::Card = testing::Card {
-    name: "Sign in Blood",
+    name: testing::TestCardName("Sign in Blood"),
     definition: || {
         cards::sorcery("Sign in Blood", cost![B, B]).spell(
             effects::draw(2)

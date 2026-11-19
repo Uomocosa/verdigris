@@ -4,9 +4,9 @@ mod app;
 mod fixtures;
 
 pub use app::{
-    AutoPassUntil, Card, Cards, CardsError, MockGame, MockGameBuilder, P1, P2, P3, P4, P5, P6, P7,
-    P8, PlayError, PlayStep, PlayerSeat, PlayerSetup, PlayerView, Targets, TestPlayer,
-    TestPlayerActions,
+    AutoPassUntil, Card, CardQuery, Cards, CardsError, CardsInZone, MockGame, MockGameBuilder, P1,
+    P2, P3, P4, P5, P6, P7, P8, PlayError, PlayStep, PlayerSeat, PlayerSetup, PlayerView, Targets,
+    TestCard, TestCardName, TestPlayer, TestPlayerActions,
 };
 pub use fixtures::{
     CANCEL, DARKSTEEL_MYR, DISPEL, DIVINATION, DOOM_BLADE, ESSENCE_SCATTER, ExpectedTargets,

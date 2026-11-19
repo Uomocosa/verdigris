@@ -53,7 +53,7 @@ mod tests {
     fn test_usage() {
         let (mut game, [p1, p2]) =
             MockGame::new([P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]), P2]);
-        let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
+        let bolt = game.player(p1).cards_in(HAND).only(LIGHTNING_BOLT).unwrap();
         game.play([
             p1.cast(bolt).targeting(p2).pass_priority(),
             p2.pass_priority(),
@@ -69,8 +69,18 @@ mod tests {
                 .mana_pool(mana![R, R]),
             P2,
         ]);
-        let first = game.player(p1).cards(HAND, LIGHTNING_BOLT).first().unwrap();
-        let second = game.player(p1).cards(HAND, LIGHTNING_BOLT).nth(1).unwrap();
+        let first = game
+            .player(p1)
+            .cards_in(HAND)
+            .matching(LIGHTNING_BOLT)
+            .first()
+            .unwrap();
+        let second = game
+            .player(p1)
+            .cards_in(HAND)
+            .matching(LIGHTNING_BOLT)
+            .nth(1)
+            .unwrap();
         game.play([
             p1.cast(first).targeting(p2),
             p1.cast(second).targeting(p2).pass_priority(),
@@ -87,7 +97,7 @@ mod tests {
     fn priority_returns_to_the_active_player_after_a_spell_resolves() {
         let (mut game, [p1, p2]) =
             MockGame::new([P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]), P2]);
-        let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
+        let bolt = game.player(p1).cards_in(HAND).only(LIGHTNING_BOLT).unwrap();
         game.play([p1.cast(bolt).targeting(p2).pass_priority()])
             .unwrap();
 

@@ -1,24 +1,25 @@
+use crate::testing;
 use crate::zones;
 
 #[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
 pub enum CardsError {
-    #[error("P{player} has no {card} in {zone:?}")]
+    #[error("{player} has no {card} in {zone:?}")]
     Missing {
-        player: usize,
-        card: &'static str,
+        player: testing::PlayerSeat,
+        card: String,
         zone: zones::Zone,
     },
-    #[error("P{player} has {count} {card} in {zone:?}, expected exactly one")]
+    #[error("{player} has {count} {card} in {zone:?}, expected exactly one")]
     NotOne {
-        player: usize,
-        card: &'static str,
+        player: testing::PlayerSeat,
+        card: String,
         zone: zones::Zone,
         count: usize,
     },
-    #[error("P{player} has {count} {card} in {zone:?}; index {index} is out of range")]
+    #[error("{player} has {count} {card} in {zone:?}; index {index} is out of range")]
     OutOfRange {
-        player: usize,
-        card: &'static str,
+        player: testing::PlayerSeat,
+        card: String,
         zone: zones::Zone,
         count: usize,
         index: usize,

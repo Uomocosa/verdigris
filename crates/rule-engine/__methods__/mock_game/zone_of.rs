@@ -2,7 +2,8 @@ use crate::LIBRARY;
 use crate::testing;
 use crate::zones;
 
-pub fn zone_of(game: &testing::MockGame, card: bevy::prelude::Entity) -> zones::Zone {
+pub fn zone_of(game: &testing::MockGame, card: impl Into<bevy::prelude::Entity>) -> zones::Zone {
+    let card = card.into();
     let world = game.app.world();
     world
         .get::<zones::InZone>(card)
@@ -22,8 +23,8 @@ mod tests {
         let (game, [_, p2, ..]) = MockGame::new([P1, P2.battlefield([GRIZZLY_BEARS])]);
         let bears = game
             .player(p2)
-            .cards(BATTLEFIELD, GRIZZLY_BEARS)
-            .only()
+            .cards_in(BATTLEFIELD)
+            .only(GRIZZLY_BEARS)
             .unwrap();
         assert_eq!(zone_of(&game, bears), BATTLEFIELD);
     }

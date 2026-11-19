@@ -5,7 +5,7 @@ use crate::effects;
 use crate::testing;
 
 pub const MIND_ROT: testing::Card = testing::Card {
-    name: "Mind Rot",
+    name: testing::TestCardName("Mind Rot"),
     definition: || {
         cards::sorcery("Mind Rot", cost![2, B])
             .spell(effects::discard(2).to(effects::target(1, PLAYER)))

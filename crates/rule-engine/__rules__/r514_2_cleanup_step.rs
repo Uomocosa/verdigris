@@ -44,12 +44,12 @@ mod tests {
                 .battlefield([GRIZZLY_BEARS])
                 .mana_pool(mana![G]),
         ]);
-        let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
-        let growth = game.player(p2).cards(HAND, GIANT_GROWTH).only().unwrap();
+        let bolt = game.player(p1).cards_in(HAND).only(LIGHTNING_BOLT).unwrap();
+        let growth = game.player(p2).cards_in(HAND).only(GIANT_GROWTH).unwrap();
         let bears = game
             .player(p2)
-            .cards(BATTLEFIELD, GRIZZLY_BEARS)
-            .only()
+            .cards_in(BATTLEFIELD)
+            .only(GRIZZLY_BEARS)
             .unwrap();
 
         game.play([
@@ -64,13 +64,16 @@ mod tests {
 
         assert_eq!(game.zone_of(bears), BATTLEFIELD);
         assert_eq!(
-            game.app.world().get::<damage::Damage>(bears).copied(),
+            game.app
+                .world()
+                .get::<damage::Damage>(bears.into())
+                .copied(),
             Some(damage::Damage(0))
         );
         assert!(
             game.app
                 .world()
-                .get::<effects::PowerToughnessModifier>(bears)
+                .get::<effects::PowerToughnessModifier>(bears.into())
                 .is_none()
         );
     }
@@ -83,12 +86,12 @@ mod tests {
                 .mana_pool(mana![G, R]),
             P2,
         ]);
-        let growth = game.player(p1).cards(HAND, GIANT_GROWTH).only().unwrap();
-        let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
+        let growth = game.player(p1).cards_in(HAND).only(GIANT_GROWTH).unwrap();
+        let bolt = game.player(p1).cards_in(HAND).only(LIGHTNING_BOLT).unwrap();
         let bears = game
             .player(p1)
-            .cards(BATTLEFIELD, GRIZZLY_BEARS)
-            .only()
+            .cards_in(BATTLEFIELD)
+            .only(GRIZZLY_BEARS)
             .unwrap();
 
         game.play([

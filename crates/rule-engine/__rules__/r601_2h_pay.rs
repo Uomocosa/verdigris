@@ -53,7 +53,7 @@ mod tests {
     fn test_usage() {
         let (mut game, [p1, p2]) =
             MockGame::new([P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]), P2]);
-        let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
+        let bolt = game.player(p1).cards_in(HAND).only(LIGHTNING_BOLT).unwrap();
         game.play([p1.cast(bolt).targeting(p2)]).unwrap();
         assert!(game.last_rejection().is_none());
         assert_eq!(game.mana_pool(p1), cards::ManaPool::default());
@@ -62,11 +62,11 @@ mod tests {
     #[test]
     fn test_cannot_cast_without_mana() {
         let (mut game, [p1, p2]) = MockGame::new([P1.hand([LIGHTNING_BOLT]), P2]);
-        let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
+        let bolt = game.player(p1).cards_in(HAND).only(LIGHTNING_BOLT).unwrap();
         let err = game.play([p1.cast(bolt).targeting(p2)]).unwrap_err();
         assert_eq!(
             err.rejection(),
-            Some(&actions::Rejected::CannotPay { spell: bolt })
+            Some(&actions::Rejected::CannotPay { spell: bolt.into() })
         );
         assert_eq!(game.zone_of(bolt), HAND);
     }

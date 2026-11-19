@@ -4,7 +4,7 @@ use crate::pt;
 use crate::testing;
 
 pub const TYPHOID_RATS: testing::Card = testing::Card {
-    name: "Typhoid Rats",
+    name: testing::TestCardName("Typhoid Rats"),
     definition: || {
         cards::creature("Typhoid Rats", cost![B], pt!(1, 1)).keyword(cards::deathtouch())
     },

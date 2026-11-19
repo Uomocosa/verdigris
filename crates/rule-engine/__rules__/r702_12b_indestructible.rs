@@ -48,11 +48,11 @@ mod tests {
             P1.hand([MURDER]).mana_pool(mana![1, B, B]),
             P2.battlefield([DARKSTEEL_MYR]),
         ]);
-        let murder = game.player(p1).cards(HAND, MURDER).only().unwrap();
+        let murder = game.player(p1).cards_in(HAND).only(MURDER).unwrap();
         let myr = game
             .player(p2)
-            .cards(BATTLEFIELD, DARKSTEEL_MYR)
-            .only()
+            .cards_in(BATTLEFIELD)
+            .only(DARKSTEEL_MYR)
             .unwrap();
         game.play([
             p1.cast(murder).targeting(myr).pass_priority(),
@@ -68,11 +68,11 @@ mod tests {
             P1.hand([MURDER]).mana_pool(mana![1, B, B]),
             P2.battlefield([DARKSTEEL_MYR]),
         ]);
-        let murder = game.player(p1).cards(HAND, MURDER).only().unwrap();
+        let murder = game.player(p1).cards_in(HAND).only(MURDER).unwrap();
         let myr = game
             .player(p2)
-            .cards(BATTLEFIELD, DARKSTEEL_MYR)
-            .only()
+            .cards_in(BATTLEFIELD)
+            .only(DARKSTEEL_MYR)
             .unwrap();
         game.play([
             p1.cast(murder).targeting(myr).pass_priority(),
@@ -81,7 +81,7 @@ mod tests {
         .unwrap();
         assert_eq!(game.zone_of(myr), BATTLEFIELD);
         assert_eq!(game.zone_of(murder), GRAVEYARD);
-        assert!(!game.player(p2).cards(BATTLEFIELD, DARKSTEEL_MYR).is_empty());
+        assert!(game.player(p2).cards_in(BATTLEFIELD).has(DARKSTEEL_MYR));
     }
 
     #[test]
@@ -90,11 +90,11 @@ mod tests {
             P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
             P2.battlefield([DARKSTEEL_MYR]),
         ]);
-        let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
+        let bolt = game.player(p1).cards_in(HAND).only(LIGHTNING_BOLT).unwrap();
         let myr = game
             .player(p2)
-            .cards(BATTLEFIELD, DARKSTEEL_MYR)
-            .only()
+            .cards_in(BATTLEFIELD)
+            .only(DARKSTEEL_MYR)
             .unwrap();
         game.play([
             p1.cast(bolt).targeting(myr).pass_priority(),
@@ -102,7 +102,7 @@ mod tests {
         ])
         .unwrap();
         assert_eq!(game.zone_of(myr), BATTLEFIELD);
-        let damage = game.app.world().get::<damage::Damage>(myr).unwrap();
+        let damage = game.app.world().get::<damage::Damage>(myr.into()).unwrap();
         assert_eq!(**damage, 3);
     }
 
@@ -112,11 +112,11 @@ mod tests {
             P1.hand([DOOM_BLADE]).mana_pool(mana![1, B]),
             P2.battlefield([DARKSTEEL_MYR]),
         ]);
-        let blade = game.player(p1).cards(HAND, DOOM_BLADE).only().unwrap();
+        let blade = game.player(p1).cards_in(HAND).only(DOOM_BLADE).unwrap();
         let myr = game
             .player(p2)
-            .cards(BATTLEFIELD, DARKSTEEL_MYR)
-            .only()
+            .cards_in(BATTLEFIELD)
+            .only(DARKSTEEL_MYR)
             .unwrap();
         game.play([
             p1.cast(blade).targeting(myr).pass_priority(),

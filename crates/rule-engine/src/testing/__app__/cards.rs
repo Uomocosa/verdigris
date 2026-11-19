@@ -1,28 +1,27 @@
 use atomic_delegate_macros::atomic_delegates;
-use bevy::prelude::Entity;
 
 use crate::testing;
 use crate::zones;
 
 pub struct Cards {
-    entities: Vec<Entity>,
-    card_name: &'static str,
+    matches: Vec<testing::TestCard>,
+    card: String,
     zone: zones::Zone,
-    seat: usize,
+    player: testing::TestPlayer,
 }
 
 impl Cards {
     pub(crate) const fn from_matches(
-        entities: Vec<Entity>,
-        card_name: &'static str,
+        cards: Vec<testing::TestCard>,
+        card: String,
         zone: zones::Zone,
-        seat: usize,
+        player: testing::TestPlayer,
     ) -> Self {
         Self {
-            entities,
-            card_name,
+            matches: cards,
+            card,
             zone,
-            seat,
+            player,
         }
     }
 }
@@ -30,36 +29,36 @@ impl Cards {
 #[rustfmt::skip]
 impl Cards {
     #[must_use]
-    pub fn all(&self) -> &[Entity] { &self.entities }
+    pub fn all(&self) -> &[testing::TestCard] { &self.matches }
 
     #[must_use]
-    pub const fn is_empty(&self) -> bool { self.entities.is_empty() }
+    pub const fn is_empty(&self) -> bool { self.matches.is_empty() }
 
     #[must_use]
-    pub const fn len(&self) -> usize { self.entities.len() }
+    pub const fn len(&self) -> usize { self.matches.len() }
 }
 
 #[atomic_delegates]
 impl Cards {
-    pub fn first(&self) -> Result<Entity, testing::CardsError> {}
+    pub fn first(&self) -> Result<testing::TestCard, testing::CardsError> {}
 
-    pub fn nth(&self, index: usize) -> Result<Entity, testing::CardsError> {}
+    pub fn nth(&self, index: usize) -> Result<testing::TestCard, testing::CardsError> {}
 }
 
 impl Cards {
-    pub const fn only(&self) -> Result<Entity, testing::CardsError> {
-        match self.entities.as_slice() {
-            [entity] => Ok(*entity),
+    pub fn only(&self) -> Result<testing::TestCard, testing::CardsError> {
+        match self.matches.as_slice() {
+            [card] => Ok(*card),
             [] => Err(testing::CardsError::Missing {
-                player: self.seat,
-                card: self.card_name,
+                player: self.player.seat,
+                card: self.card.clone(),
                 zone: self.zone,
             }),
             _ => Err(testing::CardsError::NotOne {
-                player: self.seat,
-                card: self.card_name,
+                player: self.player.seat,
+                card: self.card.clone(),
                 zone: self.zone,
-                count: self.entities.len(),
+                count: self.matches.len(),
             }),
         }
     }
@@ -67,9 +66,9 @@ impl Cards {
 
 #[rustfmt::skip]
 impl Cards {
-    pub(crate) const fn card_name(&self) -> &'static str { self.card_name }
+    pub(crate) fn card(&self) -> &str { &self.card }
 
-    pub(crate) const fn seat(&self) -> usize { self.seat }
+    pub(crate) const fn seat(&self) -> testing::PlayerSeat { self.player.seat }
 
     pub(crate) const fn zone(&self) -> zones::Zone { self.zone }
 }
@@ -82,19 +81,19 @@ mod tests {
     #[test]
     fn test_usage() {
         let (game, [p1, ..]) = MockGame::new([P1.hand([LIGHTNING_BOLT]), P2]);
-        let cards = game.player(p1).cards(HAND, LIGHTNING_BOLT);
+        let cards = game.player(p1).cards_in(HAND).matching(LIGHTNING_BOLT);
         assert_eq!(cards.len(), 1);
         assert!(!cards.is_empty());
         assert_eq!(cards.first(), cards.only());
         assert_eq!(cards.nth(0), cards.first());
         assert_eq!(cards.all().len(), 1);
-        assert!(game.player(p1).cards(HAND, MURDER).is_empty());
+        assert!(game.player(p1).cards_in(HAND).matching(MURDER).is_empty());
     }
 
     #[test]
     fn two_matching_cards_are_all_returned() {
         let (game, [p1, ..]) = MockGame::new([P1.hand([LIGHTNING_BOLT, LIGHTNING_BOLT]), P2]);
-        let cards = game.player(p1).cards(HAND, LIGHTNING_BOLT);
+        let cards = game.player(p1).cards_in(HAND).matching(LIGHTNING_BOLT);
         assert_eq!(cards.len(), 2);
         assert_eq!(cards.all().len(), 2);
         assert_ne!(cards.first(), cards.nth(1));
@@ -105,14 +104,15 @@ mod tests {
         let (game, [p1, ..]) = MockGame::new([P1, P2]);
         let error = game
             .player(p1)
-            .cards(HAND, LIGHTNING_BOLT)
+            .cards_in(HAND)
+            .matching(LIGHTNING_BOLT)
             .only()
             .unwrap_err();
         assert_eq!(
             error,
             CardsError::Missing {
-                player: 1,
-                card: "Lightning Bolt",
+                player: PlayerSeat(1),
+                card: "Lightning Bolt".to_string(),
                 zone: HAND,
             }
         );
@@ -123,14 +123,15 @@ mod tests {
         let (game, [p1, ..]) = MockGame::new([P1.hand([LIGHTNING_BOLT, LIGHTNING_BOLT]), P2]);
         let error = game
             .player(p1)
-            .cards(HAND, LIGHTNING_BOLT)
+            .cards_in(HAND)
+            .matching(LIGHTNING_BOLT)
             .only()
             .unwrap_err();
         assert_eq!(
             error,
             CardsError::NotOne {
-                player: 1,
-                card: "Lightning Bolt",
+                player: PlayerSeat(1),
+                card: "Lightning Bolt".to_string(),
                 zone: HAND,
                 count: 2,
             }
@@ -140,23 +141,23 @@ mod tests {
     #[test]
     fn first_and_nth_report_a_missing_card() {
         let (game, [p1, ..]) = MockGame::new([P1.hand([LIGHTNING_BOLT]), P2]);
-        let cards = game.player(p1).cards(HAND, LIGHTNING_BOLT);
+        let cards = game.player(p1).cards_in(HAND).matching(LIGHTNING_BOLT);
         assert_eq!(
             cards.nth(3),
             Err(CardsError::OutOfRange {
-                player: 1,
-                card: "Lightning Bolt",
+                player: PlayerSeat(1),
+                card: "Lightning Bolt".to_string(),
                 zone: HAND,
                 count: 1,
                 index: 3,
             })
         );
-        let missing = game.player(p1).cards(HAND, MURDER);
+        let missing = game.player(p1).cards_in(HAND).matching(MURDER);
         assert_eq!(
             missing.first(),
             Err(CardsError::Missing {
-                player: 1,
-                card: "Murder",
+                player: PlayerSeat(1),
+                card: "Murder".to_string(),
                 zone: HAND,
             })
         );

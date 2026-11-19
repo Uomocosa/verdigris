@@ -63,10 +63,10 @@ mod tests {
             ]);
         let corpse = game
             .player(p1)
-            .cards(BATTLEFIELD, WALKING_CORPSE)
-            .only()
+            .cards_in(BATTLEFIELD)
+            .only(WALKING_CORPSE)
             .unwrap();
-        let bolt = game.player(p2).cards(HAND, LIGHTNING_BOLT).only().unwrap();
+        let bolt = game.player(p2).cards_in(HAND).only(LIGHTNING_BOLT).unwrap();
         game.play([
             p2.cast(bolt).targeting(corpse).pass_priority(),
             p1.pass_priority(),

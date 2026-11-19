@@ -85,6 +85,8 @@ fn target_is_legal(
 
 #[cfg(test)]
 mod tests {
+    use bevy::prelude::Entity;
+
     use crate::cards;
     use crate::mana;
     use crate::testing::*;
@@ -94,7 +96,7 @@ mod tests {
     fn test_usage() {
         let (mut game, [p1, p2]) =
             MockGame::new([P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]), P2]);
-        let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
+        let bolt = game.player(p1).cards_in(HAND).only(LIGHTNING_BOLT).unwrap();
         game.play([
             p1.cast(bolt).targeting(p2).pass_priority(),
             p2.pass_priority(),
@@ -110,12 +112,12 @@ mod tests {
                 .mana_pool(mana![1, B, B, R]),
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
-        let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
-        let murder = game.player(p1).cards(HAND, MURDER).only().unwrap();
+        let bolt = game.player(p1).cards_in(HAND).only(LIGHTNING_BOLT).unwrap();
+        let murder = game.player(p1).cards_in(HAND).only(MURDER).unwrap();
         let bears = game
             .player(p2)
-            .cards(BATTLEFIELD, GRIZZLY_BEARS)
-            .only()
+            .cards_in(BATTLEFIELD)
+            .only(GRIZZLY_BEARS)
             .unwrap();
 
         game.play([
@@ -138,11 +140,11 @@ mod tests {
             P1.hand([DOOM_BLADE]).mana_pool(mana![1, B]),
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
-        let blade = game.player(p1).cards(HAND, DOOM_BLADE).only().unwrap();
+        let blade = game.player(p1).cards_in(HAND).only(DOOM_BLADE).unwrap();
         let bears = game
             .player(p2)
-            .cards(BATTLEFIELD, GRIZZLY_BEARS)
-            .only()
+            .cards_in(BATTLEFIELD)
+            .only(GRIZZLY_BEARS)
             .unwrap();
 
         game.play([p1.cast(blade).targeting(bears)]).unwrap();
@@ -150,11 +152,14 @@ mod tests {
         let mut definition = game
             .app
             .world()
-            .get::<cards::CardDefinition>(bears)
+            .get::<cards::CardDefinition>(bears.into())
             .cloned()
             .unwrap();
         definition.cost.black = definition.cost.black.saturating_add(1);
-        game.app.world_mut().entity_mut(bears).insert(definition);
+        game.app
+            .world_mut()
+            .entity_mut(Entity::from(bears))
+            .insert(definition);
 
         game.play([p1.pass_priority(), p2.pass_priority()]).unwrap();
         assert_eq!(game.zone_of(bears), BATTLEFIELD);

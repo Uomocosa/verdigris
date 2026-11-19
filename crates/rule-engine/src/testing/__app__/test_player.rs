@@ -31,7 +31,7 @@ impl PartialEq<TestPlayer> for Entity {
 #[rustfmt::skip]
 impl TestPlayer {
     #[must_use]
-    pub fn cast(self, spell: Entity) -> testing::TestPlayerActions { testing::TestPlayerActions::from_cast(self, spell) }
+    pub fn cast(self, spell: impl Into<Entity>) -> testing::TestPlayerActions { testing::TestPlayerActions::from_cast(self, spell.into()) }
 
     #[must_use]
     pub fn pass_priority(self) -> testing::TestPlayerActions { testing::TestPlayerActions::of(self).pass_priority() }

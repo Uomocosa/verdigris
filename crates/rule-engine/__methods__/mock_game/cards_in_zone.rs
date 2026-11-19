@@ -4,12 +4,11 @@ use crate::cards;
 use crate::testing;
 use crate::zones;
 
-pub fn entities_in_zone_matching_card(
+pub fn cards_in_zone(
     game: &testing::MockGame,
     player: Entity,
     zone: zones::Zone,
-    name: &str,
-) -> Vec<Entity> {
+) -> Vec<(testing::TestCard, cards::CardName)> {
     let world = game.app.world();
     let Some(zone_entity) = world
         .iter_entities()
@@ -31,29 +30,29 @@ pub fn entities_in_zone_matching_card(
             entity
                 .get::<zones::InZone>()
                 .is_some_and(|in_zone| **in_zone == zone_entity)
-                && entity
-                    .get::<cards::CardDefinition>()
-                    .is_some_and(|definition| definition.name.as_str() == name)
         })
-        .map(|entity| entity.id())
+        .filter_map(|entity| {
+            let definition = entity.get::<cards::CardDefinition>()?;
+            Some((testing::TestCard(entity.id()), definition.name.clone()))
+        })
         .collect()
 }
 
 #[cfg(test)]
 mod tests {
+    use crate::BATTLEFIELD;
     use crate::HAND;
     use crate::testing::*;
 
-    use super::entities_in_zone_matching_card;
+    use super::cards_in_zone;
 
     #[test]
     fn test_usage() {
         let (game, [p1, ..]) = MockGame::new([P1.hand([LIGHTNING_BOLT, LIGHTNING_BOLT]), P2]);
-        let found = entities_in_zone_matching_card(&game, *p1, HAND, "Lightning Bolt");
+        let found = cards_in_zone(&game, *p1, HAND);
         assert_eq!(found.len(), 2);
-        assert_eq!(
-            entities_in_zone_matching_card(&game, *p1, HAND, "Murder"),
-            Vec::<bevy::prelude::Entity>::new()
-        );
+        let names: Vec<_> = found.iter().map(|(_, name)| name.as_str()).collect();
+        assert_eq!(names, ["Lightning Bolt", "Lightning Bolt"]);
+        assert_eq!(cards_in_zone(&game, *p1, BATTLEFIELD).len(), 0);
     }
 }

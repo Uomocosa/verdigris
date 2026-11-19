@@ -123,7 +123,7 @@ mod tests {
         ];
 
         for card in fixtures {
-            assert_eq!(*((card.definition)()).name, card.name);
+            assert_eq!(*((card.definition)()).name, *card.name);
         }
     }
 
@@ -131,6 +131,6 @@ mod tests {
     fn hand_places_a_card_constant_in_the_hand_zone() {
         let (game, [p1, _]) = MockGame::new([P1.hand([LIGHTNING_BOLT]), P2]);
 
-        assert!(!game.player(p1).cards(HAND, LIGHTNING_BOLT).is_empty());
+        assert!(game.player(p1).cards_in(HAND).has(LIGHTNING_BOLT));
     }
 }

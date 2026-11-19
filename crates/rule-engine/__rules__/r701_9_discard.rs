@@ -91,10 +91,10 @@ mod tests {
             P1.hand([MIND_ROT]).mana_pool(mana![2, B]),
             P2.hand([GRIZZLY_BEARS]),
         ]);
-        let mind_rot = game.player(p1).cards(HAND, MIND_ROT).only().unwrap();
+        let mind_rot = game.player(p1).cards_in(HAND).only(MIND_ROT).unwrap();
         game.play([p1.cast(mind_rot).targeting(p2).end_turn(), p2.end_turn()])
             .unwrap();
-        assert!(!game.player(p2).cards(GRAVEYARD, GRIZZLY_BEARS).is_empty());
+        assert!(game.player(p2).cards_in(GRAVEYARD).has(GRIZZLY_BEARS));
     }
 
     #[test]
@@ -103,17 +103,20 @@ mod tests {
             P1.hand([MIND_ROT]).mana_pool(mana![2, B]),
             P2.hand([GRIZZLY_BEARS, LIGHTNING_BOLT, MURDER]),
         ]);
-        let mind_rot = game.player(p1).cards(HAND, MIND_ROT).only().unwrap();
+        let mind_rot = game.player(p1).cards_in(HAND).only(MIND_ROT).unwrap();
         game.play([p1.cast(mind_rot).targeting(p2).end_turn(), p2.end_turn()])
             .unwrap();
 
-        let bears = game.player(p2).cards(HAND, GRIZZLY_BEARS).only().unwrap();
-        let bolt = game.player(p2).cards(HAND, LIGHTNING_BOLT).only().unwrap();
-        game.act(p2, actions::Action::ChooseDiscard(vec![bears, bolt]));
+        let bears = game.player(p2).cards_in(HAND).only(GRIZZLY_BEARS).unwrap();
+        let bolt = game.player(p2).cards_in(HAND).only(LIGHTNING_BOLT).unwrap();
+        game.act(
+            p2,
+            actions::Action::ChooseDiscard(vec![bears.into(), bolt.into()]),
+        );
 
         assert_eq!(game.zone_of(bears), GRAVEYARD);
         assert_eq!(game.zone_of(bolt), GRAVEYARD);
-        assert!(!game.player(p2).cards(HAND, MURDER).is_empty());
+        assert!(game.player(p2).cards_in(HAND).has(MURDER));
     }
 
     #[test]
@@ -122,19 +125,19 @@ mod tests {
             P1.hand([MIND_ROT]).mana_pool(mana![2, B]),
             P2.hand([GRIZZLY_BEARS]),
         ]);
-        let mind_rot = game.player(p1).cards(HAND, MIND_ROT).only().unwrap();
+        let mind_rot = game.player(p1).cards_in(HAND).only(MIND_ROT).unwrap();
         game.play([p1.cast(mind_rot).targeting(p2).end_turn(), p2.end_turn()])
             .unwrap();
 
         assert_eq!(
             game.zone_of(
                 game.player(p2)
-                    .cards(GRAVEYARD, GRIZZLY_BEARS)
-                    .only()
+                    .cards_in(GRAVEYARD)
+                    .only(GRIZZLY_BEARS)
                     .unwrap()
             ),
             GRAVEYARD
         );
-        assert!(game.player(p2).cards(HAND, GRIZZLY_BEARS).is_empty());
+        assert!(game.player(p2).cards_in(HAND).has_no(GRIZZLY_BEARS));
     }
 }

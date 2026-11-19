@@ -80,7 +80,7 @@ mod tests {
     fn test_usage() {
         let (mut game, [p1, ..]) =
             MockGame::new([P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]), P2]);
-        let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
+        let bolt = game.player(p1).cards_in(HAND).only(LIGHTNING_BOLT).unwrap();
         game.play([p1.cast(bolt)]).unwrap();
         assert_eq!(game.zone_of(bolt), STACK);
     }
@@ -91,11 +91,13 @@ mod tests {
             .turn(2, turns::Step::PrecombatMain)
             .players([P1.hand([DIVINATION]).mana_pool(mana![2, U]), P2.active()]);
         game.play([p2.pass_priority()]).unwrap();
-        let divination = game.player(p1).cards(HAND, DIVINATION).only().unwrap();
+        let divination = game.player(p1).cards_in(HAND).only(DIVINATION).unwrap();
         let err = game.play([p1.cast(divination)]).unwrap_err();
         assert_eq!(
             err.rejection(),
-            Some(&actions::Rejected::CannotCast { spell: divination })
+            Some(&actions::Rejected::CannotCast {
+                spell: divination.into()
+            })
         );
         assert_eq!(game.zone_of(divination), HAND);
     }
@@ -107,13 +109,15 @@ mod tests {
                 .mana_pool(mana![R, 2, U]),
             P2,
         ]);
-        let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
+        let bolt = game.player(p1).cards_in(HAND).only(LIGHTNING_BOLT).unwrap();
         game.play([p1.cast(bolt).targeting(p2)]).unwrap();
-        let divination = game.player(p1).cards(HAND, DIVINATION).only().unwrap();
+        let divination = game.player(p1).cards_in(HAND).only(DIVINATION).unwrap();
         let err = game.play([p1.cast(divination)]).unwrap_err();
         assert_eq!(
             err.rejection(),
-            Some(&actions::Rejected::CannotCast { spell: divination })
+            Some(&actions::Rejected::CannotCast {
+                spell: divination.into()
+            })
         );
         assert_eq!(game.zone_of(divination), HAND);
     }

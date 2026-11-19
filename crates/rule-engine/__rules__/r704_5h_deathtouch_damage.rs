@@ -48,8 +48,8 @@ mod tests {
             P1.battlefield([TYPHOID_RATS]),
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
-        assert!(!game.player(p1).cards(BATTLEFIELD, TYPHOID_RATS).is_empty());
-        assert!(!game.player(p2).cards(BATTLEFIELD, GRIZZLY_BEARS).is_empty());
+        assert!(game.player(p1).cards_in(BATTLEFIELD).has(TYPHOID_RATS));
+        assert!(game.player(p2).cards_in(BATTLEFIELD).has(GRIZZLY_BEARS));
     }
 
     #[test]
@@ -59,8 +59,8 @@ mod tests {
             P1.battlefield([TYPHOID_RATS]),
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
-        assert!(!game.player(p1).cards(BATTLEFIELD, TYPHOID_RATS).is_empty());
-        assert!(!game.player(p2).cards(BATTLEFIELD, GRIZZLY_BEARS).is_empty());
+        assert!(game.player(p1).cards_in(BATTLEFIELD).has(TYPHOID_RATS));
+        assert!(game.player(p2).cards_in(BATTLEFIELD).has(GRIZZLY_BEARS));
     }
 
     #[test]
@@ -70,7 +70,7 @@ mod tests {
             P1.battlefield([TYPHOID_RATS]),
             P2.battlefield([DARKSTEEL_MYR]),
         ]);
-        assert!(!game.player(p2).cards(BATTLEFIELD, DARKSTEEL_MYR).is_empty());
+        assert!(game.player(p2).cards_in(BATTLEFIELD).has(DARKSTEEL_MYR));
     }
 
     #[test]
@@ -80,6 +80,6 @@ mod tests {
             P1.battlefield([WALKING_CORPSE]),
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
-        assert!(!game.player(p2).cards(BATTLEFIELD, GRIZZLY_BEARS).is_empty());
+        assert!(game.player(p2).cards_in(BATTLEFIELD).has(GRIZZLY_BEARS));
     }
 }

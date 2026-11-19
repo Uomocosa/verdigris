@@ -19,6 +19,11 @@ impl From<testing::TestPlayer> for Targets {
 }
 
 #[rustfmt::skip]
+impl From<testing::TestCard> for Targets {
+    fn from(card: testing::TestCard) -> Self { Self::One(*card) }
+}
+
+#[rustfmt::skip]
 impl<const N: usize> From<[Entity; N]> for Targets {
     fn from(entities: [Entity; N]) -> Self { Self::Many(entities.into()) }
 }

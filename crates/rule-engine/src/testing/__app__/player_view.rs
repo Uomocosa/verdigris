@@ -32,11 +32,9 @@ impl PlayerView<'_> {
 
 impl PlayerView<'_> {
     #[must_use]
-    pub fn cards(&self, zone: zones::Zone, card: testing::Card) -> testing::Cards {
-        let entities = self
-            .game
-            .entities_in_zone_matching_card(*self.player, zone, card.name);
-        testing::Cards::from_matches(entities, card.name, zone, *self.player.seat)
+    pub fn cards_in(&self, zone: zones::Zone) -> testing::CardsInZone {
+        let cards = self.game.cards_in_zone(*self.player, zone);
+        testing::CardsInZone::from_cards(cards, zone, self.player)
     }
 }
 
@@ -53,6 +51,6 @@ mod tests {
         assert_eq!(view.id(), p1);
         assert_eq!(view.life(), 20);
         assert_eq!(view.mana_pool(), mana![R]);
-        assert_eq!(view.cards(HAND, LIGHTNING_BOLT).len(), 1);
+        assert_eq!(view.cards_in(HAND).len(), 1);
     }
 }

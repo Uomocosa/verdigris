@@ -56,10 +56,10 @@ mod tests {
     fn test_usage() {
         let (mut game, [p1, p2]) =
             MockGame::new([P1.hand([DIVINATION]).mana_pool(mana![2, U]), P2]);
-        let divination = game.player(p1).cards(HAND, DIVINATION).only().unwrap();
+        let divination = game.player(p1).cards_in(HAND).only(DIVINATION).unwrap();
         game.play([p1.cast(divination).pass_priority(), p2.pass_priority()])
             .unwrap();
-        assert!(!game.player(p1).cards(HAND, GRIZZLY_BEARS).is_empty());
+        assert!(game.player(p1).cards_in(HAND).has(GRIZZLY_BEARS));
         assert_eq!(game.zone_of(divination), GRAVEYARD);
     }
 
@@ -75,13 +75,13 @@ mod tests {
                 .mana_pool(mana![2, U]),
             P2,
         ]);
-        let divination = game.player(p1).cards(HAND, DIVINATION).only().unwrap();
+        let divination = game.player(p1).cards_in(HAND).only(DIVINATION).unwrap();
         game.play([p1.cast(divination).pass_priority(), p2.pass_priority()])
             .unwrap();
-        assert!(!game.player(p1).cards(HAND, GRIZZLY_BEARS).is_empty());
-        assert!(!game.player(p1).cards(HAND, LIGHTNING_BOLT).is_empty());
+        assert!(game.player(p1).cards_in(HAND).has(GRIZZLY_BEARS));
+        assert!(game.player(p1).cards_in(HAND).has(LIGHTNING_BOLT));
         assert_eq!(
-            game.zone_of(game.player(p1).cards(LIBRARY, MURDER).only().unwrap()),
+            game.zone_of(game.player(p1).cards_in(LIBRARY).only(MURDER).unwrap()),
             LIBRARY
         );
     }
