@@ -5,7 +5,7 @@ pub fn cleanup(game: &mut testing::MockGame) {
     let _ = game
         .app
         .world_mut()
-        .write_message(turns::CleanupStepStarted);
+        .write_message(turns::StepStarted(turns::Step::Cleanup));
     game.app.update();
 }
 

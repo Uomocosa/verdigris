@@ -9,4 +9,5 @@ pub enum RuleSet {
     StepEnd,
     StepStarted,
     Cleanup,
+    TurnEnd,
 }

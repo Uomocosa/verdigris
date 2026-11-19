@@ -64,6 +64,8 @@ impl MockGame {
 impl MockGame {
     pub fn cleanup(&mut self) {}
 
+    pub fn end_turn(&mut self) {}
+
     #[must_use]
     pub fn find(&self, player: Entity, zone: zones::Zone, name: &str) -> Option<Entity> {}
 

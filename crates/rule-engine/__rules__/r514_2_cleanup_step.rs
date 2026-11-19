@@ -8,12 +8,15 @@ use crate::zones;
 /// (including phased-out permanents) is removed and all "until end of turn" and "this turn"
 /// effects end. This turn-based action doesn't use the stack.
 pub fn r514_2_cleanup_step(
-    mut cleanups: MessageReader<turns::CleanupStepStarted>,
+    mut step_started: MessageReader<turns::StepStarted>,
     mut commands: Commands,
     damaged: Query<(Entity, &zones::Damage)>,
     modified: Query<Entity, With<effects::PowerToughnessModifier>>,
 ) {
-    for _ in cleanups.read() {
+    for step in step_started.read() {
+        if **step != turns::Step::Cleanup {
+            continue;
+        }
         for (entity, _) in damaged.iter() {
             commands.entity(entity).insert(zones::Damage(0));
         }
@@ -48,7 +51,7 @@ mod tests {
                 toughness: 3,
             },
         ));
-        game.cleanup();
+        game.end_turn();
         assert_eq!(
             game.app.world().get::<zones::Damage>(bears).copied(),
             Some(zones::Damage(0))
@@ -88,7 +91,7 @@ mod tests {
         game.act(p2, actions::Action::ChooseTargets(vec![bears]));
         game.pass_priority_all();
         game.pass_priority_all();
-        game.cleanup();
+        game.end_turn();
 
         assert_eq!(game.zone_of(bears), zones::Zone::Battlefield);
         assert_eq!(
@@ -126,7 +129,9 @@ mod tests {
         game.act(game.p1, actions::Action::Cast(growth));
         game.act(game.p1, actions::Action::ChooseTargets(vec![bears]));
         game.pass_priority_all();
-        game.cleanup();
+        game.end_turn();
+        game.end_turn();
+        game.pass_priority();
         game.act(game.p1, actions::Action::Cast(bolt));
         game.act(game.p1, actions::Action::ChooseTargets(vec![bears]));
         game.pass_priority_all();

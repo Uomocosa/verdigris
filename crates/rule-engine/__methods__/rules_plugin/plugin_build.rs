@@ -31,6 +31,7 @@ pub fn plugin_build(_rules_plugin: &RulesPlugin, app: &mut App) {
             rules::RuleSet::StepEnd,
             rules::RuleSet::StepStarted,
             rules::RuleSet::Cleanup,
+            rules::RuleSet::TurnEnd,
         )
             .chain(),
     );
@@ -86,6 +87,11 @@ pub fn plugin_build(_rules_plugin: &RulesPlugin, app: &mut App) {
     app.add_systems(
         Update,
         rules::r514_2_cleanup_step::r514_2_cleanup_step.in_set(rules::RuleSet::Cleanup),
+    );
+    app.add_systems(
+        Update,
+        rules::r500_3_step_without_priority_ends::r500_3_step_without_priority_ends
+            .in_set(rules::RuleSet::TurnEnd),
     );
 }
 
