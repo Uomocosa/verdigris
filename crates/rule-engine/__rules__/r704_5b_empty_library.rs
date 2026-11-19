@@ -34,7 +34,7 @@ mod tests {
             .player(p1)
             .cards_in(HAND)
             .matching(DIVINATION)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         game.play([p1.cast(divination).pass_priority(), p2.pass_priority()])
             .unwrap();
@@ -49,7 +49,7 @@ mod tests {
             .player(p1)
             .cards_in(HAND)
             .matching(DIVINATION)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         game.play([p1.cast(divination)]).unwrap();
         assert!(game.app.world().get::<players::Lost>(*p1).is_none());

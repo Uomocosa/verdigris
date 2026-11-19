@@ -32,7 +32,7 @@ mod tests {
             .player(p1)
             .cards_in(HAND)
             .matching(SIGN_IN_BLOOD)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         game.play([
             p1.cast(sign_in_blood).targeting(p2).end_turn(),
@@ -55,7 +55,7 @@ mod tests {
             .player(p1)
             .cards_in(HAND)
             .matching(SIGN_IN_BLOOD)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         game.play([
             p1.cast(sign_in_blood).targeting(p2).end_turn(),
@@ -84,7 +84,7 @@ mod tests {
             .player(p1)
             .cards_in(HAND)
             .matching(SIGN_IN_BLOOD)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         game.play([
             p1.cast(sign_in_blood).targeting(p1).end_turn(),
@@ -107,7 +107,7 @@ mod tests {
             .player(p1)
             .cards_in(HAND)
             .matching(SIGN_IN_BLOOD)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         game.play([
             p1.cast(sign_in_blood).targeting(p2).end_turn(),

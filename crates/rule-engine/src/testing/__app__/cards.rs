@@ -40,7 +40,7 @@ impl Cards {
 
 #[atomic_delegates]
 impl Cards {
-    pub fn expect_n<const N: usize>(&self) -> Result<[testing::TestCard; N], testing::CardsError> {}
+    pub fn exactly<const N: usize>(&self) -> Result<[testing::TestCard; N], testing::CardsError> {}
 
     pub fn first(&self) -> Result<testing::TestCard, testing::CardsError> {}
 
@@ -67,7 +67,7 @@ mod tests {
         let cards = game.player(p1).cards_in(HAND).matching(LIGHTNING_BOLT);
         assert_eq!(cards.len(), 1);
         assert!(!cards.is_empty());
-        assert_eq!(cards.first().map(|card| [card]), cards.expect_n::<1>());
+        assert_eq!(cards.first().map(|card| [card]), cards.exactly::<1>());
         assert_eq!(cards.nth(0), cards.first());
         assert_eq!(cards.all().len(), 1);
         assert!(game.player(p1).cards_in(HAND).matching(MURDER).is_empty());
@@ -83,13 +83,13 @@ mod tests {
     }
 
     #[test]
-    fn expect_n_rejects_no_matching_card() {
+    fn exactly_rejects_no_matching_card() {
         let (game, [p1, ..]) = MockGame::new([P1, P2]);
         let error = game
             .player(p1)
             .cards_in(HAND)
             .matching(LIGHTNING_BOLT)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap_err();
         assert_eq!(
             error,
@@ -104,13 +104,13 @@ mod tests {
     }
 
     #[test]
-    fn expect_n_rejects_two_matching_cards() {
+    fn exactly_rejects_two_matching_cards() {
         let (game, [p1, ..]) = MockGame::new([P1.hand([LIGHTNING_BOLT, LIGHTNING_BOLT]), P2]);
         let error = game
             .player(p1)
             .cards_in(HAND)
             .matching(LIGHTNING_BOLT)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap_err();
         assert_eq!(
             error,

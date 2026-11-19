@@ -57,7 +57,7 @@ mod tests {
             .player(p1)
             .cards_in(HAND)
             .matching(LIGHTNING_BOLT)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         game.play([
             p1.cast(bolt).targeting(p2).pass_priority(),
@@ -78,7 +78,7 @@ mod tests {
             .player(p1)
             .cards_in(HAND)
             .matching(LIGHTNING_BOLT)
-            .expect_n::<2>()
+            .exactly::<2>()
             .unwrap();
         game.play([
             p1.cast(first).targeting(p2),
@@ -103,7 +103,7 @@ mod tests {
             .player(p1)
             .cards_in(HAND)
             .matching(LIGHTNING_BOLT)
-            .expect_n::<2>()
+            .exactly::<2>()
             .unwrap();
         game.play([
             p1.cast(first).targeting(p2),
@@ -127,7 +127,7 @@ mod tests {
             .player(p1)
             .cards_in(HAND)
             .matching(LIGHTNING_BOLT)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         game.play([p1.cast(bolt).targeting(p2).pass_priority()])
             .unwrap();

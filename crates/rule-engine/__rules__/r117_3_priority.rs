@@ -89,7 +89,7 @@ mod tests {
             .player(p2)
             .cards_in(HAND)
             .matching(LIGHTNING_BOLT)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
 
         game.play([p1.pass_priority(), p2.cast(bolt)]).unwrap();

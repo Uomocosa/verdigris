@@ -72,20 +72,20 @@ mod tests {
         assert!(cards.has_no(MURDER));
         assert_eq!(cards.matching(LIGHTNING_BOLT).len(), 2);
         assert!(cards.matching(MURDER).is_empty());
-        assert!(cards.matching(LIGHTNING_BOLT).expect_n::<1>().is_err());
+        assert!(cards.matching(LIGHTNING_BOLT).exactly::<1>().is_err());
     }
 
     #[test]
-    fn expect_n_returns_the_single_matching_card() {
+    fn exactly_returns_the_single_matching_card() {
         let (game, [p1, ..]) = MockGame::new([P1.hand([LIGHTNING_BOLT]), P2]);
         let cards = game.player(p1).cards_in(HAND);
         let [found] = cards
             .matching(LIGHTNING_BOLT)
-            .expect_n::<1>()
+            .exactly::<1>()
             .expect("P1 holds one Lightning Bolt");
 
         assert!(cards.has(found));
-        assert_eq!(cards.matching(found).expect_n::<1>(), Ok([found]));
+        assert_eq!(cards.matching(found).exactly::<1>(), Ok([found]));
     }
 
     #[test]
@@ -97,7 +97,7 @@ mod tests {
         assert_eq!(cards.len(), 0);
         assert!(cards.has_no(GRIZZLY_BEARS));
         assert_eq!(
-            cards.matching(GRIZZLY_BEARS).expect_n::<1>(),
+            cards.matching(GRIZZLY_BEARS).exactly::<1>(),
             Err(CardsError::WrongCount {
                 player: PlayerSeat(1),
                 card: "Grizzly Bears".to_string(),

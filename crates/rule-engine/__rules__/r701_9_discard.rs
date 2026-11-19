@@ -95,7 +95,7 @@ mod tests {
             .player(p1)
             .cards_in(HAND)
             .matching(MIND_ROT)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         game.play([p1.cast(mind_rot).targeting(p2).end_turn(), p2.end_turn()])
             .unwrap();
@@ -112,7 +112,7 @@ mod tests {
             .player(p1)
             .cards_in(HAND)
             .matching(MIND_ROT)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         game.play([p1.cast(mind_rot).targeting(p2).end_turn(), p2.end_turn()])
             .unwrap();
@@ -121,13 +121,13 @@ mod tests {
             .player(p2)
             .cards_in(HAND)
             .matching(GRIZZLY_BEARS)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         let [bolt] = game
             .player(p2)
             .cards_in(HAND)
             .matching(LIGHTNING_BOLT)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         game.act(
             p2,
@@ -149,7 +149,7 @@ mod tests {
             .player(p1)
             .cards_in(HAND)
             .matching(MIND_ROT)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         game.play([p1.cast(mind_rot).targeting(p2).end_turn(), p2.end_turn()])
             .unwrap();
@@ -159,7 +159,7 @@ mod tests {
                 game.player(p2)
                     .cards_in(GRAVEYARD)
                     .matching(GRIZZLY_BEARS)
-                    .expect_n::<1>()
+                    .exactly::<1>()
                     .unwrap()[0]
             ),
             GRAVEYARD

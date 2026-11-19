@@ -127,7 +127,7 @@ mod tests {
             .player(p1)
             .cards_in(HAND)
             .matching(LIGHTNING_BOLT)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         game.play([p1.cast(bolt).targeting(p2).end_turn(), p2.end_turn()])
             .unwrap();
@@ -144,13 +144,13 @@ mod tests {
             .player(p2)
             .cards_in(BATTLEFIELD)
             .matching(GRIZZLY_BEARS)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         let [bolt] = game
             .player(p1)
             .cards_in(HAND)
             .matching(LIGHTNING_BOLT)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         game.play([p1.cast(bolt).targeting(bears).end_turn(), p2.end_turn()])
             .unwrap();
@@ -160,7 +160,7 @@ mod tests {
             .player(p1)
             .cards_in(GRAVEYARD)
             .matching(LIGHTNING_BOLT)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         assert_eq!(game.zone_of(bolt), GRAVEYARD);
     }
@@ -175,13 +175,13 @@ mod tests {
             .player(p2)
             .cards_in(BATTLEFIELD)
             .matching(GRIZZLY_BEARS)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         let [murder] = game
             .player(p1)
             .cards_in(HAND)
             .matching(MURDER)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         game.play([p1.cast(murder).targeting(bears).end_turn(), p2.end_turn()])
             .unwrap();
@@ -198,13 +198,13 @@ mod tests {
             .player(p2)
             .cards_in(BATTLEFIELD)
             .matching(GRIZZLY_BEARS)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         let [doom_blade] = game
             .player(p1)
             .cards_in(HAND)
             .matching(DOOM_BLADE)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         game.play([
             p1.cast(doom_blade).targeting(bears).end_turn(),
@@ -217,7 +217,7 @@ mod tests {
             .player(p1)
             .cards_in(GRAVEYARD)
             .matching(DOOM_BLADE)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         assert_eq!(game.zone_of(blade), GRAVEYARD);
     }

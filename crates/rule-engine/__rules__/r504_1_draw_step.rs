@@ -55,7 +55,7 @@ mod tests {
             .player(p1)
             .cards_in(LIBRARY)
             .matching(GRIZZLY_BEARS)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
 
         game.play([p1.pass_priority(), p2.pass_priority(), p1.pass_priority()])
@@ -66,7 +66,7 @@ mod tests {
             game.player(p1)
                 .cards_in(HAND)
                 .matching(GRIZZLY_BEARS)
-                .expect_n::<1>()
+                .exactly::<1>()
                 .unwrap()[0],
             top
         );

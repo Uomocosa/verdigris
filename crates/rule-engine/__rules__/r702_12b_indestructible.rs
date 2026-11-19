@@ -52,13 +52,13 @@ mod tests {
             .player(p1)
             .cards_in(HAND)
             .matching(MURDER)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         let [myr] = game
             .player(p2)
             .cards_in(BATTLEFIELD)
             .matching(DARKSTEEL_MYR)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         game.play([
             p1.cast(murder).targeting(myr).pass_priority(),
@@ -78,13 +78,13 @@ mod tests {
             .player(p1)
             .cards_in(HAND)
             .matching(MURDER)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         let [myr] = game
             .player(p2)
             .cards_in(BATTLEFIELD)
             .matching(DARKSTEEL_MYR)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         game.play([
             p1.cast(murder).targeting(myr).pass_priority(),
@@ -106,13 +106,13 @@ mod tests {
             .player(p1)
             .cards_in(HAND)
             .matching(LIGHTNING_BOLT)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         let [myr] = game
             .player(p2)
             .cards_in(BATTLEFIELD)
             .matching(DARKSTEEL_MYR)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         game.play([
             p1.cast(bolt).targeting(myr).pass_priority(),
@@ -134,13 +134,13 @@ mod tests {
             .player(p1)
             .cards_in(HAND)
             .matching(DOOM_BLADE)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         let [myr] = game
             .player(p2)
             .cards_in(BATTLEFIELD)
             .matching(DARKSTEEL_MYR)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         game.play([
             p1.cast(blade).targeting(myr).pass_priority(),

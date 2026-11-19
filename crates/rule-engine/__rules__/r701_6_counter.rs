@@ -45,13 +45,13 @@ mod tests {
             .player(p1)
             .cards_in(HAND)
             .matching(LIGHTNING_BOLT)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         let [cancel] = game
             .player(p2)
             .cards_in(HAND)
             .matching(CANCEL)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
 
         game.play([
@@ -76,13 +76,13 @@ mod tests {
             .player(p1)
             .cards_in(HAND)
             .matching(GRIZZLY_BEARS)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         let [scatter] = game
             .player(p2)
             .cards_in(HAND)
             .matching(ESSENCE_SCATTER)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
 
         game.play([
@@ -106,13 +106,13 @@ mod tests {
             .player(p1)
             .cards_in(HAND)
             .matching(LIGHTNING_BOLT)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         let [negate] = game
             .player(p2)
             .cards_in(HAND)
             .matching(NEGATE)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
 
         game.play([
@@ -137,19 +137,19 @@ mod tests {
             .player(p1)
             .cards_in(HAND)
             .matching(LIGHTNING_BOLT)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         let [dispel] = game
             .player(p1)
             .cards_in(HAND)
             .matching(DISPEL)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         let [cancel] = game
             .player(p2)
             .cards_in(HAND)
             .matching(CANCEL)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
 
         game.play([
@@ -179,19 +179,19 @@ mod tests {
             .player(p1)
             .cards_in(HAND)
             .matching(LIGHTNING_BOLT)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         let [p1_cancel] = game
             .player(p1)
             .cards_in(HAND)
             .matching(CANCEL)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         let [p2_cancel] = game
             .player(p2)
             .cards_in(HAND)
             .matching(CANCEL)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
 
         game.play([

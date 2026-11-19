@@ -182,7 +182,7 @@ mod tests {
             .player(p1)
             .cards_in(HAND)
             .matching(LIGHTNING_BOLT)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         game.play([p1.cast(bolt)]).unwrap();
         assert!(game.target_choice().is_some());
@@ -198,13 +198,13 @@ mod tests {
             .player(p1)
             .cards_in(HAND)
             .matching(LIGHTNING_BOLT)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         let [bears] = game
             .player(p2)
             .cards_in(BATTLEFIELD)
             .matching(GRIZZLY_BEARS)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         game.play([p1.cast(bolt)]).unwrap();
         assert_eq!(
@@ -220,7 +220,7 @@ mod tests {
             .player(p1)
             .cards_in(HAND)
             .matching(MURDER)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         let err = game.play([p1.cast(murder)]).unwrap_err();
         assert_eq!(
@@ -242,13 +242,13 @@ mod tests {
             .player(p1)
             .cards_in(HAND)
             .matching(DOOM_BLADE)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         let [bears] = game
             .player(p2)
             .cards_in(BATTLEFIELD)
             .matching(GRIZZLY_BEARS)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         game.play([p1.cast(blade)]).unwrap();
         assert_eq!(game.target_choice(), Some(pick(1).from([bears.into()])));
@@ -264,13 +264,13 @@ mod tests {
             .player(p1)
             .cards_in(HAND)
             .matching(DOOM_BLADE)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         let [corpse] = game
             .player(p2)
             .cards_in(BATTLEFIELD)
             .matching(WALKING_CORPSE)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         let err = game.play([p1.cast(blade).targeting(corpse)]).unwrap_err();
         assert_eq!(
@@ -291,7 +291,7 @@ mod tests {
             .player(p1)
             .cards_in(HAND)
             .matching(DOOM_BLADE)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         let err = game.play([p1.cast(blade)]).unwrap_err();
         assert_eq!(
@@ -314,19 +314,19 @@ mod tests {
             .player(p1)
             .cards_in(HAND)
             .matching(LIGHTNING_BOLT)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         let [cancel] = game
             .player(p1)
             .cards_in(HAND)
             .matching(CANCEL)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         let [bears] = game
             .player(p2)
             .cards_in(BATTLEFIELD)
             .matching(GRIZZLY_BEARS)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
 
         game.play([p1.cast(bolt).targeting(p2), p1.cast(cancel)])
@@ -353,13 +353,13 @@ mod tests {
             .player(p1)
             .cards_in(HAND)
             .matching(LIGHTNING_BOLT)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         let [scatter] = game
             .player(p2)
             .cards_in(HAND)
             .matching(ESSENCE_SCATTER)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
 
         let err = game
@@ -389,13 +389,13 @@ mod tests {
             .player(p1)
             .cards_in(HAND)
             .matching(GRIZZLY_BEARS)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         let [negate] = game
             .player(p2)
             .cards_in(HAND)
             .matching(NEGATE)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
 
         let err = game
@@ -422,13 +422,13 @@ mod tests {
             .player(p1)
             .cards_in(HAND)
             .matching(DIVINATION)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         let [dispel] = game
             .player(p2)
             .cards_in(HAND)
             .matching(DISPEL)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
 
         let err = game
@@ -453,7 +453,7 @@ mod tests {
             .player(p1)
             .cards_in(HAND)
             .matching(LIGHTNING_BOLT)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         game.play([p1.cast(bolt)]).unwrap();
         assert_eq!(

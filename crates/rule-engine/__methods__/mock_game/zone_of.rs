@@ -25,7 +25,7 @@ mod tests {
             .player(p2)
             .cards_in(BATTLEFIELD)
             .matching(GRIZZLY_BEARS)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         assert_eq!(zone_of(&game, bears), BATTLEFIELD);
     }

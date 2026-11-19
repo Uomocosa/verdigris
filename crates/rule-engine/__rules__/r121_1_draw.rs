@@ -60,7 +60,7 @@ mod tests {
             .player(p1)
             .cards_in(HAND)
             .matching(DIVINATION)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         game.play([p1.cast(divination).pass_priority(), p2.pass_priority()])
             .unwrap();
@@ -84,7 +84,7 @@ mod tests {
             .player(p1)
             .cards_in(HAND)
             .matching(DIVINATION)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         game.play([p1.cast(divination).pass_priority(), p2.pass_priority()])
             .unwrap();
@@ -95,7 +95,7 @@ mod tests {
                 game.player(p1)
                     .cards_in(LIBRARY)
                     .matching(MURDER)
-                    .expect_n::<1>()
+                    .exactly::<1>()
                     .unwrap()[0]
             ),
             LIBRARY

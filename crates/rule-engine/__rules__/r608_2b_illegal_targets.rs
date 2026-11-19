@@ -100,7 +100,7 @@ mod tests {
             .player(p1)
             .cards_in(HAND)
             .matching(LIGHTNING_BOLT)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         game.play([
             p1.cast(bolt).targeting(p2).pass_priority(),
@@ -121,19 +121,19 @@ mod tests {
             .player(p1)
             .cards_in(HAND)
             .matching(LIGHTNING_BOLT)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         let [murder] = game
             .player(p1)
             .cards_in(HAND)
             .matching(MURDER)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         let [bears] = game
             .player(p2)
             .cards_in(BATTLEFIELD)
             .matching(GRIZZLY_BEARS)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
 
         game.play([
@@ -160,13 +160,13 @@ mod tests {
             .player(p1)
             .cards_in(HAND)
             .matching(DOOM_BLADE)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         let [bears] = game
             .player(p2)
             .cards_in(BATTLEFIELD)
             .matching(GRIZZLY_BEARS)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
 
         game.play([p1.cast(blade).targeting(bears)]).unwrap();

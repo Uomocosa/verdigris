@@ -89,7 +89,7 @@ mod tests {
             .player(p1)
             .cards_in(HAND)
             .matching(LIGHTNING_BOLT)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
 
         play(
@@ -108,7 +108,7 @@ mod tests {
             .player(p1)
             .cards_in(HAND)
             .matching(LIGHTNING_BOLT)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
 
         let error = play(
@@ -137,13 +137,13 @@ mod tests {
             .player(p1)
             .cards_in(HAND)
             .matching(LIGHTNING_BOLT)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         let [negate] = game
             .player(p2)
             .cards_in(HAND)
             .matching(NEGATE)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
 
         game.play([
@@ -157,14 +157,14 @@ mod tests {
             game.player(p1)
                 .cards_in(GRAVEYARD)
                 .matching(LIGHTNING_BOLT)
-                .expect_n::<1>()
+                .exactly::<1>()
                 .is_ok()
         );
         assert!(
             game.player(p2)
                 .cards_in(GRAVEYARD)
                 .matching(NEGATE)
-                .expect_n::<1>()
+                .exactly::<1>()
                 .is_ok()
         );
         let turn = *game.app.world().resource::<turns::Turn>();
@@ -182,19 +182,19 @@ mod tests {
             .player(p1)
             .cards_in(HAND)
             .matching(LIGHTNING_BOLT)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         let [dispel] = game
             .player(p1)
             .cards_in(HAND)
             .matching(DISPEL)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         let [cancel] = game
             .player(p2)
             .cards_in(HAND)
             .matching(CANCEL)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
 
         game.play([

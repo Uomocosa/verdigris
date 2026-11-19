@@ -48,19 +48,19 @@ mod tests {
             .player(p1)
             .cards_in(HAND)
             .matching(LIGHTNING_BOLT)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         let [growth] = game
             .player(p2)
             .cards_in(HAND)
             .matching(GIANT_GROWTH)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         let [bears] = game
             .player(p2)
             .cards_in(BATTLEFIELD)
             .matching(GRIZZLY_BEARS)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
 
         game.play([
@@ -101,19 +101,19 @@ mod tests {
             .player(p1)
             .cards_in(HAND)
             .matching(GIANT_GROWTH)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         let [bolt] = game
             .player(p1)
             .cards_in(HAND)
             .matching(LIGHTNING_BOLT)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         let [bears] = game
             .player(p1)
             .cards_in(BATTLEFIELD)
             .matching(GRIZZLY_BEARS)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
 
         game.play([

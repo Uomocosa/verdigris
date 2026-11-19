@@ -22,6 +22,6 @@ mod tests {
     fn test_usage() {
         let (game, [p1, ..]) = MockGame::new([P1.hand([LIGHTNING_BOLT]), P2]);
         let cards = game.player(p1).cards_in(HAND).matching(LIGHTNING_BOLT);
-        assert_eq!(nth(&cards, 0).map(|card| [card]), cards.expect_n::<1>());
+        assert_eq!(nth(&cards, 0).map(|card| [card]), cards.exactly::<1>());
     }
 }

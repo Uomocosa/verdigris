@@ -65,13 +65,13 @@ mod tests {
             .player(p1)
             .cards_in(BATTLEFIELD)
             .matching(WALKING_CORPSE)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         let [bolt] = game
             .player(p2)
             .cards_in(HAND)
             .matching(LIGHTNING_BOLT)
-            .expect_n::<1>()
+            .exactly::<1>()
             .unwrap();
         game.play([
             p2.cast(bolt).targeting(corpse).pass_priority(),
