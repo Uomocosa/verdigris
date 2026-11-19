@@ -80,19 +80,11 @@ pub fn r701_9_discard(
 
 #[cfg(test)]
 mod tests {
-    use bevy::prelude::Entity;
-
     use crate::actions;
     use crate::mana;
+    use crate::testing::traits::Caster;
     use crate::testing::*;
     use crate::{GRAVEYARD, HAND};
-
-    fn cast_and_resolve_mind_rot(game: &mut MockGame, caster: Entity, target: Entity) {
-        let mind_rot = game.find(caster, HAND, "Mind Rot").unwrap();
-        game.act(caster, actions::Action::Cast(mind_rot));
-        game.act(caster, actions::Action::ChooseTargets(vec![target]));
-        game.pass_priority_all();
-    }
 
     #[test]
     fn test_usage() {
@@ -100,8 +92,10 @@ mod tests {
             P1.hand([mind_rot()]).mana_pool(mana![2, B]),
             P2.hand([grizzly_bears()]),
         ]);
-        cast_and_resolve_mind_rot(&mut game, p1, p2);
-        assert!(game.find(p2, GRAVEYARD, "Grizzly Bears").is_some());
+        let mind_rot = game.player(p1).cards(HAND, MIND_ROT).only().unwrap();
+        game.play(p1.cast(mind_rot).targeting(p2).resolve())
+            .unwrap();
+        assert!(!game.player(p2).cards(GRAVEYARD, GRIZZLY_BEARS).is_empty());
     }
 
     #[test]
@@ -110,15 +104,17 @@ mod tests {
             P1.hand([mind_rot()]).mana_pool(mana![2, B]),
             P2.hand([grizzly_bears(), lightning_bolt(), murder()]),
         ]);
-        cast_and_resolve_mind_rot(&mut game, p1, p2);
+        let mind_rot = game.player(p1).cards(HAND, MIND_ROT).only().unwrap();
+        game.play(p1.cast(mind_rot).targeting(p2).resolve())
+            .unwrap();
 
-        let bears = game.find(p2, HAND, "Grizzly Bears").unwrap();
-        let bolt = game.find(p2, HAND, "Lightning Bolt").unwrap();
+        let bears = game.player(p2).cards(HAND, GRIZZLY_BEARS).only().unwrap();
+        let bolt = game.player(p2).cards(HAND, LIGHTNING_BOLT).only().unwrap();
         game.act(p2, actions::Action::ChooseDiscard(vec![bears, bolt]));
 
         assert_eq!(game.zone_of(bears), GRAVEYARD);
         assert_eq!(game.zone_of(bolt), GRAVEYARD);
-        assert!(game.find(p2, HAND, "Murder").is_some());
+        assert!(!game.player(p2).cards(HAND, MURDER).is_empty());
     }
 
     #[test]
@@ -127,12 +123,19 @@ mod tests {
             P1.hand([mind_rot()]).mana_pool(mana![2, B]),
             P2.hand([grizzly_bears()]),
         ]);
-        cast_and_resolve_mind_rot(&mut game, p1, p2);
+        let mind_rot = game.player(p1).cards(HAND, MIND_ROT).only().unwrap();
+        game.play(p1.cast(mind_rot).targeting(p2).resolve())
+            .unwrap();
 
         assert_eq!(
-            game.zone_of(game.find(p2, GRAVEYARD, "Grizzly Bears").unwrap()),
+            game.zone_of(
+                game.player(p2)
+                    .cards(GRAVEYARD, GRIZZLY_BEARS)
+                    .only()
+                    .unwrap()
+            ),
             GRAVEYARD
         );
-        assert!(game.find(p2, HAND, "Grizzly Bears").is_none());
+        assert!(game.player(p2).cards(HAND, GRIZZLY_BEARS).is_empty());
     }
 }

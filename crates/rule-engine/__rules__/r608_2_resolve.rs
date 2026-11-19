@@ -135,12 +135,20 @@ mod tests {
             P1.hand([lightning_bolt()]).mana_pool(mana![R]),
             P2.battlefield([grizzly_bears()]),
         ]);
-        let bears = game.find(p2, BATTLEFIELD, "Grizzly Bears").unwrap();
+        let bears = game
+            .player(p2)
+            .cards(BATTLEFIELD, GRIZZLY_BEARS)
+            .only()
+            .unwrap();
         let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
         game.play(p1.cast(bolt).targeting(bears).resolve()).unwrap();
         assert_eq!(game.zone_of(bears), GRAVEYARD);
-        assert!(game.find(p2, GRAVEYARD, "Grizzly Bears").is_some());
-        let bolt = game.find(p1, GRAVEYARD, "Lightning Bolt").unwrap();
+        assert!(!game.player(p2).cards(GRAVEYARD, GRIZZLY_BEARS).is_empty());
+        let bolt = game
+            .player(p1)
+            .cards(GRAVEYARD, LIGHTNING_BOLT)
+            .only()
+            .unwrap();
         assert_eq!(game.zone_of(bolt), GRAVEYARD);
     }
 
@@ -150,7 +158,11 @@ mod tests {
             P1.hand([murder()]).mana_pool(mana![1, B, B]),
             P2.battlefield([grizzly_bears()]),
         ]);
-        let bears = game.find(p2, BATTLEFIELD, "Grizzly Bears").unwrap();
+        let bears = game
+            .player(p2)
+            .cards(BATTLEFIELD, GRIZZLY_BEARS)
+            .only()
+            .unwrap();
         let murder = game.player(p1).cards(HAND, MURDER).only().unwrap();
         game.play(p1.cast(murder).targeting(bears).resolve())
             .unwrap();
@@ -163,13 +175,17 @@ mod tests {
             P1.hand([doom_blade()]).mana_pool(mana![1, B]),
             P2.battlefield([grizzly_bears()]),
         ]);
-        let bears = game.find(p2, BATTLEFIELD, "Grizzly Bears").unwrap();
+        let bears = game
+            .player(p2)
+            .cards(BATTLEFIELD, GRIZZLY_BEARS)
+            .only()
+            .unwrap();
         let doom_blade = game.player(p1).cards(HAND, DOOM_BLADE).only().unwrap();
         game.play(p1.cast(doom_blade).targeting(bears).resolve())
             .unwrap();
         assert_eq!(game.zone_of(bears), GRAVEYARD);
-        assert!(game.find(p2, GRAVEYARD, "Grizzly Bears").is_some());
-        let blade = game.find(p1, GRAVEYARD, "Doom Blade").unwrap();
+        assert!(!game.player(p2).cards(GRAVEYARD, GRIZZLY_BEARS).is_empty());
+        let blade = game.player(p1).cards(GRAVEYARD, DOOM_BLADE).only().unwrap();
         assert_eq!(game.zone_of(blade), GRAVEYARD);
     }
 }

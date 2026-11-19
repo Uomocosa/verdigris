@@ -42,8 +42,8 @@ mod tests {
             P1.hand([lightning_bolt()]).mana_pool(mana![R]),
             P2.hand([cancel()]).mana_pool(mana![1, U, U]),
         ]);
-        let bolt = game.find(p1, HAND, "Lightning Bolt").unwrap();
-        let cancel = game.find(p2, HAND, "Cancel").unwrap();
+        let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
+        let cancel = game.player(p2).cards(HAND, CANCEL).only().unwrap();
 
         game.act(p1, actions::Action::Cast(bolt));
         game.act(p1, actions::Action::ChooseTargets(vec![p2]));
@@ -63,8 +63,8 @@ mod tests {
             P1.hand([grizzly_bears()]).mana_pool(mana![1, G]),
             P2.hand([essence_scatter()]).mana_pool(mana![1, U]),
         ]);
-        let bears = game.find(p1, HAND, "Grizzly Bears").unwrap();
-        let scatter = game.find(p2, HAND, "Essence Scatter").unwrap();
+        let bears = game.player(p1).cards(HAND, GRIZZLY_BEARS).only().unwrap();
+        let scatter = game.player(p2).cards(HAND, ESSENCE_SCATTER).only().unwrap();
 
         game.act(p1, actions::Action::Cast(bears));
         game.pass_priority();
@@ -82,8 +82,8 @@ mod tests {
             P1.hand([lightning_bolt()]).mana_pool(mana![R]),
             P2.hand([negate()]).mana_pool(mana![1, U]),
         ]);
-        let bolt = game.find(p1, HAND, "Lightning Bolt").unwrap();
-        let negate = game.find(p2, HAND, "Negate").unwrap();
+        let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
+        let negate = game.player(p2).cards(HAND, NEGATE).only().unwrap();
 
         game.act(p1, actions::Action::Cast(bolt));
         game.act(p1, actions::Action::ChooseTargets(vec![p2]));
@@ -103,9 +103,9 @@ mod tests {
             P1.hand([lightning_bolt(), dispel()]).mana_pool(mana![R, U]),
             P2.hand([cancel()]).mana_pool(mana![1, U, U]),
         ]);
-        let bolt = game.find(p1, HAND, "Lightning Bolt").unwrap();
-        let dispel = game.find(p1, HAND, "Dispel").unwrap();
-        let cancel = game.find(p2, HAND, "Cancel").unwrap();
+        let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
+        let dispel = game.player(p1).cards(HAND, DISPEL).only().unwrap();
+        let cancel = game.player(p2).cards(HAND, CANCEL).only().unwrap();
 
         game.act(p1, actions::Action::Cast(bolt));
         game.act(p1, actions::Action::ChooseTargets(vec![p2]));
@@ -133,9 +133,9 @@ mod tests {
                 .mana_pool(mana![1, U, U, R]),
             P2.hand([cancel()]).mana_pool(mana![1, U, U]),
         ]);
-        let bolt = game.find(p1, HAND, "Lightning Bolt").unwrap();
-        let p1_cancel = game.find(p1, HAND, "Cancel").unwrap();
-        let p2_cancel = game.find(p2, HAND, "Cancel").unwrap();
+        let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
+        let p1_cancel = game.player(p1).cards(HAND, CANCEL).only().unwrap();
+        let p2_cancel = game.player(p2).cards(HAND, CANCEL).only().unwrap();
 
         game.act(p1, actions::Action::Cast(bolt));
         game.act(p1, actions::Action::ChooseTargets(vec![p2]));

@@ -95,7 +95,7 @@ mod tests {
     fn test_usage() {
         let (mut game, [p1, p2]) =
             MockGame::new([P1.hand([lightning_bolt()]).mana_pool(mana![R]), P2]);
-        let bolt = game.find(p1, HAND, "Lightning Bolt").unwrap();
+        let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
         game.act(p1, actions::Action::Cast(bolt));
         game.act(p1, actions::Action::ChooseTargets(vec![p2]));
         game.pass_priority_all();
@@ -109,9 +109,13 @@ mod tests {
                 .mana_pool(mana![1, B, B, R]),
             P2.battlefield([grizzly_bears()]),
         ]);
-        let bolt = game.find(p1, HAND, "Lightning Bolt").unwrap();
-        let murder = game.find(p1, HAND, "Murder").unwrap();
-        let bears = game.find(p2, BATTLEFIELD, "Grizzly Bears").unwrap();
+        let bolt = game.player(p1).cards(HAND, LIGHTNING_BOLT).only().unwrap();
+        let murder = game.player(p1).cards(HAND, MURDER).only().unwrap();
+        let bears = game
+            .player(p2)
+            .cards(BATTLEFIELD, GRIZZLY_BEARS)
+            .only()
+            .unwrap();
 
         game.act(p1, actions::Action::Cast(bolt));
         game.act(p1, actions::Action::ChooseTargets(vec![bears]));
@@ -133,8 +137,12 @@ mod tests {
             P1.hand([doom_blade()]).mana_pool(mana![1, B]),
             P2.battlefield([grizzly_bears()]),
         ]);
-        let blade = game.find(p1, HAND, "Doom Blade").unwrap();
-        let bears = game.find(p2, BATTLEFIELD, "Grizzly Bears").unwrap();
+        let blade = game.player(p1).cards(HAND, DOOM_BLADE).only().unwrap();
+        let bears = game
+            .player(p2)
+            .cards(BATTLEFIELD, GRIZZLY_BEARS)
+            .only()
+            .unwrap();
 
         game.act(p1, actions::Action::Cast(blade));
         game.act(p1, actions::Action::ChooseTargets(vec![bears]));
