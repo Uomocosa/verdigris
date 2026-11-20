@@ -14,9 +14,9 @@ impl RuleTests {
     pub const CODE: &'static str = "VRDG005";
     pub const DOC: RuleDoc = RuleDoc {
         category: Category::Layout,
-        summary: "Every `__rules__/` file keeps a `#[cfg(test)] mod tests` with a `test_usage` test, and every other `#[test]` fn is named `r<id>_<description>` for one of the file name's rule ids.",
-        why: "The test name says which Comprehensive Rules section the scenario checks, so a failing test points at its rule and the `__rules__/` listing stays scannable; an unprefixed or foreign-prefixed test name hides which rule it guards.",
-        fix: "Keep `#[test] fn test_usage` and name every other test `r<id>_<snake_case description>` where `<id>` is one of the file name's ids (e.g. `r608_2_bolt_kills_bears` in `r608_2_r608_2c_resolve.rs`).",
+        summary: "Every `__rules__/` file keeps a `#[cfg(test)] mod tests` with at least one `#[test]` fn, named for what it tests.",
+        why: "A rule file without a test guards nothing; a test named for what it tests tells the reader which behaviour the rule implements.",
+        fix: "Keep a `#[cfg(test)] mod tests` with at least one `#[test]` fn named for what it tests (e.g. `bolt_kills_bears` in `r608_2_r608_2c_resolve.rs`).",
         bad: rule_examples!("rule_tests/bad"),
         good: rule_examples!("rule_tests/good"),
     };

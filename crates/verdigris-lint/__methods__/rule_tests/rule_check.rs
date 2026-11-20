@@ -27,7 +27,7 @@ pub fn rule_check(_self: &rules::rule_tests::RuleTests, project: &Project) -> Ve
         if stem == "mod" {
             continue;
         }
-        let Ok(parsed) = rules::rule_file_stem::RuleFileStem::try_from(stem) else {
+        let Ok(_) = rules::rule_file_stem::RuleFileStem::try_from(stem) else {
             continue;
         };
         let Some(file) = project.parsed_files.get(&entry.relative_path) else {
@@ -50,39 +50,15 @@ pub fn rule_check(_self: &rules::rule_tests::RuleTests, project: &Project) -> Ve
             ));
             continue;
         };
-        let names: Vec<String> = items
-            .iter()
-            .filter_map(|item| match item {
-                syn::Item::Fn(found)
-                    if found.attrs.iter().any(|attr| ItemMarker(attr).is_test()) =>
-                {
-                    Some(found.sig.ident.to_string())
-                }
-                _ => None,
-            })
-            .collect();
-        if !names.iter().any(|name| name == "test_usage") {
+        let has_test = items.iter().any(|item| match item {
+            syn::Item::Fn(found) => found.attrs.iter().any(|attr| ItemMarker(attr).is_test()),
+            _ => false,
+        });
+        if !has_test {
             violations.push(RuleViolation::from_file(
                 entry.absolute_path.clone(),
                 rules::rule_tests::RuleTests::CODE,
-                format!("rule file {stem} has no #[test] fn test_usage in its tests module"),
-            ));
-        }
-        let allowed: Vec<String> = parsed.ids.iter().map(|id| format!("r{id}_")).collect();
-        for name in &names {
-            if name == "test_usage" {
-                continue;
-            }
-            if allowed.iter().any(|prefix| name.starts_with(prefix) && name.len() > prefix.len()) {
-                continue;
-            }
-            violations.push(RuleViolation::from_file(
-                entry.absolute_path.clone(),
-                rules::rule_tests::RuleTests::CODE,
-                format!(
-                    "test {name} in {stem} must be named r<id>_<description> (allowed prefixes: {})",
-                    allowed.join(", ")
-                ),
+                format!("rule file {stem} has no #[test] fn in its tests module"),
             ));
         }
     }
@@ -113,7 +89,28 @@ mod tests {
         project.parsed_files.insert(
             PathBuf::from("__rules__/r117_4_priority.rs"),
             syn::parse_str(
-                "pub fn r117_4_priority() {} #[cfg(test)] mod tests { #[test] fn test_usage() {} #[test] fn r117_4_passing_resolves_the_spell() {} }",
+                "pub fn r117_4_priority() {} #[cfg(test)] mod tests { #[test] fn passing_resolves_the_spell() {} }",
+            )
+            .unwrap(),
+        );
+        let violations = rule_check(&rules::rule_tests::RuleTests, &project);
+        assert_eq!(violations.len(), 0);
+    }
+
+    #[test]
+    fn test_usage_name_is_also_clean() {
+        let mut project = Project {
+            entries: vec![Entry {
+                relative_path: PathBuf::from("__rules__/r117_4_priority.rs"),
+                absolute_path: PathBuf::from("/crate/__rules__/r117_4_priority.rs"),
+                kind: EntryKind::File,
+            }],
+            ..Project::default()
+        };
+        project.parsed_files.insert(
+            PathBuf::from("__rules__/r117_4_priority.rs"),
+            syn::parse_str(
+                "pub fn r117_4_priority() {} #[cfg(test)] mod tests { #[test] fn test_usage() {} }",
             )
             .unwrap(),
         );
@@ -142,7 +139,7 @@ mod tests {
     }
 
     #[test]
-    fn missing_test_usage_is_a_violation() {
+    fn tests_module_without_a_test_is_a_violation() {
         let mut project = Project {
             entries: vec![Entry {
                 relative_path: PathBuf::from("__rules__/r117_4_priority.rs"),
@@ -153,19 +150,17 @@ mod tests {
         };
         project.parsed_files.insert(
             PathBuf::from("__rules__/r117_4_priority.rs"),
-            syn::parse_str(
-                "pub fn r117_4_priority() {} #[cfg(test)] mod tests { #[test] fn r117_4_passing_resolves_the_spell() {} }",
-            )
-            .unwrap(),
+            syn::parse_str("pub fn r117_4_priority() {} #[cfg(test)] mod tests { fn helper() {} }")
+                .unwrap(),
         );
         let violations = rule_check(&rules::rule_tests::RuleTests, &project);
         assert_eq!(violations.len(), 1);
         assert!(violations[0].message.contains("r117_4_priority"));
-        assert!(violations[0].message.contains("test_usage"));
+        assert!(violations[0].message.contains("no #[test] fn"));
     }
 
     #[test]
-    fn unprefixed_name_is_a_violation() {
+    fn unprefixed_name_is_clean() {
         let mut project = Project {
             entries: vec![Entry {
                 relative_path: PathBuf::from("__rules__/r608_2_r608_2c_resolve.rs"),
@@ -177,19 +172,16 @@ mod tests {
         project.parsed_files.insert(
             PathBuf::from("__rules__/r608_2_r608_2c_resolve.rs"),
             syn::parse_str(
-                "pub fn r608_2_r608_2c_resolve() {} #[cfg(test)] mod tests { #[test] fn test_usage() {} #[test] fn test_bolt_kills_bears() {} }",
+                "pub fn r608_2_r608_2c_resolve() {} #[cfg(test)] mod tests { #[test] fn bolt_kills_bears() {} }",
             )
             .unwrap(),
         );
         let violations = rule_check(&rules::rule_tests::RuleTests, &project);
-        assert_eq!(violations.len(), 1);
-        assert!(violations[0].message.contains("test_bolt_kills_bears"));
-        assert!(violations[0].message.contains("r608_2_"));
-        assert!(violations[0].message.contains("r608_2c_"));
+        assert_eq!(violations.len(), 0);
     }
 
     #[test]
-    fn foreign_id_prefix_is_a_violation() {
+    fn foreign_id_prefix_is_clean() {
         let mut project = Project {
             entries: vec![Entry {
                 relative_path: PathBuf::from("__rules__/r305_6_basic_land_mana_ability.rs"),
@@ -201,14 +193,12 @@ mod tests {
         project.parsed_files.insert(
             PathBuf::from("__rules__/r305_6_basic_land_mana_ability.rs"),
             syn::parse_str(
-                "pub fn r305_6_basic_land_mana_ability() {} #[cfg(test)] mod tests { #[test] fn test_usage() {} #[test] fn r107_5_tapped_land_cannot_tap_again() {} }",
+                "pub fn r305_6_basic_land_mana_ability() {} #[cfg(test)] mod tests { #[test] fn tapped_land_cannot_tap_again() {} }",
             )
             .unwrap(),
         );
         let violations = rule_check(&rules::rule_tests::RuleTests, &project);
-        assert_eq!(violations.len(), 1);
-        assert!(violations[0].message.contains("r107_5_tapped_land_cannot_tap_again"));
-        assert!(violations[0].message.contains("r305_6_"));
+        assert_eq!(violations.len(), 0);
     }
 
     #[test]
