@@ -17,6 +17,7 @@ mod player_view;
 mod targets;
 mod test_card;
 mod test_card_name;
+mod test_error;
 mod test_player;
 mod test_player_actions;
 
@@ -36,6 +37,7 @@ pub use player_view::PlayerView;
 pub use targets::Targets;
 pub use test_card::TestCard;
 pub use test_card_name::TestCardName;
+pub use test_error::TestError;
 pub use test_player::TestPlayer;
 pub use test_player_actions::TestPlayerActions;
 

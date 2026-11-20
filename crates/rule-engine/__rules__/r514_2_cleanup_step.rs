@@ -32,6 +32,7 @@ mod tests {
     use crate::damage;
     use crate::effects;
     use crate::mana;
+    use crate::testing;
     use crate::testing::*;
     use crate::{BATTLEFIELD, GRAVEYARD, HAND, MAIN_1};
 
@@ -67,39 +68,35 @@ mod tests {
     }
 
     #[test]
-    fn r514_2_until_end_of_turn_effect_expires_before_the_next_bolt() {
+    fn r514_2_until_end_of_turn_effect_expires_before_the_next_bolt()
+    -> Result<(), testing::TestError> {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([GIANT_GROWTH, LIGHTNING_BOLT]).battlefield([FOREST, MOUNTAIN, GRIZZLY_BEARS]),
             P2,
         ]);
-        let [growth] =
-            game.player(p1).cards_in(HAND).matching(GIANT_GROWTH).exactly::<1>().unwrap();
-        let [bolt] =
-            game.player(p1).cards_in(HAND).matching(LIGHTNING_BOLT).exactly::<1>().unwrap();
+        let [growth] = game.player(p1).cards_in(HAND).matching(GIANT_GROWTH).exactly::<1>()?;
+        let [bolt] = game.player(p1).cards_in(HAND).matching(LIGHTNING_BOLT).exactly::<1>()?;
         let [bears] =
-            game.player(p1).cards_in(BATTLEFIELD).matching(GRIZZLY_BEARS).exactly::<1>().unwrap();
-        let [forest] =
-            game.player(p1).cards_in(BATTLEFIELD).matching(FOREST).exactly::<1>().unwrap();
-        let [mountain] =
-            game.player(p1).cards_in(BATTLEFIELD).matching(MOUNTAIN).exactly::<1>().unwrap();
+            game.player(p1).cards_in(BATTLEFIELD).matching(GRIZZLY_BEARS).exactly::<1>()?;
+        let [forest] = game.player(p1).cards_in(BATTLEFIELD).matching(FOREST).exactly::<1>()?;
+        let [mountain] = game.player(p1).cards_in(BATTLEFIELD).matching(MOUNTAIN).exactly::<1>()?;
 
         game.act(p1, actions::Action::ActivateManaAbility(forest.into()));
         game.play([
             p1.cast(growth).targeting(bears).pass_priority(),
             p2.pass_priority(),
-        ])
-        .unwrap();
-        game.play([p1.end_turn(), p2.end_turn()]).unwrap();
-        game.play([p1.end_turn(), p2.end_turn()]).unwrap();
-        game.play([p1.pass_to(MAIN_1), p2.pass_to(MAIN_1)]).unwrap();
+        ])?;
+        game.play([p1.end_turn(), p2.end_turn()])?;
+        game.play([p1.end_turn(), p2.end_turn()])?;
+        game.play([p1.pass_to(MAIN_1), p2.pass_to(MAIN_1)])?;
 
         game.act(p1, actions::Action::ActivateManaAbility(mountain.into()));
         game.play([
             p1.cast(bolt).targeting(bears).pass_priority(),
             p2.pass_priority(),
-        ])
-        .unwrap();
+        ])?;
 
         assert_eq!(game.zone_of(bears), GRAVEYARD);
+        Ok(())
     }
 }

@@ -1,3 +1,4 @@
+#![cfg_attr(test, allow(clippy::panic_in_result_fn))]
 pub mod actions;
 pub mod cards;
 pub mod damage;
