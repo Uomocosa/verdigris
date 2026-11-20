@@ -31,6 +31,7 @@ If a git hook fails, stop and report the root cause; never use `--no-verify`.
 - Tests live inline (`#[cfg(test)]`) and each non-trivial file ends with a `test_usage` test.
 - Never add `#[allow(clippy::…)]` for pedantic/nursery without explicit user approval.
 - Every claim about existing code cites a `file:line` you actually read.
+- Load the `verdigris-style` skill before writing or reviewing Rust here; repo-specific style decisions live there.
 
 ## Working with AI assistants
 
