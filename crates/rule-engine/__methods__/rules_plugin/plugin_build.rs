@@ -93,7 +93,12 @@ pub fn plugin_build(_rules_plugin: &RulesPlugin, app: &mut App) {
     );
     app.add_systems(
         Update,
-        rules::r514_2_cleanup_step::r514_2_cleanup_step.in_set(rules::RuleSet::Cleanup),
+        (
+            rules::r514_1_cleanup_discard::r514_1_cleanup_discard,
+            rules::r514_2_cleanup_step::r514_2_cleanup_step,
+        )
+            .chain()
+            .in_set(rules::RuleSet::Cleanup),
     );
     app.add_systems(
         Update,

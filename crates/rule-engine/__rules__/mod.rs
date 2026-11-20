@@ -9,6 +9,7 @@ pub mod r500_2_step_ends;
 pub mod r500_3_step_without_priority_ends;
 pub mod r504_1_draw_step;
 pub mod r508_1a_declare_attackers;
+pub mod r514_1_cleanup_discard;
 pub mod r514_2_cleanup_step;
 pub mod r601_2a_cast;
 pub mod r601_2c_targets;
