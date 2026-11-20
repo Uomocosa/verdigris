@@ -45,6 +45,35 @@ assert_eq!(game.mana_pool(p1), cards::ManaPool::default());
 
 If a type needs `Default` (derives, builders), make `default()` return the named constant.
 
+## 3. MockGame tests: setup → look up → act → assert
+
+The verdigris form of SMELLS S10. Right after `MockGame::new(...)`, look up every card the
+test uses with `exactly::<N>(CARD)?`; then write the actions as one `game.play([...])` script
+built from the verb helpers (`cast`, `targeting`, `activate_ability`, `declare_attackers`,
+`declare_blockers`, `play_land`, `discard`, `pass_to`); then assert. Tests return
+`Result<(), TestError>` and use `?` (keep the turbofish explicit: `exactly::<1>`).
+
+```rust
+// Good
+let (mut game, [p1, p2]) = MockGame::new([P1.battlefield([GRIZZLY_BEARS]), P2]);
+let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+game.play([p1.pass_to(DECLARE_ATTACKERS).declare_attackers([bears]), p2.pass_to(DECLARE_ATTACKERS)])?;
+assert!(game.app.world().get::<cards::Attacking>(bears.into()).is_some());
+Ok(())
+
+// Bad — play first, look up after, raw Action built by hand
+game.play([p1.pass_to(DECLARE_ATTACKERS), p2.pass_to(DECLARE_ATTACKERS)]).unwrap();
+let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
+game.act(p1, actions::Action::DeclareAttackers(vec![bears.into()]));
+```
+
+Raw `game.act(..)` stays only in tests that check the engine rejects an action
+(`game.last_rejection()`). A card that only exists after an action (drawn, created) is looked
+up right after that step, with a comment.
+
+**Why:** the reader learns what is on the table before reading what happens to it, and a
+lookup placed after `play` silently depends on the card not having moved.
+
 ## Adding rules here
 
 Add a section per decision the user makes about how verdigris code should look: a one-line
