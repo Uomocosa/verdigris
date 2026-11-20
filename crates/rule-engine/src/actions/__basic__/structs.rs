@@ -15,3 +15,9 @@ pub struct DiscardChoice {
     pub count: u32,
     pub legal: BTreeSet<Entity>,
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct BlockAssignment {
+    pub blocker: Entity,
+    pub attacker: Entity,
+}

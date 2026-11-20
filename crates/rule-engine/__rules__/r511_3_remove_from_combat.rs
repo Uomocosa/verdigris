@@ -10,6 +10,8 @@ pub fn r511_3_remove_from_combat(
     mut step_started: MessageReader<turns::StepStarted>,
     mut commands: Commands,
     attacking: Query<Entity, With<cards::Attacking>>,
+    blocking: Query<Entity, With<cards::Blocking>>,
+    blocked: Query<Entity, With<cards::Blocked>>,
 ) {
     for step in step_started.read() {
         if **step != turns::Step::PostcombatMain {
@@ -17,6 +19,12 @@ pub fn r511_3_remove_from_combat(
         }
         for entity in attacking.iter() {
             commands.entity(entity).remove::<cards::Attacking>();
+        }
+        for entity in blocking.iter() {
+            commands.entity(entity).remove::<cards::Blocking>();
+        }
+        for entity in blocked.iter() {
+            commands.entity(entity).remove::<cards::Blocked>();
         }
     }
 }
@@ -57,6 +65,73 @@ mod tests {
             game.app
                 .world()
                 .get::<crate::cards::Attacking>(bears.into())
+                .is_none()
+        );
+    }
+
+    #[test]
+    fn r511_3_blockers_are_removed_from_combat_after_end_of_combat() {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.battlefield([TYPHOID_RATS]),
+            P2.battlefield([GRIZZLY_BEARS]),
+        ]);
+        game.play([
+            p1.pass_to(turns::Step::DeclareAttackers),
+            p2.pass_to(turns::Step::DeclareAttackers),
+        ])
+        .unwrap();
+        let [rats] = game
+            .player(p1)
+            .cards_in(BATTLEFIELD)
+            .matching(TYPHOID_RATS)
+            .exactly::<1>()
+            .unwrap();
+
+        game.act(p1, actions::Action::DeclareAttackers(vec![rats.into()]));
+
+        game.play([
+            p1.pass_to(turns::Step::DeclareBlockers),
+            p2.pass_to(turns::Step::DeclareBlockers),
+        ])
+        .unwrap();
+        game.play([p1.pass_priority()]).unwrap();
+        let [bears] = game
+            .player(p2)
+            .cards_in(BATTLEFIELD)
+            .matching(GRIZZLY_BEARS)
+            .exactly::<1>()
+            .unwrap();
+
+        game.act(
+            p2,
+            actions::Action::DeclareBlockers(vec![actions::BlockAssignment {
+                blocker: bears.into(),
+                attacker: rats.into(),
+            }]),
+        );
+        assert!(
+            game.app
+                .world()
+                .get::<crate::cards::Blocking>(bears.into())
+                .is_some()
+        );
+
+        game.play([
+            p1.pass_to(turns::Step::PostcombatMain),
+            p2.pass_to(turns::Step::PostcombatMain),
+        ])
+        .unwrap();
+
+        assert!(
+            game.app
+                .world()
+                .get::<crate::cards::Blocking>(bears.into())
+                .is_none()
+        );
+        assert!(
+            game.app
+                .world()
+                .get::<crate::cards::Blocked>(rats.into())
                 .is_none()
         );
     }

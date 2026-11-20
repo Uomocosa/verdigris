@@ -8,6 +8,7 @@ pub enum Action {
     ChooseTargets(Vec<Entity>),
     ChooseDiscard(Vec<Entity>),
     DeclareAttackers(Vec<Entity>),
+    DeclareBlockers(Vec<actions::BlockAssignment>),
     PassPriority,
 }
 

@@ -11,6 +11,7 @@ pub mod r502_3_untap;
 pub mod r504_1_draw_step;
 pub mod r508_1a_declare_attackers;
 pub mod r508_1f_tap_attackers;
+pub mod r509_1a_declare_blockers;
 pub mod r511_3_remove_from_combat;
 pub mod r514_1_cleanup_discard;
 pub mod r514_2_cleanup_step;

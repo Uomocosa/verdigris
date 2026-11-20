@@ -10,11 +10,28 @@ pub struct PlayerAction {
 
 #[derive(Message, Debug, Clone, PartialEq, Eq)]
 pub enum Rejected {
-    NoLegalTargets { spell: Entity },
-    CannotCast { spell: Entity },
-    CannotPay { spell: Entity },
-    InvalidTargets { spell: Entity },
-    InvalidDiscard { player: Entity },
-    CannotAttack { attackers: Vec<Entity> },
-    NoPriority { player: Entity },
+    NoLegalTargets {
+        spell: Entity,
+    },
+    CannotCast {
+        spell: Entity,
+    },
+    CannotPay {
+        spell: Entity,
+    },
+    InvalidTargets {
+        spell: Entity,
+    },
+    InvalidDiscard {
+        player: Entity,
+    },
+    CannotAttack {
+        attackers: Vec<Entity>,
+    },
+    CannotBlock {
+        assignments: Vec<actions::BlockAssignment>,
+    },
+    NoPriority {
+        player: Entity,
+    },
 }
