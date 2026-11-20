@@ -90,3 +90,8 @@ pub const fn deathtouch() -> cards::Keyword {
 pub const fn lifelink() -> cards::Keyword {
     cards::Keyword::Lifelink
 }
+
+#[must_use]
+pub const fn trample() -> cards::Keyword {
+    cards::Keyword::Trample
+}

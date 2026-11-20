@@ -23,6 +23,7 @@ pub enum Keyword {
     Indestructible,
     Deathtouch,
     Lifelink,
+    Trample,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

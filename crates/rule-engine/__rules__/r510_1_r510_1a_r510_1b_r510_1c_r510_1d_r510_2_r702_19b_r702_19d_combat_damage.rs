@@ -35,14 +35,32 @@ use crate::turns;
 /// action doesn’t use the stack. No player has the chance to cast spells or activate abilities
 /// between the time combat damage is assigned and the time it’s dealt.
 ///
+/// 702.19b The controller of an attacking creature with trample first assigns damage to the
+/// creature(s) blocking it. Once all those blocking creatures are assigned lethal damage, any
+/// excess damage is assigned as its controller chooses among those blocking creatures and the
+/// player, planeswalker, or battle the creature is attacking. When checking for assigned lethal
+/// damage, take into account damage already marked on the creature and damage from other creatures
+/// that’s being assigned during the same combat damage step, but not any abilities or effects that
+/// might change the amount of damage that’s actually dealt. The attacking creature’s controller
+/// need not assign lethal damage to all those blocking creatures but in that case can’t assign any
+/// damage to the player or planeswalker it’s attacking.
+///
+/// 702.19d If an attacking creature with trample or trample over planeswalkers is blocked, but
+/// there are no creatures blocking it when damage is assigned, its damage is assigned to the
+/// defending player and/or planeswalker as though all blocking creatures have been assigned lethal
+/// damage.
+///
 /// # Notes
 ///
 /// Scope: unblocked creatures deal damage to the defending player (two-player games; planeswalker
 /// and battle targets are deferred), single-blocker and single-blocked cases deal damage both ways,
 /// and creatures with power 0 or less assign nothing. An attacker blocked by two or more creatures
 /// assigns its damage divided as its controller chooses among them; each of its blockers still
-/// assigns damage to it.
-pub fn r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_combat_damage(
+/// assigns damage to it. Trample: a single blocker is assigned lethal damage first (toughness minus
+/// damage already marked on it) and any excess goes to the defending player; a blocked attacker
+/// with no blockers left assigns all its damage to the defending player. Trample over two or more
+/// blockers is deferred alongside the divided-damage choice.
+pub fn r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_r702_19b_r702_19d_combat_damage(
     mut step_started: MessageReader<turns::StepStarted>,
     mut actions: MessageReader<actions::PlayerAction>,
     mut rejected: MessageWriter<actions::Rejected>,
@@ -52,7 +70,12 @@ pub fn r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_combat_damage(
         (Entity, &cards::CardDefinition, Option<&cards::Blocked>),
         With<cards::Attacking>,
     >,
-    blockers: Query<(Entity, &cards::CardDefinition, &cards::Blocking)>,
+    blockers: Query<(
+        Entity,
+        &cards::CardDefinition,
+        &cards::Blocking,
+        Option<&damage::Damage>,
+    )>,
     modifiers: Query<&effects::PowerToughnessModifier>,
     defenders: Query<Entity, With<players::DefendingPlayer>>,
     turn: Res<turns::Turn>,
@@ -84,44 +107,15 @@ pub fn r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_combat_damage(
                     amount,
                 });
             } else {
-                let mut blockers_of: Vec<Entity> = Vec::new();
-                for (blocker, blocker_definition, blocking) in blockers.iter() {
-                    if **blocking != attacker {
-                        continue;
-                    }
-                    blockers_of.push(blocker);
-                    let blocker_modifier = modifiers.get(blocker).ok();
-                    let Some(blocker_power_toughness) =
-                        blocker_definition.effective_power_toughness(blocker_modifier)
-                    else {
-                        continue;
-                    };
-                    if blocker_power_toughness.power <= 0 {
-                        continue;
-                    }
-                    let Ok(blocker_amount) = u32::try_from(blocker_power_toughness.power) else {
-                        continue;
-                    };
-                    dealt.write(damage::DamageDealt {
-                        source: blocker,
-                        target: attacker,
-                        amount: blocker_amount,
-                    });
-                }
-                match blockers_of.as_slice() {
-                    [blocker] => {
-                        dealt.write(damage::DamageDealt {
-                            source: attacker,
-                            target: *blocker,
-                            amount,
-                        });
-                    }
-                    [] => {}
-                    _ => needed.push(actions::RequiredCombatDamage {
-                        source: attacker,
-                        amount,
-                        legal: blockers_of.iter().copied().collect(),
-                    }),
+                for write in definition.assigned_blocked_damage(
+                    attacker,
+                    amount,
+                    defending,
+                    &blockers,
+                    &modifiers,
+                    &mut needed,
+                ) {
+                    dealt.write(write);
                 }
             }
         }
@@ -307,6 +301,43 @@ mod tests {
             game.app.world().get::<damage::Damage>(second.into()).copied(),
             Some(damage::Damage(1))
         );
+        Ok(())
+    }
+
+    #[test]
+    fn r702_19b_trample_assigns_excess_damage_to_the_defending_player() -> TestResult {
+        use crate::BATTLEFIELD;
+        use crate::GRAVEYARD;
+
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.battlefield([GARRUKS_COMPANION]),
+            P2.battlefield([GRIZZLY_BEARS]),
+        ]);
+        let [companion] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GARRUKS_COMPANION)?;
+        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareAttackers),
+            p2.pass_to(turns::Step::DeclareAttackers),
+            p1.declare_attackers([companion]),
+        ])?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareBlockers),
+            p2.pass_to(turns::Step::DeclareBlockers),
+        ])?;
+        game.play([
+            p1.pass_priority(),
+            p2.declare_blockers([(bears, companion)]),
+        ])?;
+        game.play([
+            p1.pass_to(turns::Step::CombatDamage),
+            p2.pass_to(turns::Step::CombatDamage),
+            p1.pass_priority(),
+            p2.pass_priority(),
+        ])?;
+
+        assert_eq!(game.life(p2), 19);
+        assert_eq!(game.zone_of(bears), GRAVEYARD);
+        assert_eq!(game.zone_of(companion), GRAVEYARD);
         Ok(())
     }
 

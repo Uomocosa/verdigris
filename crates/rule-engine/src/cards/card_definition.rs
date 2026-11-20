@@ -1,7 +1,9 @@
 use atomic_delegate_macros::atomic_delegates;
-use bevy::prelude::Component;
+use bevy::prelude::{Component, Entity, Query};
 
+use crate::actions;
 use crate::cards;
+use crate::damage;
 use crate::effects;
 #[cfg(feature = "testing")]
 use crate::testing;
@@ -51,6 +53,26 @@ impl CardDefinition {
     pub fn supertype(mut self, supertype: cards::Supertype) -> Self {
         self.supertypes.push(supertype);
         self
+    }
+}
+
+#[atomic_delegates]
+impl CardDefinition {
+    #[must_use]
+    pub(crate) fn assigned_blocked_damage(
+        &self,
+        source: Entity,
+        amount: u32,
+        defending: Entity,
+        blockers: &Query<(
+            Entity,
+            &cards::CardDefinition,
+            &cards::Blocking,
+            Option<&damage::Damage>,
+        )>,
+        modifiers: &Query<&effects::PowerToughnessModifier>,
+        needed: &mut Vec<actions::RequiredCombatDamage>,
+    ) -> Vec<damage::DamageDealt> {
     }
 }
 
