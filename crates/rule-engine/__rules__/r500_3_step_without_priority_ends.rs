@@ -1,4 +1,4 @@
-use bevy::prelude::{Res, ResMut};
+use bevy::prelude::{MessageWriter, Res, ResMut};
 
 use crate::turns;
 
@@ -17,6 +17,7 @@ use crate::turns;
 /// 503.1 The upkeep step has no turn-based actions. Once it begins, the active player gets
 /// priority.
 pub fn r500_3_step_without_priority_ends(
+    mut step_started: MessageWriter<turns::StepStarted>,
     mut turn: ResMut<turns::Turn>,
     mut priority: ResMut<turns::Priority>,
     turn_order: Res<turns::TurnOrder>,
@@ -32,6 +33,7 @@ pub fn r500_3_step_without_priority_ends(
             turn.step = turns::Step::Untap;
             priority.consecutive_passes = 0;
             priority.player = next;
+            step_started.write(turns::StepStarted(turns::Step::Untap));
         }
         turns::Step::Untap => {
             turn.step = turns::Step::Upkeep;

@@ -20,7 +20,12 @@ pub fn r508_1a_declare_attackers(
     mut commands: Commands,
     priority: Res<turns::Priority>,
     turn: Res<turns::Turn>,
-    cards: Query<(&cards::CardDefinition, &cards::Owner, &zones::InZone)>,
+    cards: Query<(
+        &cards::CardDefinition,
+        &cards::Owner,
+        &zones::InZone,
+        Option<&cards::Tapped>,
+    )>,
     zone_entities: Query<(Entity, &zones::Zone, Option<&cards::Owner>)>,
 ) {
     let priority = priority.into_inner();
@@ -49,10 +54,11 @@ pub fn r508_1a_declare_attackers(
         let all_legal = attackers.iter().all(|attacker| {
             cards
                 .get(*attacker)
-                .is_ok_and(|(definition, owner, in_zone)| {
+                .is_ok_and(|(definition, owner, in_zone, tapped)| {
                     definition.types.contains(&cards::CardType::Creature)
                         && **owner == action.player
                         && **in_zone == battlefield
+                        && tapped.is_none()
                 })
         });
         if !all_legal {
@@ -178,6 +184,40 @@ mod tests {
             game.app
                 .world()
                 .get::<crate::cards::Attacking>(defending.into())
+                .is_none()
+        );
+    }
+
+    #[test]
+    fn r508_1a_a_tapped_creature_cannot_be_declared_as_an_attacker() {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.battlefield_tapped([GRIZZLY_BEARS]),
+            P2.battlefield([GRIZZLY_BEARS]),
+        ]);
+        game.play([
+            p1.pass_to(turns::Step::DeclareAttackers),
+            p2.pass_to(turns::Step::DeclareAttackers),
+        ])
+        .unwrap();
+        let [tapped] = game
+            .player(p1)
+            .cards_in(BATTLEFIELD)
+            .matching(GRIZZLY_BEARS)
+            .exactly::<1>()
+            .unwrap();
+
+        game.act(p1, actions::Action::DeclareAttackers(vec![tapped.into()]));
+
+        assert_eq!(
+            game.last_rejection(),
+            Some(&actions::Rejected::CannotAttack {
+                attackers: vec![tapped.into()]
+            })
+        );
+        assert!(
+            game.app
+                .world()
+                .get::<crate::cards::Attacking>(tapped.into())
                 .is_none()
         );
     }

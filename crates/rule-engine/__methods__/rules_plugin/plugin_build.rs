@@ -48,6 +48,7 @@ pub fn plugin_build(_rules_plugin: &RulesPlugin, app: &mut App) {
             rules::r601_2c_targets::r601_2c_targets,
             rules::r601_2h_pay::r601_2h_pay,
             rules::r508_1a_declare_attackers::r508_1a_declare_attackers,
+            rules::r508_1f_tap_attackers::r508_1f_tap_attackers,
         )
             .chain()
             .in_set(rules::RuleSet::Casting),
@@ -90,6 +91,10 @@ pub fn plugin_build(_rules_plugin: &RulesPlugin, app: &mut App) {
     app.add_systems(
         Update,
         rules::r504_1_draw_step::r504_1_draw_step.in_set(rules::RuleSet::StepStarted),
+    );
+    app.add_systems(
+        Update,
+        rules::r502_3_untap::r502_3_untap.in_set(rules::RuleSet::StepStarted),
     );
     app.add_systems(
         Update,

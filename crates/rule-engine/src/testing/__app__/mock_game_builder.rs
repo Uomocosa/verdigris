@@ -1,8 +1,11 @@
 use atomic_delegate_macros::atomic_delegates;
 use bevy::prelude::{App, Entity};
 
+use crate::cards;
+use crate::damage;
 use crate::testing;
 use crate::turns;
+use crate::zones;
 
 pub struct MockGameBuilder {
     pub(crate) turn_number: u32,
@@ -53,10 +56,35 @@ impl MockGameBuilder {
     pub(crate) fn spawn_players(app: &mut App, players: &[testing::PlayerSetup]) -> Vec<Entity> {}
 }
 
+impl MockGameBuilder {
+    pub(crate) fn spawn_tapped_battlefield(
+        app: &mut App,
+        player: Entity,
+        setup: &testing::PlayerSetup,
+        battlefield: Entity,
+    ) {
+        for definition in setup.tapped_battlefield.iter().cloned() {
+            let _ = app.world_mut().spawn((
+                definition,
+                zones::InZone(battlefield),
+                cards::Owner(player),
+                damage::Damage(0),
+                cards::Tapped,
+            ));
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
+    use bevy::prelude::{App, Entity, With};
+
+    use crate::cards;
     use crate::testing::*;
     use crate::turns;
+    use crate::zones;
+
+    use super::MockGameBuilder;
 
     #[test]
     fn test_usage() {
@@ -68,5 +96,26 @@ mod tests {
         let turn = game.app.world().resource::<turns::Turn>();
         assert_eq!(turn.number, 3);
         assert_eq!(turn.step, turns::Step::PostcombatMain);
+    }
+
+    #[test]
+    fn tapped_battlefield_spawns_tapped_permanents() {
+        let mut app = App::new();
+        let player = app.world_mut().spawn_empty().id();
+        let battlefield = app.world_mut().spawn_empty().id();
+        let setup = P1.battlefield_tapped([GRIZZLY_BEARS]);
+
+        MockGameBuilder::spawn_tapped_battlefield(&mut app, player, &setup, battlefield);
+
+        let mut found = app
+            .world_mut()
+            .query_filtered::<(Entity, &cards::Owner, &zones::InZone), With<cards::Tapped>>();
+        let found: Vec<(Entity, Entity, Entity)> = found
+            .iter(app.world())
+            .map(|(entity, owner, in_zone)| (entity, **owner, **in_zone))
+            .collect();
+        assert_eq!(found.len(), 1);
+        assert_eq!(found[0].1, player);
+        assert_eq!(found[0].2, battlefield);
     }
 }

@@ -24,8 +24,7 @@ pub fn spawn_game(
     }
     let active_seats: Vec<usize> = players
         .iter()
-        .filter(|setup| setup.active)
-        .map(|setup| setup.seat)
+        .filter_map(|setup| setup.active.then_some(setup.seat))
         .collect();
     assert!(
         active_seats.len() <= 1,
@@ -78,6 +77,7 @@ pub fn spawn_game(
                 damage::Damage(0),
             ));
         }
+        testing::MockGameBuilder::spawn_tapped_battlefield(&mut app, *player, setup, battlefield);
 
         let library = player_zones
             .get(&LIBRARY)
@@ -94,9 +94,8 @@ pub fn spawn_game(
         }
     }
 
-    let active_index = players.iter().position(|setup| setup.active).unwrap_or(0);
     let active = entities
-        .get(active_index)
+        .get(players.iter().position(|setup| setup.active).unwrap_or(0))
         .copied()
         .unwrap_or(Entity::PLACEHOLDER);
     app.insert_resource(turns::Turn {

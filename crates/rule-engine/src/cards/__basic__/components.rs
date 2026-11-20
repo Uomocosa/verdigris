@@ -6,3 +6,6 @@ pub struct Owner(pub Entity);
 
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Attacking;
+
+#[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Tapped;

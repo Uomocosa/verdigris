@@ -5,6 +5,7 @@ pub struct PlayerSetup {
     pub(crate) seat: usize,
     pub(crate) hand: Vec<cards::CardDefinition>,
     pub(crate) battlefield: Vec<cards::CardDefinition>,
+    pub(crate) tapped_battlefield: Vec<cards::CardDefinition>,
     pub(crate) library: Option<Vec<cards::CardDefinition>>,
     pub(crate) mana_pool: cards::ManaPool,
     pub(crate) life: i32,
@@ -18,6 +19,7 @@ impl PlayerSetup {
             seat,
             hand: Vec::new(),
             battlefield: Vec::new(),
+            tapped_battlefield: Vec::new(),
             library: None,
             mana_pool: cards::ManaPool::EMPTY,
             life: 20,
@@ -42,6 +44,16 @@ impl PlayerSetup {
         definitions: impl IntoIterator<Item = impl Into<cards::CardDefinition>>,
     ) -> Self {
         self.battlefield
+            .extend(definitions.into_iter().map(Into::into));
+        self
+    }
+
+    #[must_use]
+    pub fn battlefield_tapped(
+        mut self,
+        definitions: impl IntoIterator<Item = impl Into<cards::CardDefinition>>,
+    ) -> Self {
+        self.tapped_battlefield
             .extend(definitions.into_iter().map(Into::into));
         self
     }
