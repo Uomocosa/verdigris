@@ -1,3 +1,5 @@
+use bevy::prelude::Entity;
+
 use crate::actions;
 use crate::testing;
 
@@ -9,6 +11,12 @@ pub enum PlayError {
         step: testing::PlayStep,
         rejection: actions::Rejected,
     },
+    #[error("card {card:?} has {count} abilities; use mana_ability(color) to pick one")]
+    AmbiguousAbility {
+        index: usize,
+        card: Entity,
+        count: usize,
+    },
     #[error("game stalled: too many passes without progress")]
     Stalled,
 }
@@ -18,7 +26,7 @@ impl PlayError {
     pub const fn rejection(&self) -> Option<&actions::Rejected> {
         match self {
             Self::Rejected { rejection, .. } => Some(rejection),
-            Self::Stalled => None,
+            Self::AmbiguousAbility { .. } | Self::Stalled => None,
         }
     }
 }
@@ -30,5 +38,14 @@ mod tests {
     #[test]
     fn test_usage() {
         assert!(PlayError::Stalled.rejection().is_none());
+        assert!(
+            PlayError::AmbiguousAbility {
+                index: 0,
+                card: bevy::prelude::Entity::PLACEHOLDER,
+                count: 2,
+            }
+            .rejection()
+            .is_none()
+        );
     }
 }

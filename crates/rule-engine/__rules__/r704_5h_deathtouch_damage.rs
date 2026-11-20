@@ -173,15 +173,8 @@ mod tests {
         );
         let [growth] = game.player(p2).cards_in(HAND).exactly::<1>(GIANT_GROWTH).unwrap();
         let [forest] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(FOREST).unwrap();
-        game.act(
-            p2,
-            actions::Action::ActivateManaAbility {
-                source: forest.into(),
-                produces: crate::cards::Color::Green,
-            },
-        );
         game.play([
-            p2.cast(growth).targeting(bears).pass_priority(),
+            p2.activate_ability(forest.ability()).cast(growth).targeting(bears).pass_priority(),
             p1.pass_priority(),
         ])
         .unwrap();

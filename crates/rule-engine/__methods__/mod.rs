@@ -16,5 +16,7 @@ pub mod mock_game_builder;
 pub mod pass_budget;
 pub mod rules_plugin;
 #[cfg(feature = "testing")]
+pub mod test_card;
+#[cfg(feature = "testing")]
 pub mod test_player_actions;
 pub mod zone_ref;

@@ -1,8 +1,24 @@
+use atomic_delegate_macros::atomic_delegates;
 use bevy::prelude::Entity;
 use derive_more::Deref;
 
+use crate::cards;
+use crate::testing;
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Deref)]
 pub struct TestCard(#[deref] pub(crate) Entity);
+
+#[atomic_delegates]
+impl TestCard {
+    #[must_use]
+    pub fn mana_ability(self, produces: cards::Color) -> testing::TestAbility {}
+}
+
+#[rustfmt::skip]
+impl TestCard {
+    #[must_use]
+    pub fn ability(self) -> testing::TestAbility { testing::TestAbility::Only { source: *self } }
+}
 
 #[rustfmt::skip]
 impl From<TestCard> for Entity {
@@ -18,6 +34,7 @@ impl PartialEq<TestCard> for Entity {
 mod tests {
     use bevy::prelude::{Entity, World};
 
+    use crate::cards;
     use crate::testing;
 
     #[test]
@@ -28,5 +45,16 @@ mod tests {
 
         assert_eq!(Entity::from(card), entity);
         assert_eq!(*card, entity);
+        assert_eq!(
+            card.ability(),
+            testing::TestAbility::Only { source: entity }
+        );
+        assert_eq!(
+            card.mana_ability(cards::Color::Green),
+            testing::TestAbility::Mana {
+                source: entity,
+                produces: cards::Color::Green,
+            }
+        );
     }
 }

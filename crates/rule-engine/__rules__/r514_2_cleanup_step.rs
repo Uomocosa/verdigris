@@ -28,7 +28,6 @@ pub fn r514_2_cleanup_step(
 
 #[cfg(test)]
 mod tests {
-    use crate::actions;
     use crate::damage;
     use crate::effects;
     use crate::mana;
@@ -77,30 +76,16 @@ mod tests {
         let [forest] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(FOREST)?;
         let [mountain] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(MOUNTAIN)?;
 
-        game.act(
-            p1,
-            actions::Action::ActivateManaAbility {
-                source: forest.into(),
-                produces: crate::cards::Color::Green,
-            },
-        );
         game.play([
-            p1.cast(growth).targeting(bears).pass_priority(),
+            p1.activate_ability(forest.ability()).cast(growth).targeting(bears).pass_priority(),
             p2.pass_priority(),
         ])?;
         game.play([p1.end_turn(), p2.end_turn()])?;
         game.play([p1.end_turn(), p2.end_turn()])?;
         game.play([p1.pass_to(MAIN_1), p2.pass_to(MAIN_1)])?;
 
-        game.act(
-            p1,
-            actions::Action::ActivateManaAbility {
-                source: mountain.into(),
-                produces: crate::cards::Color::Red,
-            },
-        );
         game.play([
-            p1.cast(bolt).targeting(bears).pass_priority(),
+            p1.activate_ability(mountain.ability()).cast(bolt).targeting(bears).pass_priority(),
             p2.pass_priority(),
         ])?;
 

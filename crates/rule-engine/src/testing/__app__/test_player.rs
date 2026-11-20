@@ -31,6 +31,9 @@ impl PartialEq<TestPlayer> for Entity {
 #[rustfmt::skip]
 impl TestPlayer {
     #[must_use]
+    pub fn activate_ability(self, ability: testing::TestAbility) -> testing::TestPlayerActions { testing::TestPlayerActions::of(self).activate_ability(ability) }
+
+    #[must_use]
     pub fn cast(self, spell: impl Into<Entity>) -> testing::TestPlayerActions { testing::TestPlayerActions::from_cast(self, spell.into()) }
 
     #[must_use]

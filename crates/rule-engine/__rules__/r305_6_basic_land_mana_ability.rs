@@ -94,13 +94,7 @@ mod tests {
     fn test_usage() {
         let (mut game, [p1, ..]) = MockGame::new([P1.battlefield([FOREST]), P2]);
         let [forest] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(FOREST).unwrap();
-        game.act(
-            p1,
-            actions::Action::ActivateManaAbility {
-                source: forest.into(),
-                produces: cards::Color::Green,
-            },
-        );
+        game.play([p1.activate_ability(forest.ability())]).unwrap();
         assert_eq!(game.mana_pool(p1), mana![G]);
     }
 
@@ -110,13 +104,7 @@ mod tests {
         let [forest] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(FOREST).unwrap();
         assert_eq!(game.mana_pool(p1), cards::ManaPool::EMPTY);
 
-        game.act(
-            p1,
-            actions::Action::ActivateManaAbility {
-                source: forest.into(),
-                produces: cards::Color::Green,
-            },
-        );
+        game.play([p1.activate_ability(forest.ability())]).unwrap();
 
         assert_eq!(game.mana_pool(p1), mana![G]);
         assert!(game.last_rejection().is_none());
@@ -129,13 +117,7 @@ mod tests {
         let (mut game, [p1, ..]) = MockGame::new([P1.battlefield([MOUNTAIN]), P2]);
         let [mountain] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(MOUNTAIN).unwrap();
 
-        game.act(
-            p1,
-            actions::Action::ActivateManaAbility {
-                source: mountain.into(),
-                produces: cards::Color::Red,
-            },
-        );
+        game.play([p1.activate_ability(mountain.ability())]).unwrap();
 
         assert_eq!(game.mana_pool(p1), mana![R]);
     }
@@ -197,13 +179,7 @@ mod tests {
         let (mut game, [p1, ..]) = MockGame::new([P1.battlefield([TUNDRA]), P2]);
         let [tundra] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TUNDRA).unwrap();
 
-        game.act(
-            p1,
-            actions::Action::ActivateManaAbility {
-                source: tundra.into(),
-                produces: cards::Color::White,
-            },
-        );
+        game.play([p1.activate_ability(tundra.mana_ability(cards::Color::White))]).unwrap();
 
         assert_eq!(game.mana_pool(p1), mana![W]);
         assert!(game.last_rejection().is_none());
@@ -215,20 +191,10 @@ mod tests {
         let (mut game, [p1, ..]) = MockGame::new([P1.battlefield([TUNDRA, TUNDRA]), P2]);
         let [first, second] = game.player(p1).cards_in(BATTLEFIELD).exactly::<2>(TUNDRA).unwrap();
 
-        game.act(
-            p1,
-            actions::Action::ActivateManaAbility {
-                source: first.into(),
-                produces: cards::Color::White,
-            },
-        );
-        game.act(
-            p1,
-            actions::Action::ActivateManaAbility {
-                source: second.into(),
-                produces: cards::Color::Blue,
-            },
-        );
+        game.play([p1
+            .activate_ability(first.mana_ability(cards::Color::White))
+            .activate_ability(second.mana_ability(cards::Color::Blue))])
+            .unwrap();
 
         assert_eq!(game.mana_pool(p1), mana![W, U]);
         assert!(game.last_rejection().is_none());

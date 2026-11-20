@@ -22,6 +22,19 @@ impl TestPlayerActions {
 
 impl TestPlayerActions {
     #[must_use]
+    pub fn activate_ability(self, ability: testing::TestAbility) -> Self {
+        let player = *self.player;
+        self.with_step(testing::PlayStep::Activate(player, ability))
+    }
+
+    #[must_use]
+    pub fn cast(self, spell: impl Into<Entity>) -> Self {
+        let player = *self.player;
+        let spell = spell.into();
+        self.with_step(testing::PlayStep::Act(player, actions::Action::Cast(spell)))
+    }
+
+    #[must_use]
     pub fn targeting(self, targets: impl Into<testing::Targets>) -> Self {
         let step = testing::PlayStep::Act(
             *self.player,
@@ -121,6 +134,35 @@ mod tests {
             ))
             .steps,
             Vec::new()
+        );
+    }
+
+    #[test]
+    fn activate_ability_pushes_an_activate_step() {
+        let mut world = World::new();
+        let caster = world.spawn_empty().id();
+        let source = world.spawn_empty().id();
+        let spell = world.spawn_empty().id();
+        let ability = testing::TestAbility::Only { source };
+
+        let first = testing::TestPlayer::from_entity_and_seat(caster, testing::PlayerSeat(1))
+            .activate_ability(ability);
+
+        assert_eq!(
+            first.steps,
+            vec![testing::PlayStep::Activate(caster, ability)]
+        );
+
+        let chained = testing::TestPlayer::from_entity_and_seat(caster, testing::PlayerSeat(1))
+            .activate_ability(ability)
+            .cast(spell);
+
+        assert_eq!(
+            chained.steps,
+            vec![
+                testing::PlayStep::Activate(caster, ability),
+                testing::PlayStep::Act(caster, actions::Action::Cast(spell)),
+            ]
         );
     }
 }

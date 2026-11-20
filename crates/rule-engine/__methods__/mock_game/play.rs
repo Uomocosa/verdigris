@@ -1,4 +1,5 @@
 use crate::actions;
+use crate::cards;
 use crate::testing;
 use crate::turns;
 
@@ -15,6 +16,49 @@ pub fn play(
             testing::PlayStep::Act(player, action) => {
                 let before = game.rejection_count();
                 game.act(*player, action.clone());
+                if game.rejection_count() > before
+                    && let Some(rejection) = game.last_rejection().cloned()
+                {
+                    return Err(testing::PlayError::Rejected {
+                        index,
+                        step: step.clone(),
+                        rejection,
+                    });
+                }
+            }
+            testing::PlayStep::Activate(player, ability) => {
+                let source = match ability {
+                    testing::TestAbility::Only { source }
+                    | testing::TestAbility::Mana { source, .. } => *source,
+                };
+                let produces = match ability {
+                    testing::TestAbility::Mana { produces, .. } => Some(*produces),
+                    testing::TestAbility::Only { .. } => {
+                        game.app.world().get::<cards::CardDefinition>(source).and_then(
+                            |definition| match definition.land_types.as_slice() {
+                                [land_type] => Some(land_type.color()),
+                                _ => None,
+                            },
+                        )
+                    }
+                };
+                let Some(produces) = produces else {
+                    let count = game
+                        .app
+                        .world()
+                        .get::<cards::CardDefinition>(source)
+                        .map_or(0, |definition| definition.land_types.len());
+                    return Err(testing::PlayError::AmbiguousAbility {
+                        index,
+                        card: source,
+                        count,
+                    });
+                };
+                let before = game.rejection_count();
+                game.act(
+                    *player,
+                    actions::Action::ActivateManaAbility { source, produces },
+                );
                 if game.rejection_count() > before
                     && let Some(rejection) = game.last_rejection().cloned()
                 {
@@ -69,10 +113,11 @@ pub fn play(
 #[cfg(test)]
 mod tests {
     use crate::actions;
+    use crate::cards;
     use crate::mana;
     use crate::testing::*;
     use crate::turns;
-    use crate::{GRAVEYARD, HAND, MAIN_2};
+    use crate::{BATTLEFIELD, GRAVEYARD, HAND, MAIN_2};
 
     use super::play;
 
@@ -193,5 +238,43 @@ mod tests {
             game.app.world().resource::<turns::Turn>().step,
             turns::Step::BeginningOfCombat
         );
+    }
+
+    #[test]
+    fn activate_ability_with_only_on_a_forest_adds_green() {
+        let (mut game, [p1, ..]) = MockGame::new([P1.battlefield([FOREST]), P2]);
+        let [forest] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(FOREST).unwrap();
+
+        game.play([p1.activate_ability(forest.ability())]).unwrap();
+
+        assert_eq!(game.mana_pool(p1), mana![G]);
+    }
+
+    #[test]
+    fn activate_ability_with_only_on_a_tundra_is_ambiguous() {
+        let (mut game, [p1, ..]) = MockGame::new([P1.battlefield([TUNDRA]), P2]);
+        let [tundra] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TUNDRA).unwrap();
+
+        let error = game.play([p1.activate_ability(tundra.ability())]).unwrap_err();
+
+        assert_eq!(
+            error,
+            PlayError::AmbiguousAbility {
+                index: 0,
+                card: tundra.into(),
+                count: 2,
+            }
+        );
+        assert_eq!(game.mana_pool(p1), mana![]);
+    }
+
+    #[test]
+    fn activate_ability_with_mana_ability_on_a_tundra_adds_blue() {
+        let (mut game, [p1, ..]) = MockGame::new([P1.battlefield([TUNDRA]), P2]);
+        let [tundra] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TUNDRA).unwrap();
+
+        game.play([p1.activate_ability(tundra.mana_ability(cards::Color::Blue))]).unwrap();
+
+        assert_eq!(game.mana_pool(p1), mana![U]);
     }
 }
