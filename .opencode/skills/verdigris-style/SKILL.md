@@ -123,6 +123,57 @@ gates `pub mod testing` on that feature (line ~11).
 
 **Why:** one copy of each card and each scenario, so a rules change touches one place.
 
+## 5. Derived characteristics (CR 613)
+
+Game objects have SOURCE components (written by actions/effects: `CardDefinition`, `InZone`,
+`Owner`, `Controller`, `Damage`, `Tapped`, `Counters`, `ContinuousEffect` entities) and
+DERIVED components (`EffectivePT`, type and keyword markers like `Flying`/`Lifelink`,
+`OnBattlefield`, `StaticAbilities`, `TriggeredAbilities`). Derived components are written
+only by the `r613_1_layers` system (`OnBattlefield` by a hook on `InZone`). Rules filter on
+them with `With<>`/`Without<>` and never re-derive them.
+
+Static abilities apply live (CR 611.3a); effects from a resolving spell are
+`ContinuousEffect` entities whose affected set is fixed at resolution (CR 611.2c).
+
+One game event = one message stage; layers recompute after each event and inside the
+117.5 priority loop. A Bevy frame means nothing in game terms.
+
+Invariant: removing all derived components and re-running layers yields the same world.
+
+Observers/hooks only maintain structural invariants, never CR rules (triggers, SBAs,
+replacement effects), because observers fire immediately and break the simultaneity of
+704.3 / 510.2 and the "triggers wait for priority" timing of 603.3.
+
+**Why:** Bevy does the filtering, and a rule stays correct when a new card grants or
+removes an ability (e.g. Jump: "Target creature gains flying until end of turn").
+
+**How to apply:** when a rule needs a characteristic (power/toughness, types, keywords,
+whether something is on the battlefield), read the derived component in the query filter,
+never the source component in the body.
+
+```rust
+// Good
+sources: Query<&cards::Owner, With<cards::Lifelink>>,
+
+// Bad
+sources: Query<(&cards::CardDefinition, &cards::Owner)>
+// ... in the body:
+if !definition.keywords.contains(&cards::Keyword::Lifelink) { continue; }
+```
+
+(The names above land in later phases; the example shows the target shape.)
+
+### Smells
+
+- Rule reads `definition.keywords` / `definition.types` / `effective_power_toughness` → read the derived marker / `EffectivePT`.
+- `if !… { continue }` testing a component's presence or a zone → put it in the query filter.
+- Insert/remove of a derived component outside layers/hooks → fix: move the write into `r613_1_layers` (or the `InZone` hook for `OnBattlefield`).
+- An effect mutates characteristics directly instead of spawning a `ContinuousEffect` → fix: spawn the effect entity.
+- A rule copies the zone-lookup query → fix: use the `ZoneLookup` SystemParam.
+- An observer changes game state for a CR rule → fix: emit a message and let the rule system handle it.
+- Reading a card that already left its zone through the live entity → fix: use LKI.
+- A rule reads derived components where layers may be stale → fix: recompute layers first or read sources.
+
 ## Adding rules here
 
 Add a section per decision the user makes about how verdigris code should look: a one-line
