@@ -4,14 +4,8 @@ use crate::actions;
 use crate::testing;
 
 pub fn last_rejection(game: &testing::MockGame) -> Option<&actions::Rejected> {
-    let messages = game
-        .app
-        .world()
-        .get_resource::<Messages<actions::Rejected>>()?;
-    let last = messages
-        .oldest_message_count()
-        .checked_add(messages.len())?
-        .checked_sub(1)?;
+    let messages = game.app.world().get_resource::<Messages<actions::Rejected>>()?;
+    let last = messages.oldest_message_count().checked_add(messages.len())?.checked_sub(1)?;
     messages.get_message(last).map(|(message, _id)| message)
 }
 

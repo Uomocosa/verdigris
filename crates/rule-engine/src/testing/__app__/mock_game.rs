@@ -3,6 +3,7 @@ use bevy::prelude::{App, Entity};
 
 use crate::actions;
 use crate::cards;
+use crate::players;
 use crate::testing;
 use crate::turns;
 use crate::zones;
@@ -29,15 +30,18 @@ impl MockGame {
 
     #[must_use]
     pub const fn player(&self, player: testing::TestPlayer) -> testing::PlayerView<'_> { testing::PlayerView::from_game_and_player(self, player) }
+
+    #[must_use]
+    pub fn life(&self, player: impl Into<Entity>) -> i32 { self.app.world().get::<players::Life>(player.into()).map_or(0, |life| **life) }
+
+    #[must_use]
+    pub fn mana_pool(&self, player: impl Into<Entity>) -> cards::ManaPool { self.app.world().get::<cards::ManaPool>(player.into()).copied().unwrap_or_default() }
 }
 
 impl MockGame {
     pub fn act(&mut self, player: impl Into<Entity>, action: actions::Action) {
         let player = player.into();
-        let _ = self
-            .app
-            .world_mut()
-            .write_message(actions::PlayerAction { player, action });
+        let _ = self.app.world_mut().write_message(actions::PlayerAction { player, action });
         self.app.update();
     }
 
@@ -51,11 +55,7 @@ impl MockGame {
     }
 
     pub fn pass_priority_all(&mut self) {
-        let passes = self
-            .app
-            .world()
-            .resource::<turns::Priority>()
-            .consecutive_passes;
+        let passes = self.app.world().resource::<turns::Priority>().consecutive_passes;
         let player_count = u32::try_from(self.players.len()).unwrap_or(u32::MAX);
         for _ in passes..player_count {
             self.pass_priority();
@@ -76,12 +76,6 @@ impl MockGame {
 
     #[must_use]
     pub fn last_rejection(&self) -> Option<&actions::Rejected> {}
-
-    #[must_use]
-    pub fn life(&self, player: impl Into<Entity>) -> i32 {}
-
-    #[must_use]
-    pub fn mana_pool(&self, player: impl Into<Entity>) -> cards::ManaPool {}
 
     pub fn play(
         &mut self,
@@ -147,9 +141,8 @@ mod tests {
 
     #[test]
     fn overrides_place_cards_and_support_four_players() {
-        let (game, [p1, p2, ..]) = MockGame::builder()
-            .turn(3, turns::Step::PostcombatMain)
-            .players([
+        let (game, [p1, p2, ..]) =
+            MockGame::builder().turn(3, turns::Step::PostcombatMain).players([
                 P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
                 P2.active()
                     .battlefield([GRIZZLY_BEARS])

@@ -13,16 +13,11 @@ pub fn r611_2a_continuous_effects(
     modifiers: Query<&effects::PowerToughnessModifier>,
 ) {
     for modification in modifications.read() {
-        let current = modifiers
-            .get(modification.target)
-            .copied()
-            .unwrap_or_default();
-        commands
-            .entity(modification.target)
-            .insert(effects::PowerToughnessModifier {
-                power: current.power.saturating_add(modification.power),
-                toughness: current.toughness.saturating_add(modification.toughness),
-            });
+        let current = modifiers.get(modification.target).copied().unwrap_or_default();
+        commands.entity(modification.target).insert(effects::PowerToughnessModifier {
+            power: current.power.saturating_add(modification.power),
+            toughness: current.toughness.saturating_add(modification.toughness),
+        });
     }
 }
 
@@ -37,33 +32,20 @@ mod tests {
     #[test]
     fn test_usage() {
         let (mut game, [p1, p2]) = MockGame::new([
-            P1.hand([GIANT_GROWTH])
-                .battlefield([GRIZZLY_BEARS])
-                .mana_pool(mana![G]),
+            P1.hand([GIANT_GROWTH]).battlefield([GRIZZLY_BEARS]).mana_pool(mana![G]),
             P2,
         ]);
-        let [growth] = game
-            .player(p1)
-            .cards_in(HAND)
-            .matching(GIANT_GROWTH)
-            .exactly::<1>()
-            .unwrap();
-        let [bears] = game
-            .player(p1)
-            .cards_in(BATTLEFIELD)
-            .matching(GRIZZLY_BEARS)
-            .exactly::<1>()
-            .unwrap();
+        let [growth] =
+            game.player(p1).cards_in(HAND).matching(GIANT_GROWTH).exactly::<1>().unwrap();
+        let [bears] =
+            game.player(p1).cards_in(BATTLEFIELD).matching(GRIZZLY_BEARS).exactly::<1>().unwrap();
         game.play([
             p1.cast(growth).targeting(bears).pass_priority(),
             p2.pass_priority(),
         ])
         .unwrap();
-        let modifier = game
-            .app
-            .world()
-            .get::<effects::PowerToughnessModifier>(bears.into())
-            .copied();
+        let modifier =
+            game.app.world().get::<effects::PowerToughnessModifier>(bears.into()).copied();
         assert_eq!(
             modifier,
             Some(effects::PowerToughnessModifier {
@@ -78,28 +60,14 @@ mod tests {
     fn r611_2a_giant_growth_saves_a_creature_from_lethal_damage() {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
-            P2.hand([GIANT_GROWTH])
-                .battlefield([GRIZZLY_BEARS])
-                .mana_pool(mana![G]),
+            P2.hand([GIANT_GROWTH]).battlefield([GRIZZLY_BEARS]).mana_pool(mana![G]),
         ]);
-        let [bolt] = game
-            .player(p1)
-            .cards_in(HAND)
-            .matching(LIGHTNING_BOLT)
-            .exactly::<1>()
-            .unwrap();
-        let [growth] = game
-            .player(p2)
-            .cards_in(HAND)
-            .matching(GIANT_GROWTH)
-            .exactly::<1>()
-            .unwrap();
-        let [bears] = game
-            .player(p2)
-            .cards_in(BATTLEFIELD)
-            .matching(GRIZZLY_BEARS)
-            .exactly::<1>()
-            .unwrap();
+        let [bolt] =
+            game.player(p1).cards_in(HAND).matching(LIGHTNING_BOLT).exactly::<1>().unwrap();
+        let [growth] =
+            game.player(p2).cards_in(HAND).matching(GIANT_GROWTH).exactly::<1>().unwrap();
+        let [bears] =
+            game.player(p2).cards_in(BATTLEFIELD).matching(GRIZZLY_BEARS).exactly::<1>().unwrap();
 
         game.play([
             p1.cast(bolt).targeting(bears).pass_priority(),
@@ -111,17 +79,10 @@ mod tests {
         .unwrap();
 
         assert_eq!(game.zone_of(bears), BATTLEFIELD);
-        let damage = game
-            .app
-            .world()
-            .get::<damage::Damage>(bears.into())
-            .copied();
+        let damage = game.app.world().get::<damage::Damage>(bears.into()).copied();
         assert_eq!(damage, Some(damage::Damage(3)));
-        let modifier = game
-            .app
-            .world()
-            .get::<effects::PowerToughnessModifier>(bears.into())
-            .copied();
+        let modifier =
+            game.app.world().get::<effects::PowerToughnessModifier>(bears.into()).copied();
         assert_eq!(
             modifier,
             Some(effects::PowerToughnessModifier {

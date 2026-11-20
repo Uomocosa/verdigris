@@ -22,10 +22,8 @@ pub fn spawn_game(
             index.saturating_add(1)
         );
     }
-    let active_seats: Vec<usize> = players
-        .iter()
-        .filter_map(|setup| setup.active.then_some(setup.seat))
-        .collect();
+    let active_seats: Vec<usize> =
+        players.iter().filter_map(|setup| setup.active.then_some(setup.seat)).collect();
     assert!(
         active_seats.len() <= 1,
         "MockGame: P{} and P{} are both marked .active(); mark at most one",
@@ -55,20 +53,12 @@ pub fn spawn_game(
         let Some(player_zones) = zone_entities.get(index) else {
             continue;
         };
-        let hand = player_zones
-            .get(&HAND)
-            .copied()
-            .unwrap_or(Entity::PLACEHOLDER);
+        let hand = player_zones.get(&HAND).copied().unwrap_or(Entity::PLACEHOLDER);
         for definition in setup.hand.iter().cloned() {
-            let _ = app
-                .world_mut()
-                .spawn((definition, zones::InZone(hand), cards::Owner(*player)));
+            let _ = app.world_mut().spawn((definition, zones::InZone(hand), cards::Owner(*player)));
         }
 
-        let battlefield = player_zones
-            .get(&BATTLEFIELD)
-            .copied()
-            .unwrap_or(Entity::PLACEHOLDER);
+        let battlefield = player_zones.get(&BATTLEFIELD).copied().unwrap_or(Entity::PLACEHOLDER);
         for definition in setup.battlefield.iter().cloned() {
             let _ = app.world_mut().spawn((
                 definition,
@@ -79,18 +69,14 @@ pub fn spawn_game(
         }
         testing::MockGameBuilder::spawn_tapped_battlefield(&mut app, *player, setup, battlefield);
 
-        let library = player_zones
-            .get(&LIBRARY)
-            .copied()
-            .unwrap_or(Entity::PLACEHOLDER);
+        let library = player_zones.get(&LIBRARY).copied().unwrap_or(Entity::PLACEHOLDER);
         let library_cards = setup
             .library
             .clone()
             .unwrap_or_else(|| vec![cards::CardDefinition::from(testing::GRIZZLY_BEARS); 12]);
         for definition in library_cards {
             let _ =
-                app.world_mut()
-                    .spawn((definition, zones::InZone(library), cards::Owner(*player)));
+                app.world_mut().spawn((definition, zones::InZone(library), cards::Owner(*player)));
         }
     }
 

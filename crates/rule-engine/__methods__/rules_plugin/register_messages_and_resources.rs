@@ -36,20 +36,8 @@ mod tests {
     fn test_usage() {
         let mut app = App::new();
         register_messages_and_resources(&mut app);
-        assert!(
-            app.world()
-                .get_resource::<Messages<actions::PlayerAction>>()
-                .is_some()
-        );
-        assert!(
-            app.world()
-                .get_resource::<Messages<turns::StepStarted>>()
-                .is_some()
-        );
-        assert!(
-            app.world()
-                .get_resource::<actions::PendingChoice>()
-                .is_some()
-        );
+        assert!(app.world().get_resource::<Messages<actions::PlayerAction>>().is_some());
+        assert!(app.world().get_resource::<Messages<turns::StepStarted>>().is_some());
+        assert!(app.world().get_resource::<actions::PendingChoice>().is_some());
     }
 }

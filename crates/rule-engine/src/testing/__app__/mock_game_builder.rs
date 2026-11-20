@@ -88,9 +88,8 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let (game, [p1, ..]) = MockGame::builder()
-            .turn(3, turns::Step::PostcombatMain)
-            .players([P1, P2.life(7)]);
+        let (game, [p1, ..]) =
+            MockGame::builder().turn(3, turns::Step::PostcombatMain).players([P1, P2.life(7)]);
 
         assert_eq!(game.life(p1), 20);
         let turn = game.app.world().resource::<turns::Turn>();

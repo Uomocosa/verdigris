@@ -47,12 +47,8 @@ mod tests {
             p2.pass_to(turns::Step::DeclareAttackers),
         ])
         .unwrap();
-        let [bears] = game
-            .player(p1)
-            .cards_in(BATTLEFIELD)
-            .matching(GRIZZLY_BEARS)
-            .exactly::<1>()
-            .unwrap();
+        let [bears] =
+            game.player(p1).cards_in(BATTLEFIELD).matching(GRIZZLY_BEARS).exactly::<1>().unwrap();
 
         game.act(p1, actions::Action::DeclareAttackers(vec![bears.into()]));
         game.play([
@@ -61,12 +57,7 @@ mod tests {
         ])
         .unwrap();
 
-        assert!(
-            game.app
-                .world()
-                .get::<crate::cards::Attacking>(bears.into())
-                .is_none()
-        );
+        assert!(game.app.world().get::<crate::cards::Attacking>(bears.into()).is_none());
     }
 
     #[test]
@@ -80,12 +71,8 @@ mod tests {
             p2.pass_to(turns::Step::DeclareAttackers),
         ])
         .unwrap();
-        let [rats] = game
-            .player(p1)
-            .cards_in(BATTLEFIELD)
-            .matching(TYPHOID_RATS)
-            .exactly::<1>()
-            .unwrap();
+        let [rats] =
+            game.player(p1).cards_in(BATTLEFIELD).matching(TYPHOID_RATS).exactly::<1>().unwrap();
 
         game.act(p1, actions::Action::DeclareAttackers(vec![rats.into()]));
 
@@ -95,12 +82,8 @@ mod tests {
         ])
         .unwrap();
         game.play([p1.pass_priority()]).unwrap();
-        let [bears] = game
-            .player(p2)
-            .cards_in(BATTLEFIELD)
-            .matching(GRIZZLY_BEARS)
-            .exactly::<1>()
-            .unwrap();
+        let [bears] =
+            game.player(p2).cards_in(BATTLEFIELD).matching(GRIZZLY_BEARS).exactly::<1>().unwrap();
 
         game.act(
             p2,
@@ -109,12 +92,7 @@ mod tests {
                 attacker: rats.into(),
             }]),
         );
-        assert!(
-            game.app
-                .world()
-                .get::<crate::cards::Blocking>(bears.into())
-                .is_some()
-        );
+        assert!(game.app.world().get::<crate::cards::Blocking>(bears.into()).is_some());
 
         game.play([
             p1.pass_to(turns::Step::PostcombatMain),
@@ -122,18 +100,8 @@ mod tests {
         ])
         .unwrap();
 
-        assert!(
-            game.app
-                .world()
-                .get::<crate::cards::Blocking>(bears.into())
-                .is_none()
-        );
-        assert!(
-            game.app
-                .world()
-                .get::<crate::cards::Blocked>(rats.into())
-                .is_none()
-        );
+        assert!(game.app.world().get::<crate::cards::Blocking>(bears.into()).is_none());
+        assert!(game.app.world().get::<crate::cards::Blocked>(rats.into()).is_none());
     }
 
     #[test]
@@ -147,20 +115,11 @@ mod tests {
             p2.pass_to(turns::Step::DeclareAttackers),
         ])
         .unwrap();
-        let [bears] = game
-            .player(p1)
-            .cards_in(BATTLEFIELD)
-            .matching(GRIZZLY_BEARS)
-            .exactly::<1>()
-            .unwrap();
+        let [bears] =
+            game.player(p1).cards_in(BATTLEFIELD).matching(GRIZZLY_BEARS).exactly::<1>().unwrap();
 
         game.act(p1, actions::Action::DeclareAttackers(vec![bears.into()]));
-        assert!(
-            game.app
-                .world()
-                .get::<crate::cards::Attacking>(bears.into())
-                .is_some()
-        );
+        assert!(game.app.world().get::<crate::cards::Attacking>(bears.into()).is_some());
 
         game.play([
             p1.pass_to(turns::Step::PostcombatMain),
@@ -172,11 +131,6 @@ mod tests {
             game.app.world().resource::<turns::Turn>().step,
             turns::Step::PostcombatMain
         );
-        assert!(
-            game.app
-                .world()
-                .get::<crate::cards::Attacking>(bears.into())
-                .is_none()
-        );
+        assert!(game.app.world().get::<crate::cards::Attacking>(bears.into()).is_none());
     }
 }

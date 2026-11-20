@@ -43,8 +43,7 @@ impl PlayerSetup {
         mut self,
         definitions: impl IntoIterator<Item = impl Into<cards::CardDefinition>>,
     ) -> Self {
-        self.battlefield
-            .extend(definitions.into_iter().map(Into::into));
+        self.battlefield.extend(definitions.into_iter().map(Into::into));
         self
     }
 
@@ -53,8 +52,7 @@ impl PlayerSetup {
         mut self,
         definitions: impl IntoIterator<Item = impl Into<cards::CardDefinition>>,
     ) -> Self {
-        self.tapped_battlefield
-            .extend(definitions.into_iter().map(Into::into));
+        self.tapped_battlefield.extend(definitions.into_iter().map(Into::into));
         self
     }
 

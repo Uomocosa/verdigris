@@ -51,14 +51,9 @@ mod tests {
     fn test_usage() {
         let (mut game, [p1, p2]) =
             MockGame::new([P1.hand([GRIZZLY_BEARS]).mana_pool(mana![1, G]), P2]);
-        let [bears] = game
-            .player(p1)
-            .cards_in(HAND)
-            .matching(GRIZZLY_BEARS)
-            .exactly::<1>()
-            .unwrap();
-        game.play([p1.cast(bears).pass_priority(), p2.pass_priority()])
-            .unwrap();
+        let [bears] =
+            game.player(p1).cards_in(HAND).matching(GRIZZLY_BEARS).exactly::<1>().unwrap();
+        game.play([p1.cast(bears).pass_priority(), p2.pass_priority()]).unwrap();
         assert_eq!(game.zone_of(bears), BATTLEFIELD);
     }
 
@@ -66,14 +61,9 @@ mod tests {
     fn r608_3a_cast_bears_enters_the_battlefield() {
         let (mut game, [p1, p2]) =
             MockGame::new([P1.hand([GRIZZLY_BEARS]).mana_pool(mana![1, G]), P2]);
-        let [bears] = game
-            .player(p1)
-            .cards_in(HAND)
-            .matching(GRIZZLY_BEARS)
-            .exactly::<1>()
-            .unwrap();
-        game.play([p1.cast(bears).pass_priority(), p2.pass_priority()])
-            .unwrap();
+        let [bears] =
+            game.player(p1).cards_in(HAND).matching(GRIZZLY_BEARS).exactly::<1>().unwrap();
+        game.play([p1.cast(bears).pass_priority(), p2.pass_priority()]).unwrap();
         assert_eq!(game.zone_of(bears), BATTLEFIELD);
     }
 }

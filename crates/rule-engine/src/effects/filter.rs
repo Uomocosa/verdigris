@@ -28,9 +28,7 @@ mod tests {
         assert_eq!(CREATURE.excluded_color, None);
         assert_eq!(ANY_TARGET.kind, effects::FilterKind::AnyTarget);
         assert_eq!(
-            CREATURE
-                .controlled_by(effects::PlayerRef::You)
-                .controlled_by,
+            CREATURE.controlled_by(effects::PlayerRef::You).controlled_by,
             Some(effects::PlayerRef::You)
         );
     }

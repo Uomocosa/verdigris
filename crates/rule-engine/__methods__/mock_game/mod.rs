@@ -1,7 +1,5 @@
 mod cards_in_zone;
 mod last_rejection;
-mod life;
-mod mana_pool;
 mod p;
 mod play;
 mod rejection_count;
@@ -9,8 +7,6 @@ mod target_choice;
 mod zone_of;
 pub use cards_in_zone::cards_in_zone;
 pub use last_rejection::last_rejection;
-pub use life::life;
-pub use mana_pool::mana_pool;
 pub use p::p;
 pub use play::play;
 pub use rejection_count::rejection_count;

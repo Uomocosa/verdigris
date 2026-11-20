@@ -13,12 +13,8 @@ pub fn cards_in_zone(
     let Some(zone_entity) = world
         .iter_entities()
         .find(|entity| {
-            entity
-                .get::<zones::Zone>()
-                .is_some_and(|found| *found == zone)
-                && entity
-                    .get::<cards::Owner>()
-                    .is_some_and(|owner| **owner == player)
+            entity.get::<zones::Zone>().is_some_and(|found| *found == zone)
+                && entity.get::<cards::Owner>().is_some_and(|owner| **owner == player)
         })
         .map(|entity| entity.id())
     else {
@@ -27,9 +23,7 @@ pub fn cards_in_zone(
     world
         .iter_entities()
         .filter(|entity| {
-            entity
-                .get::<zones::InZone>()
-                .is_some_and(|in_zone| **in_zone == zone_entity)
+            entity.get::<zones::InZone>().is_some_and(|in_zone| **in_zone == zone_entity)
         })
         .filter_map(|entity| {
             let definition = entity.get::<cards::CardDefinition>()?;

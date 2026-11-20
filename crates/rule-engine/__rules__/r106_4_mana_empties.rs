@@ -44,8 +44,7 @@ mod tests {
         let (mut game, [p1, p2]) = MockGame::new([P1.mana_pool(mana![R, 2, U]), P2]);
         assert_eq!(game.mana_pool(p1), mana![R, 2, U]);
 
-        game.play([p1.pass_to(turns::Step::End), p2.pass_to(turns::Step::End)])
-            .unwrap();
+        game.play([p1.pass_to(turns::Step::End), p2.pass_to(turns::Step::End)]).unwrap();
 
         assert_eq!(game.mana_pool(p1), cards::ManaPool::EMPTY);
         assert_eq!(game.mana_pool(p2), cards::ManaPool::EMPTY);

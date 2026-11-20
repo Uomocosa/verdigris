@@ -84,16 +84,12 @@ pub fn r608_2_resolve(
                 }
                 effects::EffectKind::LoseLife(amount) => {
                     if let Some(player) = player_target {
-                        player_effects
-                            .p0()
-                            .write(players::LifeLost { player, amount });
+                        player_effects.p0().write(players::LifeLost { player, amount });
                     }
                 }
                 effects::EffectKind::Discard(count) => {
                     if let Some(player) = player_target {
-                        player_effects
-                            .p1()
-                            .write(players::DiscardRequested { player, count });
+                        player_effects.p1().write(players::DiscardRequested { player, count });
                     }
                 }
                 effects::EffectKind::ModifyPowerToughness { power, toughness } => {
@@ -123,14 +119,9 @@ mod tests {
     fn test_usage() {
         let (mut game, [p1, p2]) =
             MockGame::new([P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]), P2]);
-        let [bolt] = game
-            .player(p1)
-            .cards_in(HAND)
-            .matching(LIGHTNING_BOLT)
-            .exactly::<1>()
-            .unwrap();
-        game.play([p1.cast(bolt).targeting(p2).end_turn(), p2.end_turn()])
-            .unwrap();
+        let [bolt] =
+            game.player(p1).cards_in(HAND).matching(LIGHTNING_BOLT).exactly::<1>().unwrap();
+        game.play([p1.cast(bolt).targeting(p2).end_turn(), p2.end_turn()]).unwrap();
         assert_eq!(game.life(p2), 17);
     }
 
@@ -140,28 +131,15 @@ mod tests {
             P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
-        let [bears] = game
-            .player(p2)
-            .cards_in(BATTLEFIELD)
-            .matching(GRIZZLY_BEARS)
-            .exactly::<1>()
-            .unwrap();
-        let [bolt] = game
-            .player(p1)
-            .cards_in(HAND)
-            .matching(LIGHTNING_BOLT)
-            .exactly::<1>()
-            .unwrap();
-        game.play([p1.cast(bolt).targeting(bears).end_turn(), p2.end_turn()])
-            .unwrap();
+        let [bears] =
+            game.player(p2).cards_in(BATTLEFIELD).matching(GRIZZLY_BEARS).exactly::<1>().unwrap();
+        let [bolt] =
+            game.player(p1).cards_in(HAND).matching(LIGHTNING_BOLT).exactly::<1>().unwrap();
+        game.play([p1.cast(bolt).targeting(bears).end_turn(), p2.end_turn()]).unwrap();
         assert_eq!(game.zone_of(bears), GRAVEYARD);
         assert!(game.player(p2).cards_in(GRAVEYARD).has(GRIZZLY_BEARS));
-        let [bolt] = game
-            .player(p1)
-            .cards_in(GRAVEYARD)
-            .matching(LIGHTNING_BOLT)
-            .exactly::<1>()
-            .unwrap();
+        let [bolt] =
+            game.player(p1).cards_in(GRAVEYARD).matching(LIGHTNING_BOLT).exactly::<1>().unwrap();
         assert_eq!(game.zone_of(bolt), GRAVEYARD);
     }
 
@@ -171,20 +149,10 @@ mod tests {
             P1.hand([MURDER]).mana_pool(mana![1, B, B]),
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
-        let [bears] = game
-            .player(p2)
-            .cards_in(BATTLEFIELD)
-            .matching(GRIZZLY_BEARS)
-            .exactly::<1>()
-            .unwrap();
-        let [murder] = game
-            .player(p1)
-            .cards_in(HAND)
-            .matching(MURDER)
-            .exactly::<1>()
-            .unwrap();
-        game.play([p1.cast(murder).targeting(bears).end_turn(), p2.end_turn()])
-            .unwrap();
+        let [bears] =
+            game.player(p2).cards_in(BATTLEFIELD).matching(GRIZZLY_BEARS).exactly::<1>().unwrap();
+        let [murder] = game.player(p1).cards_in(HAND).matching(MURDER).exactly::<1>().unwrap();
+        game.play([p1.cast(murder).targeting(bears).end_turn(), p2.end_turn()]).unwrap();
         assert_eq!(game.zone_of(bears), GRAVEYARD);
     }
 
@@ -194,18 +162,10 @@ mod tests {
             P1.hand([DOOM_BLADE]).mana_pool(mana![1, B]),
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
-        let [bears] = game
-            .player(p2)
-            .cards_in(BATTLEFIELD)
-            .matching(GRIZZLY_BEARS)
-            .exactly::<1>()
-            .unwrap();
-        let [doom_blade] = game
-            .player(p1)
-            .cards_in(HAND)
-            .matching(DOOM_BLADE)
-            .exactly::<1>()
-            .unwrap();
+        let [bears] =
+            game.player(p2).cards_in(BATTLEFIELD).matching(GRIZZLY_BEARS).exactly::<1>().unwrap();
+        let [doom_blade] =
+            game.player(p1).cards_in(HAND).matching(DOOM_BLADE).exactly::<1>().unwrap();
         game.play([
             p1.cast(doom_blade).targeting(bears).end_turn(),
             p2.end_turn(),
@@ -213,12 +173,8 @@ mod tests {
         .unwrap();
         assert_eq!(game.zone_of(bears), GRAVEYARD);
         assert!(game.player(p2).cards_in(GRAVEYARD).has(GRIZZLY_BEARS));
-        let [blade] = game
-            .player(p1)
-            .cards_in(GRAVEYARD)
-            .matching(DOOM_BLADE)
-            .exactly::<1>()
-            .unwrap();
+        let [blade] =
+            game.player(p1).cards_in(GRAVEYARD).matching(DOOM_BLADE).exactly::<1>().unwrap();
         assert_eq!(game.zone_of(blade), GRAVEYARD);
     }
 }

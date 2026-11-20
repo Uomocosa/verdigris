@@ -21,9 +21,7 @@ pub fn r514_2_cleanup_step(
             commands.entity(entity).insert(damage::Damage(0));
         }
         for entity in modified.iter() {
-            commands
-                .entity(entity)
-                .remove::<effects::PowerToughnessModifier>();
+            commands.entity(entity).remove::<effects::PowerToughnessModifier>();
         }
     }
 }
@@ -41,28 +39,14 @@ mod tests {
     fn test_usage() {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
-            P2.hand([GIANT_GROWTH])
-                .battlefield([GRIZZLY_BEARS])
-                .mana_pool(mana![G]),
+            P2.hand([GIANT_GROWTH]).battlefield([GRIZZLY_BEARS]).mana_pool(mana![G]),
         ]);
-        let [bolt] = game
-            .player(p1)
-            .cards_in(HAND)
-            .matching(LIGHTNING_BOLT)
-            .exactly::<1>()
-            .unwrap();
-        let [growth] = game
-            .player(p2)
-            .cards_in(HAND)
-            .matching(GIANT_GROWTH)
-            .exactly::<1>()
-            .unwrap();
-        let [bears] = game
-            .player(p2)
-            .cards_in(BATTLEFIELD)
-            .matching(GRIZZLY_BEARS)
-            .exactly::<1>()
-            .unwrap();
+        let [bolt] =
+            game.player(p1).cards_in(HAND).matching(LIGHTNING_BOLT).exactly::<1>().unwrap();
+        let [growth] =
+            game.player(p2).cards_in(HAND).matching(GIANT_GROWTH).exactly::<1>().unwrap();
+        let [bears] =
+            game.player(p2).cards_in(BATTLEFIELD).matching(GRIZZLY_BEARS).exactly::<1>().unwrap();
 
         game.play([
             p1.cast(bolt).targeting(bears).pass_priority(),
@@ -76,57 +60,28 @@ mod tests {
 
         assert_eq!(game.zone_of(bears), BATTLEFIELD);
         assert_eq!(
-            game.app
-                .world()
-                .get::<damage::Damage>(bears.into())
-                .copied(),
+            game.app.world().get::<damage::Damage>(bears.into()).copied(),
             Some(damage::Damage(0))
         );
-        assert!(
-            game.app
-                .world()
-                .get::<effects::PowerToughnessModifier>(bears.into())
-                .is_none()
-        );
+        assert!(game.app.world().get::<effects::PowerToughnessModifier>(bears.into()).is_none());
     }
 
     #[test]
     fn r514_2_until_end_of_turn_effect_expires_before_the_next_bolt() {
         let (mut game, [p1, p2]) = MockGame::new([
-            P1.hand([GIANT_GROWTH, LIGHTNING_BOLT])
-                .battlefield([FOREST, MOUNTAIN, GRIZZLY_BEARS]),
+            P1.hand([GIANT_GROWTH, LIGHTNING_BOLT]).battlefield([FOREST, MOUNTAIN, GRIZZLY_BEARS]),
             P2,
         ]);
-        let [growth] = game
-            .player(p1)
-            .cards_in(HAND)
-            .matching(GIANT_GROWTH)
-            .exactly::<1>()
-            .unwrap();
-        let [bolt] = game
-            .player(p1)
-            .cards_in(HAND)
-            .matching(LIGHTNING_BOLT)
-            .exactly::<1>()
-            .unwrap();
-        let [bears] = game
-            .player(p1)
-            .cards_in(BATTLEFIELD)
-            .matching(GRIZZLY_BEARS)
-            .exactly::<1>()
-            .unwrap();
-        let [forest] = game
-            .player(p1)
-            .cards_in(BATTLEFIELD)
-            .matching(FOREST)
-            .exactly::<1>()
-            .unwrap();
-        let [mountain] = game
-            .player(p1)
-            .cards_in(BATTLEFIELD)
-            .matching(MOUNTAIN)
-            .exactly::<1>()
-            .unwrap();
+        let [growth] =
+            game.player(p1).cards_in(HAND).matching(GIANT_GROWTH).exactly::<1>().unwrap();
+        let [bolt] =
+            game.player(p1).cards_in(HAND).matching(LIGHTNING_BOLT).exactly::<1>().unwrap();
+        let [bears] =
+            game.player(p1).cards_in(BATTLEFIELD).matching(GRIZZLY_BEARS).exactly::<1>().unwrap();
+        let [forest] =
+            game.player(p1).cards_in(BATTLEFIELD).matching(FOREST).exactly::<1>().unwrap();
+        let [mountain] =
+            game.player(p1).cards_in(BATTLEFIELD).matching(MOUNTAIN).exactly::<1>().unwrap();
 
         game.act(p1, actions::Action::ActivateManaAbility(forest.into()));
         game.play([

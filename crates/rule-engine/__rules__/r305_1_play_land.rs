@@ -99,12 +99,7 @@ mod tests {
     #[test]
     fn test_usage() {
         let (mut game, [p1, ..]) = MockGame::new([P1.hand([FOREST]), P2]);
-        let [forest] = game
-            .player(p1)
-            .cards_in(HAND)
-            .matching(FOREST)
-            .exactly::<1>()
-            .unwrap();
+        let [forest] = game.player(p1).cards_in(HAND).matching(FOREST).exactly::<1>().unwrap();
         game.act(p1, actions::Action::PlayLand(forest.into()));
         assert_eq!(game.zone_of(forest), BATTLEFIELD);
     }
@@ -112,12 +107,7 @@ mod tests {
     #[test]
     fn r305_1_a_player_plays_a_land_from_their_hand_as_a_special_action() {
         let (mut game, [p1, ..]) = MockGame::new([P1.hand([FOREST]), P2]);
-        let [forest] = game
-            .player(p1)
-            .cards_in(HAND)
-            .matching(FOREST)
-            .exactly::<1>()
-            .unwrap();
+        let [forest] = game.player(p1).cards_in(HAND).matching(FOREST).exactly::<1>().unwrap();
 
         game.act(p1, actions::Action::PlayLand(forest.into()));
 
@@ -128,12 +118,8 @@ mod tests {
     #[test]
     fn r305_2_a_second_land_in_the_same_turn_is_rejected() {
         let (mut game, [p1, ..]) = MockGame::new([P1.hand([FOREST, FOREST]), P2]);
-        let [first, second] = game
-            .player(p1)
-            .cards_in(HAND)
-            .matching(FOREST)
-            .exactly::<2>()
-            .unwrap();
+        let [first, second] =
+            game.player(p1).cards_in(HAND).matching(FOREST).exactly::<2>().unwrap();
 
         game.act(p1, actions::Action::PlayLand(first.into()));
         game.act(p1, actions::Action::PlayLand(second.into()));
@@ -154,12 +140,7 @@ mod tests {
             .turn(2, turns::Step::PrecombatMain)
             .players([P1.hand([FOREST]), P2.active()]);
         game.play([p2.pass_priority()]).unwrap();
-        let [forest] = game
-            .player(p1)
-            .cards_in(HAND)
-            .matching(FOREST)
-            .exactly::<1>()
-            .unwrap();
+        let [forest] = game.player(p1).cards_in(HAND).matching(FOREST).exactly::<1>().unwrap();
 
         game.act(p1, actions::Action::PlayLand(forest.into()));
 

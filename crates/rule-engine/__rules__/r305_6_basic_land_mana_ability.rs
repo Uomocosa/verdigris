@@ -90,12 +90,8 @@ mod tests {
     #[test]
     fn test_usage() {
         let (mut game, [p1, ..]) = MockGame::new([P1.battlefield([FOREST]), P2]);
-        let [forest] = game
-            .player(p1)
-            .cards_in(BATTLEFIELD)
-            .matching(FOREST)
-            .exactly::<1>()
-            .unwrap();
+        let [forest] =
+            game.player(p1).cards_in(BATTLEFIELD).matching(FOREST).exactly::<1>().unwrap();
         game.act(p1, actions::Action::ActivateManaAbility(forest.into()));
         assert_eq!(game.mana_pool(p1), mana![G]);
     }
@@ -103,36 +99,23 @@ mod tests {
     #[test]
     fn r305_6_a_forest_taps_for_green_mana_without_using_the_stack() {
         let (mut game, [p1, ..]) = MockGame::new([P1.battlefield([FOREST]), P2]);
-        let [forest] = game
-            .player(p1)
-            .cards_in(BATTLEFIELD)
-            .matching(FOREST)
-            .exactly::<1>()
-            .unwrap();
+        let [forest] =
+            game.player(p1).cards_in(BATTLEFIELD).matching(FOREST).exactly::<1>().unwrap();
         assert_eq!(game.mana_pool(p1), cards::ManaPool::EMPTY);
 
         game.act(p1, actions::Action::ActivateManaAbility(forest.into()));
 
         assert_eq!(game.mana_pool(p1), mana![G]);
         assert!(game.last_rejection().is_none());
-        assert!(
-            game.app
-                .world()
-                .get::<cards::Tapped>(forest.into())
-                .is_some()
-        );
+        assert!(game.app.world().get::<cards::Tapped>(forest.into()).is_some());
         assert_eq!(game.zone_of(forest), BATTLEFIELD);
     }
 
     #[test]
     fn r305_6_a_mountain_taps_for_red_mana() {
         let (mut game, [p1, ..]) = MockGame::new([P1.battlefield([MOUNTAIN]), P2]);
-        let [mountain] = game
-            .player(p1)
-            .cards_in(BATTLEFIELD)
-            .matching(MOUNTAIN)
-            .exactly::<1>()
-            .unwrap();
+        let [mountain] =
+            game.player(p1).cards_in(BATTLEFIELD).matching(MOUNTAIN).exactly::<1>().unwrap();
 
         game.act(p1, actions::Action::ActivateManaAbility(mountain.into()));
 
@@ -142,12 +125,8 @@ mod tests {
     #[test]
     fn r107_5_a_tapped_land_cannot_be_tapped_for_more_mana() {
         let (mut game, [p1, ..]) = MockGame::new([P1.battlefield([FOREST]), P2]);
-        let [forest] = game
-            .player(p1)
-            .cards_in(BATTLEFIELD)
-            .matching(FOREST)
-            .exactly::<1>()
-            .unwrap();
+        let [forest] =
+            game.player(p1).cards_in(BATTLEFIELD).matching(FOREST).exactly::<1>().unwrap();
         game.act(p1, actions::Action::ActivateManaAbility(forest.into()));
 
         game.act(p1, actions::Action::ActivateManaAbility(forest.into()));

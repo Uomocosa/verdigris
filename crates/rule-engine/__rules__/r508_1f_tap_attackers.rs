@@ -31,21 +31,12 @@ mod tests {
             p2.pass_to(turns::Step::DeclareAttackers),
         ])
         .unwrap();
-        let [bears] = game
-            .player(p1)
-            .cards_in(BATTLEFIELD)
-            .matching(GRIZZLY_BEARS)
-            .exactly::<1>()
-            .unwrap();
+        let [bears] =
+            game.player(p1).cards_in(BATTLEFIELD).matching(GRIZZLY_BEARS).exactly::<1>().unwrap();
 
         game.act(p1, actions::Action::DeclareAttackers(vec![bears.into()]));
 
-        assert!(
-            game.app
-                .world()
-                .get::<crate::cards::Tapped>(bears.into())
-                .is_some()
-        );
+        assert!(game.app.world().get::<crate::cards::Tapped>(bears.into()).is_some());
     }
 
     #[test]
@@ -59,41 +50,18 @@ mod tests {
             p2.pass_to(turns::Step::DeclareAttackers),
         ])
         .unwrap();
-        let [attacking] = game
-            .player(p1)
-            .cards_in(BATTLEFIELD)
-            .matching(GRIZZLY_BEARS)
-            .exactly::<1>()
-            .unwrap();
-        let [defending] = game
-            .player(p2)
-            .cards_in(BATTLEFIELD)
-            .matching(GRIZZLY_BEARS)
-            .exactly::<1>()
-            .unwrap();
+        let [attacking] =
+            game.player(p1).cards_in(BATTLEFIELD).matching(GRIZZLY_BEARS).exactly::<1>().unwrap();
+        let [defending] =
+            game.player(p2).cards_in(BATTLEFIELD).matching(GRIZZLY_BEARS).exactly::<1>().unwrap();
 
         game.act(
             p1,
             actions::Action::DeclareAttackers(vec![attacking.into()]),
         );
 
-        assert!(
-            game.app
-                .world()
-                .get::<crate::cards::Attacking>(attacking.into())
-                .is_some()
-        );
-        assert!(
-            game.app
-                .world()
-                .get::<crate::cards::Tapped>(attacking.into())
-                .is_some()
-        );
-        assert!(
-            game.app
-                .world()
-                .get::<crate::cards::Tapped>(defending.into())
-                .is_none()
-        );
+        assert!(game.app.world().get::<crate::cards::Attacking>(attacking.into()).is_some());
+        assert!(game.app.world().get::<crate::cards::Tapped>(attacking.into()).is_some());
+        assert!(game.app.world().get::<crate::cards::Tapped>(defending.into()).is_none());
     }
 }

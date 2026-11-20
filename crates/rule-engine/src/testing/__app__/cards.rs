@@ -85,12 +85,8 @@ mod tests {
     #[test]
     fn exactly_rejects_no_matching_card() {
         let (game, [p1, ..]) = MockGame::new([P1, P2]);
-        let error = game
-            .player(p1)
-            .cards_in(HAND)
-            .matching(LIGHTNING_BOLT)
-            .exactly::<1>()
-            .unwrap_err();
+        let error =
+            game.player(p1).cards_in(HAND).matching(LIGHTNING_BOLT).exactly::<1>().unwrap_err();
         assert_eq!(
             error,
             CardsError::WrongCount {
@@ -106,12 +102,8 @@ mod tests {
     #[test]
     fn exactly_rejects_two_matching_cards() {
         let (game, [p1, ..]) = MockGame::new([P1.hand([LIGHTNING_BOLT, LIGHTNING_BOLT]), P2]);
-        let error = game
-            .player(p1)
-            .cards_in(HAND)
-            .matching(LIGHTNING_BOLT)
-            .exactly::<1>()
-            .unwrap_err();
+        let error =
+            game.player(p1).cards_in(HAND).matching(LIGHTNING_BOLT).exactly::<1>().unwrap_err();
         assert_eq!(
             error,
             CardsError::WrongCount {

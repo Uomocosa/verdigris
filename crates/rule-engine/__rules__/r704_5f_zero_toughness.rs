@@ -48,18 +48,10 @@ mod tests {
             P1.hand([DISFIGURE]).mana_pool(mana![B]),
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
-        let [disfigure] = game
-            .player(p1)
-            .cards_in(HAND)
-            .matching(DISFIGURE)
-            .exactly::<1>()
-            .unwrap();
-        let [bears] = game
-            .player(p2)
-            .cards_in(BATTLEFIELD)
-            .matching(GRIZZLY_BEARS)
-            .exactly::<1>()
-            .unwrap();
+        let [disfigure] =
+            game.player(p1).cards_in(HAND).matching(DISFIGURE).exactly::<1>().unwrap();
+        let [bears] =
+            game.player(p2).cards_in(BATTLEFIELD).matching(GRIZZLY_BEARS).exactly::<1>().unwrap();
         game.play([
             p1.cast(disfigure).targeting(bears).pass_priority(),
             p2.pass_priority(),
@@ -74,18 +66,10 @@ mod tests {
             P1.hand([DISFIGURE]).mana_pool(mana![B]),
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
-        let [disfigure] = game
-            .player(p1)
-            .cards_in(HAND)
-            .matching(DISFIGURE)
-            .exactly::<1>()
-            .unwrap();
-        let [bears] = game
-            .player(p2)
-            .cards_in(BATTLEFIELD)
-            .matching(GRIZZLY_BEARS)
-            .exactly::<1>()
-            .unwrap();
+        let [disfigure] =
+            game.player(p1).cards_in(HAND).matching(DISFIGURE).exactly::<1>().unwrap();
+        let [bears] =
+            game.player(p2).cards_in(BATTLEFIELD).matching(GRIZZLY_BEARS).exactly::<1>().unwrap();
         game.play([
             p1.cast(disfigure).targeting(bears).pass_priority(),
             p2.pass_priority(),

@@ -28,12 +28,8 @@ mod tests {
     fn test_usage() {
         let (mut game, [p1, p2]) =
             MockGame::new([P1.hand([SIGN_IN_BLOOD]).mana_pool(mana![B, B]), P2]);
-        let [sign_in_blood] = game
-            .player(p1)
-            .cards_in(HAND)
-            .matching(SIGN_IN_BLOOD)
-            .exactly::<1>()
-            .unwrap();
+        let [sign_in_blood] =
+            game.player(p1).cards_in(HAND).matching(SIGN_IN_BLOOD).exactly::<1>().unwrap();
         game.play([
             p1.cast(sign_in_blood).targeting(p2).end_turn(),
             p2.end_turn(),
@@ -51,12 +47,8 @@ mod tests {
                 cards::CardDefinition::from(MURDER),
             ]),
         ]);
-        let [sign_in_blood] = game
-            .player(p1)
-            .cards_in(HAND)
-            .matching(SIGN_IN_BLOOD)
-            .exactly::<1>()
-            .unwrap();
+        let [sign_in_blood] =
+            game.player(p1).cards_in(HAND).matching(SIGN_IN_BLOOD).exactly::<1>().unwrap();
         game.play([
             p1.cast(sign_in_blood).targeting(p2).end_turn(),
             p2.end_turn(),
@@ -80,12 +72,8 @@ mod tests {
                 .mana_pool(mana![B, B]),
             P2,
         ]);
-        let [sign_in_blood] = game
-            .player(p1)
-            .cards_in(HAND)
-            .matching(SIGN_IN_BLOOD)
-            .exactly::<1>()
-            .unwrap();
+        let [sign_in_blood] =
+            game.player(p1).cards_in(HAND).matching(SIGN_IN_BLOOD).exactly::<1>().unwrap();
         game.play([
             p1.cast(sign_in_blood).targeting(p1).end_turn(),
             p2.end_turn(),
@@ -103,12 +91,8 @@ mod tests {
             P1.hand([SIGN_IN_BLOOD]).mana_pool(mana![B, B]),
             P2.library([]),
         ]);
-        let [sign_in_blood] = game
-            .player(p1)
-            .cards_in(HAND)
-            .matching(SIGN_IN_BLOOD)
-            .exactly::<1>()
-            .unwrap();
+        let [sign_in_blood] =
+            game.player(p1).cards_in(HAND).matching(SIGN_IN_BLOOD).exactly::<1>().unwrap();
         game.play([
             p1.cast(sign_in_blood).targeting(p2).end_turn(),
             p2.end_turn(),

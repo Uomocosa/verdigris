@@ -2,10 +2,7 @@ use crate::testing;
 
 pub fn has(cards: &testing::CardsInZone, card: impl Into<testing::CardQuery>) -> bool {
     let card = card.into();
-    cards
-        .cards
-        .iter()
-        .any(|(test_card, name)| card.matches(*test_card, name))
+    cards.cards.iter().any(|(test_card, name)| card.matches(*test_card, name))
 }
 
 #[cfg(test)]

@@ -27,21 +27,13 @@ pub fn r120_3_damage_results(
             *life = players::Life((**life).saturating_sub(helpers::signed_damage(event.amount)));
             continue;
         }
-        let marked = targets
-            .get(event.target)
-            .ok()
-            .flatten()
-            .map_or(0, |damage| **damage);
-        commands
-            .entity(event.target)
-            .insert(damage::Damage(marked.saturating_add(event.amount)));
+        let marked = targets.get(event.target).ok().flatten().map_or(0, |damage| **damage);
+        commands.entity(event.target).insert(damage::Damage(marked.saturating_add(event.amount)));
         let has_deathtouch = sources
             .get(event.source)
             .is_ok_and(|definition| definition.keywords.contains(&cards::Keyword::Deathtouch));
         if has_deathtouch {
-            commands
-                .entity(event.target)
-                .insert(damage::DealtByDeathtouch);
+            commands.entity(event.target).insert(damage::DealtByDeathtouch);
         }
     }
 }
@@ -55,24 +47,15 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let (mut game, [p1, p2]) = MockGame::builder()
-            .turn(1, turns::Step::PrecombatMain)
-            .players([
+        let (mut game, [p1, p2]) =
+            MockGame::builder().turn(1, turns::Step::PrecombatMain).players([
                 P1.battlefield([WALKING_CORPSE]),
                 P2.active().hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
             ]);
-        let [corpse] = game
-            .player(p1)
-            .cards_in(BATTLEFIELD)
-            .matching(WALKING_CORPSE)
-            .exactly::<1>()
-            .unwrap();
-        let [bolt] = game
-            .player(p2)
-            .cards_in(HAND)
-            .matching(LIGHTNING_BOLT)
-            .exactly::<1>()
-            .unwrap();
+        let [corpse] =
+            game.player(p1).cards_in(BATTLEFIELD).matching(WALKING_CORPSE).exactly::<1>().unwrap();
+        let [bolt] =
+            game.player(p2).cards_in(HAND).matching(LIGHTNING_BOLT).exactly::<1>().unwrap();
         game.play([
             p2.cast(bolt).targeting(corpse).pass_priority(),
             p1.pass_priority(),

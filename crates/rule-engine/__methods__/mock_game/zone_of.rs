@@ -21,12 +21,8 @@ mod tests {
     #[test]
     fn test_usage() {
         let (game, [_, p2, ..]) = MockGame::new([P1, P2.battlefield([GRIZZLY_BEARS])]);
-        let [bears] = game
-            .player(p2)
-            .cards_in(BATTLEFIELD)
-            .matching(GRIZZLY_BEARS)
-            .exactly::<1>()
-            .unwrap();
+        let [bears] =
+            game.player(p2).cards_in(BATTLEFIELD).matching(GRIZZLY_BEARS).exactly::<1>().unwrap();
         assert_eq!(zone_of(&game, bears), BATTLEFIELD);
     }
 }

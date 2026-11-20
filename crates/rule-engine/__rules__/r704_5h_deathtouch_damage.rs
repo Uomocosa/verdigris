@@ -21,9 +21,7 @@ pub fn r704_5h_deathtouch_damage(
     zone_entities: Query<(Entity, &zones::Zone, Option<&cards::Owner>)>,
 ) {
     for (creature, definition, _, in_zone) in cards.iter() {
-        commands
-            .entity(creature)
-            .remove::<damage::DealtByDeathtouch>();
+        commands.entity(creature).remove::<damage::DealtByDeathtouch>();
         if !helpers::is_card_in_zone(**in_zone, BATTLEFIELD, &zone_entities) {
             continue;
         }
@@ -55,12 +53,8 @@ mod tests {
             p2.pass_to(turns::Step::DeclareAttackers),
         ])
         .unwrap();
-        let [rats] = game
-            .player(p1)
-            .cards_in(BATTLEFIELD)
-            .matching(TYPHOID_RATS)
-            .exactly::<1>()
-            .unwrap();
+        let [rats] =
+            game.player(p1).cards_in(BATTLEFIELD).matching(TYPHOID_RATS).exactly::<1>().unwrap();
         game.act(p1, actions::Action::DeclareAttackers(vec![rats.into()]));
         game.play([
             p1.pass_to(turns::Step::CombatDamage),
@@ -84,12 +78,8 @@ mod tests {
             p2.pass_to(turns::Step::DeclareAttackers),
         ])
         .unwrap();
-        let [rats] = game
-            .player(p1)
-            .cards_in(BATTLEFIELD)
-            .matching(TYPHOID_RATS)
-            .exactly::<1>()
-            .unwrap();
+        let [rats] =
+            game.player(p1).cards_in(BATTLEFIELD).matching(TYPHOID_RATS).exactly::<1>().unwrap();
         game.act(p1, actions::Action::DeclareAttackers(vec![rats.into()]));
         game.play([
             p1.pass_to(turns::Step::DeclareBlockers),
@@ -97,12 +87,8 @@ mod tests {
         ])
         .unwrap();
         game.play([p1.pass_priority()]).unwrap();
-        let [bears] = game
-            .player(p2)
-            .cards_in(BATTLEFIELD)
-            .matching(GRIZZLY_BEARS)
-            .exactly::<1>()
-            .unwrap();
+        let [bears] =
+            game.player(p2).cards_in(BATTLEFIELD).matching(GRIZZLY_BEARS).exactly::<1>().unwrap();
         game.act(
             p2,
             actions::Action::DeclareBlockers(vec![actions::BlockAssignment {
@@ -133,12 +119,8 @@ mod tests {
             p2.pass_to(turns::Step::DeclareAttackers),
         ])
         .unwrap();
-        let [rats] = game
-            .player(p1)
-            .cards_in(BATTLEFIELD)
-            .matching(TYPHOID_RATS)
-            .exactly::<1>()
-            .unwrap();
+        let [rats] =
+            game.player(p1).cards_in(BATTLEFIELD).matching(TYPHOID_RATS).exactly::<1>().unwrap();
         game.act(p1, actions::Action::DeclareAttackers(vec![rats.into()]));
         game.play([
             p1.pass_to(turns::Step::DeclareBlockers),
@@ -146,12 +128,8 @@ mod tests {
         ])
         .unwrap();
         game.play([p1.pass_priority()]).unwrap();
-        let [myr] = game
-            .player(p2)
-            .cards_in(BATTLEFIELD)
-            .matching(DARKSTEEL_MYR)
-            .exactly::<1>()
-            .unwrap();
+        let [myr] =
+            game.player(p2).cards_in(BATTLEFIELD).matching(DARKSTEEL_MYR).exactly::<1>().unwrap();
         game.act(
             p2,
             actions::Action::DeclareBlockers(vec![actions::BlockAssignment {
@@ -182,12 +160,8 @@ mod tests {
             p2.pass_to(turns::Step::DeclareAttackers),
         ])
         .unwrap();
-        let [corpse] = game
-            .player(p1)
-            .cards_in(BATTLEFIELD)
-            .matching(WALKING_CORPSE)
-            .exactly::<1>()
-            .unwrap();
+        let [corpse] =
+            game.player(p1).cards_in(BATTLEFIELD).matching(WALKING_CORPSE).exactly::<1>().unwrap();
         game.act(p1, actions::Action::DeclareAttackers(vec![corpse.into()]));
         game.play([
             p1.pass_to(turns::Step::DeclareBlockers),
@@ -195,12 +169,8 @@ mod tests {
         ])
         .unwrap();
         game.play([p1.pass_priority()]).unwrap();
-        let [bears] = game
-            .player(p2)
-            .cards_in(BATTLEFIELD)
-            .matching(GRIZZLY_BEARS)
-            .exactly::<1>()
-            .unwrap();
+        let [bears] =
+            game.player(p2).cards_in(BATTLEFIELD).matching(GRIZZLY_BEARS).exactly::<1>().unwrap();
         game.act(
             p2,
             actions::Action::DeclareBlockers(vec![actions::BlockAssignment {
@@ -208,18 +178,10 @@ mod tests {
                 attacker: corpse.into(),
             }]),
         );
-        let [growth] = game
-            .player(p2)
-            .cards_in(HAND)
-            .matching(GIANT_GROWTH)
-            .exactly::<1>()
-            .unwrap();
-        let [forest] = game
-            .player(p2)
-            .cards_in(BATTLEFIELD)
-            .matching(FOREST)
-            .exactly::<1>()
-            .unwrap();
+        let [growth] =
+            game.player(p2).cards_in(HAND).matching(GIANT_GROWTH).exactly::<1>().unwrap();
+        let [forest] =
+            game.player(p2).cards_in(BATTLEFIELD).matching(FOREST).exactly::<1>().unwrap();
         game.act(p2, actions::Action::ActivateManaAbility(forest.into()));
         game.play([
             p2.cast(growth).targeting(bears).pass_priority(),

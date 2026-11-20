@@ -41,12 +41,10 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let (mut game, [p1, p2]) = MockGame::builder()
-            .turn(1, turns::Step::Upkeep)
-            .players([P1, P2]);
+        let (mut game, [p1, p2]) =
+            MockGame::builder().turn(1, turns::Step::Upkeep).players([P1, P2]);
 
-        game.play([p1.pass_priority(), p2.pass_priority(), p1.pass_priority()])
-            .unwrap();
+        game.play([p1.pass_priority(), p2.pass_priority(), p1.pass_priority()]).unwrap();
 
         assert_eq!(
             game.app.world().resource::<turns::Turn>().step,
@@ -65,8 +63,7 @@ mod tests {
         ]);
         let hand_before = game.player(p1).cards_in(HAND).len();
 
-        game.play([p1.pass_priority(), p2.pass_priority(), p1.pass_priority()])
-            .unwrap();
+        game.play([p1.pass_priority(), p2.pass_priority(), p1.pass_priority()]).unwrap();
 
         assert_eq!(
             game.app.world().resource::<turns::Turn>().step,
@@ -84,23 +81,14 @@ mod tests {
             ]),
             P2,
         ]);
-        let [top] = game
-            .player(p1)
-            .cards_in(LIBRARY)
-            .matching(GRIZZLY_BEARS)
-            .exactly::<1>()
-            .unwrap();
+        let [top] =
+            game.player(p1).cards_in(LIBRARY).matching(GRIZZLY_BEARS).exactly::<1>().unwrap();
 
-        game.play([p1.pass_priority(), p2.pass_priority(), p1.pass_priority()])
-            .unwrap();
+        game.play([p1.pass_priority(), p2.pass_priority(), p1.pass_priority()]).unwrap();
 
         assert_eq!(game.zone_of(top), HAND);
         assert_eq!(
-            game.player(p1)
-                .cards_in(HAND)
-                .matching(GRIZZLY_BEARS)
-                .exactly::<1>()
-                .unwrap()[0],
+            game.player(p1).cards_in(HAND).matching(GRIZZLY_BEARS).exactly::<1>().unwrap()[0],
             top
         );
     }

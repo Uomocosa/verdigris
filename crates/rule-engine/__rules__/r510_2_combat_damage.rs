@@ -129,12 +129,8 @@ mod tests {
             p2.pass_to(turns::Step::DeclareAttackers),
         ])
         .unwrap();
-        let [rats] = game
-            .player(p1)
-            .cards_in(BATTLEFIELD)
-            .matching(TYPHOID_RATS)
-            .exactly::<1>()
-            .unwrap();
+        let [rats] =
+            game.player(p1).cards_in(BATTLEFIELD).matching(TYPHOID_RATS).exactly::<1>().unwrap();
         game.act(p1, actions::Action::DeclareAttackers(vec![rats.into()]));
         game.play([
             p1.pass_to(turns::Step::DeclareBlockers),
@@ -142,12 +138,8 @@ mod tests {
         ])
         .unwrap();
         game.play([p1.pass_priority()]).unwrap();
-        let [bears] = game
-            .player(p2)
-            .cards_in(BATTLEFIELD)
-            .matching(GRIZZLY_BEARS)
-            .exactly::<1>()
-            .unwrap();
+        let [bears] =
+            game.player(p2).cards_in(BATTLEFIELD).matching(GRIZZLY_BEARS).exactly::<1>().unwrap();
         game.act(
             p2,
             actions::Action::DeclareBlockers(vec![actions::BlockAssignment {
@@ -180,12 +172,8 @@ mod tests {
             p2.pass_to(turns::Step::DeclareAttackers),
         ])
         .unwrap();
-        let [bears] = game
-            .player(p1)
-            .cards_in(BATTLEFIELD)
-            .matching(GRIZZLY_BEARS)
-            .exactly::<1>()
-            .unwrap();
+        let [bears] =
+            game.player(p1).cards_in(BATTLEFIELD).matching(GRIZZLY_BEARS).exactly::<1>().unwrap();
         game.act(p1, actions::Action::DeclareAttackers(vec![bears.into()]));
         game.play([
             p1.pass_to(turns::Step::CombatDamage),
@@ -212,12 +200,8 @@ mod tests {
             p2.pass_to(turns::Step::DeclareAttackers),
         ])
         .unwrap();
-        let [bears] = game
-            .player(p1)
-            .cards_in(BATTLEFIELD)
-            .matching(GRIZZLY_BEARS)
-            .exactly::<1>()
-            .unwrap();
+        let [bears] =
+            game.player(p1).cards_in(BATTLEFIELD).matching(GRIZZLY_BEARS).exactly::<1>().unwrap();
         game.act(p1, actions::Action::DeclareAttackers(vec![bears.into()]));
         game.play([
             p1.pass_to(turns::Step::CombatDamage),

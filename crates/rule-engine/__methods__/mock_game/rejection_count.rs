@@ -4,14 +4,9 @@ use crate::actions;
 use crate::testing;
 
 pub fn rejection_count(game: &testing::MockGame) -> usize {
-    let messages = game
-        .app
-        .world()
-        .get_resource::<Messages<actions::Rejected>>();
+    let messages = game.app.world().get_resource::<Messages<actions::Rejected>>();
     messages.map_or(0, |messages| {
-        messages
-            .oldest_message_count()
-            .saturating_add(messages.len())
+        messages.oldest_message_count().saturating_add(messages.len())
     })
 }
 

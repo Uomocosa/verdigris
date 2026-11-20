@@ -43,10 +43,6 @@ mod tests {
     fn test_usage() {
         let mut app = App::new();
         app.add_plugins(RulesPlugin);
-        assert!(
-            app.world()
-                .get_resource::<actions::PendingChoice>()
-                .is_some()
-        );
+        assert!(app.world().get_resource::<actions::PendingChoice>().is_some());
     }
 }

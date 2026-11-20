@@ -29,9 +29,7 @@ pub fn is_card_in_zone(
     zone: zones::Zone,
     zone_entities: &Query<(Entity, &zones::Zone, Option<&cards::Owner>)>,
 ) -> bool {
-    zone_entities
-        .get(card_zone)
-        .is_ok_and(|(_, found_zone, _)| *found_zone == zone)
+    zone_entities.get(card_zone).is_ok_and(|(_, found_zone, _)| *found_zone == zone)
 }
 
 #[must_use]
@@ -60,9 +58,8 @@ pub fn does_creature_match_filter(
     filter: effects::Filter,
 ) -> bool {
     let is_creature = definition.types.contains(&cards::CardType::Creature);
-    let has_excluded_color = filter
-        .excluded_color
-        .is_some_and(|excluded| definition.colors().contains(&excluded));
+    let has_excluded_color =
+        filter.excluded_color.is_some_and(|excluded| definition.colors().contains(&excluded));
     is_creature && !has_excluded_color
 }
 

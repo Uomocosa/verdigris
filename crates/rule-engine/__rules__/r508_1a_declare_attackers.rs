@@ -52,14 +52,12 @@ pub fn r508_1a_declare_attackers(
             continue;
         };
         let all_legal = attackers.iter().all(|attacker| {
-            cards
-                .get(*attacker)
-                .is_ok_and(|(definition, owner, in_zone, tapped)| {
-                    definition.types.contains(&cards::CardType::Creature)
-                        && **owner == action.player
-                        && **in_zone == battlefield
-                        && tapped.is_none()
-                })
+            cards.get(*attacker).is_ok_and(|(definition, owner, in_zone, tapped)| {
+                definition.types.contains(&cards::CardType::Creature)
+                    && **owner == action.player
+                    && **in_zone == battlefield
+                    && tapped.is_none()
+            })
         });
         if !all_legal {
             rejected.write(actions::Rejected::CannotAttack {
@@ -91,21 +89,12 @@ mod tests {
             p2.pass_to(turns::Step::DeclareAttackers),
         ])
         .unwrap();
-        let [bears] = game
-            .player(p1)
-            .cards_in(BATTLEFIELD)
-            .matching(GRIZZLY_BEARS)
-            .exactly::<1>()
-            .unwrap();
+        let [bears] =
+            game.player(p1).cards_in(BATTLEFIELD).matching(GRIZZLY_BEARS).exactly::<1>().unwrap();
 
         game.act(p1, actions::Action::DeclareAttackers(vec![bears.into()]));
 
-        assert!(
-            game.app
-                .world()
-                .get::<crate::cards::Attacking>(bears.into())
-                .is_some()
-        );
+        assert!(game.app.world().get::<crate::cards::Attacking>(bears.into()).is_some());
     }
 
     #[test]
@@ -119,36 +108,18 @@ mod tests {
             p2.pass_to(turns::Step::DeclareAttackers),
         ])
         .unwrap();
-        let [attacking] = game
-            .player(p1)
-            .cards_in(BATTLEFIELD)
-            .matching(GRIZZLY_BEARS)
-            .exactly::<1>()
-            .unwrap();
-        let [defending] = game
-            .player(p2)
-            .cards_in(BATTLEFIELD)
-            .matching(GRIZZLY_BEARS)
-            .exactly::<1>()
-            .unwrap();
+        let [attacking] =
+            game.player(p1).cards_in(BATTLEFIELD).matching(GRIZZLY_BEARS).exactly::<1>().unwrap();
+        let [defending] =
+            game.player(p2).cards_in(BATTLEFIELD).matching(GRIZZLY_BEARS).exactly::<1>().unwrap();
 
         game.act(
             p1,
             actions::Action::DeclareAttackers(vec![attacking.into()]),
         );
 
-        assert!(
-            game.app
-                .world()
-                .get::<crate::cards::Attacking>(attacking.into())
-                .is_some()
-        );
-        assert!(
-            game.app
-                .world()
-                .get::<crate::cards::Attacking>(defending.into())
-                .is_none()
-        );
+        assert!(game.app.world().get::<crate::cards::Attacking>(attacking.into()).is_some());
+        assert!(game.app.world().get::<crate::cards::Attacking>(defending.into()).is_none());
     }
 
     #[test]
@@ -162,12 +133,8 @@ mod tests {
             p2.pass_to(turns::Step::DeclareAttackers),
         ])
         .unwrap();
-        let [defending] = game
-            .player(p2)
-            .cards_in(BATTLEFIELD)
-            .matching(GRIZZLY_BEARS)
-            .exactly::<1>()
-            .unwrap();
+        let [defending] =
+            game.player(p2).cards_in(BATTLEFIELD).matching(GRIZZLY_BEARS).exactly::<1>().unwrap();
 
         game.act(
             p1,
@@ -180,12 +147,7 @@ mod tests {
                 attackers: vec![defending.into()]
             })
         );
-        assert!(
-            game.app
-                .world()
-                .get::<crate::cards::Attacking>(defending.into())
-                .is_none()
-        );
+        assert!(game.app.world().get::<crate::cards::Attacking>(defending.into()).is_none());
     }
 
     #[test]
@@ -199,12 +161,8 @@ mod tests {
             p2.pass_to(turns::Step::DeclareAttackers),
         ])
         .unwrap();
-        let [tapped] = game
-            .player(p1)
-            .cards_in(BATTLEFIELD)
-            .matching(GRIZZLY_BEARS)
-            .exactly::<1>()
-            .unwrap();
+        let [tapped] =
+            game.player(p1).cards_in(BATTLEFIELD).matching(GRIZZLY_BEARS).exactly::<1>().unwrap();
 
         game.act(p1, actions::Action::DeclareAttackers(vec![tapped.into()]));
 
@@ -214,11 +172,6 @@ mod tests {
                 attackers: vec![tapped.into()]
             })
         );
-        assert!(
-            game.app
-                .world()
-                .get::<crate::cards::Attacking>(tapped.into())
-                .is_none()
-        );
+        assert!(game.app.world().get::<crate::cards::Attacking>(tapped.into()).is_none());
     }
 }

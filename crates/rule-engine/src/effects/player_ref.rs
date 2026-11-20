@@ -1,4 +1,3 @@
-use atomic_delegate_macros::atomic_delegates;
 use bevy::prelude::Entity;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -19,10 +18,10 @@ impl PlayerRef {
     }
 }
 
-#[atomic_delegates]
+#[rustfmt::skip]
 impl PlayerRef {
     #[must_use]
-    pub(crate) fn players_other_than(players: &[Entity], controller: Entity) -> Vec<Entity> {}
+    pub(crate) fn players_other_than(players: &[Entity], controller: Entity) -> Vec<Entity> { players.iter().copied().filter(|player| *player != controller).collect() }
 }
 
 #[cfg(test)]

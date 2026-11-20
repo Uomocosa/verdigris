@@ -2,11 +2,7 @@ use crate::actions;
 use crate::testing;
 
 pub fn target_choice(game: &testing::MockGame) -> Option<testing::ExpectedTargets> {
-    let pending = game
-        .app
-        .world()
-        .get_resource::<actions::PendingChoice>()?
-        .as_ref()?;
+    let pending = game.app.world().get_resource::<actions::PendingChoice>()?.as_ref()?;
     match pending {
         actions::Choice::Target(choice) => Some(testing::ExpectedTargets {
             count: choice.count,
