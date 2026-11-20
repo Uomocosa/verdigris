@@ -6,6 +6,7 @@ pub mod r119_3_life_loss;
 pub mod r120_3_damage_results;
 pub mod r121_1_draw;
 pub mod r305_1_play_land;
+pub mod r305_6_basic_land_mana_ability;
 pub mod r500_2_step_ends;
 pub mod r500_3_step_without_priority_ends;
 pub mod r502_3_untap;

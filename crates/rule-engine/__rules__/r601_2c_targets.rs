@@ -107,6 +107,7 @@ pub fn r601_2c_targets(
             | actions::Action::DeclareAttackers(_)
             | actions::Action::DeclareBlockers(_)
             | actions::Action::PlayLand(_)
+            | actions::Action::ActivateManaAbility(_)
             | actions::Action::PassPriority => {}
         }
     }

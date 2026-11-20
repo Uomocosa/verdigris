@@ -4,6 +4,7 @@ use crate::actions;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Action {
+    ActivateManaAbility(Entity),
     Cast(Entity),
     PlayLand(Entity),
     ChooseTargets(Vec<Entity>),

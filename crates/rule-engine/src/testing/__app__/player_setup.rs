@@ -128,6 +128,7 @@ mod tests {
             GRIZZLY_BEARS,
             LIGHTNING_BOLT,
             MIND_ROT,
+            MOUNTAIN,
             MURDER,
             NEGATE,
             SIGN_IN_BLOOD,

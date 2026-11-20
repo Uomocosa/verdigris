@@ -13,6 +13,7 @@ pub fn add_priority_action_systems(app: &mut App) {
             rules::r508_1f_tap_attackers::r508_1f_tap_attackers,
             rules::r509_1a_declare_blockers::r509_1a_declare_blockers,
             rules::r305_1_play_land::r305_1_play_land,
+            rules::r305_6_basic_land_mana_ability::r305_6_basic_land_mana_ability,
         )
             .chain()
             .in_set(rules::RuleSet::PriorityAction),
@@ -30,6 +31,6 @@ mod tests {
         let mut app = App::new();
         add_priority_action_systems(&mut app);
 
-        assert_eq!(app.get_schedule(Update).map(Schedule::systems_len), Some(7));
+        assert_eq!(app.get_schedule(Update).map(Schedule::systems_len), Some(8));
     }
 }
