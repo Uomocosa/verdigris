@@ -1,8 +1,9 @@
 use crate::{BATTLEFIELD, STACK};
-use bevy::prelude::{Commands, Entity, MessageReader, Query};
+use bevy::prelude::{Commands, Entity, MessageReader, Query, Res};
 
 use crate::cards;
 use crate::stack;
+use crate::turns;
 use crate::zones;
 
 /// 608.3a If the object that’s resolving has no targets, it becomes a permanent and enters the
@@ -18,7 +19,9 @@ pub fn r608_3a_permanent_enters(
     mut commands: Commands,
     cards: Query<(&cards::CardDefinition, &cards::Owner, &zones::InZone)>,
     zone_entities: Query<(Entity, &zones::Zone, Option<&cards::Owner>)>,
+    turn: Res<turns::Turn>,
 ) {
+    let turn = turn.into_inner();
     for resolution in resolutions.read() {
         let spell = **resolution;
         let Ok((definition, owner, in_zone)) = cards.get(spell) else {
@@ -37,7 +40,10 @@ pub fn r608_3a_permanent_enters(
             continue;
         }
         if let Some(battlefield) = BATTLEFIELD.find_entity(Some(**owner), &zone_entities) {
-            commands.entity(spell).insert(zones::InZone(battlefield));
+            commands.entity(spell).insert((
+                zones::InZone(battlefield),
+                cards::EnteredOnTurn(turn.number),
+            ));
         }
     }
 }

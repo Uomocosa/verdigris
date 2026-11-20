@@ -13,6 +13,14 @@ use crate::zones;
 /// 508.1k Each chosen creature still controlled by the active player becomes an attacking creature.
 /// It remains an attacking creature until it’s removed from combat or the combat phase ends,
 /// whichever comes first. See rule 506.4.
+///
+/// # See also
+///
+/// 302.6. A creature’s activated ability with the tap symbol or the untap symbol in its activation
+/// cost can’t be activated unless the creature has been under its controller’s control continuously
+/// since their most recent turn began. A creature can’t attack unless it has been under its
+/// controller’s control continuously since their most recent turn began. This rule is informally
+/// called the “summoning sickness” rule.
 pub fn r508_1a_r508_1k_declare_attackers(
     mut actions: MessageReader<actions::PlayerAction>,
     mut rejected: MessageWriter<actions::Rejected>,
@@ -25,6 +33,7 @@ pub fn r508_1a_r508_1k_declare_attackers(
         &zones::InZone,
         Option<&cards::Tapped>,
     )>,
+    entered_on: Query<Option<&cards::EnteredOnTurn>>,
     zone_entities: Query<(Entity, &zones::Zone, Option<&cards::Owner>)>,
 ) {
     let priority = priority.into_inner();
@@ -54,6 +63,9 @@ pub fn r508_1a_r508_1k_declare_attackers(
                     && **owner == action.player
                     && **in_zone == battlefield
                     && tapped.is_none()
+                    && entered_on.get(*attacker).is_ok_and(|on_turn| {
+                        on_turn.is_none_or(|turn_number| **turn_number != turn.number)
+                    })
             })
         });
         if !all_legal {
@@ -159,6 +171,33 @@ mod tests {
             })
         );
         assert!(game.app.world().get::<crate::cards::Attacking>(tapped.into()).is_none());
+        Ok(())
+    }
+
+    #[test]
+    fn r508_1a_a_creature_that_entered_this_turn_cannot_attack() -> TestResult {
+        use crate::HAND;
+        use crate::cards;
+        use crate::mana;
+
+        let (mut game, [p1, p2]) =
+            MockGame::new([P1.hand([WALKING_CORPSE]).mana_pool(mana![1, B]), P2]);
+        let [corpse] = game.player(p1).cards_in(HAND).exactly::<1>(WALKING_CORPSE)?;
+        game.play([p1.cast(corpse).pass_priority(), p2.pass_priority()])?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareAttackers),
+            p2.pass_to(turns::Step::DeclareAttackers),
+        ])?;
+
+        game.act(p1, actions::Action::DeclareAttackers(vec![corpse.into()]));
+
+        assert_eq!(
+            game.last_rejection(),
+            Some(&actions::Rejected::CannotAttack {
+                attackers: vec![corpse.into()]
+            })
+        );
+        assert!(game.app.world().get::<cards::Attacking>(corpse.into()).is_none());
         Ok(())
     }
 }

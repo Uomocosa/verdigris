@@ -13,5 +13,8 @@ pub struct Blocking(pub Entity);
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Blocked;
 
+#[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Deref)]
+pub struct EnteredOnTurn(pub u32);
+
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Tapped;

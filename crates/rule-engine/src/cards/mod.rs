@@ -4,7 +4,7 @@ mod basic;
 pub use basic::card_text::{
     artifact_creature, creature, deathtouch, indestructible, instant, land, sorcery,
 };
-pub use basic::components::{Attacking, Blocked, Blocking, Owner, Tapped};
+pub use basic::components::{Attacking, Blocked, Blocking, EnteredOnTurn, Owner, Tapped};
 pub use basic::enums::{CardType, Color, Keyword, ManaSymbol, Supertype};
 pub use basic::newtypes::CardName;
 pub use basic::structs::PowerToughness;
