@@ -61,6 +61,22 @@ pub fn rule_check(_self: &rules::rule_tests::RuleTests, project: &Project) -> Ve
                 format!("rule file {stem} has no #[test] fn in its tests module"),
             ));
         }
+        let has_test_usage = items.iter().any(|item| match item {
+            syn::Item::Fn(found) => {
+                found.sig.ident == "test_usage"
+                    && found.attrs.iter().any(|attr| ItemMarker(attr).is_test())
+            }
+            _ => false,
+        });
+        if has_test_usage {
+            violations.push(RuleViolation::from_file(
+                entry.absolute_path.clone(),
+                rules::rule_tests::RuleTests::CODE,
+                format!(
+                    "rule file {stem} has a test_usage test; name rule tests for the behaviour they check"
+                ),
+            ));
+        }
     }
     violations
 }
@@ -98,7 +114,7 @@ mod tests {
     }
 
     #[test]
-    fn test_usage_name_is_also_clean() {
+    fn test_usage_is_a_violation() {
         let mut project = Project {
             entries: vec![Entry {
                 relative_path: PathBuf::from("__rules__/r117_4_priority.rs"),
@@ -115,7 +131,9 @@ mod tests {
             .unwrap(),
         );
         let violations = rule_check(&rules::rule_tests::RuleTests, &project);
-        assert_eq!(violations.len(), 0);
+        assert_eq!(violations.len(), 1);
+        assert!(violations[0].message.contains("r117_4_priority"));
+        assert!(violations[0].message.contains("test_usage"));
     }
 
     #[test]

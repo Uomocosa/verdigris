@@ -26,11 +26,11 @@ pub const EXEMPTIONS: [PathExemption; 6] = [
     PathExemption {
         code: "LELETEST003",
         root: RULES_ROOT,
-        reason: "Rule files are tested by tests named for the behaviour they check; test_usage does not apply to a rule.",
+        reason: "Rule files have no test_usage by VRDG005; every rule test is named for the behaviour it checks.",
     },
     PathExemption {
         code: "LELETEST007",
         root: RULES_ROOT,
-        reason: "A rule file's primary item is a Bevy system registered on the app; its test_usage drives that system through a MockGame scenario, so it cannot call the system directly or assert a value the system returns.",
+        reason: "Rule files have no test_usage by VRDG005; rule tests drive the Bevy system through MockGame scenarios instead of calling it directly.",
     },
 ];

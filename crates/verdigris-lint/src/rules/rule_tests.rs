@@ -14,9 +14,9 @@ impl RuleTests {
     pub const CODE: &'static str = "VRDG005";
     pub const DOC: RuleDoc = RuleDoc {
         category: Category::Layout,
-        summary: "Every `__rules__/` file keeps a `#[cfg(test)] mod tests` with at least one `#[test]` fn, named for what it tests.",
-        why: "A rule file without a test guards nothing; a test named for what it tests tells the reader which behaviour the rule implements.",
-        fix: "Keep a `#[cfg(test)] mod tests` with at least one `#[test]` fn named for what it tests (e.g. `bolt_kills_bears` in `r608_2_r608_2c_resolve.rs`).",
+        summary: "Every `__rules__/` file keeps a `#[cfg(test)] mod tests` with at least one `#[test]` fn, named for what it tests; `test_usage` is banned.",
+        why: "A rule file without a test guards nothing; a test named for what it tests tells the reader which behaviour the rule implements. A rule is not used, it is tested, so `test_usage` says nothing about the behaviour.",
+        fix: "Keep a `#[cfg(test)] mod tests` with at least one `#[test]` fn named for what it tests (e.g. `bolt_kills_bears` in `r608_2_r608_2c_resolve.rs`); never name a rule test `test_usage`.",
         bad: rule_examples!("rule_tests/bad"),
         good: rule_examples!("rule_tests/good"),
     };
