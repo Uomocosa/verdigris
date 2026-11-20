@@ -1515,6 +1515,7 @@ dependencies = [
  "lele-bevy-lint",
  "lele-lint",
  "rule-examples-macro",
+ "syn 2.0.119",
  "tempfile",
  "thiserror 2.0.21",
 ]
