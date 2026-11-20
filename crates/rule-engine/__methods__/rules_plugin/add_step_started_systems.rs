@@ -11,6 +11,11 @@ pub fn add_step_started_systems(app: &mut App) {
         Update,
         rules::r502_3_untap::r502_3_untap.in_set(rules::RuleSet::StepStarted),
     );
+    app.add_systems(
+        Update,
+        rules::r511_3_remove_from_combat::r511_3_remove_from_combat
+            .in_set(rules::RuleSet::StepStarted),
+    );
 }
 
 #[cfg(test)]
@@ -24,6 +29,6 @@ mod tests {
         let mut app = App::new();
         add_step_started_systems(&mut app);
 
-        assert_eq!(app.get_schedule(Update).map(Schedule::systems_len), Some(2));
+        assert_eq!(app.get_schedule(Update).map(Schedule::systems_len), Some(3));
     }
 }
