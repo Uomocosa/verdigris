@@ -129,7 +129,7 @@ Game objects have SOURCE components (written by actions/effects: `CardDefinition
 `Owner`, `Controller`, `Damage`, `Tapped`, `Counters`, `ContinuousEffect` entities) and
 DERIVED components (`EffectivePT`, type and keyword markers like `Flying`/`Lifelink`,
 `OnBattlefield`, `StaticAbilities`, `TriggeredAbilities`). Derived components are written
-only by the `r613_1_layers` system (`OnBattlefield` by a hook on `InZone`). Rules filter on
+only by the `r613_1_layers` system, `OnBattlefield` included. Rules filter on
 them with `With<>`/`Without<>` and never re-derive them.
 
 Static abilities apply live (CR 611.3a); effects from a resolving spell are
@@ -167,7 +167,7 @@ if !definition.keywords.contains(&cards::Keyword::Lifelink) { continue; }
 
 - Rule reads `definition.keywords` / `definition.types` / `effective_power_toughness` → read the derived marker / `EffectivePT`.
 - `if !… { continue }` testing a component's presence or a zone → put it in the query filter.
-- Insert/remove of a derived component outside layers/hooks → fix: move the write into `r613_1_layers` (or the `InZone` hook for `OnBattlefield`).
+- Insert/remove of a derived component outside layers → fix: move the write into `r613_1_layers`.
 - An effect mutates characteristics directly instead of spawning a `ContinuousEffect` → fix: spawn the effect entity.
 - A rule copies the zone-lookup query → fix: use the `ZoneLookup` SystemParam.
 - An observer changes game state for a CR rule → fix: emit a message and let the rule system handle it.
