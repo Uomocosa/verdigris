@@ -21,7 +21,14 @@ use crate::zones;
 /// creature. This remains unchanged until the creature is removed from combat, an effect says that
 /// it becomes blocked or unblocked, or the combat phase ends, whichever comes first. A creature
 /// remains blocked even if all the creatures blocking it are removed from combat.
-pub fn r509_1a_r509_1g_r509_1h_declare_blockers(
+///
+/// 702.9b A creature with flying can’t be blocked except by creatures with flying and/or reach. A
+/// creature with flying can block a creature with or without flying. (See rule 509, “Declare
+/// Blockers Step,” and rule 702.17, “Reach.”)
+///
+/// 702.17b A creature with flying can’t be blocked except by creatures with flying and/or reach.
+/// (See rule 509, “Declare Blockers Step,” and rule 702.9, “Flying.”)
+pub fn r509_1a_r509_1g_r509_1h_r702_9b_r702_17b_declare_blockers(
     mut actions: MessageReader<actions::PlayerAction>,
     mut rejected: MessageWriter<actions::Rejected>,
     mut commands: Commands,
@@ -33,7 +40,7 @@ pub fn r509_1a_r509_1g_r509_1h_declare_blockers(
         &zones::InZone,
         Option<&cards::Tapped>,
     )>,
-    attacking: Query<&cards::Attacking>,
+    attacking: Query<(&cards::Attacking, &cards::CardDefinition)>,
     zone_entities: Query<(Entity, &zones::Zone, Option<&cards::Owner>)>,
 ) {
     let priority = priority.into_inner();
@@ -65,7 +72,18 @@ pub fn r509_1a_r509_1g_r509_1h_declare_blockers(
                         && **in_zone == battlefield
                         && tapped.is_none()
                 });
-            let attacker_legal = attacking.get(assignment.attacker).is_ok();
+            let attacker_legal =
+                attacking.get(assignment.attacker).is_ok_and(|(_, attacker_definition)| {
+                    let does_attacker_fly =
+                        attacker_definition.keywords.contains(&cards::Keyword::Flying);
+                    if !does_attacker_fly {
+                        return true;
+                    }
+                    cards.get(assignment.blocker).is_ok_and(|(definition, ..)| {
+                        definition.keywords.contains(&cards::Keyword::Flying)
+                            || definition.keywords.contains(&cards::Keyword::Reach)
+                    })
+                });
             blocker_legal && attacker_legal
         });
         if !all_legal {
@@ -208,6 +226,63 @@ mod tests {
         assert_eq!(
             game.last_rejection(),
             Some(&actions::Rejected::CannotBlock { assignments })
+        );
+        Ok(())
+    }
+
+    #[test]
+    fn r702_9b_a_creature_without_flying_or_reach_cannot_block_a_flyer() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.battlefield([WIND_DRAKE]),
+            P2.battlefield([GRIZZLY_BEARS]),
+        ]);
+        let [drake] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(WIND_DRAKE)?;
+        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareAttackers),
+            p2.pass_to(turns::Step::DeclareAttackers),
+            p1.declare_attackers([drake]),
+        ])?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareBlockers),
+            p2.pass_to(turns::Step::DeclareBlockers),
+        ])?;
+        game.play([p1.pass_priority()])?;
+        let assignments = vec![actions::BlockAssignment {
+            blocker: bears.into(),
+            attacker: drake.into(),
+        }];
+
+        game.act(p2, actions::Action::DeclareBlockers(assignments.clone()));
+
+        assert_eq!(
+            game.last_rejection(),
+            Some(&actions::Rejected::CannotBlock { assignments })
+        );
+        assert!(game.app.world().get::<crate::cards::Blocking>(bears.into()).is_none());
+        Ok(())
+    }
+
+    #[test]
+    fn r702_17b_a_creature_with_reach_can_block_a_flyer() -> TestResult {
+        let (mut game, [p1, p2]) =
+            MockGame::new([P1.battlefield([WIND_DRAKE]), P2.battlefield([GIANT_SPIDER])]);
+        let [drake] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(WIND_DRAKE)?;
+        let [spider] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GIANT_SPIDER)?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareAttackers),
+            p2.pass_to(turns::Step::DeclareAttackers),
+            p1.declare_attackers([drake]),
+        ])?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareBlockers),
+            p2.pass_to(turns::Step::DeclareBlockers),
+        ])?;
+        game.play([p1.pass_priority(), p2.declare_blockers([(spider, drake)])])?;
+
+        assert_eq!(
+            game.app.world().get::<crate::cards::Blocking>(spider.into()),
+            Some(&crate::cards::Blocking(drake.into()))
         );
         Ok(())
     }

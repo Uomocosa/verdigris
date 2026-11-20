@@ -95,3 +95,13 @@ pub const fn lifelink() -> cards::Keyword {
 pub const fn trample() -> cards::Keyword {
     cards::Keyword::Trample
 }
+
+#[must_use]
+pub const fn flying() -> cards::Keyword {
+    cards::Keyword::Flying
+}
+
+#[must_use]
+pub const fn reach() -> cards::Keyword {
+    cards::Keyword::Reach
+}

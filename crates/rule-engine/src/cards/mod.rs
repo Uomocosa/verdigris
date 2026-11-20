@@ -2,8 +2,8 @@
 mod basic;
 
 pub use basic::card_text::{
-    artifact_creature, creature, deathtouch, indestructible, instant, land, lifelink, sorcery,
-    trample,
+    artifact_creature, creature, deathtouch, flying, indestructible, instant, land, lifelink,
+    reach, sorcery, trample,
 };
 pub use basic::components::{Attacking, Blocked, Blocking, EnteredOnTurn, Owner, Tapped};
 pub use basic::enums::{CardType, Color, Keyword, ManaSymbol, Supertype};

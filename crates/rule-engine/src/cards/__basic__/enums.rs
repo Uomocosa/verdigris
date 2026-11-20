@@ -24,6 +24,8 @@ pub enum Keyword {
     Deathtouch,
     Lifelink,
     Trample,
+    Flying,
+    Reach,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
