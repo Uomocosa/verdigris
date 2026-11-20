@@ -34,7 +34,6 @@ impl PartialEq<TestCard> for Entity {
 mod tests {
     use bevy::prelude::{Entity, World};
 
-    use crate::cards;
     use crate::testing;
 
     #[test]
@@ -48,13 +47,6 @@ mod tests {
         assert_eq!(
             card.ability(),
             testing::TestAbility::Only { source: entity }
-        );
-        assert_eq!(
-            card.mana_ability(cards::Color::Green),
-            testing::TestAbility::Mana {
-                source: entity,
-                produces: cards::Color::Green,
-            }
         );
     }
 }

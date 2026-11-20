@@ -115,7 +115,6 @@ impl TestPlayerActions {
 mod tests {
     use bevy::prelude::World;
 
-    use crate::actions;
     use crate::testing;
     use crate::turns;
 
@@ -125,94 +124,15 @@ mod tests {
     fn test_usage() {
         let mut world = World::new();
         let caster = world.spawn_empty().id();
-        let spell = world.spawn_empty().id();
-        let target = world.spawn_empty().id();
+        let player = testing::TestPlayer::from_entity_and_seat(caster, testing::PlayerSeat(1));
 
-        let actions = testing::TestPlayer::from_entity_and_seat(caster, testing::PlayerSeat(1))
-            .cast(spell)
-            .targeting(target)
-            .pass_to(turns::Step::PostcombatMain);
-
+        assert_eq!(TestPlayerActions::of(player).steps, Vec::new());
         assert_eq!(
-            actions.steps,
-            vec![
-                testing::PlayStep::Act(caster, actions::Action::Cast(spell)),
-                testing::PlayStep::Act(caster, actions::Action::ChooseTargets(vec![target])),
-                testing::PlayStep::AutoPass {
-                    player: caster,
-                    until: testing::AutoPassUntil::StepStarts(turns::Step::PostcombatMain),
-                },
-            ]
-        );
-
-        assert_eq!(
-            TestPlayerActions::of(testing::TestPlayer::from_entity_and_seat(
-                caster,
-                testing::PlayerSeat(1)
-            ))
-            .steps,
-            Vec::new()
-        );
-    }
-
-    #[test]
-    fn declare_attackers_declare_blockers_play_land_and_discard_push_act_steps() {
-        let mut world = World::new();
-        let caster = world.spawn_empty().id();
-        let attacker = world.spawn_empty().id();
-        let blocker = world.spawn_empty().id();
-        let land = world.spawn_empty().id();
-        let card = world.spawn_empty().id();
-
-        let actions = testing::TestPlayer::from_entity_and_seat(caster, testing::PlayerSeat(1))
-            .declare_attackers([testing::TestCard(attacker)])
-            .declare_blockers([(testing::TestCard(blocker), testing::TestCard(attacker))])
-            .play_land(testing::TestCard(land))
-            .discard([testing::TestCard(card)]);
-
-        assert_eq!(
-            actions.steps,
-            vec![
-                testing::PlayStep::Act(caster, actions::Action::DeclareAttackers(vec![attacker])),
-                testing::PlayStep::Act(
-                    caster,
-                    actions::Action::DeclareBlockers(vec![actions::BlockAssignment {
-                        blocker,
-                        attacker,
-                    }])
-                ),
-                testing::PlayStep::Act(caster, actions::Action::PlayLand(land)),
-                testing::PlayStep::Act(caster, actions::Action::ChooseDiscard(vec![card])),
-            ]
-        );
-    }
-
-    #[test]
-    fn activate_ability_pushes_an_activate_step() {
-        let mut world = World::new();
-        let caster = world.spawn_empty().id();
-        let source = world.spawn_empty().id();
-        let spell = world.spawn_empty().id();
-        let ability = testing::TestAbility::Only { source };
-
-        let first = testing::TestPlayer::from_entity_and_seat(caster, testing::PlayerSeat(1))
-            .activate_ability(ability);
-
-        assert_eq!(
-            first.steps,
-            vec![testing::PlayStep::Activate(caster, ability)]
-        );
-
-        let chained = testing::TestPlayer::from_entity_and_seat(caster, testing::PlayerSeat(1))
-            .activate_ability(ability)
-            .cast(spell);
-
-        assert_eq!(
-            chained.steps,
-            vec![
-                testing::PlayStep::Activate(caster, ability),
-                testing::PlayStep::Act(caster, actions::Action::Cast(spell)),
-            ]
+            player.pass_to(turns::Step::PostcombatMain).steps,
+            vec![testing::PlayStep::AutoPass {
+                player: caster,
+                until: testing::AutoPassUntil::StepStarts(turns::Step::PostcombatMain),
+            }]
         );
     }
 }

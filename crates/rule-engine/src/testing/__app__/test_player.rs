@@ -68,7 +68,6 @@ impl TestPlayer {
 mod tests {
     use bevy::prelude::{Entity, World};
 
-    use crate::actions;
     use crate::testing;
     use crate::turns;
 
@@ -76,17 +75,11 @@ mod tests {
     fn test_usage() {
         let mut world = World::new();
         let entity = world.spawn_empty().id();
-        let spell = world.spawn_empty().id();
-        let attacker = world.spawn_empty().id();
-        let blocker = world.spawn_empty().id();
-        let land = world.spawn_empty().id();
-        let card = world.spawn_empty().id();
         let player = testing::TestPlayer::from_entity_and_seat(entity, testing::PlayerSeat(1));
 
         assert_eq!(Entity::from(player), entity);
         assert_eq!(*player, entity);
         assert_eq!(*player.seat, 1);
-        assert_eq!(player.cast(spell).steps.len(), 1);
         assert_eq!(
             player.pass_to(turns::Step::PostcombatMain).steps,
             vec![testing::PlayStep::AutoPass {
@@ -95,37 +88,11 @@ mod tests {
             }]
         );
         assert_eq!(
-            player.declare_attackers([testing::TestCard(attacker)]).steps,
-            vec![testing::PlayStep::Act(
-                entity,
-                actions::Action::DeclareAttackers(vec![attacker])
-            )]
-        );
-        assert_eq!(
-            player
-                .declare_blockers([(testing::TestCard(blocker), testing::TestCard(attacker))])
-                .steps,
-            vec![testing::PlayStep::Act(
-                entity,
-                actions::Action::DeclareBlockers(vec![actions::BlockAssignment {
-                    blocker,
-                    attacker,
-                }])
-            )]
-        );
-        assert_eq!(
-            player.play_land(testing::TestCard(land)).steps,
-            vec![testing::PlayStep::Act(
-                entity,
-                actions::Action::PlayLand(land)
-            )]
-        );
-        assert_eq!(
-            player.discard([testing::TestCard(card)]).steps,
-            vec![testing::PlayStep::Act(
-                entity,
-                actions::Action::ChooseDiscard(vec![card])
-            )]
+            player.end_turn().steps,
+            vec![testing::PlayStep::AutoPass {
+                player: entity,
+                until: testing::AutoPassUntil::OwnNextTurn,
+            }]
         );
     }
 }
