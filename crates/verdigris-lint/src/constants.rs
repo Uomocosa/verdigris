@@ -2,7 +2,7 @@ use lele_lint::PathExemption;
 
 pub const RULES_ROOT: &str = "__rules__";
 
-pub const EXEMPTIONS: [PathExemption; 5] = [
+pub const EXEMPTIONS: [PathExemption; 6] = [
     PathExemption {
         code: "LELE008",
         root: RULES_ROOT,
@@ -22,6 +22,11 @@ pub const EXEMPTIONS: [PathExemption; 5] = [
         code: "LELEBEVY002",
         root: RULES_ROOT,
         reason: "CR rule systems live in __rules__/ (one file per rule) instead of a domain's __bevy_systems__/ so the rule-to-file mapping stays complete; moving them would lose that mapping.",
+    },
+    PathExemption {
+        code: "LELETEST003",
+        root: RULES_ROOT,
+        reason: "Rule files are tested by tests named for the behaviour they check; test_usage does not apply to a rule.",
     },
     PathExemption {
         code: "LELETEST007",

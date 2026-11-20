@@ -29,7 +29,7 @@ mod tests {
     use crate::testing::*;
 
     #[test]
-    fn test_usage() -> TestResult {
+    fn last_player_wins_when_their_opponent_has_left() -> TestResult {
         let (mut game, [p1, _p2]) = MockGame::new([P1, P2.life(0)]);
         game.play([p1.pass_priority()])?;
         assert!(game.app.world().get::<players::Won>(*p1).is_some());
@@ -37,7 +37,7 @@ mod tests {
     }
 
     #[test]
-    fn r104_2a_the_last_player_in_the_game_wins_when_every_opponent_has_left() -> TestResult {
+    fn last_player_wins_when_every_opponent_has_left() -> TestResult {
         let (mut game, [p1, p2, p3]) = MockGame::new([P1, P2.life(0), P3.life(0)]);
 
         game.play([p1.pass_priority()])?;
@@ -51,7 +51,7 @@ mod tests {
     }
 
     #[test]
-    fn r104_2a_no_winner_is_declared_while_an_opponent_is_still_in_the_game() -> TestResult {
+    fn no_winner_is_declared_while_an_opponent_is_still_in_the_game() -> TestResult {
         let (mut game, [p1, p2, p3]) = MockGame::new([P1, P2.life(0), P3]);
 
         game.play([p1.pass_priority()])?;

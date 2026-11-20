@@ -51,18 +51,7 @@ mod tests {
     use crate::{GRAVEYARD, HAND, LIBRARY};
 
     #[test]
-    fn test_usage() -> TestResult {
-        let (mut game, [p1, p2]) =
-            MockGame::new([P1.hand([DIVINATION]).mana_pool(mana![2, U]), P2]);
-        let [divination] = game.player(p1).cards_in(HAND).exactly::<1>(DIVINATION)?;
-        game.play([p1.cast(divination).pass_priority(), p2.pass_priority()])?;
-        assert!(game.player(p1).cards_in(HAND).has(GRIZZLY_BEARS));
-        assert_eq!(game.zone_of(divination), GRAVEYARD);
-        Ok(())
-    }
-
-    #[test]
-    fn r121_1_divination_draws_the_top_two_cards_of_the_library() -> TestResult {
+    fn divination_draws_the_top_two_cards_of_the_library() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([DIVINATION])
                 .library([GRIZZLY_BEARS, LIGHTNING_BOLT, MURDER])
@@ -73,6 +62,7 @@ mod tests {
         game.play([p1.cast(divination).pass_priority(), p2.pass_priority()])?;
         assert!(game.player(p1).cards_in(HAND).has(GRIZZLY_BEARS));
         assert!(game.player(p1).cards_in(HAND).has(LIGHTNING_BOLT));
+        assert_eq!(game.zone_of(divination), GRAVEYARD);
         assert_eq!(
             game.zone_of(game.player(p1).cards_in(LIBRARY).exactly::<1>(MURDER)?[0]),
             LIBRARY

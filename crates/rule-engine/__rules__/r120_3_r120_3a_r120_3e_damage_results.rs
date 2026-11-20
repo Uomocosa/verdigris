@@ -48,7 +48,7 @@ mod tests {
     use crate::{BATTLEFIELD, GRAVEYARD, HAND};
 
     #[test]
-    fn test_usage() -> TestResult {
+    fn lightning_bolt_marks_damage_and_destroys_the_creature() -> TestResult {
         let (mut game, [p1, p2]) =
             MockGame::builder().turn(1, turns::Step::PrecombatMain).players([
                 P1.battlefield([WALKING_CORPSE]),

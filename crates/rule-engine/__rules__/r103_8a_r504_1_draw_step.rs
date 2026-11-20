@@ -39,21 +39,7 @@ mod tests {
     use crate::{HAND, LIBRARY};
 
     #[test]
-    fn test_usage() -> TestResult {
-        let (mut game, [p1, p2]) =
-            MockGame::builder().turn(1, turns::Step::Upkeep).players([P1, P2]);
-
-        game.play([p1.pass_priority(), p2.pass_priority(), p1.pass_priority()])?;
-
-        assert_eq!(
-            game.app.world().resource::<turns::Turn>().step,
-            turns::Step::Draw
-        );
-        Ok(())
-    }
-
-    #[test]
-    fn r103_8a_first_player_skips_the_draw_step_of_their_first_turn() -> TestResult {
+    fn first_player_skips_the_draw_step_of_their_first_turn() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::builder()
             .turn(1, turns::Step::Upkeep)
             .players([P1.library([GRIZZLY_BEARS, LIGHTNING_BOLT]), P2]);
@@ -70,7 +56,7 @@ mod tests {
     }
 
     #[test]
-    fn r103_8a_the_active_player_draws_a_card_during_their_draw_step() -> TestResult {
+    fn the_active_player_draws_a_card_during_their_draw_step() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::builder()
             .turn(2, turns::Step::Upkeep)
             .players([P1.library([GRIZZLY_BEARS, LIGHTNING_BOLT]), P2]);
