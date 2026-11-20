@@ -34,7 +34,7 @@ stage, commit or run anything that changes files outside `.local-run/`.
 | `4xx-5xx` | Zones and turn structure, including combat (`400.`–`514.`) |
 | `6xx` | Spells, abilities, effects (`600.`–`616.`) |
 | `7xx` | Additional rules: keyword actions, keyword abilities, state-based actions (`700.`–`732.`) |
-| `partial` | Already-covered sections: ignored tests, missing subrules of quoted rules |
+| `partial` | Already-covered sections: ignored tests, `# Notes` in rule docs, missing subrules of quoted rules |
 | `<NNN>` or `<NNN.N>` | That one section or rule |
 
 `--exclude <CR,CR,...>` skips rules another worker already took. `--out <dir>` sets the report
@@ -48,12 +48,17 @@ CR text: `docs/MagicCompRules-20250919.txt`. Section titles:
 A candidate is a CR rule (or group of rules) that is either:
 
 - **missing** — no system quotes it, or
-- **partial** — an ignored test needs it, or a system quotes the parent rule but leaves out a
-  subrule that a real card can hit (e.g. `120.3` quoted but `120.3c` not handled).
+- **partial** — an ignored test needs it, a rule file's doc has a `# Notes` section (free prose
+  about a shortcut, simplification or missing piece: list them with
+  `grep -l '^/// # Notes' crates/rule-engine/__rules__/*.rs`), or a system quotes the parent rule
+  but leaves out a subrule that a real card can hit (e.g. `120.3` quoted but `120.3c` not handled).
+
+`# Notes` is allowed by verdigris-lint for now, but like an `#[ignore = "needs …"]` test it marks
+debt to remove: a proposal that makes a note unnecessary deletes the whole `# Notes` section.
 
 Prefer, in order:
 
-1. rules that turn an ignored test green;
+1. rules that turn an ignored test green or remove a `# Notes` section;
 2. rules whose prerequisites are already implemented (check the coverage list, not your
    memory of MTG);
 3. rules a real, simple card exercises with existing card syntax;
@@ -145,6 +150,7 @@ proposals:
     new_syntax: false
     deps_missing: ["506.1"]       # CR rules still needed first; [] if none
     unignores: ["r704_5h_deathtouch_damage_destroys_a_larger_creature"]
+    removes_notes: []             # rule files whose `# Notes` section this deletes
     score: 11
 ```
 

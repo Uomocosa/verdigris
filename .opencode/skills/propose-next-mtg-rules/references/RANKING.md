@@ -6,6 +6,7 @@ Higher total = do it sooner.
 | Criterion | Points |
 |---|---|
 | Turns at least one `#[ignore = "needs …"]` test green | +3 |
+| Deletes at least one `# Notes` section from a rule file's doc | +2 |
 | Every CR rule it depends on is already implemented (`deps_missing` empty) | +3 |
 | Its test can be red right now, without `#[ignore]` (compiles today, no `// ?`) | +2 |
 | Only extends existing systems, no new system for the rule | −1 |
