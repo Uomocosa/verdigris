@@ -51,7 +51,8 @@ The verdigris form of SMELLS S10. Right after `MockGame::new(...)`, look up ever
 test uses with `exactly::<N>(CARD)?`; then write the actions as one `game.play([...])` script
 built from the verb helpers (`cast`, `targeting`, `activate_ability`, `declare_attackers`,
 `declare_blockers`, `play_land`, `discard`, `pass_to`); then assert. Tests return
-`Result<(), TestError>` and use `?` (keep the turbofish explicit: `exactly::<1>`).
+`TestResult` and use `?` on every lookup and `play`, also in tests that expect an error
+(only the expected failure keeps `unwrap_err()`; keep the turbofish explicit: `exactly::<1>`).
 
 ```rust
 // Good
