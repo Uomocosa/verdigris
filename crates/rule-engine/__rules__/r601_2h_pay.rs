@@ -60,7 +60,7 @@ mod tests {
     }
 
     #[test]
-    fn test_cannot_cast_without_mana() -> TestResult {
+    fn r601_2h_cannot_cast_without_mana() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([P1.hand([LIGHTNING_BOLT]), P2]);
         let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
         let err = game.play([p1.cast(bolt).targeting(p2)]).unwrap_err();

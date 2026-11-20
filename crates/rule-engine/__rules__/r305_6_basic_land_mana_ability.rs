@@ -131,7 +131,7 @@ mod tests {
     }
 
     #[test]
-    fn r107_5_a_tapped_land_cannot_be_tapped_for_more_mana() -> TestResult {
+    fn r305_6_a_tapped_land_cannot_be_tapped_for_more_mana() -> TestResult {
         let (mut game, [p1, ..]) = MockGame::new([P1.battlefield([FOREST]), P2]);
         let [forest] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(FOREST)?;
         game.act(

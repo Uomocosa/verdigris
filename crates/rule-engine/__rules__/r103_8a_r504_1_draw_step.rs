@@ -75,7 +75,7 @@ mod tests {
     }
 
     #[test]
-    fn the_active_player_draws_a_card_during_their_draw_step() -> TestResult {
+    fn r103_8a_the_active_player_draws_a_card_during_their_draw_step() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::builder().turn(2, turns::Step::Upkeep).players([
             P1.library([
                 cards::CardDefinition::from(GRIZZLY_BEARS),

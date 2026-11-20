@@ -55,7 +55,7 @@ mod tests {
     }
 
     #[test]
-    fn essence_scatter_counters_a_creature_spell() -> TestResult {
+    fn r701_6a_essence_scatter_counters_a_creature_spell() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([GRIZZLY_BEARS]).mana_pool(mana![1, G]),
             P2.hand([ESSENCE_SCATTER]).mana_pool(mana![1, U]),
@@ -75,7 +75,7 @@ mod tests {
     }
 
     #[test]
-    fn negate_counters_a_noncreature_spell() -> TestResult {
+    fn r701_6a_negate_counters_a_noncreature_spell() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
             P2.hand([NEGATE]).mana_pool(mana![1, U]),
@@ -96,7 +96,7 @@ mod tests {
     }
 
     #[test]
-    fn dispel_can_counter_a_cancel_so_the_outer_bolt_resolves() -> TestResult {
+    fn r701_6a_dispel_can_counter_a_cancel_so_the_outer_bolt_resolves() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([LIGHTNING_BOLT, DISPEL]).mana_pool(mana![R, U]),
             P2.hand([CANCEL]).mana_pool(mana![1, U, U]),
@@ -122,7 +122,7 @@ mod tests {
     }
 
     #[test]
-    fn cancelled_cancel_does_not_stop_the_outer_bolt() -> TestResult {
+    fn r701_6a_cancelled_cancel_does_not_stop_the_outer_bolt() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([LIGHTNING_BOLT, CANCEL]).mana_pool(mana![1, U, U, R]),
             P2.hand([CANCEL]).mana_pool(mana![1, U, U]),

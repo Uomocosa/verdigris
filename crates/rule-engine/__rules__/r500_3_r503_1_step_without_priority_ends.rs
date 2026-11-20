@@ -63,7 +63,7 @@ mod tests {
     }
 
     #[test]
-    fn cleanup_ends_the_turn_and_the_next_player_becomes_active() -> TestResult {
+    fn r500_3_cleanup_ends_the_turn_and_the_next_player_becomes_active() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([P1, P2]);
 
         game.play([p1.end_turn(), p2.end_turn()])?;

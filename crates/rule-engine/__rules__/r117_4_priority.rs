@@ -63,7 +63,7 @@ mod tests {
     }
 
     #[test]
-    fn all_players_passing_resolves_one_spell() -> TestResult {
+    fn r117_4_all_players_passing_resolves_one_spell() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([LIGHTNING_BOLT, LIGHTNING_BOLT]).mana_pool(mana![R, R]),
             P2,
@@ -82,7 +82,7 @@ mod tests {
     }
 
     #[test]
-    fn two_rounds_of_passing_resolves_both_spells() -> TestResult {
+    fn r117_4_two_rounds_of_passing_resolves_both_spells() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([LIGHTNING_BOLT, LIGHTNING_BOLT]).mana_pool(mana![R, R]),
             P2,
@@ -103,7 +103,7 @@ mod tests {
     }
 
     #[test]
-    fn priority_returns_to_the_active_player_after_a_spell_resolves() -> TestResult {
+    fn r117_4_priority_returns_to_the_active_player_after_a_spell_resolves() -> TestResult {
         let (mut game, [p1, p2]) =
             MockGame::new([P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]), P2]);
         let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;

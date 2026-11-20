@@ -5,4 +5,5 @@ pub mod rule_file_stem;
 pub mod rule_one_system;
 pub mod rule_registered;
 pub mod rule_registered_scan;
+pub mod rule_tests;
 pub mod verdigris_linter;

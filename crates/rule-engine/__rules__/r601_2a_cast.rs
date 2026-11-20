@@ -85,7 +85,7 @@ mod tests {
     }
 
     #[test]
-    fn sorcery_cannot_be_cast_on_an_opponents_turn() -> TestResult {
+    fn r601_2a_sorcery_cannot_be_cast_on_an_opponents_turn() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::builder()
             .turn(2, turns::Step::PrecombatMain)
             .players([P1.hand([DIVINATION]).mana_pool(mana![2, U]), P2.active()]);
@@ -103,7 +103,7 @@ mod tests {
     }
 
     #[test]
-    fn sorcery_cannot_be_cast_while_the_stack_is_not_empty() -> TestResult {
+    fn r601_2a_sorcery_cannot_be_cast_while_the_stack_is_not_empty() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([LIGHTNING_BOLT, DIVINATION]).mana_pool(mana![R, 2, U]),
             P2,

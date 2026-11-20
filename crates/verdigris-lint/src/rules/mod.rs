@@ -7,3 +7,4 @@ pub mod rule_file_stem_error;
 pub(crate) mod rule_one_system;
 pub(crate) mod rule_registered;
 pub(crate) mod rule_registered_scan;
+pub(crate) mod rule_tests;

@@ -112,7 +112,7 @@ mod tests {
     }
 
     #[test]
-    fn cannot_declare_another_players_creature() -> TestResult {
+    fn r508_1a_cannot_declare_another_players_creature() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield([GRIZZLY_BEARS]),
             P2.battlefield([GRIZZLY_BEARS]),

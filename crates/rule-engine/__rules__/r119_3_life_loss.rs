@@ -39,7 +39,7 @@ mod tests {
     }
 
     #[test]
-    fn sign_in_blood_makes_the_target_draw_two_cards_and_lose_two_life() -> TestResult {
+    fn r119_3_sign_in_blood_makes_the_target_draw_two_cards_and_lose_two_life() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([SIGN_IN_BLOOD]).mana_pool(mana![B, B]),
             P2.library([
@@ -61,7 +61,7 @@ mod tests {
     }
 
     #[test]
-    fn sign_in_blood_can_target_its_controller() -> TestResult {
+    fn r119_3_sign_in_blood_can_target_its_controller() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([SIGN_IN_BLOOD])
                 .library([
@@ -84,7 +84,7 @@ mod tests {
     }
 
     #[test]
-    fn sign_in_blood_targeting_an_empty_library_loses_the_game_at_the_next_state_based_check()
+    fn r119_3_sign_in_blood_targeting_an_empty_library_loses_the_game_at_the_next_state_based_check()
     -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([SIGN_IN_BLOOD]).mana_pool(mana![B, B]),

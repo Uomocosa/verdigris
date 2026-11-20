@@ -50,5 +50,6 @@ mod tests {
         assert!(linter.rules.iter().any(|rule| rule.code() == "VRDG002"));
         assert!(linter.rules.iter().any(|rule| rule.code() == "VRDG003"));
         assert!(linter.rules.iter().any(|rule| rule.code() == "VRDG004"));
+        assert!(linter.rules.iter().any(|rule| rule.code() == "VRDG005"));
     }
 }

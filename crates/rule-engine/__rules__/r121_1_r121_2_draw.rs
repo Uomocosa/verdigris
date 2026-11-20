@@ -63,7 +63,7 @@ mod tests {
     }
 
     #[test]
-    fn divination_draws_the_top_two_cards_of_the_library() -> TestResult {
+    fn r121_1_divination_draws_the_top_two_cards_of_the_library() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([DIVINATION])
                 .library([
