@@ -11,7 +11,7 @@ pub const EXEMPTIONS: [PathExemption; 5] = [
     PathExemption {
         code: "LELE031",
         root: RULES_ROOT,
-        reason: "Every rule file starts with a doc comment quoting the Comprehensive Rules text it enforces; that quotation is the rule's specification and the convention keeps it next to the system, outside the single constants.rs comment exception.",
+        reason: "Every rule file starts with a doc comment quoting the Comprehensive Rules text it enforces; that quotation is the rule's specification next to its system, and VRDG007 enforces the stricter verdigris version (only the system fn's doc comment, checked word-for-word against the rule text), outside the single constants.rs comment exception.",
     },
     PathExemption {
         code: "LELE034",
