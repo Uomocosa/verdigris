@@ -88,24 +88,7 @@ mod tests {
     use crate::turns;
 
     #[test]
-    fn test_usage() -> TestResult {
-        let (mut game, [p1, p2]) = MockGame::new([
-            P1.battlefield([GRIZZLY_BEARS]),
-            P2.battlefield([GRIZZLY_BEARS]),
-        ]);
-        let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
-        game.play([
-            p1.pass_to(turns::Step::DeclareAttackers),
-            p2.pass_to(turns::Step::DeclareAttackers),
-            p1.declare_attackers([bears]),
-        ])?;
-
-        assert!(game.app.world().get::<crate::cards::Attacking>(bears.into()).is_some());
-        Ok(())
-    }
-
-    #[test]
-    fn r508_1a_declared_creatures_become_attacking() -> TestResult {
+    fn declared_creatures_become_attacking() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield([GRIZZLY_BEARS]),
             P2.battlefield([GRIZZLY_BEARS]),
@@ -124,7 +107,7 @@ mod tests {
     }
 
     #[test]
-    fn r508_1a_cannot_declare_another_players_creature() -> TestResult {
+    fn cannot_declare_another_players_creature() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield([GRIZZLY_BEARS]),
             P2.battlefield([GRIZZLY_BEARS]),
@@ -151,7 +134,7 @@ mod tests {
     }
 
     #[test]
-    fn r508_1a_a_tapped_creature_cannot_be_declared_as_an_attacker() -> TestResult {
+    fn a_tapped_creature_cannot_be_declared_as_an_attacker() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield_tapped([GRIZZLY_BEARS]),
             P2.battlefield([GRIZZLY_BEARS]),
@@ -175,7 +158,7 @@ mod tests {
     }
 
     #[test]
-    fn r508_1a_a_creature_that_entered_this_turn_cannot_attack() -> TestResult {
+    fn a_creature_that_entered_this_turn_cannot_attack() -> TestResult {
         use crate::HAND;
         use crate::cards;
         use crate::mana;

@@ -80,7 +80,7 @@ mod tests {
     use crate::turns;
 
     #[test]
-    fn r507_1_the_active_player_chooses_one_opponent_as_the_defending_player() -> TestResult {
+    fn the_active_player_chooses_one_opponent_as_the_defending_player() -> TestResult {
         let (mut game, [p1, p2, p3]) =
             MockGame::builder().turn(2, turns::Step::BeginningOfCombat).players([
                 P1,
@@ -109,8 +109,7 @@ mod tests {
     }
 
     #[test]
-    fn r507_1_the_defending_player_marker_is_cleared_at_the_next_beginning_of_combat() -> TestResult
-    {
+    fn the_defending_player_marker_is_cleared_at_the_next_beginning_of_combat() -> TestResult {
         let (mut game, [p1, p2, p3]) = MockGame::new([P1, P2, P3]);
         game.play([
             p1.pass_to(turns::Step::BeginningOfCombat),
@@ -136,7 +135,7 @@ mod tests {
     }
 
     #[test]
-    fn r507_1_a_player_who_has_lost_cannot_be_chosen_as_the_defending_player() -> TestResult {
+    fn a_player_who_has_lost_cannot_be_chosen_as_the_defending_player() -> TestResult {
         let (mut game, [p1, p2, p3]) = MockGame::new([P1, P2, P3.life(0)]);
         game.play([
             p1.pass_to(turns::Step::BeginningOfCombat),
@@ -156,7 +155,7 @@ mod tests {
     }
 
     #[test]
-    fn test_usage() -> TestResult {
+    fn sole_opponent_automatically_becomes_defending_player() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([P1, P2]);
         game.play([
             p1.pass_to(turns::Step::BeginningOfCombat),

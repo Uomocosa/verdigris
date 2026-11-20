@@ -57,28 +57,7 @@ mod tests {
     use crate::turns;
 
     #[test]
-    fn test_usage() -> TestResult {
-        let (mut game, [p1, p2]) = MockGame::new([
-            P1.battlefield([GRIZZLY_BEARS]),
-            P2.battlefield([GRIZZLY_BEARS]),
-        ]);
-        let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
-        game.play([
-            p1.pass_to(turns::Step::DeclareAttackers),
-            p2.pass_to(turns::Step::DeclareAttackers),
-            p1.declare_attackers([bears]),
-        ])?;
-        game.play([
-            p1.pass_to(turns::Step::PostcombatMain),
-            p2.pass_to(turns::Step::PostcombatMain),
-        ])?;
-
-        assert!(game.app.world().get::<crate::cards::Attacking>(bears.into()).is_none());
-        Ok(())
-    }
-
-    #[test]
-    fn r511_3_blockers_are_removed_from_combat_after_end_of_combat() -> TestResult {
+    fn blockers_are_removed_from_combat_after_end_of_combat() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield([TYPHOID_RATS]),
             P2.battlefield([GRIZZLY_BEARS]),
@@ -109,7 +88,7 @@ mod tests {
     }
 
     #[test]
-    fn r506_4_a_creature_that_leaves_the_battlefield_is_removed_from_combat() -> TestResult {
+    fn a_creature_that_leaves_the_battlefield_is_removed_from_combat() -> TestResult {
         use crate::{GRAVEYARD, HAND};
 
         let (mut game, [p1, p2]) = MockGame::new([
@@ -135,7 +114,7 @@ mod tests {
     }
 
     #[test]
-    fn r511_3_attackers_are_removed_from_combat_after_end_of_combat() -> TestResult {
+    fn attackers_are_removed_from_combat_after_end_of_combat() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield([GRIZZLY_BEARS]),
             P2.battlefield([GRIZZLY_BEARS]),

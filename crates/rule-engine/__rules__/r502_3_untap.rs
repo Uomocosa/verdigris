@@ -33,7 +33,7 @@ mod tests {
     use crate::turns;
 
     #[test]
-    fn test_usage() -> TestResult {
+    fn untap_step_advances_to_upkeep() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield_tapped([GRIZZLY_BEARS]),
             P2.battlefield([GRIZZLY_BEARS]),
@@ -50,7 +50,7 @@ mod tests {
     }
 
     #[test]
-    fn r502_3_the_untap_step_untaps_the_active_players_permanents_only() -> TestResult {
+    fn the_untap_step_untaps_the_active_players_permanents_only() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield_tapped([GRIZZLY_BEARS]),
             P2.battlefield_tapped([GRIZZLY_BEARS]),
