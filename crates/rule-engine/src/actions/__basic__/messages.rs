@@ -15,5 +15,6 @@ pub enum Rejected {
     CannotPay { spell: Entity },
     InvalidTargets { spell: Entity },
     InvalidDiscard { player: Entity },
+    CannotAttack { attackers: Vec<Entity> },
     NoPriority { player: Entity },
 }

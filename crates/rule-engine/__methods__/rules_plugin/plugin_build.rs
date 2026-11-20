@@ -47,6 +47,7 @@ pub fn plugin_build(_rules_plugin: &RulesPlugin, app: &mut App) {
             rules::r601_2a_cast::r601_2a_cast,
             rules::r601_2c_targets::r601_2c_targets,
             rules::r601_2h_pay::r601_2h_pay,
+            rules::r508_1a_declare_attackers::r508_1a_declare_attackers,
         )
             .chain()
             .in_set(rules::RuleSet::Casting),

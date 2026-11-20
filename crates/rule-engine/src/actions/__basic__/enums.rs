@@ -7,6 +7,7 @@ pub enum Action {
     Cast(Entity),
     ChooseTargets(Vec<Entity>),
     ChooseDiscard(Vec<Entity>),
+    DeclareAttackers(Vec<Entity>),
     PassPriority,
 }
 

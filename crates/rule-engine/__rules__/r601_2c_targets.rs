@@ -103,7 +103,9 @@ pub fn r601_2c_targets(
                 ));
                 *pending = actions::PendingChoice(None);
             }
-            actions::Action::ChooseDiscard(_) | actions::Action::PassPriority => {}
+            actions::Action::ChooseDiscard(_)
+            | actions::Action::DeclareAttackers(_)
+            | actions::Action::PassPriority => {}
         }
     }
 }
