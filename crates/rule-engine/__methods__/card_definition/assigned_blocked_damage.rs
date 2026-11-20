@@ -91,48 +91,61 @@ pub fn assigned_blocked_damage(
 
 #[cfg(test)]
 mod tests {
-    use bevy::ecs::system::SystemState;
-    use bevy::prelude::{Entity, Query, World};
+    use bevy::prelude::Entity;
 
+    use crate::BATTLEFIELD;
+    use crate::HAND;
     use crate::cards;
     use crate::damage;
     use crate::effects;
-    use crate::pt;
+    use crate::mana;
+    use crate::testing::*;
+    use crate::turns;
 
     #[test]
-    fn test_usage() {
-        let mut world = World::new();
-        let attacker = cards::creature("Garruk's Companion", cards::Cost::default(), pt!(3, 2))
-            .keyword(cards::trample());
-        let source = world.spawn_empty().id();
-        let defending = world.spawn_empty().id();
-        let blocker = world
-            .spawn((
-                cards::creature("Grizzly Bears", cards::Cost::default(), pt!(2, 2)),
-                cards::Blocking(source),
-            ))
-            .id();
-        let mut blockers_state = SystemState::<
-            Query<(
-                Entity,
-                &cards::CardDefinition,
-                &cards::Blocking,
-                Option<&damage::Damage>,
-            )>,
-        >::new(&mut world);
-        let mut modifiers_state =
-            SystemState::<Query<&effects::PowerToughnessModifier>>::new(&mut world);
+    fn test_usage() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.battlefield([GARRUKS_COMPANION]),
+            P2.battlefield([GRIZZLY_BEARS]),
+        ]);
+        let [companion] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GARRUKS_COMPANION)?;
+        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareAttackers),
+            p2.pass_to(turns::Step::DeclareAttackers),
+            p1.declare_attackers([companion]),
+        ])?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareBlockers),
+            p2.pass_to(turns::Step::DeclareBlockers),
+        ])?;
+        game.play([
+            p1.pass_priority(),
+            p2.declare_blockers([(bears, companion)]),
+        ])?;
+
+        let attacker = (GARRUKS_COMPANION.definition)();
+        let source = Entity::from(companion);
+        let defending = Entity::from(p2);
+        let blocker = Entity::from(bears);
         let mut needed = Vec::new();
 
-        let blockers = blockers_state.get(&world).unwrap();
-        let modifiers = modifiers_state.get(&world).unwrap();
-        let writes = attacker.assigned_blocked_damage(
-            source,
-            3,
-            defending,
-            &blockers,
-            &modifiers,
-            &mut needed,
+        let writes = game.with_queries::<(
+            Entity,
+            &cards::CardDefinition,
+            &cards::Blocking,
+            Option<&damage::Damage>,
+        ), &effects::PowerToughnessModifier, Vec<damage::DamageDealt>>(
+            |blockers, modifiers| {
+                attacker.assigned_blocked_damage(
+                    source,
+                    3,
+                    defending,
+                    &blockers,
+                    &modifiers,
+                    &mut needed,
+                )
+            },
         );
 
         assert_eq!(
@@ -156,43 +169,58 @@ mod tests {
             ]
         );
         assert_eq!(needed.len(), 0);
+        Ok(())
     }
 
     #[test]
-    fn assigned_blocked_damage_counts_damage_already_marked_toward_lethal() {
-        let mut world = World::new();
-        let attacker = cards::creature("Garruk's Companion", cards::Cost::default(), pt!(3, 2))
-            .keyword(cards::trample());
-        let source = world.spawn_empty().id();
-        let defending = world.spawn_empty().id();
-        let blocker = world
-            .spawn((
-                cards::creature("Grizzly Bears", cards::Cost::default(), pt!(2, 2)),
-                cards::Blocking(source),
-                damage::Damage(1),
-            ))
-            .id();
-        let mut blockers_state = SystemState::<
-            Query<(
-                Entity,
-                &cards::CardDefinition,
-                &cards::Blocking,
-                Option<&damage::Damage>,
-            )>,
-        >::new(&mut world);
-        let mut modifiers_state =
-            SystemState::<Query<&effects::PowerToughnessModifier>>::new(&mut world);
+    fn assigned_blocked_damage_counts_damage_already_marked_toward_lethal() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.battlefield([GARRUKS_COMPANION]).hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
+            P2.battlefield([GIANT_SPIDER]),
+        ]);
+        let [companion] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GARRUKS_COMPANION)?;
+        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
+        let [spider] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GIANT_SPIDER)?;
+        game.play([
+            p1.cast(bolt).targeting(spider).pass_priority(),
+            p2.pass_priority(),
+        ])?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareAttackers),
+            p2.pass_to(turns::Step::DeclareAttackers),
+            p1.declare_attackers([companion]),
+        ])?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareBlockers),
+            p2.pass_to(turns::Step::DeclareBlockers),
+        ])?;
+        game.play([
+            p1.pass_priority(),
+            p2.declare_blockers([(spider, companion)]),
+        ])?;
+
+        let attacker = (GARRUKS_COMPANION.definition)();
+        let source = Entity::from(companion);
+        let defending = Entity::from(p2);
+        let blocker = Entity::from(spider);
         let mut needed = Vec::new();
 
-        let blockers = blockers_state.get(&world).unwrap();
-        let modifiers = modifiers_state.get(&world).unwrap();
-        let writes = attacker.assigned_blocked_damage(
-            source,
-            3,
-            defending,
-            &blockers,
-            &modifiers,
-            &mut needed,
+        let writes = game.with_queries::<(
+            Entity,
+            &cards::CardDefinition,
+            &cards::Blocking,
+            Option<&damage::Damage>,
+        ), &effects::PowerToughnessModifier, Vec<damage::DamageDealt>>(
+            |blockers, modifiers| {
+                attacker.assigned_blocked_damage(
+                    source,
+                    3,
+                    defending,
+                    &blockers,
+                    &modifiers,
+                    &mut needed,
+                )
+            },
         );
 
         assert_eq!(
@@ -216,5 +244,6 @@ mod tests {
             ]
         );
         assert_eq!(needed.len(), 0);
+        Ok(())
     }
 }

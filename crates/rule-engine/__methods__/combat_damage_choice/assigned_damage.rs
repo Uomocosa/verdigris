@@ -50,20 +50,28 @@ pub fn assigned_damage(
 
 #[cfg(test)]
 mod tests {
-    use bevy::prelude::World;
+    use bevy::prelude::Entity;
 
+    use crate::BATTLEFIELD;
     use crate::actions;
+    use crate::testing::*;
 
     use super::assigned_damage;
 
     #[test]
-    fn test_usage() {
-        let mut world = World::new();
-        let player = world.spawn_empty().id();
-        let source = world.spawn_empty().id();
-        let first = world.spawn_empty().id();
-        let second = world.spawn_empty().id();
-        let outsider = world.spawn_empty().id();
+    fn test_usage() -> TestResult {
+        let (game, [p1, p2, ..]) = MockGame::new([
+            P1.battlefield([GARRUKS_COMPANION]),
+            P2.battlefield([GRIZZLY_BEARS, GIANT_SPIDER]),
+        ]);
+        let [companion] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GARRUKS_COMPANION)?;
+        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        let [spider] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GIANT_SPIDER)?;
+        let player = Entity::from(p1);
+        let source = Entity::from(companion);
+        let first = Entity::from(bears);
+        let second = Entity::from(spider);
+        let outsider = Entity::from(p2);
 
         let choice = actions::CombatDamageChoice {
             player,
@@ -86,16 +94,23 @@ mod tests {
 
         assert!(assigned_damage(&choice, player, &split).is_some());
         assert!(assigned_damage(&choice, outsider, &split).is_none());
+        Ok(())
     }
 
     #[test]
-    fn assigned_damage_rejects_short_changed_illegal_and_repeated_targets() {
-        let mut world = World::new();
-        let player = world.spawn_empty().id();
-        let source = world.spawn_empty().id();
-        let first = world.spawn_empty().id();
-        let second = world.spawn_empty().id();
-        let outsider = world.spawn_empty().id();
+    fn assigned_damage_rejects_short_changed_illegal_and_repeated_targets() -> TestResult {
+        let (game, [p1, p2, ..]) = MockGame::new([
+            P1.battlefield([GARRUKS_COMPANION]),
+            P2.battlefield([GRIZZLY_BEARS, GIANT_SPIDER]),
+        ]);
+        let [companion] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GARRUKS_COMPANION)?;
+        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        let [spider] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GIANT_SPIDER)?;
+        let player = Entity::from(p1);
+        let source = Entity::from(companion);
+        let first = Entity::from(bears);
+        let second = Entity::from(spider);
+        let outsider = Entity::from(p2);
 
         let choice = actions::CombatDamageChoice {
             player,
@@ -141,5 +156,6 @@ mod tests {
             amount: 0,
         }];
         assert!(assigned_damage(&choice, player, &zero).is_none());
+        Ok(())
     }
 }
