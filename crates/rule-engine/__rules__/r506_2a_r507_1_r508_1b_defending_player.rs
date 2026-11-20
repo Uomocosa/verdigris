@@ -157,24 +157,14 @@ mod tests {
 
     #[test]
     fn test_usage() -> TestResult {
-        let (mut game, [p1, p2]) = MockGame::new([
-            P1.battlefield([GRIZZLY_BEARS]),
-            P2.battlefield([GRIZZLY_BEARS]),
-        ]);
-        let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        let (mut game, [p1, p2]) = MockGame::new([P1, P2]);
         game.play([
-            p1.pass_to(turns::Step::DeclareAttackers),
-            p2.pass_to(turns::Step::DeclareAttackers),
-            p1.declare_attackers([bears]),
-        ])?;
-        game.play([
-            p1.pass_to(turns::Step::CombatDamage),
-            p2.pass_to(turns::Step::CombatDamage),
-            p1.pass_priority(),
-            p2.pass_priority(),
+            p1.pass_to(turns::Step::BeginningOfCombat),
+            p2.pass_to(turns::Step::BeginningOfCombat),
         ])?;
 
-        assert_eq!(game.player(p2).life(), 18);
+        assert!(game.app.world().get::<players::DefendingPlayer>(p2.into()).is_some());
+        assert!(game.app.world().get::<players::DefendingPlayer>(p1.into()).is_none());
         Ok(())
     }
 }

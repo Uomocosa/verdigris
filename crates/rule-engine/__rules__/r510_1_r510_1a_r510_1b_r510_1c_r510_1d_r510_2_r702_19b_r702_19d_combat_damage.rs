@@ -346,14 +346,14 @@ mod tests {
         use crate::BATTLEFIELD;
 
         let (mut game, [p1, p2]) = MockGame::new([
-            P1.battlefield([GRIZZLY_BEARS]),
+            P1.battlefield([DARKSTEEL_MYR]),
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
-        let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        let [myr] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(DARKSTEEL_MYR)?;
         game.play([
             p1.pass_to(turns::Step::DeclareAttackers),
             p2.pass_to(turns::Step::DeclareAttackers),
-            p1.declare_attackers([bears]),
+            p1.declare_attackers([myr]),
         ])?;
         game.play([
             p1.pass_to(turns::Step::CombatDamage),
@@ -362,7 +362,8 @@ mod tests {
             p2.pass_priority(),
         ])?;
 
-        assert_eq!(game.player(p2).life(), 18);
+        assert_eq!(game.player(p2).life(), 20);
+        assert_eq!(game.zone_of(myr), BATTLEFIELD);
         Ok(())
     }
 }
