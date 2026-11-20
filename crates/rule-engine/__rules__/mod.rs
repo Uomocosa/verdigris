@@ -13,6 +13,7 @@ pub mod r502_3_untap;
 pub mod r506_4_r511_3_remove_from_combat;
 pub mod r508_1a_r508_1k_declare_attackers;
 pub mod r508_1f_tap_attackers;
+pub mod r508_8_skip_combat_steps;
 pub mod r509_1a_r509_1g_r509_1h_declare_blockers;
 pub mod r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_combat_damage;
 pub mod r514_1_cleanup_discard;

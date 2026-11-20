@@ -5,7 +5,12 @@ use crate::rules;
 pub fn add_step_end_systems(app: &mut App) {
     app.add_systems(
         Update,
-        rules::r500_1_r500_2_step_ends::r500_1_r500_2_step_ends.in_set(rules::RuleSet::StepEnd),
+        (
+            rules::r500_1_r500_2_step_ends::r500_1_r500_2_step_ends,
+            rules::r508_8_skip_combat_steps::r508_8_skip_combat_steps,
+        )
+            .chain()
+            .in_set(rules::RuleSet::StepEnd),
     );
 }
 
@@ -20,6 +25,6 @@ mod tests {
         let mut app = App::new();
         add_step_end_systems(&mut app);
 
-        assert_eq!(app.get_schedule(Update).map(Schedule::systems_len), Some(1));
+        assert_eq!(app.get_schedule(Update).map(Schedule::systems_len), Some(2));
     }
 }

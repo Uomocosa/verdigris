@@ -24,13 +24,12 @@ pub fn r500_1_r500_2_step_ends(
             turns::Step::Draw => turns::Step::PrecombatMain,
             turns::Step::PrecombatMain => turns::Step::BeginningOfCombat,
             turns::Step::BeginningOfCombat => turns::Step::DeclareAttackers,
-            turns::Step::DeclareAttackers => turns::Step::DeclareBlockers,
+            turns::Step::DeclareAttackers | turns::Step::Cleanup => continue,
             turns::Step::DeclareBlockers => turns::Step::CombatDamage,
             turns::Step::CombatDamage => turns::Step::EndOfCombat,
             turns::Step::EndOfCombat => turns::Step::PostcombatMain,
             turns::Step::PostcombatMain => turns::Step::End,
             turns::Step::End => turns::Step::Cleanup,
-            turns::Step::Cleanup => continue,
         };
         turn.step = next;
         priority.consecutive_passes = 0;
