@@ -1,5 +1,6 @@
 mod helpers;
 
+pub mod r106_4_mana_empties;
 pub mod r117_3_priority;
 pub mod r117_4_priority;
 pub mod r119_3_life_loss;

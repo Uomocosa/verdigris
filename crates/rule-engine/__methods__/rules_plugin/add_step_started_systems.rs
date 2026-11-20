@@ -5,7 +5,12 @@ use crate::rules;
 pub fn add_step_started_systems(app: &mut App) {
     app.add_systems(
         Update,
-        rules::r504_1_draw_step::r504_1_draw_step.in_set(rules::RuleSet::StepStarted),
+        (
+            rules::r106_4_mana_empties::r106_4_mana_empties,
+            rules::r504_1_draw_step::r504_1_draw_step,
+        )
+            .chain()
+            .in_set(rules::RuleSet::StepStarted),
     );
     app.add_systems(
         Update,
@@ -33,6 +38,6 @@ mod tests {
         let mut app = App::new();
         add_step_started_systems(&mut app);
 
-        assert_eq!(app.get_schedule(Update).map(Schedule::systems_len), Some(4));
+        assert_eq!(app.get_schedule(Update).map(Schedule::systems_len), Some(5));
     }
 }

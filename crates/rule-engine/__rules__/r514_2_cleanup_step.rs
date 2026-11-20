@@ -30,11 +30,12 @@ pub fn r514_2_cleanup_step(
 
 #[cfg(test)]
 mod tests {
+    use crate::actions;
     use crate::damage;
     use crate::effects;
     use crate::mana;
     use crate::testing::*;
-    use crate::{BATTLEFIELD, GRAVEYARD, HAND};
+    use crate::{BATTLEFIELD, GRAVEYARD, HAND, MAIN_1};
 
     #[test]
     fn test_usage() {
@@ -93,8 +94,7 @@ mod tests {
     fn r514_2_until_end_of_turn_effect_expires_before_the_next_bolt() {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([GIANT_GROWTH, LIGHTNING_BOLT])
-                .battlefield([GRIZZLY_BEARS])
-                .mana_pool(mana![G, R]),
+                .battlefield([FOREST, MOUNTAIN, GRIZZLY_BEARS]),
             P2,
         ]);
         let [growth] = game
@@ -115,7 +115,20 @@ mod tests {
             .matching(GRIZZLY_BEARS)
             .exactly::<1>()
             .unwrap();
+        let [forest] = game
+            .player(p1)
+            .cards_in(BATTLEFIELD)
+            .matching(FOREST)
+            .exactly::<1>()
+            .unwrap();
+        let [mountain] = game
+            .player(p1)
+            .cards_in(BATTLEFIELD)
+            .matching(MOUNTAIN)
+            .exactly::<1>()
+            .unwrap();
 
+        game.act(p1, actions::Action::ActivateManaAbility(forest.into()));
         game.play([
             p1.cast(growth).targeting(bears).pass_priority(),
             p2.pass_priority(),
@@ -123,8 +136,10 @@ mod tests {
         .unwrap();
         game.play([p1.end_turn(), p2.end_turn()]).unwrap();
         game.play([p1.end_turn(), p2.end_turn()]).unwrap();
+        game.play([p1.pass_to(MAIN_1), p2.pass_to(MAIN_1)]).unwrap();
+
+        game.act(p1, actions::Action::ActivateManaAbility(mountain.into()));
         game.play([
-            p1.pass_priority(),
             p1.cast(bolt).targeting(bears).pass_priority(),
             p2.pass_priority(),
         ])

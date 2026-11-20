@@ -40,7 +40,6 @@ pub fn r704_5h_deathtouch_damage(
 mod tests {
     use crate::GRAVEYARD;
     use crate::actions;
-    use crate::mana;
     use crate::testing::*;
     use crate::turns;
     use crate::{BATTLEFIELD, HAND};
@@ -176,9 +175,7 @@ mod tests {
     fn r704_5h_damage_without_deathtouch_does_not_destroy_a_two_two() {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield([WALKING_CORPSE]),
-            P2.battlefield([GRIZZLY_BEARS])
-                .hand([GIANT_GROWTH])
-                .mana_pool(mana![G]),
+            P2.battlefield([GRIZZLY_BEARS, FOREST]).hand([GIANT_GROWTH]),
         ]);
         game.play([
             p1.pass_to(turns::Step::DeclareAttackers),
@@ -217,6 +214,13 @@ mod tests {
             .matching(GIANT_GROWTH)
             .exactly::<1>()
             .unwrap();
+        let [forest] = game
+            .player(p2)
+            .cards_in(BATTLEFIELD)
+            .matching(FOREST)
+            .exactly::<1>()
+            .unwrap();
+        game.act(p2, actions::Action::ActivateManaAbility(forest.into()));
         game.play([
             p2.cast(growth).targeting(bears).pass_priority(),
             p1.pass_priority(),
