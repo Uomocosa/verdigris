@@ -1,7 +1,6 @@
 mod active_auto_pass;
 #[path = "__basic__/mod.rs"]
 mod basic;
-mod card;
 mod card_query;
 mod cards;
 mod cards_error;
@@ -17,14 +16,12 @@ mod player_view;
 mod targets;
 mod test_ability;
 mod test_card;
-mod test_card_name;
 mod test_error;
 mod test_player;
 mod test_player_actions;
 mod test_result;
 
 pub use basic::enums::{AutoPassUntil, PlayStep};
-pub use card::Card;
 pub use card_query::CardQuery;
 pub use cards::Cards;
 pub use cards_error::CardsError;
@@ -39,7 +36,6 @@ pub use player_view::PlayerView;
 pub use targets::Targets;
 pub use test_ability::TestAbility;
 pub use test_card::TestCard;
-pub use test_card_name::TestCardName;
 pub use test_error::TestError;
 pub use test_player::TestPlayer;
 pub use test_player_actions::TestPlayerActions;

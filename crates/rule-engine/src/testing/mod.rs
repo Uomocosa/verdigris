@@ -1,13 +1,16 @@
 #[path = "__app__/mod.rs"]
 mod app;
+#[path = "__basic__/mod.rs"]
+mod basic;
 #[path = "__fixtures__/mod.rs"]
 mod fixtures;
 
 pub use app::{
-    AutoPassUntil, Card, CardQuery, Cards, CardsError, CardsInZone, MockGame, MockGameBuilder, P1,
-    P2, P3, P4, P5, P6, P7, P8, PlayError, PlayStep, PlayerSeat, PlayerSetup, PlayerView, Targets,
-    TestAbility, TestCard, TestCardName, TestError, TestPlayer, TestPlayerActions, TestResult,
+    AutoPassUntil, CardQuery, Cards, CardsError, CardsInZone, MockGame, MockGameBuilder, P1, P2,
+    P3, P4, P5, P6, P7, P8, PlayError, PlayStep, PlayerSeat, PlayerSetup, PlayerView, Targets,
+    TestAbility, TestCard, TestError, TestPlayer, TestPlayerActions, TestResult,
 };
+pub use basic::{newtypes::TestCardName, structs::Card};
 pub use fixtures::{
     CANCEL, CHILD_OF_NIGHT, DARKSTEEL_MYR, DISFIGURE, DISPEL, DIVINATION, DOOM_BLADE,
     ESSENCE_SCATTER, ExpectedTargets, FOREST, GARRUKS_COMPANION, GIANT_GROWTH, GIANT_SPIDER,
