@@ -61,7 +61,7 @@ mod tests {
             .unwrap();
         game.play([p1.cast(bolt).targeting(p2)]).unwrap();
         assert!(game.last_rejection().is_none());
-        assert_eq!(game.mana_pool(p1), cards::ManaPool::default());
+        assert_eq!(game.mana_pool(p1), cards::ManaPool::EMPTY);
     }
 
     #[test]

@@ -3,7 +3,7 @@ use bevy::prelude::Component;
 
 use crate::cards;
 
-#[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Default)]
+#[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct ManaPool {
     pub white: u32,
     pub blue: u32,
@@ -11,6 +11,12 @@ pub struct ManaPool {
     pub red: u32,
     pub green: u32,
     pub colorless: u32,
+}
+
+impl Default for ManaPool {
+    fn default() -> Self {
+        Self::EMPTY
+    }
 }
 
 impl ManaPool {
@@ -68,17 +74,13 @@ mod tests {
 
     #[test]
     fn test_usage() {
+        assert_eq!(cards::ManaPool::default(), cards::ManaPool::EMPTY);
         let pool = mana![2, G];
         assert_eq!(pool.green, 1);
         assert_eq!(pool.colorless, 2);
-        assert_eq!(
-            cards::ManaPool::default()
-                .plus(cards::ManaSymbol::Blue)
-                .blue,
-            1
-        );
+        assert_eq!(cards::ManaPool::EMPTY.plus(cards::ManaSymbol::Blue).blue, 1);
         let mut pool = mana![1, B, B];
         assert!(pool.pay(cost![1, B, B]));
-        assert_eq!(pool, cards::ManaPool::default());
+        assert_eq!(pool, cards::ManaPool::EMPTY);
     }
 }

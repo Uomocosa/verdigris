@@ -30,7 +30,7 @@ macro_rules! cost {
 #[macro_export]
 macro_rules! mana {
     ($($symbol:tt),* $(,)?) => {
-        $crate::cards::ManaPool::default()$(.plus($crate::mana_symbol!($symbol)))*
+        $crate::cards::ManaPool::EMPTY$(.plus($crate::mana_symbol!($symbol)))*
     };
 }
 

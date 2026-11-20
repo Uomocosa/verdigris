@@ -31,7 +31,7 @@ mod tests {
     fn test_usage() {
         let mut pool = mana![1, B, B];
         assert!(pay(&mut pool, cost![1, B, B]));
-        assert_eq!(pool, cards::ManaPool::default());
+        assert_eq!(pool, cards::ManaPool::EMPTY);
         assert!(!pay(&mut pool, cost![B]));
     }
 }
