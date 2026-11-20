@@ -80,6 +80,37 @@ up right after that step, with a comment.
 **Why:** the reader learns what is on the table before reading what happens to it, and a
 lookup placed after `play` silently depends on the card not having moved.
 
+## 4. Test levels and fixtures
+
+Each scenario is tested at exactly one level (RATIONALE §21, SMELLS S12):
+
+| Level | Where | What it tests | Style |
+| Method | `__methods__/…` `test_usage` | how to call it, one minimal case; honest corners as `#[rstest]` | `testing` fixtures |
+| Rule | `__rules__/` with `MockGame` | simple tests, one rule at a time, the smallest setup that shows it | `MockGame` + fixtures |
+| Scenario | `tests/` (planned, does not exist yet) | complex games where several rules interact, an expected outcome, detailed asserts | `MockGame` |
+
+A method test does not repeat what its rule test shows; a `tests/` scenario exists only
+when several rules interact.
+
+Cards in tests come from `testing` fixtures (`testing::GARRUKS_COMPANION`,
+`testing::GRIZZLY_BEARS`, …; call `(FIXTURE.definition)()` where a `CardDefinition` is
+needed), never `cards::creature(..)` built in a test (RATIONALE §20, SMELLS S11). A
+missing card gets a new fixture in `crates/rule-engine/src/testing/__fixtures__/`.
+
+```rust
+// Good
+let attacker = (testing::GARRUKS_COMPANION.definition)();
+
+// Bad — hand-built card in a test
+let attacker = cards::creature("Garruk's Companion", cards::Cost::default(), pt!(3, 2)).keyword(cards::trample());
+```
+
+The crate's own tests use `crate::testing`: `crates/rule-engine/Cargo.toml` enables the
+`testing` feature for the dev-dependency on itself (lines ~18-21), and `src/lib.rs`
+gates `pub mod testing` on that feature (line ~11).
+
+**Why:** one copy of each card and each scenario, so a rules change touches one place.
+
 ## Adding rules here
 
 Add a section per decision the user makes about how verdigris code should look: a one-line
