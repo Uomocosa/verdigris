@@ -8,6 +8,29 @@ impl Plugin for RulesPlugin {
     fn build(&self, app: &mut App) {}
 }
 
+#[atomic_delegates]
+impl RulesPlugin {
+    pub fn register_messages_and_resources(app: &mut App) {}
+
+    pub fn configure_schedule_sets(app: &mut App) {}
+
+    pub fn add_turn_systems(app: &mut App) {}
+
+    pub fn add_casting_systems(app: &mut App) {}
+
+    pub fn add_resolution_systems(app: &mut App) {}
+
+    pub fn add_state_based_systems(app: &mut App) {}
+
+    pub fn add_step_end_systems(app: &mut App) {}
+
+    pub fn add_step_started_systems(app: &mut App) {}
+
+    pub fn add_cleanup_systems(app: &mut App) {}
+
+    pub fn add_turn_end_systems(app: &mut App) {}
+}
+
 #[cfg(test)]
 mod tests {
     use bevy::prelude::App;

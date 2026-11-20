@@ -1,0 +1,33 @@
+use bevy::prelude::{App, IntoScheduleConfigs, Update};
+
+use crate::rules;
+
+pub fn add_casting_systems(app: &mut App) {
+    app.add_systems(
+        Update,
+        (
+            rules::r601_2a_cast::r601_2a_cast,
+            rules::r601_2c_targets::r601_2c_targets,
+            rules::r601_2h_pay::r601_2h_pay,
+            rules::r508_1a_declare_attackers::r508_1a_declare_attackers,
+            rules::r508_1f_tap_attackers::r508_1f_tap_attackers,
+        )
+            .chain()
+            .in_set(rules::RuleSet::Casting),
+    );
+}
+
+#[cfg(test)]
+mod tests {
+    use bevy::prelude::{App, Schedule, Update};
+
+    use super::add_casting_systems;
+
+    #[test]
+    fn test_usage() {
+        let mut app = App::new();
+        add_casting_systems(&mut app);
+
+        assert_eq!(app.get_schedule(Update).map(Schedule::systems_len), Some(5));
+    }
+}
