@@ -58,14 +58,14 @@ mod tests {
             Some(effects::PlayerRef::You)
         );
         let bears = (testing::GRIZZLY_BEARS.definition)();
-        let murder = (testing::MURDER.definition)();
+        let bolt = (testing::LIGHTNING_BOLT.definition)();
         let instant_spell = effects::Filter {
             kind: effects::FilterKind::InstantSpell,
             ..ANY_TARGET
         };
         assert!(CREATURE.does_creature_match(&bears));
         assert!(!CREATURE.does_spell_match(&bears));
-        assert!(instant_spell.does_spell_match(&murder));
-        assert!(!instant_spell.does_creature_match(&murder));
+        assert!(instant_spell.does_spell_match(&bolt));
+        assert!(!instant_spell.does_creature_match(&bolt));
     }
 }
