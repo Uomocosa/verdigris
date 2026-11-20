@@ -25,7 +25,7 @@ mod tests {
     use crate::testing::*;
 
     #[test]
-    fn test_usage() -> Result<(), TestError> {
+    fn test_usage() -> TestResult {
         let (mut game, [p1, p2]) =
             MockGame::new([P1.hand([SIGN_IN_BLOOD]).mana_pool(mana![B, B]), P2]);
         let [sign_in_blood] = game.player(p1).cards_in(HAND).exactly::<1>(SIGN_IN_BLOOD)?;
@@ -38,7 +38,7 @@ mod tests {
     }
 
     #[test]
-    fn sign_in_blood_makes_the_target_draw_two_cards_and_lose_two_life() -> Result<(), TestError> {
+    fn sign_in_blood_makes_the_target_draw_two_cards_and_lose_two_life() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([SIGN_IN_BLOOD]).mana_pool(mana![B, B]),
             P2.library([
@@ -60,7 +60,7 @@ mod tests {
     }
 
     #[test]
-    fn sign_in_blood_can_target_its_controller() -> Result<(), TestError> {
+    fn sign_in_blood_can_target_its_controller() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([SIGN_IN_BLOOD])
                 .library([
@@ -84,7 +84,7 @@ mod tests {
 
     #[test]
     fn sign_in_blood_targeting_an_empty_library_loses_the_game_at_the_next_state_based_check()
-    -> Result<(), TestError> {
+    -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([SIGN_IN_BLOOD]).mana_pool(mana![B, B]),
             P2.library([]),

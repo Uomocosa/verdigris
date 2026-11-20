@@ -93,7 +93,7 @@ mod tests {
     use crate::{BATTLEFIELD, GRAVEYARD, HAND};
 
     #[test]
-    fn test_usage() -> Result<(), TestError> {
+    fn test_usage() -> TestResult {
         let (mut game, [p1, p2]) =
             MockGame::new([P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]), P2]);
         let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
@@ -106,7 +106,7 @@ mod tests {
     }
 
     #[test]
-    fn test_bolt_fizzles_when_target_gone() -> Result<(), TestError> {
+    fn test_bolt_fizzles_when_target_gone() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([LIGHTNING_BOLT, MURDER]).mana_pool(mana![1, B, B, R]),
             P2.battlefield([GRIZZLY_BEARS]),
@@ -130,7 +130,7 @@ mod tests {
     }
 
     #[test]
-    fn doom_blade_fizzles_when_its_target_becomes_black() -> Result<(), TestError> {
+    fn doom_blade_fizzles_when_its_target_becomes_black() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([DOOM_BLADE]).mana_pool(mana![1, B]),
             P2.battlefield([GRIZZLY_BEARS]),

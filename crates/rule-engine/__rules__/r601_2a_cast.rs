@@ -75,7 +75,7 @@ mod tests {
     use crate::{HAND, STACK};
 
     #[test]
-    fn test_usage() -> Result<(), TestError> {
+    fn test_usage() -> TestResult {
         let (mut game, [p1, ..]) =
             MockGame::new([P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]), P2]);
         let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
@@ -85,12 +85,12 @@ mod tests {
     }
 
     #[test]
-    fn sorcery_cannot_be_cast_on_an_opponents_turn() {
+    fn sorcery_cannot_be_cast_on_an_opponents_turn() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::builder()
             .turn(2, turns::Step::PrecombatMain)
             .players([P1.hand([DIVINATION]).mana_pool(mana![2, U]), P2.active()]);
-        game.play([p2.pass_priority()]).unwrap();
-        let [divination] = game.player(p1).cards_in(HAND).exactly::<1>(DIVINATION).unwrap();
+        game.play([p2.pass_priority()])?;
+        let [divination] = game.player(p1).cards_in(HAND).exactly::<1>(DIVINATION)?;
         let err = game.play([p1.cast(divination)]).unwrap_err();
         assert_eq!(
             err.rejection(),
@@ -99,17 +99,18 @@ mod tests {
             })
         );
         assert_eq!(game.zone_of(divination), HAND);
+        Ok(())
     }
 
     #[test]
-    fn sorcery_cannot_be_cast_while_the_stack_is_not_empty() {
+    fn sorcery_cannot_be_cast_while_the_stack_is_not_empty() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([LIGHTNING_BOLT, DIVINATION]).mana_pool(mana![R, 2, U]),
             P2,
         ]);
-        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT).unwrap();
-        game.play([p1.cast(bolt).targeting(p2)]).unwrap();
-        let [divination] = game.player(p1).cards_in(HAND).exactly::<1>(DIVINATION).unwrap();
+        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
+        game.play([p1.cast(bolt).targeting(p2)])?;
+        let [divination] = game.player(p1).cards_in(HAND).exactly::<1>(DIVINATION)?;
         let err = game.play([p1.cast(divination)]).unwrap_err();
         assert_eq!(
             err.rejection(),
@@ -118,5 +119,6 @@ mod tests {
             })
         );
         assert_eq!(game.zone_of(divination), HAND);
+        Ok(())
     }
 }

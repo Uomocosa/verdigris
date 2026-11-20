@@ -122,7 +122,7 @@ mod tests {
     use super::play;
 
     #[test]
-    fn test_usage() -> Result<(), TestError> {
+    fn test_usage() -> TestResult {
         let (mut game, [p1, p2]) =
             MockGame::new([P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]), P2]);
         let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
@@ -137,9 +137,9 @@ mod tests {
     }
 
     #[test]
-    fn play_with_an_empty_mana_pool_reports_the_rejection() {
+    fn play_with_an_empty_mana_pool_reports_the_rejection() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([P1.hand([LIGHTNING_BOLT]), P2]);
-        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT).unwrap();
+        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
 
         let error = play(
             &mut game,
@@ -155,11 +155,11 @@ mod tests {
                 rejection: actions::Rejected::CannotPay { spell: bolt.into() },
             }
         );
+        Ok(())
     }
 
     #[test]
-    fn a_negate_counters_a_bolt_and_the_turn_advances_to_the_next_player() -> Result<(), TestError>
-    {
+    fn a_negate_counters_a_bolt_and_the_turn_advances_to_the_next_player() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
             P2.hand([NEGATE]).mana_pool(mana![1, U]),
@@ -182,7 +182,7 @@ mod tests {
     }
 
     #[test]
-    fn a_dispel_counters_a_cancel_so_the_bolt_resolves() -> Result<(), TestError> {
+    fn a_dispel_counters_a_cancel_so_the_bolt_resolves() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([LIGHTNING_BOLT, DISPEL]).mana_pool(mana![R, U]),
             P2.hand([CANCEL]).mana_pool(mana![1, U, U]),
@@ -206,7 +206,7 @@ mod tests {
     }
 
     #[test]
-    fn pass_to_advances_both_players_to_the_requested_step() -> Result<(), TestError> {
+    fn pass_to_advances_both_players_to_the_requested_step() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([P1, P2]);
 
         game.play([p1.pass_to(MAIN_2), p2.pass_to(MAIN_2)])?;
@@ -219,7 +219,7 @@ mod tests {
     }
 
     #[test]
-    fn end_phase_lands_on_the_first_step_of_the_next_phase() -> Result<(), TestError> {
+    fn end_phase_lands_on_the_first_step_of_the_next_phase() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([P1, P2]);
 
         game.play([p1.end_phase(), p2.end_phase()])?;
@@ -232,7 +232,7 @@ mod tests {
     }
 
     #[test]
-    fn end_current_step_moves_exactly_one_step() -> Result<(), TestError> {
+    fn end_current_step_moves_exactly_one_step() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([P1, P2]);
 
         game.play([p1.end_current_step(), p2.end_current_step()])?;
@@ -245,7 +245,7 @@ mod tests {
     }
 
     #[test]
-    fn activate_ability_with_only_on_a_forest_adds_green() -> Result<(), TestError> {
+    fn activate_ability_with_only_on_a_forest_adds_green() -> TestResult {
         let (mut game, [p1, ..]) = MockGame::new([P1.battlefield([FOREST]), P2]);
         let [forest] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(FOREST)?;
 
@@ -256,9 +256,9 @@ mod tests {
     }
 
     #[test]
-    fn activate_ability_with_only_on_a_tundra_is_ambiguous() {
+    fn activate_ability_with_only_on_a_tundra_is_ambiguous() -> TestResult {
         let (mut game, [p1, ..]) = MockGame::new([P1.battlefield([TUNDRA]), P2]);
-        let [tundra] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TUNDRA).unwrap();
+        let [tundra] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TUNDRA)?;
 
         let error = game.play([p1.activate_ability(tundra.ability())]).unwrap_err();
 
@@ -271,10 +271,11 @@ mod tests {
             }
         );
         assert_eq!(game.mana_pool(p1), mana![]);
+        Ok(())
     }
 
     #[test]
-    fn activate_ability_with_mana_ability_on_a_tundra_adds_blue() -> Result<(), TestError> {
+    fn activate_ability_with_mana_ability_on_a_tundra_adds_blue() -> TestResult {
         let (mut game, [p1, ..]) = MockGame::new([P1.battlefield([TUNDRA]), P2]);
         let [tundra] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TUNDRA)?;
 

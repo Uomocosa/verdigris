@@ -21,6 +21,7 @@ mod test_card_name;
 mod test_error;
 mod test_player;
 mod test_player_actions;
+mod test_result;
 
 pub use basic::enums::{AutoPassUntil, PlayStep};
 pub use card::Card;
@@ -42,6 +43,7 @@ pub use test_card_name::TestCardName;
 pub use test_error::TestError;
 pub use test_player::TestPlayer;
 pub use test_player_actions::TestPlayerActions;
+pub use test_result::TestResult;
 
 pub use active_auto_pass::ActiveAutoPass;
 pub use pass_budget::PassBudget;

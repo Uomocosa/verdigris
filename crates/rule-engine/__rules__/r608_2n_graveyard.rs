@@ -45,7 +45,7 @@ mod tests {
     use crate::{GRAVEYARD, HAND};
 
     #[test]
-    fn test_usage() -> Result<(), TestError> {
+    fn test_usage() -> TestResult {
         let (mut game, [p1, p2]) =
             MockGame::new([P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]), P2]);
         let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;

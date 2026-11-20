@@ -43,7 +43,7 @@ mod tests {
     use crate::{BATTLEFIELD, GRAVEYARD, HAND};
 
     #[test]
-    fn test_usage() -> Result<(), TestError> {
+    fn test_usage() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([DISFIGURE]).mana_pool(mana![B]),
             P2.battlefield([GRIZZLY_BEARS]),
@@ -59,8 +59,7 @@ mod tests {
     }
 
     #[test]
-    fn r704_5f_zero_toughness_puts_a_zero_toughness_creature_in_the_graveyard()
-    -> Result<(), TestError> {
+    fn r704_5f_zero_toughness_puts_a_zero_toughness_creature_in_the_graveyard() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([DISFIGURE]).mana_pool(mana![B]),
             P2.battlefield([GRIZZLY_BEARS]),

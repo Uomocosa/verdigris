@@ -84,7 +84,7 @@ mod tests {
     }
 
     #[test]
-    fn exactly_returns_the_single_matching_card() -> Result<(), TestError> {
+    fn exactly_returns_the_single_matching_card() -> TestResult {
         let (game, [p1, ..]) = MockGame::new([P1.hand([LIGHTNING_BOLT]), P2]);
         let cards = game.player(p1).cards_in(HAND);
         let [found] = cards.exactly::<1>(LIGHTNING_BOLT)?;

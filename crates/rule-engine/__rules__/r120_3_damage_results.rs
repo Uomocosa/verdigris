@@ -46,7 +46,7 @@ mod tests {
     use crate::{BATTLEFIELD, GRAVEYARD, HAND};
 
     #[test]
-    fn test_usage() -> Result<(), TestError> {
+    fn test_usage() -> TestResult {
         let (mut game, [p1, p2]) =
             MockGame::builder().turn(1, turns::Step::PrecombatMain).players([
                 P1.battlefield([WALKING_CORPSE]),

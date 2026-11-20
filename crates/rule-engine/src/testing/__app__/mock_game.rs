@@ -116,7 +116,7 @@ mod tests {
     }
 
     #[test]
-    fn default_game_has_two_players_twenty_life_and_full_libraries() -> Result<(), TestError> {
+    fn default_game_has_two_players_twenty_life_and_full_libraries() -> TestResult {
         let (game, [p1, p2]) = MockGame::new([P1, P2]);
         assert_eq!(game.life(p1), 20);
         assert_eq!(game.life(p2), 20);

@@ -79,7 +79,7 @@ mod tests {
     use crate::turns;
 
     #[test]
-    fn test_usage() -> Result<(), TestError> {
+    fn test_usage() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield([GRIZZLY_BEARS]),
             P2.battlefield([GRIZZLY_BEARS]),
@@ -96,7 +96,7 @@ mod tests {
     }
 
     #[test]
-    fn r508_1a_declared_creatures_become_attacking() -> Result<(), TestError> {
+    fn r508_1a_declared_creatures_become_attacking() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield([GRIZZLY_BEARS]),
             P2.battlefield([GRIZZLY_BEARS]),
@@ -115,7 +115,7 @@ mod tests {
     }
 
     #[test]
-    fn cannot_declare_another_players_creature() -> Result<(), TestError> {
+    fn cannot_declare_another_players_creature() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield([GRIZZLY_BEARS]),
             P2.battlefield([GRIZZLY_BEARS]),
@@ -142,7 +142,7 @@ mod tests {
     }
 
     #[test]
-    fn r508_1a_a_tapped_creature_cannot_be_declared_as_an_attacker() -> Result<(), TestError> {
+    fn r508_1a_a_tapped_creature_cannot_be_declared_as_an_attacker() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield_tapped([GRIZZLY_BEARS]),
             P2.battlefield([GRIZZLY_BEARS]),

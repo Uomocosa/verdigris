@@ -40,7 +40,7 @@ mod tests {
     use crate::{BATTLEFIELD, GRAVEYARD, HAND};
 
     #[test]
-    fn test_usage() -> Result<(), TestError> {
+    fn test_usage() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([MURDER]).mana_pool(mana![1, B, B]),
             P2.battlefield([DARKSTEEL_MYR]),
@@ -56,7 +56,7 @@ mod tests {
     }
 
     #[test]
-    fn r702_12b_indestructible_ignores_destroy_effects() -> Result<(), TestError> {
+    fn r702_12b_indestructible_ignores_destroy_effects() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([MURDER]).mana_pool(mana![1, B, B]),
             P2.battlefield([DARKSTEEL_MYR]),
@@ -74,7 +74,7 @@ mod tests {
     }
 
     #[test]
-    fn r702_12b_indestructible_survives_lethal_damage() -> Result<(), TestError> {
+    fn r702_12b_indestructible_survives_lethal_damage() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
             P2.battlefield([DARKSTEEL_MYR]),
@@ -92,7 +92,7 @@ mod tests {
     }
 
     #[test]
-    fn r702_12b_indestructible_survives_doom_blade() -> Result<(), TestError> {
+    fn r702_12b_indestructible_survives_doom_blade() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([DOOM_BLADE]).mana_pool(mana![1, B]),
             P2.battlefield([DARKSTEEL_MYR]),

@@ -51,7 +51,7 @@ mod tests {
     use crate::turns;
 
     #[test]
-    fn test_usage() -> Result<(), TestError> {
+    fn test_usage() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([P1, P2]);
         game.play([p1.pass_priority()])?;
         assert_eq!(game.app.world().resource::<turns::Priority>().player, p2);
@@ -59,7 +59,7 @@ mod tests {
     }
 
     #[test]
-    fn passing_moves_priority_to_the_next_player_in_turn_order() -> Result<(), TestError> {
+    fn passing_moves_priority_to_the_next_player_in_turn_order() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([P1, P2]);
 
         game.play([p1.pass_priority()])?;
@@ -72,7 +72,7 @@ mod tests {
     }
 
     #[test]
-    fn a_four_player_game_passes_priority_in_a_ring() -> Result<(), TestError> {
+    fn a_four_player_game_passes_priority_in_a_ring() -> TestResult {
         let (mut game, [p1, p2, p3, p4]) = MockGame::new([P1, P2, P3, P4]);
         let expected = [p2, p3, p4];
         let holders = [p1, p2, p3];
@@ -85,7 +85,7 @@ mod tests {
     }
 
     #[test]
-    fn the_caster_keeps_priority_after_casting_a_spell() -> Result<(), TestError> {
+    fn the_caster_keeps_priority_after_casting_a_spell() -> TestResult {
         let (mut game, [p1, p2]) =
             MockGame::new([P1, P2.hand([LIGHTNING_BOLT]).mana_pool(mana![R])]);
         let [bolt] = game.player(p2).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;

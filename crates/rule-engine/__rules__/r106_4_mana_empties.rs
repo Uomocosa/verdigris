@@ -28,7 +28,7 @@ mod tests {
     use crate::turns;
 
     #[test]
-    fn test_usage() -> Result<(), TestError> {
+    fn test_usage() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([P1.mana_pool(mana![R]), P2]);
 
         game.play([p1.pass_priority(), p2.pass_priority()])?;
@@ -41,7 +41,7 @@ mod tests {
     }
 
     #[test]
-    fn r106_4_unspent_mana_empties_when_the_step_ends() -> Result<(), TestError> {
+    fn r106_4_unspent_mana_empties_when_the_step_ends() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([P1.mana_pool(mana![R, 2, U]), P2]);
         assert_eq!(game.mana_pool(p1), mana![R, 2, U]);
 

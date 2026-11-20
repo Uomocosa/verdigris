@@ -20,7 +20,7 @@ mod tests {
     use crate::turns;
 
     #[test]
-    fn test_usage() -> Result<(), TestError> {
+    fn test_usage() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield([GRIZZLY_BEARS]),
             P2.battlefield([GRIZZLY_BEARS]),
@@ -37,7 +37,7 @@ mod tests {
     }
 
     #[test]
-    fn r508_1f_declaring_an_attacker_taps_it() -> Result<(), TestError> {
+    fn r508_1f_declaring_an_attacker_taps_it() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield([GRIZZLY_BEARS]),
             P2.battlefield([GRIZZLY_BEARS]),

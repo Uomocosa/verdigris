@@ -116,7 +116,7 @@ mod tests {
     use crate::turns;
 
     #[test]
-    fn r510_2_blocked_creatures_deal_damage_to_each_other() -> Result<(), TestError> {
+    fn r510_2_blocked_creatures_deal_damage_to_each_other() -> TestResult {
         use crate::BATTLEFIELD;
 
         let (mut game, [p1, p2]) = MockGame::new([
@@ -148,7 +148,7 @@ mod tests {
     }
 
     #[test]
-    fn r510_2_unblocked_creature_deals_damage_to_the_defending_player() -> Result<(), TestError> {
+    fn r510_2_unblocked_creature_deals_damage_to_the_defending_player() -> TestResult {
         use crate::BATTLEFIELD;
 
         let (mut game, [p1, p2]) = MockGame::new([
@@ -174,7 +174,7 @@ mod tests {
     }
 
     #[test]
-    fn test_usage() -> Result<(), TestError> {
+    fn test_usage() -> TestResult {
         use crate::BATTLEFIELD;
 
         let (mut game, [p1, p2]) = MockGame::new([

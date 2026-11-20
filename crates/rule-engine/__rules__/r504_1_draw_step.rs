@@ -40,7 +40,7 @@ mod tests {
     use crate::{HAND, LIBRARY};
 
     #[test]
-    fn test_usage() -> Result<(), TestError> {
+    fn test_usage() -> TestResult {
         let (mut game, [p1, p2]) =
             MockGame::builder().turn(1, turns::Step::Upkeep).players([P1, P2]);
 
@@ -54,7 +54,7 @@ mod tests {
     }
 
     #[test]
-    fn r103_8a_first_player_skips_the_draw_step_of_their_first_turn() -> Result<(), TestError> {
+    fn r103_8a_first_player_skips_the_draw_step_of_their_first_turn() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::builder().turn(1, turns::Step::Upkeep).players([
             P1.library([
                 cards::CardDefinition::from(GRIZZLY_BEARS),
@@ -75,7 +75,7 @@ mod tests {
     }
 
     #[test]
-    fn the_active_player_draws_a_card_during_their_draw_step() -> Result<(), TestError> {
+    fn the_active_player_draws_a_card_during_their_draw_step() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::builder().turn(2, turns::Step::Upkeep).players([
             P1.library([
                 cards::CardDefinition::from(GRIZZLY_BEARS),

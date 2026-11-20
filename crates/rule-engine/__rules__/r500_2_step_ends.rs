@@ -45,7 +45,7 @@ mod tests {
     use crate::turns;
 
     #[test]
-    fn test_usage() -> Result<(), TestError> {
+    fn test_usage() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([P1, P2]);
 
         game.play([p1.pass_priority(), p2.pass_priority()])?;
@@ -58,7 +58,7 @@ mod tests {
     }
 
     #[test]
-    fn all_players_passing_with_an_empty_stack_ends_the_step() -> Result<(), TestError> {
+    fn all_players_passing_with_an_empty_stack_ends_the_step() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([P1, P2]);
 
         game.play([p1.pass_priority(), p2.pass_priority()])?;

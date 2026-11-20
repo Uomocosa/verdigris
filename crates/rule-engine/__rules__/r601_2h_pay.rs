@@ -50,7 +50,7 @@ mod tests {
     use crate::testing::*;
 
     #[test]
-    fn test_usage() -> Result<(), TestError> {
+    fn test_usage() -> TestResult {
         let (mut game, [p1, p2]) =
             MockGame::new([P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]), P2]);
         let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
@@ -61,14 +61,15 @@ mod tests {
     }
 
     #[test]
-    fn test_cannot_cast_without_mana() {
+    fn test_cannot_cast_without_mana() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([P1.hand([LIGHTNING_BOLT]), P2]);
-        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT).unwrap();
+        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
         let err = game.play([p1.cast(bolt).targeting(p2)]).unwrap_err();
         assert_eq!(
             err.rejection(),
             Some(&actions::Rejected::CannotPay { spell: bolt.into() })
         );
         assert_eq!(game.zone_of(bolt), HAND);
+        Ok(())
     }
 }

@@ -6,7 +6,7 @@ mod fixtures;
 pub use app::{
     AutoPassUntil, Card, CardQuery, Cards, CardsError, CardsInZone, MockGame, MockGameBuilder, P1,
     P2, P3, P4, P5, P6, P7, P8, PlayError, PlayStep, PlayerSeat, PlayerSetup, PlayerView, Targets,
-    TestAbility, TestCard, TestCardName, TestError, TestPlayer, TestPlayerActions,
+    TestAbility, TestCard, TestCardName, TestError, TestPlayer, TestPlayerActions, TestResult,
 };
 pub use fixtures::{
     CANCEL, DARKSTEEL_MYR, DISFIGURE, DISPEL, DIVINATION, DOOM_BLADE, ESSENCE_SCATTER,

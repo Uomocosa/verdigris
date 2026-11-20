@@ -36,7 +36,7 @@ mod tests {
     use crate::{BATTLEFIELD, GRAVEYARD, HAND, MAIN_1};
 
     #[test]
-    fn test_usage() -> Result<(), TestError> {
+    fn test_usage() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
             P2.hand([GIANT_GROWTH]).battlefield([GRIZZLY_BEARS]).mana_pool(mana![G]),
@@ -64,8 +64,7 @@ mod tests {
     }
 
     #[test]
-    fn r514_2_until_end_of_turn_effect_expires_before_the_next_bolt()
-    -> Result<(), testing::TestError> {
+    fn r514_2_until_end_of_turn_effect_expires_before_the_next_bolt() -> testing::TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([GIANT_GROWTH, LIGHTNING_BOLT]).battlefield([FOREST, MOUNTAIN, GRIZZLY_BEARS]),
             P2,

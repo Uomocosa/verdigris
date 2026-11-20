@@ -82,7 +82,7 @@ mod tests {
     use crate::turns;
 
     #[test]
-    fn test_usage() -> Result<(), TestError> {
+    fn test_usage() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield([TYPHOID_RATS]),
             P2.battlefield([GRIZZLY_BEARS]),
@@ -109,7 +109,7 @@ mod tests {
     }
 
     #[test]
-    fn r509_1a_declared_blockers_become_blocking_and_attacker_blocked() -> Result<(), TestError> {
+    fn r509_1a_declared_blockers_become_blocking_and_attacker_blocked() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield([TYPHOID_RATS]),
             P2.battlefield([GRIZZLY_BEARS]),
@@ -137,7 +137,7 @@ mod tests {
     }
 
     #[test]
-    fn r509_1a_a_tapped_creature_cannot_be_declared_as_a_blocker() -> Result<(), TestError> {
+    fn r509_1a_a_tapped_creature_cannot_be_declared_as_a_blocker() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield([TYPHOID_RATS]),
             P2.battlefield_tapped([GRIZZLY_BEARS]),
@@ -171,7 +171,7 @@ mod tests {
     }
 
     #[test]
-    fn r509_1a_a_creature_that_is_not_attacking_cannot_be_blocked() -> Result<(), TestError> {
+    fn r509_1a_a_creature_that_is_not_attacking_cannot_be_blocked() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield([TYPHOID_RATS, GRIZZLY_BEARS]),
             P2.battlefield([GRIZZLY_BEARS]),

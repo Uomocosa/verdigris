@@ -169,7 +169,7 @@ mod tests {
     use crate::{BATTLEFIELD, HAND, STACK};
 
     #[test]
-    fn test_usage() -> Result<(), TestError> {
+    fn test_usage() -> TestResult {
         let (mut game, [p1, ..]) = MockGame::new([
             P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
             P2.battlefield([GRIZZLY_BEARS]),
@@ -181,7 +181,7 @@ mod tests {
     }
 
     #[test]
-    fn test_bolt_lists_every_legal_target() -> Result<(), TestError> {
+    fn test_bolt_lists_every_legal_target() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
             P2.battlefield([GRIZZLY_BEARS]),
@@ -197,9 +197,9 @@ mod tests {
     }
 
     #[test]
-    fn test_spell_with_no_legal_target_cannot_be_cast() {
+    fn test_spell_with_no_legal_target_cannot_be_cast() -> TestResult {
         let (mut game, [p1, ..]) = MockGame::new([P1.hand([MURDER]).mana_pool(mana![1, B, B]), P2]);
-        let [murder] = game.player(p1).cards_in(HAND).exactly::<1>(MURDER).unwrap();
+        let [murder] = game.player(p1).cards_in(HAND).exactly::<1>(MURDER)?;
         let err = game.play([p1.cast(murder)]).unwrap_err();
         assert_eq!(
             err.rejection(),
@@ -208,10 +208,11 @@ mod tests {
             })
         );
         assert_eq!(game.zone_of(murder), HAND);
+        Ok(())
     }
 
     #[test]
-    fn doom_blade_lists_only_nonblack_creatures() -> Result<(), TestError> {
+    fn doom_blade_lists_only_nonblack_creatures() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([DOOM_BLADE]).mana_pool(mana![1, B]),
             P2.battlefield([GRIZZLY_BEARS, WALKING_CORPSE]),
@@ -224,13 +225,13 @@ mod tests {
     }
 
     #[test]
-    fn doom_blade_rejects_a_black_creature_as_target() {
+    fn doom_blade_rejects_a_black_creature_as_target() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([DOOM_BLADE]).mana_pool(mana![1, B]),
             P2.battlefield([GRIZZLY_BEARS, WALKING_CORPSE]),
         ]);
-        let [blade] = game.player(p1).cards_in(HAND).exactly::<1>(DOOM_BLADE).unwrap();
-        let [corpse] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(WALKING_CORPSE).unwrap();
+        let [blade] = game.player(p1).cards_in(HAND).exactly::<1>(DOOM_BLADE)?;
+        let [corpse] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(WALKING_CORPSE)?;
         let err = game.play([p1.cast(blade).targeting(corpse)]).unwrap_err();
         assert_eq!(
             err.rejection(),
@@ -238,15 +239,16 @@ mod tests {
                 spell: blade.into()
             })
         );
+        Ok(())
     }
 
     #[test]
-    fn doom_blade_cannot_be_cast_with_only_black_creatures() {
+    fn doom_blade_cannot_be_cast_with_only_black_creatures() -> TestResult {
         let (mut game, [p1, ..]) = MockGame::new([
             P1.hand([DOOM_BLADE]).mana_pool(mana![1, B]),
             P2.battlefield([WALKING_CORPSE]),
         ]);
-        let [blade] = game.player(p1).cards_in(HAND).exactly::<1>(DOOM_BLADE).unwrap();
+        let [blade] = game.player(p1).cards_in(HAND).exactly::<1>(DOOM_BLADE)?;
         let err = game.play([p1.cast(blade)]).unwrap_err();
         assert_eq!(
             err.rejection(),
@@ -255,10 +257,11 @@ mod tests {
             })
         );
         assert_eq!(game.zone_of(blade), HAND);
+        Ok(())
     }
 
     #[test]
-    fn cancel_cannot_target_a_permanent() -> Result<(), TestError> {
+    fn cancel_cannot_target_a_permanent() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([LIGHTNING_BOLT, CANCEL]).mana_pool(mana![1, U, U, R]),
             P2.battlefield([GRIZZLY_BEARS]),
@@ -282,13 +285,13 @@ mod tests {
     }
 
     #[test]
-    fn essence_scatter_cannot_target_a_noncreature_spell() {
+    fn essence_scatter_cannot_target_a_noncreature_spell() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
             P2.hand([ESSENCE_SCATTER]).mana_pool(mana![1, U]),
         ]);
-        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT).unwrap();
-        let [scatter] = game.player(p2).cards_in(HAND).exactly::<1>(ESSENCE_SCATTER).unwrap();
+        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
+        let [scatter] = game.player(p2).cards_in(HAND).exactly::<1>(ESSENCE_SCATTER)?;
 
         let err = game
             .play([
@@ -305,16 +308,17 @@ mod tests {
         );
         assert_eq!(game.zone_of(scatter), HAND);
         assert_eq!(game.zone_of(bolt), STACK);
+        Ok(())
     }
 
     #[test]
-    fn negate_cannot_target_a_creature_spell() {
+    fn negate_cannot_target_a_creature_spell() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([GRIZZLY_BEARS]).mana_pool(mana![1, G]),
             P2.hand([NEGATE]).mana_pool(mana![1, U]),
         ]);
-        let [bears] = game.player(p1).cards_in(HAND).exactly::<1>(GRIZZLY_BEARS).unwrap();
-        let [negate] = game.player(p2).cards_in(HAND).exactly::<1>(NEGATE).unwrap();
+        let [bears] = game.player(p1).cards_in(HAND).exactly::<1>(GRIZZLY_BEARS)?;
+        let [negate] = game.player(p2).cards_in(HAND).exactly::<1>(NEGATE)?;
 
         let err = game.play([p1.cast(bears).pass_priority(), p2.cast(negate)]).unwrap_err();
 
@@ -326,16 +330,17 @@ mod tests {
         );
         assert_eq!(game.zone_of(negate), HAND);
         assert_eq!(game.zone_of(bears), STACK);
+        Ok(())
     }
 
     #[test]
-    fn dispel_cannot_target_a_sorcery_spell() {
+    fn dispel_cannot_target_a_sorcery_spell() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([DIVINATION]).mana_pool(mana![2, U]),
             P2.hand([DISPEL]).mana_pool(mana![U]),
         ]);
-        let [divination] = game.player(p1).cards_in(HAND).exactly::<1>(DIVINATION).unwrap();
-        let [dispel] = game.player(p2).cards_in(HAND).exactly::<1>(DISPEL).unwrap();
+        let [divination] = game.player(p1).cards_in(HAND).exactly::<1>(DIVINATION)?;
+        let [dispel] = game.player(p2).cards_in(HAND).exactly::<1>(DISPEL)?;
 
         let err = game.play([p1.cast(divination).pass_priority(), p2.cast(dispel)]).unwrap_err();
 
@@ -347,10 +352,11 @@ mod tests {
         );
         assert_eq!(game.zone_of(dispel), HAND);
         assert_eq!(game.zone_of(divination), STACK);
+        Ok(())
     }
 
     #[test]
-    fn test_any_target_in_multiplayer() -> Result<(), TestError> {
+    fn test_any_target_in_multiplayer() -> TestResult {
         let (mut game, [p1, p2, p3, p4]) =
             MockGame::new([P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]), P2, P3, P4]);
         let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;

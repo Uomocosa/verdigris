@@ -51,7 +51,7 @@ mod tests {
     use crate::{GRAVEYARD, HAND, LIBRARY};
 
     #[test]
-    fn test_usage() -> Result<(), TestError> {
+    fn test_usage() -> TestResult {
         let (mut game, [p1, p2]) =
             MockGame::new([P1.hand([DIVINATION]).mana_pool(mana![2, U]), P2]);
         let [divination] = game.player(p1).cards_in(HAND).exactly::<1>(DIVINATION)?;
@@ -62,7 +62,7 @@ mod tests {
     }
 
     #[test]
-    fn divination_draws_the_top_two_cards_of_the_library() -> Result<(), TestError> {
+    fn divination_draws_the_top_two_cards_of_the_library() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([DIVINATION])
                 .library([

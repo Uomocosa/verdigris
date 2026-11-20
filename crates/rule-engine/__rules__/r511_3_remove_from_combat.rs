@@ -36,7 +36,7 @@ mod tests {
     use crate::turns;
 
     #[test]
-    fn test_usage() -> Result<(), TestError> {
+    fn test_usage() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield([GRIZZLY_BEARS]),
             P2.battlefield([GRIZZLY_BEARS]),
@@ -57,7 +57,7 @@ mod tests {
     }
 
     #[test]
-    fn r511_3_blockers_are_removed_from_combat_after_end_of_combat() -> Result<(), TestError> {
+    fn r511_3_blockers_are_removed_from_combat_after_end_of_combat() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield([TYPHOID_RATS]),
             P2.battlefield([GRIZZLY_BEARS]),
@@ -88,7 +88,7 @@ mod tests {
     }
 
     #[test]
-    fn r511_3_attackers_are_removed_from_combat_after_end_of_combat() -> Result<(), TestError> {
+    fn r511_3_attackers_are_removed_from_combat_after_end_of_combat() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield([GRIZZLY_BEARS]),
             P2.battlefield([GRIZZLY_BEARS]),
