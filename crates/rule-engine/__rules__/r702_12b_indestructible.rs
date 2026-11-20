@@ -39,23 +39,7 @@ mod tests {
     use crate::{BATTLEFIELD, GRAVEYARD, HAND};
 
     #[test]
-    fn test_usage() -> TestResult {
-        let (mut game, [p1, p2]) = MockGame::new([
-            P1.hand([MURDER]).mana_pool(mana![1, B, B]),
-            P2.battlefield([DARKSTEEL_MYR]),
-        ]);
-        let [murder] = game.player(p1).cards_in(HAND).exactly::<1>(MURDER)?;
-        let [myr] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(DARKSTEEL_MYR)?;
-        game.play([
-            p1.cast(murder).targeting(myr).pass_priority(),
-            p2.pass_priority(),
-        ])?;
-        assert_eq!(game.zone_of(myr), BATTLEFIELD);
-        Ok(())
-    }
-
-    #[test]
-    fn r702_12b_indestructible_ignores_destroy_effects() -> TestResult {
+    fn survives_murder() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([MURDER]).mana_pool(mana![1, B, B]),
             P2.battlefield([DARKSTEEL_MYR]),
@@ -73,7 +57,7 @@ mod tests {
     }
 
     #[test]
-    fn r702_12b_indestructible_survives_lethal_damage() -> TestResult {
+    fn survives_lethal_damage() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
             P2.battlefield([DARKSTEEL_MYR]),
@@ -91,7 +75,7 @@ mod tests {
     }
 
     #[test]
-    fn r702_12b_indestructible_survives_doom_blade() -> TestResult {
+    fn survives_doom_blade() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([DOOM_BLADE]).mana_pool(mana![1, B]),
             P2.battlefield([DARKSTEEL_MYR]),

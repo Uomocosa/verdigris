@@ -41,7 +41,7 @@ mod tests {
     use crate::{BATTLEFIELD, HAND};
 
     #[test]
-    fn test_usage() -> TestResult {
+    fn unblocked_deathtouch_attacker_still_deals_combat_damage() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield([TYPHOID_RATS]),
             P2.battlefield([GRIZZLY_BEARS]),
@@ -64,7 +64,7 @@ mod tests {
     }
 
     #[test]
-    fn r704_5h_deathtouch_damage_destroys_a_larger_creature() -> TestResult {
+    fn deathtouch_damage_destroys_a_larger_creature() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield([TYPHOID_RATS]),
             P2.battlefield([GRIZZLY_BEARS]),
@@ -94,7 +94,7 @@ mod tests {
     }
 
     #[test]
-    fn r704_5h_deathtouch_damage_does_not_destroy_indestructible() -> TestResult {
+    fn deathtouch_damage_does_not_destroy_indestructible() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield([TYPHOID_RATS]),
             P2.battlefield([DARKSTEEL_MYR]),
@@ -124,7 +124,7 @@ mod tests {
     }
 
     #[test]
-    fn r704_5h_damage_without_deathtouch_does_not_destroy_a_two_two() -> TestResult {
+    fn non_deathtouch_damage_does_not_destroy_a_two_two() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield([WALKING_CORPSE]),
             P2.battlefield([GRIZZLY_BEARS, FOREST]).hand([GIANT_GROWTH]),

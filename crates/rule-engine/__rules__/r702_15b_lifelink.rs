@@ -37,7 +37,7 @@ mod tests {
     use crate::turns;
 
     #[test]
-    fn test_usage() -> TestResult {
+    fn lifelink_gains_life_even_when_source_dies() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield([CHILD_OF_NIGHT]),
             P2.battlefield([GRIZZLY_BEARS]),
@@ -68,7 +68,7 @@ mod tests {
     }
 
     #[test]
-    fn r702_15b_lifelink_combat_damage_gains_its_controller_that_much_life() -> TestResult {
+    fn lifelink_combat_damage_gains_its_controller_that_much_life() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield([CHILD_OF_NIGHT]),
             P2.battlefield([GRIZZLY_BEARS]),
