@@ -15,6 +15,7 @@ pub mod r601_2h_pay;
 pub mod r608_2_resolve;
 pub mod r608_2b_illegal_targets;
 pub mod r608_2n_graveyard;
+pub mod r608_3a_permanent_enters;
 pub mod r611_2a_continuous_effects;
 pub mod r701_6_counter;
 pub mod r701_9_discard;

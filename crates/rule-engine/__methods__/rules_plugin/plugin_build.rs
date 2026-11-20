@@ -64,6 +64,7 @@ pub fn plugin_build(_rules_plugin: &RulesPlugin, app: &mut App) {
             rules::r701_6_counter::r701_6_counter,
             rules::r120_3_damage_results::r120_3_damage_results,
             rules::r608_2n_graveyard::r608_2n_graveyard,
+            rules::r608_3a_permanent_enters::r608_3a_permanent_enters,
         )
             .chain()
             .in_set(rules::RuleSet::Resolution),
