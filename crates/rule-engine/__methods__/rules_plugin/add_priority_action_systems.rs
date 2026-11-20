@@ -2,7 +2,7 @@ use bevy::prelude::{App, IntoScheduleConfigs, Update};
 
 use crate::rules;
 
-pub fn add_casting_systems(app: &mut App) {
+pub fn add_priority_action_systems(app: &mut App) {
     app.add_systems(
         Update,
         (
@@ -13,7 +13,7 @@ pub fn add_casting_systems(app: &mut App) {
             rules::r508_1f_tap_attackers::r508_1f_tap_attackers,
         )
             .chain()
-            .in_set(rules::RuleSet::Casting),
+            .in_set(rules::RuleSet::PriorityAction),
     );
 }
 
@@ -21,12 +21,12 @@ pub fn add_casting_systems(app: &mut App) {
 mod tests {
     use bevy::prelude::{App, Schedule, Update};
 
-    use super::add_casting_systems;
+    use super::add_priority_action_systems;
 
     #[test]
     fn test_usage() {
         let mut app = App::new();
-        add_casting_systems(&mut app);
+        add_priority_action_systems(&mut app);
 
         assert_eq!(app.get_schedule(Update).map(Schedule::systems_len), Some(5));
     }

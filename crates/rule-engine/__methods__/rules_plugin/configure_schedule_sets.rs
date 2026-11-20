@@ -7,7 +7,7 @@ pub fn configure_schedule_sets(app: &mut App) {
         Update,
         (
             rules::RuleSet::Turn,
-            rules::RuleSet::Casting,
+            rules::RuleSet::PriorityAction,
             rules::RuleSet::Resolution,
             rules::RuleSet::StateBased,
             rules::RuleSet::StepEnd,

@@ -16,7 +16,7 @@ impl RulesPlugin {
 
     pub fn add_turn_systems(app: &mut App) {}
 
-    pub fn add_casting_systems(app: &mut App) {}
+    pub fn add_priority_action_systems(app: &mut App) {}
 
     pub fn add_resolution_systems(app: &mut App) {}
 
