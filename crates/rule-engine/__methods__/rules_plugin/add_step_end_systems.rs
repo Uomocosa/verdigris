@@ -1,5 +1,6 @@
 use bevy::prelude::{App, IntoScheduleConfigs, Update};
 
+use crate::RuleSet;
 use crate::rules;
 
 pub fn add_step_end_systems(app: &mut App) {
@@ -10,7 +11,7 @@ pub fn add_step_end_systems(app: &mut App) {
             rules::r508_8_skip_combat_steps::r508_8_skip_combat_steps,
         )
             .chain()
-            .in_set(rules::RuleSet::StepEnd),
+            .in_set(RuleSet::StepEnd),
     );
 }
 

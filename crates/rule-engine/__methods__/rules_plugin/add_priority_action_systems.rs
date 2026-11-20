@@ -1,5 +1,6 @@
 use bevy::prelude::{App, IntoScheduleConfigs, Update};
 
+use crate::RuleSet;
 use crate::rules;
 
 pub fn add_priority_action_systems(app: &mut App) {
@@ -16,7 +17,7 @@ pub fn add_priority_action_systems(app: &mut App) {
             rules::r305_6_basic_land_mana_ability::r305_6_basic_land_mana_ability,
         )
             .chain()
-            .in_set(rules::RuleSet::PriorityAction),
+            .in_set(RuleSet::PriorityAction),
     );
 }
 

@@ -1,5 +1,6 @@
 use bevy::prelude::{App, IntoScheduleConfigs, Update};
 
+use crate::RuleSet;
 use crate::rules;
 
 pub fn add_state_based_systems(app: &mut App) {
@@ -15,7 +16,7 @@ pub fn add_state_based_systems(app: &mut App) {
             rules::r104_2a_wins_when_opponents_left::r104_2a_wins_when_opponents_left,
         )
             .chain()
-            .in_set(rules::RuleSet::StateBased),
+            .in_set(RuleSet::StateBased),
     );
 }
 

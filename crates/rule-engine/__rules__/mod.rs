@@ -37,7 +37,3 @@ pub mod r704_5b_empty_library;
 pub mod r704_5f_zero_toughness;
 pub mod r704_5g_lethal_damage;
 pub mod r704_5h_deathtouch_damage;
-
-#[path = "__basic__/mod.rs"]
-mod basic;
-pub use basic::enums::RuleSet;

@@ -1,5 +1,6 @@
 use bevy::prelude::{App, IntoScheduleConfigs, Update};
 
+use crate::RuleSet;
 use crate::rules;
 
 pub fn add_resolution_systems(app: &mut App) {
@@ -20,7 +21,7 @@ pub fn add_resolution_systems(app: &mut App) {
             rules::r608_3a_permanent_enters::r608_3a_permanent_enters,
         )
             .chain()
-            .in_set(rules::RuleSet::Resolution),
+            .in_set(RuleSet::Resolution),
     );
 }
 

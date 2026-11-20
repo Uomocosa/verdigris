@@ -1,19 +1,19 @@
 use bevy::prelude::{App, IntoScheduleConfigs, Update};
 
-use crate::rules;
+use crate::RuleSet;
 
 pub fn configure_schedule_sets(app: &mut App) {
     app.configure_sets(
         Update,
         (
-            rules::RuleSet::Turn,
-            rules::RuleSet::PriorityAction,
-            rules::RuleSet::Resolution,
-            rules::RuleSet::StateBased,
-            rules::RuleSet::StepEnd,
-            rules::RuleSet::StepStarted,
-            rules::RuleSet::Cleanup,
-            rules::RuleSet::TurnEnd,
+            RuleSet::Turn,
+            RuleSet::PriorityAction,
+            RuleSet::Resolution,
+            RuleSet::StateBased,
+            RuleSet::StepEnd,
+            RuleSet::StepStarted,
+            RuleSet::Cleanup,
+            RuleSet::TurnEnd,
         )
             .chain(),
     );

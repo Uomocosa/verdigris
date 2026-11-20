@@ -1,5 +1,7 @@
 #![cfg_attr(test, allow(clippy::panic_in_result_fn))]
 pub mod actions;
+#[path = "__basic__/mod.rs"]
+mod basic;
 pub mod cards;
 pub mod damage;
 pub mod effects;
@@ -13,6 +15,7 @@ pub mod testing;
 pub mod turns;
 pub mod zones;
 
+pub use basic::enums::RuleSet;
 pub use rules_plugin::RulesPlugin;
 
 mod constants;

@@ -1,5 +1,6 @@
 use bevy::prelude::{App, IntoScheduleConfigs, Update};
 
+use crate::RuleSet;
 use crate::rules;
 
 pub fn add_step_started_systems(app: &mut App) {
@@ -10,11 +11,11 @@ pub fn add_step_started_systems(app: &mut App) {
             rules::r103_8a_r504_1_draw_step::r103_8a_r504_1_draw_step,
         )
             .chain()
-            .in_set(rules::RuleSet::StepStarted),
+            .in_set(RuleSet::StepStarted),
     );
     app.add_systems(
         Update,
-        rules::r502_3_untap::r502_3_untap.in_set(rules::RuleSet::StepStarted),
+        rules::r502_3_untap::r502_3_untap.in_set(RuleSet::StepStarted),
     );
     app.add_systems(
         Update,
@@ -22,11 +23,11 @@ pub fn add_step_started_systems(app: &mut App) {
             rules::r506_2a_r507_1_r508_1b_defending_player::r506_2a_r507_1_r508_1b_defending_player,
             rules::r506_4_r511_3_remove_from_combat::r506_4_r511_3_remove_from_combat,
         )
-            .in_set(rules::RuleSet::StepStarted),
+            .in_set(RuleSet::StepStarted),
     );
     app.add_systems(
         Update,
-        rules::r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_r702_19b_r702_19d_combat_damage::r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_r702_19b_r702_19d_combat_damage.in_set(rules::RuleSet::StepStarted),
+        rules::r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_r702_19b_r702_19d_combat_damage::r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_r702_19b_r702_19d_combat_damage.in_set(RuleSet::StepStarted),
     );
 }
 

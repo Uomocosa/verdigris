@@ -1,5 +1,6 @@
 use bevy::prelude::{App, IntoScheduleConfigs, Update};
 
+use crate::RuleSet;
 use crate::rules;
 
 pub fn add_cleanup_systems(app: &mut App) {
@@ -10,7 +11,7 @@ pub fn add_cleanup_systems(app: &mut App) {
             rules::r514_2_cleanup_step::r514_2_cleanup_step,
         )
             .chain()
-            .in_set(rules::RuleSet::Cleanup),
+            .in_set(RuleSet::Cleanup),
     );
 }
 
