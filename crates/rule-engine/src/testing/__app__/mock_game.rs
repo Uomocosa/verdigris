@@ -1,5 +1,8 @@
+use std::collections::BTreeMap;
+
 use atomic_delegate_macros::atomic_delegates;
-use bevy::prelude::{App, Entity};
+use bevy::ecs::query::QueryData;
+use bevy::prelude::{App, Entity, Query};
 
 use crate::actions;
 use crate::cards;
@@ -10,6 +13,8 @@ use crate::zones;
 
 pub struct MockGame {
     pub(crate) players: Vec<Entity>,
+    pub(crate) zones: Vec<BTreeMap<zones::Zone, Entity>>,
+    pub(crate) stack: Entity,
     pub(crate) app: App,
 }
 
@@ -39,6 +44,15 @@ impl MockGame {
 }
 
 impl MockGame {
+    #[must_use]
+    pub fn zone_entity(&self, player: testing::TestPlayer, zone: zones::Zone) -> Option<Entity> {
+        if zone == zones::Zone::Stack {
+            Some(self.stack)
+        } else {
+            self.zones.get((*player.seat).saturating_sub(1))?.get(&zone).copied()
+        }
+    }
+
     pub fn act(&mut self, player: impl Into<Entity>, action: actions::Action) {
         let player = player.into();
         let _ = self.app.world_mut().write_message(actions::PlayerAction { player, action });
@@ -81,6 +95,20 @@ impl MockGame {
         &mut self,
         actions: impl IntoIterator<Item = testing::TestPlayerActions>,
     ) -> Result<(), testing::PlayError> {
+    }
+
+    #[must_use]
+    pub fn with_query<D: QueryData, R>(
+        &mut self,
+        with: impl FnOnce(Query<'_, '_, D::ReadOnly>) -> R,
+    ) -> R {
+    }
+
+    #[must_use]
+    pub fn with_queries<D: QueryData, E: QueryData, R>(
+        &mut self,
+        with: impl FnOnce(Query<'_, '_, D::ReadOnly>, Query<'_, '_, E::ReadOnly>) -> R,
+    ) -> R {
     }
 }
 

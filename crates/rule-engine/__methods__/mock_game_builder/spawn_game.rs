@@ -47,7 +47,7 @@ pub fn spawn_game(
                 .collect()
         })
         .collect();
-    let _ = app.world_mut().spawn((STACK,)).id();
+    let stack = app.world_mut().spawn((STACK,)).id();
 
     for (index, (player, setup)) in entities.iter().zip(players).enumerate() {
         let Some(player_zones) = zone_entities.get(index) else {
@@ -97,6 +97,8 @@ pub fn spawn_game(
 
     let game = testing::MockGame {
         players: entities.clone(),
+        zones: zone_entities,
+        stack,
         app,
     };
     (game, entities)
@@ -106,6 +108,7 @@ pub fn spawn_game(
 mod tests {
     use crate::testing::*;
     use crate::turns;
+    use crate::zones;
 
     use super::spawn_game;
 
@@ -123,5 +126,9 @@ mod tests {
             entities[1]
         );
         assert_eq!(game.app.world().resource::<turns::TurnOrder>().len(), 2);
+        assert_eq!(
+            game.app.world().get::<zones::Zone>(game.stack),
+            Some(&zones::Zone::Stack)
+        );
     }
 }
