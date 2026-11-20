@@ -78,7 +78,7 @@ pub fn r510_2_combat_damage(
             } else {
                 let mut blockers_of: Vec<Entity> = Vec::new();
                 for (blocker, blocker_definition, blocking) in blockers.iter() {
-                    if blocking.0 != attacker {
+                    if **blocking != attacker {
                         continue;
                     }
                     blockers_of.push(blocker);

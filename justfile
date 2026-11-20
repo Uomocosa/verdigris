@@ -26,7 +26,7 @@ t PATTERN="" *FLAGS:
     cargo nextest run --workspace --all-targets --all-features --no-tests=pass -E 'test(/{{ PATTERN }}/)' {{ FLAGS }}
 
 [group('dev')]
-[doc('Clippy plus lele-lint for one package (e.g. just check-crate verdigris-game).')]
+[doc('Clippy plus verdigris-lint for one package (e.g. just check-crate verdigris-game).')]
 check-crate CRATE:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -41,7 +41,7 @@ check-crate CRATE:
             ;;
     esac
     cargo clippy -p {{ CRATE }} --all-targets --all-features -- -D warnings
-    lele-lint --config lele.toml "$dir"
+    cargo run --quiet -p verdigris-lint -- --config lele.toml "$dir"
 
 [group('dev')]
 [doc('Check formatting (cargo fmt --all -- --check).')]
@@ -54,18 +54,12 @@ clippy:
     cargo clippy --workspace --all-targets --all-features -- -D warnings
 
 [group('dev')]
-[doc('Run lele-lint over every workspace crate dir.')]
+[doc('Run verdigris-lint (all lele-lint and lele-bevy-lint rules) over every workspace crate dir.')]
 lint:
-    lele-lint --config lele.toml crates/rule-engine
-    lele-lint --config lele.toml crates/parser
-    lele-lint --config lele.toml crates/game
-    lele-lint --config lele.toml crates/verdigris-lint
-
-[group('dev')]
-[doc('Run lele-bevy-lint over the Bevy crates.')]
-bevy-lint:
-    lele-bevy-lint --config lele.toml crates/rule-engine
-    lele-bevy-lint --config lele.toml crates/game
+    cargo run --quiet -p verdigris-lint -- --config lele.toml crates/rule-engine
+    cargo run --quiet -p verdigris-lint -- --config lele.toml crates/parser
+    cargo run --quiet -p verdigris-lint -- --config lele.toml crates/game
+    cargo run --quiet -p verdigris-lint -- --config lele.toml crates/verdigris-lint
 
 # Regenerate the __methods__ indexes after adding or removing #[atomic_delegates] shells.
 [group('dev')]

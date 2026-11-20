@@ -3,9 +3,21 @@ name = "verdigris-lint"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
-description = "Verdigris rules for lele-lint"
+description = "lele-lint plus lele-bevy-lint with verdigris __rules__ exemptions"
+
+[[bin]]
+name = "verdigris-lint"
+path = "src/main.rs"
 
 [lints]
 workspace = true
 
 [dependencies]
+atomic-delegate-macros.workspace = true
+clap.workspace = true
+derive_more = { workspace = true, features = ["deref", "deref_mut"] }
+lele-bevy-lint.workspace = true
+lele-lint.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
