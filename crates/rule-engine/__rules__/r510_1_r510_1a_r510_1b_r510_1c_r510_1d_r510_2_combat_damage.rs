@@ -2,6 +2,7 @@ use bevy::prelude::{Entity, MessageReader, MessageWriter, Query, Res, With};
 
 use crate::cards;
 use crate::damage;
+use crate::effects;
 use crate::players;
 use crate::turns;
 
@@ -48,6 +49,7 @@ pub fn r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_combat_damage(
         With<cards::Attacking>,
     >,
     blockers: Query<(Entity, &cards::CardDefinition, &cards::Blocking)>,
+    modifiers: Query<&effects::PowerToughnessModifier>,
     defenders: Query<Entity, With<players::Player>>,
     turn: Res<turns::Turn>,
 ) {
@@ -60,7 +62,8 @@ pub fn r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_combat_damage(
             continue;
         };
         for (attacker, definition, blocked) in attackers.iter() {
-            let Some(power_toughness) = definition.power_toughness else {
+            let modifier = modifiers.get(attacker).ok();
+            let Some(power_toughness) = definition.effective_power_toughness(modifier) else {
                 continue;
             };
             if power_toughness.power <= 0 {
@@ -82,7 +85,10 @@ pub fn r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_combat_damage(
                         continue;
                     }
                     blockers_of.push(blocker);
-                    let Some(blocker_power_toughness) = blocker_definition.power_toughness else {
+                    let blocker_modifier = modifiers.get(blocker).ok();
+                    let Some(blocker_power_toughness) =
+                        blocker_definition.effective_power_toughness(blocker_modifier)
+                    else {
                         continue;
                     };
                     if blocker_power_toughness.power <= 0 {
@@ -112,6 +118,7 @@ pub fn r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_combat_damage(
 #[cfg(test)]
 mod tests {
     use crate::GRAVEYARD;
+    use crate::mana;
     use crate::testing::*;
     use crate::turns;
 
@@ -170,6 +177,38 @@ mod tests {
 
         assert_eq!(game.player(p2).life(), 18);
         assert_eq!(game.zone_of(bears), BATTLEFIELD);
+        Ok(())
+    }
+
+    #[test]
+    fn r510_1a_a_pumped_creature_assigns_combat_damage_equal_to_its_modified_power() -> TestResult {
+        use crate::BATTLEFIELD;
+        use crate::HAND;
+
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.battlefield([GRIZZLY_BEARS]).hand([GIANT_GROWTH]).mana_pool(mana![G]),
+            P2,
+        ]);
+        let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        let [growth] = game.player(p1).cards_in(HAND).exactly::<1>(GIANT_GROWTH)?;
+
+        game.play([
+            p1.cast(growth).targeting(bears).pass_priority(),
+            p2.pass_priority(),
+        ])?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareAttackers),
+            p2.pass_to(turns::Step::DeclareAttackers),
+            p1.declare_attackers([bears]),
+        ])?;
+        game.play([
+            p1.pass_to(turns::Step::CombatDamage),
+            p2.pass_to(turns::Step::CombatDamage),
+            p1.pass_priority(),
+            p2.pass_priority(),
+        ])?;
+
+        assert_eq!(game.player(p2).life(), 15);
         Ok(())
     }
 
