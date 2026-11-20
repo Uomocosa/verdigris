@@ -4,6 +4,9 @@ use derive_more::Deref;
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Player;
 
+#[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
+pub struct DefendingPlayer;
+
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Deref)]
 pub struct Life(pub i32);
 

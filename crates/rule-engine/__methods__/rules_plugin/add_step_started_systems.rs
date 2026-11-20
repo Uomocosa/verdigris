@@ -18,7 +18,10 @@ pub fn add_step_started_systems(app: &mut App) {
     );
     app.add_systems(
         Update,
-        rules::r506_4_r511_3_remove_from_combat::r506_4_r511_3_remove_from_combat
+        (
+            rules::r506_2a_r507_1_r508_1b_defending_player::r506_2a_r507_1_r508_1b_defending_player,
+            rules::r506_4_r511_3_remove_from_combat::r506_4_r511_3_remove_from_combat,
+        )
             .in_set(rules::RuleSet::StepStarted),
     );
     app.add_systems(
@@ -38,6 +41,6 @@ mod tests {
         let mut app = App::new();
         add_step_started_systems(&mut app);
 
-        assert_eq!(app.get_schedule(Update).map(Schedule::systems_len), Some(5));
+        assert_eq!(app.get_schedule(Update).map(Schedule::systems_len), Some(6));
     }
 }

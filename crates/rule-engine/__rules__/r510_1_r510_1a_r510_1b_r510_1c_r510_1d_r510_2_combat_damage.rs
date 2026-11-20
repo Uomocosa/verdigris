@@ -54,7 +54,7 @@ pub fn r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_combat_damage(
     >,
     blockers: Query<(Entity, &cards::CardDefinition, &cards::Blocking)>,
     modifiers: Query<&effects::PowerToughnessModifier>,
-    defenders: Query<Entity, With<players::Player>>,
+    defenders: Query<Entity, With<players::DefendingPlayer>>,
     turn: Res<turns::Turn>,
 ) {
     let turn = turn.into_inner();
@@ -62,7 +62,7 @@ pub fn r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_combat_damage(
         if **step != turns::Step::CombatDamage {
             continue;
         }
-        let Some(defending) = defenders.iter().find(|player| *player != turn.active) else {
+        let Some(defending) = defenders.iter().next() else {
             continue;
         };
         let mut needed: Vec<actions::RequiredCombatDamage> = Vec::new();

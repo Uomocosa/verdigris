@@ -34,6 +34,9 @@ pub enum Rejected {
     InvalidCombatDamage {
         player: Entity,
     },
+    CannotChooseDefendingPlayer {
+        player: Entity,
+    },
     CannotAttack {
         attackers: Vec<Entity>,
     },

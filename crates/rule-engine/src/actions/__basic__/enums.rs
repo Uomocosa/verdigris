@@ -13,6 +13,7 @@ pub enum Action {
     PlayLand(Entity),
     ChooseTargets(Vec<Entity>),
     ChooseDiscard(Vec<Entity>),
+    ChooseDefendingPlayer(Entity),
     AssignCombatDamage(Vec<actions::DamageAssignment>),
     DeclareAttackers(Vec<Entity>),
     DeclareBlockers(Vec<actions::BlockAssignment>),
