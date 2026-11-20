@@ -22,6 +22,7 @@ thiserror = "=2.0.21"
 atomic-delegate-macros = { git = "https://github.com/Uomocosa/lele-rust-linter", tag = "v0.0.15" }
 lele-bevy-lint = { git = "https://github.com/Uomocosa/lele-rust-linter", tag = "v0.0.15" }
 lele-lint = { git = "https://github.com/Uomocosa/lele-rust-linter", tag = "v0.0.15" }
+rule-examples-macro = { git = "https://github.com/Uomocosa/lele-rust-linter", tag = "v0.0.15" }
 
 [workspace.lints.clippy]
 pedantic = { level = "deny", priority = -1 }

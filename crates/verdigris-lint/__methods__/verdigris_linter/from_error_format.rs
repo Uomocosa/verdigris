@@ -1,7 +1,9 @@
 use lele_bevy_lint::BevyLinter;
 use lele_lint::ErrorFormat;
 use lele_lint::Linter;
+use lele_lint::traits::Rule;
 
+use crate::rules;
 use crate::verdigris_linter::VerdigrisLinter;
 
 pub fn from_error_format(error_format: ErrorFormat) -> VerdigrisLinter {
@@ -10,6 +12,9 @@ pub fn from_error_format(error_format: ErrorFormat) -> VerdigrisLinter {
         ..Linter::default()
     };
     linter.extend_rules(BevyLinter::bevy_rules());
+    let mut verdigris_rules: Vec<Box<dyn Rule>> = Vec::new();
+    rules::rule_file_name::RuleFileName::register(&mut verdigris_rules);
+    linter.extend_rules(verdigris_rules);
     for exemption in VerdigrisLinter::exemptions() {
         linter.exempt(exemption);
     }
@@ -25,5 +30,6 @@ mod tests {
     fn test_usage() {
         let linter = from_error_format(ErrorFormat::Clippy);
         assert!(linter.rules.iter().any(|rule| rule.code().starts_with("LELEBEVY")));
+        assert!(linter.rules.iter().any(|rule| rule.code() == "VRDG001"));
     }
 }

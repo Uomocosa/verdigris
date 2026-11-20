@@ -18,6 +18,8 @@ clap.workspace = true
 derive_more = { workspace = true, features = ["deref", "deref_mut"] }
 lele-bevy-lint.workspace = true
 lele-lint.workspace = true
+rule-examples-macro.workspace = true
+thiserror.workspace = true
 
 [dev-dependencies]
 tempfile.workspace = true

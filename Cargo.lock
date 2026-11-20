@@ -1514,7 +1514,9 @@ dependencies = [
  "derive_more",
  "lele-bevy-lint",
  "lele-lint",
+ "rule-examples-macro",
  "tempfile",
+ "thiserror 2.0.21",
 ]
 
 [[package]]
