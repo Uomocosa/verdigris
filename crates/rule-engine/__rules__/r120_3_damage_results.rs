@@ -52,10 +52,8 @@ mod tests {
                 P1.battlefield([WALKING_CORPSE]),
                 P2.active().hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
             ]);
-        let [corpse] =
-            game.player(p1).cards_in(BATTLEFIELD).matching(WALKING_CORPSE).exactly::<1>().unwrap();
-        let [bolt] =
-            game.player(p2).cards_in(HAND).matching(LIGHTNING_BOLT).exactly::<1>().unwrap();
+        let [corpse] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(WALKING_CORPSE).unwrap();
+        let [bolt] = game.player(p2).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT).unwrap();
         game.play([
             p2.cast(bolt).targeting(corpse).pass_priority(),
             p1.pass_priority(),

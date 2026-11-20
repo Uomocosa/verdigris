@@ -124,10 +124,7 @@ mod tests {
         for player in [p1, p2] {
             let library = game.player(player).cards_in(LIBRARY);
             assert_eq!(library.len(), 12);
-            library
-                .matching(GRIZZLY_BEARS)
-                .exactly::<12>()
-                .expect("default library is 12 Grizzly Bears");
+            library.exactly::<12>(GRIZZLY_BEARS).expect("default library is 12 Grizzly Bears");
         }
         assert!(game.player(p1).cards_in(HAND).has_no(GRIZZLY_BEARS));
         assert!(game.player(p2).cards_in(HAND).has_no(GRIZZLY_BEARS));

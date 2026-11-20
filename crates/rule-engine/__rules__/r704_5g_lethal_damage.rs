@@ -50,10 +50,8 @@ mod tests {
             P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
-        let [bolt] =
-            game.player(p1).cards_in(HAND).matching(LIGHTNING_BOLT).exactly::<1>().unwrap();
-        let [bears] =
-            game.player(p2).cards_in(BATTLEFIELD).matching(GRIZZLY_BEARS).exactly::<1>().unwrap();
+        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT).unwrap();
+        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
         game.play([
             p1.cast(bolt).targeting(bears).pass_priority(),
             p2.pass_priority(),

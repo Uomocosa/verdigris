@@ -91,7 +91,7 @@ mod tests {
             P1.hand([MIND_ROT]).mana_pool(mana![2, B]),
             P2.hand([GRIZZLY_BEARS]),
         ]);
-        let [mind_rot] = game.player(p1).cards_in(HAND).matching(MIND_ROT).exactly::<1>().unwrap();
+        let [mind_rot] = game.player(p1).cards_in(HAND).exactly::<1>(MIND_ROT).unwrap();
         game.play([p1.cast(mind_rot).targeting(p2).end_turn(), p2.end_turn()]).unwrap();
         assert!(game.player(p2).cards_in(GRAVEYARD).has(GRIZZLY_BEARS));
     }
@@ -102,13 +102,11 @@ mod tests {
             P1.hand([MIND_ROT]).mana_pool(mana![2, B]),
             P2.hand([GRIZZLY_BEARS, LIGHTNING_BOLT, MURDER]),
         ]);
-        let [mind_rot] = game.player(p1).cards_in(HAND).matching(MIND_ROT).exactly::<1>().unwrap();
+        let [mind_rot] = game.player(p1).cards_in(HAND).exactly::<1>(MIND_ROT).unwrap();
         game.play([p1.cast(mind_rot).targeting(p2).end_turn(), p2.end_turn()]).unwrap();
 
-        let [bears] =
-            game.player(p2).cards_in(HAND).matching(GRIZZLY_BEARS).exactly::<1>().unwrap();
-        let [bolt] =
-            game.player(p2).cards_in(HAND).matching(LIGHTNING_BOLT).exactly::<1>().unwrap();
+        let [bears] = game.player(p2).cards_in(HAND).exactly::<1>(GRIZZLY_BEARS).unwrap();
+        let [bolt] = game.player(p2).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT).unwrap();
         game.act(
             p2,
             actions::Action::ChooseDiscard(vec![bears.into(), bolt.into()]),
@@ -125,13 +123,12 @@ mod tests {
             P1.hand([MIND_ROT]).mana_pool(mana![2, B]),
             P2.hand([GRIZZLY_BEARS]),
         ]);
-        let [mind_rot] = game.player(p1).cards_in(HAND).matching(MIND_ROT).exactly::<1>().unwrap();
+        let [mind_rot] = game.player(p1).cards_in(HAND).exactly::<1>(MIND_ROT).unwrap();
         game.play([p1.cast(mind_rot).targeting(p2).end_turn(), p2.end_turn()]).unwrap();
 
         assert_eq!(
             game.zone_of(
-                game.player(p2).cards_in(GRAVEYARD).matching(GRIZZLY_BEARS).exactly::<1>().unwrap()
-                    [0]
+                game.player(p2).cards_in(GRAVEYARD).exactly::<1>(GRIZZLY_BEARS).unwrap()[0]
             ),
             GRAVEYARD
         );

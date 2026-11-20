@@ -69,8 +69,7 @@ mod tests {
             P2,
         ]);
         game.play([p1.end_turn(), p2.end_turn()]).unwrap();
-        let [bears] =
-            game.player(p1).cards_in(HAND).matching(GRIZZLY_BEARS).exactly::<1>().unwrap();
+        let [bears] = game.player(p1).cards_in(HAND).exactly::<1>(GRIZZLY_BEARS).unwrap();
         game.act(p1, actions::Action::ChooseDiscard(vec![bears.into()]));
         assert_eq!(game.zone_of(bears), GRAVEYARD);
         assert_eq!(game.player(p1).cards_in(HAND).len(), 7);

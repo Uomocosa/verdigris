@@ -35,10 +35,8 @@ mod tests {
             P1.hand([GIANT_GROWTH]).battlefield([GRIZZLY_BEARS]).mana_pool(mana![G]),
             P2,
         ]);
-        let [growth] =
-            game.player(p1).cards_in(HAND).matching(GIANT_GROWTH).exactly::<1>().unwrap();
-        let [bears] =
-            game.player(p1).cards_in(BATTLEFIELD).matching(GRIZZLY_BEARS).exactly::<1>().unwrap();
+        let [growth] = game.player(p1).cards_in(HAND).exactly::<1>(GIANT_GROWTH).unwrap();
+        let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
         game.play([
             p1.cast(growth).targeting(bears).pass_priority(),
             p2.pass_priority(),
@@ -62,12 +60,9 @@ mod tests {
             P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
             P2.hand([GIANT_GROWTH]).battlefield([GRIZZLY_BEARS]).mana_pool(mana![G]),
         ]);
-        let [bolt] =
-            game.player(p1).cards_in(HAND).matching(LIGHTNING_BOLT).exactly::<1>().unwrap();
-        let [growth] =
-            game.player(p2).cards_in(HAND).matching(GIANT_GROWTH).exactly::<1>().unwrap();
-        let [bears] =
-            game.player(p2).cards_in(BATTLEFIELD).matching(GRIZZLY_BEARS).exactly::<1>().unwrap();
+        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT).unwrap();
+        let [growth] = game.player(p2).cards_in(HAND).exactly::<1>(GIANT_GROWTH).unwrap();
+        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
 
         game.play([
             p1.cast(bolt).targeting(bears).pass_priority(),

@@ -174,8 +174,7 @@ mod tests {
             P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
-        let [bolt] =
-            game.player(p1).cards_in(HAND).matching(LIGHTNING_BOLT).exactly::<1>().unwrap();
+        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT).unwrap();
         game.play([p1.cast(bolt)]).unwrap();
         assert!(game.target_choice().is_some());
     }
@@ -186,10 +185,8 @@ mod tests {
             P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
-        let [bolt] =
-            game.player(p1).cards_in(HAND).matching(LIGHTNING_BOLT).exactly::<1>().unwrap();
-        let [bears] =
-            game.player(p2).cards_in(BATTLEFIELD).matching(GRIZZLY_BEARS).exactly::<1>().unwrap();
+        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT).unwrap();
+        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
         game.play([p1.cast(bolt)]).unwrap();
         assert_eq!(
             game.target_choice(),
@@ -200,7 +197,7 @@ mod tests {
     #[test]
     fn test_spell_with_no_legal_target_cannot_be_cast() {
         let (mut game, [p1, ..]) = MockGame::new([P1.hand([MURDER]).mana_pool(mana![1, B, B]), P2]);
-        let [murder] = game.player(p1).cards_in(HAND).matching(MURDER).exactly::<1>().unwrap();
+        let [murder] = game.player(p1).cards_in(HAND).exactly::<1>(MURDER).unwrap();
         let err = game.play([p1.cast(murder)]).unwrap_err();
         assert_eq!(
             err.rejection(),
@@ -217,9 +214,8 @@ mod tests {
             P1.hand([DOOM_BLADE]).mana_pool(mana![1, B]),
             P2.battlefield([GRIZZLY_BEARS, WALKING_CORPSE]),
         ]);
-        let [blade] = game.player(p1).cards_in(HAND).matching(DOOM_BLADE).exactly::<1>().unwrap();
-        let [bears] =
-            game.player(p2).cards_in(BATTLEFIELD).matching(GRIZZLY_BEARS).exactly::<1>().unwrap();
+        let [blade] = game.player(p1).cards_in(HAND).exactly::<1>(DOOM_BLADE).unwrap();
+        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
         game.play([p1.cast(blade)]).unwrap();
         assert_eq!(game.target_choice(), Some(pick(1).from([bears.into()])));
     }
@@ -230,9 +226,8 @@ mod tests {
             P1.hand([DOOM_BLADE]).mana_pool(mana![1, B]),
             P2.battlefield([GRIZZLY_BEARS, WALKING_CORPSE]),
         ]);
-        let [blade] = game.player(p1).cards_in(HAND).matching(DOOM_BLADE).exactly::<1>().unwrap();
-        let [corpse] =
-            game.player(p2).cards_in(BATTLEFIELD).matching(WALKING_CORPSE).exactly::<1>().unwrap();
+        let [blade] = game.player(p1).cards_in(HAND).exactly::<1>(DOOM_BLADE).unwrap();
+        let [corpse] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(WALKING_CORPSE).unwrap();
         let err = game.play([p1.cast(blade).targeting(corpse)]).unwrap_err();
         assert_eq!(
             err.rejection(),
@@ -248,7 +243,7 @@ mod tests {
             P1.hand([DOOM_BLADE]).mana_pool(mana![1, B]),
             P2.battlefield([WALKING_CORPSE]),
         ]);
-        let [blade] = game.player(p1).cards_in(HAND).matching(DOOM_BLADE).exactly::<1>().unwrap();
+        let [blade] = game.player(p1).cards_in(HAND).exactly::<1>(DOOM_BLADE).unwrap();
         let err = game.play([p1.cast(blade)]).unwrap_err();
         assert_eq!(
             err.rejection(),
@@ -265,11 +260,9 @@ mod tests {
             P1.hand([LIGHTNING_BOLT, CANCEL]).mana_pool(mana![1, U, U, R]),
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
-        let [bolt] =
-            game.player(p1).cards_in(HAND).matching(LIGHTNING_BOLT).exactly::<1>().unwrap();
-        let [cancel] = game.player(p1).cards_in(HAND).matching(CANCEL).exactly::<1>().unwrap();
-        let [bears] =
-            game.player(p2).cards_in(BATTLEFIELD).matching(GRIZZLY_BEARS).exactly::<1>().unwrap();
+        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT).unwrap();
+        let [cancel] = game.player(p1).cards_in(HAND).exactly::<1>(CANCEL).unwrap();
+        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
 
         game.play([p1.cast(bolt).targeting(p2), p1.cast(cancel)]).unwrap();
 
@@ -290,10 +283,8 @@ mod tests {
             P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
             P2.hand([ESSENCE_SCATTER]).mana_pool(mana![1, U]),
         ]);
-        let [bolt] =
-            game.player(p1).cards_in(HAND).matching(LIGHTNING_BOLT).exactly::<1>().unwrap();
-        let [scatter] =
-            game.player(p2).cards_in(HAND).matching(ESSENCE_SCATTER).exactly::<1>().unwrap();
+        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT).unwrap();
+        let [scatter] = game.player(p2).cards_in(HAND).exactly::<1>(ESSENCE_SCATTER).unwrap();
 
         let err = game
             .play([
@@ -318,9 +309,8 @@ mod tests {
             P1.hand([GRIZZLY_BEARS]).mana_pool(mana![1, G]),
             P2.hand([NEGATE]).mana_pool(mana![1, U]),
         ]);
-        let [bears] =
-            game.player(p1).cards_in(HAND).matching(GRIZZLY_BEARS).exactly::<1>().unwrap();
-        let [negate] = game.player(p2).cards_in(HAND).matching(NEGATE).exactly::<1>().unwrap();
+        let [bears] = game.player(p1).cards_in(HAND).exactly::<1>(GRIZZLY_BEARS).unwrap();
+        let [negate] = game.player(p2).cards_in(HAND).exactly::<1>(NEGATE).unwrap();
 
         let err = game.play([p1.cast(bears).pass_priority(), p2.cast(negate)]).unwrap_err();
 
@@ -340,9 +330,8 @@ mod tests {
             P1.hand([DIVINATION]).mana_pool(mana![2, U]),
             P2.hand([DISPEL]).mana_pool(mana![U]),
         ]);
-        let [divination] =
-            game.player(p1).cards_in(HAND).matching(DIVINATION).exactly::<1>().unwrap();
-        let [dispel] = game.player(p2).cards_in(HAND).matching(DISPEL).exactly::<1>().unwrap();
+        let [divination] = game.player(p1).cards_in(HAND).exactly::<1>(DIVINATION).unwrap();
+        let [dispel] = game.player(p2).cards_in(HAND).exactly::<1>(DISPEL).unwrap();
 
         let err = game.play([p1.cast(divination).pass_priority(), p2.cast(dispel)]).unwrap_err();
 
@@ -360,8 +349,7 @@ mod tests {
     fn test_any_target_in_multiplayer() {
         let (mut game, [p1, p2, p3, p4]) =
             MockGame::new([P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]), P2, P3, P4]);
-        let [bolt] =
-            game.player(p1).cards_in(HAND).matching(LIGHTNING_BOLT).exactly::<1>().unwrap();
+        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT).unwrap();
         game.play([p1.cast(bolt)]).unwrap();
         assert_eq!(
             game.target_choice(),

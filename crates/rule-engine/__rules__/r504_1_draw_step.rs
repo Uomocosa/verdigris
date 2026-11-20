@@ -81,14 +81,13 @@ mod tests {
             ]),
             P2,
         ]);
-        let [top] =
-            game.player(p1).cards_in(LIBRARY).matching(GRIZZLY_BEARS).exactly::<1>().unwrap();
+        let [top] = game.player(p1).cards_in(LIBRARY).exactly::<1>(GRIZZLY_BEARS).unwrap();
 
         game.play([p1.pass_priority(), p2.pass_priority(), p1.pass_priority()]).unwrap();
 
         assert_eq!(game.zone_of(top), HAND);
         assert_eq!(
-            game.player(p1).cards_in(HAND).matching(GRIZZLY_BEARS).exactly::<1>().unwrap()[0],
+            game.player(p1).cards_in(HAND).exactly::<1>(GRIZZLY_BEARS).unwrap()[0],
             top
         );
     }

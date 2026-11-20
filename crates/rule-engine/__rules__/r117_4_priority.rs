@@ -53,8 +53,7 @@ mod tests {
     fn test_usage() {
         let (mut game, [p1, p2]) =
             MockGame::new([P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]), P2]);
-        let [bolt] =
-            game.player(p1).cards_in(HAND).matching(LIGHTNING_BOLT).exactly::<1>().unwrap();
+        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT).unwrap();
         game.play([
             p1.cast(bolt).targeting(p2).pass_priority(),
             p2.pass_priority(),
@@ -69,8 +68,7 @@ mod tests {
             P1.hand([LIGHTNING_BOLT, LIGHTNING_BOLT]).mana_pool(mana![R, R]),
             P2,
         ]);
-        let [first, second] =
-            game.player(p1).cards_in(HAND).matching(LIGHTNING_BOLT).exactly::<2>().unwrap();
+        let [first, second] = game.player(p1).cards_in(HAND).exactly::<2>(LIGHTNING_BOLT).unwrap();
         game.play([
             p1.cast(first).targeting(p2),
             p1.cast(second).targeting(p2).pass_priority(),
@@ -89,8 +87,7 @@ mod tests {
             P1.hand([LIGHTNING_BOLT, LIGHTNING_BOLT]).mana_pool(mana![R, R]),
             P2,
         ]);
-        let [first, second] =
-            game.player(p1).cards_in(HAND).matching(LIGHTNING_BOLT).exactly::<2>().unwrap();
+        let [first, second] = game.player(p1).cards_in(HAND).exactly::<2>(LIGHTNING_BOLT).unwrap();
         game.play([
             p1.cast(first).targeting(p2),
             p1.cast(second).targeting(p2).pass_priority(),
@@ -109,8 +106,7 @@ mod tests {
     fn priority_returns_to_the_active_player_after_a_spell_resolves() {
         let (mut game, [p1, p2]) =
             MockGame::new([P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]), P2]);
-        let [bolt] =
-            game.player(p1).cards_in(HAND).matching(LIGHTNING_BOLT).exactly::<1>().unwrap();
+        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT).unwrap();
         game.play([p1.cast(bolt).targeting(p2).pass_priority()]).unwrap();
 
         assert_ne!(game.app.world().resource::<turns::Priority>().player, p1);

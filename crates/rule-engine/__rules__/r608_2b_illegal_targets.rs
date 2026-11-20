@@ -96,8 +96,7 @@ mod tests {
     fn test_usage() {
         let (mut game, [p1, p2]) =
             MockGame::new([P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]), P2]);
-        let [bolt] =
-            game.player(p1).cards_in(HAND).matching(LIGHTNING_BOLT).exactly::<1>().unwrap();
+        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT).unwrap();
         game.play([
             p1.cast(bolt).targeting(p2).pass_priority(),
             p2.pass_priority(),
@@ -112,11 +111,9 @@ mod tests {
             P1.hand([LIGHTNING_BOLT, MURDER]).mana_pool(mana![1, B, B, R]),
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
-        let [bolt] =
-            game.player(p1).cards_in(HAND).matching(LIGHTNING_BOLT).exactly::<1>().unwrap();
-        let [murder] = game.player(p1).cards_in(HAND).matching(MURDER).exactly::<1>().unwrap();
-        let [bears] =
-            game.player(p2).cards_in(BATTLEFIELD).matching(GRIZZLY_BEARS).exactly::<1>().unwrap();
+        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT).unwrap();
+        let [murder] = game.player(p1).cards_in(HAND).exactly::<1>(MURDER).unwrap();
+        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
 
         game.play([
             p1.cast(bolt).targeting(bears),
@@ -138,9 +135,8 @@ mod tests {
             P1.hand([DOOM_BLADE]).mana_pool(mana![1, B]),
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
-        let [blade] = game.player(p1).cards_in(HAND).matching(DOOM_BLADE).exactly::<1>().unwrap();
-        let [bears] =
-            game.player(p2).cards_in(BATTLEFIELD).matching(GRIZZLY_BEARS).exactly::<1>().unwrap();
+        let [blade] = game.player(p1).cards_in(HAND).exactly::<1>(DOOM_BLADE).unwrap();
+        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
 
         game.play([p1.cast(blade).targeting(bears)]).unwrap();
 

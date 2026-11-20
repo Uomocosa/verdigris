@@ -42,12 +42,9 @@ mod tests {
             P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
             P2.hand([GIANT_GROWTH]).battlefield([GRIZZLY_BEARS]).mana_pool(mana![G]),
         ]);
-        let [bolt] =
-            game.player(p1).cards_in(HAND).matching(LIGHTNING_BOLT).exactly::<1>().unwrap();
-        let [growth] =
-            game.player(p2).cards_in(HAND).matching(GIANT_GROWTH).exactly::<1>().unwrap();
-        let [bears] =
-            game.player(p2).cards_in(BATTLEFIELD).matching(GRIZZLY_BEARS).exactly::<1>().unwrap();
+        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT).unwrap();
+        let [growth] = game.player(p2).cards_in(HAND).exactly::<1>(GIANT_GROWTH).unwrap();
+        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
 
         game.play([
             p1.cast(bolt).targeting(bears).pass_priority(),
@@ -74,12 +71,11 @@ mod tests {
             P1.hand([GIANT_GROWTH, LIGHTNING_BOLT]).battlefield([FOREST, MOUNTAIN, GRIZZLY_BEARS]),
             P2,
         ]);
-        let [growth] = game.player(p1).cards_in(HAND).matching(GIANT_GROWTH).exactly::<1>()?;
-        let [bolt] = game.player(p1).cards_in(HAND).matching(LIGHTNING_BOLT).exactly::<1>()?;
-        let [bears] =
-            game.player(p1).cards_in(BATTLEFIELD).matching(GRIZZLY_BEARS).exactly::<1>()?;
-        let [forest] = game.player(p1).cards_in(BATTLEFIELD).matching(FOREST).exactly::<1>()?;
-        let [mountain] = game.player(p1).cards_in(BATTLEFIELD).matching(MOUNTAIN).exactly::<1>()?;
+        let [growth] = game.player(p1).cards_in(HAND).exactly::<1>(GIANT_GROWTH)?;
+        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
+        let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        let [forest] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(FOREST)?;
+        let [mountain] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(MOUNTAIN)?;
 
         game.act(p1, actions::Action::ActivateManaAbility(forest.into()));
         game.play([

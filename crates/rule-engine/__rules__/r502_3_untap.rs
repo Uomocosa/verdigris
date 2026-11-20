@@ -54,10 +54,8 @@ mod tests {
             P1.battlefield_tapped([GRIZZLY_BEARS]),
             P2.battlefield_tapped([GRIZZLY_BEARS]),
         ]);
-        let [p1_bears] =
-            game.player(p1).cards_in(BATTLEFIELD).matching(GRIZZLY_BEARS).exactly::<1>().unwrap();
-        let [p2_bears] =
-            game.player(p2).cards_in(BATTLEFIELD).matching(GRIZZLY_BEARS).exactly::<1>().unwrap();
+        let [p1_bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
+        let [p2_bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
 
         game.play([p1.end_turn(), p2.end_turn()]).unwrap();
         game.play([p2.pass_to(turns::Step::Upkeep)]).unwrap();

@@ -54,8 +54,7 @@ mod tests {
     fn test_usage() {
         let (mut game, [p1, p2]) =
             MockGame::new([P1.hand([DIVINATION]).mana_pool(mana![2, U]), P2]);
-        let [divination] =
-            game.player(p1).cards_in(HAND).matching(DIVINATION).exactly::<1>().unwrap();
+        let [divination] = game.player(p1).cards_in(HAND).exactly::<1>(DIVINATION).unwrap();
         game.play([p1.cast(divination).pass_priority(), p2.pass_priority()]).unwrap();
         assert!(game.player(p1).cards_in(HAND).has(GRIZZLY_BEARS));
         assert_eq!(game.zone_of(divination), GRAVEYARD);
@@ -73,15 +72,12 @@ mod tests {
                 .mana_pool(mana![2, U]),
             P2,
         ]);
-        let [divination] =
-            game.player(p1).cards_in(HAND).matching(DIVINATION).exactly::<1>().unwrap();
+        let [divination] = game.player(p1).cards_in(HAND).exactly::<1>(DIVINATION).unwrap();
         game.play([p1.cast(divination).pass_priority(), p2.pass_priority()]).unwrap();
         assert!(game.player(p1).cards_in(HAND).has(GRIZZLY_BEARS));
         assert!(game.player(p1).cards_in(HAND).has(LIGHTNING_BOLT));
         assert_eq!(
-            game.zone_of(
-                game.player(p1).cards_in(LIBRARY).matching(MURDER).exactly::<1>().unwrap()[0]
-            ),
+            game.zone_of(game.player(p1).cards_in(LIBRARY).exactly::<1>(MURDER).unwrap()[0]),
             LIBRARY
         );
     }

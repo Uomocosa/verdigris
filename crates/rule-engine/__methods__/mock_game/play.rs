@@ -80,8 +80,7 @@ mod tests {
     fn test_usage() {
         let (mut game, [p1, p2]) =
             MockGame::new([P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]), P2]);
-        let [bolt] =
-            game.player(p1).cards_in(HAND).matching(LIGHTNING_BOLT).exactly::<1>().unwrap();
+        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT).unwrap();
 
         play(
             &mut game,
@@ -95,8 +94,7 @@ mod tests {
     #[test]
     fn play_with_an_empty_mana_pool_reports_the_rejection() {
         let (mut game, [p1, p2]) = MockGame::new([P1.hand([LIGHTNING_BOLT]), P2]);
-        let [bolt] =
-            game.player(p1).cards_in(HAND).matching(LIGHTNING_BOLT).exactly::<1>().unwrap();
+        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT).unwrap();
 
         let error = play(
             &mut game,
@@ -120,9 +118,8 @@ mod tests {
             P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
             P2.hand([NEGATE]).mana_pool(mana![1, U]),
         ]);
-        let [bolt] =
-            game.player(p1).cards_in(HAND).matching(LIGHTNING_BOLT).exactly::<1>().unwrap();
-        let [negate] = game.player(p2).cards_in(HAND).matching(NEGATE).exactly::<1>().unwrap();
+        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT).unwrap();
+        let [negate] = game.player(p2).cards_in(HAND).exactly::<1>(NEGATE).unwrap();
 
         game.play([
             p1.cast(bolt).targeting(p2).end_turn(),
@@ -131,10 +128,8 @@ mod tests {
         .unwrap();
 
         assert_eq!(game.player(p2).life(), 20);
-        assert!(
-            game.player(p1).cards_in(GRAVEYARD).matching(LIGHTNING_BOLT).exactly::<1>().is_ok()
-        );
-        assert!(game.player(p2).cards_in(GRAVEYARD).matching(NEGATE).exactly::<1>().is_ok());
+        assert!(game.player(p1).cards_in(GRAVEYARD).exactly::<1>(LIGHTNING_BOLT).is_ok());
+        assert!(game.player(p2).cards_in(GRAVEYARD).exactly::<1>(NEGATE).is_ok());
         let turn = *game.app.world().resource::<turns::Turn>();
         assert_eq!(turn.number, 2);
         assert_eq!(turn.active, p2);
@@ -146,10 +141,9 @@ mod tests {
             P1.hand([LIGHTNING_BOLT, DISPEL]).mana_pool(mana![R, U]),
             P2.hand([CANCEL]).mana_pool(mana![1, U, U]),
         ]);
-        let [bolt] =
-            game.player(p1).cards_in(HAND).matching(LIGHTNING_BOLT).exactly::<1>().unwrap();
-        let [dispel] = game.player(p1).cards_in(HAND).matching(DISPEL).exactly::<1>().unwrap();
-        let [cancel] = game.player(p2).cards_in(HAND).matching(CANCEL).exactly::<1>().unwrap();
+        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT).unwrap();
+        let [dispel] = game.player(p1).cards_in(HAND).exactly::<1>(DISPEL).unwrap();
+        let [cancel] = game.player(p2).cards_in(HAND).exactly::<1>(CANCEL).unwrap();
 
         game.play([
             p1.cast(bolt).targeting(p2).pass_priority(),

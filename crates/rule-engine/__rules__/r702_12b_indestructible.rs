@@ -45,9 +45,8 @@ mod tests {
             P1.hand([MURDER]).mana_pool(mana![1, B, B]),
             P2.battlefield([DARKSTEEL_MYR]),
         ]);
-        let [murder] = game.player(p1).cards_in(HAND).matching(MURDER).exactly::<1>().unwrap();
-        let [myr] =
-            game.player(p2).cards_in(BATTLEFIELD).matching(DARKSTEEL_MYR).exactly::<1>().unwrap();
+        let [murder] = game.player(p1).cards_in(HAND).exactly::<1>(MURDER).unwrap();
+        let [myr] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(DARKSTEEL_MYR).unwrap();
         game.play([
             p1.cast(murder).targeting(myr).pass_priority(),
             p2.pass_priority(),
@@ -62,9 +61,8 @@ mod tests {
             P1.hand([MURDER]).mana_pool(mana![1, B, B]),
             P2.battlefield([DARKSTEEL_MYR]),
         ]);
-        let [murder] = game.player(p1).cards_in(HAND).matching(MURDER).exactly::<1>().unwrap();
-        let [myr] =
-            game.player(p2).cards_in(BATTLEFIELD).matching(DARKSTEEL_MYR).exactly::<1>().unwrap();
+        let [murder] = game.player(p1).cards_in(HAND).exactly::<1>(MURDER).unwrap();
+        let [myr] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(DARKSTEEL_MYR).unwrap();
         game.play([
             p1.cast(murder).targeting(myr).pass_priority(),
             p2.pass_priority(),
@@ -81,10 +79,8 @@ mod tests {
             P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
             P2.battlefield([DARKSTEEL_MYR]),
         ]);
-        let [bolt] =
-            game.player(p1).cards_in(HAND).matching(LIGHTNING_BOLT).exactly::<1>().unwrap();
-        let [myr] =
-            game.player(p2).cards_in(BATTLEFIELD).matching(DARKSTEEL_MYR).exactly::<1>().unwrap();
+        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT).unwrap();
+        let [myr] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(DARKSTEEL_MYR).unwrap();
         game.play([
             p1.cast(bolt).targeting(myr).pass_priority(),
             p2.pass_priority(),
@@ -101,9 +97,8 @@ mod tests {
             P1.hand([DOOM_BLADE]).mana_pool(mana![1, B]),
             P2.battlefield([DARKSTEEL_MYR]),
         ]);
-        let [blade] = game.player(p1).cards_in(HAND).matching(DOOM_BLADE).exactly::<1>().unwrap();
-        let [myr] =
-            game.player(p2).cards_in(BATTLEFIELD).matching(DARKSTEEL_MYR).exactly::<1>().unwrap();
+        let [blade] = game.player(p1).cards_in(HAND).exactly::<1>(DOOM_BLADE).unwrap();
+        let [myr] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(DARKSTEEL_MYR).unwrap();
         game.play([
             p1.cast(blade).targeting(myr).pass_priority(),
             p2.pass_priority(),

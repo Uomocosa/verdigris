@@ -43,6 +43,14 @@ impl CardsInZone {
         let matching = self.matching_cards(card);
         testing::Cards::from_matches(matching, card.label(), self.zone, self.player)
     }
+
+    pub fn exactly<const N: usize>(
+        &self,
+        card: impl Into<testing::CardQuery>,
+    ) -> Result<[testing::TestCard; N], testing::CardsError> {
+        let matching = self.matching(card);
+        matching.exactly::<N>()
+    }
 }
 
 #[atomic_delegates]
@@ -72,18 +80,17 @@ mod tests {
         assert!(cards.has_no(MURDER));
         assert_eq!(cards.matching(LIGHTNING_BOLT).len(), 2);
         assert!(cards.matching(MURDER).is_empty());
-        assert!(cards.matching(LIGHTNING_BOLT).exactly::<1>().is_err());
+        assert!(cards.exactly::<1>(LIGHTNING_BOLT).is_err());
     }
 
     #[test]
     fn exactly_returns_the_single_matching_card() {
         let (game, [p1, ..]) = MockGame::new([P1.hand([LIGHTNING_BOLT]), P2]);
         let cards = game.player(p1).cards_in(HAND);
-        let [found] =
-            cards.matching(LIGHTNING_BOLT).exactly::<1>().expect("P1 holds one Lightning Bolt");
+        let [found] = cards.exactly::<1>(LIGHTNING_BOLT).expect("P1 holds one Lightning Bolt");
 
         assert!(cards.has(found));
-        assert_eq!(cards.matching(found).exactly::<1>(), Ok([found]));
+        assert_eq!(cards.exactly::<1>(found), Ok([found]));
     }
 
     #[test]
@@ -95,7 +102,7 @@ mod tests {
         assert_eq!(cards.len(), 0);
         assert!(cards.has_no(GRIZZLY_BEARS));
         assert_eq!(
-            cards.matching(GRIZZLY_BEARS).exactly::<1>(),
+            cards.exactly::<1>(GRIZZLY_BEARS),
             Err(CardsError::WrongCount {
                 player: PlayerSeat(1),
                 card: "Grizzly Bears".to_string(),
