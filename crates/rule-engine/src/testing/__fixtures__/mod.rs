@@ -1,5 +1,6 @@
 mod cancel;
 mod darksteel_myr;
+mod disfigure;
 mod dispel;
 mod divination;
 mod doom_blade;
@@ -18,6 +19,7 @@ mod walking_corpse;
 
 pub use cancel::CANCEL;
 pub use darksteel_myr::DARKSTEEL_MYR;
+pub use disfigure::DISFIGURE;
 pub use dispel::DISPEL;
 pub use divination::DIVINATION;
 pub use doom_blade::DOOM_BLADE;

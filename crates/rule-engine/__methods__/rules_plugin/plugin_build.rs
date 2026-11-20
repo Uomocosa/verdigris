@@ -73,6 +73,7 @@ pub fn plugin_build(_rules_plugin: &RulesPlugin, app: &mut App) {
     app.add_systems(
         Update,
         (
+            rules::r704_5f_zero_toughness::r704_5f_zero_toughness,
             rules::r704_5g_lethal_damage::r704_5g_lethal_damage,
             rules::r704_5h_deathtouch_damage::r704_5h_deathtouch_damage,
             rules::r702_12b_indestructible::r702_12b_indestructible,

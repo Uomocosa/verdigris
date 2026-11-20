@@ -23,6 +23,7 @@ pub mod r701_9_discard;
 pub mod r702_12b_indestructible;
 pub mod r704_5a_zero_life;
 pub mod r704_5b_empty_library;
+pub mod r704_5f_zero_toughness;
 pub mod r704_5g_lethal_damage;
 pub mod r704_5h_deathtouch_damage;
 pub mod rule_set;
