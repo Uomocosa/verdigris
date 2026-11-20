@@ -111,7 +111,6 @@ mod tests {
     use crate::mana;
     use crate::testing::*;
     use crate::turns;
-    use crate::zones;
     use crate::{BATTLEFIELD, HAND, LIBRARY};
 
     use super::MockGame;
@@ -128,28 +127,14 @@ mod tests {
         assert_eq!(game.life(p1), 20);
         assert_eq!(game.life(p2), 20);
 
-        let first_bear = game
-            .player(p1)
-            .cards_in(LIBRARY)
-            .matching(GRIZZLY_BEARS)
-            .first()
-            .expect("P1 library holds Grizzly Bears");
-        let library = *game
-            .app
-            .world()
-            .get::<zones::InZone>(Entity::from(first_bear))
-            .unwrap();
-        let bears_in_library = game
-            .app
-            .world()
-            .iter_entities()
-            .filter(|entity| {
-                entity
-                    .get::<zones::InZone>()
-                    .is_some_and(|in_zone| *in_zone == library)
-            })
-            .count();
-        assert_eq!(bears_in_library, 12);
+        for player in [p1, p2] {
+            let library = game.player(player).cards_in(LIBRARY);
+            assert_eq!(library.len(), 12);
+            library
+                .matching(GRIZZLY_BEARS)
+                .exactly::<12>()
+                .expect("default library is 12 Grizzly Bears");
+        }
         assert!(game.player(p1).cards_in(HAND).has_no(GRIZZLY_BEARS));
         assert!(game.player(p2).cards_in(HAND).has_no(GRIZZLY_BEARS));
 
