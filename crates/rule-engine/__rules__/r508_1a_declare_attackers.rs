@@ -84,14 +84,13 @@ mod tests {
             P1.battlefield([GRIZZLY_BEARS]),
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
+        let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
         game.play([
             p1.pass_to(turns::Step::DeclareAttackers),
             p2.pass_to(turns::Step::DeclareAttackers),
+            p1.declare_attackers([bears]),
         ])
         .unwrap();
-        let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
-
-        game.act(p1, actions::Action::DeclareAttackers(vec![bears.into()]));
 
         assert!(game.app.world().get::<crate::cards::Attacking>(bears.into()).is_some());
     }
@@ -102,20 +101,16 @@ mod tests {
             P1.battlefield([GRIZZLY_BEARS]),
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
-        game.play([
-            p1.pass_to(turns::Step::DeclareAttackers),
-            p2.pass_to(turns::Step::DeclareAttackers),
-        ])
-        .unwrap();
         let [attacking] =
             game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
         let [defending] =
             game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
-
-        game.act(
-            p1,
-            actions::Action::DeclareAttackers(vec![attacking.into()]),
-        );
+        game.play([
+            p1.pass_to(turns::Step::DeclareAttackers),
+            p2.pass_to(turns::Step::DeclareAttackers),
+            p1.declare_attackers([attacking]),
+        ])
+        .unwrap();
 
         assert!(game.app.world().get::<crate::cards::Attacking>(attacking.into()).is_some());
         assert!(game.app.world().get::<crate::cards::Attacking>(defending.into()).is_none());
@@ -127,13 +122,13 @@ mod tests {
             P1.battlefield([GRIZZLY_BEARS]),
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
+        let [defending] =
+            game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
         game.play([
             p1.pass_to(turns::Step::DeclareAttackers),
             p2.pass_to(turns::Step::DeclareAttackers),
         ])
         .unwrap();
-        let [defending] =
-            game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
 
         game.act(
             p1,
@@ -155,12 +150,12 @@ mod tests {
             P1.battlefield_tapped([GRIZZLY_BEARS]),
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
+        let [tapped] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
         game.play([
             p1.pass_to(turns::Step::DeclareAttackers),
             p2.pass_to(turns::Step::DeclareAttackers),
         ])
         .unwrap();
-        let [tapped] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
 
         game.act(p1, actions::Action::DeclareAttackers(vec![tapped.into()]));
 

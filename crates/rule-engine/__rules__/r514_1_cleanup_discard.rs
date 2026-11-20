@@ -41,7 +41,6 @@ pub fn r514_1_cleanup_discard(
 
 #[cfg(test)]
 mod tests {
-    use crate::actions;
     use crate::testing::*;
     use crate::{GRAVEYARD, HAND};
 
@@ -68,9 +67,9 @@ mod tests {
             ]),
             P2,
         ]);
-        game.play([p1.end_turn(), p2.end_turn()]).unwrap();
         let [bears] = game.player(p1).cards_in(HAND).exactly::<1>(GRIZZLY_BEARS).unwrap();
-        game.act(p1, actions::Action::ChooseDiscard(vec![bears.into()]));
+        game.play([p1.end_turn(), p2.end_turn()]).unwrap();
+        game.play([p1.discard([bears])]).unwrap();
         assert_eq!(game.zone_of(bears), GRAVEYARD);
         assert_eq!(game.player(p1).cards_in(HAND).len(), 7);
     }

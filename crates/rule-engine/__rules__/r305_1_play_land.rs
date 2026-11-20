@@ -100,7 +100,7 @@ mod tests {
     fn test_usage() {
         let (mut game, [p1, ..]) = MockGame::new([P1.hand([FOREST]), P2]);
         let [forest] = game.player(p1).cards_in(HAND).exactly::<1>(FOREST).unwrap();
-        game.act(p1, actions::Action::PlayLand(forest.into()));
+        game.play([p1.play_land(forest)]).unwrap();
         assert_eq!(game.zone_of(forest), BATTLEFIELD);
     }
 
@@ -109,7 +109,7 @@ mod tests {
         let (mut game, [p1, ..]) = MockGame::new([P1.hand([FOREST]), P2]);
         let [forest] = game.player(p1).cards_in(HAND).exactly::<1>(FOREST).unwrap();
 
-        game.act(p1, actions::Action::PlayLand(forest.into()));
+        game.play([p1.play_land(forest)]).unwrap();
 
         assert_eq!(game.zone_of(forest), BATTLEFIELD);
         assert!(game.last_rejection().is_none());
@@ -120,7 +120,7 @@ mod tests {
         let (mut game, [p1, ..]) = MockGame::new([P1.hand([FOREST, FOREST]), P2]);
         let [first, second] = game.player(p1).cards_in(HAND).exactly::<2>(FOREST).unwrap();
 
-        game.act(p1, actions::Action::PlayLand(first.into()));
+        game.play([p1.play_land(first)]).unwrap();
         game.act(p1, actions::Action::PlayLand(second.into()));
 
         assert_eq!(game.zone_of(first), BATTLEFIELD);
@@ -138,8 +138,8 @@ mod tests {
         let (mut game, [p1, p2]) = MockGame::builder()
             .turn(2, turns::Step::PrecombatMain)
             .players([P1.hand([FOREST]), P2.active()]);
-        game.play([p2.pass_priority()]).unwrap();
         let [forest] = game.player(p1).cards_in(HAND).exactly::<1>(FOREST).unwrap();
+        game.play([p2.pass_priority()]).unwrap();
 
         game.act(p1, actions::Action::PlayLand(forest.into()));
 

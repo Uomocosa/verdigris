@@ -20,6 +20,34 @@ impl TestPlayerActions {
     pub fn from_cast(player: testing::TestPlayer, spell: Entity) -> Self {}
 }
 
+#[atomic_delegates]
+impl TestPlayerActions {
+    #[must_use]
+    pub fn targeting(self, targets: impl Into<testing::Targets>) -> Self {}
+
+    #[must_use]
+    pub fn declare_attackers<const N: usize>(self, attackers: [testing::TestCard; N]) -> Self {}
+
+    #[must_use]
+    pub fn declare_blockers<const N: usize>(
+        self,
+        blocks: [(testing::TestCard, testing::TestCard); N],
+    ) -> Self {
+    }
+
+    #[must_use]
+    pub fn discard<const N: usize>(self, cards: [testing::TestCard; N]) -> Self {}
+}
+
+#[rustfmt::skip]
+impl TestPlayerActions {
+    #[must_use]
+    pub fn pass_priority(self) -> Self { self.act(actions::Action::PassPriority) }
+
+    #[must_use]
+    pub fn play_land(self, land: testing::TestCard) -> Self { self.act(actions::Action::PlayLand(land.into())) }
+}
+
 impl TestPlayerActions {
     #[must_use]
     pub fn activate_ability(self, ability: testing::TestAbility) -> Self {
@@ -32,21 +60,6 @@ impl TestPlayerActions {
         let player = *self.player;
         let spell = spell.into();
         self.with_step(testing::PlayStep::Act(player, actions::Action::Cast(spell)))
-    }
-
-    #[must_use]
-    pub fn targeting(self, targets: impl Into<testing::Targets>) -> Self {
-        let step = testing::PlayStep::Act(
-            *self.player,
-            actions::Action::ChooseTargets(targets.into().into_entities()),
-        );
-        self.with_step(step)
-    }
-
-    #[must_use]
-    pub fn pass_priority(self) -> Self {
-        let step = testing::PlayStep::Act(*self.player, actions::Action::PassPriority);
-        self.with_step(step)
     }
 
     #[must_use]
@@ -91,6 +104,11 @@ impl TestPlayerActions {
         self.steps.push(step);
         self
     }
+
+    pub(crate) fn act(self, action: actions::Action) -> Self {
+        let player = *self.player;
+        self.with_step(testing::PlayStep::Act(player, action))
+    }
 }
 
 #[cfg(test)]
@@ -134,6 +152,38 @@ mod tests {
             ))
             .steps,
             Vec::new()
+        );
+    }
+
+    #[test]
+    fn declare_attackers_declare_blockers_play_land_and_discard_push_act_steps() {
+        let mut world = World::new();
+        let caster = world.spawn_empty().id();
+        let attacker = world.spawn_empty().id();
+        let blocker = world.spawn_empty().id();
+        let land = world.spawn_empty().id();
+        let card = world.spawn_empty().id();
+
+        let actions = testing::TestPlayer::from_entity_and_seat(caster, testing::PlayerSeat(1))
+            .declare_attackers([testing::TestCard(attacker)])
+            .declare_blockers([(testing::TestCard(blocker), testing::TestCard(attacker))])
+            .play_land(testing::TestCard(land))
+            .discard([testing::TestCard(card)]);
+
+        assert_eq!(
+            actions.steps,
+            vec![
+                testing::PlayStep::Act(caster, actions::Action::DeclareAttackers(vec![attacker])),
+                testing::PlayStep::Act(
+                    caster,
+                    actions::Action::DeclareBlockers(vec![actions::BlockAssignment {
+                        blocker,
+                        attacker,
+                    }])
+                ),
+                testing::PlayStep::Act(caster, actions::Action::PlayLand(land)),
+                testing::PlayStep::Act(caster, actions::Action::ChooseDiscard(vec![card])),
+            ]
         );
     }
 

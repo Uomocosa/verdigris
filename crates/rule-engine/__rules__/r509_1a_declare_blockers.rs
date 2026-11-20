@@ -87,30 +87,21 @@ mod tests {
             P1.battlefield([TYPHOID_RATS]),
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
+        let [rats] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TYPHOID_RATS).unwrap();
+        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
         game.play([
             p1.pass_to(turns::Step::DeclareAttackers),
             p2.pass_to(turns::Step::DeclareAttackers),
+            p1.declare_attackers([rats]),
         ])
         .unwrap();
-        let [rats] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TYPHOID_RATS).unwrap();
-
-        game.act(p1, actions::Action::DeclareAttackers(vec![rats.into()]));
 
         game.play([
             p1.pass_to(turns::Step::DeclareBlockers),
             p2.pass_to(turns::Step::DeclareBlockers),
         ])
         .unwrap();
-        game.play([p1.pass_priority()]).unwrap();
-        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
-
-        game.act(
-            p2,
-            actions::Action::DeclareBlockers(vec![actions::BlockAssignment {
-                blocker: bears.into(),
-                attacker: rats.into(),
-            }]),
-        );
+        game.play([p1.pass_priority(), p2.declare_blockers([(bears, rats)])]).unwrap();
 
         assert_eq!(
             game.app.world().get::<crate::cards::Blocking>(bears.into()),
@@ -124,30 +115,21 @@ mod tests {
             P1.battlefield([TYPHOID_RATS]),
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
+        let [rats] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TYPHOID_RATS).unwrap();
+        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
         game.play([
             p1.pass_to(turns::Step::DeclareAttackers),
             p2.pass_to(turns::Step::DeclareAttackers),
+            p1.declare_attackers([rats]),
         ])
         .unwrap();
-        let [rats] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TYPHOID_RATS).unwrap();
-
-        game.act(p1, actions::Action::DeclareAttackers(vec![rats.into()]));
 
         game.play([
             p1.pass_to(turns::Step::DeclareBlockers),
             p2.pass_to(turns::Step::DeclareBlockers),
         ])
         .unwrap();
-        game.play([p1.pass_priority()]).unwrap();
-        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
-
-        game.act(
-            p2,
-            actions::Action::DeclareBlockers(vec![actions::BlockAssignment {
-                blocker: bears.into(),
-                attacker: rats.into(),
-            }]),
-        );
+        game.play([p1.pass_priority(), p2.declare_blockers([(bears, rats)])]).unwrap();
 
         assert_eq!(
             game.app.world().get::<crate::cards::Blocking>(bears.into()),
@@ -162,14 +144,14 @@ mod tests {
             P1.battlefield([TYPHOID_RATS]),
             P2.battlefield_tapped([GRIZZLY_BEARS]),
         ]);
+        let [rats] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TYPHOID_RATS).unwrap();
+        let [tapped] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
         game.play([
             p1.pass_to(turns::Step::DeclareAttackers),
             p2.pass_to(turns::Step::DeclareAttackers),
+            p1.declare_attackers([rats]),
         ])
         .unwrap();
-        let [rats] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TYPHOID_RATS).unwrap();
-
-        game.act(p1, actions::Action::DeclareAttackers(vec![rats.into()]));
 
         game.play([
             p1.pass_to(turns::Step::DeclareBlockers),
@@ -177,7 +159,6 @@ mod tests {
         ])
         .unwrap();
         game.play([p1.pass_priority()]).unwrap();
-        let [tapped] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
         let assignments = vec![actions::BlockAssignment {
             blocker: tapped.into(),
             attacker: rats.into(),
@@ -198,14 +179,15 @@ mod tests {
             P1.battlefield([TYPHOID_RATS, GRIZZLY_BEARS]),
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
+        let [rats] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TYPHOID_RATS).unwrap();
+        let [idle] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
+        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
         game.play([
             p1.pass_to(turns::Step::DeclareAttackers),
             p2.pass_to(turns::Step::DeclareAttackers),
+            p1.declare_attackers([rats]),
         ])
         .unwrap();
-        let [rats] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TYPHOID_RATS).unwrap();
-
-        game.act(p1, actions::Action::DeclareAttackers(vec![rats.into()]));
 
         game.play([
             p1.pass_to(turns::Step::DeclareBlockers),
@@ -213,8 +195,6 @@ mod tests {
         ])
         .unwrap();
         game.play([p1.pass_priority()]).unwrap();
-        let [idle] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
-        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
         assert!(game.app.world().get::<crate::cards::Attacking>(idle.into()).is_none());
         let assignments = vec![actions::BlockAssignment {
             blocker: bears.into(),

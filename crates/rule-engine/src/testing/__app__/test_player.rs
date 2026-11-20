@@ -40,6 +40,18 @@ impl TestPlayer {
     pub fn pass_priority(self) -> testing::TestPlayerActions { testing::TestPlayerActions::of(self).pass_priority() }
 
     #[must_use]
+    pub fn declare_attackers<const N: usize>(self, attackers: [testing::TestCard; N]) -> testing::TestPlayerActions { testing::TestPlayerActions::of(self).declare_attackers(attackers) }
+
+    #[must_use]
+    pub fn declare_blockers<const N: usize>(self, blocks: [(testing::TestCard, testing::TestCard); N]) -> testing::TestPlayerActions { testing::TestPlayerActions::of(self).declare_blockers(blocks) }
+
+    #[must_use]
+    pub fn play_land(self, land: testing::TestCard) -> testing::TestPlayerActions { testing::TestPlayerActions::of(self).play_land(land) }
+
+    #[must_use]
+    pub fn discard<const N: usize>(self, cards: [testing::TestCard; N]) -> testing::TestPlayerActions { testing::TestPlayerActions::of(self).discard(cards) }
+
+    #[must_use]
     pub fn pass_to(self, step: turns::Step) -> testing::TestPlayerActions { testing::TestPlayerActions::of(self).pass_to(step) }
 
     #[must_use]
@@ -56,6 +68,7 @@ impl TestPlayer {
 mod tests {
     use bevy::prelude::{Entity, World};
 
+    use crate::actions;
     use crate::testing;
     use crate::turns;
 
@@ -64,6 +77,10 @@ mod tests {
         let mut world = World::new();
         let entity = world.spawn_empty().id();
         let spell = world.spawn_empty().id();
+        let attacker = world.spawn_empty().id();
+        let blocker = world.spawn_empty().id();
+        let land = world.spawn_empty().id();
+        let card = world.spawn_empty().id();
         let player = testing::TestPlayer::from_entity_and_seat(entity, testing::PlayerSeat(1));
 
         assert_eq!(Entity::from(player), entity);
@@ -76,6 +93,39 @@ mod tests {
                 player: entity,
                 until: testing::AutoPassUntil::StepStarts(turns::Step::PostcombatMain),
             }]
+        );
+        assert_eq!(
+            player.declare_attackers([testing::TestCard(attacker)]).steps,
+            vec![testing::PlayStep::Act(
+                entity,
+                actions::Action::DeclareAttackers(vec![attacker])
+            )]
+        );
+        assert_eq!(
+            player
+                .declare_blockers([(testing::TestCard(blocker), testing::TestCard(attacker))])
+                .steps,
+            vec![testing::PlayStep::Act(
+                entity,
+                actions::Action::DeclareBlockers(vec![actions::BlockAssignment {
+                    blocker,
+                    attacker,
+                }])
+            )]
+        );
+        assert_eq!(
+            player.play_land(testing::TestCard(land)).steps,
+            vec![testing::PlayStep::Act(
+                entity,
+                actions::Action::PlayLand(land)
+            )]
+        );
+        assert_eq!(
+            player.discard([testing::TestCard(card)]).steps,
+            vec![testing::PlayStep::Act(
+                entity,
+                actions::Action::ChooseDiscard(vec![card])
+            )]
         );
     }
 }

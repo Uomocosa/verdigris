@@ -1,4 +1,12 @@
+mod declare_attackers;
+mod declare_blockers;
+mod discard;
 mod from_cast;
 mod of;
+mod targeting;
+pub use declare_attackers::declare_attackers;
+pub use declare_blockers::declare_blockers;
+pub use discard::discard;
 pub use from_cast::from_cast;
 pub use of::of;
+pub use targeting::targeting;
