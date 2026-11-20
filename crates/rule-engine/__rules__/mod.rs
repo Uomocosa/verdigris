@@ -3,6 +3,7 @@ pub mod r104_2a_wins_when_opponents_left;
 pub mod r106_4_mana_empties;
 pub mod r117_3a_r117_3c_r117_3d_priority;
 pub mod r117_4_priority;
+pub mod r117_5_r704_3_state_based_actions;
 pub mod r119_3_life_loss;
 pub mod r120_3_r120_3a_r120_3e_damage_results;
 pub mod r121_1_r121_2_draw;

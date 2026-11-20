@@ -10,6 +10,9 @@ pub const ANY: effects::PlayerRef = effects::PlayerRef::Any;
 /// 514.1 Maximum hand size (normally seven).
 pub const MAX_HAND_SIZE: usize = 7;
 
+/// Guards the 117.5 loop against an endless chain of state-based actions.
+pub const MAX_STATE_BASED_PASSES: u32 = 64;
+
 pub const HAND: zones::Zone = zones::Zone::Hand;
 pub const BATTLEFIELD: zones::Zone = zones::Zone::Battlefield;
 pub const GRAVEYARD: zones::Zone = zones::Zone::Graveyard;

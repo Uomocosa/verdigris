@@ -1,11 +1,12 @@
 use bevy::prelude::{App, IntoScheduleConfigs, Update};
 
 use crate::RuleSet;
+use crate::StateBasedActions;
 use crate::rules;
 
 pub fn add_state_based_systems(app: &mut App) {
     app.add_systems(
-        Update,
+        StateBasedActions,
         (
             rules::r704_5f_zero_toughness::r704_5f_zero_toughness,
             rules::r704_5g_lethal_damage::r704_5g_lethal_damage,
@@ -15,7 +16,11 @@ pub fn add_state_based_systems(app: &mut App) {
             rules::r704_5b_empty_library::r704_5b_empty_library,
             rules::r104_2a_wins_when_opponents_left::r104_2a_wins_when_opponents_left,
         )
-            .chain()
+            .chain(),
+    );
+    app.add_systems(
+        Update,
+        rules::r117_5_r704_3_state_based_actions::r117_5_r704_3_state_based_actions
             .in_set(RuleSet::StateBased),
     );
 }
@@ -24,6 +29,8 @@ pub fn add_state_based_systems(app: &mut App) {
 mod tests {
     use bevy::prelude::{App, Schedule, Update};
 
+    use crate::StateBasedActions;
+
     use super::add_state_based_systems;
 
     #[test]
@@ -31,6 +38,10 @@ mod tests {
         let mut app = App::new();
         add_state_based_systems(&mut app);
 
-        assert_eq!(app.get_schedule(Update).map(Schedule::systems_len), Some(7));
+        assert_eq!(app.get_schedule(Update).map(Schedule::systems_len), Some(1));
+        assert_eq!(
+            app.get_schedule(StateBasedActions).map(Schedule::systems_len),
+            Some(7)
+        );
     }
 }

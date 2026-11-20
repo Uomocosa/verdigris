@@ -1,5 +1,6 @@
 use bevy::prelude::App;
 
+use crate::StateBasedActionsPerformed;
 use crate::actions;
 use crate::damage;
 use crate::effects;
@@ -21,6 +22,7 @@ pub fn register_messages_and_resources(app: &mut App) {
         .add_message::<turns::StepStarted>()
         .add_message::<turns::AllPlayersPassed>();
     app.init_resource::<actions::PendingChoice>();
+    app.init_resource::<StateBasedActionsPerformed>();
 }
 
 #[cfg(test)]

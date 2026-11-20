@@ -1,15 +1,18 @@
-use bevy::prelude::{Commands, Entity, Query, Without};
+use bevy::prelude::{Commands, Entity, Query, ResMut, Without};
 
+use crate::StateBasedActionsPerformed;
 use crate::players;
 
 /// 704.5a If a player has 0 or less life, that player loses the game.
 pub fn r704_5a_zero_life(
     mut commands: Commands,
+    mut state_based_actions_performed: ResMut<StateBasedActionsPerformed>,
     players: Query<(Entity, &players::Life), Without<players::Lost>>,
 ) {
     for (player, life) in players.iter() {
         if **life <= 0 {
             commands.entity(player).insert(players::Lost);
+            **state_based_actions_performed = true;
         }
     }
 }
