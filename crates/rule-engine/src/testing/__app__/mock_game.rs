@@ -101,7 +101,6 @@ mod tests {
     use bevy::prelude::Entity;
 
     use crate::actions;
-    use crate::cards;
     use crate::mana;
     use crate::testing::*;
     use crate::turns;
@@ -142,9 +141,7 @@ mod tests {
         let (game, [p1, p2, ..]) =
             MockGame::builder().turn(3, turns::Step::PostcombatMain).players([
                 P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
-                P2.active()
-                    .battlefield([GRIZZLY_BEARS])
-                    .library([cards::CardDefinition::from(MURDER)]),
+                P2.active().battlefield([GRIZZLY_BEARS]).library([MURDER]),
                 P3,
                 P4,
             ]);

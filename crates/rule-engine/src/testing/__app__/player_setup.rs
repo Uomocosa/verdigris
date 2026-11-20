@@ -57,8 +57,17 @@ impl PlayerSetup {
     }
 
     #[must_use]
-    pub fn library(mut self, definitions: impl IntoIterator<Item = cards::CardDefinition>) -> Self {
-        self.library = Some(definitions.into_iter().collect());
+    pub fn library(
+        mut self,
+        definitions: impl IntoIterator<Item = impl Into<cards::CardDefinition>>,
+    ) -> Self {
+        self.library = Some(definitions.into_iter().map(Into::into).collect());
+        self
+    }
+
+    #[must_use]
+    pub fn empty_library(mut self) -> Self {
+        self.library = Some(Vec::new());
         self
     }
 
@@ -95,7 +104,7 @@ mod tests {
             .mana_pool(mana![2, U])
             .hand([DIVINATION])
             .battlefield([GRIZZLY_BEARS])
-            .library([cards::CardDefinition::from(MURDER)]);
+            .library([MURDER]);
 
         assert_eq!(setup.seat, 3);
         assert_eq!(setup.life, 7);
@@ -110,6 +119,7 @@ mod tests {
             Some(vec![cards::CardDefinition::from(MURDER)])
         );
         assert!(!setup.active);
+        assert_eq!(P1.empty_library().library, Some(vec![]));
     }
 
     #[test]

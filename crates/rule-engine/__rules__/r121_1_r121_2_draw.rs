@@ -46,7 +46,6 @@ pub fn r121_1_r121_2_draw(
 
 #[cfg(test)]
 mod tests {
-    use crate::cards;
     use crate::mana;
     use crate::testing::*;
     use crate::{GRAVEYARD, HAND, LIBRARY};
@@ -66,11 +65,7 @@ mod tests {
     fn r121_1_divination_draws_the_top_two_cards_of_the_library() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([DIVINATION])
-                .library([
-                    cards::CardDefinition::from(GRIZZLY_BEARS),
-                    cards::CardDefinition::from(LIGHTNING_BOLT),
-                    cards::CardDefinition::from(MURDER),
-                ])
+                .library([GRIZZLY_BEARS, LIGHTNING_BOLT, MURDER])
                 .mana_pool(mana![2, U]),
             P2,
         ]);

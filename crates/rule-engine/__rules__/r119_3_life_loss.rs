@@ -20,7 +20,6 @@ pub fn r119_3_life_loss(
 #[cfg(test)]
 mod tests {
     use crate::HAND;
-    use crate::cards;
     use crate::mana;
     use crate::players;
     use crate::testing::*;
@@ -42,10 +41,7 @@ mod tests {
     fn r119_3_sign_in_blood_makes_the_target_draw_two_cards_and_lose_two_life() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([SIGN_IN_BLOOD]).mana_pool(mana![B, B]),
-            P2.library([
-                cards::CardDefinition::from(LIGHTNING_BOLT),
-                cards::CardDefinition::from(MURDER),
-            ]),
+            P2.library([LIGHTNING_BOLT, MURDER]),
         ]);
         let [sign_in_blood] = game.player(p1).cards_in(HAND).exactly::<1>(SIGN_IN_BLOOD)?;
         game.play([
@@ -63,12 +59,7 @@ mod tests {
     #[test]
     fn r119_3_sign_in_blood_can_target_its_controller() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
-            P1.hand([SIGN_IN_BLOOD])
-                .library([
-                    cards::CardDefinition::from(LIGHTNING_BOLT),
-                    cards::CardDefinition::from(MURDER),
-                ])
-                .mana_pool(mana![B, B]),
+            P1.hand([SIGN_IN_BLOOD]).library([LIGHTNING_BOLT, MURDER]).mana_pool(mana![B, B]),
             P2,
         ]);
         let [sign_in_blood] = game.player(p1).cards_in(HAND).exactly::<1>(SIGN_IN_BLOOD)?;
@@ -88,7 +79,7 @@ mod tests {
     -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([SIGN_IN_BLOOD]).mana_pool(mana![B, B]),
-            P2.library([]),
+            P2.empty_library(),
         ]);
         let [sign_in_blood] = game.player(p1).cards_in(HAND).exactly::<1>(SIGN_IN_BLOOD)?;
         game.play([

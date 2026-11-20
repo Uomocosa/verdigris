@@ -34,7 +34,6 @@ pub fn r103_8a_r504_1_draw_step(
 
 #[cfg(test)]
 mod tests {
-    use crate::cards;
     use crate::testing::*;
     use crate::turns;
     use crate::{HAND, LIBRARY};
@@ -55,13 +54,9 @@ mod tests {
 
     #[test]
     fn r103_8a_first_player_skips_the_draw_step_of_their_first_turn() -> TestResult {
-        let (mut game, [p1, p2]) = MockGame::builder().turn(1, turns::Step::Upkeep).players([
-            P1.library([
-                cards::CardDefinition::from(GRIZZLY_BEARS),
-                cards::CardDefinition::from(LIGHTNING_BOLT),
-            ]),
-            P2,
-        ]);
+        let (mut game, [p1, p2]) = MockGame::builder()
+            .turn(1, turns::Step::Upkeep)
+            .players([P1.library([GRIZZLY_BEARS, LIGHTNING_BOLT]), P2]);
         let hand_before = game.player(p1).cards_in(HAND).len();
 
         game.play([p1.pass_priority(), p2.pass_priority(), p1.pass_priority()])?;
@@ -76,13 +71,9 @@ mod tests {
 
     #[test]
     fn r103_8a_the_active_player_draws_a_card_during_their_draw_step() -> TestResult {
-        let (mut game, [p1, p2]) = MockGame::builder().turn(2, turns::Step::Upkeep).players([
-            P1.library([
-                cards::CardDefinition::from(GRIZZLY_BEARS),
-                cards::CardDefinition::from(LIGHTNING_BOLT),
-            ]),
-            P2,
-        ]);
+        let (mut game, [p1, p2]) = MockGame::builder()
+            .turn(2, turns::Step::Upkeep)
+            .players([P1.library([GRIZZLY_BEARS, LIGHTNING_BOLT]), P2]);
         let [top] = game.player(p1).cards_in(LIBRARY).exactly::<1>(GRIZZLY_BEARS)?;
 
         game.play([p1.pass_priority(), p2.pass_priority(), p1.pass_priority()])?;
