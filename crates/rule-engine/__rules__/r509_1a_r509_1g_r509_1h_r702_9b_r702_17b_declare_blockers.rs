@@ -107,34 +107,7 @@ mod tests {
     use crate::turns;
 
     #[test]
-    fn test_usage() -> TestResult {
-        let (mut game, [p1, p2]) = MockGame::new([
-            P1.battlefield([TYPHOID_RATS]),
-            P2.battlefield([GRIZZLY_BEARS]),
-        ]);
-        let [rats] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TYPHOID_RATS)?;
-        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
-        game.play([
-            p1.pass_to(turns::Step::DeclareAttackers),
-            p2.pass_to(turns::Step::DeclareAttackers),
-            p1.declare_attackers([rats]),
-        ])?;
-
-        game.play([
-            p1.pass_to(turns::Step::DeclareBlockers),
-            p2.pass_to(turns::Step::DeclareBlockers),
-        ])?;
-        game.play([p1.pass_priority(), p2.declare_blockers([(bears, rats)])])?;
-
-        assert_eq!(
-            game.app.world().get::<crate::cards::Blocking>(bears.into()),
-            Some(&crate::cards::Blocking(rats.into()))
-        );
-        Ok(())
-    }
-
-    #[test]
-    fn r509_1a_declared_blockers_become_blocking_and_attacker_blocked() -> TestResult {
+    fn declared_blockers_become_blocking_and_attacker_blocked() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield([TYPHOID_RATS]),
             P2.battlefield([GRIZZLY_BEARS]),
@@ -162,7 +135,7 @@ mod tests {
     }
 
     #[test]
-    fn r509_1a_a_tapped_creature_cannot_be_declared_as_a_blocker() -> TestResult {
+    fn a_tapped_creature_cannot_be_declared_as_a_blocker() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield([TYPHOID_RATS]),
             P2.battlefield_tapped([GRIZZLY_BEARS]),
@@ -196,7 +169,7 @@ mod tests {
     }
 
     #[test]
-    fn r509_1a_a_creature_that_is_not_attacking_cannot_be_blocked() -> TestResult {
+    fn a_creature_that_is_not_attacking_cannot_be_blocked() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield([TYPHOID_RATS, GRIZZLY_BEARS]),
             P2.battlefield([GRIZZLY_BEARS]),
@@ -231,7 +204,7 @@ mod tests {
     }
 
     #[test]
-    fn r702_9b_a_creature_without_flying_or_reach_cannot_block_a_flyer() -> TestResult {
+    fn a_creature_without_flying_or_reach_cannot_block_a_flyer() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield([WIND_DRAKE]),
             P2.battlefield([GRIZZLY_BEARS]),
@@ -264,7 +237,7 @@ mod tests {
     }
 
     #[test]
-    fn r702_17b_a_creature_with_reach_can_block_a_flyer() -> TestResult {
+    fn a_creature_with_reach_can_block_a_flyer() -> TestResult {
         let (mut game, [p1, p2]) =
             MockGame::new([P1.battlefield([WIND_DRAKE]), P2.battlefield([GIANT_SPIDER])]);
         let [drake] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(WIND_DRAKE)?;

@@ -75,7 +75,7 @@ mod tests {
     use crate::{HAND, STACK};
 
     #[test]
-    fn test_usage() -> TestResult {
+    fn casting_an_instant_moves_it_to_the_stack() -> TestResult {
         let (mut game, [p1, ..]) =
             MockGame::new([P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]), P2]);
         let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
@@ -85,7 +85,7 @@ mod tests {
     }
 
     #[test]
-    fn r601_2a_sorcery_cannot_be_cast_on_an_opponents_turn() -> TestResult {
+    fn sorcery_cannot_be_cast_on_an_opponents_turn() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::builder()
             .turn(2, turns::Step::PrecombatMain)
             .players([P1.hand([DIVINATION]).mana_pool(mana![2, U]), P2.active()]);
@@ -103,7 +103,7 @@ mod tests {
     }
 
     #[test]
-    fn r601_2a_sorcery_cannot_be_cast_while_the_stack_is_not_empty() -> TestResult {
+    fn sorcery_cannot_be_cast_while_the_stack_is_not_empty() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([LIGHTNING_BOLT, DIVINATION]).mana_pool(mana![R, 2, U]),
             P2,

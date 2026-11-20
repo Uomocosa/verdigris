@@ -185,19 +185,7 @@ mod tests {
     use crate::{BATTLEFIELD, HAND, STACK};
 
     #[test]
-    fn test_usage() -> TestResult {
-        let (mut game, [p1, ..]) = MockGame::new([
-            P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
-            P2.battlefield([GRIZZLY_BEARS]),
-        ]);
-        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
-        game.play([p1.cast(bolt)])?;
-        assert!(game.target_choice().is_some());
-        Ok(())
-    }
-
-    #[test]
-    fn r601_2c_bolt_lists_every_legal_target() -> TestResult {
+    fn bolt_lists_every_legal_target() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
             P2.battlefield([GRIZZLY_BEARS]),
@@ -213,7 +201,7 @@ mod tests {
     }
 
     #[test]
-    fn r601_2c_spell_with_no_legal_target_cannot_be_cast() -> TestResult {
+    fn spell_with_no_legal_target_cannot_be_cast() -> TestResult {
         let (mut game, [p1, ..]) = MockGame::new([P1.hand([MURDER]).mana_pool(mana![1, B, B]), P2]);
         let [murder] = game.player(p1).cards_in(HAND).exactly::<1>(MURDER)?;
         let err = game.play([p1.cast(murder)]).unwrap_err();
@@ -228,7 +216,7 @@ mod tests {
     }
 
     #[test]
-    fn r601_2c_doom_blade_lists_only_nonblack_creatures() -> TestResult {
+    fn doom_blade_lists_only_nonblack_creatures() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([DOOM_BLADE]).mana_pool(mana![1, B]),
             P2.battlefield([GRIZZLY_BEARS, WALKING_CORPSE]),
@@ -241,7 +229,7 @@ mod tests {
     }
 
     #[test]
-    fn r601_2c_doom_blade_rejects_a_black_creature_as_target() -> TestResult {
+    fn doom_blade_rejects_a_black_creature_as_target() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([DOOM_BLADE]).mana_pool(mana![1, B]),
             P2.battlefield([GRIZZLY_BEARS, WALKING_CORPSE]),
@@ -259,7 +247,7 @@ mod tests {
     }
 
     #[test]
-    fn r601_2c_doom_blade_cannot_be_cast_with_only_black_creatures() -> TestResult {
+    fn doom_blade_cannot_be_cast_with_only_black_creatures() -> TestResult {
         let (mut game, [p1, ..]) = MockGame::new([
             P1.hand([DOOM_BLADE]).mana_pool(mana![1, B]),
             P2.battlefield([WALKING_CORPSE]),
@@ -277,7 +265,7 @@ mod tests {
     }
 
     #[test]
-    fn r601_2c_cancel_cannot_target_a_permanent() -> TestResult {
+    fn cancel_cannot_target_a_permanent() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([LIGHTNING_BOLT, CANCEL]).mana_pool(mana![1, U, U, R]),
             P2.battlefield([GRIZZLY_BEARS]),
@@ -301,7 +289,7 @@ mod tests {
     }
 
     #[test]
-    fn r601_2c_essence_scatter_cannot_target_a_noncreature_spell() -> TestResult {
+    fn essence_scatter_cannot_target_a_noncreature_spell() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
             P2.hand([ESSENCE_SCATTER]).mana_pool(mana![1, U]),
@@ -328,7 +316,7 @@ mod tests {
     }
 
     #[test]
-    fn r601_2c_negate_cannot_target_a_creature_spell() -> TestResult {
+    fn negate_cannot_target_a_creature_spell() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([GRIZZLY_BEARS]).mana_pool(mana![1, G]),
             P2.hand([NEGATE]).mana_pool(mana![1, U]),
@@ -350,7 +338,7 @@ mod tests {
     }
 
     #[test]
-    fn r601_2c_dispel_cannot_target_a_sorcery_spell() -> TestResult {
+    fn dispel_cannot_target_a_sorcery_spell() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([DIVINATION]).mana_pool(mana![2, U]),
             P2.hand([DISPEL]).mana_pool(mana![U]),
@@ -372,7 +360,7 @@ mod tests {
     }
 
     #[test]
-    fn r601_2c_any_target_in_multiplayer() -> TestResult {
+    fn any_target_in_multiplayer() -> TestResult {
         let (mut game, [p1, p2, p3, p4]) =
             MockGame::new([P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]), P2, P3, P4]);
         let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;

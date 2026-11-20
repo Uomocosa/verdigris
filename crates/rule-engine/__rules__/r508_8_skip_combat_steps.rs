@@ -42,7 +42,7 @@ mod tests {
     use crate::turns;
 
     #[test]
-    fn r508_8_no_attackers_skips_the_declare_blockers_and_combat_damage_steps() -> TestResult {
+    fn no_attackers_skips_the_declare_blockers_and_combat_damage_steps() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([P1, P2]);
 
         game.play([
@@ -59,7 +59,7 @@ mod tests {
     }
 
     #[test]
-    fn test_usage() -> TestResult {
+    fn attackers_continue_to_declare_blockers() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield([GRIZZLY_BEARS]),
             P2.battlefield([GRIZZLY_BEARS]),

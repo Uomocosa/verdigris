@@ -159,7 +159,7 @@ mod tests {
     use crate::turns;
 
     #[test]
-    fn r510_2_blocked_creatures_deal_damage_to_each_other() -> TestResult {
+    fn blocked_creatures_deal_damage_to_each_other() -> TestResult {
         use crate::BATTLEFIELD;
 
         let (mut game, [p1, p2]) = MockGame::new([
@@ -191,7 +191,7 @@ mod tests {
     }
 
     #[test]
-    fn r510_2_unblocked_creature_deals_damage_to_the_defending_player() -> TestResult {
+    fn unblocked_creature_deals_damage_to_the_defending_player() -> TestResult {
         use crate::BATTLEFIELD;
 
         let (mut game, [p1, p2]) = MockGame::new([
@@ -217,7 +217,7 @@ mod tests {
     }
 
     #[test]
-    fn r510_1a_a_pumped_creature_assigns_combat_damage_equal_to_its_modified_power() -> TestResult {
+    fn a_pumped_creature_assigns_combat_damage_equal_to_its_modified_power() -> TestResult {
         use crate::BATTLEFIELD;
         use crate::HAND;
 
@@ -249,7 +249,7 @@ mod tests {
     }
 
     #[test]
-    fn r510_1c_a_blocked_creature_divides_its_damage_among_its_blockers() -> TestResult {
+    fn a_blocked_creature_divides_its_damage_among_its_blockers() -> TestResult {
         use crate::BATTLEFIELD;
         use crate::actions;
         use crate::damage;
@@ -305,7 +305,7 @@ mod tests {
     }
 
     #[test]
-    fn r702_19b_trample_assigns_excess_damage_to_the_defending_player() -> TestResult {
+    fn trample_assigns_excess_damage_to_the_defending_player() -> TestResult {
         use crate::BATTLEFIELD;
         use crate::GRAVEYARD;
 
@@ -342,7 +342,7 @@ mod tests {
     }
 
     #[test]
-    fn test_usage() -> TestResult {
+    fn creature_with_zero_power_assigns_no_damage() -> TestResult {
         use crate::BATTLEFIELD;
 
         let (mut game, [p1, p2]) = MockGame::new([

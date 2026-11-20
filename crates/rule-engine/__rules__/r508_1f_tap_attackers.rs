@@ -20,24 +20,7 @@ mod tests {
     use crate::turns;
 
     #[test]
-    fn test_usage() -> TestResult {
-        let (mut game, [p1, p2]) = MockGame::new([
-            P1.battlefield([GRIZZLY_BEARS]),
-            P2.battlefield([GRIZZLY_BEARS]),
-        ]);
-        let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
-        game.play([
-            p1.pass_to(turns::Step::DeclareAttackers),
-            p2.pass_to(turns::Step::DeclareAttackers),
-            p1.declare_attackers([bears]),
-        ])?;
-
-        assert!(game.app.world().get::<crate::cards::Tapped>(bears.into()).is_some());
-        Ok(())
-    }
-
-    #[test]
-    fn r508_1f_declaring_an_attacker_taps_it() -> TestResult {
+    fn declaring_an_attacker_taps_it() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield([GRIZZLY_BEARS]),
             P2.battlefield([GRIZZLY_BEARS]),

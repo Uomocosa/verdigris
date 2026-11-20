@@ -44,7 +44,7 @@ mod tests {
     use crate::{GRAVEYARD, HAND};
 
     #[test]
-    fn test_usage() -> TestResult {
+    fn cleanup_with_empty_hand_discards_nothing() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([P1, P2]);
         game.play([p1.end_turn(), p2.end_turn()])?;
 
@@ -53,7 +53,7 @@ mod tests {
     }
 
     #[test]
-    fn r514_1_active_player_discards_excess_cards_in_cleanup() -> TestResult {
+    fn active_player_discards_excess_cards_in_cleanup() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([
                 GRIZZLY_BEARS,
