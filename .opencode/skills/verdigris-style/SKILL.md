@@ -87,11 +87,22 @@ Each scenario is tested at exactly one level (RATIONALE §21, SMELLS S12):
 | Level | Where | What it tests | Style |
 |---|---|---|---|
 | Method | `__methods__/…` `test_usage` | how to call it, one minimal case; honest corners as `#[rstest]` | `testing` fixtures |
-| Rule | `__rules__/` with `MockGame` | simple tests, one rule at a time, the smallest setup that shows it | `MockGame` + fixtures |
+| Rule | `__rules__/` with `MockGame` (tests named for the behaviour they check, no `test_usage`) | simple tests, one rule at a time, the smallest setup that shows it | `MockGame` + fixtures |
 | Scenario | `tests/` (planned, does not exist yet) | complex games where several rules interact, an expected outcome, detailed asserts | `MockGame` |
 
 A method test does not repeat what its rule test shows; a `tests/` scenario exists only
 when several rules interact.
+
+**Smell — rule test named after the rule id.** The file name already carries the rule ids;
+the test name says the behaviour.
+
+```rust
+// Bad
+fn r702_19b_trample_assigns_excess_damage_to_the_defending_player()
+
+// Good
+fn trample_assigns_excess_damage_to_the_defending_player()
+```
 
 Cards in tests come from `testing` fixtures (`testing::GARRUKS_COMPANION`,
 `testing::GRIZZLY_BEARS`, …; call `(FIXTURE.definition)()` where a `CardDefinition` is

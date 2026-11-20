@@ -70,8 +70,8 @@ same state and would otherwise be split for no reason (see `r117_3_priority`,
 its doc comment. Never group rules only to make a proposal look bigger.
 
 **Duplicates.** Before proposing a test, search for one of the same scenario
-(`grep -rn "fn r<num>" crates/` plus a search on the card and the action). If one exists, the
-proposal extends or reuses it (AGENTS rule 8).
+(search the rule file `crates/rule-engine/__rules__/r<num>*` plus a search on the card and
+the action). If one exists, the proposal extends or reuses it (AGENTS rule 8).
 
 ## 3. Write each proposal
 
@@ -92,8 +92,8 @@ targeting rule in `r601_2c_targets`) rather than a new system, say so, name the 
 extends, and say whether a dedicated system was considered and why not — the goal is one
 system per rule (or rule group), so extending is the exception.
 
-**Test** — the full red `MockGame` test (rust fence), named after the rule
-(`r<num>_<behaviour>`), driven only through builder setup and player actions (`act`,
+**Test** — the full red `MockGame` test (rust fence), named for the behaviour it checks
+(no `r<num>_` prefix: the file name already carries the rule ids), driven only through builder setup and player actions (`act`,
 `pass_priority`, `pass_priority_all`, `end_turn`), asserting each state. Never writes messages
 or components with `app.world_mut()`. If no action can reach the state yet:
 `#[ignore = "needs <feature>: <why>"]` and say which proposal/feature unblocks it.
@@ -121,7 +121,8 @@ Rules for the code: one system per file, it only reads world state and writes
 messages/choices/components, no time, no randomness except `GameRng`, no input; relative words
 (`YOU`, `OPPONENT`, `ANY`) resolved at rule time for 2+ players — a CR rule worded "in a
 two-player game" (e.g. 103.8a) must say what the system does with 3+ players (see 103.8b–c); `thiserror` errors, no
-`unwrap`/`expect`/`panic` in production code; the file ends with a `test_usage` test.
+`unwrap`/`expect`/`panic` in production code; a `__rules__/` file ends with a test named
+for the behaviour it checks (no `test_usage` there — VRDG005 bans it).
 
 ## 4. Output
 
@@ -149,7 +150,7 @@ proposals:
     new_cards: ["Typhoid Rats"]   # [] if fixtures suffice
     new_syntax: false
     deps_missing: ["506.1"]       # CR rules still needed first; [] if none
-    unignores: ["r704_5h_deathtouch_damage_destroys_a_larger_creature"]
+    unignores: ["deathtouch_damage_destroys_a_larger_creature"]
     removes_notes: []             # rule files whose `# Notes` section this deletes
     score: 11
 ```
