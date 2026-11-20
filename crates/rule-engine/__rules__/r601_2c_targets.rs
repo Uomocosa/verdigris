@@ -106,6 +106,7 @@ pub fn r601_2c_targets(
             actions::Action::ChooseDiscard(_)
             | actions::Action::DeclareAttackers(_)
             | actions::Action::DeclareBlockers(_)
+            | actions::Action::PlayLand(_)
             | actions::Action::PassPriority => {}
         }
     }

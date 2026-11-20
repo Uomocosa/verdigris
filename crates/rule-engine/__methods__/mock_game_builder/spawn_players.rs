@@ -8,7 +8,12 @@ pub fn spawn_players(app: &mut App, setups: &[testing::PlayerSetup]) -> Vec<Enti
         .iter()
         .map(|setup| {
             app.world_mut()
-                .spawn((players::Player, players::Life(setup.life), setup.mana_pool))
+                .spawn((
+                    players::Player,
+                    players::Life(setup.life),
+                    players::LandsPlayedThisTurn::NONE,
+                    setup.mana_pool,
+                ))
                 .id()
         })
         .collect()

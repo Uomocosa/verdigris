@@ -16,6 +16,9 @@ pub enum Rejected {
     CannotCast {
         spell: Entity,
     },
+    CannotPlayLand {
+        land: Entity,
+    },
     CannotPay {
         spell: Entity,
     },
