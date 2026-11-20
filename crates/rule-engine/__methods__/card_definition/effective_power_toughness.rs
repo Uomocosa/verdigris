@@ -5,14 +5,8 @@ pub fn effective_power_toughness(
     definition: &cards::CardDefinition,
     modifier: Option<&effects::PowerToughnessModifier>,
 ) -> Option<cards::PowerToughness> {
-    let base = definition.power_toughness?;
-    let Some(modifier) = modifier else {
-        return Some(base);
-    };
-    Some(cards::PowerToughness {
-        power: base.power.saturating_add(modifier.power),
-        toughness: base.toughness.saturating_add(modifier.toughness),
-    })
+    let from_printed_value = cards::Characteristics::from_printed(definition, false);
+    from_printed_value.with_modifier(modifier).power_toughness
 }
 
 #[cfg(test)]

@@ -3,6 +3,7 @@ pub mod card_definition;
 pub mod cards;
 #[cfg(feature = "testing")]
 pub mod cards_in_zone;
+pub mod characteristics;
 pub mod combat_damage_choice;
 pub mod effect;
 #[cfg(feature = "testing")]

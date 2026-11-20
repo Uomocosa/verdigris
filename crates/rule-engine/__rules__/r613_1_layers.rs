@@ -1,0 +1,91 @@
+use bevy::prelude::{Commands, Entity, Has, Query};
+
+use crate::BATTLEFIELD;
+use crate::cards;
+use crate::effects;
+use crate::zones;
+
+/// 613.1. The values of an object’s characteristics are determined by starting with the actual
+/// object. For a card, that means the values of the characteristics printed on that card. For a
+/// token or a copy of a spell or card, that means the values of the characteristics defined by the
+/// effect that created it. Then all applicable continuous effects are applied in a series of layers
+/// in the following order:
+///
+/// # See also
+///
+/// 613.4c Layer 7c: Effects and counters that modify power and/or toughness (but don’t set power
+/// and/or toughness to a specific number or value) are applied.
+///
+/// 613.5. The application of continuous effects as described by the layer system is continually and
+/// automatically performed by the game. All resulting changes to an object’s characteristics are
+/// instantaneous.
+pub fn r613_1_layers(
+    mut commands: Commands,
+    cards: Query<(
+        Entity,
+        &cards::CardDefinition,
+        &zones::InZone,
+        Option<&effects::PowerToughnessModifier>,
+    )>,
+    first_markers: Query<(Has<cards::OnBattlefield>, Has<cards::Indestructible>)>,
+    second_markers: Query<(Has<cards::Deathtouch>, Has<cards::Lifelink>)>,
+    third_markers: Query<(Has<cards::Trample>, Has<cards::Flying>)>,
+    fourth_markers: Query<(Has<cards::Reach>, Option<&cards::EffectivePT>)>,
+    zone_entities: Query<(Entity, &zones::Zone, Option<&cards::Owner>)>,
+) {
+    for (card, definition, in_zone, modifier) in cards.iter() {
+        let Ok((has_on_battlefield, has_indestructible)) = first_markers.get(card) else {
+            continue;
+        };
+        let Ok((has_deathtouch, has_lifelink)) = second_markers.get(card) else {
+            continue;
+        };
+        let Ok((has_trample, has_flying)) = third_markers.get(card) else {
+            continue;
+        };
+        let Ok((has_reach, current_effective)) = fourth_markers.get(card) else {
+            continue;
+        };
+        let on_battlefield = BATTLEFIELD.contains_card(**in_zone, &zone_entities);
+        let characteristics = cards::Characteristics::from_printed(definition, on_battlefield)
+            .with_modifier(modifier);
+        characteristics.write_markers(
+            &mut commands.entity(card),
+            (
+                has_on_battlefield,
+                current_effective.copied().map(|effective| *effective),
+                has_indestructible,
+                has_deathtouch,
+                has_lifelink,
+                has_trample,
+                has_flying,
+                has_reach,
+            ),
+        );
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::cards;
+    use crate::testing::*;
+    use crate::{BATTLEFIELD, HAND};
+
+    #[test]
+    fn battlefield_cards_get_derived_markers() -> TestResult {
+        let (mut game, [p1, _]) =
+            MockGame::new([P1.battlefield([GRIZZLY_BEARS]).hand([GIANT_GROWTH]), P2]);
+        let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        let [growth] = game.player(p1).cards_in(HAND).exactly::<1>(GIANT_GROWTH)?;
+        game.pass_priority();
+        let world = game.app.world();
+        assert!(world.get::<cards::OnBattlefield>(bears.into()).is_some());
+        assert_eq!(
+            world.get::<cards::EffectivePT>(bears.into()).copied(),
+            Some(cards::EffectivePT(crate::pt!(2, 2)))
+        );
+        assert!(world.get::<cards::OnBattlefield>(growth.into()).is_none());
+        assert!(world.get::<cards::EffectivePT>(growth.into()).is_none());
+        Ok(())
+    }
+}

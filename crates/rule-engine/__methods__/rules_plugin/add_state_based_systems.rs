@@ -8,6 +8,7 @@ pub fn add_state_based_systems(app: &mut App) {
     app.add_systems(
         StateBasedActions,
         (
+            rules::r613_1_layers::r613_1_layers,
             rules::r704_5f_zero_toughness::r704_5f_zero_toughness,
             rules::r704_5g_lethal_damage::r704_5g_lethal_damage,
             rules::r704_5h_deathtouch_damage::r704_5h_deathtouch_damage,
@@ -41,7 +42,7 @@ mod tests {
         assert_eq!(app.get_schedule(Update).map(Schedule::systems_len), Some(1));
         assert_eq!(
             app.get_schedule(StateBasedActions).map(Schedule::systems_len),
-            Some(7)
+            Some(8)
         );
     }
 }

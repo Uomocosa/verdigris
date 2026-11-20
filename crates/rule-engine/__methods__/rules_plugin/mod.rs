@@ -1,4 +1,5 @@
 mod add_cleanup_systems;
+mod add_layers_systems;
 mod add_priority_action_systems;
 mod add_resolution_systems;
 mod add_state_based_systems;
@@ -10,6 +11,7 @@ mod configure_schedule_sets;
 mod plugin_build;
 mod register_messages_and_resources;
 pub use add_cleanup_systems::add_cleanup_systems;
+pub use add_layers_systems::add_layers_systems;
 pub use add_priority_action_systems::add_priority_action_systems;
 pub use add_resolution_systems::add_resolution_systems;
 pub use add_state_based_systems::add_state_based_systems;

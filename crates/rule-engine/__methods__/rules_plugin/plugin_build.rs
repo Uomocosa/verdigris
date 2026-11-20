@@ -5,6 +5,7 @@ use crate::RulesPlugin;
 pub fn plugin_build(_rules_plugin: &RulesPlugin, app: &mut App) {
     RulesPlugin::register_messages_and_resources(app);
     RulesPlugin::configure_schedule_sets(app);
+    RulesPlugin::add_layers_systems(app);
     RulesPlugin::add_turn_systems(app);
     RulesPlugin::add_priority_action_systems(app);
     RulesPlugin::add_resolution_systems(app);

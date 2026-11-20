@@ -14,6 +14,8 @@ impl RulesPlugin {
 
     pub fn configure_schedule_sets(app: &mut App) {}
 
+    pub fn add_layers_systems(app: &mut App) {}
+
     pub fn add_turn_systems(app: &mut App) {}
 
     pub fn add_priority_action_systems(app: &mut App) {}
