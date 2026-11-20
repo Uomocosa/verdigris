@@ -5,6 +5,7 @@ use lele_lint::CommonArgs;
 use lele_lint::Config;
 use lele_lint::Project;
 use verdigris_lint::VerdigrisLinter;
+use verdigris_lint::rules;
 
 #[derive(Parser)]
 #[command(
@@ -71,6 +72,12 @@ fn main() -> ExitCode {
             return ExitCode::FAILURE;
         }
     };
+    if let Err(error) = rules::comprehensive_rules::ComprehensiveRules::try_from(
+        config_dir.join(lele_lint::config::CONFIG_FILENAME).as_path(),
+    ) {
+        eprintln!("verdigris-lint: {error}");
+        return ExitCode::FAILURE;
+    }
     project.config_dir = config_dir;
 
     if let Err(error) = VerdigrisLinter::include_rules_root(&mut project) {

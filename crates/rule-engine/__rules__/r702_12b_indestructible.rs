@@ -5,7 +5,7 @@ use crate::cards;
 use crate::damage;
 use crate::zones;
 
-/// 702.12b A permanent with indestructible can't be destroyed. Such permanents aren't destroyed by
+/// 702.12b A permanent with indestructible can’t be destroyed. Such permanents aren’t destroyed by
 /// lethal damage, and they ignore the state-based action that checks for lethal damage (see rule
 /// 704.5g).
 pub fn r702_12b_indestructible(

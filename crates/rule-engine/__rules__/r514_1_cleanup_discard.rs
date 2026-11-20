@@ -6,9 +6,9 @@ use crate::players;
 use crate::turns;
 use crate::zones;
 
-/// 514.1 First, if the active player's hand contains more cards than their maximum hand size
+/// 514.1. First, if the active player’s hand contains more cards than their maximum hand size
 /// (normally seven), they discard enough cards to reduce their hand size to that number. This
-/// turn-based action doesn't use the stack.
+/// turn-based action doesn’t use the stack.
 pub fn r514_1_cleanup_discard(
     mut step_started: MessageReader<turns::StepStarted>,
     mut discards: MessageWriter<players::DiscardRequested>,

@@ -5,7 +5,7 @@ use crate::cards;
 use crate::damage;
 use crate::zones;
 
-/// 704.5h If a creature has toughness greater than 0, and it's been dealt damage by a source with
+/// 704.5h If a creature has toughness greater than 0, and it’s been dealt damage by a source with
 /// deathtouch since the last time state-based actions were checked, that creature is destroyed.
 /// Regeneration can replace this event.
 pub fn r704_5h_deathtouch_damage(

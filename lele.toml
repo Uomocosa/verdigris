@@ -15,3 +15,6 @@ why        = "Rules read world state and write messages/choices/components; time
 folders    = ["crates/rule-engine/src"]
 cannot_use = ["bevy::render", "bevy::ui", "bevy::window", "std::time", "rand", "std::fs"]
 require    = "honest"
+
+[verdigris.lint]
+comprehensive_rules = "docs/MagicCompRules-20250919.txt"

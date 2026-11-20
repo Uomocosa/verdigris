@@ -3,11 +3,11 @@ use bevy::prelude::{Entity, MessageReader, MessageWriter, Query, Res, With};
 use crate::players;
 use crate::turns;
 
-/// 504.1 First, the active player draws a card. This turn-based action doesn’t use the stack.
+/// 504.1. First, the active player draws a card. This turn-based action doesn’t use the stack.
 ///
-/// 103.8a In a two-player game, the player who plays first skips the draw step (see rule 504,
-/// “Draw Step”) of their first turn.
-pub fn r504_1_draw_step(
+/// 103.8a In a two-player game, the player who plays first skips the draw step (see rule 504, “Draw
+/// Step”) of their first turn.
+pub fn r103_8a_r504_1_draw_step(
     mut step_started: MessageReader<turns::StepStarted>,
     mut draws: MessageWriter<players::DrawRequested>,
     turn: Res<turns::Turn>,

@@ -10,10 +10,10 @@ use crate::zones;
 /// chosen creatures must be untapped, they can’t also be battles, and each one must either have
 /// haste or have been controlled by the active player continuously since the turn began.
 ///
-/// 508.1k Each chosen creature still controlled by the active player becomes an attacking
-/// creature. It remains an attacking creature until it’s removed from combat or the combat phase
-/// ends, whichever comes first. See rule 506.4.
-pub fn r508_1a_declare_attackers(
+/// 508.1k Each chosen creature still controlled by the active player becomes an attacking creature.
+/// It remains an attacking creature until it’s removed from combat or the combat phase ends,
+/// whichever comes first. See rule 506.4.
+pub fn r508_1a_r508_1k_declare_attackers(
     mut actions: MessageReader<actions::PlayerAction>,
     mut rejected: MessageWriter<actions::Rejected>,
     mut commands: Commands,

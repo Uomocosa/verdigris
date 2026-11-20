@@ -6,32 +6,38 @@ use crate::cards;
 use crate::turns;
 use crate::zones;
 
-/// 305.6 The basic land types are Plains, Island, Swamp, Mountain, and Forest. If an object uses
-/// the words "basic land type," it's referring to one of these subtypes. An object with the land
-/// card type and a basic land type has the intrinsic ability "{T}: Add [mana symbol]," even if
-/// the text box doesn't actually contain that text or the object has no text box. For Plains,
-/// [mana symbol] is {W}; for Islands, {U}; for Swamps, {B}; for Mountains, {R}; and for Forests,
-/// {G}. See rule 107.4a. See also rule 605, "Mana Abilities."
+/// 305.6. The basic land types are Plains, Island, Swamp, Mountain, and Forest. If an object uses
+/// the words “basic land type,” it’s referring to one of these subtypes. An object with the land
+/// card type and a basic land type has the intrinsic ability “{T}: Add [mana symbol],” even if the
+/// text box doesn’t actually contain that text or the object has no text box. For Plains, [mana
+/// symbol] is {W}; for Islands, {U}; for Swamps, {B}; for Mountains, {R}; and for Forests, {G}. See
+/// rule 107.4a. See also rule 605, “Mana Abilities.”
+///
+/// # See also
 ///
 /// 605.1a An activated ability is a mana ability if it meets all of the following criteria: it
-/// doesn't require a target (see rule 115.6), it could add mana to a player's mana pool when it
-/// resolves, and it's not a loyalty ability. (See rule 606, "Loyalty Abilities.")
+/// doesn’t require a target (see rule 115.6), it could add mana to a player’s mana pool when it
+/// resolves, and it’s not a loyalty ability. (See rule 606, “Loyalty Abilities.”)
 ///
 /// 605.3a A player may activate an activated mana ability whenever they have priority, whenever
 /// they are casting a spell or activating an ability that requires a mana payment, or whenever a
-/// rule or effect asks for a mana payment, even if it's in the middle of casting or resolving a
+/// rule or effect asks for a mana payment, even if it’s in the middle of casting or resolving a
 /// spell or activating or resolving an ability.
 ///
-/// 605.3b An activated mana ability doesn't go on the stack, so it can't be targeted, countered,
-/// or otherwise responded to. Rather, it resolves immediately after it is activated. (See rule
+/// 605.3b An activated mana ability doesn’t go on the stack, so it can’t be targeted, countered, or
+/// otherwise responded to. Rather, it resolves immediately after it is activated. (See rule
 /// 405.6c.)
 ///
-/// 107.5 The tap symbol is {T}. The tap symbol in an activation cost means "Tap this permanent."
-/// A permanent that's already tapped can't be tapped again to pay the cost.
+/// 107.5. The tap symbol is {T}. The tap symbol in an activation cost means “Tap this permanent.” A
+/// permanent that’s already tapped can’t be tapped again to pay the cost. A creature’s activated
+/// ability with the tap symbol in its activation cost can’t be activated unless the creature has
+/// been under its controller’s control continuously since their most recent turn began. See rule
+/// 302.6.
 ///
-/// 118.3 A player can't pay a cost without having the necessary resources to pay it fully. For
-/// example, a player with only 1 life can't pay a cost of 2 life, and a permanent that's already
-/// tapped can't be tapped to pay a cost.
+/// 118.3. A player can’t pay a cost without having the necessary resources to pay it fully. For
+/// example, a player with only 1 life can’t pay a cost of 2 life, and a permanent that’s already
+/// tapped can’t be tapped to pay a cost. See rule 202, “Mana Cost and Color,” and rule 602,
+/// “Activating Activated Abilities.”
 pub fn r305_6_basic_land_mana_ability(
     mut actions: MessageReader<actions::PlayerAction>,
     mut rejected: MessageWriter<actions::Rejected>,

@@ -3,7 +3,7 @@ use bevy::prelude::{MessageReader, Query};
 use crate::damage;
 use crate::players;
 
-/// 119.3 If an effect causes a player to gain life or lose life, that player's life total is
+/// 119.3. If an effect causes a player to gain life or lose life, that player’s life total is
 /// adjusted accordingly.
 pub fn r119_3_life_loss(
     mut life_lost: MessageReader<players::LifeLost>,

@@ -5,10 +5,9 @@ use crate::cards;
 use crate::stack;
 use crate::zones;
 
-/// 701.6a To counter a spell or ability means to cancel it, removing it from the stack. It
-/// doesn't resolve and none of its effects occur. A countered spell is put into its owner's
-/// graveyard.
-pub fn r701_6_counter(
+/// 701.6a To counter a spell or ability means to cancel it, removing it from the stack. It doesn’t
+/// resolve and none of its effects occur. A countered spell is put into its owner’s graveyard.
+pub fn r701_6a_counter(
     mut countered: MessageReader<stack::Countered>,
     mut commands: Commands,
     spells: Query<(&cards::Owner, &zones::InZone)>,

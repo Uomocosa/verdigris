@@ -5,7 +5,7 @@ use crate::rules;
 pub fn add_step_end_systems(app: &mut App) {
     app.add_systems(
         Update,
-        rules::r500_2_step_ends::r500_2_step_ends.in_set(rules::RuleSet::StepEnd),
+        rules::r500_1_r500_2_step_ends::r500_1_r500_2_step_ends.in_set(rules::RuleSet::StepEnd),
     );
 }
 

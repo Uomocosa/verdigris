@@ -5,9 +5,9 @@ use crate::cards;
 use crate::stack;
 use crate::zones;
 
-/// 608.2n As the final part of an instant or sorcery spell's resolution, the spell is put into
-/// its owner's graveyard. As the final part of an ability's resolution, the ability is removed
-/// from the stack and ceases to exist.
+/// 608.2n As the final part of an instant or sorcery spell’s resolution, the spell is put into its
+/// owner’s graveyard. As the final part of an ability’s resolution, the ability is removed from the
+/// stack and ceases to exist.
 pub fn r608_2n_graveyard(
     mut resolutions: MessageReader<stack::Resolution>,
     mut commands: Commands,

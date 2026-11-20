@@ -4,9 +4,9 @@ use crate::damage;
 use crate::effects;
 use crate::turns;
 
-/// 514.2 Second, the following actions happen simultaneously: all damage marked on permanents
-/// (including phased-out permanents) is removed and all "until end of turn" and "this turn"
-/// effects end. This turn-based action doesn't use the stack.
+/// 514.2. Second, the following actions happen simultaneously: all damage marked on permanents
+/// (including phased-out permanents) is removed and all “until end of turn” and “this turn” effects
+/// end. This turn-based action doesn’t use the stack.
 pub fn r514_2_cleanup_step(
     mut step_started: MessageReader<turns::StepStarted>,
     mut commands: Commands,

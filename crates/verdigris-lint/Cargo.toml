@@ -21,6 +21,7 @@ lele-lint.workspace = true
 rule-examples-macro.workspace = true
 syn = { version = "=2.0.119", features = ["full"] }
 thiserror.workspace = true
+toml = "=0.8.23"
 
 [dev-dependencies]
 tempfile.workspace = true

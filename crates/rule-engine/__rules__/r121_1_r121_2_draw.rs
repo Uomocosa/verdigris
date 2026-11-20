@@ -5,16 +5,18 @@ use crate::cards;
 use crate::players;
 use crate::zones;
 
-/// 121.1 A player draws a card by putting the top card of their library into their hand. This is
-/// done as a turn-based action during each player's draw step. It may also be done as part of a
+/// 121.1. A player draws a card by putting the top card of their library into their hand. This is
+/// done as a turn-based action during each player’s draw step. It may also be done as part of a
 /// cost or effect of a spell or ability.
 ///
-/// 121.2 Cards may only be drawn one at a time. If a player is instructed to draw multiple cards,
+/// 121.2. Cards may only be drawn one at a time. If a player is instructed to draw multiple cards,
 /// that player performs that many individual card draws.
 ///
-/// The top card of a library is the first card in its `ZoneContents`, and `MockGameBuilder` lists
-/// a library top first.
-pub fn r121_1_draw(
+/// # Notes
+///
+/// The top card of a library is the first card in its `ZoneContents`, and `MockGameBuilder` lists a
+/// library top first.
+pub fn r121_1_r121_2_draw(
     mut draws: MessageReader<players::DrawRequested>,
     mut commands: Commands,
     zone_entities: Query<(Entity, &zones::Zone, Option<&cards::Owner>)>,

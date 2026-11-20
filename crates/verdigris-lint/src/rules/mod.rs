@@ -1,3 +1,6 @@
+pub mod comprehensive_rules;
+pub mod comprehensive_rules_error;
+pub(crate) mod rule_doc_text;
 pub(crate) mod rule_file_name;
 pub mod rule_file_stem;
 pub mod rule_file_stem_error;

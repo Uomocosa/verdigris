@@ -3,10 +3,18 @@ use bevy::prelude::{Commands, Entity, MessageReader, Query, With};
 use crate::cards;
 use crate::turns;
 
-/// 511.3. As soon as the end of combat step ends, all creatures, battles, and planeswalkers are removed from combat. After the end of combat step ends, the combat phase is over and the postcombat main phase begins (see rule 505).
+/// 511.3. As soon as the end of combat step ends, all creatures, battles, and planeswalkers are
+/// removed from combat. After the end of combat step ends, the combat phase is over and the
+/// postcombat main phase begins (see rule 505).
 ///
-/// 506.4. A permanent is removed from combat if it leaves the battlefield, if its controller changes, if it phases out, if an effect specifically removes it from combat, if it’s a planeswalker that’s being attacked and stops being a planeswalker, if it’s a battle that’s being attacked and stops being a battle, or if it’s an attacking or blocking creature that regenerates (see rule 701.19), stops being a creature, or becomes a battle. A creature that’s removed from combat stops being an attacking, blocking, blocked, and/or unblocked creature. A planeswalker or battle that’s removed from combat stops being attacked.
-pub fn r511_3_remove_from_combat(
+/// 506.4. A permanent is removed from combat if it leaves the battlefield, if its controller
+/// changes, if it phases out, if an effect specifically removes it from combat, if it’s a
+/// planeswalker that’s being attacked and stops being a planeswalker, if it’s a battle that’s being
+/// attacked and stops being a battle, or if it’s an attacking or blocking creature that regenerates
+/// (see rule 701.19), stops being a creature, or becomes a battle. A creature that’s removed from
+/// combat stops being an attacking, blocking, blocked, and/or unblocked creature. A planeswalker or
+/// battle that’s removed from combat stops being attacked.
+pub fn r506_4_r511_3_remove_from_combat(
     mut step_started: MessageReader<turns::StepStarted>,
     mut commands: Commands,
     attacking: Query<Entity, With<cards::Attacking>>,

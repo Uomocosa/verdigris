@@ -7,7 +7,7 @@ pub fn add_step_started_systems(app: &mut App) {
         Update,
         (
             rules::r106_4_mana_empties::r106_4_mana_empties,
-            rules::r504_1_draw_step::r504_1_draw_step,
+            rules::r103_8a_r504_1_draw_step::r103_8a_r504_1_draw_step,
         )
             .chain()
             .in_set(rules::RuleSet::StepStarted),
@@ -18,12 +18,12 @@ pub fn add_step_started_systems(app: &mut App) {
     );
     app.add_systems(
         Update,
-        rules::r511_3_remove_from_combat::r511_3_remove_from_combat
+        rules::r506_4_r511_3_remove_from_combat::r506_4_r511_3_remove_from_combat
             .in_set(rules::RuleSet::StepStarted),
     );
     app.add_systems(
         Update,
-        rules::r510_2_combat_damage::r510_2_combat_damage.in_set(rules::RuleSet::StepStarted),
+        rules::r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_combat_damage::r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_combat_damage.in_set(rules::RuleSet::StepStarted),
     );
 }
 

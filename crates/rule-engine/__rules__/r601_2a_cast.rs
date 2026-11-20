@@ -7,10 +7,11 @@ use crate::turns;
 use crate::zones;
 
 /// 601.2a To propose the casting of a spell, a player first moves that card (or that copy of a
-/// card) from where it is to the stack. It becomes the topmost object on the stack. It has all
-/// the characteristics of the card (or the copy of a card) associated with it, and that player
-/// becomes its controller. The spell remains on the stack until it resolves, it's countered, or
-/// a rule or effect moves it elsewhere.
+/// card) from where it is to the stack. It becomes the topmost object on the stack. It has all the
+/// characteristics of the card (or the copy of a card) associated with it, and that player becomes
+/// its controller. Any continuous effects that modify the characteristics of the spell as you start
+/// casting it begin as it is put on the stack (see rule 611.2f). The spell remains on the stack
+/// until it resolves, it’s countered, or a rule or effect moves it elsewhere.
 pub fn r601_2a_cast(
     mut actions: MessageReader<actions::PlayerAction>,
     mut rejected: MessageWriter<actions::Rejected>,

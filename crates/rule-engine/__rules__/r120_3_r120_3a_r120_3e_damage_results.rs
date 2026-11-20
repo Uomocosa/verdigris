@@ -4,14 +4,16 @@ use crate::cards;
 use crate::damage;
 use crate::players;
 
-/// 120.3 Damage may have one or more of the following results, depending on whether the recipient
-/// of the damage is a player or permanent, the characteristics of the damage's source, and the
-/// characteristics of the damage's recipient (if it's a permanent).
+/// 120.3. Damage may have one or more of the following results, depending on whether the recipient
+/// of the damage is a player or permanent, the characteristics of the damage’s source, and the
+/// characteristics of the damage’s recipient (if it’s a permanent).
+///
 /// 120.3a Damage dealt to a player by a source without infect causes that player to lose that much
 /// life.
+///
 /// 120.3e Damage dealt to a creature by a source with neither wither nor infect causes that much
 /// damage to be marked on that creature.
-pub fn r120_3_damage_results(
+pub fn r120_3_r120_3a_r120_3e_damage_results(
     mut damage_dealt: MessageReader<damage::DamageDealt>,
     mut commands: Commands,
     mut lives: Query<&mut players::Life>,

@@ -5,12 +5,14 @@ use crate::cards;
 use crate::stack;
 use crate::zones;
 
-/// 608.3. If the object that’s resolving is a permanent spell, its resolution may involve
-/// several steps. The instructions in rules 608.3a and b are always performed first. Then one
-/// of the steps in rule 608.3c–e is performed, if appropriate.
-///
 /// 608.3a If the object that’s resolving has no targets, it becomes a permanent and enters the
 /// battlefield under the control of the spell’s controller.
+///
+/// # See also
+///
+/// 608.3. If the object that’s resolving is a permanent spell, its resolution may involve several
+/// steps. The instructions in rules 608.3a and b are always performed first. Then one of the steps
+/// in rule 608.3c–e is performed, if appropriate.
 pub fn r608_3a_permanent_enters(
     mut resolutions: MessageReader<stack::Resolution>,
     mut commands: Commands,

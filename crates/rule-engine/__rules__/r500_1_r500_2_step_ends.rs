@@ -2,16 +2,16 @@ use bevy::prelude::{MessageReader, MessageWriter, ResMut};
 
 use crate::turns;
 
-/// 500.1 A turn consists of five phases, in this order: beginning, precombat main, combat,
+/// 500.1. A turn consists of five phases, in this order: beginning, precombat main, combat,
 /// postcombat main, and ending. Each of these phases takes place every turn, even if nothing
-/// happens during the phase. The beginning, combat, and ending phases are further broken down
-/// into steps, which proceed in order.
+/// happens during the phase. The beginning, combat, and ending phases are further broken down into
+/// steps, which proceed in order.
 ///
-/// 500.2 A phase or step in which players receive priority ends when the stack is empty and all
+/// 500.2. A phase or step in which players receive priority ends when the stack is empty and all
 /// players pass in succession. Simply having the stack become empty doesn’t cause such a phase or
 /// step to end; all players have to pass in succession with the stack empty. Because of this, each
 /// player gets a chance to add new things to the stack before that phase or step ends.
-pub fn r500_2_step_ends(
+pub fn r500_1_r500_2_step_ends(
     mut all_players_passed: MessageReader<turns::AllPlayersPassed>,
     mut step_started: MessageWriter<turns::StepStarted>,
     mut turn: ResMut<turns::Turn>,

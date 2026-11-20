@@ -2,21 +2,25 @@ use bevy::prelude::{MessageWriter, Res, ResMut};
 
 use crate::turns;
 
-/// 500.3 A step in which no players receive priority ends when all specified actions that take
-/// place during that step are completed. The only such steps are the untap step (see rule 502)
-/// and certain cleanup steps (see rule 514).
+/// 500.3. A step in which no players receive priority ends when all specified actions that take
+/// place during that step are completed. The only such steps are the untap step (see rule 502) and
+/// certain cleanup steps (see rule 514).
 ///
-/// 512.1 The ending phase consists of two steps: end and cleanup.
+/// 503.1. The upkeep step has no turn-based actions. Once it begins, the active player gets
+/// priority. (See rule 117, “Timing and Priority.”)
 ///
-/// 514.3 Normally, no player receives priority during the cleanup step, so no spells can be cast
-/// and no abilities can be activated.
+/// # See also
 ///
-/// 502.4 No player receives priority during the untap step, so no spells can be cast or resolve
-/// and no abilities can be activated or resolve.
+/// 502.4. No player receives priority during the untap step, so no spells can be cast or resolve
+/// and no abilities can be activated or resolve. Any ability that triggers during this step will be
+/// held until the next time a player would receive priority, which is usually during the upkeep
+/// step. (See rule 503, “Upkeep Step.”)
 ///
-/// 503.1 The upkeep step has no turn-based actions. Once it begins, the active player gets
-/// priority.
-pub fn r500_3_step_without_priority_ends(
+/// 512.1. The ending phase consists of two steps: end and cleanup.
+///
+/// 514.3. Normally, no player receives priority during the cleanup step, so no spells can be cast
+/// and no abilities can be activated. However, this rule is subject to the following exception:
+pub fn r500_3_r503_1_step_without_priority_ends(
     mut step_started: MessageWriter<turns::StepStarted>,
     mut turn: ResMut<turns::Turn>,
     mut priority: ResMut<turns::Priority>,

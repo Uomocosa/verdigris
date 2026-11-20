@@ -48,5 +48,6 @@ mod tests {
         assert!(linter.exemptions.iter().any(|exemption| exemption.code == "LELE034"));
         assert!(linter.rules.iter().any(|rule| rule.code() == "VRDG001"));
         assert!(linter.rules.iter().any(|rule| rule.code() == "VRDG002"));
+        assert!(linter.rules.iter().any(|rule| rule.code() == "VRDG003"));
     }
 }

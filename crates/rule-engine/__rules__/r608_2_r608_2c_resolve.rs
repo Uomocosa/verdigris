@@ -8,12 +8,18 @@ use crate::players;
 use crate::stack;
 use crate::zones;
 
-/// 608.2 If the object that's resolving is an instant spell, a sorcery spell, or an ability, its
-/// resolution may involve several steps. ... The steps described in rule 608.2n are followed
-/// last.
+/// 608.2. If the object that’s resolving is an instant spell, a sorcery spell, or an ability, its
+/// resolution may involve several steps. The steps described in rules 608.2a and 608.2b are
+/// followed first. The steps described in rules 608.2c–m are then followed as appropriate, in no
+/// specific order. The steps described in rule 608.2n and 608.2p are followed last.
 ///
 /// 608.2c The controller of the spell or ability follows its instructions in the order written.
-pub fn r608_2_resolve(
+/// However, replacement effects may modify these actions. In some cases, later text on the card may
+/// modify the meaning of earlier text (for example, “Destroy target creature. It can’t be
+/// regenerated” or “Counter target spell. If that spell is countered this way, put it on top of its
+/// owner’s library instead of into its owner’s graveyard.”) Don’t just apply effects step by step
+/// without thinking in these cases—read the whole text and apply the rules of English to the text.
+pub fn r608_2_r608_2c_resolve(
     mut resolutions: MessageReader<stack::Resolution>,
     mut damage_dealt: MessageWriter<damage::DamageDealt>,
     mut destructions: MessageWriter<damage::Destruction>,

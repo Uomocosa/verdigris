@@ -8,11 +8,12 @@ use crate::cards;
 use crate::players;
 use crate::zones;
 
-/// 701.9a To discard a card, move it from its owner's hand to that player's graveyard.
+/// 701.9a To discard a card, move it from its owner’s hand to that player’s graveyard.
 ///
 /// 701.9b By default, effects that cause a player to discard a card allow the affected player to
-/// choose which card to discard.
-pub fn r701_9_discard(
+/// choose which card to discard. Some effects, however, require a random discard or allow another
+/// player to choose which card is discarded.
+pub fn r701_9a_r701_9b_discard(
     mut discards: MessageReader<players::DiscardRequested>,
     mut actions: MessageReader<actions::PlayerAction>,
     mut rejected: MessageWriter<actions::Rejected>,

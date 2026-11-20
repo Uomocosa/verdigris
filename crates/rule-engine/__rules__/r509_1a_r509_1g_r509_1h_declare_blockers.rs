@@ -6,12 +6,22 @@ use crate::cards;
 use crate::turns;
 use crate::zones;
 
-/// 509.1a The defending player chooses which creatures they control, if any, will block. The chosen creatures must be untapped and they can’t also be battles. For each of the chosen creatures, the defending player chooses one creature for it to block that’s attacking that player, a planeswalker they control, or a battle they protect.
+/// 509.1a The defending player chooses which creatures they control, if any, will block. The chosen
+/// creatures must be untapped and they can’t also be battles. For each of the chosen creatures, the
+/// defending player chooses one creature for it to block that’s attacking that player, a
+/// planeswalker they control, or a battle they protect.
 ///
-/// 509.1g Each chosen creature still controlled by the defending player becomes a blocking creature. Each one is blocking the attacking creatures chosen for it. It remains a blocking creature until it’s removed from combat or the combat phase ends, whichever comes first. See rule 506.4.
+/// 509.1g Each chosen creature still controlled by the defending player becomes a blocking
+/// creature. Each one is blocking the attacking creatures chosen for it. It remains a blocking
+/// creature until it’s removed from combat or the combat phase ends, whichever comes first. See
+/// rule 506.4.
 ///
-/// 509.1h An attacking creature with one or more creatures declared as blockers for it becomes a blocked creature; one with no creatures declared as blockers for it becomes an unblocked creature. This remains unchanged until the creature is removed from combat, an effect says that it becomes blocked or unblocked, or the combat phase ends, whichever comes first. A creature remains blocked even if all the creatures blocking it are removed from combat.
-pub fn r509_1a_declare_blockers(
+/// 509.1h An attacking creature with one or more creatures declared as blockers for it becomes a
+/// blocked creature; one with no creatures declared as blockers for it becomes an unblocked
+/// creature. This remains unchanged until the creature is removed from combat, an effect says that
+/// it becomes blocked or unblocked, or the combat phase ends, whichever comes first. A creature
+/// remains blocked even if all the creatures blocking it are removed from combat.
+pub fn r509_1a_r509_1g_r509_1h_declare_blockers(
     mut actions: MessageReader<actions::PlayerAction>,
     mut rejected: MessageWriter<actions::Rejected>,
     mut commands: Commands,

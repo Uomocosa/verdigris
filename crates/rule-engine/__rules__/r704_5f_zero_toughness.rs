@@ -6,8 +6,8 @@ use crate::cards;
 use crate::effects;
 use crate::zones;
 
-/// 704.5f If a creature has toughness 0 or less, it's put into its owner's
-/// graveyard. Regeneration can't replace this event.
+/// 704.5f If a creature has toughness 0 or less, it’s put into its owner’s graveyard. Regeneration
+/// can’t replace this event.
 pub fn r704_5f_zero_toughness(
     mut commands: Commands,
     cards: Query<(

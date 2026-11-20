@@ -5,14 +5,13 @@ use crate::damage;
 use crate::players;
 use crate::turns;
 
-/// 510.1. First, the active player announces how each attacking creature assigns its combat
-/// damage, then the defending player announces how each blocking creature assigns its combat
-/// damage. This turn-based action doesn’t use the stack. A player assigns a creature’s combat
-/// damage according to the following rules:
+/// 510.1. First, the active player announces how each attacking creature assigns its combat damage,
+/// then the defending player announces how each blocking creature assigns its combat damage. This
+/// turn-based action doesn’t use the stack. A player assigns a creature’s combat damage according
+/// to the following rules:
 ///
 /// 510.1a Each attacking creature and each blocking creature assigns combat damage equal to its
-/// power. Creatures that would assign 0 or less damage this way don’t assign combat damage at
-/// all.
+/// power. Creatures that would assign 0 or less damage this way don’t assign combat damage at all.
 ///
 /// 510.1b An unblocked creature assigns its combat damage to the player, planeswalker, or battle
 /// it’s attacking. If it isn’t currently attacking anything (if, for example, it was attacking a
@@ -20,27 +19,28 @@ use crate::turns;
 ///
 /// 510.1c A blocked creature assigns its combat damage to the creatures blocking it. If no
 /// creatures are currently blocking it (if, for example, they were destroyed or removed from
-/// combat), it assigns no combat damage. If exactly one creature is blocking it, it assigns all
-/// its combat damage to that creature. If two or more creatures are blocking it, it assigns its
-/// combat damage to those creatures divided as its controller chooses among them.
+/// combat), it assigns no combat damage. If exactly one creature is blocking it, it assigns all its
+/// combat damage to that creature. If two or more creatures are blocking it, it assigns its combat
+/// damage to those creatures divided as its controller chooses among them.
 ///
 /// 510.1d A blocking creature assigns combat damage to the creatures it’s blocking. If it isn’t
-/// currently blocking any creatures (if, for example, they were destroyed or removed from
-/// combat), it assigns no combat damage. If it’s blocking exactly one creature, it assigns all
-/// its combat damage to that creature. If it’s blocking two or more creatures, it assigns its
-/// combat damage divided as its controller chooses among them.
+/// currently blocking any creatures (if, for example, they were destroyed or removed from combat),
+/// it assigns no combat damage. If it’s blocking exactly one creature, it assigns all its combat
+/// damage to that creature. If it’s blocking two or more creatures, it assigns its combat damage
+/// divided as its controller chooses among them.
 ///
-/// 510.2. Second, all combat damage that’s been assigned is dealt simultaneously. This
-/// turn-based action doesn’t use the stack. No player has the chance to cast spells or activate
-/// abilities between the time combat damage is assigned and the time it’s dealt.
+/// 510.2. Second, all combat damage that’s been assigned is dealt simultaneously. This turn-based
+/// action doesn’t use the stack. No player has the chance to cast spells or activate abilities
+/// between the time combat damage is assigned and the time it’s dealt.
 ///
-/// Scope: unblocked creatures deal damage to the defending player (two-player games;
-/// planeswalker and battle targets are deferred), single-blocker and single-blocked cases deal
-/// damage both ways, and creatures with power 0 or less assign nothing. Division among two or
-/// more blockers or blocked creatures (controller choice) is deferred: a blocked creature with
-/// two or more blockers assigns no combat damage yet, while each of its blockers still assigns
-/// damage to it.
-pub fn r510_2_combat_damage(
+/// # Notes
+///
+/// Scope: unblocked creatures deal damage to the defending player (two-player games; planeswalker
+/// and battle targets are deferred), single-blocker and single-blocked cases deal damage both ways,
+/// and creatures with power 0 or less assign nothing. Division among two or more blockers or
+/// blocked creatures (controller choice) is deferred: a blocked creature with two or more blockers
+/// assigns no combat damage yet, while each of its blockers still assigns damage to it.
+pub fn r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_combat_damage(
     mut step_started: MessageReader<turns::StepStarted>,
     mut dealt: MessageWriter<damage::DamageDealt>,
     attackers: Query<

@@ -3,19 +3,19 @@ use bevy::prelude::{MessageReader, MessageWriter, Res, ResMut};
 use crate::actions;
 use crate::turns;
 
-/// 117.3a The active player receives priority at the beginning of most steps and phases, after
-/// any turn-based actions (such as drawing a card during the draw step; see rule 703) have been
-/// dealt with and abilities that trigger at the beginning of that phase or step have been put on
-/// the stack. No player receives priority during the untap step. Players usually don't get
-/// priority during the cleanup step (see rule 514.3).
+/// 117.3a The active player receives priority at the beginning of most steps and phases, after any
+/// turn-based actions (such as drawing a card during the draw step; see rule 703) have been dealt
+/// with and abilities that trigger at the beginning of that phase or step have been put on the
+/// stack. No player receives priority during the untap step. Players usually don’t get priority
+/// during the cleanup step (see rule 514.3).
 ///
 /// 117.3c If a player has priority when they cast a spell, activate an ability, or take a special
 /// action, that player receives priority afterward.
 ///
 /// 117.3d If a player has priority and chooses not to take any actions, that player passes. If any
-/// mana is in that player's mana pool, they announce what mana is there. Then the next player in
+/// mana is in that player’s mana pool, they announce what mana is there. Then the next player in
 /// turn order receives priority.
-pub fn r117_3_priority(
+pub fn r117_3a_r117_3c_r117_3d_priority(
     mut actions: MessageReader<actions::PlayerAction>,
     mut rejected: MessageWriter<actions::Rejected>,
     mut priority: ResMut<turns::Priority>,

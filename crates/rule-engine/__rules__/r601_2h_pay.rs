@@ -6,9 +6,9 @@ use crate::cards;
 use crate::stack;
 use crate::zones;
 
-/// 601.2h The player pays the total cost. First, they pay all costs that don't involve random
-/// elements or moving objects from the library to a public zone, in any order. ... Partial
-/// payments are not allowed. Unpayable costs can't be paid.
+/// 601.2h The player pays the total cost. First, they pay all costs that don’t involve random
+/// elements or moving objects from the library to a public zone, in any order. Then they pay all
+/// remaining costs in any order. Partial payments are not allowed. Unpayable costs can’t be paid.
 pub fn r601_2h_pay(
     mut rejected: MessageWriter<actions::Rejected>,
     mut commands: Commands,
