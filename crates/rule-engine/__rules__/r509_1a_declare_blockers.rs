@@ -51,14 +51,15 @@ pub fn r509_1a_declare_blockers(
             continue;
         };
         let all_legal = assignments.iter().all(|assignment| {
-            let blocker_legal = cards
-                .get(assignment.blocker)
-                .is_ok_and(|(definition, owner, in_zone, tapped)| {
-                    definition.types.contains(&cards::CardType::Creature)
-                        && **owner == action.player
-                        && **in_zone == battlefield
-                        && tapped.is_none()
-                });
+            let blocker_legal =
+                cards
+                    .get(assignment.blocker)
+                    .is_ok_and(|(definition, owner, in_zone, tapped)| {
+                        definition.types.contains(&cards::CardType::Creature)
+                            && **owner == action.player
+                            && **in_zone == battlefield
+                            && tapped.is_none()
+                    });
             let attacker_legal = attacking.get(assignment.attacker).is_ok();
             blocker_legal && attacker_legal
         });
