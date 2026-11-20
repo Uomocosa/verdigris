@@ -87,6 +87,7 @@ fn target_is_legal(
 mod tests {
     use bevy::prelude::Entity;
 
+    use crate::STACK;
     use crate::cards;
     use crate::mana;
     use crate::testing::*;
@@ -122,6 +123,7 @@ mod tests {
         ])?;
         assert_eq!(game.zone_of(bears), GRAVEYARD);
         assert_eq!(game.zone_of(murder), GRAVEYARD);
+        assert_eq!(game.zone_of(bolt), STACK);
 
         game.play([p1.pass_priority(), p2.pass_priority()])?;
         assert_eq!(game.zone_of(bolt), GRAVEYARD);
