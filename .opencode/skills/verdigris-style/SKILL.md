@@ -57,7 +57,7 @@ built from the verb helpers (`cast`, `targeting`, `activate_ability`, `declare_a
 // Good
 let (mut game, [p1, p2]) = MockGame::new([P1.battlefield([GRIZZLY_BEARS]), P2]);
 let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
-game.play([p1.pass_to(DECLARE_ATTACKERS).declare_attackers([bears]), p2.pass_to(DECLARE_ATTACKERS)])?;
+game.play([p1.pass_to(DECLARE_ATTACKERS), p2.pass_to(DECLARE_ATTACKERS), p1.declare_attackers([bears])])?;
 assert!(game.app.world().get::<cards::Attacking>(bears.into()).is_some());
 Ok(())
 
@@ -66,6 +66,11 @@ game.play([p1.pass_to(DECLARE_ATTACKERS), p2.pass_to(DECLARE_ATTACKERS)]).unwrap
 let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
 game.act(p1, actions::Action::DeclareAttackers(vec![bears.into()]));
 ```
+
+`play` starts the `pass_to` auto-passes only once every player's `pass_to` is listed, so an
+action that must happen IN a step goes after all of them as its own entry, never chained onto
+`pass_to` (`p1.pass_to(X).declare_attackers(..)` declares before step X starts). Chains of
+actions with no `pass_to` (`activate_ability(..).cast(..).targeting(..)`) are fine.
 
 Raw `game.act(..)` stays only in tests that check the engine rejects an action
 (`game.last_rejection()`). A card that only exists after an action (drawn, created) is looked
