@@ -19,13 +19,13 @@ pub fn effective_power_toughness(
 mod tests {
     use crate::cards;
     use crate::effects;
-    use crate::{cost, pt};
+    use crate::testing;
 
     use super::effective_power_toughness;
 
     #[test]
     fn test_usage() {
-        let bears = cards::creature("Grizzly Bears", cost![1, G], pt!(2, 2));
+        let bears = (testing::GRIZZLY_BEARS.definition)();
         assert_eq!(
             effective_power_toughness(&bears, None),
             Some(cards::PowerToughness {

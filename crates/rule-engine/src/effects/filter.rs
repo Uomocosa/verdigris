@@ -45,9 +45,8 @@ impl Filter {
 mod tests {
     use crate::ANY_TARGET;
     use crate::CREATURE;
-    use crate::cards;
     use crate::effects;
-    use crate::{cost, pt};
+    use crate::testing;
 
     #[test]
     fn test_usage() {
@@ -58,8 +57,8 @@ mod tests {
             CREATURE.controlled_by(effects::PlayerRef::You).controlled_by,
             Some(effects::PlayerRef::You)
         );
-        let bears = cards::creature("Grizzly Bears", cost![1, G], pt!(2, 2));
-        let bolt = cards::instant("Lightning Bolt", cards::Cost::default());
+        let bears = (testing::GRIZZLY_BEARS.definition)();
+        let bolt = (testing::MURDER.definition)();
         let instant_spell = effects::Filter {
             kind: effects::FilterKind::InstantSpell,
             ..ANY_TARGET

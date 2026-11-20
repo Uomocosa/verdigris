@@ -18,19 +18,18 @@ pub fn colors(definition: &cards::CardDefinition) -> Vec<cards::Color> {
 #[cfg(test)]
 mod tests {
     use crate::cards;
-    use crate::cost;
-    use crate::pt;
+    use crate::testing;
 
     use super::colors;
 
     #[test]
     fn test_usage() {
-        let multicolored = cards::creature("Gold Bear", cost![1, B, G], pt!(2, 2));
+        let multicolored = (testing::WATCHWOLF.definition)();
         assert_eq!(
             colors(&multicolored),
-            vec![cards::Color::Black, cards::Color::Green]
+            vec![cards::Color::White, cards::Color::Green]
         );
-        let colorless = cards::creature("Artifact Bear", cards::Cost::default(), pt!(2, 2));
+        let colorless = (testing::DARKSTEEL_MYR.definition)();
         assert_eq!(colors(&colorless), Vec::new());
     }
 }
