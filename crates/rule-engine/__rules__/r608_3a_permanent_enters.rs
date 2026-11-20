@@ -55,17 +55,7 @@ mod tests {
     use crate::{BATTLEFIELD, HAND};
 
     #[test]
-    fn test_usage() -> TestResult {
-        let (mut game, [p1, p2]) =
-            MockGame::new([P1.hand([GRIZZLY_BEARS]).mana_pool(mana![1, G]), P2]);
-        let [bears] = game.player(p1).cards_in(HAND).exactly::<1>(GRIZZLY_BEARS)?;
-        game.play([p1.cast(bears).pass_priority(), p2.pass_priority()])?;
-        assert_eq!(game.zone_of(bears), BATTLEFIELD);
-        Ok(())
-    }
-
-    #[test]
-    fn r608_3a_cast_bears_enters_the_battlefield() -> TestResult {
+    fn cast_bears_enters_the_battlefield() -> TestResult {
         let (mut game, [p1, p2]) =
             MockGame::new([P1.hand([GRIZZLY_BEARS]).mana_pool(mana![1, G]), P2]);
         let [bears] = game.player(p1).cards_in(HAND).exactly::<1>(GRIZZLY_BEARS)?;

@@ -121,7 +121,7 @@ mod tests {
     use crate::{BATTLEFIELD, GRAVEYARD, HAND};
 
     #[test]
-    fn test_usage() -> TestResult {
+    fn bolt_deals_damage_to_a_player() -> TestResult {
         let (mut game, [p1, p2]) =
             MockGame::new([P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]), P2]);
         let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
@@ -131,7 +131,7 @@ mod tests {
     }
 
     #[test]
-    fn r608_2_bolt_kills_bears() -> TestResult {
+    fn bolt_kills_bears() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
             P2.battlefield([GRIZZLY_BEARS]),
@@ -147,7 +147,7 @@ mod tests {
     }
 
     #[test]
-    fn r608_2_murder_kills_bears() -> TestResult {
+    fn murder_kills_bears() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([MURDER]).mana_pool(mana![1, B, B]),
             P2.battlefield([GRIZZLY_BEARS]),
@@ -160,7 +160,7 @@ mod tests {
     }
 
     #[test]
-    fn r608_2_doom_blade_destroys_a_green_creature() -> TestResult {
+    fn doom_blade_destroys_a_green_creature() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([DOOM_BLADE]).mana_pool(mana![1, B]),
             P2.battlefield([GRIZZLY_BEARS]),

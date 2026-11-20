@@ -33,7 +33,7 @@ mod tests {
     use crate::{BATTLEFIELD, GRAVEYARD, HAND};
 
     #[test]
-    fn test_usage() -> TestResult {
+    fn giant_growth_applies_power_toughness_modifier() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([GIANT_GROWTH]).battlefield([GRIZZLY_BEARS]).mana_pool(mana![G]),
             P2,
@@ -58,7 +58,7 @@ mod tests {
     }
 
     #[test]
-    fn r611_2a_giant_growth_saves_a_creature_from_lethal_damage() -> TestResult {
+    fn giant_growth_saves_a_creature_from_lethal_damage() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
             P2.hand([GIANT_GROWTH]).battlefield([GRIZZLY_BEARS]).mana_pool(mana![G]),
