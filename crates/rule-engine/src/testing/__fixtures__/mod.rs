@@ -22,6 +22,7 @@ mod sign_in_blood;
 mod tundra;
 mod typhoid_rats;
 mod walking_corpse;
+mod watchwolf;
 mod wind_drake;
 
 pub use cancel::CANCEL;
@@ -48,4 +49,5 @@ pub use sign_in_blood::SIGN_IN_BLOOD;
 pub use tundra::TUNDRA;
 pub use typhoid_rats::TYPHOID_RATS;
 pub use walking_corpse::WALKING_CORPSE;
+pub use watchwolf::WATCHWOLF;
 pub use wind_drake::WIND_DRAKE;
