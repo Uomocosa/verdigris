@@ -22,15 +22,15 @@ mod tests {
     use crate::testing::*;
 
     #[test]
-    fn test_usage() {
+    fn test_usage() -> Result<(), TestError> {
         let (mut game, [p1, p2]) =
             MockGame::new([P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]), P2.life(3)]);
-        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT).unwrap();
+        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
         game.play([
             p1.cast(bolt).targeting(p2).pass_priority(),
             p2.pass_priority(),
-        ])
-        .unwrap();
+        ])?;
         assert!(game.app.world().get::<players::Lost>(*p2).is_some());
+        Ok(())
     }
 }

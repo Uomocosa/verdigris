@@ -40,71 +40,71 @@ mod tests {
     use crate::{BATTLEFIELD, GRAVEYARD, HAND};
 
     #[test]
-    fn test_usage() {
+    fn test_usage() -> Result<(), TestError> {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([MURDER]).mana_pool(mana![1, B, B]),
             P2.battlefield([DARKSTEEL_MYR]),
         ]);
-        let [murder] = game.player(p1).cards_in(HAND).exactly::<1>(MURDER).unwrap();
-        let [myr] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(DARKSTEEL_MYR).unwrap();
+        let [murder] = game.player(p1).cards_in(HAND).exactly::<1>(MURDER)?;
+        let [myr] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(DARKSTEEL_MYR)?;
         game.play([
             p1.cast(murder).targeting(myr).pass_priority(),
             p2.pass_priority(),
-        ])
-        .unwrap();
+        ])?;
         assert_eq!(game.zone_of(myr), BATTLEFIELD);
+        Ok(())
     }
 
     #[test]
-    fn r702_12b_indestructible_ignores_destroy_effects() {
+    fn r702_12b_indestructible_ignores_destroy_effects() -> Result<(), TestError> {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([MURDER]).mana_pool(mana![1, B, B]),
             P2.battlefield([DARKSTEEL_MYR]),
         ]);
-        let [murder] = game.player(p1).cards_in(HAND).exactly::<1>(MURDER).unwrap();
-        let [myr] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(DARKSTEEL_MYR).unwrap();
+        let [murder] = game.player(p1).cards_in(HAND).exactly::<1>(MURDER)?;
+        let [myr] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(DARKSTEEL_MYR)?;
         game.play([
             p1.cast(murder).targeting(myr).pass_priority(),
             p2.pass_priority(),
-        ])
-        .unwrap();
+        ])?;
         assert_eq!(game.zone_of(myr), BATTLEFIELD);
         assert_eq!(game.zone_of(murder), GRAVEYARD);
         assert!(game.player(p2).cards_in(BATTLEFIELD).has(DARKSTEEL_MYR));
+        Ok(())
     }
 
     #[test]
-    fn r702_12b_indestructible_survives_lethal_damage() {
+    fn r702_12b_indestructible_survives_lethal_damage() -> Result<(), TestError> {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
             P2.battlefield([DARKSTEEL_MYR]),
         ]);
-        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT).unwrap();
-        let [myr] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(DARKSTEEL_MYR).unwrap();
+        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
+        let [myr] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(DARKSTEEL_MYR)?;
         game.play([
             p1.cast(bolt).targeting(myr).pass_priority(),
             p2.pass_priority(),
-        ])
-        .unwrap();
+        ])?;
         assert_eq!(game.zone_of(myr), BATTLEFIELD);
         let damage = game.app.world().get::<damage::Damage>(myr.into()).unwrap();
         assert_eq!(**damage, 3);
+        Ok(())
     }
 
     #[test]
-    fn r702_12b_indestructible_survives_doom_blade() {
+    fn r702_12b_indestructible_survives_doom_blade() -> Result<(), TestError> {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([DOOM_BLADE]).mana_pool(mana![1, B]),
             P2.battlefield([DARKSTEEL_MYR]),
         ]);
-        let [blade] = game.player(p1).cards_in(HAND).exactly::<1>(DOOM_BLADE).unwrap();
-        let [myr] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(DARKSTEEL_MYR).unwrap();
+        let [blade] = game.player(p1).cards_in(HAND).exactly::<1>(DOOM_BLADE)?;
+        let [myr] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(DARKSTEEL_MYR)?;
         game.play([
             p1.cast(blade).targeting(myr).pass_priority(),
             p2.pass_priority(),
-        ])
-        .unwrap();
+        ])?;
         assert_eq!(game.zone_of(myr), BATTLEFIELD);
         assert_eq!(game.zone_of(blade), GRAVEYARD);
+        Ok(())
     }
 }

@@ -97,30 +97,32 @@ mod tests {
     use crate::{BATTLEFIELD, HAND};
 
     #[test]
-    fn test_usage() {
+    fn test_usage() -> Result<(), TestError> {
         let (mut game, [p1, ..]) = MockGame::new([P1.hand([FOREST]), P2]);
-        let [forest] = game.player(p1).cards_in(HAND).exactly::<1>(FOREST).unwrap();
-        game.play([p1.play_land(forest)]).unwrap();
+        let [forest] = game.player(p1).cards_in(HAND).exactly::<1>(FOREST)?;
+        game.play([p1.play_land(forest)])?;
         assert_eq!(game.zone_of(forest), BATTLEFIELD);
+        Ok(())
     }
 
     #[test]
-    fn r305_1_a_player_plays_a_land_from_their_hand_as_a_special_action() {
+    fn r305_1_a_player_plays_a_land_from_their_hand_as_a_special_action() -> Result<(), TestError> {
         let (mut game, [p1, ..]) = MockGame::new([P1.hand([FOREST]), P2]);
-        let [forest] = game.player(p1).cards_in(HAND).exactly::<1>(FOREST).unwrap();
+        let [forest] = game.player(p1).cards_in(HAND).exactly::<1>(FOREST)?;
 
-        game.play([p1.play_land(forest)]).unwrap();
+        game.play([p1.play_land(forest)])?;
 
         assert_eq!(game.zone_of(forest), BATTLEFIELD);
         assert!(game.last_rejection().is_none());
+        Ok(())
     }
 
     #[test]
-    fn r305_2_a_second_land_in_the_same_turn_is_rejected() {
+    fn r305_2_a_second_land_in_the_same_turn_is_rejected() -> Result<(), TestError> {
         let (mut game, [p1, ..]) = MockGame::new([P1.hand([FOREST, FOREST]), P2]);
-        let [first, second] = game.player(p1).cards_in(HAND).exactly::<2>(FOREST).unwrap();
+        let [first, second] = game.player(p1).cards_in(HAND).exactly::<2>(FOREST)?;
 
-        game.play([p1.play_land(first)]).unwrap();
+        game.play([p1.play_land(first)])?;
         game.act(p1, actions::Action::PlayLand(second.into()));
 
         assert_eq!(game.zone_of(first), BATTLEFIELD);
@@ -131,15 +133,16 @@ mod tests {
             })
         );
         assert_eq!(game.zone_of(second), HAND);
+        Ok(())
     }
 
     #[test]
-    fn r305_3_a_land_cannot_be_played_during_an_opponents_turn() {
+    fn r305_3_a_land_cannot_be_played_during_an_opponents_turn() -> Result<(), TestError> {
         let (mut game, [p1, p2]) = MockGame::builder()
             .turn(2, turns::Step::PrecombatMain)
             .players([P1.hand([FOREST]), P2.active()]);
-        let [forest] = game.player(p1).cards_in(HAND).exactly::<1>(FOREST).unwrap();
-        game.play([p2.pass_priority()]).unwrap();
+        let [forest] = game.player(p1).cards_in(HAND).exactly::<1>(FOREST)?;
+        game.play([p2.pass_priority()])?;
 
         game.act(p1, actions::Action::PlayLand(forest.into()));
 
@@ -150,5 +153,6 @@ mod tests {
             })
         );
         assert_eq!(game.zone_of(forest), HAND);
+        Ok(())
     }
 }

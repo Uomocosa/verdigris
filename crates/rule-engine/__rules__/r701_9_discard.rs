@@ -85,49 +85,50 @@ mod tests {
     use crate::{GRAVEYARD, HAND};
 
     #[test]
-    fn test_usage() {
+    fn test_usage() -> Result<(), TestError> {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([MIND_ROT]).mana_pool(mana![2, B]),
             P2.hand([GRIZZLY_BEARS]),
         ]);
-        let [mind_rot] = game.player(p1).cards_in(HAND).exactly::<1>(MIND_ROT).unwrap();
-        game.play([p1.cast(mind_rot).targeting(p2).end_turn(), p2.end_turn()]).unwrap();
+        let [mind_rot] = game.player(p1).cards_in(HAND).exactly::<1>(MIND_ROT)?;
+        game.play([p1.cast(mind_rot).targeting(p2).end_turn(), p2.end_turn()])?;
         assert!(game.player(p2).cards_in(GRAVEYARD).has(GRIZZLY_BEARS));
+        Ok(())
     }
 
     #[test]
-    fn mind_rot_makes_the_target_choose_two_cards_to_discard() {
+    fn mind_rot_makes_the_target_choose_two_cards_to_discard() -> Result<(), TestError> {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([MIND_ROT]).mana_pool(mana![2, B]),
             P2.hand([GRIZZLY_BEARS, LIGHTNING_BOLT, MURDER]),
         ]);
-        let [mind_rot] = game.player(p1).cards_in(HAND).exactly::<1>(MIND_ROT).unwrap();
-        let [bears] = game.player(p2).cards_in(HAND).exactly::<1>(GRIZZLY_BEARS).unwrap();
-        let [bolt] = game.player(p2).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT).unwrap();
-        game.play([p1.cast(mind_rot).targeting(p2).end_turn(), p2.end_turn()]).unwrap();
+        let [mind_rot] = game.player(p1).cards_in(HAND).exactly::<1>(MIND_ROT)?;
+        let [bears] = game.player(p2).cards_in(HAND).exactly::<1>(GRIZZLY_BEARS)?;
+        let [bolt] = game.player(p2).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
+        game.play([p1.cast(mind_rot).targeting(p2).end_turn(), p2.end_turn()])?;
 
-        game.play([p2.discard([bears, bolt])]).unwrap();
+        game.play([p2.discard([bears, bolt])])?;
 
         assert_eq!(game.zone_of(bears), GRAVEYARD);
         assert_eq!(game.zone_of(bolt), GRAVEYARD);
         assert!(game.player(p2).cards_in(HAND).has(MURDER));
+        Ok(())
     }
 
     #[test]
-    fn mind_rot_discards_every_card_when_the_hand_holds_fewer_than_two() {
+    fn mind_rot_discards_every_card_when_the_hand_holds_fewer_than_two() -> Result<(), TestError> {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([MIND_ROT]).mana_pool(mana![2, B]),
             P2.hand([GRIZZLY_BEARS]),
         ]);
-        let [mind_rot] = game.player(p1).cards_in(HAND).exactly::<1>(MIND_ROT).unwrap();
-        game.play([p1.cast(mind_rot).targeting(p2).end_turn(), p2.end_turn()]).unwrap();
+        let [mind_rot] = game.player(p1).cards_in(HAND).exactly::<1>(MIND_ROT)?;
+        game.play([p1.cast(mind_rot).targeting(p2).end_turn(), p2.end_turn()])?;
 
         assert_eq!(
-            game.zone_of(
-                game.player(p2).cards_in(GRAVEYARD).exactly::<1>(GRIZZLY_BEARS).unwrap()[0]
-            ),
+            game.zone_of(game.player(p2).cards_in(GRAVEYARD).exactly::<1>(GRIZZLY_BEARS)?[0]),
             GRAVEYARD
         );
         assert!(game.player(p2).cards_in(HAND).has_no(GRIZZLY_BEARS));
+        Ok(())
     }
 }

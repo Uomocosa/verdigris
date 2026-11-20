@@ -122,18 +122,18 @@ mod tests {
     use super::play;
 
     #[test]
-    fn test_usage() {
+    fn test_usage() -> Result<(), TestError> {
         let (mut game, [p1, p2]) =
             MockGame::new([P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]), P2]);
-        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT).unwrap();
+        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
 
         play(
             &mut game,
             [p1.cast(bolt).targeting(p2).end_turn(), p2.end_turn()],
-        )
-        .unwrap();
+        )?;
 
         assert_eq!(game.player(p2).life(), 17);
+        Ok(())
     }
 
     #[test]
@@ -158,19 +158,19 @@ mod tests {
     }
 
     #[test]
-    fn a_negate_counters_a_bolt_and_the_turn_advances_to_the_next_player() {
+    fn a_negate_counters_a_bolt_and_the_turn_advances_to_the_next_player() -> Result<(), TestError>
+    {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
             P2.hand([NEGATE]).mana_pool(mana![1, U]),
         ]);
-        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT).unwrap();
-        let [negate] = game.player(p2).cards_in(HAND).exactly::<1>(NEGATE).unwrap();
+        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
+        let [negate] = game.player(p2).cards_in(HAND).exactly::<1>(NEGATE)?;
 
         game.play([
             p1.cast(bolt).targeting(p2).end_turn(),
             p2.cast(negate).targeting(bolt).end_turn(),
-        ])
-        .unwrap();
+        ])?;
 
         assert_eq!(game.player(p2).life(), 20);
         assert!(game.player(p1).cards_in(GRAVEYARD).exactly::<1>(LIGHTNING_BOLT).is_ok());
@@ -178,76 +178,81 @@ mod tests {
         let turn = *game.app.world().resource::<turns::Turn>();
         assert_eq!(turn.number, 2);
         assert_eq!(turn.active, p2);
+        Ok(())
     }
 
     #[test]
-    fn a_dispel_counters_a_cancel_so_the_bolt_resolves() {
+    fn a_dispel_counters_a_cancel_so_the_bolt_resolves() -> Result<(), TestError> {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([LIGHTNING_BOLT, DISPEL]).mana_pool(mana![R, U]),
             P2.hand([CANCEL]).mana_pool(mana![1, U, U]),
         ]);
-        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT).unwrap();
-        let [dispel] = game.player(p1).cards_in(HAND).exactly::<1>(DISPEL).unwrap();
-        let [cancel] = game.player(p2).cards_in(HAND).exactly::<1>(CANCEL).unwrap();
+        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
+        let [dispel] = game.player(p1).cards_in(HAND).exactly::<1>(DISPEL)?;
+        let [cancel] = game.player(p2).cards_in(HAND).exactly::<1>(CANCEL)?;
 
         game.play([
             p1.cast(bolt).targeting(p2).pass_priority(),
             p2.cast(cancel).targeting(bolt).pass_priority(),
             p1.cast(dispel).targeting(cancel).end_turn(),
             p2.end_turn(),
-        ])
-        .unwrap();
+        ])?;
 
         assert_eq!(game.player(p2).life(), 17);
         assert_eq!(game.zone_of(bolt), GRAVEYARD);
         assert_eq!(game.zone_of(cancel), GRAVEYARD);
         assert_eq!(game.zone_of(dispel), GRAVEYARD);
+        Ok(())
     }
 
     #[test]
-    fn pass_to_advances_both_players_to_the_requested_step() {
+    fn pass_to_advances_both_players_to_the_requested_step() -> Result<(), TestError> {
         let (mut game, [p1, p2]) = MockGame::new([P1, P2]);
 
-        game.play([p1.pass_to(MAIN_2), p2.pass_to(MAIN_2)]).unwrap();
+        game.play([p1.pass_to(MAIN_2), p2.pass_to(MAIN_2)])?;
 
         let turn = *game.app.world().resource::<turns::Turn>();
         assert_eq!(turn.number, 1);
         assert_eq!(turn.active, p1);
         assert_eq!(turn.step, turns::Step::PostcombatMain);
+        Ok(())
     }
 
     #[test]
-    fn end_phase_lands_on_the_first_step_of_the_next_phase() {
+    fn end_phase_lands_on_the_first_step_of_the_next_phase() -> Result<(), TestError> {
         let (mut game, [p1, p2]) = MockGame::new([P1, P2]);
 
-        game.play([p1.end_phase(), p2.end_phase()]).unwrap();
+        game.play([p1.end_phase(), p2.end_phase()])?;
 
         assert_eq!(
             game.app.world().resource::<turns::Turn>().step,
             turns::Step::BeginningOfCombat
         );
+        Ok(())
     }
 
     #[test]
-    fn end_current_step_moves_exactly_one_step() {
+    fn end_current_step_moves_exactly_one_step() -> Result<(), TestError> {
         let (mut game, [p1, p2]) = MockGame::new([P1, P2]);
 
-        game.play([p1.end_current_step(), p2.end_current_step()]).unwrap();
+        game.play([p1.end_current_step(), p2.end_current_step()])?;
 
         assert_eq!(
             game.app.world().resource::<turns::Turn>().step,
             turns::Step::BeginningOfCombat
         );
+        Ok(())
     }
 
     #[test]
-    fn activate_ability_with_only_on_a_forest_adds_green() {
+    fn activate_ability_with_only_on_a_forest_adds_green() -> Result<(), TestError> {
         let (mut game, [p1, ..]) = MockGame::new([P1.battlefield([FOREST]), P2]);
-        let [forest] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(FOREST).unwrap();
+        let [forest] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(FOREST)?;
 
-        game.play([p1.activate_ability(forest.ability())]).unwrap();
+        game.play([p1.activate_ability(forest.ability())])?;
 
         assert_eq!(game.mana_pool(p1), mana![G]);
+        Ok(())
     }
 
     #[test]
@@ -269,12 +274,13 @@ mod tests {
     }
 
     #[test]
-    fn activate_ability_with_mana_ability_on_a_tundra_adds_blue() {
+    fn activate_ability_with_mana_ability_on_a_tundra_adds_blue() -> Result<(), TestError> {
         let (mut game, [p1, ..]) = MockGame::new([P1.battlefield([TUNDRA]), P2]);
-        let [tundra] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TUNDRA).unwrap();
+        let [tundra] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TUNDRA)?;
 
-        game.play([p1.activate_ability(tundra.mana_ability(cards::Color::Blue))]).unwrap();
+        game.play([p1.activate_ability(tundra.mana_ability(cards::Color::Blue))])?;
 
         assert_eq!(game.mana_pool(p1), mana![U]);
+        Ok(())
     }
 }

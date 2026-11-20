@@ -51,17 +51,18 @@ mod tests {
     use crate::{GRAVEYARD, HAND, LIBRARY};
 
     #[test]
-    fn test_usage() {
+    fn test_usage() -> Result<(), TestError> {
         let (mut game, [p1, p2]) =
             MockGame::new([P1.hand([DIVINATION]).mana_pool(mana![2, U]), P2]);
-        let [divination] = game.player(p1).cards_in(HAND).exactly::<1>(DIVINATION).unwrap();
-        game.play([p1.cast(divination).pass_priority(), p2.pass_priority()]).unwrap();
+        let [divination] = game.player(p1).cards_in(HAND).exactly::<1>(DIVINATION)?;
+        game.play([p1.cast(divination).pass_priority(), p2.pass_priority()])?;
         assert!(game.player(p1).cards_in(HAND).has(GRIZZLY_BEARS));
         assert_eq!(game.zone_of(divination), GRAVEYARD);
+        Ok(())
     }
 
     #[test]
-    fn divination_draws_the_top_two_cards_of_the_library() {
+    fn divination_draws_the_top_two_cards_of_the_library() -> Result<(), TestError> {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([DIVINATION])
                 .library([
@@ -72,13 +73,14 @@ mod tests {
                 .mana_pool(mana![2, U]),
             P2,
         ]);
-        let [divination] = game.player(p1).cards_in(HAND).exactly::<1>(DIVINATION).unwrap();
-        game.play([p1.cast(divination).pass_priority(), p2.pass_priority()]).unwrap();
+        let [divination] = game.player(p1).cards_in(HAND).exactly::<1>(DIVINATION)?;
+        game.play([p1.cast(divination).pass_priority(), p2.pass_priority()])?;
         assert!(game.player(p1).cards_in(HAND).has(GRIZZLY_BEARS));
         assert!(game.player(p1).cards_in(HAND).has(LIGHTNING_BOLT));
         assert_eq!(
-            game.zone_of(game.player(p1).cards_in(LIBRARY).exactly::<1>(MURDER).unwrap()[0]),
+            game.zone_of(game.player(p1).cards_in(LIBRARY).exactly::<1>(MURDER)?[0]),
             LIBRARY
         );
+        Ok(())
     }
 }

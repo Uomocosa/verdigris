@@ -50,13 +50,14 @@ mod tests {
     use crate::testing::*;
 
     #[test]
-    fn test_usage() {
+    fn test_usage() -> Result<(), TestError> {
         let (mut game, [p1, p2]) =
             MockGame::new([P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]), P2]);
-        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT).unwrap();
-        game.play([p1.cast(bolt).targeting(p2)]).unwrap();
+        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
+        game.play([p1.cast(bolt).targeting(p2)])?;
         assert!(game.last_rejection().is_none());
         assert_eq!(game.mana_pool(p1), cards::ManaPool::EMPTY);
+        Ok(())
     }
 
     #[test]

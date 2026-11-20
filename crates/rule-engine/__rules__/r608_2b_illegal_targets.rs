@@ -93,60 +93,61 @@ mod tests {
     use crate::{BATTLEFIELD, GRAVEYARD, HAND};
 
     #[test]
-    fn test_usage() {
+    fn test_usage() -> Result<(), TestError> {
         let (mut game, [p1, p2]) =
             MockGame::new([P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]), P2]);
-        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT).unwrap();
+        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
         game.play([
             p1.cast(bolt).targeting(p2).pass_priority(),
             p2.pass_priority(),
-        ])
-        .unwrap();
+        ])?;
         assert_eq!(game.zone_of(bolt), GRAVEYARD);
+        Ok(())
     }
 
     #[test]
-    fn test_bolt_fizzles_when_target_gone() {
+    fn test_bolt_fizzles_when_target_gone() -> Result<(), TestError> {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([LIGHTNING_BOLT, MURDER]).mana_pool(mana![1, B, B, R]),
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
-        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT).unwrap();
-        let [murder] = game.player(p1).cards_in(HAND).exactly::<1>(MURDER).unwrap();
-        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
+        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
+        let [murder] = game.player(p1).cards_in(HAND).exactly::<1>(MURDER)?;
+        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
 
         game.play([
             p1.cast(bolt).targeting(bears),
             p1.cast(murder).targeting(bears).pass_priority(),
             p2.pass_priority(),
-        ])
-        .unwrap();
+        ])?;
         assert_eq!(game.zone_of(bears), GRAVEYARD);
         assert_eq!(game.zone_of(murder), GRAVEYARD);
 
-        game.play([p1.pass_priority(), p2.pass_priority()]).unwrap();
+        game.play([p1.pass_priority(), p2.pass_priority()])?;
         assert_eq!(game.zone_of(bolt), GRAVEYARD);
         assert_eq!(game.life(p2), 20);
+        Ok(())
     }
 
     #[test]
-    fn doom_blade_fizzles_when_its_target_becomes_black() {
+    fn doom_blade_fizzles_when_its_target_becomes_black() -> Result<(), TestError> {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([DOOM_BLADE]).mana_pool(mana![1, B]),
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
-        let [blade] = game.player(p1).cards_in(HAND).exactly::<1>(DOOM_BLADE).unwrap();
-        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
+        let [blade] = game.player(p1).cards_in(HAND).exactly::<1>(DOOM_BLADE)?;
+        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
 
-        game.play([p1.cast(blade).targeting(bears)]).unwrap();
+        game.play([p1.cast(blade).targeting(bears)])?;
 
         let mut definition =
             game.app.world().get::<cards::CardDefinition>(bears.into()).cloned().unwrap();
         definition.cost.black = definition.cost.black.saturating_add(1);
         game.app.world_mut().entity_mut(Entity::from(bears)).insert(definition);
 
-        game.play([p1.pass_priority(), p2.pass_priority()]).unwrap();
+        game.play([p1.pass_priority(), p2.pass_priority()])?;
         assert_eq!(game.zone_of(bears), BATTLEFIELD);
         assert_eq!(game.zone_of(blade), GRAVEYARD);
+        Ok(())
     }
 }

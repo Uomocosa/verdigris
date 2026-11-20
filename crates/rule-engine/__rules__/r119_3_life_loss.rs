@@ -25,20 +25,20 @@ mod tests {
     use crate::testing::*;
 
     #[test]
-    fn test_usage() {
+    fn test_usage() -> Result<(), TestError> {
         let (mut game, [p1, p2]) =
             MockGame::new([P1.hand([SIGN_IN_BLOOD]).mana_pool(mana![B, B]), P2]);
-        let [sign_in_blood] = game.player(p1).cards_in(HAND).exactly::<1>(SIGN_IN_BLOOD).unwrap();
+        let [sign_in_blood] = game.player(p1).cards_in(HAND).exactly::<1>(SIGN_IN_BLOOD)?;
         game.play([
             p1.cast(sign_in_blood).targeting(p2).end_turn(),
             p2.end_turn(),
-        ])
-        .unwrap();
+        ])?;
         assert_eq!(game.life(p2), 18);
+        Ok(())
     }
 
     #[test]
-    fn sign_in_blood_makes_the_target_draw_two_cards_and_lose_two_life() {
+    fn sign_in_blood_makes_the_target_draw_two_cards_and_lose_two_life() -> Result<(), TestError> {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([SIGN_IN_BLOOD]).mana_pool(mana![B, B]),
             P2.library([
@@ -46,21 +46,21 @@ mod tests {
                 cards::CardDefinition::from(MURDER),
             ]),
         ]);
-        let [sign_in_blood] = game.player(p1).cards_in(HAND).exactly::<1>(SIGN_IN_BLOOD).unwrap();
+        let [sign_in_blood] = game.player(p1).cards_in(HAND).exactly::<1>(SIGN_IN_BLOOD)?;
         game.play([
             p1.cast(sign_in_blood).targeting(p2).end_turn(),
             p2.end_turn(),
-        ])
-        .unwrap();
+        ])?;
 
         assert_eq!(game.life(p2), 18);
         assert_eq!(game.life(p1), 20);
         assert!(game.player(p2).cards_in(HAND).has(LIGHTNING_BOLT));
         assert!(game.player(p2).cards_in(HAND).has(MURDER));
+        Ok(())
     }
 
     #[test]
-    fn sign_in_blood_can_target_its_controller() {
+    fn sign_in_blood_can_target_its_controller() -> Result<(), TestError> {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([SIGN_IN_BLOOD])
                 .library([
@@ -70,30 +70,31 @@ mod tests {
                 .mana_pool(mana![B, B]),
             P2,
         ]);
-        let [sign_in_blood] = game.player(p1).cards_in(HAND).exactly::<1>(SIGN_IN_BLOOD).unwrap();
+        let [sign_in_blood] = game.player(p1).cards_in(HAND).exactly::<1>(SIGN_IN_BLOOD)?;
         game.play([
             p1.cast(sign_in_blood).targeting(p1).end_turn(),
             p2.end_turn(),
-        ])
-        .unwrap();
+        ])?;
 
         assert_eq!(game.life(p1), 18);
         assert!(game.player(p1).cards_in(HAND).has(LIGHTNING_BOLT));
         assert!(game.player(p1).cards_in(HAND).has(MURDER));
+        Ok(())
     }
 
     #[test]
-    fn sign_in_blood_targeting_an_empty_library_loses_the_game_at_the_next_state_based_check() {
+    fn sign_in_blood_targeting_an_empty_library_loses_the_game_at_the_next_state_based_check()
+    -> Result<(), TestError> {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([SIGN_IN_BLOOD]).mana_pool(mana![B, B]),
             P2.library([]),
         ]);
-        let [sign_in_blood] = game.player(p1).cards_in(HAND).exactly::<1>(SIGN_IN_BLOOD).unwrap();
+        let [sign_in_blood] = game.player(p1).cards_in(HAND).exactly::<1>(SIGN_IN_BLOOD)?;
         game.play([
             p1.cast(sign_in_blood).targeting(p2).end_turn(),
             p2.end_turn(),
-        ])
-        .unwrap();
+        ])?;
         assert!(game.app.world().get::<players::Lost>(*p2).is_some());
+        Ok(())
     }
 }

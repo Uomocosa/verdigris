@@ -30,18 +30,17 @@ mod tests {
     use crate::{BATTLEFIELD, GRAVEYARD, HAND};
 
     #[test]
-    fn test_usage() {
+    fn test_usage() -> Result<(), TestError> {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([GIANT_GROWTH]).battlefield([GRIZZLY_BEARS]).mana_pool(mana![G]),
             P2,
         ]);
-        let [growth] = game.player(p1).cards_in(HAND).exactly::<1>(GIANT_GROWTH).unwrap();
-        let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
+        let [growth] = game.player(p1).cards_in(HAND).exactly::<1>(GIANT_GROWTH)?;
+        let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
         game.play([
             p1.cast(growth).targeting(bears).pass_priority(),
             p2.pass_priority(),
-        ])
-        .unwrap();
+        ])?;
         let modifier =
             game.app.world().get::<effects::PowerToughnessModifier>(bears.into()).copied();
         assert_eq!(
@@ -52,17 +51,18 @@ mod tests {
             })
         );
         assert_eq!(game.zone_of(growth), GRAVEYARD);
+        Ok(())
     }
 
     #[test]
-    fn r611_2a_giant_growth_saves_a_creature_from_lethal_damage() {
+    fn r611_2a_giant_growth_saves_a_creature_from_lethal_damage() -> Result<(), TestError> {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
             P2.hand([GIANT_GROWTH]).battlefield([GRIZZLY_BEARS]).mana_pool(mana![G]),
         ]);
-        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT).unwrap();
-        let [growth] = game.player(p2).cards_in(HAND).exactly::<1>(GIANT_GROWTH).unwrap();
-        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
+        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
+        let [growth] = game.player(p2).cards_in(HAND).exactly::<1>(GIANT_GROWTH)?;
+        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
 
         game.play([
             p1.cast(bolt).targeting(bears).pass_priority(),
@@ -70,8 +70,7 @@ mod tests {
             p1.pass_priority(),
             p1.pass_priority(),
             p2.pass_priority(),
-        ])
-        .unwrap();
+        ])?;
 
         assert_eq!(game.zone_of(bears), BATTLEFIELD);
         let damage = game.app.world().get::<damage::Damage>(bears.into()).copied();
@@ -85,5 +84,6 @@ mod tests {
                 toughness: 3,
             })
         );
+        Ok(())
     }
 }

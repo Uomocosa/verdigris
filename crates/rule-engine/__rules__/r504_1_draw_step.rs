@@ -40,20 +40,21 @@ mod tests {
     use crate::{HAND, LIBRARY};
 
     #[test]
-    fn test_usage() {
+    fn test_usage() -> Result<(), TestError> {
         let (mut game, [p1, p2]) =
             MockGame::builder().turn(1, turns::Step::Upkeep).players([P1, P2]);
 
-        game.play([p1.pass_priority(), p2.pass_priority(), p1.pass_priority()]).unwrap();
+        game.play([p1.pass_priority(), p2.pass_priority(), p1.pass_priority()])?;
 
         assert_eq!(
             game.app.world().resource::<turns::Turn>().step,
             turns::Step::Draw
         );
+        Ok(())
     }
 
     #[test]
-    fn r103_8a_first_player_skips_the_draw_step_of_their_first_turn() {
+    fn r103_8a_first_player_skips_the_draw_step_of_their_first_turn() -> Result<(), TestError> {
         let (mut game, [p1, p2]) = MockGame::builder().turn(1, turns::Step::Upkeep).players([
             P1.library([
                 cards::CardDefinition::from(GRIZZLY_BEARS),
@@ -63,17 +64,18 @@ mod tests {
         ]);
         let hand_before = game.player(p1).cards_in(HAND).len();
 
-        game.play([p1.pass_priority(), p2.pass_priority(), p1.pass_priority()]).unwrap();
+        game.play([p1.pass_priority(), p2.pass_priority(), p1.pass_priority()])?;
 
         assert_eq!(
             game.app.world().resource::<turns::Turn>().step,
             turns::Step::Draw
         );
         assert_eq!(game.player(p1).cards_in(HAND).len(), hand_before);
+        Ok(())
     }
 
     #[test]
-    fn the_active_player_draws_a_card_during_their_draw_step() {
+    fn the_active_player_draws_a_card_during_their_draw_step() -> Result<(), TestError> {
         let (mut game, [p1, p2]) = MockGame::builder().turn(2, turns::Step::Upkeep).players([
             P1.library([
                 cards::CardDefinition::from(GRIZZLY_BEARS),
@@ -81,14 +83,15 @@ mod tests {
             ]),
             P2,
         ]);
-        let [top] = game.player(p1).cards_in(LIBRARY).exactly::<1>(GRIZZLY_BEARS).unwrap();
+        let [top] = game.player(p1).cards_in(LIBRARY).exactly::<1>(GRIZZLY_BEARS)?;
 
-        game.play([p1.pass_priority(), p2.pass_priority(), p1.pass_priority()]).unwrap();
+        game.play([p1.pass_priority(), p2.pass_priority(), p1.pass_priority()])?;
 
         assert_eq!(game.zone_of(top), HAND);
         assert_eq!(
-            game.player(p1).cards_in(HAND).exactly::<1>(GRIZZLY_BEARS).unwrap()[0],
+            game.player(p1).cards_in(HAND).exactly::<1>(GRIZZLY_BEARS)?[0],
             top
         );
+        Ok(())
     }
 }

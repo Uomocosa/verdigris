@@ -19,9 +19,10 @@ mod tests {
     use super::zone_of;
 
     #[test]
-    fn test_usage() {
+    fn test_usage() -> Result<(), TestError> {
         let (game, [_, p2, ..]) = MockGame::new([P1, P2.battlefield([GRIZZLY_BEARS])]);
-        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
+        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
         assert_eq!(zone_of(&game, bears), BATTLEFIELD);
+        Ok(())
     }
 }

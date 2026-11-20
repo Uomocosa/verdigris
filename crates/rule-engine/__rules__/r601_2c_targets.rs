@@ -169,29 +169,31 @@ mod tests {
     use crate::{BATTLEFIELD, HAND, STACK};
 
     #[test]
-    fn test_usage() {
+    fn test_usage() -> Result<(), TestError> {
         let (mut game, [p1, ..]) = MockGame::new([
             P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
-        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT).unwrap();
-        game.play([p1.cast(bolt)]).unwrap();
+        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
+        game.play([p1.cast(bolt)])?;
         assert!(game.target_choice().is_some());
+        Ok(())
     }
 
     #[test]
-    fn test_bolt_lists_every_legal_target() {
+    fn test_bolt_lists_every_legal_target() -> Result<(), TestError> {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
-        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT).unwrap();
-        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
-        game.play([p1.cast(bolt)]).unwrap();
+        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
+        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        game.play([p1.cast(bolt)])?;
         assert_eq!(
             game.target_choice(),
             Some(pick(1).from([bears.into(), *p1, *p2]))
         );
+        Ok(())
     }
 
     #[test]
@@ -209,15 +211,16 @@ mod tests {
     }
 
     #[test]
-    fn doom_blade_lists_only_nonblack_creatures() {
+    fn doom_blade_lists_only_nonblack_creatures() -> Result<(), TestError> {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([DOOM_BLADE]).mana_pool(mana![1, B]),
             P2.battlefield([GRIZZLY_BEARS, WALKING_CORPSE]),
         ]);
-        let [blade] = game.player(p1).cards_in(HAND).exactly::<1>(DOOM_BLADE).unwrap();
-        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
-        game.play([p1.cast(blade)]).unwrap();
+        let [blade] = game.player(p1).cards_in(HAND).exactly::<1>(DOOM_BLADE)?;
+        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        game.play([p1.cast(blade)])?;
         assert_eq!(game.target_choice(), Some(pick(1).from([bears.into()])));
+        Ok(())
     }
 
     #[test]
@@ -255,16 +258,16 @@ mod tests {
     }
 
     #[test]
-    fn cancel_cannot_target_a_permanent() {
+    fn cancel_cannot_target_a_permanent() -> Result<(), TestError> {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([LIGHTNING_BOLT, CANCEL]).mana_pool(mana![1, U, U, R]),
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
-        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT).unwrap();
-        let [cancel] = game.player(p1).cards_in(HAND).exactly::<1>(CANCEL).unwrap();
-        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
+        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
+        let [cancel] = game.player(p1).cards_in(HAND).exactly::<1>(CANCEL)?;
+        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
 
-        game.play([p1.cast(bolt).targeting(p2), p1.cast(cancel)]).unwrap();
+        game.play([p1.cast(bolt).targeting(p2), p1.cast(cancel)])?;
 
         assert_eq!(game.target_choice(), Some(pick(1).from([bolt.into()])));
 
@@ -275,6 +278,7 @@ mod tests {
                 spell: cancel.into()
             })
         );
+        Ok(())
     }
 
     #[test]
@@ -346,14 +350,15 @@ mod tests {
     }
 
     #[test]
-    fn test_any_target_in_multiplayer() {
+    fn test_any_target_in_multiplayer() -> Result<(), TestError> {
         let (mut game, [p1, p2, p3, p4]) =
             MockGame::new([P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]), P2, P3, P4]);
-        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT).unwrap();
-        game.play([p1.cast(bolt)]).unwrap();
+        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
+        game.play([p1.cast(bolt)])?;
         assert_eq!(
             game.target_choice(),
             Some(pick(1).from([*p1, *p2, *p3, *p4]))
         );
+        Ok(())
     }
 }

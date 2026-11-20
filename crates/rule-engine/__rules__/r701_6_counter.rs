@@ -36,116 +36,116 @@ mod tests {
     use crate::{GRAVEYARD, HAND};
 
     #[test]
-    fn test_usage() {
+    fn test_usage() -> Result<(), TestError> {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
             P2.hand([CANCEL]).mana_pool(mana![1, U, U]),
         ]);
-        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT).unwrap();
-        let [cancel] = game.player(p2).cards_in(HAND).exactly::<1>(CANCEL).unwrap();
+        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
+        let [cancel] = game.player(p2).cards_in(HAND).exactly::<1>(CANCEL)?;
 
         game.play([
             p1.cast(bolt).targeting(p2).pass_priority(),
             p2.cast(cancel).targeting(bolt).pass_priority(),
             p1.pass_priority(),
-        ])
-        .unwrap();
+        ])?;
 
         assert_eq!(game.life(p2), 20);
         assert_eq!(game.zone_of(bolt), GRAVEYARD);
         assert_eq!(game.zone_of(cancel), GRAVEYARD);
+        Ok(())
     }
 
     #[test]
-    fn essence_scatter_counters_a_creature_spell() {
+    fn essence_scatter_counters_a_creature_spell() -> Result<(), TestError> {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([GRIZZLY_BEARS]).mana_pool(mana![1, G]),
             P2.hand([ESSENCE_SCATTER]).mana_pool(mana![1, U]),
         ]);
-        let [bears] = game.player(p1).cards_in(HAND).exactly::<1>(GRIZZLY_BEARS).unwrap();
-        let [scatter] = game.player(p2).cards_in(HAND).exactly::<1>(ESSENCE_SCATTER).unwrap();
+        let [bears] = game.player(p1).cards_in(HAND).exactly::<1>(GRIZZLY_BEARS)?;
+        let [scatter] = game.player(p2).cards_in(HAND).exactly::<1>(ESSENCE_SCATTER)?;
 
         game.play([
             p1.cast(bears).pass_priority(),
             p2.cast(scatter).targeting(bears).pass_priority(),
             p1.pass_priority(),
-        ])
-        .unwrap();
+        ])?;
 
         assert_eq!(game.zone_of(bears), GRAVEYARD);
         assert_eq!(game.zone_of(scatter), GRAVEYARD);
+        Ok(())
     }
 
     #[test]
-    fn negate_counters_a_noncreature_spell() {
+    fn negate_counters_a_noncreature_spell() -> Result<(), TestError> {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
             P2.hand([NEGATE]).mana_pool(mana![1, U]),
         ]);
-        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT).unwrap();
-        let [negate] = game.player(p2).cards_in(HAND).exactly::<1>(NEGATE).unwrap();
+        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
+        let [negate] = game.player(p2).cards_in(HAND).exactly::<1>(NEGATE)?;
 
         game.play([
             p1.cast(bolt).targeting(p2).pass_priority(),
             p2.cast(negate).targeting(bolt).pass_priority(),
             p1.pass_priority(),
-        ])
-        .unwrap();
+        ])?;
 
         assert_eq!(game.life(p2), 20);
         assert_eq!(game.zone_of(bolt), GRAVEYARD);
         assert_eq!(game.zone_of(negate), GRAVEYARD);
+        Ok(())
     }
 
     #[test]
-    fn dispel_can_counter_a_cancel_so_the_outer_bolt_resolves() {
+    fn dispel_can_counter_a_cancel_so_the_outer_bolt_resolves() -> Result<(), TestError> {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([LIGHTNING_BOLT, DISPEL]).mana_pool(mana![R, U]),
             P2.hand([CANCEL]).mana_pool(mana![1, U, U]),
         ]);
-        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT).unwrap();
-        let [dispel] = game.player(p1).cards_in(HAND).exactly::<1>(DISPEL).unwrap();
-        let [cancel] = game.player(p2).cards_in(HAND).exactly::<1>(CANCEL).unwrap();
+        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
+        let [dispel] = game.player(p1).cards_in(HAND).exactly::<1>(DISPEL)?;
+        let [cancel] = game.player(p2).cards_in(HAND).exactly::<1>(CANCEL)?;
 
         game.play([
             p1.cast(bolt).targeting(p2).pass_priority(),
             p2.cast(cancel).targeting(bolt).pass_priority(),
             p1.cast(dispel).targeting(cancel).pass_priority(),
             p2.pass_priority(),
-        ])
-        .unwrap();
+        ])?;
         assert_eq!(game.zone_of(cancel), GRAVEYARD);
         assert_eq!(game.life(p2), 20);
 
-        game.play([p1.pass_priority(), p2.pass_priority()]).unwrap();
+        game.play([p1.pass_priority(), p2.pass_priority()])?;
         assert_eq!(game.life(p2), 17);
         assert_eq!(game.zone_of(bolt), GRAVEYARD);
         assert_eq!(game.zone_of(dispel), GRAVEYARD);
+        Ok(())
     }
 
     #[test]
-    fn cancelled_cancel_does_not_stop_the_outer_bolt() {
+    fn cancelled_cancel_does_not_stop_the_outer_bolt() -> Result<(), TestError> {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([LIGHTNING_BOLT, CANCEL]).mana_pool(mana![1, U, U, R]),
             P2.hand([CANCEL]).mana_pool(mana![1, U, U]),
         ]);
-        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT).unwrap();
-        let [p1_cancel] = game.player(p1).cards_in(HAND).exactly::<1>(CANCEL).unwrap();
-        let [p2_cancel] = game.player(p2).cards_in(HAND).exactly::<1>(CANCEL).unwrap();
+        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
+        let [p1_cancel] = game.player(p1).cards_in(HAND).exactly::<1>(CANCEL)?;
+        let [p2_cancel] = game.player(p2).cards_in(HAND).exactly::<1>(CANCEL)?;
 
         game.play([
             p1.cast(bolt).targeting(p2).pass_priority(),
             p2.cast(p2_cancel).targeting(bolt).pass_priority(),
             p1.cast(p1_cancel).targeting(p2_cancel).pass_priority(),
             p2.pass_priority(),
-        ])
-        .unwrap();
+        ])?;
         assert_eq!(game.zone_of(p2_cancel), GRAVEYARD);
         assert_eq!(game.life(p2), 20);
 
-        game.play([p1.pass_priority(), p2.pass_priority()]).unwrap();
+        game.play([p1.pass_priority(), p2.pass_priority()])?;
         assert_eq!(game.life(p2), 17);
         assert_eq!(game.zone_of(bolt), GRAVEYARD);
         assert_eq!(game.zone_of(p1_cancel), GRAVEYARD);
+        Ok(())
     }
 }

@@ -116,89 +116,85 @@ mod tests {
     use crate::turns;
 
     #[test]
-    fn r510_2_blocked_creatures_deal_damage_to_each_other() {
+    fn r510_2_blocked_creatures_deal_damage_to_each_other() -> Result<(), TestError> {
         use crate::BATTLEFIELD;
 
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield([TYPHOID_RATS]),
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
-        let [rats] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TYPHOID_RATS).unwrap();
-        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
+        let [rats] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TYPHOID_RATS)?;
+        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
         game.play([
             p1.pass_to(turns::Step::DeclareAttackers),
             p2.pass_to(turns::Step::DeclareAttackers),
             p1.declare_attackers([rats]),
-        ])
-        .unwrap();
+        ])?;
         game.play([
             p1.pass_to(turns::Step::DeclareBlockers),
             p2.pass_to(turns::Step::DeclareBlockers),
-        ])
-        .unwrap();
-        game.play([p1.pass_priority(), p2.declare_blockers([(bears, rats)])]).unwrap();
+        ])?;
+        game.play([p1.pass_priority(), p2.declare_blockers([(bears, rats)])])?;
         game.play([
             p1.pass_to(turns::Step::CombatDamage),
             p2.pass_to(turns::Step::CombatDamage),
             p1.pass_priority(),
             p2.pass_priority(),
-        ])
-        .unwrap();
+        ])?;
 
         assert_eq!(game.zone_of(rats), GRAVEYARD);
         assert_eq!(game.zone_of(bears), GRAVEYARD);
+        Ok(())
     }
 
     #[test]
-    fn r510_2_unblocked_creature_deals_damage_to_the_defending_player() {
+    fn r510_2_unblocked_creature_deals_damage_to_the_defending_player() -> Result<(), TestError> {
         use crate::BATTLEFIELD;
 
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield([GRIZZLY_BEARS]),
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
-        let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
+        let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
         game.play([
             p1.pass_to(turns::Step::DeclareAttackers),
             p2.pass_to(turns::Step::DeclareAttackers),
             p1.declare_attackers([bears]),
-        ])
-        .unwrap();
+        ])?;
         game.play([
             p1.pass_to(turns::Step::CombatDamage),
             p2.pass_to(turns::Step::CombatDamage),
             p1.pass_priority(),
             p2.pass_priority(),
-        ])
-        .unwrap();
+        ])?;
 
         assert_eq!(game.player(p2).life(), 18);
         assert_eq!(game.zone_of(bears), BATTLEFIELD);
+        Ok(())
     }
 
     #[test]
-    fn test_usage() {
+    fn test_usage() -> Result<(), TestError> {
         use crate::BATTLEFIELD;
 
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield([GRIZZLY_BEARS]),
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
-        let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
+        let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
         game.play([
             p1.pass_to(turns::Step::DeclareAttackers),
             p2.pass_to(turns::Step::DeclareAttackers),
             p1.declare_attackers([bears]),
-        ])
-        .unwrap();
+        ])?;
         game.play([
             p1.pass_to(turns::Step::CombatDamage),
             p2.pass_to(turns::Step::CombatDamage),
             p1.pass_priority(),
             p2.pass_priority(),
-        ])
-        .unwrap();
+        ])?;
 
         assert_eq!(game.player(p2).life(), 18);
+        Ok(())
     }
 }

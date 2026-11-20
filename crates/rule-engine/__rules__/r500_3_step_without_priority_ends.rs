@@ -49,19 +49,20 @@ mod tests {
     use crate::turns;
 
     #[test]
-    fn test_usage() {
+    fn test_usage() -> Result<(), TestError> {
         let (mut game, [p1, p2]) = MockGame::new([P1, P2]);
 
-        game.play([p1.end_turn(), p2.end_turn()]).unwrap();
+        game.play([p1.end_turn(), p2.end_turn()])?;
 
         assert_eq!(game.app.world().resource::<turns::Turn>().number, 2);
+        Ok(())
     }
 
     #[test]
-    fn cleanup_ends_the_turn_and_the_next_player_becomes_active() {
+    fn cleanup_ends_the_turn_and_the_next_player_becomes_active() -> Result<(), TestError> {
         let (mut game, [p1, p2]) = MockGame::new([P1, P2]);
 
-        game.play([p1.end_turn(), p2.end_turn()]).unwrap();
+        game.play([p1.end_turn(), p2.end_turn()])?;
 
         let turn = *game.app.world().resource::<turns::Turn>();
         let priority = *game.app.world().resource::<turns::Priority>();
@@ -78,5 +79,6 @@ mod tests {
         let priority = *game.app.world().resource::<turns::Priority>();
         assert_eq!(turn.step, turns::Step::Upkeep);
         assert_eq!(priority.player, p2);
+        Ok(())
     }
 }

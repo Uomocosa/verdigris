@@ -45,15 +45,16 @@ mod tests {
     use crate::{GRAVEYARD, HAND};
 
     #[test]
-    fn test_usage() {
+    fn test_usage() -> Result<(), TestError> {
         let (mut game, [p1, p2]) = MockGame::new([P1, P2]);
-        game.play([p1.end_turn(), p2.end_turn()]).unwrap();
+        game.play([p1.end_turn(), p2.end_turn()])?;
 
         assert_eq!(game.player(p1).cards_in(HAND).len(), 0);
+        Ok(())
     }
 
     #[test]
-    fn r514_1_active_player_discards_excess_cards_in_cleanup() {
+    fn r514_1_active_player_discards_excess_cards_in_cleanup() -> Result<(), TestError> {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([
                 GRIZZLY_BEARS,
@@ -67,10 +68,11 @@ mod tests {
             ]),
             P2,
         ]);
-        let [bears] = game.player(p1).cards_in(HAND).exactly::<1>(GRIZZLY_BEARS).unwrap();
-        game.play([p1.end_turn(), p2.end_turn()]).unwrap();
-        game.play([p1.discard([bears])]).unwrap();
+        let [bears] = game.player(p1).cards_in(HAND).exactly::<1>(GRIZZLY_BEARS)?;
+        game.play([p1.end_turn(), p2.end_turn()])?;
+        game.play([p1.discard([bears])])?;
         assert_eq!(game.zone_of(bears), GRAVEYARD);
         assert_eq!(game.player(p1).cards_in(HAND).len(), 7);
+        Ok(())
     }
 }

@@ -91,41 +91,44 @@ mod tests {
     use crate::testing::*;
 
     #[test]
-    fn test_usage() {
+    fn test_usage() -> Result<(), TestError> {
         let (mut game, [p1, ..]) = MockGame::new([P1.battlefield([FOREST]), P2]);
-        let [forest] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(FOREST).unwrap();
-        game.play([p1.activate_ability(forest.ability())]).unwrap();
+        let [forest] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(FOREST)?;
+        game.play([p1.activate_ability(forest.ability())])?;
         assert_eq!(game.mana_pool(p1), mana![G]);
+        Ok(())
     }
 
     #[test]
-    fn r305_6_a_forest_taps_for_green_mana_without_using_the_stack() {
+    fn r305_6_a_forest_taps_for_green_mana_without_using_the_stack() -> Result<(), TestError> {
         let (mut game, [p1, ..]) = MockGame::new([P1.battlefield([FOREST]), P2]);
-        let [forest] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(FOREST).unwrap();
+        let [forest] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(FOREST)?;
         assert_eq!(game.mana_pool(p1), cards::ManaPool::EMPTY);
 
-        game.play([p1.activate_ability(forest.ability())]).unwrap();
+        game.play([p1.activate_ability(forest.ability())])?;
 
         assert_eq!(game.mana_pool(p1), mana![G]);
         assert!(game.last_rejection().is_none());
         assert!(game.app.world().get::<cards::Tapped>(forest.into()).is_some());
         assert_eq!(game.zone_of(forest), BATTLEFIELD);
+        Ok(())
     }
 
     #[test]
-    fn r305_6_a_mountain_taps_for_red_mana() {
+    fn r305_6_a_mountain_taps_for_red_mana() -> Result<(), TestError> {
         let (mut game, [p1, ..]) = MockGame::new([P1.battlefield([MOUNTAIN]), P2]);
-        let [mountain] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(MOUNTAIN).unwrap();
+        let [mountain] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(MOUNTAIN)?;
 
-        game.play([p1.activate_ability(mountain.ability())]).unwrap();
+        game.play([p1.activate_ability(mountain.ability())])?;
 
         assert_eq!(game.mana_pool(p1), mana![R]);
+        Ok(())
     }
 
     #[test]
-    fn r107_5_a_tapped_land_cannot_be_tapped_for_more_mana() {
+    fn r107_5_a_tapped_land_cannot_be_tapped_for_more_mana() -> Result<(), TestError> {
         let (mut game, [p1, ..]) = MockGame::new([P1.battlefield([FOREST]), P2]);
-        let [forest] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(FOREST).unwrap();
+        let [forest] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(FOREST)?;
         game.act(
             p1,
             actions::Action::ActivateManaAbility {
@@ -149,12 +152,13 @@ mod tests {
                 permanent: forest.into()
             })
         );
+        Ok(())
     }
 
     #[test]
-    fn r305_6_a_forest_asked_for_white_is_rejected_and_stays_untapped() {
+    fn r305_6_a_forest_asked_for_white_is_rejected_and_stays_untapped() -> Result<(), TestError> {
         let (mut game, [p1, ..]) = MockGame::new([P1.battlefield([FOREST]), P2]);
-        let [forest] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(FOREST).unwrap();
+        let [forest] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(FOREST)?;
 
         game.act(
             p1,
@@ -172,38 +176,40 @@ mod tests {
                 permanent: forest.into()
             })
         );
+        Ok(())
     }
 
     #[test]
-    fn r305_6_a_tundra_taps_for_white_mana() {
+    fn r305_6_a_tundra_taps_for_white_mana() -> Result<(), TestError> {
         let (mut game, [p1, ..]) = MockGame::new([P1.battlefield([TUNDRA]), P2]);
-        let [tundra] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TUNDRA).unwrap();
+        let [tundra] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TUNDRA)?;
 
-        game.play([p1.activate_ability(tundra.mana_ability(cards::Color::White))]).unwrap();
+        game.play([p1.activate_ability(tundra.mana_ability(cards::Color::White))])?;
 
         assert_eq!(game.mana_pool(p1), mana![W]);
         assert!(game.last_rejection().is_none());
         assert!(game.app.world().get::<cards::Tapped>(tundra.into()).is_some());
+        Ok(())
     }
 
     #[test]
-    fn r305_6_a_second_tundra_taps_for_blue_mana() {
+    fn r305_6_a_second_tundra_taps_for_blue_mana() -> Result<(), TestError> {
         let (mut game, [p1, ..]) = MockGame::new([P1.battlefield([TUNDRA, TUNDRA]), P2]);
-        let [first, second] = game.player(p1).cards_in(BATTLEFIELD).exactly::<2>(TUNDRA).unwrap();
+        let [first, second] = game.player(p1).cards_in(BATTLEFIELD).exactly::<2>(TUNDRA)?;
 
         game.play([p1
             .activate_ability(first.mana_ability(cards::Color::White))
-            .activate_ability(second.mana_ability(cards::Color::Blue))])
-            .unwrap();
+            .activate_ability(second.mana_ability(cards::Color::Blue))])?;
 
         assert_eq!(game.mana_pool(p1), mana![W, U]);
         assert!(game.last_rejection().is_none());
+        Ok(())
     }
 
     #[test]
-    fn r305_6_a_tapped_tundra_cannot_be_tapped_for_the_other_colour() {
+    fn r305_6_a_tapped_tundra_cannot_be_tapped_for_the_other_colour() -> Result<(), TestError> {
         let (mut game, [p1, ..]) = MockGame::new([P1.battlefield([TUNDRA]), P2]);
-        let [tundra] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TUNDRA).unwrap();
+        let [tundra] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TUNDRA)?;
 
         game.act(
             p1,
@@ -227,5 +233,6 @@ mod tests {
                 permanent: tundra.into()
             })
         );
+        Ok(())
     }
 }

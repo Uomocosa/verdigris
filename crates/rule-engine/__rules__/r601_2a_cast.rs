@@ -75,12 +75,13 @@ mod tests {
     use crate::{HAND, STACK};
 
     #[test]
-    fn test_usage() {
+    fn test_usage() -> Result<(), TestError> {
         let (mut game, [p1, ..]) =
             MockGame::new([P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]), P2]);
-        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT).unwrap();
-        game.play([p1.cast(bolt)]).unwrap();
+        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
+        game.play([p1.cast(bolt)])?;
         assert_eq!(game.zone_of(bolt), STACK);
+        Ok(())
     }
 
     #[test]

@@ -33,34 +33,36 @@ mod tests {
     use crate::turns;
 
     #[test]
-    fn test_usage() {
+    fn test_usage() -> Result<(), TestError> {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield_tapped([GRIZZLY_BEARS]),
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
 
-        game.play([p1.end_turn(), p2.end_turn()]).unwrap();
-        game.play([p2.pass_to(turns::Step::Upkeep)]).unwrap();
+        game.play([p1.end_turn(), p2.end_turn()])?;
+        game.play([p2.pass_to(turns::Step::Upkeep)])?;
 
         assert_eq!(
             game.app.world().resource::<turns::Turn>().step,
             turns::Step::Upkeep
         );
+        Ok(())
     }
 
     #[test]
-    fn r502_3_the_untap_step_untaps_the_active_players_permanents_only() {
+    fn r502_3_the_untap_step_untaps_the_active_players_permanents_only() -> Result<(), TestError> {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield_tapped([GRIZZLY_BEARS]),
             P2.battlefield_tapped([GRIZZLY_BEARS]),
         ]);
-        let [p1_bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
-        let [p2_bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
+        let [p1_bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        let [p2_bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
 
-        game.play([p1.end_turn(), p2.end_turn()]).unwrap();
-        game.play([p2.pass_to(turns::Step::Upkeep)]).unwrap();
+        game.play([p1.end_turn(), p2.end_turn()])?;
+        game.play([p2.pass_to(turns::Step::Upkeep)])?;
 
         assert!(game.app.world().get::<crate::cards::Tapped>(p2_bears.into()).is_none());
         assert!(game.app.world().get::<crate::cards::Tapped>(p1_bears.into()).is_some());
+        Ok(())
     }
 }

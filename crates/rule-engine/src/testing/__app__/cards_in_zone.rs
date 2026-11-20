@@ -84,13 +84,14 @@ mod tests {
     }
 
     #[test]
-    fn exactly_returns_the_single_matching_card() {
+    fn exactly_returns_the_single_matching_card() -> Result<(), TestError> {
         let (game, [p1, ..]) = MockGame::new([P1.hand([LIGHTNING_BOLT]), P2]);
         let cards = game.player(p1).cards_in(HAND);
-        let [found] = cards.exactly::<1>(LIGHTNING_BOLT).expect("P1 holds one Lightning Bolt");
+        let [found] = cards.exactly::<1>(LIGHTNING_BOLT)?;
 
         assert!(cards.has(found));
         assert_eq!(cards.exactly::<1>(found), Ok([found]));
+        Ok(())
     }
 
     #[test]

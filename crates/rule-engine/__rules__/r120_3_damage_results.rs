@@ -46,20 +46,20 @@ mod tests {
     use crate::{BATTLEFIELD, GRAVEYARD, HAND};
 
     #[test]
-    fn test_usage() {
+    fn test_usage() -> Result<(), TestError> {
         let (mut game, [p1, p2]) =
             MockGame::builder().turn(1, turns::Step::PrecombatMain).players([
                 P1.battlefield([WALKING_CORPSE]),
                 P2.active().hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
             ]);
-        let [corpse] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(WALKING_CORPSE).unwrap();
-        let [bolt] = game.player(p2).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT).unwrap();
+        let [corpse] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(WALKING_CORPSE)?;
+        let [bolt] = game.player(p2).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
         game.play([
             p2.cast(bolt).targeting(corpse).pass_priority(),
             p1.pass_priority(),
-        ])
-        .unwrap();
+        ])?;
         assert_eq!(game.zone_of(corpse), GRAVEYARD);
         assert_eq!(game.life(p1), 20);
+        Ok(())
     }
 }

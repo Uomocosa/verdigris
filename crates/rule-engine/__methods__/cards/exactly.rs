@@ -20,12 +20,13 @@ mod tests {
     use super::exactly;
 
     #[test]
-    fn test_usage() {
+    fn test_usage() -> Result<(), TestError> {
         let (game, [p1, ..]) = MockGame::new([P1.hand([LIGHTNING_BOLT, LIGHTNING_BOLT]), P2]);
         let cards = game.player(p1).cards_in(HAND).matching(LIGHTNING_BOLT);
-        let [first, second] = exactly(&cards).unwrap();
+        let [first, second] = exactly(&cards)?;
         assert_eq!(Ok(first), cards.first());
         assert_eq!(Ok(second), cards.nth(1));
+        Ok(())
     }
 
     #[test]

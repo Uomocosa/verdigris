@@ -28,25 +28,27 @@ mod tests {
     use crate::turns;
 
     #[test]
-    fn test_usage() {
+    fn test_usage() -> Result<(), TestError> {
         let (mut game, [p1, p2]) = MockGame::new([P1.mana_pool(mana![R]), P2]);
 
-        game.play([p1.pass_priority(), p2.pass_priority()]).unwrap();
+        game.play([p1.pass_priority(), p2.pass_priority()])?;
 
         assert_eq!(
             game.app.world().resource::<turns::Turn>().step,
             turns::Step::BeginningOfCombat
         );
+        Ok(())
     }
 
     #[test]
-    fn r106_4_unspent_mana_empties_when_the_step_ends() {
+    fn r106_4_unspent_mana_empties_when_the_step_ends() -> Result<(), TestError> {
         let (mut game, [p1, p2]) = MockGame::new([P1.mana_pool(mana![R, 2, U]), P2]);
         assert_eq!(game.mana_pool(p1), mana![R, 2, U]);
 
-        game.play([p1.pass_to(turns::Step::End), p2.pass_to(turns::Step::End)]).unwrap();
+        game.play([p1.pass_to(turns::Step::End), p2.pass_to(turns::Step::End)])?;
 
         assert_eq!(game.mana_pool(p1), cards::ManaPool::EMPTY);
         assert_eq!(game.mana_pool(p2), cards::ManaPool::EMPTY);
+        Ok(())
     }
 }

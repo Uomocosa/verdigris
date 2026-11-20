@@ -79,56 +79,52 @@ mod tests {
     use crate::turns;
 
     #[test]
-    fn test_usage() {
+    fn test_usage() -> Result<(), TestError> {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield([GRIZZLY_BEARS]),
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
-        let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
+        let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
         game.play([
             p1.pass_to(turns::Step::DeclareAttackers),
             p2.pass_to(turns::Step::DeclareAttackers),
             p1.declare_attackers([bears]),
-        ])
-        .unwrap();
+        ])?;
 
         assert!(game.app.world().get::<crate::cards::Attacking>(bears.into()).is_some());
+        Ok(())
     }
 
     #[test]
-    fn r508_1a_declared_creatures_become_attacking() {
+    fn r508_1a_declared_creatures_become_attacking() -> Result<(), TestError> {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield([GRIZZLY_BEARS]),
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
-        let [attacking] =
-            game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
-        let [defending] =
-            game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
+        let [attacking] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        let [defending] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
         game.play([
             p1.pass_to(turns::Step::DeclareAttackers),
             p2.pass_to(turns::Step::DeclareAttackers),
             p1.declare_attackers([attacking]),
-        ])
-        .unwrap();
+        ])?;
 
         assert!(game.app.world().get::<crate::cards::Attacking>(attacking.into()).is_some());
         assert!(game.app.world().get::<crate::cards::Attacking>(defending.into()).is_none());
+        Ok(())
     }
 
     #[test]
-    fn cannot_declare_another_players_creature() {
+    fn cannot_declare_another_players_creature() -> Result<(), TestError> {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield([GRIZZLY_BEARS]),
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
-        let [defending] =
-            game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
+        let [defending] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
         game.play([
             p1.pass_to(turns::Step::DeclareAttackers),
             p2.pass_to(turns::Step::DeclareAttackers),
-        ])
-        .unwrap();
+        ])?;
 
         game.act(
             p1,
@@ -142,20 +138,20 @@ mod tests {
             })
         );
         assert!(game.app.world().get::<crate::cards::Attacking>(defending.into()).is_none());
+        Ok(())
     }
 
     #[test]
-    fn r508_1a_a_tapped_creature_cannot_be_declared_as_an_attacker() {
+    fn r508_1a_a_tapped_creature_cannot_be_declared_as_an_attacker() -> Result<(), TestError> {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield_tapped([GRIZZLY_BEARS]),
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
-        let [tapped] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
+        let [tapped] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
         game.play([
             p1.pass_to(turns::Step::DeclareAttackers),
             p2.pass_to(turns::Step::DeclareAttackers),
-        ])
-        .unwrap();
+        ])?;
 
         game.act(p1, actions::Action::DeclareAttackers(vec![tapped.into()]));
 
@@ -166,5 +162,6 @@ mod tests {
             })
         );
         assert!(game.app.world().get::<crate::cards::Attacking>(tapped.into()).is_none());
+        Ok(())
     }
 }

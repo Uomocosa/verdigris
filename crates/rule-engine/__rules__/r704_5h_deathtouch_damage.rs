@@ -42,129 +42,121 @@ mod tests {
     use crate::{BATTLEFIELD, HAND};
 
     #[test]
-    fn test_usage() {
+    fn test_usage() -> Result<(), TestError> {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield([TYPHOID_RATS]),
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
-        let [rats] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TYPHOID_RATS).unwrap();
+        let [rats] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TYPHOID_RATS)?;
         game.play([
             p1.pass_to(turns::Step::DeclareAttackers),
             p2.pass_to(turns::Step::DeclareAttackers),
             p1.declare_attackers([rats]),
-        ])
-        .unwrap();
+        ])?;
         game.play([
             p1.pass_to(turns::Step::CombatDamage),
             p2.pass_to(turns::Step::CombatDamage),
             p1.pass_priority(),
             p2.pass_priority(),
-        ])
-        .unwrap();
+        ])?;
 
         assert_eq!(game.player(p2).life(), 19);
+        Ok(())
     }
 
     #[test]
-    fn r704_5h_deathtouch_damage_destroys_a_larger_creature() {
+    fn r704_5h_deathtouch_damage_destroys_a_larger_creature() -> Result<(), TestError> {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield([TYPHOID_RATS]),
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
-        let [rats] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TYPHOID_RATS).unwrap();
-        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
+        let [rats] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TYPHOID_RATS)?;
+        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
         game.play([
             p1.pass_to(turns::Step::DeclareAttackers),
             p2.pass_to(turns::Step::DeclareAttackers),
             p1.declare_attackers([rats]),
-        ])
-        .unwrap();
+        ])?;
         game.play([
             p1.pass_to(turns::Step::DeclareBlockers),
             p2.pass_to(turns::Step::DeclareBlockers),
-        ])
-        .unwrap();
-        game.play([p1.pass_priority(), p2.declare_blockers([(bears, rats)])]).unwrap();
+        ])?;
+        game.play([p1.pass_priority(), p2.declare_blockers([(bears, rats)])])?;
         game.play([
             p1.pass_to(turns::Step::CombatDamage),
             p2.pass_to(turns::Step::CombatDamage),
             p1.pass_priority(),
             p2.pass_priority(),
-        ])
-        .unwrap();
+        ])?;
 
         assert_eq!(game.zone_of(rats), GRAVEYARD);
         assert_eq!(game.zone_of(bears), GRAVEYARD);
+        Ok(())
     }
 
     #[test]
-    fn r704_5h_deathtouch_damage_does_not_destroy_indestructible() {
+    fn r704_5h_deathtouch_damage_does_not_destroy_indestructible() -> Result<(), TestError> {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield([TYPHOID_RATS]),
             P2.battlefield([DARKSTEEL_MYR]),
         ]);
-        let [rats] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TYPHOID_RATS).unwrap();
-        let [myr] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(DARKSTEEL_MYR).unwrap();
+        let [rats] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TYPHOID_RATS)?;
+        let [myr] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(DARKSTEEL_MYR)?;
         game.play([
             p1.pass_to(turns::Step::DeclareAttackers),
             p2.pass_to(turns::Step::DeclareAttackers),
             p1.declare_attackers([rats]),
-        ])
-        .unwrap();
+        ])?;
         game.play([
             p1.pass_to(turns::Step::DeclareBlockers),
             p2.pass_to(turns::Step::DeclareBlockers),
-        ])
-        .unwrap();
-        game.play([p1.pass_priority(), p2.declare_blockers([(myr, rats)])]).unwrap();
+        ])?;
+        game.play([p1.pass_priority(), p2.declare_blockers([(myr, rats)])])?;
         game.play([
             p1.pass_to(turns::Step::CombatDamage),
             p2.pass_to(turns::Step::CombatDamage),
             p1.pass_priority(),
             p2.pass_priority(),
-        ])
-        .unwrap();
+        ])?;
 
         assert_eq!(game.zone_of(rats), BATTLEFIELD);
         assert_eq!(game.zone_of(myr), BATTLEFIELD);
+        Ok(())
     }
 
     #[test]
-    fn r704_5h_damage_without_deathtouch_does_not_destroy_a_two_two() {
+    fn r704_5h_damage_without_deathtouch_does_not_destroy_a_two_two() -> Result<(), TestError> {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield([WALKING_CORPSE]),
             P2.battlefield([GRIZZLY_BEARS, FOREST]).hand([GIANT_GROWTH]),
         ]);
-        let [corpse] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(WALKING_CORPSE).unwrap();
-        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
-        let [forest] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(FOREST).unwrap();
-        let [growth] = game.player(p2).cards_in(HAND).exactly::<1>(GIANT_GROWTH).unwrap();
+        let [corpse] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(WALKING_CORPSE)?;
+        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        let [forest] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(FOREST)?;
+        let [growth] = game.player(p2).cards_in(HAND).exactly::<1>(GIANT_GROWTH)?;
         game.play([
             p1.pass_to(turns::Step::DeclareAttackers),
             p2.pass_to(turns::Step::DeclareAttackers),
             p1.declare_attackers([corpse]),
-        ])
-        .unwrap();
+        ])?;
         game.play([
             p1.pass_to(turns::Step::DeclareBlockers),
             p2.pass_to(turns::Step::DeclareBlockers),
-        ])
-        .unwrap();
-        game.play([p1.pass_priority(), p2.declare_blockers([(bears, corpse)])]).unwrap();
+        ])?;
+        game.play([p1.pass_priority(), p2.declare_blockers([(bears, corpse)])])?;
         game.play([
             p2.activate_ability(forest.ability()).cast(growth).targeting(bears).pass_priority(),
             p1.pass_priority(),
-        ])
-        .unwrap();
+        ])?;
         game.play([
             p1.pass_to(turns::Step::CombatDamage),
             p2.pass_to(turns::Step::CombatDamage),
             p1.pass_priority(),
             p2.pass_priority(),
-        ])
-        .unwrap();
+        ])?;
 
         assert_eq!(game.zone_of(bears), BATTLEFIELD);
         assert_eq!(game.zone_of(corpse), GRAVEYARD);
+        Ok(())
     }
 }

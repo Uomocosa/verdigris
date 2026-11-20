@@ -43,36 +43,37 @@ mod tests {
     use crate::{BATTLEFIELD, GRAVEYARD, HAND};
 
     #[test]
-    fn test_usage() {
+    fn test_usage() -> Result<(), TestError> {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([DISFIGURE]).mana_pool(mana![B]),
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
-        let [disfigure] = game.player(p1).cards_in(HAND).exactly::<1>(DISFIGURE).unwrap();
-        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
+        let [disfigure] = game.player(p1).cards_in(HAND).exactly::<1>(DISFIGURE)?;
+        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
         game.play([
             p1.cast(disfigure).targeting(bears).pass_priority(),
             p2.pass_priority(),
-        ])
-        .unwrap();
+        ])?;
         assert_eq!(game.zone_of(bears), GRAVEYARD);
+        Ok(())
     }
 
     #[test]
-    fn r704_5f_zero_toughness_puts_a_zero_toughness_creature_in_the_graveyard() {
+    fn r704_5f_zero_toughness_puts_a_zero_toughness_creature_in_the_graveyard()
+    -> Result<(), TestError> {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([DISFIGURE]).mana_pool(mana![B]),
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
-        let [disfigure] = game.player(p1).cards_in(HAND).exactly::<1>(DISFIGURE).unwrap();
-        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
+        let [disfigure] = game.player(p1).cards_in(HAND).exactly::<1>(DISFIGURE)?;
+        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
         game.play([
             p1.cast(disfigure).targeting(bears).pass_priority(),
             p2.pass_priority(),
-        ])
-        .unwrap();
+        ])?;
         assert!(!game.player(p2).cards_in(BATTLEFIELD).has(GRIZZLY_BEARS));
         assert!(game.player(p2).cards_in(GRAVEYARD).has(GRIZZLY_BEARS));
         assert_eq!(game.zone_of(disfigure), GRAVEYARD);
+        Ok(())
     }
 }

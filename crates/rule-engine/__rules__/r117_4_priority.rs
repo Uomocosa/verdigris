@@ -50,70 +50,71 @@ mod tests {
     use crate::{GRAVEYARD, HAND, STACK};
 
     #[test]
-    fn test_usage() {
+    fn test_usage() -> Result<(), TestError> {
         let (mut game, [p1, p2]) =
             MockGame::new([P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]), P2]);
-        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT).unwrap();
+        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
         game.play([
             p1.cast(bolt).targeting(p2).pass_priority(),
             p2.pass_priority(),
-        ])
-        .unwrap();
+        ])?;
         assert_eq!(game.zone_of(bolt), GRAVEYARD);
+        Ok(())
     }
 
     #[test]
-    fn all_players_passing_resolves_one_spell() {
+    fn all_players_passing_resolves_one_spell() -> Result<(), TestError> {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([LIGHTNING_BOLT, LIGHTNING_BOLT]).mana_pool(mana![R, R]),
             P2,
         ]);
-        let [first, second] = game.player(p1).cards_in(HAND).exactly::<2>(LIGHTNING_BOLT).unwrap();
+        let [first, second] = game.player(p1).cards_in(HAND).exactly::<2>(LIGHTNING_BOLT)?;
         game.play([
             p1.cast(first).targeting(p2),
             p1.cast(second).targeting(p2).pass_priority(),
             p2.pass_priority(),
-        ])
-        .unwrap();
+        ])?;
 
         assert_eq!(game.zone_of(second), GRAVEYARD);
         assert_eq!(game.zone_of(first), STACK);
         assert_eq!(game.life(p2), 17);
+        Ok(())
     }
 
     #[test]
-    fn two_rounds_of_passing_resolves_both_spells() {
+    fn two_rounds_of_passing_resolves_both_spells() -> Result<(), TestError> {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([LIGHTNING_BOLT, LIGHTNING_BOLT]).mana_pool(mana![R, R]),
             P2,
         ]);
-        let [first, second] = game.player(p1).cards_in(HAND).exactly::<2>(LIGHTNING_BOLT).unwrap();
+        let [first, second] = game.player(p1).cards_in(HAND).exactly::<2>(LIGHTNING_BOLT)?;
         game.play([
             p1.cast(first).targeting(p2),
             p1.cast(second).targeting(p2).pass_priority(),
             p2.pass_priority(),
             p1.pass_priority(),
             p2.pass_priority(),
-        ])
-        .unwrap();
+        ])?;
 
         assert_eq!(game.zone_of(second), GRAVEYARD);
         assert_eq!(game.zone_of(first), GRAVEYARD);
         assert_eq!(game.life(p2), 14);
+        Ok(())
     }
 
     #[test]
-    fn priority_returns_to_the_active_player_after_a_spell_resolves() {
+    fn priority_returns_to_the_active_player_after_a_spell_resolves() -> Result<(), TestError> {
         let (mut game, [p1, p2]) =
             MockGame::new([P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]), P2]);
-        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT).unwrap();
-        game.play([p1.cast(bolt).targeting(p2).pass_priority()]).unwrap();
+        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
+        game.play([p1.cast(bolt).targeting(p2).pass_priority()])?;
 
         assert_ne!(game.app.world().resource::<turns::Priority>().player, p1);
-        game.play([p2.pass_priority()]).unwrap();
+        game.play([p2.pass_priority()])?;
 
         let priority = *game.app.world().resource::<turns::Priority>();
         assert_eq!(priority.player, p1);
         assert_eq!(priority.consecutive_passes, 0);
+        Ok(())
     }
 }

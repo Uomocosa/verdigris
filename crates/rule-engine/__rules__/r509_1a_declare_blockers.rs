@@ -82,83 +82,79 @@ mod tests {
     use crate::turns;
 
     #[test]
-    fn test_usage() {
+    fn test_usage() -> Result<(), TestError> {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield([TYPHOID_RATS]),
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
-        let [rats] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TYPHOID_RATS).unwrap();
-        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
+        let [rats] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TYPHOID_RATS)?;
+        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
         game.play([
             p1.pass_to(turns::Step::DeclareAttackers),
             p2.pass_to(turns::Step::DeclareAttackers),
             p1.declare_attackers([rats]),
-        ])
-        .unwrap();
+        ])?;
 
         game.play([
             p1.pass_to(turns::Step::DeclareBlockers),
             p2.pass_to(turns::Step::DeclareBlockers),
-        ])
-        .unwrap();
-        game.play([p1.pass_priority(), p2.declare_blockers([(bears, rats)])]).unwrap();
+        ])?;
+        game.play([p1.pass_priority(), p2.declare_blockers([(bears, rats)])])?;
 
         assert_eq!(
             game.app.world().get::<crate::cards::Blocking>(bears.into()),
             Some(&crate::cards::Blocking(rats.into()))
         );
+        Ok(())
     }
 
     #[test]
-    fn r509_1a_declared_blockers_become_blocking_and_attacker_blocked() {
+    fn r509_1a_declared_blockers_become_blocking_and_attacker_blocked() -> Result<(), TestError> {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield([TYPHOID_RATS]),
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
-        let [rats] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TYPHOID_RATS).unwrap();
-        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
+        let [rats] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TYPHOID_RATS)?;
+        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
         game.play([
             p1.pass_to(turns::Step::DeclareAttackers),
             p2.pass_to(turns::Step::DeclareAttackers),
             p1.declare_attackers([rats]),
-        ])
-        .unwrap();
+        ])?;
 
         game.play([
             p1.pass_to(turns::Step::DeclareBlockers),
             p2.pass_to(turns::Step::DeclareBlockers),
-        ])
-        .unwrap();
-        game.play([p1.pass_priority(), p2.declare_blockers([(bears, rats)])]).unwrap();
+        ])?;
+        game.play([p1.pass_priority(), p2.declare_blockers([(bears, rats)])])?;
 
         assert_eq!(
             game.app.world().get::<crate::cards::Blocking>(bears.into()),
             Some(&crate::cards::Blocking(rats.into()))
         );
         assert!(game.app.world().get::<crate::cards::Blocked>(rats.into()).is_some());
+        Ok(())
     }
 
     #[test]
-    fn r509_1a_a_tapped_creature_cannot_be_declared_as_a_blocker() {
+    fn r509_1a_a_tapped_creature_cannot_be_declared_as_a_blocker() -> Result<(), TestError> {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield([TYPHOID_RATS]),
             P2.battlefield_tapped([GRIZZLY_BEARS]),
         ]);
-        let [rats] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TYPHOID_RATS).unwrap();
-        let [tapped] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
+        let [rats] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TYPHOID_RATS)?;
+        let [tapped] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
         game.play([
             p1.pass_to(turns::Step::DeclareAttackers),
             p2.pass_to(turns::Step::DeclareAttackers),
             p1.declare_attackers([rats]),
-        ])
-        .unwrap();
+        ])?;
 
         game.play([
             p1.pass_to(turns::Step::DeclareBlockers),
             p2.pass_to(turns::Step::DeclareBlockers),
-        ])
-        .unwrap();
-        game.play([p1.pass_priority()]).unwrap();
+        ])?;
+        game.play([p1.pass_priority()])?;
         let assignments = vec![actions::BlockAssignment {
             blocker: tapped.into(),
             attacker: rats.into(),
@@ -171,30 +167,29 @@ mod tests {
             Some(&actions::Rejected::CannotBlock { assignments })
         );
         assert!(game.app.world().get::<crate::cards::Blocking>(tapped.into()).is_none());
+        Ok(())
     }
 
     #[test]
-    fn r509_1a_a_creature_that_is_not_attacking_cannot_be_blocked() {
+    fn r509_1a_a_creature_that_is_not_attacking_cannot_be_blocked() -> Result<(), TestError> {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield([TYPHOID_RATS, GRIZZLY_BEARS]),
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
-        let [rats] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TYPHOID_RATS).unwrap();
-        let [idle] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
-        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
+        let [rats] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TYPHOID_RATS)?;
+        let [idle] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
         game.play([
             p1.pass_to(turns::Step::DeclareAttackers),
             p2.pass_to(turns::Step::DeclareAttackers),
             p1.declare_attackers([rats]),
-        ])
-        .unwrap();
+        ])?;
 
         game.play([
             p1.pass_to(turns::Step::DeclareBlockers),
             p2.pass_to(turns::Step::DeclareBlockers),
-        ])
-        .unwrap();
-        game.play([p1.pass_priority()]).unwrap();
+        ])?;
+        game.play([p1.pass_priority()])?;
         assert!(game.app.world().get::<crate::cards::Attacking>(idle.into()).is_none());
         let assignments = vec![actions::BlockAssignment {
             blocker: bears.into(),
@@ -207,5 +202,6 @@ mod tests {
             game.last_rejection(),
             Some(&actions::Rejected::CannotBlock { assignments })
         );
+        Ok(())
     }
 }
