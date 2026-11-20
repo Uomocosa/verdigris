@@ -10,7 +10,9 @@ use crate::testing;
 pub struct CardDefinition {
     pub name: cards::CardName,
     pub cost: cards::Cost,
+    pub supertypes: Vec<cards::Supertype>,
     pub types: Vec<cards::CardType>,
+    pub land_types: Vec<cards::LandType>,
     pub power_toughness: Option<cards::PowerToughness>,
     pub effect: Option<effects::Effect>,
     pub keywords: Vec<cards::Keyword>,
@@ -35,6 +37,12 @@ impl CardDefinition {
     #[must_use]
     pub fn keyword(mut self, keyword: cards::Keyword) -> Self {
         self.keywords.push(keyword);
+        self
+    }
+
+    #[must_use]
+    pub fn supertype(mut self, supertype: cards::Supertype) -> Self {
+        self.supertypes.push(supertype);
         self
     }
 }

@@ -25,6 +25,15 @@ pub enum Keyword {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum Supertype {
+    Basic,
+    Legendary,
+    Ongoing,
+    Snow,
+    World,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum ManaSymbol {
     White,
     Blue,

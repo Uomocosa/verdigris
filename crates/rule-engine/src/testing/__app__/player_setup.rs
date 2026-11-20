@@ -123,6 +123,7 @@ mod tests {
             DIVINATION,
             DOOM_BLADE,
             ESSENCE_SCATTER,
+            FOREST,
             GIANT_GROWTH,
             GRIZZLY_BEARS,
             LIGHTNING_BOLT,
