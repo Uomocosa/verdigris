@@ -30,6 +30,7 @@ pub fn r506_2a_r507_1_r508_1b_defending_player(
     priority: Res<turns::Priority>,
     players: Query<Entity, With<players::Player>>,
     defending: Query<Entity, With<players::DefendingPlayer>>,
+    lost: Query<Entity, With<players::Lost>>,
 ) {
     let turn = turn.into_inner();
     let priority = priority.into_inner();
@@ -37,11 +38,11 @@ pub fn r506_2a_r507_1_r508_1b_defending_player(
         if **step != turns::Step::BeginningOfCombat {
             continue;
         }
+        for player in defending.iter() {
+            commands.entity(player).remove::<players::DefendingPlayer>();
+        }
         let mut opponents = players.iter().filter(|player| *player != turn.active);
         if let (Some(solo_opponent), None) = (opponents.next(), opponents.next()) {
-            for player in defending.iter() {
-                commands.entity(player).remove::<players::DefendingPlayer>();
-            }
             commands.entity(solo_opponent).insert(players::DefendingPlayer);
         }
     }
@@ -53,7 +54,8 @@ pub fn r506_2a_r507_1_r508_1b_defending_player(
             && action.player == turn.active
             && action.player == priority.player
             && players.get(*chosen).is_ok()
-            && *chosen != turn.active;
+            && *chosen != turn.active
+            && lost.get(*chosen).is_err();
         if !is_legal {
             rejected.write(actions::Rejected::CannotChooseDefendingPlayer {
                 player: action.player,
@@ -69,8 +71,11 @@ pub fn r506_2a_r507_1_r508_1b_defending_player(
 
 #[cfg(test)]
 mod tests {
+    use bevy::prelude::Entity;
+
     use crate::BATTLEFIELD;
     use crate::actions;
+    use crate::players;
     use crate::testing::*;
     use crate::turns;
 
@@ -100,6 +105,53 @@ mod tests {
 
         assert_eq!(game.life(p3), 18);
         assert_eq!(game.life(p1), 20);
+        Ok(())
+    }
+
+    #[test]
+    fn r507_1_the_defending_player_marker_is_cleared_at_the_next_beginning_of_combat() -> TestResult
+    {
+        let (mut game, [p1, p2, p3]) = MockGame::new([P1, P2, P3]);
+        game.play([
+            p1.pass_to(turns::Step::BeginningOfCombat),
+            p2.pass_to(turns::Step::BeginningOfCombat),
+            p3.pass_to(turns::Step::BeginningOfCombat),
+        ])?;
+
+        game.act(p1, actions::Action::ChooseDefendingPlayer(p3.into()));
+        let marker: Option<Entity> =
+            game.app.world().get::<players::DefendingPlayer>(p3.into()).map(|_| p3.into());
+        assert_eq!(marker, Some(p3.into()));
+
+        game.play([
+            p1.pass_to(turns::Step::BeginningOfCombat),
+            p2.pass_to(turns::Step::BeginningOfCombat),
+            p3.pass_to(turns::Step::BeginningOfCombat),
+        ])?;
+
+        assert!(game.app.world().get::<players::DefendingPlayer>(p1.into()).is_none());
+        assert!(game.app.world().get::<players::DefendingPlayer>(p2.into()).is_none());
+        assert!(game.app.world().get::<players::DefendingPlayer>(p3.into()).is_none());
+        Ok(())
+    }
+
+    #[test]
+    fn r507_1_a_player_who_has_lost_cannot_be_chosen_as_the_defending_player() -> TestResult {
+        let (mut game, [p1, p2, p3]) = MockGame::new([P1, P2, P3.life(0)]);
+        game.play([
+            p1.pass_to(turns::Step::BeginningOfCombat),
+            p2.pass_to(turns::Step::BeginningOfCombat),
+            p3.pass_to(turns::Step::BeginningOfCombat),
+        ])?;
+        assert!(game.app.world().get::<players::Lost>(p3.into()).is_some());
+
+        game.act(p1, actions::Action::ChooseDefendingPlayer(p3.into()));
+
+        assert_eq!(
+            game.last_rejection(),
+            Some(&actions::Rejected::CannotChooseDefendingPlayer { player: *p1 })
+        );
+        assert!(game.app.world().get::<players::DefendingPlayer>(p3.into()).is_none());
         Ok(())
     }
 
