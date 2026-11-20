@@ -3,7 +3,6 @@ use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query, Res};
 
 use crate::actions;
 use crate::cards;
-use crate::rules::helpers;
 use crate::turns;
 use crate::zones;
 
@@ -43,7 +42,7 @@ pub fn r601_2a_cast(
             rejected.write(actions::Rejected::CannotCast { spell });
             continue;
         }
-        let Some(stack) = helpers::find_zone(STACK, None, &zone_entities) else {
+        let Some(stack) = STACK.find_entity(None, &zone_entities) else {
             rejected.write(actions::Rejected::CannotCast { spell });
             continue;
         };

@@ -5,7 +5,6 @@ use crate::cards;
 use crate::damage;
 use crate::effects;
 use crate::players;
-use crate::rules::helpers;
 use crate::stack;
 use crate::zones;
 
@@ -39,7 +38,7 @@ pub fn r608_2_resolve(
         let Ok((definition, owner, in_zone, chosen)) = spells.get(spell) else {
             continue;
         };
-        if !helpers::is_card_in_zone(**in_zone, STACK, &zone_entities) {
+        if !STACK.contains_card(**in_zone, &zone_entities) {
             continue;
         }
         let Some(effect) = definition.effect else {
@@ -63,7 +62,7 @@ pub fn r608_2_resolve(
                 effects::EffectKind::Destroy => {
                     if let Some(target) = chosen_target
                         && let Ok((_, _, target_zone, _)) = spells.get(target)
-                        && helpers::is_card_in_zone(**target_zone, BATTLEFIELD, &zone_entities)
+                        && BATTLEFIELD.contains_card(**target_zone, &zone_entities)
                     {
                         destructions.write(damage::Destruction(target));
                     }
@@ -71,7 +70,7 @@ pub fn r608_2_resolve(
                 effects::EffectKind::Counter => {
                     if let Some(target) = chosen_target
                         && let Ok((_, _, target_zone, _)) = spells.get(target)
-                        && helpers::is_card_in_zone(**target_zone, STACK, &zone_entities)
+                        && STACK.contains_card(**target_zone, &zone_entities)
                     {
                         countered.write(stack::Countered(target));
                     }
@@ -95,7 +94,7 @@ pub fn r608_2_resolve(
                 effects::EffectKind::ModifyPowerToughness { power, toughness } => {
                     if let Some(target) = chosen_target
                         && let Ok((_, _, target_zone, _)) = spells.get(target)
-                        && helpers::is_card_in_zone(**target_zone, BATTLEFIELD, &zone_entities)
+                        && BATTLEFIELD.contains_card(**target_zone, &zone_entities)
                     {
                         power_toughness_modified.write(effects::PowerToughnessModified {
                             target,

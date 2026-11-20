@@ -6,7 +6,6 @@ use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query, ResMu
 use crate::actions;
 use crate::cards;
 use crate::players;
-use crate::rules::helpers;
 use crate::zones;
 
 /// 701.9a To discard a card, move it from its owner's hand to that player's graveyard.
@@ -23,11 +22,10 @@ pub fn r701_9_discard(
     zone_contents: Query<&zones::ZoneContents>,
 ) {
     for discard in discards.read() {
-        let Some(hand) = helpers::find_zone(HAND, Some(discard.player), &zone_entities) else {
+        let Some(hand) = HAND.find_entity(Some(discard.player), &zone_entities) else {
             continue;
         };
-        let Some(graveyard) = helpers::find_zone(GRAVEYARD, Some(discard.player), &zone_entities)
-        else {
+        let Some(graveyard) = GRAVEYARD.find_entity(Some(discard.player), &zone_entities) else {
             continue;
         };
         let held: Vec<Entity> = zone_contents
@@ -67,8 +65,7 @@ pub fn r701_9_discard(
             });
             continue;
         }
-        let Some(graveyard) = helpers::find_zone(GRAVEYARD, Some(choice.player), &zone_entities)
-        else {
+        let Some(graveyard) = GRAVEYARD.find_entity(Some(choice.player), &zone_entities) else {
             continue;
         };
         for card in cards {

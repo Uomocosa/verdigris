@@ -4,7 +4,6 @@ use bevy::prelude::{Commands, Entity, MessageReader, Query, With};
 use crate::cards;
 use crate::effects;
 use crate::players;
-use crate::rules::helpers;
 use crate::stack;
 use crate::zones;
 
@@ -29,7 +28,7 @@ pub fn r608_2b_illegal_targets(
         let Ok((definition, owner, in_zone, chosen)) = cards.get(spell) else {
             continue;
         };
-        if !helpers::is_card_in_zone(**in_zone, STACK, &zone_entities) {
+        if !STACK.contains_card(**in_zone, &zone_entities) {
             continue;
         }
         let Some(effect) = definition.effect else {
@@ -44,7 +43,7 @@ pub fn r608_2b_illegal_targets(
         if is_legal {
             continue;
         }
-        if let Some(graveyard) = helpers::find_zone(GRAVEYARD, Some(**owner), &zone_entities) {
+        if let Some(graveyard) = GRAVEYARD.find_entity(Some(**owner), &zone_entities) {
             commands.entity(spell).insert(zones::InZone(graveyard));
         }
     }
@@ -64,8 +63,8 @@ fn target_is_legal(
 ) -> bool {
     let is_player = players.contains(target);
     let creature_matches_filter = cards.get(target).is_ok_and(|(definition, _, in_zone, _)| {
-        helpers::does_creature_match_filter(definition, requirement.filter)
-            && helpers::is_card_in_zone(**in_zone, BATTLEFIELD, zone_entities)
+        requirement.filter.does_creature_match(definition)
+            && BATTLEFIELD.contains_card(**in_zone, zone_entities)
     });
     match requirement.filter.kind {
         effects::FilterKind::AnyTarget => is_player || creature_matches_filter,
@@ -76,8 +75,8 @@ fn target_is_legal(
         | effects::FilterKind::NoncreatureSpell
         | effects::FilterKind::InstantSpell => {
             cards.get(target).is_ok_and(|(definition, _, in_zone, _)| {
-                helpers::is_card_in_zone(**in_zone, STACK, zone_entities)
-                    && helpers::does_spell_match_filter(definition, requirement.filter)
+                STACK.contains_card(**in_zone, zone_entities)
+                    && requirement.filter.does_spell_match(definition)
             })
         }
     }

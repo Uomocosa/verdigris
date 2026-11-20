@@ -1,7 +1,7 @@
 use bevy::prelude::{MessageReader, Query};
 
+use crate::damage;
 use crate::players;
-use crate::rules::helpers;
 
 /// 119.3 If an effect causes a player to gain life or lose life, that player's life total is
 /// adjusted accordingly.
@@ -11,7 +11,8 @@ pub fn r119_3_life_loss(
 ) {
     for event in life_lost.read() {
         if let Ok(mut life) = lives.get_mut(event.player) {
-            *life = players::Life((**life).saturating_sub(helpers::signed_damage(event.amount)));
+            *life =
+                players::Life((**life).saturating_sub(damage::Damage::signed_amount(event.amount)));
         }
     }
 }

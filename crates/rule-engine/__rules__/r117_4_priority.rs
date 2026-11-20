@@ -2,7 +2,6 @@ use crate::STACK;
 use bevy::prelude::{Entity, MessageWriter, Query, Res, ResMut};
 
 use crate::cards;
-use crate::rules::helpers;
 use crate::stack;
 use crate::turns;
 use crate::zones;
@@ -27,7 +26,8 @@ pub fn r117_4_priority(
         return;
     }
     priority.consecutive_passes = 0;
-    let top = helpers::find_zone(STACK, None, &zone_entities)
+    let top = STACK
+        .find_entity(None, &zone_entities)
         .and_then(|stack| stack_contents.get(stack).ok())
         .and_then(|contents| contents.last().copied());
     let Some(top) = top else {

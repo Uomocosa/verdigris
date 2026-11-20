@@ -2,7 +2,6 @@ use crate::{BATTLEFIELD, STACK};
 use bevy::prelude::{Commands, Entity, MessageReader, Query};
 
 use crate::cards;
-use crate::rules::helpers;
 use crate::stack;
 use crate::zones;
 
@@ -23,7 +22,7 @@ pub fn r608_3a_permanent_enters(
         let Ok((definition, owner, in_zone)) = cards.get(spell) else {
             continue;
         };
-        if !helpers::is_card_in_zone(**in_zone, STACK, &zone_entities) {
+        if !STACK.contains_card(**in_zone, &zone_entities) {
             continue;
         }
         let is_permanent = !definition.types.iter().any(|card_type| {
@@ -35,7 +34,7 @@ pub fn r608_3a_permanent_enters(
         if !is_permanent {
             continue;
         }
-        if let Some(battlefield) = helpers::find_zone(BATTLEFIELD, Some(**owner), &zone_entities) {
+        if let Some(battlefield) = BATTLEFIELD.find_entity(Some(**owner), &zone_entities) {
             commands.entity(spell).insert(zones::InZone(battlefield));
         }
     }

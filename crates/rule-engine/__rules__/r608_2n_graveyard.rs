@@ -2,7 +2,6 @@ use crate::{GRAVEYARD, STACK};
 use bevy::prelude::{Commands, Entity, MessageReader, Query};
 
 use crate::cards;
-use crate::rules::helpers;
 use crate::stack;
 use crate::zones;
 
@@ -20,7 +19,7 @@ pub fn r608_2n_graveyard(
         let Ok((definition, owner, in_zone)) = cards.get(spell) else {
             continue;
         };
-        if !helpers::is_card_in_zone(**in_zone, STACK, &zone_entities) {
+        if !STACK.contains_card(**in_zone, &zone_entities) {
             continue;
         }
         let is_instant_or_sorcery = definition.types.iter().any(|card_type| {
@@ -32,7 +31,7 @@ pub fn r608_2n_graveyard(
         if !is_instant_or_sorcery {
             continue;
         }
-        if let Some(graveyard) = helpers::find_zone(GRAVEYARD, Some(**owner), &zone_entities) {
+        if let Some(graveyard) = GRAVEYARD.find_entity(Some(**owner), &zone_entities) {
             commands.entity(spell).insert(zones::InZone(graveyard));
         }
     }

@@ -19,4 +19,5 @@ pub mod rules_plugin;
 pub mod test_card;
 #[cfg(feature = "testing")]
 pub mod test_player_actions;
+pub mod zone;
 pub mod zone_ref;

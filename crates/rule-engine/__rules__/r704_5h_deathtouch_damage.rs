@@ -3,7 +3,6 @@ use bevy::prelude::{Commands, Entity, MessageWriter, Query};
 
 use crate::cards;
 use crate::damage;
-use crate::rules::helpers;
 use crate::zones;
 
 /// 704.5h If a creature has toughness greater than 0, and it's been dealt damage by a source with
@@ -22,7 +21,7 @@ pub fn r704_5h_deathtouch_damage(
 ) {
     for (creature, definition, _, in_zone) in cards.iter() {
         commands.entity(creature).remove::<damage::DealtByDeathtouch>();
-        if !helpers::is_card_in_zone(**in_zone, BATTLEFIELD, &zone_entities) {
+        if !BATTLEFIELD.contains_card(**in_zone, &zone_entities) {
             continue;
         }
         let Some(power_toughness) = definition.power_toughness else {

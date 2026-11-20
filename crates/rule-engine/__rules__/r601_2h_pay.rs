@@ -3,7 +3,6 @@ use bevy::prelude::{Commands, Entity, MessageWriter, Query};
 
 use crate::actions;
 use crate::cards;
-use crate::rules::helpers;
 use crate::stack;
 use crate::zones;
 
@@ -34,7 +33,7 @@ pub fn r601_2h_pay(
             continue;
         }
         rejected.write(actions::Rejected::CannotPay { spell });
-        if let Some(hand) = helpers::find_zone(HAND, Some(**owner), &zone_entities) {
+        if let Some(hand) = HAND.find_entity(Some(**owner), &zone_entities) {
             commands.entity(spell).insert(zones::InZone(hand));
         }
         commands.entity(spell).remove::<stack::CastingStage>();

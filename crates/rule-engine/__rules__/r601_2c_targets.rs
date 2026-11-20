@@ -7,7 +7,6 @@ use crate::actions;
 use crate::cards;
 use crate::effects;
 use crate::players;
-use crate::rules::helpers;
 use crate::stack;
 use crate::zones;
 
@@ -34,7 +33,7 @@ pub fn r601_2c_targets(
                 let Ok((_, definition, owner, in_zone)) = cards.get(spell) else {
                     continue;
                 };
-                if !helpers::is_card_in_zone(**in_zone, STACK, &zone_entities) {
+                if !STACK.contains_card(**in_zone, &zone_entities) {
                     continue;
                 }
                 let controller = **owner;
@@ -56,7 +55,7 @@ pub fn r601_2c_targets(
                 );
                 if legal.is_empty() {
                     rejected.write(actions::Rejected::NoLegalTargets { spell });
-                    if let Some(hand) = helpers::find_zone(HAND, Some(controller), &zone_entities) {
+                    if let Some(hand) = HAND.find_entity(Some(controller), &zone_entities) {
                         commands.entity(spell).insert(zones::InZone(hand));
                     }
                     commands.entity(spell).remove::<stack::CastingStage>();
@@ -145,12 +144,11 @@ fn legal_targets(
             | effects::FilterKind::CreatureSpell
             | effects::FilterKind::NoncreatureSpell
             | effects::FilterKind::InstantSpell => {
-                helpers::is_card_in_zone(**in_zone, STACK, zone_entities)
-                    && helpers::does_spell_match_filter(definition, filter)
+                STACK.contains_card(**in_zone, zone_entities) && filter.does_spell_match(definition)
             }
             effects::FilterKind::Creature | effects::FilterKind::AnyTarget => {
-                helpers::does_creature_match_filter(definition, filter)
-                    && helpers::is_card_in_zone(**in_zone, BATTLEFIELD, zone_entities)
+                filter.does_creature_match(definition)
+                    && BATTLEFIELD.contains_card(**in_zone, zone_entities)
             }
             effects::FilterKind::Player => false,
         };

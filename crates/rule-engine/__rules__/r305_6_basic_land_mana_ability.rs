@@ -1,8 +1,8 @@
 use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query, Res};
 
+use crate::BATTLEFIELD;
 use crate::actions;
 use crate::cards;
-use crate::rules::helpers;
 use crate::turns;
 use crate::zones;
 
@@ -57,8 +57,7 @@ pub fn r305_6_basic_land_mana_ability(
             rejected.write(actions::Rejected::CannotActivateManaAbility { permanent });
             continue;
         };
-        let is_on_the_battlefield =
-            helpers::is_card_in_zone(**in_zone, crate::BATTLEFIELD, &zone_entities);
+        let is_on_the_battlefield = BATTLEFIELD.contains_card(**in_zone, &zone_entities);
         let Some(land_type) =
             definition.land_types.iter().copied().find(|land_type| land_type.color() == produces)
         else {

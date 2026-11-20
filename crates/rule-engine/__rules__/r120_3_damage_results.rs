@@ -3,7 +3,6 @@ use bevy::prelude::{Commands, MessageReader, Query};
 use crate::cards;
 use crate::damage;
 use crate::players;
-use crate::rules::helpers;
 
 /// 120.3 Damage may have one or more of the following results, depending on whether the recipient
 /// of the damage is a player or permanent, the characteristics of the damage's source, and the
@@ -24,7 +23,8 @@ pub fn r120_3_damage_results(
             continue;
         }
         if let Ok(mut life) = lives.get_mut(event.target) {
-            *life = players::Life((**life).saturating_sub(helpers::signed_damage(event.amount)));
+            *life =
+                players::Life((**life).saturating_sub(damage::Damage::signed_amount(event.amount)));
             continue;
         }
         let marked = targets.get(event.target).ok().flatten().map_or(0, |damage| **damage);

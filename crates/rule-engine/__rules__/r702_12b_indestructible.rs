@@ -3,7 +3,6 @@ use bevy::prelude::{Commands, Entity, MessageReader, Query};
 
 use crate::cards;
 use crate::damage;
-use crate::rules::helpers;
 use crate::zones;
 
 /// 702.12b A permanent with indestructible can't be destroyed. Such permanents aren't destroyed by
@@ -23,10 +22,10 @@ pub fn r702_12b_indestructible(
         if definition.keywords.contains(&cards::Keyword::Indestructible) {
             continue;
         }
-        if !helpers::is_card_in_zone(**in_zone, BATTLEFIELD, &zone_entities) {
+        if !BATTLEFIELD.contains_card(**in_zone, &zone_entities) {
             continue;
         }
-        if let Some(graveyard) = helpers::find_zone(GRAVEYARD, Some(**owner), &zone_entities) {
+        if let Some(graveyard) = GRAVEYARD.find_entity(Some(**owner), &zone_entities) {
             commands.entity(permanent).insert(zones::InZone(graveyard));
         }
     }

@@ -3,7 +3,6 @@ use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query, Res};
 use crate::BATTLEFIELD;
 use crate::actions;
 use crate::cards;
-use crate::rules::helpers;
 use crate::turns;
 use crate::zones;
 
@@ -42,9 +41,7 @@ pub fn r509_1a_declare_blockers(
             });
             continue;
         }
-        let Some(battlefield) =
-            helpers::find_zone(BATTLEFIELD, Some(action.player), &zone_entities)
-        else {
+        let Some(battlefield) = BATTLEFIELD.find_entity(Some(action.player), &zone_entities) else {
             rejected.write(actions::Rejected::CannotBlock {
                 assignments: assignments.clone(),
             });

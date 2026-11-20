@@ -4,7 +4,6 @@ use bevy::prelude::{Commands, Entity, Query};
 
 use crate::cards;
 use crate::effects;
-use crate::rules::helpers;
 use crate::zones;
 
 /// 704.5f If a creature has toughness 0 or less, it's put into its owner's
@@ -21,16 +20,16 @@ pub fn r704_5f_zero_toughness(
     zone_entities: Query<(Entity, &zones::Zone, Option<&cards::Owner>)>,
 ) {
     for (creature, definition, owner, in_zone, modifier) in cards.iter() {
-        if !helpers::is_card_in_zone(**in_zone, BATTLEFIELD, &zone_entities) {
+        if !BATTLEFIELD.contains_card(**in_zone, &zone_entities) {
             continue;
         }
-        let Some(power_toughness) = helpers::effective_power_toughness(definition, modifier) else {
+        let Some(power_toughness) = definition.effective_power_toughness(modifier) else {
             continue;
         };
         if power_toughness.toughness > 0 {
             continue;
         }
-        if let Some(graveyard) = helpers::find_zone(GRAVEYARD, Some(**owner), &zone_entities) {
+        if let Some(graveyard) = GRAVEYARD.find_entity(Some(**owner), &zone_entities) {
             commands.entity(creature).insert(zones::InZone(graveyard));
         }
     }

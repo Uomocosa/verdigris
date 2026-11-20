@@ -3,7 +3,6 @@ use bevy::prelude::{Entity, MessageReader, MessageWriter, Query, Res};
 
 use crate::cards;
 use crate::players;
-use crate::rules::helpers;
 use crate::turns;
 use crate::zones;
 
@@ -22,7 +21,7 @@ pub fn r514_1_cleanup_discard(
         if **step != turns::Step::Cleanup {
             continue;
         }
-        let Some(hand) = helpers::find_zone(HAND, Some(turn.active), &zone_entities) else {
+        let Some(hand) = HAND.find_entity(Some(turn.active), &zone_entities) else {
             continue;
         };
         let Ok(contents) = zone_contents.get(hand) else {

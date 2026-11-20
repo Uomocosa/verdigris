@@ -3,7 +3,6 @@ use bevy::prelude::{Commands, Entity, MessageReader, Query};
 
 use crate::cards;
 use crate::players;
-use crate::rules::helpers;
 use crate::zones;
 
 /// 121.1 A player draws a card by putting the top card of their library into their hand. This is
@@ -22,7 +21,7 @@ pub fn r121_1_draw(
     zone_contents: Query<&zones::ZoneContents>,
 ) {
     for draw in draws.read() {
-        let Some(library) = helpers::find_zone(LIBRARY, Some(draw.player), &zone_entities) else {
+        let Some(library) = LIBRARY.find_entity(Some(draw.player), &zone_entities) else {
             continue;
         };
         let drawn_from_top: Vec<Entity> = zone_contents
@@ -32,7 +31,7 @@ pub fn r121_1_draw(
                 contents.iter().take(requested).copied().collect()
             })
             .unwrap_or_default();
-        if let Some(hand) = helpers::find_zone(HAND, Some(draw.player), &zone_entities) {
+        if let Some(hand) = HAND.find_entity(Some(draw.player), &zone_entities) {
             for card in &drawn_from_top {
                 commands.entity(*card).insert(zones::InZone(hand));
             }

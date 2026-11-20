@@ -6,7 +6,6 @@ use crate::STACK;
 use crate::actions;
 use crate::cards;
 use crate::players;
-use crate::rules::helpers;
 use crate::turns;
 use crate::zones;
 
@@ -48,11 +47,11 @@ pub fn r305_1_play_land(
             rejected.write(actions::Rejected::CannotPlayLand { land });
             continue;
         };
-        let Some(hand) = helpers::find_zone(HAND, Some(action.player), &zone_entities) else {
+        let Some(hand) = HAND.find_entity(Some(action.player), &zone_entities) else {
             rejected.write(actions::Rejected::CannotPlayLand { land });
             continue;
         };
-        let Some(stack) = helpers::find_zone(STACK, None, &zone_entities) else {
+        let Some(stack) = STACK.find_entity(None, &zone_entities) else {
             rejected.write(actions::Rejected::CannotPlayLand { land });
             continue;
         };
@@ -81,9 +80,7 @@ pub fn r305_1_play_land(
             continue;
         }
         record.record_play(turn.number);
-        if let Some(battlefield) =
-            helpers::find_zone(BATTLEFIELD, Some(action.player), &zone_entities)
-        {
+        if let Some(battlefield) = BATTLEFIELD.find_entity(Some(action.player), &zone_entities) {
             commands.entity(land).insert(zones::InZone(battlefield));
         }
     }

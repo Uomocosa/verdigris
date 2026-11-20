@@ -4,7 +4,6 @@ use bevy::prelude::{Entity, MessageWriter, Query};
 use crate::cards;
 use crate::damage;
 use crate::effects;
-use crate::rules::helpers;
 use crate::zones;
 
 /// 704.5g If a creature has toughness greater than 0, it has damage marked on it, and the total
@@ -22,13 +21,13 @@ pub fn r704_5g_lethal_damage(
     zone_entities: Query<(Entity, &zones::Zone, Option<&cards::Owner>)>,
 ) {
     for (creature, definition, damage, in_zone, modifier) in cards.iter() {
-        if !helpers::is_card_in_zone(**in_zone, BATTLEFIELD, &zone_entities) {
+        if !BATTLEFIELD.contains_card(**in_zone, &zone_entities) {
             continue;
         }
-        let Some(power_toughness) = helpers::effective_power_toughness(definition, modifier) else {
+        let Some(power_toughness) = definition.effective_power_toughness(modifier) else {
             continue;
         };
-        let marked = helpers::signed_damage(**damage);
+        let marked = damage::Damage::signed_amount(**damage);
         let is_lethal =
             power_toughness.toughness > 0 && marked > 0 && marked >= power_toughness.toughness;
         if !is_lethal {
