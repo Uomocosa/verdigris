@@ -38,48 +38,199 @@ pub fn r704_5h_deathtouch_damage(
 
 #[cfg(test)]
 mod tests {
-    use crate::BATTLEFIELD;
+    use crate::GRAVEYARD;
+    use crate::actions;
+    use crate::mana;
     use crate::testing::*;
+    use crate::turns;
+    use crate::{BATTLEFIELD, HAND};
 
     #[test]
-    #[ignore = "needs combat: Typhoid Rats deals damage by attacking or blocking"]
     fn test_usage() {
-        let (game, [p1, p2]) = MockGame::new([
+        let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield([TYPHOID_RATS]),
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
-        assert!(game.player(p1).cards_in(BATTLEFIELD).has(TYPHOID_RATS));
-        assert!(game.player(p2).cards_in(BATTLEFIELD).has(GRIZZLY_BEARS));
+        game.play([
+            p1.pass_to(turns::Step::DeclareAttackers),
+            p2.pass_to(turns::Step::DeclareAttackers),
+        ])
+        .unwrap();
+        let [rats] = game
+            .player(p1)
+            .cards_in(BATTLEFIELD)
+            .matching(TYPHOID_RATS)
+            .exactly::<1>()
+            .unwrap();
+        game.act(p1, actions::Action::DeclareAttackers(vec![rats.into()]));
+        game.play([
+            p1.pass_to(turns::Step::CombatDamage),
+            p2.pass_to(turns::Step::CombatDamage),
+            p1.pass_priority(),
+            p2.pass_priority(),
+        ])
+        .unwrap();
+
+        assert_eq!(game.player(p2).life(), 19);
     }
 
     #[test]
-    #[ignore = "needs combat: Typhoid Rats deals damage by attacking or blocking"]
     fn r704_5h_deathtouch_damage_destroys_a_larger_creature() {
-        let (game, [p1, p2]) = MockGame::new([
+        let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield([TYPHOID_RATS]),
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
-        assert!(game.player(p1).cards_in(BATTLEFIELD).has(TYPHOID_RATS));
-        assert!(game.player(p2).cards_in(BATTLEFIELD).has(GRIZZLY_BEARS));
+        game.play([
+            p1.pass_to(turns::Step::DeclareAttackers),
+            p2.pass_to(turns::Step::DeclareAttackers),
+        ])
+        .unwrap();
+        let [rats] = game
+            .player(p1)
+            .cards_in(BATTLEFIELD)
+            .matching(TYPHOID_RATS)
+            .exactly::<1>()
+            .unwrap();
+        game.act(p1, actions::Action::DeclareAttackers(vec![rats.into()]));
+        game.play([
+            p1.pass_to(turns::Step::DeclareBlockers),
+            p2.pass_to(turns::Step::DeclareBlockers),
+        ])
+        .unwrap();
+        game.play([p1.pass_priority()]).unwrap();
+        let [bears] = game
+            .player(p2)
+            .cards_in(BATTLEFIELD)
+            .matching(GRIZZLY_BEARS)
+            .exactly::<1>()
+            .unwrap();
+        game.act(
+            p2,
+            actions::Action::DeclareBlockers(vec![actions::BlockAssignment {
+                blocker: bears.into(),
+                attacker: rats.into(),
+            }]),
+        );
+        game.play([
+            p1.pass_to(turns::Step::CombatDamage),
+            p2.pass_to(turns::Step::CombatDamage),
+            p1.pass_priority(),
+            p2.pass_priority(),
+        ])
+        .unwrap();
+
+        assert_eq!(game.zone_of(rats), GRAVEYARD);
+        assert_eq!(game.zone_of(bears), GRAVEYARD);
     }
 
     #[test]
-    #[ignore = "needs combat: Typhoid Rats deals damage by attacking or blocking"]
     fn r704_5h_deathtouch_damage_does_not_destroy_indestructible() {
-        let (game, [_, p2]) = MockGame::new([
+        let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield([TYPHOID_RATS]),
             P2.battlefield([DARKSTEEL_MYR]),
         ]);
-        assert!(game.player(p2).cards_in(BATTLEFIELD).has(DARKSTEEL_MYR));
+        game.play([
+            p1.pass_to(turns::Step::DeclareAttackers),
+            p2.pass_to(turns::Step::DeclareAttackers),
+        ])
+        .unwrap();
+        let [rats] = game
+            .player(p1)
+            .cards_in(BATTLEFIELD)
+            .matching(TYPHOID_RATS)
+            .exactly::<1>()
+            .unwrap();
+        game.act(p1, actions::Action::DeclareAttackers(vec![rats.into()]));
+        game.play([
+            p1.pass_to(turns::Step::DeclareBlockers),
+            p2.pass_to(turns::Step::DeclareBlockers),
+        ])
+        .unwrap();
+        game.play([p1.pass_priority()]).unwrap();
+        let [myr] = game
+            .player(p2)
+            .cards_in(BATTLEFIELD)
+            .matching(DARKSTEEL_MYR)
+            .exactly::<1>()
+            .unwrap();
+        game.act(
+            p2,
+            actions::Action::DeclareBlockers(vec![actions::BlockAssignment {
+                blocker: myr.into(),
+                attacker: rats.into(),
+            }]),
+        );
+        game.play([
+            p1.pass_to(turns::Step::CombatDamage),
+            p2.pass_to(turns::Step::CombatDamage),
+            p1.pass_priority(),
+            p2.pass_priority(),
+        ])
+        .unwrap();
+
+        assert_eq!(game.zone_of(rats), BATTLEFIELD);
+        assert_eq!(game.zone_of(myr), BATTLEFIELD);
     }
 
     #[test]
-    #[ignore = "needs combat: Typhoid Rats deals damage by attacking or blocking"]
     fn r704_5h_damage_without_deathtouch_does_not_destroy_a_two_two() {
-        let (game, [_, p2]) = MockGame::new([
+        let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield([WALKING_CORPSE]),
-            P2.battlefield([GRIZZLY_BEARS]),
+            P2.battlefield([GRIZZLY_BEARS])
+                .hand([GIANT_GROWTH])
+                .mana_pool(mana![G]),
         ]);
-        assert!(game.player(p2).cards_in(BATTLEFIELD).has(GRIZZLY_BEARS));
+        game.play([
+            p1.pass_to(turns::Step::DeclareAttackers),
+            p2.pass_to(turns::Step::DeclareAttackers),
+        ])
+        .unwrap();
+        let [corpse] = game
+            .player(p1)
+            .cards_in(BATTLEFIELD)
+            .matching(WALKING_CORPSE)
+            .exactly::<1>()
+            .unwrap();
+        game.act(p1, actions::Action::DeclareAttackers(vec![corpse.into()]));
+        game.play([
+            p1.pass_to(turns::Step::DeclareBlockers),
+            p2.pass_to(turns::Step::DeclareBlockers),
+        ])
+        .unwrap();
+        game.play([p1.pass_priority()]).unwrap();
+        let [bears] = game
+            .player(p2)
+            .cards_in(BATTLEFIELD)
+            .matching(GRIZZLY_BEARS)
+            .exactly::<1>()
+            .unwrap();
+        game.act(
+            p2,
+            actions::Action::DeclareBlockers(vec![actions::BlockAssignment {
+                blocker: bears.into(),
+                attacker: corpse.into(),
+            }]),
+        );
+        let [growth] = game
+            .player(p2)
+            .cards_in(HAND)
+            .matching(GIANT_GROWTH)
+            .exactly::<1>()
+            .unwrap();
+        game.play([
+            p2.cast(growth).targeting(bears).pass_priority(),
+            p1.pass_priority(),
+        ])
+        .unwrap();
+        game.play([
+            p1.pass_to(turns::Step::CombatDamage),
+            p2.pass_to(turns::Step::CombatDamage),
+            p1.pass_priority(),
+            p2.pass_priority(),
+        ])
+        .unwrap();
+
+        assert_eq!(game.zone_of(bears), BATTLEFIELD);
+        assert_eq!(game.zone_of(corpse), GRAVEYARD);
     }
 }
