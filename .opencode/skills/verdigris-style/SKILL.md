@@ -85,6 +85,7 @@ lookup placed after `play` silently depends on the card not having moved.
 Each scenario is tested at exactly one level (RATIONALE §21, SMELLS S12):
 
 | Level | Where | What it tests | Style |
+|---|---|---|---|
 | Method | `__methods__/…` `test_usage` | how to call it, one minimal case; honest corners as `#[rstest]` | `testing` fixtures |
 | Rule | `__rules__/` with `MockGame` | simple tests, one rule at a time, the smallest setup that shows it | `MockGame` + fixtures |
 | Scenario | `tests/` (planned, does not exist yet) | complex games where several rules interact, an expected outcome, detailed asserts | `MockGame` |
