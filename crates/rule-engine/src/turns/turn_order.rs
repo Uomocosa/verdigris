@@ -14,18 +14,22 @@ impl TurnOrder {
 
 #[cfg(test)]
 mod tests {
-    use bevy::prelude::World;
+    use bevy::prelude::Entity;
+
+    use crate::testing::*;
 
     use super::TurnOrder;
 
     #[test]
     fn test_usage() {
-        let mut world = World::new();
-        let first = world.spawn_empty().id();
-        let second = world.spawn_empty().id();
-        let third = world.spawn_empty().id();
-        let fourth = world.spawn_empty().id();
-        let outsider = world.spawn_empty().id();
+        let (_, [p1, p2, p3, p4, p5]) = MockGame::new([P1, P2, P3, P4, P5]);
+        let (first, second, third, fourth, outsider) = (
+            Entity::from(p1),
+            Entity::from(p2),
+            Entity::from(p3),
+            Entity::from(p4),
+            Entity::from(p5),
+        );
         let order = TurnOrder::from(vec![first, second, third, fourth]);
 
         assert_eq!(order.next_after(first), Some(second));

@@ -40,11 +40,11 @@ impl Zone {
 
 #[cfg(test)]
 mod tests {
-    use bevy::ecs::system::SystemState;
-    use bevy::prelude::{Entity, Query, World};
+    use bevy::prelude::Entity;
 
     use crate::cards;
     use crate::effects;
+    use crate::testing::*;
     use crate::zones;
     use crate::{BATTLEFIELD, YOU};
 
@@ -60,12 +60,18 @@ mod tests {
             }
         );
 
-        let mut world = World::new();
-        let card = world.spawn(zones::Zone::Battlefield).id();
-        let mut state =
-            SystemState::<Query<(Entity, &zones::Zone, Option<&cards::Owner>)>>::new(&mut world);
-        let zone_entities = state.get(&world).unwrap();
-        assert!(Zone::Battlefield.contains_card(card, &zone_entities));
-        assert!(!Zone::Hand.contains_card(card, &zone_entities));
+        let (mut game, [p1, ..]) = MockGame::new([P1, P2]);
+        let battlefield = game.zone_entity(p1, BATTLEFIELD).unwrap();
+        let (battlefield_holds, hand_holds) = game
+            .with_query::<(Entity, &zones::Zone, Option<&cards::Owner>), (bool, bool)>(
+                |zone_entities| {
+                    (
+                        Zone::Battlefield.contains_card(battlefield, &zone_entities),
+                        Zone::Hand.contains_card(battlefield, &zone_entities),
+                    )
+                },
+            );
+        assert!(battlefield_holds);
+        assert!(!hand_holds);
     }
 }

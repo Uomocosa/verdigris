@@ -24,34 +24,40 @@ pub fn find_entity(
 
 #[cfg(test)]
 mod tests {
-    use bevy::ecs::system::SystemState;
-    use bevy::prelude::{Entity, Query, World};
+    use bevy::prelude::Entity;
 
+    use crate::HAND;
     use crate::cards;
+    use crate::testing::*;
     use crate::zones;
 
     use super::find_entity;
 
     #[test]
     fn test_usage() {
-        let mut world = World::new();
-        let stack_entity = world.spawn(zones::Zone::Stack).id();
-        let owner = world.spawn_empty().id();
-        let hand_entity = world.spawn((zones::Zone::Hand, cards::Owner(owner))).id();
-        let mut state =
-            SystemState::<Query<(Entity, &zones::Zone, Option<&cards::Owner>)>>::new(&mut world);
-        let zone_entities = state.get(&world).unwrap();
-        assert_eq!(
-            find_entity(zones::Zone::Stack, None, &zone_entities),
-            Some(stack_entity)
+        let (mut game, [p1, ..]) = MockGame::new([P1, P2]);
+        let (stack, hand, owner) = (
+            game.stack,
+            game.zone_entity(p1, HAND).unwrap(),
+            Entity::from(p1),
         );
-        assert_eq!(
-            find_entity(zones::Zone::Hand, Some(owner), &zone_entities),
-            Some(hand_entity)
-        );
-        assert_eq!(
-            find_entity(zones::Zone::Graveyard, Some(owner), &zone_entities),
-            None
-        );
+        let (stack_found, hand_found, owned_stack) = game.with_query::<(
+            Entity,
+            &zones::Zone,
+            Option<&cards::Owner>,
+        ), (
+            Option<Entity>,
+            Option<Entity>,
+            Option<Entity>,
+        )>(|zone_entities| {
+            (
+                find_entity(zones::Zone::Stack, None, &zone_entities),
+                find_entity(zones::Zone::Hand, Some(owner), &zone_entities),
+                find_entity(zones::Zone::Stack, Some(stack), &zone_entities),
+            )
+        });
+        assert_eq!(stack_found, Some(stack));
+        assert_eq!(hand_found, Some(hand));
+        assert_eq!(owned_stack, None);
     }
 }

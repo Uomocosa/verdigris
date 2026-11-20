@@ -26,14 +26,21 @@ impl PlayerRef {
 
 #[cfg(test)]
 mod tests {
-    use bevy::prelude::{Entity, World};
+    use bevy::prelude::Entity;
+
+    use crate::testing::*;
 
     use super::PlayerRef;
 
     #[test]
     fn test_usage() {
-        let mut world = World::new();
-        let players: Vec<Entity> = (0..4).map(|_| world.spawn_empty().id()).collect();
+        let (_, [p1, p2, p3, p4]) = MockGame::new([P1, P2, P3, P4]);
+        let players = vec![
+            Entity::from(p1),
+            Entity::from(p2),
+            Entity::from(p3),
+            Entity::from(p4),
+        ];
         let controller = players[0];
         assert_eq!(
             PlayerRef::You.resolve(controller, &players),

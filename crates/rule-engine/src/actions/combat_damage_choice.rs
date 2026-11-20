@@ -23,18 +23,20 @@ impl CombatDamageChoice {
 
 #[cfg(test)]
 mod tests {
-    use bevy::prelude::World;
+    use bevy::prelude::Entity;
 
+    use crate::BATTLEFIELD;
+    use crate::HAND;
     use crate::actions;
-    use crate::damage;
+    use crate::testing::*;
 
     #[test]
     fn test_usage() {
-        let mut world = World::new();
-        let player = world.spawn_empty().id();
-        let source = world.spawn_empty().id();
-        let first = world.spawn_empty().id();
-        let second = world.spawn_empty().id();
+        let (game, [p1, p2]) = MockGame::new([P1, P2]);
+        let player = Entity::from(p1);
+        let source = Entity::from(p2);
+        let first = game.zone_entity(p1, BATTLEFIELD).unwrap();
+        let second = game.zone_entity(p2, HAND).unwrap();
 
         let choice = actions::CombatDamageChoice {
             player,
@@ -45,32 +47,14 @@ mod tests {
             }],
         };
 
+        assert_eq!(choice.player, player);
         assert_eq!(
-            choice.assigned_damage(
-                player,
-                &[
-                    actions::DamageAssignment {
-                        target: first,
-                        amount: 1
-                    },
-                    actions::DamageAssignment {
-                        target: second,
-                        amount: 1
-                    },
-                ]
-            ),
-            Some(vec![
-                damage::DamageDealt {
-                    source,
-                    target: first,
-                    amount: 1
-                },
-                damage::DamageDealt {
-                    source,
-                    target: second,
-                    amount: 1
-                },
-            ])
+            choice.needed,
+            vec![actions::RequiredCombatDamage {
+                source,
+                amount: 2,
+                legal: [first, second].into_iter().collect(),
+            }]
         );
     }
 }
