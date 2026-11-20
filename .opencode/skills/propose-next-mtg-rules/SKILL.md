@@ -37,7 +37,8 @@ stage, commit or run anything that changes files outside `.local-run/`.
 | `partial` | Already-covered sections: ignored tests, missing subrules of quoted rules |
 | `<NNN>` or `<NNN.N>` | That one section or rule |
 
-`--exclude <CR,CR,...>` skips rules another worker already took.
+`--exclude <CR,CR,...>` skips rules another worker already took. `--out <dir>` sets the report
+folder (see "Output").
 
 CR text: `docs/MagicCompRules-20250919.txt`. Section titles:
 `grep -nE '^[0-9]{3}\. ' docs/MagicCompRules-20250919.txt`.
@@ -113,14 +114,15 @@ that are still missing, anything that could break existing tests.
 
 Rules for the code: one system per file, it only reads world state and writes
 messages/choices/components, no time, no randomness except `GameRng`, no input; relative words
-(`YOU`, `OPPONENT`, `ANY`) resolved at rule time for 2+ players; `thiserror` errors, no
+(`YOU`, `OPPONENT`, `ANY`) resolved at rule time for 2+ players — a CR rule worded "in a
+two-player game" (e.g. 103.8a) must say what the system does with 3+ players (see 103.8b–c); `thiserror` errors, no
 `unwrap`/`expect`/`panic` in production code; the file ends with a `test_usage` test.
 
 ## 4. Output
 
-Write the report to
-`.local-run/orchestrator/<YYYY-MM-DD>-propose-next-mtg-rules/<lane-or-solo>.md`
-(today's date; `solo` when run alone without a lane; append `-2`, `-3` if the file exists).
+Write the report to `<out>/<lane-or-solo>.md`, where `<out>` is the `--out <dir>` argument if
+given, else `.local-run/orchestrator/<YYYY-MM-DD>-propose-next-mtg-rules/` (today's date).
+`solo` = run alone without a lane; append `-2`, `-3` if the file exists.
 If you cannot write files (read-only agent), put the whole report in your final message
 instead.
 
@@ -155,7 +157,10 @@ For the orchestrator, on top of `orchestrator-core`:
 1. **One lane per worker** so they don't all propose the same easiest rule. For N workers use
    the lanes in this order: `4xx-5xx`, `6xx`, `7xx`, `partial`, `1xx-3xx`; past 5, split the
    busiest lane by section (e.g. `702`, `704`).
-2. Worker prompt = `/propose-next-mtg-rules <lane>`. Workers write only their own report file,
+2. Make a fresh run folder
+   `.local-run/orchestrator/<YYYY-MM-DD>-<HHMM>-propose-next-mtg-rules/` (never reuse one: an
+   older report there would be merged by mistake). Worker prompt =
+   `/propose-next-mtg-rules <lane> --out <run folder>`. Workers write only their own report file,
    so several may run in the same directory at once; still no other edits.
 3. When all are done: read every report's YAML block, merge, and drop duplicates (same CR rule
    in two proposals → keep the higher score, note the other).
@@ -163,5 +168,6 @@ For the orchestrator, on top of `orchestrator-core`:
    is missing/partial (`scripts/rule-coverage.sh`), the test only uses player actions, no
    existing test already covers it. Fix the score or drop it if not.
 5. Rank with `references/RANKING.md` and write `report.md` in the same folder: ranked table
-   (rank, CR rules, title, score, lane, deps), then the top 3 proposals in full, then cost per
-   worker. Tell the user the path and the top 3 in one line each.
+   (rank, CR rules, title, score, lane, deps), then for each of the top 3 a link to its
+   proposal (`<lane>.md` P<n>) plus what you verified and what stays worker word (e.g. test
+   not compiled), then cost per worker. Tell the user the path and the top 3 in one line each.
