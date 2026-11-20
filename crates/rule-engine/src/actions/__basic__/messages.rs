@@ -31,6 +31,9 @@ pub enum Rejected {
     InvalidDiscard {
         player: Entity,
     },
+    InvalidCombatDamage {
+        player: Entity,
+    },
     CannotAttack {
         attackers: Vec<Entity>,
     },

@@ -1,5 +1,6 @@
-use bevy::prelude::{Entity, MessageReader, MessageWriter, Query, Res, With};
+use bevy::prelude::{Entity, MessageReader, MessageWriter, Query, Res, ResMut, With};
 
+use crate::actions;
 use crate::cards;
 use crate::damage;
 use crate::effects;
@@ -38,11 +39,14 @@ use crate::turns;
 ///
 /// Scope: unblocked creatures deal damage to the defending player (two-player games; planeswalker
 /// and battle targets are deferred), single-blocker and single-blocked cases deal damage both ways,
-/// and creatures with power 0 or less assign nothing. Division among two or more blockers or
-/// blocked creatures (controller choice) is deferred: a blocked creature with two or more blockers
-/// assigns no combat damage yet, while each of its blockers still assigns damage to it.
+/// and creatures with power 0 or less assign nothing. An attacker blocked by two or more creatures
+/// assigns its damage divided as its controller chooses among them; each of its blockers still
+/// assigns damage to it.
 pub fn r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_combat_damage(
     mut step_started: MessageReader<turns::StepStarted>,
+    mut actions: MessageReader<actions::PlayerAction>,
+    mut rejected: MessageWriter<actions::Rejected>,
+    mut pending: ResMut<actions::PendingChoice>,
     mut dealt: MessageWriter<damage::DamageDealt>,
     attackers: Query<
         (Entity, &cards::CardDefinition, Option<&cards::Blocked>),
@@ -61,6 +65,7 @@ pub fn r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_combat_damage(
         let Some(defending) = defenders.iter().find(|player| *player != turn.active) else {
             continue;
         };
+        let mut needed: Vec<actions::RequiredCombatDamage> = Vec::new();
         for (attacker, definition, blocked) in attackers.iter() {
             let modifier = modifiers.get(attacker).ok();
             let Some(power_toughness) = definition.effective_power_toughness(modifier) else {
@@ -103,15 +108,52 @@ pub fn r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_combat_damage(
                         amount: blocker_amount,
                     });
                 }
-                if let [blocker] = blockers_of.as_slice() {
-                    dealt.write(damage::DamageDealt {
+                match blockers_of.as_slice() {
+                    [blocker] => {
+                        dealt.write(damage::DamageDealt {
+                            source: attacker,
+                            target: *blocker,
+                            amount,
+                        });
+                    }
+                    [] => {}
+                    _ => needed.push(actions::RequiredCombatDamage {
                         source: attacker,
-                        target: *blocker,
                         amount,
-                    });
+                        legal: blockers_of.iter().copied().collect(),
+                    }),
                 }
             }
         }
+        if !needed.is_empty() {
+            *pending = actions::PendingChoice(Some(actions::Choice::CombatDamage(
+                actions::CombatDamageChoice {
+                    player: turn.active,
+                    needed,
+                },
+            )));
+        }
+    }
+    for action in actions.read() {
+        let actions::Action::AssignCombatDamage(assignments) = &action.action else {
+            continue;
+        };
+        let Some(actions::Choice::CombatDamage(choice)) = (*pending).as_ref().cloned() else {
+            rejected.write(actions::Rejected::InvalidCombatDamage {
+                player: action.player,
+            });
+            continue;
+        };
+        let Some(writes) = choice.assigned_damage(action.player, assignments) else {
+            rejected.write(actions::Rejected::InvalidCombatDamage {
+                player: action.player,
+            });
+            continue;
+        };
+        for write in writes {
+            dealt.write(write);
+        }
+        *pending = actions::PendingChoice(None);
     }
 }
 
@@ -209,6 +251,62 @@ mod tests {
         ])?;
 
         assert_eq!(game.player(p2).life(), 15);
+        Ok(())
+    }
+
+    #[test]
+    fn r510_1c_a_blocked_creature_divides_its_damage_among_its_blockers() -> TestResult {
+        use crate::BATTLEFIELD;
+        use crate::actions;
+        use crate::damage;
+
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.battlefield([GRIZZLY_BEARS]),
+            P2.battlefield([DARKSTEEL_MYR, DARKSTEEL_MYR]),
+        ]);
+        let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        let [first, second] = game.player(p2).cards_in(BATTLEFIELD).exactly::<2>(DARKSTEEL_MYR)?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareAttackers),
+            p2.pass_to(turns::Step::DeclareAttackers),
+            p1.declare_attackers([bears]),
+        ])?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareBlockers),
+            p2.pass_to(turns::Step::DeclareBlockers),
+        ])?;
+        game.play([
+            p1.pass_priority(),
+            p2.declare_blockers([(first, bears), (second, bears)]),
+        ])?;
+        game.play([
+            p1.pass_to(turns::Step::CombatDamage),
+            p2.pass_to(turns::Step::CombatDamage),
+        ])?;
+
+        game.act(
+            p1,
+            actions::Action::AssignCombatDamage(vec![
+                actions::DamageAssignment {
+                    target: first.into(),
+                    amount: 1,
+                },
+                actions::DamageAssignment {
+                    target: second.into(),
+                    amount: 1,
+                },
+            ]),
+        );
+        game.play([p1.pass_priority(), p2.pass_priority()])?;
+
+        assert_eq!(
+            game.app.world().get::<damage::Damage>(first.into()).copied(),
+            Some(damage::Damage(1))
+        );
+        assert_eq!(
+            game.app.world().get::<damage::Damage>(second.into()).copied(),
+            Some(damage::Damage(1))
+        );
         Ok(())
     }
 

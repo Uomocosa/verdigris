@@ -21,3 +21,16 @@ pub struct BlockAssignment {
     pub blocker: Entity,
     pub attacker: Entity,
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct DamageAssignment {
+    pub target: Entity,
+    pub amount: u32,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RequiredCombatDamage {
+    pub source: Entity,
+    pub amount: u32,
+    pub legal: BTreeSet<Entity>,
+}

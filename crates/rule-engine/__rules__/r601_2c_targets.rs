@@ -113,6 +113,7 @@ pub fn r601_2c_targets(
                 *pending = actions::PendingChoice(None);
             }
             actions::Action::ChooseDiscard(_)
+            | actions::Action::AssignCombatDamage(_)
             | actions::Action::DeclareAttackers(_)
             | actions::Action::DeclareBlockers(_)
             | actions::Action::PlayLand(_)
