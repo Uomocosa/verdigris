@@ -85,3 +85,8 @@ pub const fn indestructible() -> cards::Keyword {
 pub const fn deathtouch() -> cards::Keyword {
     cards::Keyword::Deathtouch
 }
+
+#[must_use]
+pub const fn lifelink() -> cards::Keyword {
+    cards::Keyword::Lifelink
+}

@@ -1,4 +1,5 @@
 mod cancel;
+mod child_of_night;
 mod darksteel_myr;
 mod disfigure;
 mod dispel;
@@ -21,6 +22,7 @@ mod typhoid_rats;
 mod walking_corpse;
 
 pub use cancel::CANCEL;
+pub use child_of_night::CHILD_OF_NIGHT;
 pub use darksteel_myr::DARKSTEEL_MYR;
 pub use disfigure::DISFIGURE;
 pub use dispel::DISPEL;

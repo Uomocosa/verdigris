@@ -31,6 +31,7 @@ pub mod r611_2a_continuous_effects;
 pub mod r701_6a_counter;
 pub mod r701_9a_r701_9b_discard;
 pub mod r702_12b_indestructible;
+pub mod r702_15b_lifelink;
 pub mod r704_5a_zero_life;
 pub mod r704_5b_empty_library;
 pub mod r704_5f_zero_toughness;

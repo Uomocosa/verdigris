@@ -2,7 +2,7 @@
 mod basic;
 
 pub use basic::card_text::{
-    artifact_creature, creature, deathtouch, indestructible, instant, land, sorcery,
+    artifact_creature, creature, deathtouch, indestructible, instant, land, lifelink, sorcery,
 };
 pub use basic::components::{Attacking, Blocked, Blocking, EnteredOnTurn, Owner, Tapped};
 pub use basic::enums::{CardType, Color, Keyword, ManaSymbol, Supertype};
