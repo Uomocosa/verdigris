@@ -77,7 +77,13 @@ mod tests {
         let [forest] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(FOREST)?;
         let [mountain] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(MOUNTAIN)?;
 
-        game.act(p1, actions::Action::ActivateManaAbility(forest.into()));
+        game.act(
+            p1,
+            actions::Action::ActivateManaAbility {
+                source: forest.into(),
+                produces: crate::cards::Color::Green,
+            },
+        );
         game.play([
             p1.cast(growth).targeting(bears).pass_priority(),
             p2.pass_priority(),
@@ -86,7 +92,13 @@ mod tests {
         game.play([p1.end_turn(), p2.end_turn()])?;
         game.play([p1.pass_to(MAIN_1), p2.pass_to(MAIN_1)])?;
 
-        game.act(p1, actions::Action::ActivateManaAbility(mountain.into()));
+        game.act(
+            p1,
+            actions::Action::ActivateManaAbility {
+                source: mountain.into(),
+                produces: crate::cards::Color::Red,
+            },
+        );
         game.play([
             p1.cast(bolt).targeting(bears).pass_priority(),
             p2.pass_priority(),

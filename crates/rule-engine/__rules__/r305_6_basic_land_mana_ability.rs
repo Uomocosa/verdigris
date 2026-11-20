@@ -48,17 +48,20 @@ pub fn r305_6_basic_land_mana_ability(
 ) {
     let priority = priority.into_inner();
     for action in actions.read() {
-        let actions::Action::ActivateManaAbility(permanent) = &action.action else {
+        let actions::Action::ActivateManaAbility { source, produces } = &action.action else {
             continue;
         };
-        let permanent = *permanent;
+        let produces = *produces;
+        let permanent = *source;
         let Ok((definition, owner, in_zone, tapped)) = permanents.get(permanent) else {
             rejected.write(actions::Rejected::CannotActivateManaAbility { permanent });
             continue;
         };
         let is_on_the_battlefield =
             helpers::is_card_in_zone(**in_zone, crate::BATTLEFIELD, &zone_entities);
-        let [land_type] = definition.land_types.as_slice() else {
+        let Some(land_type) =
+            definition.land_types.iter().copied().find(|land_type| land_type.color() == produces)
+        else {
             rejected.write(actions::Rejected::CannotActivateManaAbility { permanent });
             continue;
         };
@@ -91,7 +94,13 @@ mod tests {
     fn test_usage() {
         let (mut game, [p1, ..]) = MockGame::new([P1.battlefield([FOREST]), P2]);
         let [forest] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(FOREST).unwrap();
-        game.act(p1, actions::Action::ActivateManaAbility(forest.into()));
+        game.act(
+            p1,
+            actions::Action::ActivateManaAbility {
+                source: forest.into(),
+                produces: cards::Color::Green,
+            },
+        );
         assert_eq!(game.mana_pool(p1), mana![G]);
     }
 
@@ -101,7 +110,13 @@ mod tests {
         let [forest] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(FOREST).unwrap();
         assert_eq!(game.mana_pool(p1), cards::ManaPool::EMPTY);
 
-        game.act(p1, actions::Action::ActivateManaAbility(forest.into()));
+        game.act(
+            p1,
+            actions::Action::ActivateManaAbility {
+                source: forest.into(),
+                produces: cards::Color::Green,
+            },
+        );
 
         assert_eq!(game.mana_pool(p1), mana![G]);
         assert!(game.last_rejection().is_none());
@@ -114,7 +129,13 @@ mod tests {
         let (mut game, [p1, ..]) = MockGame::new([P1.battlefield([MOUNTAIN]), P2]);
         let [mountain] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(MOUNTAIN).unwrap();
 
-        game.act(p1, actions::Action::ActivateManaAbility(mountain.into()));
+        game.act(
+            p1,
+            actions::Action::ActivateManaAbility {
+                source: mountain.into(),
+                produces: cards::Color::Red,
+            },
+        );
 
         assert_eq!(game.mana_pool(p1), mana![R]);
     }
@@ -123,15 +144,121 @@ mod tests {
     fn r107_5_a_tapped_land_cannot_be_tapped_for_more_mana() {
         let (mut game, [p1, ..]) = MockGame::new([P1.battlefield([FOREST]), P2]);
         let [forest] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(FOREST).unwrap();
-        game.act(p1, actions::Action::ActivateManaAbility(forest.into()));
+        game.act(
+            p1,
+            actions::Action::ActivateManaAbility {
+                source: forest.into(),
+                produces: cards::Color::Green,
+            },
+        );
 
-        game.act(p1, actions::Action::ActivateManaAbility(forest.into()));
+        game.act(
+            p1,
+            actions::Action::ActivateManaAbility {
+                source: forest.into(),
+                produces: cards::Color::Green,
+            },
+        );
 
         assert_eq!(game.mana_pool(p1), mana![G]);
         assert_eq!(
             game.last_rejection(),
             Some(&actions::Rejected::CannotActivateManaAbility {
                 permanent: forest.into()
+            })
+        );
+    }
+
+    #[test]
+    fn r305_6_a_forest_asked_for_white_is_rejected_and_stays_untapped() {
+        let (mut game, [p1, ..]) = MockGame::new([P1.battlefield([FOREST]), P2]);
+        let [forest] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(FOREST).unwrap();
+
+        game.act(
+            p1,
+            actions::Action::ActivateManaAbility {
+                source: forest.into(),
+                produces: cards::Color::White,
+            },
+        );
+
+        assert_eq!(game.mana_pool(p1), cards::ManaPool::EMPTY);
+        assert!(game.app.world().get::<cards::Tapped>(forest.into()).is_none());
+        assert_eq!(
+            game.last_rejection(),
+            Some(&actions::Rejected::CannotActivateManaAbility {
+                permanent: forest.into()
+            })
+        );
+    }
+
+    #[test]
+    fn r305_6_a_tundra_taps_for_white_mana() {
+        let (mut game, [p1, ..]) = MockGame::new([P1.battlefield([TUNDRA]), P2]);
+        let [tundra] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TUNDRA).unwrap();
+
+        game.act(
+            p1,
+            actions::Action::ActivateManaAbility {
+                source: tundra.into(),
+                produces: cards::Color::White,
+            },
+        );
+
+        assert_eq!(game.mana_pool(p1), mana![W]);
+        assert!(game.last_rejection().is_none());
+        assert!(game.app.world().get::<cards::Tapped>(tundra.into()).is_some());
+    }
+
+    #[test]
+    fn r305_6_a_second_tundra_taps_for_blue_mana() {
+        let (mut game, [p1, ..]) = MockGame::new([P1.battlefield([TUNDRA, TUNDRA]), P2]);
+        let [first, second] = game.player(p1).cards_in(BATTLEFIELD).exactly::<2>(TUNDRA).unwrap();
+
+        game.act(
+            p1,
+            actions::Action::ActivateManaAbility {
+                source: first.into(),
+                produces: cards::Color::White,
+            },
+        );
+        game.act(
+            p1,
+            actions::Action::ActivateManaAbility {
+                source: second.into(),
+                produces: cards::Color::Blue,
+            },
+        );
+
+        assert_eq!(game.mana_pool(p1), mana![W, U]);
+        assert!(game.last_rejection().is_none());
+    }
+
+    #[test]
+    fn r305_6_a_tapped_tundra_cannot_be_tapped_for_the_other_colour() {
+        let (mut game, [p1, ..]) = MockGame::new([P1.battlefield([TUNDRA]), P2]);
+        let [tundra] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TUNDRA).unwrap();
+
+        game.act(
+            p1,
+            actions::Action::ActivateManaAbility {
+                source: tundra.into(),
+                produces: cards::Color::White,
+            },
+        );
+        game.act(
+            p1,
+            actions::Action::ActivateManaAbility {
+                source: tundra.into(),
+                produces: cards::Color::Blue,
+            },
+        );
+
+        assert_eq!(game.mana_pool(p1), mana![W]);
+        assert_eq!(
+            game.last_rejection(),
+            Some(&actions::Rejected::CannotActivateManaAbility {
+                permanent: tundra.into()
             })
         );
     }

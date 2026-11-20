@@ -16,6 +16,7 @@ mod murder;
 mod negate;
 mod pick;
 mod sign_in_blood;
+mod tundra;
 mod typhoid_rats;
 mod walking_corpse;
 
@@ -37,5 +38,6 @@ pub use murder::MURDER;
 pub use negate::NEGATE;
 pub use pick::pick;
 pub use sign_in_blood::SIGN_IN_BLOOD;
+pub use tundra::TUNDRA;
 pub use typhoid_rats::TYPHOID_RATS;
 pub use walking_corpse::WALKING_CORPSE;

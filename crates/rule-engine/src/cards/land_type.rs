@@ -11,6 +11,17 @@ pub enum LandType {
 
 impl LandType {
     #[must_use]
+    pub const fn color(self) -> cards::Color {
+        match self {
+            Self::Plains => cards::Color::White,
+            Self::Island => cards::Color::Blue,
+            Self::Swamp => cards::Color::Black,
+            Self::Mountain => cards::Color::Red,
+            Self::Forest => cards::Color::Green,
+        }
+    }
+
+    #[must_use]
     pub const fn mana_symbol(self) -> cards::ManaSymbol {
         match self {
             Self::Plains => cards::ManaSymbol::White,
@@ -40,6 +51,18 @@ mod tests {
 
         for (land_type, symbol) in symbols {
             assert_eq!(land_type.mana_symbol(), symbol);
+        }
+
+        let colors = [
+            (LandType::Plains, cards::Color::White),
+            (LandType::Island, cards::Color::Blue),
+            (LandType::Swamp, cards::Color::Black),
+            (LandType::Mountain, cards::Color::Red),
+            (LandType::Forest, cards::Color::Green),
+        ];
+
+        for (land_type, color) in colors {
+            assert_eq!(land_type.color(), color);
         }
     }
 }

@@ -1,10 +1,14 @@
 use bevy::prelude::Entity;
 
 use crate::actions;
+use crate::cards;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Action {
-    ActivateManaAbility(Entity),
+    ActivateManaAbility {
+        source: Entity,
+        produces: cards::Color,
+    },
     Cast(Entity),
     PlayLand(Entity),
     ChooseTargets(Vec<Entity>),
