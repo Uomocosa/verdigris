@@ -2,10 +2,11 @@ use std::collections::BTreeMap;
 
 use atomic_delegate_macros::atomic_delegates;
 use bevy::ecs::query::QueryData;
-use bevy::prelude::{App, Entity, Query};
+use bevy::prelude::{App, Component, Entity, Query};
 
 use crate::actions;
 use crate::cards;
+use crate::damage;
 use crate::players;
 use crate::testing;
 use crate::turns;
@@ -41,6 +42,39 @@ impl MockGame {
 
     #[must_use]
     pub fn mana_pool(&self, player: impl Into<Entity>) -> cards::ManaPool { self.app.world().get::<cards::ManaPool>(player.into()).copied().unwrap_or_default() }
+
+    #[must_use]
+    pub fn has<C: Component>(&self, entity: impl Into<Entity>) -> bool { self.app.world().get::<C>(entity.into()).is_some() }
+
+    #[must_use]
+    pub fn get<C: Component + Copy>(&self, entity: impl Into<Entity>) -> Option<C> { self.app.world().get::<C>(entity.into()).copied() }
+
+    #[must_use]
+    pub fn is_attacking(&self, card: impl Into<Entity>) -> bool { self.app.world().get::<cards::Attacking>(card.into()).is_some() }
+
+    #[must_use]
+    pub fn is_blocking(&self, card: impl Into<Entity>) -> bool { self.app.world().get::<cards::Blocking>(card.into()).is_some() }
+
+    #[must_use]
+    pub fn is_tapped(&self, card: impl Into<Entity>) -> bool { self.app.world().get::<cards::Tapped>(card.into()).is_some() }
+
+    #[must_use]
+    pub fn has_won(&self, player: impl Into<Entity>) -> bool { self.app.world().get::<players::Won>(player.into()).is_some() }
+
+    #[must_use]
+    pub fn has_lost(&self, player: impl Into<Entity>) -> bool { self.app.world().get::<players::Lost>(player.into()).is_some() }
+
+    #[must_use]
+    pub fn damage(&self, card: impl Into<Entity>) -> u32 { self.app.world().get::<damage::Damage>(card.into()).map_or(0, |damage| **damage) }
+
+    #[must_use]
+    pub fn pt(&self, card: impl Into<Entity>) -> Option<cards::PowerToughness> { self.app.world().get::<cards::EffectivePT>(card.into()).map(|effective| **effective) }
+
+    #[must_use]
+    pub fn turn(&self) -> &turns::Turn { self.app.world().resource::<turns::Turn>() }
+
+    #[must_use]
+    pub fn priority_player(&self) -> Entity { self.app.world().resource::<turns::Priority>().player }
 }
 
 impl MockGame {
@@ -133,6 +167,7 @@ mod tests {
 
     use crate::actions;
     use crate::mana;
+    use crate::players;
     use crate::testing::*;
     use crate::turns;
     use crate::{BATTLEFIELD, HAND, LIBRARY};
@@ -140,9 +175,26 @@ mod tests {
     use super::MockGame;
 
     #[test]
-    fn test_usage() {
-        let (game, [p1, ..]) = MockGame::new([P1, P2]);
+    fn test_usage() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([P1, P2.battlefield([GRIZZLY_BEARS])]);
         assert_eq!(game.life(p1), 20);
+        assert!(game.has::<players::Life>(p1));
+        assert_eq!(game.get::<players::Life>(p1), Some(players::Life(20)));
+        assert!(!game.is_tapped(p1));
+        assert!(!game.has_won(p1));
+        assert!(!game.has_lost(p1));
+        assert_eq!(game.damage(p1), 0);
+        assert_eq!(game.turn().number, 1);
+        assert_eq!(game.priority_player(), p1);
+
+        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        assert!(!game.is_attacking(bears));
+        assert!(!game.is_blocking(bears));
+        assert!(!game.is_tapped(bears));
+        assert_eq!(game.damage(bears), 0);
+        game.app.update();
+        assert_eq!(game.pt(bears), Some(crate::pt!(2, 2)));
+        Ok(())
     }
 
     #[test]
