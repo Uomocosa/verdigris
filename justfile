@@ -47,6 +47,7 @@ check-crate CRATE:
 [doc('Check formatting (cargo fmt --all -- --check).')]
 fmt:
     cargo fmt --all -- --check
+    lele-fmt --check --config lele.toml
 
 [group('dev')]
 [doc('Lint the whole workspace; warnings deny the gate.')]
