@@ -1,59 +1,12 @@
-mod cancel;
-mod child_of_night;
-mod darksteel_myr;
-mod disfigure;
-mod dispel;
-mod divination;
-mod doom_blade;
-mod essence_scatter;
+mod cards;
 mod expected_targets;
-mod felidar_sovereign;
-mod forest;
-mod garruks_companion;
-mod giant_growth;
-mod giant_spider;
-mod grizzly_bears;
-mod jump;
-mod lightning_bolt;
-mod mind_rot;
-mod mountain;
-mod murder;
-mod negate;
 mod pick;
-mod sign_in_blood;
-mod soul_warden;
-mod tundra;
-mod typhoid_rats;
-mod walking_corpse;
-mod watchwolf;
-mod wind_drake;
 
-pub use cancel::CANCEL;
-pub use child_of_night::CHILD_OF_NIGHT;
-pub use darksteel_myr::DARKSTEEL_MYR;
-pub use disfigure::DISFIGURE;
-pub use dispel::DISPEL;
-pub use divination::DIVINATION;
-pub use doom_blade::DOOM_BLADE;
-pub use essence_scatter::ESSENCE_SCATTER;
+pub use cards::{
+    CANCEL, CHILD_OF_NIGHT, DARKSTEEL_MYR, DISFIGURE, DISPEL, DIVINATION, DOOM_BLADE,
+    ESSENCE_SCATTER, FELIDAR_SOVEREIGN, FOREST, GARRUKS_COMPANION, GIANT_GROWTH, GIANT_SPIDER,
+    GRIZZLY_BEARS, JUMP, LIGHTNING_BOLT, MIND_ROT, MOUNTAIN, MURDER, NEGATE, SIGN_IN_BLOOD,
+    SOUL_WARDEN, TUNDRA, TYPHOID_RATS, WALKING_CORPSE, WATCHWOLF, WIND_DRAKE,
+};
 pub use expected_targets::ExpectedTargets;
-pub use felidar_sovereign::FELIDAR_SOVEREIGN;
-pub use forest::FOREST;
-pub use garruks_companion::GARRUKS_COMPANION;
-pub use giant_growth::GIANT_GROWTH;
-pub use giant_spider::GIANT_SPIDER;
-pub use grizzly_bears::GRIZZLY_BEARS;
-pub use jump::JUMP;
-pub use lightning_bolt::LIGHTNING_BOLT;
-pub use mind_rot::MIND_ROT;
-pub use mountain::MOUNTAIN;
-pub use murder::MURDER;
-pub use negate::NEGATE;
 pub use pick::pick;
-pub use sign_in_blood::SIGN_IN_BLOOD;
-pub use soul_warden::SOUL_WARDEN;
-pub use tundra::TUNDRA;
-pub use typhoid_rats::TYPHOID_RATS;
-pub use walking_corpse::WALKING_CORPSE;
-pub use watchwolf::WATCHWOLF;
-pub use wind_drake::WIND_DRAKE;
