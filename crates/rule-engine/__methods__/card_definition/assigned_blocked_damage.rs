@@ -137,7 +137,7 @@ mod tests {
         let attacker = (GARRUKS_COMPANION.definition)();
         let source = Entity::from(companion);
         let defending = Entity::from(p2);
-        let blocker = Entity::from(bears);
+        let bears_blocking = Entity::from(bears);
         let mut needed = Vec::new();
 
         let writes = game.with_query::<(
@@ -153,13 +153,13 @@ mod tests {
             writes,
             vec![
                 damage::DamageDealt {
-                    source: blocker,
+                    source: bears_blocking,
                     target: source,
                     amount: 2,
                 },
                 damage::DamageDealt {
                     source,
-                    target: blocker,
+                    target: bears_blocking,
                     amount: 2,
                 },
                 damage::DamageDealt {
@@ -203,7 +203,7 @@ mod tests {
         let attacker = (GARRUKS_COMPANION.definition)();
         let source = Entity::from(companion);
         let defending = Entity::from(p2);
-        let blocker = Entity::from(spider);
+        let spider_blocking = Entity::from(spider);
         let mut needed = Vec::new();
 
         let writes = game.with_query::<(
@@ -219,13 +219,13 @@ mod tests {
             writes,
             vec![
                 damage::DamageDealt {
-                    source: blocker,
+                    source: spider_blocking,
                     target: source,
                     amount: 2,
                 },
                 damage::DamageDealt {
                     source,
-                    target: blocker,
+                    target: spider_blocking,
                     amount: 1,
                 },
                 damage::DamageDealt {

@@ -88,8 +88,8 @@ mod tests {
         let [spider] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GIANT_SPIDER)?;
         let player = Entity::from(p1);
         let source = Entity::from(companion);
-        let first = Entity::from(bears);
-        let second = Entity::from(spider);
+        let bears_blocking = Entity::from(bears);
+        let spider_blocking = Entity::from(spider);
         let outsider = Entity::from(p2);
 
         let choice = actions::CombatDamageChoice {
@@ -97,18 +97,18 @@ mod tests {
             needed: vec![actions::RequiredCombatDamage {
                 source,
                 amount: 2,
-                legal: [first, second].into_iter().collect(),
+                legal: [bears_blocking, spider_blocking].into_iter().collect(),
                 trample_defender: None,
                 lethal_by_target: BTreeMap::new(),
             }],
         };
         let split = [
             actions::DamageAssignment {
-                target: first,
+                target: bears_blocking,
                 amount: 1,
             },
             actions::DamageAssignment {
-                target: second,
+                target: spider_blocking,
                 amount: 1,
             },
         ];
@@ -129,8 +129,8 @@ mod tests {
         let [spider] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GIANT_SPIDER)?;
         let player = Entity::from(p1);
         let source = Entity::from(companion);
-        let first = Entity::from(bears);
-        let second = Entity::from(spider);
+        let bears_blocking = Entity::from(bears);
+        let spider_blocking = Entity::from(spider);
         let outsider = Entity::from(p2);
 
         let choice = actions::CombatDamageChoice {
@@ -138,21 +138,21 @@ mod tests {
             needed: vec![actions::RequiredCombatDamage {
                 source,
                 amount: 2,
-                legal: [first, second].into_iter().collect(),
+                legal: [bears_blocking, spider_blocking].into_iter().collect(),
                 trample_defender: None,
                 lethal_by_target: BTreeMap::new(),
             }],
         };
 
         let short = [actions::DamageAssignment {
-            target: first,
+            target: bears_blocking,
             amount: 1,
         }];
         assert!(assigned_damage(&choice, player, &short).is_none());
 
         let illegal = [
             actions::DamageAssignment {
-                target: first,
+                target: bears_blocking,
                 amount: 1,
             },
             actions::DamageAssignment {
@@ -164,18 +164,18 @@ mod tests {
 
         let repeated = [
             actions::DamageAssignment {
-                target: first,
+                target: bears_blocking,
                 amount: 1,
             },
             actions::DamageAssignment {
-                target: first,
+                target: bears_blocking,
                 amount: 1,
             },
         ];
         assert!(assigned_damage(&choice, player, &repeated).is_none());
 
         let zero = [actions::DamageAssignment {
-            target: first,
+            target: bears_blocking,
             amount: 0,
         }];
         assert!(assigned_damage(&choice, player, &zero).is_none());
