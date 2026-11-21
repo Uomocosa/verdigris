@@ -1,6 +1,7 @@
 use bevy::prelude::{Component, Entity};
 use derive_more::Deref;
 
+use crate::abilities;
 use crate::cards;
 
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Deref)]
@@ -49,7 +50,7 @@ pub struct Reach;
 pub struct Vigilance;
 
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Deref)]
-pub struct TriggeredEnters(pub cards::TriggeredAbility);
+pub struct TriggeredEnters(pub abilities::TriggeredAbility);
 
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Deref)]
-pub struct TriggeredAtStep(pub cards::TriggeredAbility);
+pub struct TriggeredAtStep(pub abilities::TriggeredAbility);

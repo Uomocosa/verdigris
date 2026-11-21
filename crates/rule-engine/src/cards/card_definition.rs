@@ -1,6 +1,7 @@
 use atomic_delegate_macros::atomic_delegates;
 use bevy::prelude::{Component, Entity, Query};
 
+use crate::abilities;
 use crate::actions;
 use crate::cards;
 use crate::damage;
@@ -18,7 +19,7 @@ pub struct CardDefinition {
     pub power_toughness: Option<cards::PowerToughness>,
     pub effect: Option<effects::Effect>,
     pub keywords: Vec<cards::Keyword>,
-    pub triggered_abilities: Vec<cards::TriggeredAbility>,
+    pub triggered_abilities: Vec<abilities::TriggeredAbility>,
 }
 
 #[cfg(feature = "testing")]
@@ -30,13 +31,13 @@ impl From<testing::Card> for CardDefinition {
 #[atomic_delegates]
 impl CardDefinition {
     #[must_use]
-    pub fn abilities<const N: usize>(self, list: [cards::Ability; N]) -> Self {}
+    pub fn abilities<const N: usize>(self, list: [abilities::Ability; N]) -> Self {}
 
     #[must_use]
     pub fn spell(self, effect: effects::Effect) -> Self {}
 
     #[must_use]
-    pub fn triggered(self, ability: cards::TriggeredAbility) -> Self {}
+    pub fn triggered(self, ability: abilities::TriggeredAbility) -> Self {}
 
     #[must_use]
     pub fn colors(&self) -> Vec<cards::Color> {}
@@ -45,13 +46,13 @@ impl CardDefinition {
 #[rustfmt::skip]
 impl CardDefinition {
     #[must_use]
-    pub fn at(self, trigger: impl Into<cards::Trigger>, effect: effects::Effect) -> Self { self.whenever(trigger, effect) }
+    pub fn at(self, trigger: impl Into<abilities::Trigger>, effect: effects::Effect) -> Self { self.whenever(trigger, effect) }
 
     #[must_use]
-    pub fn when(self, trigger: impl Into<cards::Trigger>, effect: effects::Effect) -> Self { self.whenever(trigger, effect) }
+    pub fn when(self, trigger: impl Into<abilities::Trigger>, effect: effects::Effect) -> Self { self.whenever(trigger, effect) }
 
     #[must_use]
-    pub fn whenever(self, trigger: impl Into<cards::Trigger>, effect: effects::Effect) -> Self { self.triggered(cards::whenever(trigger, effect)) }
+    pub fn whenever(self, trigger: impl Into<abilities::Trigger>, effect: effects::Effect) -> Self { self.triggered(abilities::whenever(trigger, effect)) }
 }
 
 impl CardDefinition {

@@ -1,5 +1,6 @@
 use atomic_delegate_macros::atomic_delegates;
 
+use crate::abilities;
 use crate::cards;
 use crate::effects;
 use crate::turns;
@@ -13,24 +14,24 @@ pub enum TriggerEvent {
 #[atomic_delegates]
 impl TriggerEvent {
     #[must_use]
-    pub const fn if_(self, condition: cards::Condition) -> cards::Trigger {}
+    pub const fn if_(self, condition: abilities::Condition) -> abilities::Trigger {}
 }
 
 #[cfg(test)]
 mod tests {
     use crate::UPKEEP;
     use crate::YOU;
-    use crate::cards;
+    use crate::abilities;
 
     #[test]
     fn test_usage() {
-        let trigger = cards::TriggerEvent::BeginningOfStep(UPKEEP, YOU)
-            .if_(cards::Condition::LifeAtLeast(YOU, 40));
+        let trigger = abilities::TriggerEvent::BeginningOfStep(UPKEEP, YOU)
+            .if_(abilities::Condition::LifeAtLeast(YOU, 40));
         assert_eq!(
             trigger,
-            cards::Trigger {
-                event: cards::TriggerEvent::BeginningOfStep(UPKEEP, YOU),
-                intervening_if: Some(cards::Condition::LifeAtLeast(YOU, 40)),
+            abilities::Trigger {
+                event: abilities::TriggerEvent::BeginningOfStep(UPKEEP, YOU),
+                intervening_if: Some(abilities::Condition::LifeAtLeast(YOU, 40)),
             }
         );
     }

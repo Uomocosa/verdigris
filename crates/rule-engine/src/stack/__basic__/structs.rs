@@ -1,6 +1,7 @@
 use bevy::ecs::system::SystemParam;
 use bevy::prelude::{Entity, Query};
 
+use crate::abilities;
 use crate::cards;
 use crate::players;
 use crate::stack;
@@ -10,7 +11,7 @@ use crate::zones;
 pub struct PendingTrigger {
     pub source: Entity,
     pub controller: Entity,
-    pub ability: cards::TriggeredAbility,
+    pub ability: abilities::TriggeredAbility,
 }
 
 #[derive(SystemParam, Clone, Copy)]

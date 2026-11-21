@@ -1,6 +1,7 @@
 use atomic_delegate_macros::atomic_delegates;
 use bevy::prelude::{Component, EntityCommands};
 
+use crate::abilities;
 use crate::cards;
 use crate::effects;
 
@@ -9,7 +10,7 @@ pub struct Characteristics {
     pub on_battlefield: bool,
     pub power_toughness: Option<cards::PowerToughness>,
     pub keywords: Vec<cards::Keyword>,
-    pub triggered_abilities: Vec<cards::TriggeredAbility>,
+    pub triggered_abilities: Vec<abilities::TriggeredAbility>,
 }
 
 #[atomic_delegates]

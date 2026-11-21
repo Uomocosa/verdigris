@@ -1,5 +1,6 @@
 use bevy::prelude::{Entity, MessageReader, Query, Res, ResMut, With};
 
+use crate::abilities;
 use crate::cards;
 use crate::players;
 use crate::stack;
@@ -33,7 +34,7 @@ pub fn r603_4_intervening_if(
     let turn = turn.into_inner();
     for step in steps.read() {
         for (source, owner, at_step) in sources.iter() {
-            let cards::TriggerEvent::BeginningOfStep(expected, who) = at_step.event else {
+            let abilities::TriggerEvent::BeginningOfStep(expected, who) = at_step.event else {
                 continue;
             };
             if **step != expected {

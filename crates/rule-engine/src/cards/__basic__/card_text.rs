@@ -1,6 +1,4 @@
 use crate::cards;
-use crate::effects;
-use crate::turns;
 
 pub fn creature(
     name: impl Into<cards::CardName>,
@@ -116,35 +114,4 @@ pub const fn reach() -> cards::Keyword {
 #[must_use]
 pub const fn vigilance() -> cards::Keyword {
     cards::Keyword::Vigilance
-}
-
-#[must_use]
-pub fn whenever(
-    trigger: impl Into<cards::Trigger>,
-    effect: effects::Effect,
-) -> cards::TriggeredAbility {
-    let trigger = trigger.into();
-    cards::TriggeredAbility {
-        event: trigger.event,
-        intervening_if: trigger.intervening_if,
-        effect,
-    }
-}
-
-#[must_use]
-pub fn at(trigger: impl Into<cards::Trigger>, effect: effects::Effect) -> cards::TriggeredAbility {
-    whenever(trigger, effect)
-}
-
-#[must_use]
-pub fn when(
-    trigger: impl Into<cards::Trigger>,
-    effect: effects::Effect,
-) -> cards::TriggeredAbility {
-    whenever(trigger, effect)
-}
-
-#[must_use]
-pub const fn beginning_of(step: turns::Step, player: effects::PlayerRef) -> cards::TriggerEvent {
-    cards::TriggerEvent::BeginningOfStep(step, player)
 }

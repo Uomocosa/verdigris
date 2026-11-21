@@ -1,4 +1,5 @@
 #![cfg_attr(test, allow(clippy::panic_in_result_fn))]
+pub mod abilities;
 pub mod actions;
 #[path = "__basic__/mod.rs"]
 mod basic;

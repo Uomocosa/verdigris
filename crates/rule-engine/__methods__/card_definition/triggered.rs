@@ -1,8 +1,9 @@
+use crate::abilities;
 use crate::cards;
 
 pub fn triggered(
     mut definition: cards::CardDefinition,
-    ability: cards::TriggeredAbility,
+    ability: abilities::TriggeredAbility,
 ) -> cards::CardDefinition {
     definition.triggered_abilities.push(ability);
     definition
@@ -12,7 +13,7 @@ pub fn triggered(
 mod tests {
     use crate::ANOTHER_CREATURE;
     use crate::YOU;
-    use crate::cards;
+    use crate::abilities;
     use crate::effects;
     use crate::testing;
 
@@ -21,7 +22,7 @@ mod tests {
     #[test]
     fn test_usage() {
         let definition = (testing::GRIZZLY_BEARS.definition)();
-        let ability = cards::TriggeredAbility {
+        let ability = abilities::TriggeredAbility {
             event: ANOTHER_CREATURE.enters(),
             intervening_if: None,
             effect: effects::gain_life(1).to_player(YOU),

@@ -1,6 +1,6 @@
 use bevy::prelude::Entity;
 
-use crate::cards;
+use crate::abilities;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum PlayerRef {
@@ -23,7 +23,7 @@ impl PlayerRef {
 #[rustfmt::skip]
 impl PlayerRef {
     #[must_use]
-    pub const fn has_life_at_least(self, amount: i32) -> cards::Condition { cards::Condition::LifeAtLeast(self, amount) }
+    pub const fn has_life_at_least(self, amount: i32) -> abilities::Condition { abilities::Condition::LifeAtLeast(self, amount) }
 
     #[must_use]
     pub(crate) fn players_other_than(players: &[Entity], controller: Entity) -> Vec<Entity> { players.iter().copied().filter(|player| *player != controller).collect() }

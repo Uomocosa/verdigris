@@ -1,5 +1,6 @@
 use bevy::prelude::{Entity, MessageReader, Query, ResMut, With};
 
+use crate::abilities;
 use crate::cards;
 use crate::stack;
 
@@ -32,7 +33,7 @@ pub fn r603_2_r603_6a_triggered_abilities(
             let ability = **enters;
             if !matches!(
                 ability.event,
-                cards::TriggerEvent::Enters(cards::ObjectFilter::AnotherCreature)
+                abilities::TriggerEvent::Enters(cards::ObjectFilter::AnotherCreature)
             ) {
                 continue;
             }

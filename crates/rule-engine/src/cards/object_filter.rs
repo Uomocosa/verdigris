@@ -1,4 +1,4 @@
-use crate::cards;
+use crate::abilities;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum ObjectFilter {
@@ -8,12 +8,12 @@ pub enum ObjectFilter {
 #[rustfmt::skip]
 impl ObjectFilter {
     #[must_use]
-    pub const fn enters(self) -> cards::TriggerEvent { cards::TriggerEvent::Enters(self) }
+    pub const fn enters(self) -> abilities::TriggerEvent { abilities::TriggerEvent::Enters(self) }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::cards;
+    use crate::abilities;
 
     use super::ObjectFilter;
 
@@ -21,7 +21,7 @@ mod tests {
     fn test_usage() {
         assert_eq!(
             ObjectFilter::AnotherCreature.enters(),
-            cards::TriggerEvent::Enters(ObjectFilter::AnotherCreature)
+            abilities::TriggerEvent::Enters(ObjectFilter::AnotherCreature)
         );
     }
 }

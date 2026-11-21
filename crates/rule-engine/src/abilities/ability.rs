@@ -1,9 +1,10 @@
+use crate::abilities;
 use crate::cards;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Ability {
     Keyword(cards::Keyword),
-    Triggered(cards::TriggeredAbility),
+    Triggered(abilities::TriggeredAbility),
 }
 
 impl From<cards::Keyword> for Ability {
@@ -12,8 +13,8 @@ impl From<cards::Keyword> for Ability {
     }
 }
 
-impl From<cards::TriggeredAbility> for Ability {
-    fn from(ability: cards::TriggeredAbility) -> Self {
+impl From<abilities::TriggeredAbility> for Ability {
+    fn from(ability: abilities::TriggeredAbility) -> Self {
         Self::Triggered(ability)
     }
 }

@@ -1,5 +1,6 @@
 use crate::UPKEEP;
 use crate::YOU;
+use crate::abilities;
 use crate::card;
 use crate::cards;
 use crate::cost;
@@ -14,7 +15,7 @@ pub const FELIDAR_SOVEREIGN: testing::Card = testing::Card {
             cards::creature("Felidar Sovereign", cost![4, W, W], pt!(4, 6));
             cards::vigilance(),
             cards::lifelink(),
-            cards::at(cards::beginning_of(UPKEEP, YOU).if_(YOU.has_life_at_least(40)), effects::win_the_game()),
+            abilities::at(abilities::beginning_of(UPKEEP, YOU).if_(YOU.has_life_at_least(40)), effects::win_the_game()),
         }
     },
 };
@@ -23,6 +24,7 @@ pub const FELIDAR_SOVEREIGN: testing::Card = testing::Card {
 mod tests {
     use crate::UPKEEP;
     use crate::YOU;
+    use crate::abilities;
     use crate::cards;
     use crate::cost;
     use crate::effects;
@@ -43,9 +45,9 @@ mod tests {
         );
         assert_eq!(
             sovereign.triggered_abilities,
-            [cards::TriggeredAbility {
-                event: cards::TriggerEvent::BeginningOfStep(UPKEEP, YOU),
-                intervening_if: Some(cards::Condition::LifeAtLeast(YOU, 40)),
+            [abilities::TriggeredAbility {
+                event: abilities::TriggerEvent::BeginningOfStep(UPKEEP, YOU),
+                intervening_if: Some(abilities::Condition::LifeAtLeast(YOU, 40)),
                 effect: effects::win_the_game(),
             }]
         );

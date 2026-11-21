@@ -1,5 +1,6 @@
 use bevy::prelude::EntityCommands;
 
+use crate::abilities;
 use crate::cards;
 
 pub fn write_markers(
@@ -70,17 +71,24 @@ pub fn write_markers(
         current.vigilance,
         cards::Vigilance,
     );
-    let desired_enters = characteristics
-        .on_battlefield
-        .then(|| {
-            characteristics
-                .triggered_abilities
-                .iter()
-                .find(|ability| matches!(ability.event, cards::TriggerEvent::Enters(_)))
-                .copied()
-                .map(cards::TriggeredEnters)
-        })
-        .flatten();
+    let mut desired_enters = None;
+    let mut desired_at_step = None;
+    if characteristics.on_battlefield {
+        for ability in &characteristics.triggered_abilities {
+            match ability.event {
+                abilities::TriggerEvent::Enters(_) => {
+                    if desired_enters.is_none() {
+                        desired_enters = Some(cards::TriggeredEnters(*ability));
+                    }
+                }
+                abilities::TriggerEvent::BeginningOfStep(_, _) => {
+                    if desired_at_step.is_none() {
+                        desired_at_step = Some(cards::TriggeredAtStep(*ability));
+                    }
+                }
+            }
+        }
+    }
     if current.enters != desired_enters.as_ref() {
         if let Some(enters) = desired_enters {
             entity.insert(enters);
@@ -88,17 +96,6 @@ pub fn write_markers(
             entity.remove::<cards::TriggeredEnters>();
         }
     }
-    let desired_at_step = characteristics
-        .on_battlefield
-        .then(|| {
-            characteristics
-                .triggered_abilities
-                .iter()
-                .find(|ability| matches!(ability.event, cards::TriggerEvent::BeginningOfStep(_, _)))
-                .copied()
-                .map(cards::TriggeredAtStep)
-        })
-        .flatten();
     if current.at_step != desired_at_step.as_ref() {
         if let Some(at_step) = desired_at_step {
             entity.insert(at_step);

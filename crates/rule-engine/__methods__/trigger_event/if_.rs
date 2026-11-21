@@ -1,7 +1,10 @@
-use crate::cards;
+use crate::abilities;
 
-pub const fn if_(event: cards::TriggerEvent, condition: cards::Condition) -> cards::Trigger {
-    cards::Trigger {
+pub const fn if_(
+    event: abilities::TriggerEvent,
+    condition: abilities::Condition,
+) -> abilities::Trigger {
+    abilities::Trigger {
         event,
         intervening_if: Some(condition),
     }
@@ -11,7 +14,7 @@ pub const fn if_(event: cards::TriggerEvent, condition: cards::Condition) -> car
 mod tests {
     use crate::UPKEEP;
     use crate::YOU;
-    use crate::cards;
+    use crate::abilities;
 
     use super::if_;
 
@@ -19,12 +22,12 @@ mod tests {
     fn test_usage() {
         assert_eq!(
             if_(
-                cards::TriggerEvent::BeginningOfStep(UPKEEP, YOU),
-                cards::Condition::LifeAtLeast(YOU, 40)
+                abilities::TriggerEvent::BeginningOfStep(UPKEEP, YOU),
+                abilities::Condition::LifeAtLeast(YOU, 40)
             ),
-            cards::Trigger {
-                event: cards::TriggerEvent::BeginningOfStep(UPKEEP, YOU),
-                intervening_if: Some(cards::Condition::LifeAtLeast(YOU, 40)),
+            abilities::Trigger {
+                event: abilities::TriggerEvent::BeginningOfStep(UPKEEP, YOU),
+                intervening_if: Some(abilities::Condition::LifeAtLeast(YOU, 40)),
             }
         );
     }
