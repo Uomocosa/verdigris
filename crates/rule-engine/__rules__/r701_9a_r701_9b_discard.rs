@@ -4,7 +4,6 @@ use std::collections::BTreeSet;
 use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query, ResMut};
 
 use crate::actions;
-use crate::cards;
 use crate::players;
 use crate::zones;
 
@@ -19,14 +18,14 @@ pub fn r701_9a_r701_9b_discard(
     mut rejected: MessageWriter<actions::Rejected>,
     mut pending: ResMut<actions::PendingChoice>,
     mut commands: Commands,
-    zone_entities: Query<(Entity, &zones::Zone, Option<&cards::Owner>)>,
+    zones: zones::ZoneLookup,
     zone_contents: Query<&zones::ZoneContents>,
 ) {
     for discard in discards.read() {
-        let Some(hand) = HAND.find_entity(Some(discard.player), &zone_entities) else {
+        let Some(hand) = zones.find(HAND, Some(discard.player)) else {
             continue;
         };
-        let Some(graveyard) = GRAVEYARD.find_entity(Some(discard.player), &zone_entities) else {
+        let Some(graveyard) = zones.find(GRAVEYARD, Some(discard.player)) else {
             continue;
         };
         let held: Vec<Entity> = zone_contents
@@ -66,7 +65,7 @@ pub fn r701_9a_r701_9b_discard(
             });
             continue;
         }
-        let Some(graveyard) = GRAVEYARD.find_entity(Some(choice.player), &zone_entities) else {
+        let Some(graveyard) = zones.find(GRAVEYARD, Some(choice.player)) else {
             continue;
         };
         for card in cards {

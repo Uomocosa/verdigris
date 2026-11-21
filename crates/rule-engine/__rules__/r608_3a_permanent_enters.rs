@@ -1,5 +1,5 @@
 use crate::{BATTLEFIELD, STACK};
-use bevy::prelude::{Commands, Entity, MessageReader, Query, Res};
+use bevy::prelude::{Commands, MessageReader, Query, Res};
 
 use crate::cards;
 use crate::stack;
@@ -18,7 +18,7 @@ pub fn r608_3a_permanent_enters(
     mut resolutions: MessageReader<stack::Resolution>,
     mut commands: Commands,
     cards: Query<(&cards::CardDefinition, &cards::Owner, &zones::InZone)>,
-    zone_entities: Query<(Entity, &zones::Zone, Option<&cards::Owner>)>,
+    zones: zones::ZoneLookup,
     turn: Res<turns::Turn>,
 ) {
     let turn = turn.into_inner();
@@ -27,7 +27,7 @@ pub fn r608_3a_permanent_enters(
         let Ok((definition, owner, in_zone)) = cards.get(spell) else {
             continue;
         };
-        if !STACK.contains_card(**in_zone, &zone_entities) {
+        if !zones.contains(STACK, **in_zone) {
             continue;
         }
         let is_permanent = !definition.types.iter().any(|card_type| {
@@ -39,7 +39,7 @@ pub fn r608_3a_permanent_enters(
         if !is_permanent {
             continue;
         }
-        if let Some(battlefield) = BATTLEFIELD.find_entity(Some(**owner), &zone_entities) {
+        if let Some(battlefield) = zones.find(BATTLEFIELD, Some(**owner)) {
             commands.entity(spell).insert((
                 zones::InZone(battlefield),
                 cards::EnteredOnTurn(turn.number),

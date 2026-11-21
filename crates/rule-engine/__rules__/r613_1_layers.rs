@@ -35,10 +35,10 @@ pub fn r613_1_layers(
         cards::CurrentMarkers<'_>,
     )>,
     locked: Query<&effects::ContinuousEffect>,
-    zone_entities: Query<(Entity, &zones::Zone, Option<&cards::Owner>)>,
+    zones: zones::ZoneLookup,
 ) {
     for (card, definition, in_zone, current) in cards.iter() {
-        let on_battlefield = BATTLEFIELD.contains_card(**in_zone, &zone_entities);
+        let on_battlefield = zones.contains(BATTLEFIELD, **in_zone);
         let mut applicable: Vec<effects::ContinuousEffect> =
             locked.iter().filter(|effect| effect.affected == card).copied().collect();
         applicable.sort_by_key(|effect| effect.timestamp);

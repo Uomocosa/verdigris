@@ -35,7 +35,7 @@ pub fn spawn_game(
     app.add_plugins(RulesPlugin);
     let entities = testing::MockGameBuilder::spawn_players(&mut app, players);
 
-    let zone_entities: Vec<BTreeMap<zones::Zone, Entity>> = entities
+    let zone_maps: Vec<BTreeMap<zones::Zone, Entity>> = entities
         .iter()
         .map(|player| {
             [LIBRARY, HAND, BATTLEFIELD, GRAVEYARD, EXILE]
@@ -50,7 +50,7 @@ pub fn spawn_game(
     let stack = app.world_mut().spawn((STACK,)).id();
 
     for (index, (player, setup)) in entities.iter().zip(players).enumerate() {
-        let Some(player_zones) = zone_entities.get(index) else {
+        let Some(player_zones) = zone_maps.get(index) else {
             continue;
         };
         let hand = player_zones.get(&HAND).copied().unwrap_or(Entity::PLACEHOLDER);
@@ -97,7 +97,7 @@ pub fn spawn_game(
 
     let game = testing::MockGame {
         players: entities.clone(),
-        zones: zone_entities,
+        zones: zone_maps,
         stack,
         app,
     };

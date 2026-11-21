@@ -13,11 +13,6 @@ pub fn with_query<D: QueryData, R>(
 
 #[cfg(test)]
 mod tests {
-    use bevy::prelude::Entity;
-
-    use crate::BATTLEFIELD;
-    use crate::STACK;
-    use crate::cards;
     use crate::testing::*;
     use crate::zones;
 
@@ -25,16 +20,11 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let (mut game, [p1, ..]) = MockGame::new([P1, P2]);
-        let battlefield = game.zone_entity(p1, BATTLEFIELD).unwrap();
-        assert_eq!(game.zone_entity(p1, STACK), Some(game.stack));
+        let (mut game, ..) = MockGame::new([P1, P2]);
 
-        with_query::<(Entity, &zones::Zone, Option<&cards::Owner>), ()>(
-            &mut game,
-            |zone_entities| {
-                assert!(zones::Zone::Battlefield.contains_card(battlefield, &zone_entities));
-                assert!(!zones::Zone::Hand.contains_card(battlefield, &zone_entities));
-            },
-        );
+        with_query::<&zones::Zone, ()>(&mut game, |found| {
+            assert!(found.iter().any(|zone| *zone == zones::Zone::Battlefield));
+            assert!(found.iter().any(|zone| *zone == zones::Zone::Stack));
+        });
     }
 }

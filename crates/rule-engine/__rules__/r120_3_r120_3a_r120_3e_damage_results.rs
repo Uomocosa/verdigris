@@ -1,4 +1,4 @@
-use bevy::prelude::{Commands, MessageReader, Query};
+use bevy::prelude::{Commands, Has, MessageReader, Query};
 
 use crate::cards;
 use crate::damage;
@@ -17,7 +17,7 @@ pub fn r120_3_r120_3a_r120_3e_damage_results(
     mut damage_dealt: MessageReader<damage::DamageDealt>,
     mut commands: Commands,
     mut lives: Query<&mut players::Life>,
-    sources: Query<&cards::CardDefinition>,
+    sources: Query<Has<cards::Deathtouch>>,
     targets: Query<Option<&damage::Damage>>,
 ) {
     for event in damage_dealt.read() {
@@ -31,9 +31,7 @@ pub fn r120_3_r120_3a_r120_3e_damage_results(
         }
         let marked = targets.get(event.target).ok().flatten().map_or(0, |damage| **damage);
         commands.entity(event.target).insert(damage::Damage(marked.saturating_add(event.amount)));
-        let has_deathtouch = sources
-            .get(event.source)
-            .is_ok_and(|definition| definition.keywords.contains(&cards::Keyword::Deathtouch));
+        let has_deathtouch = sources.get(event.source).is_ok_and(|has| has);
         if has_deathtouch {
             commands.entity(event.target).insert(damage::DealtByDeathtouch);
         }

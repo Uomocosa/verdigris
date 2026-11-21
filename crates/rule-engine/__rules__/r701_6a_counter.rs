@@ -1,5 +1,5 @@
 use crate::{GRAVEYARD, STACK};
-use bevy::prelude::{Commands, Entity, MessageReader, Query};
+use bevy::prelude::{Commands, MessageReader, Query};
 
 use crate::cards;
 use crate::stack;
@@ -11,17 +11,17 @@ pub fn r701_6a_counter(
     mut countered: MessageReader<stack::Countered>,
     mut commands: Commands,
     spells: Query<(&cards::Owner, &zones::InZone)>,
-    zone_entities: Query<(Entity, &zones::Zone, Option<&cards::Owner>)>,
+    zones: zones::ZoneLookup,
 ) {
     for event in countered.read() {
         let spell = **event;
         let Ok((owner, in_zone)) = spells.get(spell) else {
             continue;
         };
-        if !STACK.contains_card(**in_zone, &zone_entities) {
+        if !zones.contains(STACK, **in_zone) {
             continue;
         }
-        if let Some(graveyard) = GRAVEYARD.find_entity(Some(**owner), &zone_entities) {
+        if let Some(graveyard) = zones.find(GRAVEYARD, Some(**owner)) {
             commands.entity(spell).insert(zones::InZone(graveyard));
         }
     }

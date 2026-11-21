@@ -66,7 +66,12 @@ pub fn r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_r702_19b_r702_19d_combat_da
     mut pending: ResMut<actions::PendingChoice>,
     mut dealt: MessageWriter<damage::DamageDealt>,
     attackers: Query<
-        (Entity, &cards::CardDefinition, Option<&cards::Blocked>),
+        (
+            Entity,
+            &cards::CardDefinition,
+            &cards::EffectivePT,
+            Option<&cards::Blocked>,
+        ),
         With<cards::Attacking>,
     >,
     blockers: Query<(
@@ -75,7 +80,6 @@ pub fn r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_r702_19b_r702_19d_combat_da
         Option<&damage::Damage>,
         Option<&cards::EffectivePT>,
     )>,
-    powers: Query<&cards::EffectivePT>,
     defenders: Query<Entity, With<players::DefendingPlayer>>,
     turn: Res<turns::Turn>,
 ) {
@@ -88,10 +92,8 @@ pub fn r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_r702_19b_r702_19d_combat_da
             continue;
         };
         let mut needed: Vec<actions::RequiredCombatDamage> = Vec::new();
-        for (attacker, definition, blocked) in attackers.iter() {
-            let Some(power_toughness) = powers.get(attacker).ok().map(|power| **power) else {
-                continue;
-            };
+        for (attacker, definition, effective, blocked) in attackers.iter() {
+            let power_toughness = **effective;
             if power_toughness.power <= 0 {
                 continue;
             }

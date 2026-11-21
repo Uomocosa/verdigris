@@ -1,3 +1,4 @@
+use atomic_delegate_macros::atomic_delegates;
 use bevy::ecs::system::SystemParam;
 use bevy::prelude::{Entity, Query};
 use derive_more::Deref;
@@ -10,18 +11,16 @@ pub struct ZoneLookup<'w, 's>(
     Query<'w, 's, (Entity, &'static zones::Zone, Option<&'static cards::Owner>)>,
 );
 
+#[rustfmt::skip]
 impl ZoneLookup<'_, '_> {
     #[must_use]
-    pub fn contains(&self, zone: zones::Zone, card_zone: Entity) -> bool {
-        let zones = &**self;
-        zone.contains_card(card_zone, zones)
-    }
+    pub fn contains(&self, zone: zones::Zone, card_zone: Entity) -> bool { self.get(card_zone).is_ok_and(|(_, found_zone, _)| *found_zone == zone) }
+}
 
+#[atomic_delegates]
+impl ZoneLookup<'_, '_> {
     #[must_use]
-    pub fn find(&self, zone: zones::Zone, owner: Option<Entity>) -> Option<Entity> {
-        let zones = &**self;
-        zone.find_entity(owner, zones)
-    }
+    pub fn find(&self, zone: zones::Zone, owner: Option<Entity>) -> Option<Entity> {}
 }
 
 #[cfg(test)]

@@ -17,10 +17,6 @@ pub fn with_queries<D: QueryData, E: QueryData, R>(
 
 #[cfg(test)]
 mod tests {
-    use bevy::prelude::Entity;
-
-    use crate::BATTLEFIELD;
-    use crate::cards;
     use crate::players;
     use crate::testing::*;
     use crate::zones;
@@ -29,15 +25,11 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let (mut game, [p1, ..]) = MockGame::new([P1, P2]);
-        let battlefield = game.zone_entity(p1, BATTLEFIELD).unwrap();
+        let (mut game, ..) = MockGame::new([P1, P2]);
 
-        with_queries::<&players::Life, (Entity, &zones::Zone, Option<&cards::Owner>), ()>(
-            &mut game,
-            |lives, zone_entities| {
-                assert!(lives.iter().all(|life| **life == 20));
-                assert!(zones::Zone::Battlefield.contains_card(battlefield, &zone_entities));
-            },
-        );
+        with_queries::<&players::Life, &zones::Zone, ()>(&mut game, |lives, found| {
+            assert!(lives.iter().all(|life| **life == 20));
+            assert!(found.iter().any(|zone| *zone == zones::Zone::Battlefield));
+        });
     }
 }

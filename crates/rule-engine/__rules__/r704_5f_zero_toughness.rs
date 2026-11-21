@@ -11,13 +11,13 @@ pub fn r704_5f_zero_toughness(
     mut commands: Commands,
     mut state_based_actions_performed: ResMut<StateBasedActionsPerformed>,
     cards: Query<(Entity, &cards::EffectivePT, &cards::Owner), With<cards::OnBattlefield>>,
-    zone_entities: Query<(Entity, &zones::Zone, Option<&cards::Owner>)>,
+    zones: zones::ZoneLookup,
 ) {
     for (creature, effective, owner) in cards.iter() {
         if effective.toughness > 0 {
             continue;
         }
-        if let Some(graveyard) = GRAVEYARD.find_entity(Some(**owner), &zone_entities) {
+        if let Some(graveyard) = zones.find(GRAVEYARD, Some(**owner)) {
             commands.entity(creature).insert(zones::InZone(graveyard));
             **state_based_actions_performed = true;
         }

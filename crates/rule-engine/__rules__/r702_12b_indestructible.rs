@@ -1,5 +1,5 @@
 use crate::GRAVEYARD;
-use bevy::prelude::{Commands, Entity, MessageReader, Query, ResMut, With, Without};
+use bevy::prelude::{Commands, MessageReader, Query, ResMut, With, Without};
 
 use crate::StateBasedActionsPerformed;
 use crate::cards;
@@ -14,14 +14,14 @@ pub fn r702_12b_indestructible(
     mut commands: Commands,
     mut state_based_actions_performed: ResMut<StateBasedActionsPerformed>,
     cards: Query<&cards::Owner, (With<cards::OnBattlefield>, Without<cards::Indestructible>)>,
-    zone_entities: Query<(Entity, &zones::Zone, Option<&cards::Owner>)>,
+    zones: zones::ZoneLookup,
 ) {
     for destruction in destructions.read() {
         let permanent = **destruction;
         let Ok(owner) = cards.get(permanent) else {
             continue;
         };
-        if let Some(graveyard) = GRAVEYARD.find_entity(Some(**owner), &zone_entities) {
+        if let Some(graveyard) = zones.find(GRAVEYARD, Some(**owner)) {
             commands.entity(permanent).insert(zones::InZone(graveyard));
             **state_based_actions_performed = true;
         }
