@@ -1,4 +1,6 @@
 use crate::cards;
+use crate::effects;
+use crate::turns;
 
 pub fn creature(
     name: impl Into<cards::CardName>,
@@ -114,4 +116,9 @@ pub const fn reach() -> cards::Keyword {
 #[must_use]
 pub const fn vigilance() -> cards::Keyword {
     cards::Keyword::Vigilance
+}
+
+#[must_use]
+pub const fn beginning_of(step: turns::Step, player: effects::PlayerRef) -> cards::TriggerEvent {
+    cards::TriggerEvent::BeginningOfStep(step, player)
 }

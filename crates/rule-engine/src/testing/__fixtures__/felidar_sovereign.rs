@@ -12,11 +12,10 @@ pub const FELIDAR_SOVEREIGN: testing::Card = testing::Card {
         cards::creature("Felidar Sovereign", cost![4, W, W], pt!(4, 6))
             .keyword(cards::vigilance())
             .keyword(cards::lifelink())
-            .triggered(cards::TriggeredAbility {
-                event: cards::TriggerEvent::BeginningOfStep(UPKEEP, YOU),
-                intervening_if: Some(cards::Condition::LifeAtLeast(YOU, 40)),
-                effect: effects::win_the_game(),
-            })
+            .at(
+                cards::beginning_of(UPKEEP, YOU).if_(YOU.has_life_at_least(40)),
+                effects::win_the_game(),
+            )
     },
 };
 

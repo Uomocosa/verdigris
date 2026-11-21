@@ -2,8 +2,8 @@
 mod basic;
 
 pub use basic::card_text::{
-    artifact_creature, creature, deathtouch, flying, indestructible, instant, land, lifelink,
-    reach, sorcery, trample, vigilance,
+    artifact_creature, beginning_of, creature, deathtouch, flying, indestructible, instant, land,
+    lifelink, reach, sorcery, trample, vigilance,
 };
 pub use basic::components::{
     Attacking, Blocked, Blocking, Deathtouch, EffectivePT, EnteredOnTurn, Flying, Indestructible,
@@ -11,7 +11,7 @@ pub use basic::components::{
     Vigilance,
 };
 pub use basic::current_markers::{CurrentMarkers, CurrentMarkersItem};
-pub use basic::enums::{CardType, Color, Keyword, ManaSymbol, Supertype, TriggerEvent};
+pub use basic::enums::{CardType, Color, Keyword, ManaSymbol, Supertype};
 pub use basic::messages::Entered;
 pub use basic::newtypes::CardName;
 pub use basic::structs::{PowerToughness, TriggeredAbility};
@@ -36,3 +36,9 @@ pub use land_type::LandType;
 
 mod mana_pool;
 pub use mana_pool::ManaPool;
+
+mod trigger;
+pub use trigger::Trigger;
+
+mod trigger_event;
+pub use trigger_event::TriggerEvent;

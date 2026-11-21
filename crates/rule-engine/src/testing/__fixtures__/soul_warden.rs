@@ -9,11 +9,10 @@ use crate::testing;
 pub const SOUL_WARDEN: testing::Card = testing::Card {
     name: testing::TestCardName("Soul Warden"),
     definition: || {
-        cards::creature("Soul Warden", cost![W], pt!(1, 1)).triggered(cards::TriggeredAbility {
-            event: ANOTHER_CREATURE.enters(),
-            intervening_if: None,
-            effect: effects::gain_life(1).to_player(YOU),
-        })
+        cards::creature("Soul Warden", cost![W], pt!(1, 1)).whenever(
+            ANOTHER_CREATURE.enters(),
+            effects::gain_life(1).to_player(YOU),
+        )
     },
 };
 

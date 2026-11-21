@@ -39,11 +39,30 @@ impl CardDefinition {
     pub fn colors(&self) -> Vec<cards::Color> {}
 }
 
+#[rustfmt::skip]
+impl CardDefinition {
+    #[must_use]
+    pub fn at(self, trigger: impl Into<cards::Trigger>, effect: effects::Effect) -> Self { self.whenever(trigger, effect) }
+
+    #[must_use]
+    pub fn when(self, trigger: impl Into<cards::Trigger>, effect: effects::Effect) -> Self { self.whenever(trigger, effect) }
+}
+
 impl CardDefinition {
     #[must_use]
     pub fn keyword(mut self, keyword: cards::Keyword) -> Self {
         self.keywords.push(keyword);
         self
+    }
+
+    #[must_use]
+    pub fn whenever(self, trigger: impl Into<cards::Trigger>, effect: effects::Effect) -> Self {
+        let trigger = trigger.into();
+        self.triggered(cards::TriggeredAbility {
+            event: trigger.event,
+            intervening_if: trigger.intervening_if,
+            effect,
+        })
     }
 
     #[must_use]

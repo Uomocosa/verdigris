@@ -1,7 +1,3 @@
-use crate::cards;
-use crate::effects;
-use crate::turns;
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum CardType {
     Creature,
@@ -50,10 +46,4 @@ pub enum ManaSymbol {
     Red,
     Green,
     Generic(u32),
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum TriggerEvent {
-    Enters(cards::ObjectFilter),
-    BeginningOfStep(turns::Step, effects::PlayerRef),
 }
