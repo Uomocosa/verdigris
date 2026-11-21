@@ -22,6 +22,7 @@ use crate::effects;
 /// and/or toughness to a specific number or value) are applied.
 pub fn r611_2a_continuous_effects(
     mut modifications: MessageReader<effects::PowerToughnessModified>,
+    mut grants: MessageReader<effects::KeywordGranted>,
     mut commands: Commands,
     mut timestamp: ResMut<effects::Timestamp>,
 ) {
@@ -32,6 +33,14 @@ pub fn r611_2a_continuous_effects(
                 power: modification.power,
                 toughness: modification.toughness,
             },
+            until: effects::Duration::UntilEndOfTurn,
+            timestamp: timestamp.advance(),
+        });
+    }
+    for grant in grants.read() {
+        commands.spawn(effects::ContinuousEffect {
+            affected: grant.target,
+            change: effects::Layered::GainKeyword(grant.keyword),
             until: effects::Duration::UntilEndOfTurn,
             timestamp: timestamp.advance(),
         });

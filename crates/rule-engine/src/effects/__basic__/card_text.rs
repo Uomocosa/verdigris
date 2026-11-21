@@ -1,3 +1,4 @@
+use crate::cards;
 use crate::effects;
 
 #[must_use]
@@ -58,6 +59,15 @@ pub const fn discard(count: u32) -> effects::Effect {
 pub const fn gets(power: i32, toughness: i32) -> effects::Effect {
     effects::Effect {
         kind: effects::EffectKind::ModifyPowerToughness { power, toughness },
+        then: None,
+        target: None,
+    }
+}
+
+#[must_use]
+pub const fn gains(keyword: cards::Keyword) -> effects::Effect {
+    effects::Effect {
+        kind: effects::EffectKind::GainKeyword(keyword),
         then: None,
         target: None,
     }

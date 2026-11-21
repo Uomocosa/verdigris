@@ -1,10 +1,12 @@
 #[path = "__basic__/mod.rs"]
 mod basic;
 
-pub use basic::card_text::{counter, damage, destroy, discard, draw, gets, lose_life, target};
+pub use basic::card_text::{
+    counter, damage, destroy, discard, draw, gains, gets, lose_life, target,
+};
 pub use basic::components::ContinuousEffect;
 pub use basic::enums::{Duration, EffectKind, FilterKind, Layered};
-pub use basic::messages::PowerToughnessModified;
+pub use basic::messages::{KeywordGranted, PowerToughnessModified};
 pub use basic::structs::Target;
 
 mod timestamp;

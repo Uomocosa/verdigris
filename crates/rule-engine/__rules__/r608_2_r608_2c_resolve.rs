@@ -29,7 +29,10 @@ pub fn r608_2_r608_2c_resolve(
         MessageWriter<players::LifeLost>,
         MessageWriter<players::DiscardRequested>,
     )>,
-    mut power_toughness_modified: MessageWriter<effects::PowerToughnessModified>,
+    mut effect_messages: ParamSet<(
+        MessageWriter<effects::PowerToughnessModified>,
+        MessageWriter<effects::KeywordGranted>,
+    )>,
     spells: Query<(
         &cards::CardDefinition,
         &cards::Owner,
@@ -102,11 +105,19 @@ pub fn r608_2_r608_2c_resolve(
                         && let Ok((_, _, target_zone, _)) = spells.get(target)
                         && BATTLEFIELD.contains_card(**target_zone, &zone_entities)
                     {
-                        power_toughness_modified.write(effects::PowerToughnessModified {
+                        effect_messages.p0().write(effects::PowerToughnessModified {
                             target,
                             power,
                             toughness,
                         });
+                    }
+                }
+                effects::EffectKind::GainKeyword(keyword) => {
+                    if let Some(target) = chosen_target
+                        && let Ok((_, _, target_zone, _)) = spells.get(target)
+                        && BATTLEFIELD.contains_card(**target_zone, &zone_entities)
+                    {
+                        effect_messages.p1().write(effects::KeywordGranted { target, keyword });
                     }
                 }
             }

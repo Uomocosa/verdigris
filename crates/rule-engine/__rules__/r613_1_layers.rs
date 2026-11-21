@@ -13,6 +13,9 @@ use crate::zones;
 ///
 /// # See also
 ///
+/// 613.1f Layer 6: Ability-adding effects, keyword counters, ability-removing effects, and
+/// effects that say an object can’t have an ability are applied.
+///
 /// 613.4c Layer 7c: Effects and counters that modify power and/or toughness (but don’t set power
 /// and/or toughness to a specific number or value) are applied.
 ///
@@ -48,8 +51,10 @@ pub fn r613_1_layers(
 #[cfg(test)]
 mod tests {
     use crate::cards;
+    use crate::effects;
+    use crate::mana;
     use crate::testing::*;
-    use crate::{BATTLEFIELD, HAND};
+    use crate::{BATTLEFIELD, GRAVEYARD, HAND};
 
     #[test]
     fn battlefield_cards_get_derived_markers() -> TestResult {
@@ -68,4 +73,101 @@ mod tests {
         assert!(world.get::<cards::EffectivePT>(growth.into()).is_none());
         Ok(())
     }
+
+    #[test]
+    fn jump_grants_flying_until_end_of_turn() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.hand([JUMP]).battlefield([GRIZZLY_BEARS]).mana_pool(mana![U]),
+            P2,
+        ]);
+        let [jump] = game.player(p1).cards_in(HAND).exactly::<1>(JUMP)?;
+        let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        game.play([
+            p1.cast(jump).targeting(bears).pass_priority(),
+            p2.pass_priority(),
+        ])?;
+        assert!(game.app.world().get::<cards::Flying>(bears.into()).is_some());
+        assert_eq!(game.zone_of(jump), GRAVEYARD);
+        Ok(())
+    }
+
+    #[test]
+    fn flying_stays_while_a_second_jump_is_active() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.hand([JUMP, JUMP]).battlefield([GRIZZLY_BEARS]).mana_pool(mana![U, U]),
+            P2,
+        ]);
+        let [first, second] = game.player(p1).cards_in(HAND).exactly::<2>(JUMP)?;
+        let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        game.play([
+            p1.cast(first).targeting(bears),
+            p1.cast(second).targeting(bears).pass_priority(),
+            p2.pass_priority(),
+            p1.pass_priority(),
+            p2.pass_priority(),
+        ])?;
+        let grants = game.with_query::<&effects::ContinuousEffect, usize>(|granted| {
+            granted
+                .iter()
+                .filter(|effect| {
+                    effect.affected == bears
+                        && effect.change == effects::Layered::GainKeyword(cards::Keyword::Flying)
+                })
+                .count()
+        });
+        assert_eq!(grants, 2);
+        assert!(game.app.world().get::<cards::Flying>(bears.into()).is_some());
+        Ok(())
+    }
+
+    #[test]
+    fn flying_ends_at_cleanup() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.hand([JUMP]).battlefield([GRIZZLY_BEARS]).mana_pool(mana![U]),
+            P2,
+        ]);
+        let [jump] = game.player(p1).cards_in(HAND).exactly::<1>(JUMP)?;
+        let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        game.play([
+            p1.cast(jump).targeting(bears).pass_priority(),
+            p2.pass_priority(),
+        ])?;
+        assert!(game.app.world().get::<cards::Flying>(bears.into()).is_some());
+        game.play([p1.end_turn(), p2.end_turn()])?;
+        assert!(game.app.world().get::<cards::Flying>(bears.into()).is_none());
+        Ok(())
+    }
+
+    #[test]
+    fn later_timestamp_applies_last() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.hand([GIANT_GROWTH, JUMP]).battlefield([GRIZZLY_BEARS]).mana_pool(mana![G, U]),
+            P2,
+        ]);
+        let [growth] = game.player(p1).cards_in(HAND).exactly::<1>(GIANT_GROWTH)?;
+        let [jump] = game.player(p1).cards_in(HAND).exactly::<1>(JUMP)?;
+        let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        game.play([
+            p1.cast(growth).targeting(bears),
+            p1.cast(jump).targeting(bears).pass_priority(),
+            p2.pass_priority(),
+            p1.pass_priority(),
+            p2.pass_priority(),
+        ])?;
+        let timestamps = game.with_query::<&effects::ContinuousEffect, Vec<u64>>(|granted| {
+            granted.iter().map(|effect| effect.timestamp).collect()
+        });
+        assert_eq!(timestamps.len(), 2);
+        assert!(timestamps[0] < timestamps[1]);
+        assert_eq!(
+            game.app.world().get::<cards::EffectivePT>(bears.into()).copied(),
+            Some(cards::EffectivePT(crate::pt!(5, 5)))
+        );
+        assert!(game.app.world().get::<cards::Flying>(bears.into()).is_some());
+        Ok(())
+    }
+
+    #[test]
+    #[ignore = "needs a dependency card: 613.8"]
+    fn dependency_overrides_timestamp() {}
 }

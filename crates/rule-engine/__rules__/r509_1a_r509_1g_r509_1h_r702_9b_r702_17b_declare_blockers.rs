@@ -100,7 +100,9 @@ pub fn r509_1a_r509_1g_r509_1h_r702_9b_r702_17b_declare_blockers(
 #[cfg(test)]
 mod tests {
     use crate::BATTLEFIELD;
+    use crate::HAND;
     use crate::actions;
+    use crate::cards;
     use crate::testing::*;
     use crate::turns;
 
@@ -255,6 +257,49 @@ mod tests {
             game.app.world().get::<crate::cards::Blocking>(spider.into()),
             Some(&crate::cards::Blocking(drake.into()))
         );
+        Ok(())
+    }
+
+    #[test]
+    fn grizzly_bears_with_jump_cannot_be_blocked_by_a_creature_without_flying_or_reach()
+    -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.hand([JUMP]).battlefield([GRIZZLY_BEARS, TUNDRA]),
+            P2.battlefield([GRIZZLY_BEARS]),
+        ]);
+        let [jump] = game.player(p1).cards_in(HAND).exactly::<1>(JUMP)?;
+        let [attacker] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        let [tundra] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TUNDRA)?;
+        let [blocker] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareAttackers),
+            p2.pass_to(turns::Step::DeclareAttackers),
+            p1.declare_attackers([attacker]),
+        ])?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareBlockers),
+            p2.pass_to(turns::Step::DeclareBlockers),
+        ])?;
+        game.play([
+            p1.activate_ability(tundra.mana_ability(cards::Color::Blue))
+                .cast(jump)
+                .targeting(attacker)
+                .pass_priority(),
+            p2.pass_priority(),
+        ])?;
+        game.play([p1.pass_priority()])?;
+        let assignments = vec![actions::BlockAssignment {
+            blocker: blocker.into(),
+            attacker: attacker.into(),
+        }];
+
+        game.act(p2, actions::Action::DeclareBlockers(assignments.clone()));
+
+        assert_eq!(
+            game.last_rejection(),
+            Some(&actions::Rejected::CannotBlock { assignments })
+        );
+        assert!(game.app.world().get::<crate::cards::Blocking>(blocker.into()).is_none());
         Ok(())
     }
 }

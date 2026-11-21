@@ -1,3 +1,5 @@
+use crate::cards;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum EffectKind {
     Damage(u32),
@@ -7,6 +9,7 @@ pub enum EffectKind {
     LoseLife(u32),
     Discard(u32),
     ModifyPowerToughness { power: i32, toughness: i32 },
+    GainKeyword(cards::Keyword),
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -23,6 +26,7 @@ pub enum FilterKind {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Layered {
     ModifyPT { power: i32, toughness: i32 },
+    GainKeyword(cards::Keyword),
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

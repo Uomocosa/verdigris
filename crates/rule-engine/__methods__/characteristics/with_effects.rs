@@ -5,18 +5,27 @@ pub fn with_effects(
     mut characteristics: cards::Characteristics,
     effects: &[effects::ContinuousEffect],
 ) -> cards::Characteristics {
+    for effect in effects {
+        if let effects::Layered::GainKeyword(keyword) = effect.change
+            && !characteristics.keywords.contains(&keyword)
+        {
+            characteristics.keywords.push(keyword);
+        }
+    }
     let Some(base) = characteristics.power_toughness else {
         return characteristics;
     };
     let mut power = base.power;
     let mut toughness = base.toughness;
     for effect in effects {
-        let effects::Layered::ModifyPT {
+        if let effects::Layered::ModifyPT {
             power: delta_power,
             toughness: delta_toughness,
-        } = effect.change;
-        power = power.saturating_add(delta_power);
-        toughness = toughness.saturating_add(delta_toughness);
+        } = effect.change
+        {
+            power = power.saturating_add(delta_power);
+            toughness = toughness.saturating_add(delta_toughness);
+        }
     }
     characteristics.power_toughness = Some(cards::PowerToughness { power, toughness });
     characteristics
@@ -53,7 +62,7 @@ mod tests {
             timestamp: 0,
         };
         assert_eq!(
-            with_effects(from_printed_value, &[effect]).power_toughness,
+            with_effects(from_printed_value.clone(), &[effect]).power_toughness,
             Some(cards::PowerToughness {
                 power: 3,
                 toughness: 5
@@ -67,6 +76,21 @@ mod tests {
             )
             .power_toughness,
             None
+        );
+        let grant = effects::ContinuousEffect {
+            affected: Entity::PLACEHOLDER,
+            change: effects::Layered::GainKeyword(cards::Keyword::Flying),
+            until: effects::Duration::UntilEndOfTurn,
+            timestamp: 0,
+        };
+        let granted = with_effects(from_printed_value, &[grant]);
+        assert!(granted.keywords.contains(&cards::Keyword::Flying));
+        assert_eq!(
+            granted.power_toughness,
+            Some(cards::PowerToughness {
+                power: 2,
+                toughness: 2
+            })
         );
     }
 }

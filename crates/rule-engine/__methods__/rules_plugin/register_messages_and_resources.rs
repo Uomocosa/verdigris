@@ -19,6 +19,7 @@ pub fn register_messages_and_resources(app: &mut App) {
         .add_message::<players::LifeLost>()
         .add_message::<players::DiscardRequested>()
         .add_message::<effects::PowerToughnessModified>()
+        .add_message::<effects::KeywordGranted>()
         .add_message::<turns::StepStarted>()
         .add_message::<turns::AllPlayersPassed>();
     app.init_resource::<actions::PendingChoice>();
