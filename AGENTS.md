@@ -64,3 +64,14 @@ Never create task files in `~/.claude/`, `~/.opencode/`, `~/.config/`, `/tmp`, o
 Before writing or reviewing card definitions or adding domain items, read
 `docs/RATIONALE.md` and `docs/SMELLS.md` (verdigris-specific; they extend the fleet
 lele-syntax-rs RATIONALE/SMELLS).
+
+## lele.toml is user policy
+
+**CRITICAL: NEVER change a repo's `lele.toml` unless the user specifically requested that change in this conversation.**
+
+- A lint error is fixed in the code, not in the config. If a rule looks wrong, or two rules seem to contradict each other, stop and show the user both diagnostics.
+- Do not add an exemption, a `level = "off"`, or a `reason` on your own initiative.
+- When the user does ask, make exactly that change, and put their request in the commit trailer `Lele-Config-Request: <their words>`. The `lele-config-guard` commit-msg hook rejects a `lele.toml` change that has no trailer.
+- `LELECORE*` rules are locked: they can never be turned off, only exempted per path with a reason.
+- Every lint run prints a "lele.toml relaxes rules" banner. Mention any new line in it to the user.
+- Fixture configs under `lele-lint-test-crates/`, `rule_examples/`, `interactions/` and `tests/fixtures/` are test data. Linter work may edit them.
