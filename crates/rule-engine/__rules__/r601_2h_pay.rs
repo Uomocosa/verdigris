@@ -19,7 +19,7 @@ pub fn r601_2h_pay(
         &stack::CastingStage,
     )>,
     mut pools: Query<&mut cards::ManaPool>,
-    zone_entities: Query<(Entity, &zones::Zone, Option<&cards::Owner>)>,
+    zones: zones::ZoneLookup,
 ) {
     for (spell, definition, owner, stage) in cards.iter() {
         if *stage != stack::CastingStage::AwaitingPayment {
@@ -33,7 +33,7 @@ pub fn r601_2h_pay(
             continue;
         }
         rejected.write(actions::Rejected::CannotPay { spell });
-        if let Some(hand) = HAND.find_entity(Some(**owner), &zone_entities) {
+        if let Some(hand) = zones.find(HAND, Some(**owner)) {
             commands.entity(spell).insert(zones::InZone(hand));
         }
         commands.entity(spell).remove::<stack::CastingStage>();

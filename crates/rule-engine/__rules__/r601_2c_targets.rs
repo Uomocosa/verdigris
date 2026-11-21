@@ -1,4 +1,4 @@
-use crate::{BATTLEFIELD, HAND, STACK};
+use crate::{HAND, STACK};
 use std::collections::BTreeSet;
 
 use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query, ResMut, With};
@@ -40,7 +40,8 @@ pub fn r601_2c_targets(
         &cards::Owner,
         &zones::InZone,
     )>,
-    zone_entities: Query<(Entity, &zones::Zone, Option<&cards::Owner>)>,
+    battlefield: Query<Entity, With<cards::OnBattlefield>>,
+    zones: zones::ZoneLookup,
 ) {
     for action in actions.read() {
         match &action.action {
@@ -49,7 +50,7 @@ pub fn r601_2c_targets(
                 let Ok((_, definition, owner, in_zone)) = cards.get(spell) else {
                     continue;
                 };
-                if !STACK.contains_card(**in_zone, &zone_entities) {
+                if !zones.contains(STACK, **in_zone) {
                     continue;
                 }
                 let controller = **owner;
@@ -67,11 +68,12 @@ pub fn r601_2c_targets(
                     controller,
                     &players,
                     &cards,
-                    &zone_entities,
+                    &battlefield,
+                    &zones,
                 );
                 if legal.is_empty() {
                     rejected.write(actions::Rejected::NoLegalTargets { spell });
-                    if let Some(hand) = HAND.find_entity(Some(controller), &zone_entities) {
+                    if let Some(hand) = zones.find(HAND, Some(controller)) {
                         commands.entity(spell).insert(zones::InZone(hand));
                     }
                     commands.entity(spell).remove::<stack::CastingStage>();
@@ -135,7 +137,8 @@ fn legal_targets(
         &cards::Owner,
         &zones::InZone,
     )>,
-    zone_entities: &Query<(Entity, &zones::Zone, Option<&cards::Owner>)>,
+    battlefield: &Query<Entity, With<cards::OnBattlefield>>,
+    zones: &zones::ZoneLookup,
 ) -> BTreeSet<Entity> {
     let all_players: Vec<Entity> = players.iter().collect();
     let allowed_controllers: Option<BTreeSet<Entity>> = filter
@@ -162,11 +165,10 @@ fn legal_targets(
             | effects::FilterKind::CreatureSpell
             | effects::FilterKind::NoncreatureSpell
             | effects::FilterKind::InstantSpell => {
-                STACK.contains_card(**in_zone, zone_entities) && filter.does_spell_match(definition)
+                zones.contains(STACK, **in_zone) && filter.does_spell_match(definition)
             }
             effects::FilterKind::Creature | effects::FilterKind::AnyTarget => {
-                filter.does_creature_match(definition)
-                    && BATTLEFIELD.contains_card(**in_zone, zone_entities)
+                filter.does_creature_match(definition) && battlefield.contains(entity)
             }
             effects::FilterKind::Player => false,
         };

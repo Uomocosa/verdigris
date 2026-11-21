@@ -1,5 +1,5 @@
 use crate::{HAND, STACK};
-use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query, Res};
+use bevy::prelude::{Commands, MessageReader, MessageWriter, Query, Res};
 
 use crate::actions;
 use crate::cards;
@@ -19,7 +19,7 @@ pub fn r601_2a_cast(
     priority: Res<turns::Priority>,
     turn: Res<turns::Turn>,
     cards: Query<(&cards::CardDefinition, &cards::Owner, &zones::InZone)>,
-    zone_entities: Query<(Entity, &zones::Zone, Option<&cards::Owner>)>,
+    zones: zones::ZoneLookup,
 ) {
     let priority = priority.into_inner();
     let turn = turn.into_inner();
@@ -36,14 +36,15 @@ pub fn r601_2a_cast(
             rejected.write(actions::Rejected::CannotCast { spell });
             continue;
         };
-        let is_in_casters_hand = zone_entities.get(**in_zone).is_ok_and(|(_, zone, zone_owner)| {
-            *zone == HAND && zone_owner.is_some_and(|zone_owner| **zone_owner == action.player)
-        });
-        if **owner != action.player || !is_in_casters_hand {
+        let Some(hand) = zones.find(HAND, Some(action.player)) else {
+            rejected.write(actions::Rejected::CannotCast { spell });
+            continue;
+        };
+        if **owner != action.player || **in_zone != hand {
             rejected.write(actions::Rejected::CannotCast { spell });
             continue;
         }
-        let Some(stack) = STACK.find_entity(None, &zone_entities) else {
+        let Some(stack) = zones.find(STACK, None) else {
             rejected.write(actions::Rejected::CannotCast { spell });
             continue;
         };

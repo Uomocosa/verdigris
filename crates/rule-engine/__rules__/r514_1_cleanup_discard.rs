@@ -1,7 +1,6 @@
 use crate::{HAND, MAX_HAND_SIZE};
-use bevy::prelude::{Entity, MessageReader, MessageWriter, Query, Res};
+use bevy::prelude::{MessageReader, MessageWriter, Query, Res};
 
-use crate::cards;
 use crate::players;
 use crate::turns;
 use crate::zones;
@@ -13,7 +12,7 @@ pub fn r514_1_cleanup_discard(
     mut step_started: MessageReader<turns::StepStarted>,
     mut discards: MessageWriter<players::DiscardRequested>,
     turn: Res<turns::Turn>,
-    zone_entities: Query<(Entity, &zones::Zone, Option<&cards::Owner>)>,
+    zones: zones::ZoneLookup,
     zone_contents: Query<&zones::ZoneContents>,
 ) {
     let turn = turn.into_inner();
@@ -21,7 +20,7 @@ pub fn r514_1_cleanup_discard(
         if **step != turns::Step::Cleanup {
             continue;
         }
-        let Some(hand) = HAND.find_entity(Some(turn.active), &zone_entities) else {
+        let Some(hand) = zones.find(HAND, Some(turn.active)) else {
             continue;
         };
         let Ok(contents) = zone_contents.get(hand) else {

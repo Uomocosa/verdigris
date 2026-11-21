@@ -1,5 +1,5 @@
 use crate::{GRAVEYARD, STACK};
-use bevy::prelude::{Commands, Entity, MessageReader, Query};
+use bevy::prelude::{Commands, MessageReader, Query};
 
 use crate::cards;
 use crate::stack;
@@ -12,14 +12,14 @@ pub fn r608_2n_graveyard(
     mut resolutions: MessageReader<stack::Resolution>,
     mut commands: Commands,
     cards: Query<(&cards::CardDefinition, &cards::Owner, &zones::InZone)>,
-    zone_entities: Query<(Entity, &zones::Zone, Option<&cards::Owner>)>,
+    zones: zones::ZoneLookup,
 ) {
     for resolution in resolutions.read() {
         let spell = **resolution;
         let Ok((definition, owner, in_zone)) = cards.get(spell) else {
             continue;
         };
-        if !STACK.contains_card(**in_zone, &zone_entities) {
+        if !zones.contains(STACK, **in_zone) {
             continue;
         }
         let is_instant_or_sorcery = definition.types.iter().any(|card_type| {
@@ -31,7 +31,7 @@ pub fn r608_2n_graveyard(
         if !is_instant_or_sorcery {
             continue;
         }
-        if let Some(graveyard) = GRAVEYARD.find_entity(Some(**owner), &zone_entities) {
+        if let Some(graveyard) = zones.find(GRAVEYARD, Some(**owner)) {
             commands.entity(spell).insert(zones::InZone(graveyard));
         }
     }

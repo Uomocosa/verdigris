@@ -1,5 +1,5 @@
 use crate::{BATTLEFIELD, STACK};
-use bevy::prelude::{Entity, MessageReader, MessageWriter, ParamSet, Query};
+use bevy::prelude::{MessageReader, MessageWriter, ParamSet, Query};
 
 use crate::cards;
 use crate::damage;
@@ -40,14 +40,14 @@ pub fn r608_2_r608_2c_resolve(
         Option<&stack::ChosenTarget>,
     )>,
     lives: Query<&players::Life>,
-    zone_entities: Query<(Entity, &zones::Zone, Option<&cards::Owner>)>,
+    zones: zones::ZoneLookup,
 ) {
     for resolution in resolutions.read() {
         let spell = **resolution;
         let Ok((definition, owner, in_zone, chosen)) = spells.get(spell) else {
             continue;
         };
-        if !STACK.contains_card(**in_zone, &zone_entities) {
+        if !zones.contains(STACK, **in_zone) {
             continue;
         }
         let Some(effect) = definition.effect else {
@@ -71,7 +71,7 @@ pub fn r608_2_r608_2c_resolve(
                 effects::EffectKind::Destroy => {
                     if let Some(target) = chosen_target
                         && let Ok((_, _, target_zone, _)) = spells.get(target)
-                        && BATTLEFIELD.contains_card(**target_zone, &zone_entities)
+                        && zones.contains(BATTLEFIELD, **target_zone)
                     {
                         destructions.write(damage::Destruction(target));
                     }
@@ -79,7 +79,7 @@ pub fn r608_2_r608_2c_resolve(
                 effects::EffectKind::Counter => {
                     if let Some(target) = chosen_target
                         && let Ok((_, _, target_zone, _)) = spells.get(target)
-                        && STACK.contains_card(**target_zone, &zone_entities)
+                        && zones.contains(STACK, **target_zone)
                     {
                         countered.write(stack::Countered(target));
                     }
@@ -103,7 +103,7 @@ pub fn r608_2_r608_2c_resolve(
                 effects::EffectKind::ModifyPowerToughness { power, toughness } => {
                     if let Some(target) = chosen_target
                         && let Ok((_, _, target_zone, _)) = spells.get(target)
-                        && BATTLEFIELD.contains_card(**target_zone, &zone_entities)
+                        && zones.contains(BATTLEFIELD, **target_zone)
                     {
                         effect_messages.p0().write(effects::PowerToughnessModified {
                             target,
@@ -115,7 +115,7 @@ pub fn r608_2_r608_2c_resolve(
                 effects::EffectKind::GainKeyword(keyword) => {
                     if let Some(target) = chosen_target
                         && let Ok((_, _, target_zone, _)) = spells.get(target)
-                        && BATTLEFIELD.contains_card(**target_zone, &zone_entities)
+                        && zones.contains(BATTLEFIELD, **target_zone)
                     {
                         effect_messages.p1().write(effects::KeywordGranted { target, keyword });
                     }
