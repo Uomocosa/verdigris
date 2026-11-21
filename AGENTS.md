@@ -58,3 +58,9 @@ If a git hook fails, stop and report the root cause; never use `--no-verify`.
 Plans, briefs, reports, logs and scratch files go in
 `<repo>/.local-run/orchestrator/<YYYY-MM-DD>-<topic>/` (gitignored).
 Never create task files in `~/.claude/`, `~/.opencode/`, `~/.config/`, `/tmp`, or a session scratchpad.
+
+## Card definitions and domains
+
+Before writing or reviewing card definitions or adding domain items, read
+`docs/RATIONALE.md` and `docs/SMELLS.md` (verdigris-specific; they extend the fleet
+lele-syntax-rs RATIONALE/SMELLS).
