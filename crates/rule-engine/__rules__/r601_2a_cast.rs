@@ -12,6 +12,25 @@ use crate::zones;
 /// its controller. Any continuous effects that modify the characteristics of the spell as you start
 /// casting it begin as it is put on the stack (see rule 611.2f). The spell remains on the stack
 /// until it resolves, it’s countered, or a rule or effect moves it elsewhere.
+///
+/// # See also
+///
+/// 305.9. If an object is both a land and another card type, it can be played only as a land. It
+/// can’t be cast as a spell.
+///
+/// 300.2a An object that’s both a land and another card type (for example, an artifact land) can
+/// only be played as a land. It can’t be cast as a spell.
+///
+/// 202.1b Some objects have no mana cost. This normally includes all land cards, any other cards
+/// that have no mana symbols where their mana cost would appear, tokens (unless the effect that
+/// creates them specifies otherwise), and nontraditional Magic cards. Having no mana cost
+/// represents an unpayable cost (see rule 118.6). Note that lands are played without paying any
+/// costs (see rule 305, “Lands”).
+///
+/// 118.6. Some objects have no mana cost. This represents an unpayable cost. An ability can also
+/// have an unpayable cost if its cost is based on the mana cost of an object with no mana cost.
+/// Attempting to cast a spell or activate an ability that has an unpayable cost is a legal
+/// action. However, attempting to pay an unpayable cost is an illegal action.
 pub fn r601_2a_cast(
     mut actions: MessageReader<actions::PlayerAction>,
     mut rejected: MessageWriter<actions::Rejected>,
@@ -41,6 +60,10 @@ pub fn r601_2a_cast(
             continue;
         };
         if **owner != action.player || **in_zone != hand {
+            rejected.write(actions::Rejected::CannotCast { spell });
+            continue;
+        }
+        if definition.types.contains(&cards::CardType::Land) {
             rejected.write(actions::Rejected::CannotCast { spell });
             continue;
         }
@@ -120,6 +143,24 @@ mod tests {
             })
         );
         assert!(game.player(p1).cards_in(HAND).has(divination));
+        Ok(())
+    }
+
+    #[test]
+    fn a_land_cannot_be_cast_as_a_spell() -> TestResult {
+        let (mut game, [p1, ..]) = MockGame::new([P1.hand([FOREST]), P2]);
+        let [forest] = game.player(p1).cards_in(HAND).exactly::<1>(FOREST)?;
+
+        game.act(p1, actions::Action::Cast(forest.into()));
+
+        assert_eq!(
+            game.last_rejection(),
+            Some(&actions::Rejected::CannotCast {
+                spell: forest.into()
+            })
+        );
+        assert!(game.player(p1).cards_in(HAND).has(forest));
+        assert!(!game.stack().has(forest));
         Ok(())
     }
 }
