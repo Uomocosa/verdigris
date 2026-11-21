@@ -1,3 +1,4 @@
+use crate::card;
 use crate::cards;
 use crate::cost;
 use crate::pt;
@@ -5,7 +6,12 @@ use crate::testing;
 
 pub const WIND_DRAKE: testing::Card = testing::Card {
     name: testing::TestCardName("Wind Drake"),
-    definition: || cards::creature("Wind Drake", cost![2, U], pt!(2, 2)).keyword(cards::flying()),
+    definition: || {
+        card! {
+            cards::creature("Wind Drake", cost![2, U], pt!(2, 2));
+            cards::flying(),
+        }
+    },
 };
 
 #[cfg(test)]

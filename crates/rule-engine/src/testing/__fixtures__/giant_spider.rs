@@ -1,3 +1,4 @@
+use crate::card;
 use crate::cards;
 use crate::cost;
 use crate::pt;
@@ -5,7 +6,12 @@ use crate::testing;
 
 pub const GIANT_SPIDER: testing::Card = testing::Card {
     name: testing::TestCardName("Giant Spider"),
-    definition: || cards::creature("Giant Spider", cost![3, G], pt!(2, 4)).keyword(cards::reach()),
+    definition: || {
+        card! {
+            cards::creature("Giant Spider", cost![3, G], pt!(2, 4));
+            cards::reach(),
+        }
+    },
 };
 
 #[cfg(test)]
