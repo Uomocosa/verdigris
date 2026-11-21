@@ -14,6 +14,7 @@ pub enum Action {
     ChooseTargets(Vec<Entity>),
     ChooseDiscard(Vec<Entity>),
     ChooseDefendingPlayer(Entity),
+    OrderTriggers(Vec<Entity>),
     AssignCombatDamage(Vec<actions::DamageAssignment>),
     DeclareAttackers(Vec<Entity>),
     DeclareBlockers(Vec<actions::BlockAssignment>),
@@ -25,4 +26,5 @@ pub enum Choice {
     Target(actions::TargetChoice),
     Discard(actions::DiscardChoice),
     CombatDamage(actions::CombatDamageChoice),
+    OrderTriggers(actions::OrderTriggersChoice),
 }

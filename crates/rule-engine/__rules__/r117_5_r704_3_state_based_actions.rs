@@ -3,6 +3,7 @@ use bevy::prelude::World;
 use crate::MAX_STATE_BASED_PASSES;
 use crate::StateBasedActions;
 use crate::StateBasedActionsPerformed;
+use crate::actions;
 use crate::rules;
 use crate::stack;
 
@@ -16,6 +17,12 @@ pub fn r117_5_r704_3_state_based_actions(world: &mut World) {
         world.run_schedule(StateBasedActions);
         if !**world.resource::<StateBasedActionsPerformed>() {
             if world.resource::<stack::TriggerQueue>().is_empty() {
+                return;
+            }
+            if matches!(
+                (*world.resource::<actions::PendingChoice>()).as_ref(),
+                Some(actions::Choice::OrderTriggers(_))
+            ) {
                 return;
             }
             rules::r603_3_triggers_on_stack::r603_3_triggers_on_stack(world);

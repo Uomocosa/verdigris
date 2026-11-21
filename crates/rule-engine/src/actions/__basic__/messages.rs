@@ -31,6 +31,9 @@ pub enum Rejected {
     InvalidDiscard {
         player: Entity,
     },
+    InvalidTriggerOrder {
+        player: Entity,
+    },
     InvalidCombatDamage {
         player: Entity,
     },

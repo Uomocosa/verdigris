@@ -37,6 +37,9 @@ impl TestPlayerActions {
 
     #[must_use]
     pub fn discard<const N: usize>(self, cards: [testing::TestCard; N]) -> Self {}
+
+    #[must_use]
+    pub fn order_triggers<const N: usize>(self, triggers: [testing::TestCard; N]) -> Self {}
 }
 
 #[rustfmt::skip]

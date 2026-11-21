@@ -116,6 +116,7 @@ pub fn r601_2c_targets(
             }
             actions::Action::ChooseDiscard(_)
             | actions::Action::ChooseDefendingPlayer(_)
+            | actions::Action::OrderTriggers(_)
             | actions::Action::AssignCombatDamage(_)
             | actions::Action::DeclareAttackers(_)
             | actions::Action::DeclareBlockers(_)

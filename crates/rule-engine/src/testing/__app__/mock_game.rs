@@ -89,6 +89,9 @@ impl MockGame {
     pub fn target_choice(&self) -> Option<testing::ExpectedTargets> {}
 
     #[must_use]
+    pub fn trigger_sources(&self) -> Vec<Entity> {}
+
+    #[must_use]
     pub fn last_rejection(&self) -> Option<&actions::Rejected> {}
 
     pub fn play(

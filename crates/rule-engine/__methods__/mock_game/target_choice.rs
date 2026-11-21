@@ -8,7 +8,9 @@ pub fn target_choice(game: &testing::MockGame) -> Option<testing::ExpectedTarget
             count: choice.count,
             legal: choice.legal.clone(),
         }),
-        actions::Choice::Discard(_) | actions::Choice::CombatDamage(_) => None,
+        actions::Choice::Discard(_)
+        | actions::Choice::CombatDamage(_)
+        | actions::Choice::OrderTriggers(_) => None,
     }
 }
 

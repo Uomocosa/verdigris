@@ -1,7 +1,9 @@
-use bevy::prelude::World;
+use bevy::prelude::{Entity, World};
 
+use crate::actions;
 use crate::cards;
 use crate::stack;
+use crate::turns;
 use crate::zones;
 
 /// 603.3. Once an ability has triggered, its controller puts it on the stack as an object that’s
@@ -15,28 +17,105 @@ use crate::zones;
 /// 603.3a A triggered ability is controlled by the player who controlled its source at the time it
 /// triggered, unless it’s a delayed triggered ability. To determine the controller of a delayed
 /// triggered ability, see rules 603.7d–f.
+///
+/// 603.3b If multiple abilities have triggered since the last time a player received priority, the
+/// abilities are placed on the stack in a two-part process. First, each player, in APNAP order,
+/// puts each triggered ability they control with a trigger condition that isn’t another ability
+/// triggering on the stack in any order they choose. (See rule 101.4.) Second, each player, in
+/// APNAP order, puts all remaining triggered abilities they control on the stack in any order
+/// they choose. Then the game once again checks for and performs state-based actions until none
+/// are performed, then abilities that triggered during this process go on the stack. This process
+/// repeats until no new state-based actions are performed and no abilities trigger. Then the
+/// appropriate player gets priority.
 pub fn r603_3_triggers_on_stack(world: &mut World) {
-    let pending = world.resource_mut::<stack::TriggerQueue>().take_pending();
+    if world.resource::<actions::PendingChoice>().is_some() {
+        return;
+    }
+    let mut pending = world.resource_mut::<stack::TriggerQueue>().take_pending();
     if pending.is_empty() {
         return;
     }
-    let mut zones = world.query::<(bevy::prelude::Entity, &zones::Zone)>();
+    let active = world.resource::<turns::Turn>().active;
+    let turn_order = world.resource::<turns::TurnOrder>().clone();
+    let apnap = players_in_apnap_order(active, &turn_order);
+    pending.sort_by_key(|trigger| apnap_position(&apnap, trigger.controller));
+    let mut groups: Vec<Vec<stack::PendingTrigger>> = Vec::new();
+    for trigger in pending {
+        let continues_run = groups.last().is_some_and(|group| {
+            group.first().is_some_and(|first| first.controller == trigger.controller)
+        });
+        if continues_run {
+            if let Some(group) = groups.last_mut() {
+                group.push(trigger);
+            }
+        } else {
+            groups.push(vec![trigger]);
+        }
+    }
+    let mut groups = groups.into_iter();
+    while let Some(group) = groups.next() {
+        if group.len() == 1 {
+            let mut single = group;
+            if let Some(trigger) = single.pop() {
+                spawn_trigger(world, trigger);
+            }
+            continue;
+        }
+        let Some(first) = group.first() else {
+            continue;
+        };
+        *world.resource_mut::<actions::PendingChoice>() = actions::PendingChoice(Some(
+            actions::Choice::OrderTriggers(actions::OrderTriggersChoice {
+                player: first.controller,
+                triggers: group.iter().map(|trigger| trigger.source).collect(),
+            }),
+        ));
+        let mut queue = world.resource_mut::<stack::TriggerQueue>();
+        for trigger in group {
+            queue.push(trigger);
+        }
+        for rest in groups.by_ref() {
+            for trigger in rest {
+                queue.push(trigger);
+            }
+        }
+        return;
+    }
+}
+
+fn players_in_apnap_order(active: Entity, turn_order: &turns::TurnOrder) -> Vec<Entity> {
+    let mut order = vec![active];
+    let mut current = active;
+    while let Some(next) = turn_order.next_after(current) {
+        if next == active {
+            break;
+        }
+        order.push(next);
+        current = next;
+    }
+    order
+}
+
+fn apnap_position(order: &[Entity], player: Entity) -> usize {
+    order.iter().position(|candidate| *candidate == player).unwrap_or(usize::MAX)
+}
+
+fn spawn_trigger(world: &mut World, trigger: stack::PendingTrigger) {
+    let mut zones = world.query::<(Entity, &zones::Zone)>();
     let Some(stack) =
         zones.iter(world).find(|(_, zone)| **zone == zones::Zone::Stack).map(|(entity, _)| entity)
     else {
         return;
     };
-    for trigger in pending {
-        world.spawn((
-            zones::InZone(stack),
-            cards::Owner(trigger.controller),
-            stack::TriggeredAbilityOnStack {
-                source: trigger.source,
-                controller: trigger.controller,
-                effect: trigger.ability.effect,
-            },
-        ));
-    }
+    world.spawn((
+        zones::InZone(stack),
+        cards::Owner(trigger.controller),
+        stack::TriggeredAbilityOnStack {
+            source: trigger.source,
+            controller: trigger.controller,
+            effect: trigger.ability.effect,
+        },
+    ));
 }
 
 #[cfg(test)]

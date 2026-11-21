@@ -34,3 +34,9 @@ pub struct RequiredCombatDamage {
     pub amount: u32,
     pub legal: BTreeSet<Entity>,
 }
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct OrderTriggersChoice {
+    pub player: Entity,
+    pub triggers: Vec<Entity>,
+}
