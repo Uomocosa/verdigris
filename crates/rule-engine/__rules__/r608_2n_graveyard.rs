@@ -11,17 +11,29 @@ use crate::zones;
 pub fn r608_2n_graveyard(
     mut resolutions: MessageReader<stack::Resolution>,
     mut commands: Commands,
-    cards: Query<(&cards::CardDefinition, &cards::Owner, &zones::InZone)>,
+    cards: Query<(
+        Option<&cards::CardDefinition>,
+        Option<&stack::TriggeredAbilityOnStack>,
+        &cards::Owner,
+        &zones::InZone,
+    )>,
     zones: zones::ZoneLookup,
 ) {
     for resolution in resolutions.read() {
         let spell = **resolution;
-        let Ok((definition, owner, in_zone)) = cards.get(spell) else {
+        let Ok((definition, ability, owner, in_zone)) = cards.get(spell) else {
             continue;
         };
         if !zones.contains(STACK, **in_zone) {
             continue;
         }
+        if ability.is_some() {
+            commands.entity(spell).despawn();
+            continue;
+        }
+        let Some(definition) = definition else {
+            continue;
+        };
         let is_instant_or_sorcery = definition.types.iter().any(|card_type| {
             matches!(
                 card_type,

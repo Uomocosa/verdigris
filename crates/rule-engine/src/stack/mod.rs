@@ -1,5 +1,9 @@
 #[path = "__basic__/mod.rs"]
 mod basic;
 
-pub use basic::components::{CastingStage, ChosenTarget};
+pub use basic::components::{CastingStage, ChosenTarget, TriggeredAbilityOnStack};
 pub use basic::messages::{Countered, Resolution};
+pub use basic::structs::{PendingTrigger, ResolutionLookups};
+
+mod trigger_queue;
+pub use trigger_queue::TriggerQueue;

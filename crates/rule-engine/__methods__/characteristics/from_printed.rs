@@ -8,6 +8,7 @@ pub fn from_printed(
         on_battlefield,
         power_toughness: definition.power_toughness,
         keywords: definition.keywords.clone(),
+        triggered_abilities: definition.triggered_abilities.clone(),
     }
 }
 

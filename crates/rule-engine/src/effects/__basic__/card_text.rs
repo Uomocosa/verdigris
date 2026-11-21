@@ -47,6 +47,15 @@ pub const fn lose_life(amount: u32) -> effects::Effect {
 }
 
 #[must_use]
+pub const fn gain_life(amount: u32) -> effects::Effect {
+    effects::Effect {
+        kind: effects::EffectKind::GainLife(amount),
+        then: None,
+        target: None,
+    }
+}
+
+#[must_use]
 pub const fn discard(count: u32) -> effects::Effect {
     effects::Effect {
         kind: effects::EffectKind::Discard(count),

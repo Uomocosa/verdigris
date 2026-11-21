@@ -13,6 +13,7 @@ pub fn creature(
         land_types: Vec::new(),
         power_toughness: Some(power_toughness),
         effect: None,
+        triggered_abilities: Vec::new(),
         keywords: Vec::new(),
     }
 }
@@ -30,6 +31,7 @@ pub fn artifact_creature(
         land_types: Vec::new(),
         power_toughness: Some(power_toughness),
         effect: None,
+        triggered_abilities: Vec::new(),
         keywords: Vec::new(),
     }
 }
@@ -43,6 +45,7 @@ pub fn instant(name: impl Into<cards::CardName>, cost: cards::Cost) -> cards::Ca
         land_types: Vec::new(),
         power_toughness: None,
         effect: None,
+        triggered_abilities: Vec::new(),
         keywords: Vec::new(),
     }
 }
@@ -56,6 +59,7 @@ pub fn sorcery(name: impl Into<cards::CardName>, cost: cards::Cost) -> cards::Ca
         land_types: Vec::new(),
         power_toughness: None,
         effect: None,
+        triggered_abilities: Vec::new(),
         keywords: Vec::new(),
     }
 }
@@ -72,6 +76,7 @@ pub fn land(
         land_types: land_types.into_iter().collect(),
         power_toughness: None,
         effect: None,
+        triggered_abilities: Vec::new(),
         keywords: Vec::new(),
     }
 }

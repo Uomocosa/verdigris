@@ -13,4 +13,5 @@ pub struct CurrentMarkers<'a> {
     pub trample: Has<cards::Trample>,
     pub flying: Has<cards::Flying>,
     pub reach: Has<cards::Reach>,
+    pub enters: Option<&'a cards::TriggeredEnters>,
 }

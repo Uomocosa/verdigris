@@ -64,6 +64,24 @@ pub fn write_markers(
         current.reach,
         cards::Reach,
     );
+    let desired_enters = characteristics
+        .on_battlefield
+        .then(|| {
+            characteristics
+                .triggered_abilities
+                .iter()
+                .find(|ability| matches!(ability.event, cards::TriggerEvent::Enters(_)))
+                .copied()
+                .map(cards::TriggeredEnters)
+        })
+        .flatten();
+    if current.enters != desired_enters.as_ref() {
+        if let Some(enters) = desired_enters {
+            entity.insert(enters);
+        } else {
+            entity.remove::<cards::TriggeredEnters>();
+        }
+    }
 }
 
 #[cfg(test)]
@@ -142,6 +160,7 @@ mod tests {
                 world.get::<cards::Trample>(bears).is_some(),
                 world.get::<cards::Flying>(bears).is_some(),
                 world.get::<cards::Reach>(bears).is_some(),
+                world.get::<cards::TriggeredEnters>(bears).is_some(),
             )
         };
         let before = snapshot(&app);
@@ -161,6 +180,7 @@ mod tests {
             cards::Trample,
             cards::Flying,
             cards::Reach,
+            cards::TriggeredEnters,
         )>();
         assert_ne!(snapshot(&app), before);
         app.update();

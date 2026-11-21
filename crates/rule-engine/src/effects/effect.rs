@@ -13,6 +13,9 @@ pub struct Effect {
 impl Effect {
     #[must_use]
     pub fn to(self, target: effects::Target) -> Self {}
+
+    #[must_use]
+    pub fn to_player(self, player: effects::PlayerRef) -> Self {}
 }
 
 impl Effect {

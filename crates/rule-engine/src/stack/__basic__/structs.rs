@@ -1,0 +1,24 @@
+use bevy::ecs::system::SystemParam;
+use bevy::prelude::{Entity, Query};
+
+use crate::cards;
+use crate::players;
+use crate::stack;
+use crate::zones;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct PendingTrigger {
+    pub source: Entity,
+    pub controller: Entity,
+    pub ability: cards::TriggeredAbility,
+}
+
+#[derive(SystemParam, Clone, Copy)]
+pub struct ResolutionLookups<'w, 's> {
+    pub in_zone: Query<'w, 's, &'static zones::InZone>,
+    pub definitions: Query<'w, 's, &'static cards::CardDefinition>,
+    pub abilities: Query<'w, 's, &'static stack::TriggeredAbilityOnStack>,
+    pub owners: Query<'w, 's, &'static cards::Owner>,
+    pub chosen_targets: Query<'w, 's, &'static stack::ChosenTarget>,
+    pub lives: Query<'w, 's, &'static players::Life>,
+}

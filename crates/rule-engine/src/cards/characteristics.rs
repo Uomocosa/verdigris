@@ -9,6 +9,7 @@ pub struct Characteristics {
     pub on_battlefield: bool,
     pub power_toughness: Option<cards::PowerToughness>,
     pub keywords: Vec<cards::Keyword>,
+    pub triggered_abilities: Vec<cards::TriggeredAbility>,
 }
 
 #[atomic_delegates]
@@ -65,5 +66,6 @@ mod tests {
         assert!(characteristics.on_battlefield);
         assert_eq!(characteristics.power_toughness, Some(pt!(2, 2)));
         assert_eq!(characteristics.keywords, Vec::new());
+        assert_eq!(characteristics.triggered_abilities, Vec::new());
     }
 }

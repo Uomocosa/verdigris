@@ -7,6 +7,8 @@ pub const YOU: effects::PlayerRef = effects::PlayerRef::You;
 pub const OPPONENT: effects::PlayerRef = effects::PlayerRef::Opponent;
 pub const ANY: effects::PlayerRef = effects::PlayerRef::Any;
 
+pub const ANOTHER_CREATURE: cards::ObjectFilter = cards::ObjectFilter::AnotherCreature;
+
 /// 514.1 Maximum hand size (normally seven).
 pub const MAX_HAND_SIZE: usize = 7;
 

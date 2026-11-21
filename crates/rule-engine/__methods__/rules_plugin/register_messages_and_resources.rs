@@ -2,6 +2,7 @@ use bevy::prelude::App;
 
 use crate::StateBasedActionsPerformed;
 use crate::actions;
+use crate::cards;
 use crate::damage;
 use crate::effects;
 use crate::players;
@@ -17,14 +18,17 @@ pub fn register_messages_and_resources(app: &mut App) {
         .add_message::<damage::Destruction>()
         .add_message::<players::DrawRequested>()
         .add_message::<players::LifeLost>()
+        .add_message::<players::LifeGained>()
         .add_message::<players::DiscardRequested>()
         .add_message::<effects::PowerToughnessModified>()
         .add_message::<effects::KeywordGranted>()
+        .add_message::<cards::Entered>()
         .add_message::<turns::StepStarted>()
         .add_message::<turns::AllPlayersPassed>();
     app.init_resource::<actions::PendingChoice>();
     app.init_resource::<StateBasedActionsPerformed>();
     app.init_resource::<effects::Timestamp>();
+    app.init_resource::<stack::TriggerQueue>();
 }
 
 #[cfg(test)]

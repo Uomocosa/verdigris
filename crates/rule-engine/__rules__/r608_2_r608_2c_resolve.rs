@@ -1,7 +1,6 @@
 use crate::{BATTLEFIELD, STACK};
-use bevy::prelude::{MessageReader, MessageWriter, ParamSet, Query};
+use bevy::prelude::{MessageReader, MessageWriter, ParamSet};
 
-use crate::cards;
 use crate::damage;
 use crate::effects;
 use crate::players;
@@ -28,38 +27,45 @@ pub fn r608_2_r608_2c_resolve(
     mut player_effects: ParamSet<(
         MessageWriter<players::LifeLost>,
         MessageWriter<players::DiscardRequested>,
+        MessageWriter<players::LifeGained>,
     )>,
     mut effect_messages: ParamSet<(
         MessageWriter<effects::PowerToughnessModified>,
         MessageWriter<effects::KeywordGranted>,
     )>,
-    spells: Query<(
-        &cards::CardDefinition,
-        &cards::Owner,
-        &zones::InZone,
-        Option<&stack::ChosenTarget>,
-    )>,
-    lives: Query<&players::Life>,
+    lookups: stack::ResolutionLookups<'_, '_>,
     zones: zones::ZoneLookup,
 ) {
     for resolution in resolutions.read() {
         let spell = **resolution;
-        let Ok((definition, owner, in_zone, chosen)) = spells.get(spell) else {
+        let Ok(in_zone) = lookups.in_zone.get(spell) else {
             continue;
         };
         if !zones.contains(STACK, **in_zone) {
             continue;
         }
-        let Some(effect) = definition.effect else {
+        let Some(effect) = lookups
+            .definitions
+            .get(spell)
+            .ok()
+            .and_then(|definition| definition.effect)
+            .or_else(|| lookups.abilities.get(spell).ok().map(|ability| ability.effect))
+        else {
             continue;
         };
-        let chosen_target = chosen.map(|chosen| **chosen);
-        let player_target = chosen_target.filter(|target| lives.get(*target).is_ok());
+        let Ok(owner) = lookups.owners.get(spell) else {
+            continue;
+        };
+        let controller = lookups.abilities.get(spell).map_or(**owner, |ability| ability.controller);
+        let chosen_target = lookups.chosen_targets.get(spell).ok().map(|chosen| **chosen);
+        let player_target = chosen_target.filter(|target| lookups.lives.get(*target).is_ok());
         for kind in [Some(effect.kind), effect.then].into_iter().flatten() {
             match kind {
                 effects::EffectKind::Damage(amount) => {
                     if let Some(target) = chosen_target
-                        && (lives.get(target).is_ok() || spells.get(target).is_ok())
+                        && (lookups.lives.get(target).is_ok()
+                            || lookups.definitions.get(target).is_ok()
+                            || lookups.abilities.get(target).is_ok())
                     {
                         damage_dealt.write(damage::DamageDealt {
                             source: spell,
@@ -70,7 +76,7 @@ pub fn r608_2_r608_2c_resolve(
                 }
                 effects::EffectKind::Destroy => {
                     if let Some(target) = chosen_target
-                        && let Ok((_, _, target_zone, _)) = spells.get(target)
+                        && let Ok(target_zone) = lookups.in_zone.get(target)
                         && zones.contains(BATTLEFIELD, **target_zone)
                     {
                         destructions.write(damage::Destruction(target));
@@ -78,7 +84,7 @@ pub fn r608_2_r608_2c_resolve(
                 }
                 effects::EffectKind::Counter => {
                     if let Some(target) = chosen_target
-                        && let Ok((_, _, target_zone, _)) = spells.get(target)
+                        && let Ok(target_zone) = lookups.in_zone.get(target)
                         && zones.contains(STACK, **target_zone)
                     {
                         countered.write(stack::Countered(target));
@@ -95,6 +101,12 @@ pub fn r608_2_r608_2c_resolve(
                         player_effects.p0().write(players::LifeLost { player, amount });
                     }
                 }
+                effects::EffectKind::GainLife(amount) => {
+                    player_effects.p2().write(players::LifeGained {
+                        player: player_target.unwrap_or(controller),
+                        amount,
+                    });
+                }
                 effects::EffectKind::Discard(count) => {
                     if let Some(player) = player_target {
                         player_effects.p1().write(players::DiscardRequested { player, count });
@@ -102,7 +114,7 @@ pub fn r608_2_r608_2c_resolve(
                 }
                 effects::EffectKind::ModifyPowerToughness { power, toughness } => {
                     if let Some(target) = chosen_target
-                        && let Ok((_, _, target_zone, _)) = spells.get(target)
+                        && let Ok(target_zone) = lookups.in_zone.get(target)
                         && zones.contains(BATTLEFIELD, **target_zone)
                     {
                         effect_messages.p0().write(effects::PowerToughnessModified {
@@ -114,7 +126,7 @@ pub fn r608_2_r608_2c_resolve(
                 }
                 effects::EffectKind::GainKeyword(keyword) => {
                     if let Some(target) = chosen_target
-                        && let Ok((_, _, target_zone, _)) = spells.get(target)
+                        && let Ok(target_zone) = lookups.in_zone.get(target)
                         && zones.contains(BATTLEFIELD, **target_zone)
                     {
                         effect_messages.p1().write(effects::KeywordGranted { target, keyword });

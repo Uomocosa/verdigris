@@ -1,5 +1,5 @@
 use crate::{BATTLEFIELD, STACK};
-use bevy::prelude::{Commands, MessageReader, Query, Res};
+use bevy::prelude::{Commands, MessageReader, MessageWriter, Query, Res};
 
 use crate::cards;
 use crate::stack;
@@ -16,6 +16,7 @@ use crate::zones;
 /// in rule 608.3c–e is performed, if appropriate.
 pub fn r608_3a_permanent_enters(
     mut resolutions: MessageReader<stack::Resolution>,
+    mut entered: MessageWriter<cards::Entered>,
     mut commands: Commands,
     cards: Query<(&cards::CardDefinition, &cards::Owner, &zones::InZone)>,
     zones: zones::ZoneLookup,
@@ -44,6 +45,7 @@ pub fn r608_3a_permanent_enters(
                 zones::InZone(battlefield),
                 cards::EnteredOnTurn(turn.number),
             ));
+            entered.write(cards::Entered(spell));
         }
     }
 }

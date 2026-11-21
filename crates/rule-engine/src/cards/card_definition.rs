@@ -18,6 +18,7 @@ pub struct CardDefinition {
     pub power_toughness: Option<cards::PowerToughness>,
     pub effect: Option<effects::Effect>,
     pub keywords: Vec<cards::Keyword>,
+    pub triggered_abilities: Vec<cards::TriggeredAbility>,
 }
 
 #[cfg(feature = "testing")]
@@ -30,6 +31,9 @@ impl From<testing::Card> for CardDefinition {
 impl CardDefinition {
     #[must_use]
     pub fn spell(self, effect: effects::Effect) -> Self {}
+
+    #[must_use]
+    pub fn triggered(self, ability: cards::TriggeredAbility) -> Self {}
 
     #[must_use]
     pub fn colors(&self) -> Vec<cards::Color> {}
