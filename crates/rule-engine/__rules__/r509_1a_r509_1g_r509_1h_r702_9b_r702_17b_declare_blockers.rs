@@ -141,41 +141,6 @@ mod tests {
             P2.battlefield_tapped([GRIZZLY_BEARS]),
         ]);
         let [rats] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TYPHOID_RATS)?;
-        let [tapped] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
-        game.play([
-            p1.pass_to(turns::Step::DeclareAttackers),
-            p2.pass_to(turns::Step::DeclareAttackers),
-            p1.declare_attackers([rats]),
-        ])?;
-
-        game.play([
-            p1.pass_to(turns::Step::DeclareBlockers),
-            p2.pass_to(turns::Step::DeclareBlockers),
-        ])?;
-        game.play([p1.pass_priority()])?;
-        let assignments = vec![actions::BlockAssignment {
-            blocker: tapped.into(),
-            attacker: rats.into(),
-        }];
-
-        game.act(p2, actions::Action::DeclareBlockers(assignments.clone()));
-
-        assert_eq!(
-            game.last_rejection(),
-            Some(&actions::Rejected::CannotBlock { assignments })
-        );
-        assert!(!game.is_blocking(tapped));
-        Ok(())
-    }
-
-    #[test]
-    fn a_creature_that_is_not_attacking_cannot_be_blocked() -> TestResult {
-        let (mut game, [p1, p2]) = MockGame::new([
-            P1.battlefield([TYPHOID_RATS, GRIZZLY_BEARS]),
-            P2.battlefield([GRIZZLY_BEARS]),
-        ]);
-        let [rats] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TYPHOID_RATS)?;
-        let [idle] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
         let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
         game.play([
             p1.pass_to(turns::Step::DeclareAttackers),
@@ -188,10 +153,45 @@ mod tests {
             p2.pass_to(turns::Step::DeclareBlockers),
         ])?;
         game.play([p1.pass_priority()])?;
-        assert!(!game.is_attacking(idle));
         let assignments = vec![actions::BlockAssignment {
             blocker: bears.into(),
-            attacker: idle.into(),
+            attacker: rats.into(),
+        }];
+
+        game.act(p2, actions::Action::DeclareBlockers(assignments.clone()));
+
+        assert_eq!(
+            game.last_rejection(),
+            Some(&actions::Rejected::CannotBlock { assignments })
+        );
+        assert!(!game.is_blocking(bears));
+        Ok(())
+    }
+
+    #[test]
+    fn a_creature_that_is_not_attacking_cannot_be_blocked() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.battlefield([TYPHOID_RATS, GRIZZLY_BEARS]),
+            P2.battlefield([GRIZZLY_BEARS]),
+        ]);
+        let [rats] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TYPHOID_RATS)?;
+        let [bears_1] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        let [bears_2] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareAttackers),
+            p2.pass_to(turns::Step::DeclareAttackers),
+            p1.declare_attackers([rats]),
+        ])?;
+
+        game.play([
+            p1.pass_to(turns::Step::DeclareBlockers),
+            p2.pass_to(turns::Step::DeclareBlockers),
+        ])?;
+        game.play([p1.pass_priority()])?;
+        assert!(!game.is_attacking(bears_1));
+        let assignments = vec![actions::BlockAssignment {
+            blocker: bears_2.into(),
+            attacker: bears_1.into(),
         }];
 
         game.act(p2, actions::Action::DeclareBlockers(assignments.clone()));
@@ -268,13 +268,13 @@ mod tests {
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
         let [jump] = game.player(p1).cards_in(HAND).exactly::<1>(JUMP)?;
-        let [attacker] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        let [bears_1] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
         let [tundra] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TUNDRA)?;
-        let [blocker] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        let [bears_2] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
         game.play([
             p1.pass_to(turns::Step::DeclareAttackers),
             p2.pass_to(turns::Step::DeclareAttackers),
-            p1.declare_attackers([attacker]),
+            p1.declare_attackers([bears_1]),
         ])?;
         game.play([
             p1.pass_to(turns::Step::DeclareBlockers),
@@ -283,14 +283,14 @@ mod tests {
         game.play([
             p1.activate_ability(tundra.mana_ability(cards::Color::Blue))
                 .cast(jump)
-                .targeting(attacker)
+                .targeting(bears_1)
                 .pass_priority(),
             p2.pass_priority(),
         ])?;
         game.play([p1.pass_priority()])?;
         let assignments = vec![actions::BlockAssignment {
-            blocker: blocker.into(),
-            attacker: attacker.into(),
+            blocker: bears_2.into(),
+            attacker: bears_1.into(),
         }];
 
         game.act(p2, actions::Action::DeclareBlockers(assignments.clone()));
@@ -299,7 +299,7 @@ mod tests {
             game.last_rejection(),
             Some(&actions::Rejected::CannotBlock { assignments })
         );
-        assert!(!game.is_blocking(blocker));
+        assert!(!game.is_blocking(bears_2));
         Ok(())
     }
 }

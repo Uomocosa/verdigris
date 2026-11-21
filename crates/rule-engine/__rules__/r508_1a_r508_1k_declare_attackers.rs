@@ -93,16 +93,16 @@ mod tests {
             P1.battlefield([GRIZZLY_BEARS]),
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
-        let [attacking] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
-        let [defending] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        let [bears_1] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        let [bears_2] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
         game.play([
             p1.pass_to(turns::Step::DeclareAttackers),
             p2.pass_to(turns::Step::DeclareAttackers),
-            p1.declare_attackers([attacking]),
+            p1.declare_attackers([bears_1]),
         ])?;
 
-        assert!(game.is_attacking(attacking));
-        assert!(!game.is_attacking(defending));
+        assert!(game.is_attacking(bears_1));
+        assert!(!game.is_attacking(bears_2));
         Ok(())
     }
 
@@ -112,24 +112,21 @@ mod tests {
             P1.battlefield([GRIZZLY_BEARS]),
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
-        let [defending] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
         game.play([
             p1.pass_to(turns::Step::DeclareAttackers),
             p2.pass_to(turns::Step::DeclareAttackers),
         ])?;
 
-        game.act(
-            p1,
-            actions::Action::DeclareAttackers(vec![defending.into()]),
-        );
+        game.act(p1, actions::Action::DeclareAttackers(vec![bears.into()]));
 
         assert_eq!(
             game.last_rejection(),
             Some(&actions::Rejected::CannotAttack {
-                attackers: vec![defending.into()]
+                attackers: vec![bears.into()]
             })
         );
-        assert!(!game.is_attacking(defending));
+        assert!(!game.is_attacking(bears));
         Ok(())
     }
 
@@ -139,21 +136,21 @@ mod tests {
             P1.battlefield_tapped([GRIZZLY_BEARS]),
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
-        let [tapped] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
         game.play([
             p1.pass_to(turns::Step::DeclareAttackers),
             p2.pass_to(turns::Step::DeclareAttackers),
         ])?;
 
-        game.act(p1, actions::Action::DeclareAttackers(vec![tapped.into()]));
+        game.act(p1, actions::Action::DeclareAttackers(vec![bears.into()]));
 
         assert_eq!(
             game.last_rejection(),
             Some(&actions::Rejected::CannotAttack {
-                attackers: vec![tapped.into()]
+                attackers: vec![bears.into()]
             })
         );
-        assert!(!game.is_attacking(tapped));
+        assert!(!game.is_attacking(bears));
         Ok(())
     }
 

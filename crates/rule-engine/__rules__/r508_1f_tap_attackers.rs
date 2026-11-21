@@ -25,17 +25,17 @@ mod tests {
             P1.battlefield([GRIZZLY_BEARS]),
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
-        let [attacking] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
-        let [defending] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        let [bears_1] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        let [bears_2] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
         game.play([
             p1.pass_to(turns::Step::DeclareAttackers),
             p2.pass_to(turns::Step::DeclareAttackers),
-            p1.declare_attackers([attacking]),
+            p1.declare_attackers([bears_1]),
         ])?;
 
-        assert!(game.is_attacking(attacking));
-        assert!(game.is_tapped(attacking));
-        assert!(!game.is_tapped(defending));
+        assert!(game.is_attacking(bears_1));
+        assert!(game.is_tapped(bears_1));
+        assert!(!game.is_tapped(bears_2));
         Ok(())
     }
 
@@ -45,15 +45,15 @@ mod tests {
             P1.battlefield([FELIDAR_SOVEREIGN]),
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
-        let [attacking] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(FELIDAR_SOVEREIGN)?;
+        let [sovereign] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(FELIDAR_SOVEREIGN)?;
         game.play([
             p1.pass_to(turns::Step::DeclareAttackers),
             p2.pass_to(turns::Step::DeclareAttackers),
-            p1.declare_attackers([attacking]),
+            p1.declare_attackers([sovereign]),
         ])?;
 
-        assert!(game.is_attacking(attacking));
-        assert!(!game.is_tapped(attacking));
+        assert!(game.is_attacking(sovereign));
+        assert!(!game.is_tapped(sovereign));
         Ok(())
     }
 }

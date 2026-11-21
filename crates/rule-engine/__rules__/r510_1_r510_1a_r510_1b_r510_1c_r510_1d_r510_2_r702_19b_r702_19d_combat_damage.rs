@@ -257,7 +257,7 @@ mod tests {
             P2.battlefield([DARKSTEEL_MYR, DARKSTEEL_MYR]),
         ]);
         let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
-        let [first, second] = game.player(p2).cards_in(BATTLEFIELD).exactly::<2>(DARKSTEEL_MYR)?;
+        let [myr_1, myr_2] = game.player(p2).cards_in(BATTLEFIELD).exactly::<2>(DARKSTEEL_MYR)?;
         game.play([
             p1.pass_to(turns::Step::DeclareAttackers),
             p2.pass_to(turns::Step::DeclareAttackers),
@@ -269,7 +269,7 @@ mod tests {
         ])?;
         game.play([
             p1.pass_priority(),
-            p2.declare_blockers([(first, bears), (second, bears)]),
+            p2.declare_blockers([(myr_1, bears), (myr_2, bears)]),
         ])?;
         game.play([
             p1.pass_to(turns::Step::CombatDamage),
@@ -280,19 +280,19 @@ mod tests {
             p1,
             actions::Action::AssignCombatDamage(vec![
                 actions::DamageAssignment {
-                    target: first.into(),
+                    target: myr_1.into(),
                     amount: 1,
                 },
                 actions::DamageAssignment {
-                    target: second.into(),
+                    target: myr_2.into(),
                     amount: 1,
                 },
             ]),
         );
         game.play([p1.pass_priority(), p2.pass_priority()])?;
 
-        assert_eq!(game.get::<damage::Damage>(first), Some(damage::Damage(1)));
-        assert_eq!(game.get::<damage::Damage>(second), Some(damage::Damage(1)));
+        assert_eq!(game.get::<damage::Damage>(myr_1), Some(damage::Damage(1)));
+        assert_eq!(game.get::<damage::Damage>(myr_2), Some(damage::Damage(1)));
         Ok(())
     }
 
