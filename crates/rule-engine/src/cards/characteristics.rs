@@ -1,5 +1,5 @@
 use atomic_delegate_macros::atomic_delegates;
-use bevy::prelude::EntityCommands;
+use bevy::prelude::{Component, EntityCommands};
 
 use crate::cards;
 use crate::effects;
@@ -25,17 +25,28 @@ impl Characteristics {
     pub fn write_markers(
         &self,
         entity: &mut EntityCommands,
-        current: (
-            bool,
-            Option<cards::PowerToughness>,
-            bool,
-            bool,
-            bool,
-            bool,
-            bool,
-            bool,
-        ),
+        current: cards::CurrentMarkersItem<'_, '_, '_>,
     ) {
+    }
+}
+
+impl Characteristics {
+    pub(crate) fn sync_marker<M>(
+        entity: &mut EntityCommands,
+        desired: bool,
+        current: bool,
+        marker: M,
+    ) where
+        M: Component,
+    {
+        if desired == current {
+            return;
+        }
+        if desired {
+            entity.insert(marker);
+        } else {
+            entity.remove::<M>();
+        }
     }
 }
 

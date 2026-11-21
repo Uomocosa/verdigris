@@ -1,4 +1,4 @@
-use bevy::prelude::{Commands, Entity, Has, Query};
+use bevy::prelude::{Commands, Entity, Query};
 
 use crate::BATTLEFIELD;
 use crate::cards;
@@ -26,42 +26,15 @@ pub fn r613_1_layers(
         &cards::CardDefinition,
         &zones::InZone,
         Option<&effects::PowerToughnessModifier>,
+        cards::CurrentMarkers<'_>,
     )>,
-    first_markers: Query<(Has<cards::OnBattlefield>, Has<cards::Indestructible>)>,
-    second_markers: Query<(Has<cards::Deathtouch>, Has<cards::Lifelink>)>,
-    third_markers: Query<(Has<cards::Trample>, Has<cards::Flying>)>,
-    fourth_markers: Query<(Has<cards::Reach>, Option<&cards::EffectivePT>)>,
     zone_entities: Query<(Entity, &zones::Zone, Option<&cards::Owner>)>,
 ) {
-    for (card, definition, in_zone, modifier) in cards.iter() {
-        let Ok((has_on_battlefield, has_indestructible)) = first_markers.get(card) else {
-            continue;
-        };
-        let Ok((has_deathtouch, has_lifelink)) = second_markers.get(card) else {
-            continue;
-        };
-        let Ok((has_trample, has_flying)) = third_markers.get(card) else {
-            continue;
-        };
-        let Ok((has_reach, current_effective)) = fourth_markers.get(card) else {
-            continue;
-        };
+    for (card, definition, in_zone, modifier, current) in cards.iter() {
         let on_battlefield = BATTLEFIELD.contains_card(**in_zone, &zone_entities);
         let characteristics = cards::Characteristics::from_printed(definition, on_battlefield)
             .with_modifier(modifier);
-        characteristics.write_markers(
-            &mut commands.entity(card),
-            (
-                has_on_battlefield,
-                current_effective.copied().map(|effective| *effective),
-                has_indestructible,
-                has_deathtouch,
-                has_lifelink,
-                has_trample,
-                has_flying,
-                has_reach,
-            ),
-        );
+        characteristics.write_markers(&mut commands.entity(card), current);
     }
 }
 

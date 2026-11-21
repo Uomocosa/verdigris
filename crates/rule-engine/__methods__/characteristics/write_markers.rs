@@ -5,40 +5,20 @@ use crate::cards;
 pub fn write_markers(
     characteristics: &cards::Characteristics,
     entity: &mut EntityCommands,
-    current: (
-        bool,
-        Option<cards::PowerToughness>,
-        bool,
-        bool,
-        bool,
-        bool,
-        bool,
-        bool,
-    ),
+    current: cards::CurrentMarkersItem<'_, '_, '_>,
 ) {
-    let (
-        current_on_battlefield,
-        current_effective,
-        current_indestructible,
-        current_deathtouch,
-        current_lifelink,
-        current_trample,
-        current_flying,
-        current_reach,
-    ) = current;
-    if characteristics.on_battlefield != current_on_battlefield {
-        if characteristics.on_battlefield {
-            entity.insert(cards::OnBattlefield);
-        } else {
-            entity.remove::<cards::OnBattlefield>();
-        }
-    }
+    cards::Characteristics::sync_marker(
+        entity,
+        characteristics.on_battlefield,
+        current.on_battlefield,
+        cards::OnBattlefield,
+    );
     let desired_effective = if characteristics.on_battlefield {
         characteristics.power_toughness
     } else {
         None
     };
-    if desired_effective != current_effective {
+    if desired_effective != current.effective.copied().map(|effective| *effective) {
         if let Some(effective) = desired_effective {
             entity.insert(cards::EffectivePT(effective));
         } else {
@@ -48,53 +28,47 @@ pub fn write_markers(
     let desired = |keyword: cards::Keyword| {
         characteristics.on_battlefield && characteristics.keywords.contains(&keyword)
     };
-    if desired(cards::Keyword::Indestructible) != current_indestructible {
-        if desired(cards::Keyword::Indestructible) {
-            entity.insert(cards::Indestructible);
-        } else {
-            entity.remove::<cards::Indestructible>();
-        }
-    }
-    if desired(cards::Keyword::Deathtouch) != current_deathtouch {
-        if desired(cards::Keyword::Deathtouch) {
-            entity.insert(cards::Deathtouch);
-        } else {
-            entity.remove::<cards::Deathtouch>();
-        }
-    }
-    if desired(cards::Keyword::Lifelink) != current_lifelink {
-        if desired(cards::Keyword::Lifelink) {
-            entity.insert(cards::Lifelink);
-        } else {
-            entity.remove::<cards::Lifelink>();
-        }
-    }
-    if desired(cards::Keyword::Trample) != current_trample {
-        if desired(cards::Keyword::Trample) {
-            entity.insert(cards::Trample);
-        } else {
-            entity.remove::<cards::Trample>();
-        }
-    }
-    if desired(cards::Keyword::Flying) != current_flying {
-        if desired(cards::Keyword::Flying) {
-            entity.insert(cards::Flying);
-        } else {
-            entity.remove::<cards::Flying>();
-        }
-    }
-    if desired(cards::Keyword::Reach) != current_reach {
-        if desired(cards::Keyword::Reach) {
-            entity.insert(cards::Reach);
-        } else {
-            entity.remove::<cards::Reach>();
-        }
-    }
+    cards::Characteristics::sync_marker(
+        entity,
+        desired(cards::Keyword::Indestructible),
+        current.indestructible,
+        cards::Indestructible,
+    );
+    cards::Characteristics::sync_marker(
+        entity,
+        desired(cards::Keyword::Deathtouch),
+        current.deathtouch,
+        cards::Deathtouch,
+    );
+    cards::Characteristics::sync_marker(
+        entity,
+        desired(cards::Keyword::Lifelink),
+        current.lifelink,
+        cards::Lifelink,
+    );
+    cards::Characteristics::sync_marker(
+        entity,
+        desired(cards::Keyword::Trample),
+        current.trample,
+        cards::Trample,
+    );
+    cards::Characteristics::sync_marker(
+        entity,
+        desired(cards::Keyword::Flying),
+        current.flying,
+        cards::Flying,
+    );
+    cards::Characteristics::sync_marker(
+        entity,
+        desired(cards::Keyword::Reach),
+        current.reach,
+        cards::Reach,
+    );
 }
 
 #[cfg(test)]
 mod tests {
-    use bevy::prelude::{App, Commands, Update};
+    use bevy::prelude::{App, Commands, Query, Update};
 
     use crate::BATTLEFIELD;
     use crate::RulesPlugin;
@@ -112,12 +86,13 @@ mod tests {
         let characteristics =
             cards::Characteristics::from_printed(&bears, true).with_modifier(None);
         let entity = app.world_mut().spawn(bears).id();
-        app.add_systems(Update, move |mut commands: Commands| {
-            characteristics.write_markers(
-                &mut commands.entity(entity),
-                (false, None, false, false, false, false, false, false),
-            );
-        });
+        app.add_systems(
+            Update,
+            move |mut commands: Commands, markers: Query<cards::CurrentMarkers<'_>>| {
+                let current = markers.get(entity).expect("test spawns the card");
+                characteristics.write_markers(&mut commands.entity(entity), current);
+            },
+        );
         app.update();
 
         let world = app.world();

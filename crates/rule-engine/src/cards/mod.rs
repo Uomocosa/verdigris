@@ -9,6 +9,7 @@ pub use basic::components::{
     Attacking, Blocked, Blocking, Deathtouch, EffectivePT, EnteredOnTurn, Flying, Indestructible,
     Lifelink, OnBattlefield, Owner, Reach, Tapped, Trample,
 };
+pub use basic::current_markers::{CurrentMarkers, CurrentMarkersItem};
 pub use basic::enums::{CardType, Color, Keyword, ManaSymbol, Supertype};
 pub use basic::newtypes::CardName;
 pub use basic::structs::PowerToughness;
