@@ -105,8 +105,8 @@ dependencies = [
 
 [[package]]
 name = "atomic-delegate-macros"
-version = "0.0.15"
-source = "git+https://github.com/Uomocosa/lele-rust-linter?tag=v0.0.15#f50fc1caf3345ea85f2bfa6503d858944c9296ad"
+version = "0.0.16"
+source = "git+https://github.com/Uomocosa/lele-rust-linter?tag=v0.0.16#d283534636af3f4950233a3ecfeee257d4a49e96"
 dependencies = [
  "lele-snake-case",
  "proc-macro2",
@@ -890,8 +890,8 @@ dependencies = [
 
 [[package]]
 name = "lele-bevy-lint"
-version = "0.0.15"
-source = "git+https://github.com/Uomocosa/lele-rust-linter?tag=v0.0.15#f50fc1caf3345ea85f2bfa6503d858944c9296ad"
+version = "0.0.16"
+source = "git+https://github.com/Uomocosa/lele-rust-linter?tag=v0.0.16#d283534636af3f4950233a3ecfeee257d4a49e96"
 dependencies = [
  "atomic-delegate-macros",
  "clap",
@@ -905,8 +905,8 @@ dependencies = [
 
 [[package]]
 name = "lele-lint"
-version = "0.0.15"
-source = "git+https://github.com/Uomocosa/lele-rust-linter?tag=v0.0.15#f50fc1caf3345ea85f2bfa6503d858944c9296ad"
+version = "0.0.16"
+source = "git+https://github.com/Uomocosa/lele-rust-linter?tag=v0.0.16#d283534636af3f4950233a3ecfeee257d4a49e96"
 dependencies = [
  "atomic-delegate-macros",
  "clap",
@@ -926,8 +926,8 @@ dependencies = [
 
 [[package]]
 name = "lele-snake-case"
-version = "0.0.15"
-source = "git+https://github.com/Uomocosa/lele-rust-linter?tag=v0.0.15#f50fc1caf3345ea85f2bfa6503d858944c9296ad"
+version = "0.0.16"
+source = "git+https://github.com/Uomocosa/lele-rust-linter?tag=v0.0.16#d283534636af3f4950233a3ecfeee257d4a49e96"
 
 [[package]]
 name = "libc"
@@ -1126,8 +1126,8 @@ dependencies = [
 
 [[package]]
 name = "rule-examples-macro"
-version = "0.0.15"
-source = "git+https://github.com/Uomocosa/lele-rust-linter?tag=v0.0.15#f50fc1caf3345ea85f2bfa6503d858944c9296ad"
+version = "0.0.16"
+source = "git+https://github.com/Uomocosa/lele-rust-linter?tag=v0.0.16#d283534636af3f4950233a3ecfeee257d4a49e96"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1504,11 +1504,11 @@ dependencies = [
 
 [[package]]
 name = "verdigris-game"
-version = "0.0.1"
+version = "0.0.2"
 
 [[package]]
 name = "verdigris-lint"
-version = "0.0.1"
+version = "0.0.2"
 dependencies = [
  "atomic-delegate-macros",
  "clap",
@@ -1524,11 +1524,11 @@ dependencies = [
 
 [[package]]
 name = "verdigris-parser"
-version = "0.0.1"
+version = "0.0.2"
 
 [[package]]
 name = "verdigris-rule-engine"
-version = "0.0.1"
+version = "0.0.2"
 dependencies = [
  "atomic-delegate-macros",
  "bevy",
