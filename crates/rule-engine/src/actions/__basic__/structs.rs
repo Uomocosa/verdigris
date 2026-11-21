@@ -42,3 +42,9 @@ pub struct OrderTriggersChoice {
     pub player: Entity,
     pub triggers: Vec<Entity>,
 }
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct LegendaryChoice {
+    pub player: Entity,
+    pub legal: BTreeSet<Entity>,
+}

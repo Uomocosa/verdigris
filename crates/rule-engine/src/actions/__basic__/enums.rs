@@ -13,6 +13,7 @@ pub enum Action {
     PlayLand(Entity),
     ChooseTargets(Vec<Entity>),
     ChooseDiscard(Vec<Entity>),
+    ChooseLegendary(Entity),
     ChooseDefendingPlayer(Entity),
     OrderTriggers(Vec<Entity>),
     AssignCombatDamage(Vec<actions::DamageAssignment>),
@@ -27,4 +28,5 @@ pub enum Choice {
     Discard(actions::DiscardChoice),
     CombatDamage(actions::CombatDamageChoice),
     OrderTriggers(actions::OrderTriggersChoice),
+    Legendary(actions::LegendaryChoice),
 }

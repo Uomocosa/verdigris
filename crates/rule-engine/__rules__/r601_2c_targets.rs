@@ -122,6 +122,7 @@ pub fn r601_2c_targets(
             | actions::Action::DeclareBlockers(_)
             | actions::Action::PlayLand(_)
             | actions::Action::ActivateManaAbility { .. }
+            | actions::Action::ChooseLegendary(_)
             | actions::Action::PassPriority => {}
         }
     }
