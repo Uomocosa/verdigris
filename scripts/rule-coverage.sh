@@ -10,24 +10,77 @@ set -euo pipefail
 
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 rules_dir="$root/crates/rule-engine/__rules__"
-plugin="$root/crates/rule-engine/__methods__/rules_plugin/plugin_build.rs"
+plugin_dir="$root/crates/rule-engine/__methods__/rules_plugin"
 fixtures_dir="$root/crates/rule-engine/src/testing/__fixtures__"
 comp_rules="$root/docs/MagicCompRules-20250919.txt"
 
-# A quoted rule is a doc line "/// 704.5g If ..." (number, space, capital letter);
-# continuation lines such as "/// 704.5g)." are not quotes.
+# A quoted rule is a doc line "/// 704.5g If ..." or "/// 121.1. A ..." (the CR
+# puts a period after an unlettered rule number). Continuation lines such as
+# "/// 704.5g)." are not quotes. Normalise away that trailing period.
 quoted_rules() {
-    grep -oE '^/// [0-9]{3}\.[0-9]+[a-z]? [A-Z]' "$1" | awk '{print $2}' || true
+    grep -oE '^/// [0-9]{3}\.[0-9]+[a-z]?\.? [A-Z]' "$1" \
+        | awk '{rule = $2; sub(/\.$/, "", rule); print rule}' || true
 }
 
-# The RuleSet a system is registered in: the first "RuleSet::X" after its line.
+# The RuleSet a system is registered in. Registrations live in add_*_systems.rs,
+# not plugin_build.rs, and an app.add_systems(...) call can span lines and mention
+# several systems. Collect the RuleSet:: names from every block that registers
+# this system: one name is its set; several names mean it is only being ordered
+# between sets (the layers system), so report that set rather than a single lie.
 rule_set_of() {
-    awk -v name="rules::$1::$1" '
-        index($0, name) { found = 1 }
-        found && match($0, /RuleSet::[A-Za-z]+/) {
-            print substr($0, RSTART + 9, RLENGTH - 9); exit
+    awk -v name="$1" '
+        function add_unique(list, value) {
+            if (index(" " list " ", " " value " ") == 0)
+                return (list == "" ? value : list " " value)
+            return list
         }
-    ' "$plugin"
+        function parse_block(block,    rest, tok, r, rs, schedule, tmp, parts, found) {
+            tmp = block
+            sub(/^.*add_systems\(/, "", tmp)
+            sub(/^[[:space:]]+/, "", tmp)
+            split(tmp, parts, /[[:space:],]/)
+            schedule = parts[1]
+
+            rest = block
+            while (match(rest, /rules::[a-z0-9_]+::/)) {
+                tok = substr(rest, RSTART, RLENGTH)
+                rest = substr(rest, RSTART + RLENGTH)
+                sub(/^rules::/, "", tok)
+                sub(/::$/, "", tok)
+                if (tok != name) continue
+                seen[name] = 1
+                found = 0
+                r = block
+                while (match(r, /RuleSet::[A-Za-z]+/)) {
+                    rs = substr(r, RSTART + 9, RLENGTH - 9)
+                    r = substr(r, RSTART + RLENGTH)
+                    sets[name] = add_unique(sets[name], rs)
+                    found = 1
+                }
+                if (!found) schedules[name] = add_unique(schedules[name], schedule)
+            }
+        }
+        /\.add_systems\(/ { in_block = 1; block = "" }
+        in_block {
+            block = block " " $0
+            if ($0 ~ /\);[[:space:]]*$/) {
+                parse_block(block)
+                in_block = 0
+                block = ""
+            }
+        }
+        END {
+            if (!(name in seen)) exit
+            n = split(sets[name], order, " ")
+            if (n == 0) print "no set (" schedules[name] ")"
+            else if (n == 1) print order[1]
+            else {
+                printf "ordered ("
+                for (i = 1; i <= n; i++) printf "%s%s", (i > 1 ? ", " : ""), order[i]
+                print ")"
+            }
+        }
+    ' "$plugin_dir"/add_*_systems.rs || true
 }
 
 echo "## 1. Systems (file | quoted CR rules | RuleSet)"
@@ -62,10 +115,11 @@ grep -rnE -A1 '#\[ignore = "needs' "$root/crates" --include='*.rs' \
 
 echo
 echo "## 4. Fixture cards (constant | name)"
-grep -hoE 'pub const [A-Z_]+: testing::Card' "$fixtures_dir"/*.rs | awk '{print $3}' | tr -d ':' \
+{ grep -hoE 'pub const [A-Z_]+: testing::Card' "$fixtures_dir"/cards/*.rs || true; } \
+    | awk '{print $3}' | tr -d ':' \
     | while read -r const; do
-        file="$fixtures_dir/$(echo "$const" | tr 'A-Z' 'a-z').rs"
-        card="$(grep -oE 'TestCardName\("[^"]+"\)' "$file" | head -1 | cut -d'"' -f2)"
+        file="$fixtures_dir/cards/$(echo "$const" | tr '[:upper:]' '[:lower:]').rs"
+        card="$(grep -oE 'TestCardName\("[^"]+"\)' "$file" | head -1 | cut -d'"' -f2 || true)"
         echo "$const | ${card:-?}"
     done
 
