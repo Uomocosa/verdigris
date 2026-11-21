@@ -83,8 +83,7 @@ mod tests {
     fn test_usage() {
         let mut app = App::new();
         let bears = (testing::GRIZZLY_BEARS.definition)();
-        let characteristics =
-            cards::Characteristics::from_printed(&bears, true).with_modifier(None);
+        let characteristics = cards::Characteristics::from_printed(&bears, true).with_effects(&[]);
         let entity = app.world_mut().spawn(bears).id();
         app.add_systems(
             Update,

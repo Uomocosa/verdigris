@@ -19,21 +19,28 @@ use crate::zones;
 /// 613.5. The application of continuous effects as described by the layer system is continually and
 /// automatically performed by the game. All resulting changes to an object’s characteristics are
 /// instantaneous.
+///
+/// 613.7. Within a layer or sublayer, determining which order effects are applied in is usually
+/// done using a timestamp system. An effect with an earlier timestamp is applied before an effect
+/// with a later timestamp.
 pub fn r613_1_layers(
     mut commands: Commands,
     cards: Query<(
         Entity,
         &cards::CardDefinition,
         &zones::InZone,
-        Option<&effects::PowerToughnessModifier>,
         cards::CurrentMarkers<'_>,
     )>,
+    locked: Query<&effects::ContinuousEffect>,
     zone_entities: Query<(Entity, &zones::Zone, Option<&cards::Owner>)>,
 ) {
-    for (card, definition, in_zone, modifier, current) in cards.iter() {
+    for (card, definition, in_zone, current) in cards.iter() {
         let on_battlefield = BATTLEFIELD.contains_card(**in_zone, &zone_entities);
+        let mut applicable: Vec<effects::ContinuousEffect> =
+            locked.iter().filter(|effect| effect.affected == card).copied().collect();
+        applicable.sort_by_key(|effect| effect.timestamp);
         let characteristics = cards::Characteristics::from_printed(definition, on_battlefield)
-            .with_modifier(modifier);
+            .with_effects(&applicable);
         characteristics.write_markers(&mut commands.entity(card), current);
     }
 }

@@ -3,7 +3,6 @@ use bevy::prelude::{Entity, MessageReader, MessageWriter, Query, Res, ResMut, Wi
 use crate::actions;
 use crate::cards;
 use crate::damage;
-use crate::effects;
 use crate::players;
 use crate::turns;
 
@@ -72,11 +71,11 @@ pub fn r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_r702_19b_r702_19d_combat_da
     >,
     blockers: Query<(
         Entity,
-        &cards::CardDefinition,
         &cards::Blocking,
         Option<&damage::Damage>,
+        Option<&cards::EffectivePT>,
     )>,
-    modifiers: Query<&effects::PowerToughnessModifier>,
+    powers: Query<&cards::EffectivePT>,
     defenders: Query<Entity, With<players::DefendingPlayer>>,
     turn: Res<turns::Turn>,
 ) {
@@ -90,8 +89,7 @@ pub fn r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_r702_19b_r702_19d_combat_da
         };
         let mut needed: Vec<actions::RequiredCombatDamage> = Vec::new();
         for (attacker, definition, blocked) in attackers.iter() {
-            let modifier = modifiers.get(attacker).ok();
-            let Some(power_toughness) = definition.effective_power_toughness(modifier) else {
+            let Some(power_toughness) = powers.get(attacker).ok().map(|power| **power) else {
                 continue;
             };
             if power_toughness.power <= 0 {
@@ -112,7 +110,6 @@ pub fn r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_r702_19b_r702_19d_combat_da
                     amount,
                     defending,
                     &blockers,
-                    &modifiers,
                     &mut needed,
                 ) {
                     dealt.write(write);

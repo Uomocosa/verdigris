@@ -3,7 +3,6 @@ use bevy::prelude::{Entity, Query};
 use crate::actions;
 use crate::cards;
 use crate::damage;
-use crate::effects;
 
 pub fn assigned_blocked_damage(
     definition: &cards::CardDefinition,
@@ -12,28 +11,26 @@ pub fn assigned_blocked_damage(
     defending: Entity,
     blockers: &Query<(
         Entity,
-        &cards::CardDefinition,
         &cards::Blocking,
         Option<&damage::Damage>,
+        Option<&cards::EffectivePT>,
     )>,
-    modifiers: &Query<&effects::PowerToughnessModifier>,
     needed: &mut Vec<actions::RequiredCombatDamage>,
 ) -> Vec<damage::DamageDealt> {
     let mut writes = Vec::new();
     let mut blockers_of: Vec<(Entity, u32)> = Vec::new();
-    for (blocker, blocker_definition, blocking, marked) in blockers.iter() {
+    for (blocker, blocking, marked, effective) in blockers.iter() {
         if **blocking != source {
             continue;
         }
-        let lethal = blocker_definition
-            .effective_power_toughness(modifiers.get(blocker).ok())
+        let lethal = effective
+            .map(|power_toughness| **power_toughness)
             .map_or(0, |power_toughness| {
                 u32::try_from(power_toughness.toughness).unwrap_or_default()
             })
             .saturating_sub(marked.map_or(0, |damage| **damage));
         blockers_of.push((blocker, lethal));
-        let Some(blocker_power_toughness) =
-            blocker_definition.effective_power_toughness(modifiers.get(blocker).ok())
+        let Some(blocker_power_toughness) = effective.map(|power_toughness| **power_toughness)
         else {
             continue;
         };
@@ -97,7 +94,6 @@ mod tests {
     use crate::HAND;
     use crate::cards;
     use crate::damage;
-    use crate::effects;
     use crate::mana;
     use crate::testing::*;
     use crate::turns;
@@ -130,23 +126,14 @@ mod tests {
         let blocker = Entity::from(bears);
         let mut needed = Vec::new();
 
-        let writes = game.with_queries::<(
+        let writes = game.with_query::<(
             Entity,
-            &cards::CardDefinition,
             &cards::Blocking,
             Option<&damage::Damage>,
-        ), &effects::PowerToughnessModifier, Vec<damage::DamageDealt>>(
-            |blockers, modifiers| {
-                attacker.assigned_blocked_damage(
-                    source,
-                    3,
-                    defending,
-                    &blockers,
-                    &modifiers,
-                    &mut needed,
-                )
-            },
-        );
+            Option<&cards::EffectivePT>,
+        ), Vec<damage::DamageDealt>>(|blockers| {
+            attacker.assigned_blocked_damage(source, 3, defending, &blockers, &mut needed)
+        });
 
         assert_eq!(
             writes,
@@ -205,23 +192,14 @@ mod tests {
         let blocker = Entity::from(spider);
         let mut needed = Vec::new();
 
-        let writes = game.with_queries::<(
+        let writes = game.with_query::<(
             Entity,
-            &cards::CardDefinition,
             &cards::Blocking,
             Option<&damage::Damage>,
-        ), &effects::PowerToughnessModifier, Vec<damage::DamageDealt>>(
-            |blockers, modifiers| {
-                attacker.assigned_blocked_damage(
-                    source,
-                    3,
-                    defending,
-                    &blockers,
-                    &modifiers,
-                    &mut needed,
-                )
-            },
-        );
+            Option<&cards::EffectivePT>,
+        ), Vec<damage::DamageDealt>>(|blockers| {
+            attacker.assigned_blocked_damage(source, 3, defending, &blockers, &mut needed)
+        });
 
         assert_eq!(
             writes,

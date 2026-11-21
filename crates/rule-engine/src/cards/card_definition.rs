@@ -33,13 +33,6 @@ impl CardDefinition {
 
     #[must_use]
     pub fn colors(&self) -> Vec<cards::Color> {}
-
-    #[must_use]
-    pub fn effective_power_toughness(
-        &self,
-        modifier: Option<&effects::PowerToughnessModifier>,
-    ) -> Option<cards::PowerToughness> {
-    }
 }
 
 impl CardDefinition {
@@ -66,11 +59,10 @@ impl CardDefinition {
         defending: Entity,
         blockers: &Query<(
             Entity,
-            &cards::CardDefinition,
             &cards::Blocking,
             Option<&damage::Damage>,
+            Option<&cards::EffectivePT>,
         )>,
-        modifiers: &Query<&effects::PowerToughnessModifier>,
         needed: &mut Vec<actions::RequiredCombatDamage>,
     ) -> Vec<damage::DamageDealt> {
     }

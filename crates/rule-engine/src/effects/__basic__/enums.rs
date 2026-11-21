@@ -19,3 +19,13 @@ pub enum FilterKind {
     NoncreatureSpell,
     InstantSpell,
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum Layered {
+    ModifyPT { power: i32, toughness: i32 },
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum Duration {
+    UntilEndOfTurn,
+}

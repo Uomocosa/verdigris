@@ -20,7 +20,7 @@ impl Characteristics {
 #[atomic_delegates]
 impl Characteristics {
     #[must_use]
-    pub const fn with_modifier(self, modifier: Option<&effects::PowerToughnessModifier>) -> Self {}
+    pub fn with_effects(self, effects: &[effects::ContinuousEffect]) -> Self {}
 
     pub fn write_markers(
         &self,

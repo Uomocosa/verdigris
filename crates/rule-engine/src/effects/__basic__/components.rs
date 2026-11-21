@@ -1,7 +1,11 @@
-use bevy::prelude::Component;
+use bevy::prelude::{Component, Entity};
 
-#[derive(Component, Debug, Clone, Copy, Default, PartialEq, Eq)]
-pub struct PowerToughnessModifier {
-    pub power: i32,
-    pub toughness: i32,
+use crate::effects;
+
+#[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ContinuousEffect {
+    pub affected: Entity,
+    pub change: effects::Layered,
+    pub until: effects::Duration,
+    pub timestamp: u64,
 }

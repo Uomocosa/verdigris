@@ -1,4 +1,4 @@
-use bevy::prelude::{Commands, Entity, MessageReader, Query, With};
+use bevy::prelude::{Commands, Entity, MessageReader, Query};
 
 use crate::damage;
 use crate::effects;
@@ -11,7 +11,7 @@ pub fn r514_2_cleanup_step(
     mut step_started: MessageReader<turns::StepStarted>,
     mut commands: Commands,
     damaged: Query<(Entity, &damage::Damage)>,
-    modified: Query<Entity, With<effects::PowerToughnessModifier>>,
+    expiring: Query<(Entity, &effects::ContinuousEffect)>,
 ) {
     for step in step_started.read() {
         if **step != turns::Step::Cleanup {
@@ -20,16 +20,18 @@ pub fn r514_2_cleanup_step(
         for (entity, _) in damaged.iter() {
             commands.entity(entity).insert(damage::Damage(0));
         }
-        for entity in modified.iter() {
-            commands.entity(entity).remove::<effects::PowerToughnessModifier>();
+        for (entity, effect) in expiring.iter() {
+            if effect.until == effects::Duration::UntilEndOfTurn {
+                commands.entity(entity).despawn();
+            }
         }
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use crate::cards;
     use crate::damage;
-    use crate::effects;
     use crate::mana;
     use crate::testing;
     use crate::testing::*;
@@ -59,7 +61,10 @@ mod tests {
             game.app.world().get::<damage::Damage>(bears.into()).copied(),
             Some(damage::Damage(0))
         );
-        assert!(game.app.world().get::<effects::PowerToughnessModifier>(bears.into()).is_none());
+        assert_eq!(
+            game.app.world().get::<cards::EffectivePT>(bears.into()).copied(),
+            Some(cards::EffectivePT(crate::pt!(2, 2)))
+        );
         Ok(())
     }
 
