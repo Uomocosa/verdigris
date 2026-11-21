@@ -20,6 +20,7 @@ pub enum Action {
     DeclareAttackers(Vec<Entity>),
     DeclareBlockers(Vec<actions::BlockAssignment>),
     PassPriority,
+    Concede,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
