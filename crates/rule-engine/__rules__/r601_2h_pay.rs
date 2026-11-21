@@ -1,10 +1,17 @@
 use crate::HAND;
-use bevy::prelude::{Commands, Entity, MessageWriter, Query};
+use bevy::prelude::{Commands, Entity, MessageWriter, Query, With, Without};
 
 use crate::actions;
 use crate::cards;
 use crate::stack;
 use crate::zones;
+
+type UntappedLands<'w, 's, 'owner, 'definition> = Query<
+    'w,
+    's,
+    (&'owner cards::Owner, &'definition cards::CardDefinition),
+    (With<cards::OnBattlefield>, Without<cards::Tapped>),
+>;
 
 /// 601.2h The player pays the total cost. First, they pay all costs that don’t involve random
 /// elements or moving objects from the library to a public zone, in any order. Then they pay all
@@ -19,6 +26,7 @@ pub fn r601_2h_pay(
         &stack::CastingStage,
     )>,
     mut pools: Query<&mut cards::ManaPool>,
+    untapped_lands: UntappedLands<'_, '_, '_, '_>,
     zones: zones::ZoneLookup,
 ) {
     for (spell, definition, owner, stage) in cards.iter() {
@@ -32,11 +40,16 @@ pub fn r601_2h_pay(
             commands.entity(spell).remove::<stack::CastingStage>();
             continue;
         }
-        rejected.write(actions::Rejected::CannotPay { spell });
-        if let Some(hand) = zones.find(HAND, Some(**owner)) {
-            commands.entity(spell).insert(zones::InZone(hand));
+        let does_owner_control_an_untapped_land = untapped_lands
+            .iter()
+            .any(|(land_owner, land)| **land_owner == **owner && !land.land_types.is_empty());
+        if !does_owner_control_an_untapped_land {
+            rejected.write(actions::Rejected::CannotPay { spell });
+            if let Some(hand) = zones.find(HAND, Some(**owner)) {
+                commands.entity(spell).insert(zones::InZone(hand));
+            }
+            commands.entity(spell).remove::<stack::CastingStage>();
         }
-        commands.entity(spell).remove::<stack::CastingStage>();
     }
 }
 

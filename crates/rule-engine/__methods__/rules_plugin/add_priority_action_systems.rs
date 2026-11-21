@@ -15,6 +15,7 @@ pub fn add_priority_action_systems(app: &mut App) {
             rules::r509_1a_r509_1g_r509_1h_r702_9b_r702_17b_declare_blockers::r509_1a_r509_1g_r509_1h_r702_9b_r702_17b_declare_blockers,
             rules::r305_1_r305_2_r305_3_play_land::r305_1_r305_2_r305_3_play_land,
             rules::r305_6_basic_land_mana_ability::r305_6_basic_land_mana_ability,
+            rules::r601_2g_mana_abilities::r601_2g_mana_abilities,
         )
             .chain()
             .in_set(RuleSet::PriorityAction),
@@ -32,6 +33,6 @@ mod tests {
         let mut app = App::new();
         add_priority_action_systems(&mut app);
 
-        assert_eq!(app.get_schedule(Update).map(Schedule::systems_len), Some(8));
+        assert_eq!(app.get_schedule(Update).map(Schedule::systems_len), Some(9));
     }
 }

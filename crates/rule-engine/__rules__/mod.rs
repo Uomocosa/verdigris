@@ -23,6 +23,7 @@ pub mod r514_1_cleanup_discard;
 pub mod r514_2_cleanup_step;
 pub mod r601_2a_cast;
 pub mod r601_2c_targets;
+pub mod r601_2g_mana_abilities;
 pub mod r601_2h_pay;
 pub mod r603_2_r603_6a_triggered_abilities;
 pub mod r603_3_triggers_on_stack;
