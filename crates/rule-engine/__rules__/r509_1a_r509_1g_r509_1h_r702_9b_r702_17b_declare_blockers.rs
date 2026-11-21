@@ -1,4 +1,4 @@
-use bevy::prelude::{Commands, Entity, Has, MessageReader, MessageWriter, Query, Res};
+use bevy::prelude::{Commands, Has, MessageReader, MessageWriter, Query, Res};
 
 use crate::BATTLEFIELD;
 use crate::actions;
@@ -42,7 +42,7 @@ pub fn r509_1a_r509_1g_r509_1h_r702_9b_r702_17b_declare_blockers(
     )>,
     attacking: Query<(&cards::Attacking, Has<cards::Flying>)>,
     flight: Query<(Has<cards::Flying>, Has<cards::Reach>)>,
-    zone_entities: Query<(Entity, &zones::Zone, Option<&cards::Owner>)>,
+    zones: zones::ZoneLookup,
 ) {
     let priority = priority.into_inner();
     let turn = turn.into_inner();
@@ -59,7 +59,7 @@ pub fn r509_1a_r509_1g_r509_1h_r702_9b_r702_17b_declare_blockers(
             });
             continue;
         }
-        let Some(battlefield) = BATTLEFIELD.find_entity(Some(action.player), &zone_entities) else {
+        let Some(battlefield) = zones.find(BATTLEFIELD, Some(action.player)) else {
             rejected.write(actions::Rejected::CannotBlock {
                 assignments: assignments.clone(),
             });

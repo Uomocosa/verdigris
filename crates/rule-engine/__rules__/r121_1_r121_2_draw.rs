@@ -1,7 +1,6 @@
 use crate::{HAND, LIBRARY};
 use bevy::prelude::{Commands, Entity, MessageReader, Query};
 
-use crate::cards;
 use crate::players;
 use crate::zones;
 
@@ -19,11 +18,11 @@ use crate::zones;
 pub fn r121_1_r121_2_draw(
     mut draws: MessageReader<players::DrawRequested>,
     mut commands: Commands,
-    zone_entities: Query<(Entity, &zones::Zone, Option<&cards::Owner>)>,
+    zones: zones::ZoneLookup,
     zone_contents: Query<&zones::ZoneContents>,
 ) {
     for draw in draws.read() {
-        let Some(library) = LIBRARY.find_entity(Some(draw.player), &zone_entities) else {
+        let Some(library) = zones.find(LIBRARY, Some(draw.player)) else {
             continue;
         };
         let drawn_from_top: Vec<Entity> = zone_contents
@@ -33,7 +32,7 @@ pub fn r121_1_r121_2_draw(
                 contents.iter().take(requested).copied().collect()
             })
             .unwrap_or_default();
-        if let Some(hand) = HAND.find_entity(Some(draw.player), &zone_entities) {
+        if let Some(hand) = zones.find(HAND, Some(draw.player)) {
             for card in &drawn_from_top {
                 commands.entity(*card).insert(zones::InZone(hand));
             }

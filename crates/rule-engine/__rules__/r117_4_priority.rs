@@ -1,7 +1,6 @@
 use crate::STACK;
-use bevy::prelude::{Entity, MessageWriter, Query, Res, ResMut};
+use bevy::prelude::{MessageWriter, Query, Res, ResMut};
 
-use crate::cards;
 use crate::stack;
 use crate::turns;
 use crate::zones;
@@ -16,7 +15,7 @@ pub fn r117_4_priority(
     turn: Res<turns::Turn>,
     turn_order: Res<turns::TurnOrder>,
     cards: Query<(&zones::InZone, Option<&stack::CastingStage>)>,
-    zone_entities: Query<(Entity, &zones::Zone, Option<&cards::Owner>)>,
+    zones: zones::ZoneLookup,
     stack_contents: Query<&zones::ZoneContents>,
 ) {
     let turn = turn.into_inner();
@@ -26,8 +25,8 @@ pub fn r117_4_priority(
         return;
     }
     priority.consecutive_passes = 0;
-    let top = STACK
-        .find_entity(None, &zone_entities)
+    let top = zones
+        .find(STACK, None)
         .and_then(|stack| stack_contents.get(stack).ok())
         .and_then(|contents| contents.last().copied());
     let Some(top) = top else {

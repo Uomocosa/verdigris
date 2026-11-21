@@ -1,4 +1,4 @@
-use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query, Res};
+use bevy::prelude::{Commands, MessageReader, MessageWriter, Query, Res};
 
 use crate::BATTLEFIELD;
 use crate::HAND;
@@ -34,7 +34,7 @@ pub fn r305_1_r305_2_r305_3_play_land(
     priority: Res<turns::Priority>,
     turn: Res<turns::Turn>,
     lands: Query<(&cards::CardDefinition, &cards::Owner, &zones::InZone)>,
-    zone_entities: Query<(Entity, &zones::Zone, Option<&cards::Owner>)>,
+    zones: zones::ZoneLookup,
     mut played: Query<&mut players::LandsPlayedThisTurn>,
 ) {
     let priority = priority.into_inner();
@@ -48,11 +48,11 @@ pub fn r305_1_r305_2_r305_3_play_land(
             rejected.write(actions::Rejected::CannotPlayLand { land });
             continue;
         };
-        let Some(hand) = HAND.find_entity(Some(action.player), &zone_entities) else {
+        let Some(hand) = zones.find(HAND, Some(action.player)) else {
             rejected.write(actions::Rejected::CannotPlayLand { land });
             continue;
         };
-        let Some(stack) = STACK.find_entity(None, &zone_entities) else {
+        let Some(stack) = zones.find(STACK, None) else {
             rejected.write(actions::Rejected::CannotPlayLand { land });
             continue;
         };
@@ -81,7 +81,7 @@ pub fn r305_1_r305_2_r305_3_play_land(
             continue;
         }
         record.record_play(turn.number);
-        if let Some(battlefield) = BATTLEFIELD.find_entity(Some(action.player), &zone_entities) {
+        if let Some(battlefield) = zones.find(BATTLEFIELD, Some(action.player)) {
             commands.entity(land).insert(zones::InZone(battlefield));
         }
     }

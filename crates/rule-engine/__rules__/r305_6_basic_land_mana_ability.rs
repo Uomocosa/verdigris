@@ -1,10 +1,8 @@
-use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query, Res};
+use bevy::prelude::{Commands, MessageReader, MessageWriter, Query, Res, With};
 
-use crate::BATTLEFIELD;
 use crate::actions;
 use crate::cards;
 use crate::turns;
-use crate::zones;
 
 /// 305.6. The basic land types are Plains, Island, Swamp, Mountain, and Forest. If an object uses
 /// the words “basic land type,” it’s referring to one of these subtypes. An object with the land
@@ -43,14 +41,15 @@ pub fn r305_6_basic_land_mana_ability(
     mut rejected: MessageWriter<actions::Rejected>,
     mut commands: Commands,
     priority: Res<turns::Priority>,
-    permanents: Query<(
-        &cards::CardDefinition,
-        &cards::Owner,
-        &zones::InZone,
-        Option<&cards::Tapped>,
-    )>,
+    permanents: Query<
+        (
+            &cards::CardDefinition,
+            &cards::Owner,
+            Option<&cards::Tapped>,
+        ),
+        With<cards::OnBattlefield>,
+    >,
     mut pools: Query<&mut cards::ManaPool>,
-    zone_entities: Query<(Entity, &zones::Zone, Option<&cards::Owner>)>,
 ) {
     let priority = priority.into_inner();
     for action in actions.read() {
@@ -59,22 +58,17 @@ pub fn r305_6_basic_land_mana_ability(
         };
         let produces = *produces;
         let permanent = *source;
-        let Ok((definition, owner, in_zone, tapped)) = permanents.get(permanent) else {
+        let Ok((definition, owner, tapped)) = permanents.get(permanent) else {
             rejected.write(actions::Rejected::CannotActivateManaAbility { permanent });
             continue;
         };
-        let is_on_the_battlefield = BATTLEFIELD.contains_card(**in_zone, &zone_entities);
         let Some(land_type) =
             definition.land_types.iter().copied().find(|land_type| land_type.color() == produces)
         else {
             rejected.write(actions::Rejected::CannotActivateManaAbility { permanent });
             continue;
         };
-        if action.player != priority.player
-            || **owner != action.player
-            || !is_on_the_battlefield
-            || tapped.is_some()
-        {
+        if action.player != priority.player || **owner != action.player || tapped.is_some() {
             rejected.write(actions::Rejected::CannotActivateManaAbility { permanent });
             continue;
         }

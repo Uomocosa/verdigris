@@ -1,9 +1,7 @@
-use crate::BATTLEFIELD;
-use bevy::prelude::{Commands, Entity, MessageReader, Query, With};
+use bevy::prelude::{Commands, Entity, MessageReader, Query, With, Without};
 
 use crate::cards;
 use crate::turns;
-use crate::zones;
 
 /// 511.3. As soon as the end of combat step ends, all creatures, battles, and planeswalkers are
 /// removed from combat. After the end of combat step ends, the combat phase is over and the
@@ -22,14 +20,10 @@ pub fn r506_4_r511_3_remove_from_combat(
     attacking: Query<Entity, With<cards::Attacking>>,
     blocking: Query<Entity, With<cards::Blocking>>,
     blocked: Query<Entity, With<cards::Blocked>>,
-    locations: Query<&zones::InZone>,
-    zone_entities: Query<(Entity, &zones::Zone, Option<&cards::Owner>)>,
+    off_battlefield: Query<Entity, Without<cards::OnBattlefield>>,
 ) {
     for permanent in attacking.iter().chain(blocking.iter()).chain(blocked.iter()) {
-        let Ok(in_zone) = locations.get(permanent) else {
-            continue;
-        };
-        if BATTLEFIELD.contains_card(**in_zone, &zone_entities) {
+        if off_battlefield.get(permanent).is_err() {
             continue;
         }
         commands.entity(permanent).remove::<(cards::Attacking, cards::Blocking, cards::Blocked)>();

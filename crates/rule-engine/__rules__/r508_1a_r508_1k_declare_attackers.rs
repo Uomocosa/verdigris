@@ -1,4 +1,4 @@
-use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query, Res};
+use bevy::prelude::{Commands, MessageReader, MessageWriter, Query, Res};
 
 use crate::BATTLEFIELD;
 use crate::actions;
@@ -34,7 +34,7 @@ pub fn r508_1a_r508_1k_declare_attackers(
         Option<&cards::Tapped>,
     )>,
     entered_on: Query<Option<&cards::EnteredOnTurn>>,
-    zone_entities: Query<(Entity, &zones::Zone, Option<&cards::Owner>)>,
+    zones: zones::ZoneLookup,
 ) {
     let priority = priority.into_inner();
     let turn = turn.into_inner();
@@ -51,7 +51,7 @@ pub fn r508_1a_r508_1k_declare_attackers(
             });
             continue;
         }
-        let Some(battlefield) = BATTLEFIELD.find_entity(Some(action.player), &zone_entities) else {
+        let Some(battlefield) = zones.find(BATTLEFIELD, Some(action.player)) else {
             rejected.write(actions::Rejected::CannotAttack {
                 attackers: attackers.clone(),
             });
