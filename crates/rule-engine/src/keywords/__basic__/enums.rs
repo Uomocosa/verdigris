@@ -7,4 +7,5 @@ pub enum Keyword {
     Flying,
     Reach,
     Vigilance,
+    Defender,
 }

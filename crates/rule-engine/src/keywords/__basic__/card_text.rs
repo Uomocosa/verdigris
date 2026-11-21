@@ -34,3 +34,8 @@ pub const fn reach() -> keywords::Keyword {
 pub const fn vigilance() -> keywords::Keyword {
     keywords::Keyword::Vigilance
 }
+
+#[must_use]
+pub const fn defender() -> keywords::Keyword {
+    keywords::Keyword::Defender
+}

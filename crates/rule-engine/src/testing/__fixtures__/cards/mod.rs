@@ -24,6 +24,7 @@ mod soul_warden;
 mod tundra;
 mod typhoid_rats;
 mod walking_corpse;
+mod wall_of_stone;
 mod watchwolf;
 mod wind_drake;
 
@@ -53,5 +54,6 @@ pub use soul_warden::SOUL_WARDEN;
 pub use tundra::TUNDRA;
 pub use typhoid_rats::TYPHOID_RATS;
 pub use walking_corpse::WALKING_CORPSE;
+pub use wall_of_stone::WALL_OF_STONE;
 pub use watchwolf::WATCHWOLF;
 pub use wind_drake::WIND_DRAKE;

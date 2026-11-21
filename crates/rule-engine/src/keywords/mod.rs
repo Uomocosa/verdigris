@@ -2,6 +2,6 @@
 mod basic;
 
 pub use basic::card_text::{
-    deathtouch, flying, indestructible, lifelink, reach, trample, vigilance,
+    deathtouch, defender, flying, indestructible, lifelink, reach, trample, vigilance,
 };
 pub use basic::enums::Keyword;

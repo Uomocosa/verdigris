@@ -3,6 +3,7 @@ use bevy::prelude::{Commands, MessageReader, MessageWriter, Query, Res};
 use crate::BATTLEFIELD;
 use crate::actions;
 use crate::cards;
+use crate::keywords;
 use crate::turns;
 use crate::zones;
 
@@ -15,6 +16,11 @@ use crate::zones;
 /// whichever comes first. See rule 506.4.
 ///
 /// # See also
+///
+/// 508.1c The active player checks each creature they control to see whether it’s affected by
+/// any restrictions (effects that say a creature can’t attack, or that it can’t attack unless
+/// some condition is met). If any restrictions are being disobeyed, the declaration of
+/// attackers is illegal.
 ///
 /// 302.6. A creature’s activated ability with the tap symbol or the untap symbol in its activation
 /// cost can’t be activated unless the creature has been under its controller’s control continuously
@@ -63,6 +69,7 @@ pub fn r508_1a_r508_1k_declare_attackers(
                     && **owner == action.player
                     && **in_zone == battlefield
                     && tapped.is_none()
+                    && !definition.keywords.contains(&keywords::Keyword::Defender)
                     && entered_on.get(*attacker).is_ok_and(|on_turn| {
                         on_turn.is_none_or(|turn_number| **turn_number != turn.number)
                     })
@@ -177,6 +184,27 @@ mod tests {
             })
         );
         assert!(!game.is_attacking(corpse));
+        Ok(())
+    }
+
+    #[test]
+    fn a_creature_with_defender_cannot_be_declared_as_an_attacker() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([P1.battlefield([WALL_OF_STONE]), P2]);
+        let [wall] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(WALL_OF_STONE)?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareAttackers),
+            p2.pass_to(turns::Step::DeclareAttackers),
+        ])?;
+
+        game.act(p1, actions::Action::DeclareAttackers(vec![wall.into()]));
+
+        assert_eq!(
+            game.last_rejection(),
+            Some(&actions::Rejected::CannotAttack {
+                attackers: vec![wall.into()]
+            })
+        );
+        assert!(!game.is_attacking(wall));
         Ok(())
     }
 }
