@@ -127,10 +127,10 @@ mod tests {
         game.play([p1.pass_priority(), p2.declare_blockers([(bears, rats)])])?;
 
         assert_eq!(
-            game.app.world().get::<crate::cards::Blocking>(bears.into()),
-            Some(&crate::cards::Blocking(rats.into()))
+            game.get::<crate::cards::Blocking>(bears),
+            Some(crate::cards::Blocking(rats.into()))
         );
-        assert!(game.app.world().get::<crate::cards::Blocked>(rats.into()).is_some());
+        assert!(game.has::<crate::cards::Blocked>(rats));
         Ok(())
     }
 
@@ -164,7 +164,7 @@ mod tests {
             game.last_rejection(),
             Some(&actions::Rejected::CannotBlock { assignments })
         );
-        assert!(game.app.world().get::<crate::cards::Blocking>(tapped.into()).is_none());
+        assert!(!game.is_blocking(tapped));
         Ok(())
     }
 
@@ -188,7 +188,7 @@ mod tests {
             p2.pass_to(turns::Step::DeclareBlockers),
         ])?;
         game.play([p1.pass_priority()])?;
-        assert!(game.app.world().get::<crate::cards::Attacking>(idle.into()).is_none());
+        assert!(!game.is_attacking(idle));
         let assignments = vec![actions::BlockAssignment {
             blocker: bears.into(),
             attacker: idle.into(),
@@ -232,7 +232,7 @@ mod tests {
             game.last_rejection(),
             Some(&actions::Rejected::CannotBlock { assignments })
         );
-        assert!(game.app.world().get::<crate::cards::Blocking>(bears.into()).is_none());
+        assert!(!game.is_blocking(bears));
         Ok(())
     }
 
@@ -254,8 +254,8 @@ mod tests {
         game.play([p1.pass_priority(), p2.declare_blockers([(spider, drake)])])?;
 
         assert_eq!(
-            game.app.world().get::<crate::cards::Blocking>(spider.into()),
-            Some(&crate::cards::Blocking(drake.into()))
+            game.get::<crate::cards::Blocking>(spider),
+            Some(crate::cards::Blocking(drake.into()))
         );
         Ok(())
     }
@@ -299,7 +299,7 @@ mod tests {
             game.last_rejection(),
             Some(&actions::Rejected::CannotBlock { assignments })
         );
-        assert!(game.app.world().get::<crate::cards::Blocking>(blocker.into()).is_none());
+        assert!(!game.is_blocking(blocker));
         Ok(())
     }
 }

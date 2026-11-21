@@ -118,8 +118,7 @@ mod tests {
         ])?;
 
         game.act(p1, actions::Action::ChooseDefendingPlayer(p3.into()));
-        let marker: Option<Entity> =
-            game.app.world().get::<players::DefendingPlayer>(p3.into()).map(|_| p3.into());
+        let marker: Option<Entity> = game.get::<players::DefendingPlayer>(p3).map(|_| p3.into());
         assert_eq!(marker, Some(p3.into()));
 
         game.play([
@@ -128,9 +127,9 @@ mod tests {
             p3.pass_to(turns::Step::BeginningOfCombat),
         ])?;
 
-        assert!(game.app.world().get::<players::DefendingPlayer>(p1.into()).is_none());
-        assert!(game.app.world().get::<players::DefendingPlayer>(p2.into()).is_none());
-        assert!(game.app.world().get::<players::DefendingPlayer>(p3.into()).is_none());
+        assert!(!game.has::<players::DefendingPlayer>(p1));
+        assert!(!game.has::<players::DefendingPlayer>(p2));
+        assert!(!game.has::<players::DefendingPlayer>(p3));
         Ok(())
     }
 
@@ -142,7 +141,7 @@ mod tests {
             p2.pass_to(turns::Step::BeginningOfCombat),
             p3.pass_to(turns::Step::BeginningOfCombat),
         ])?;
-        assert!(game.app.world().get::<players::Lost>(p3.into()).is_some());
+        assert!(game.has_lost(p3));
 
         game.act(p1, actions::Action::ChooseDefendingPlayer(p3.into()));
 
@@ -150,7 +149,7 @@ mod tests {
             game.last_rejection(),
             Some(&actions::Rejected::CannotChooseDefendingPlayer { player: *p1 })
         );
-        assert!(game.app.world().get::<players::DefendingPlayer>(p3.into()).is_none());
+        assert!(!game.has::<players::DefendingPlayer>(p3));
         Ok(())
     }
 
@@ -162,8 +161,8 @@ mod tests {
             p2.pass_to(turns::Step::BeginningOfCombat),
         ])?;
 
-        assert!(game.app.world().get::<players::DefendingPlayer>(p2.into()).is_some());
-        assert!(game.app.world().get::<players::DefendingPlayer>(p1.into()).is_none());
+        assert!(game.has::<players::DefendingPlayer>(p2));
+        assert!(!game.has::<players::DefendingPlayer>(p1));
         Ok(())
     }
 }

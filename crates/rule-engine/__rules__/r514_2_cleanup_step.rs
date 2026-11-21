@@ -30,7 +30,6 @@ pub fn r514_2_cleanup_step(
 
 #[cfg(test)]
 mod tests {
-    use crate::cards;
     use crate::damage;
     use crate::mana;
     use crate::testing;
@@ -57,14 +56,8 @@ mod tests {
         game.play([p1.end_turn(), p2.end_turn()])?;
 
         assert_eq!(game.zone_of(bears), BATTLEFIELD);
-        assert_eq!(
-            game.app.world().get::<damage::Damage>(bears.into()).copied(),
-            Some(damage::Damage(0))
-        );
-        assert_eq!(
-            game.app.world().get::<cards::EffectivePT>(bears.into()).copied(),
-            Some(cards::EffectivePT(crate::pt!(2, 2)))
-        );
+        assert_eq!(game.get::<damage::Damage>(bears), Some(damage::Damage(0)));
+        assert_eq!(game.pt(bears), Some(crate::pt!(2, 2)));
         Ok(())
     }
 

@@ -28,7 +28,6 @@ pub fn r119_3_life_loss(
 mod tests {
     use crate::HAND;
     use crate::mana;
-    use crate::players;
     use crate::testing::*;
 
     #[test]
@@ -80,7 +79,7 @@ mod tests {
             p1.cast(sign_in_blood).targeting(p2).end_turn(),
             p2.end_turn(),
         ])?;
-        assert!(game.app.world().get::<players::Lost>(*p2).is_some());
+        assert!(game.has_lost(p2));
         Ok(())
     }
 }

@@ -64,14 +64,10 @@ mod tests {
         let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
         let [growth] = game.player(p1).cards_in(HAND).exactly::<1>(GIANT_GROWTH)?;
         game.pass_priority();
-        let world = game.app.world();
-        assert!(world.get::<cards::OnBattlefield>(bears.into()).is_some());
-        assert_eq!(
-            world.get::<cards::EffectivePT>(bears.into()).copied(),
-            Some(cards::EffectivePT(crate::pt!(2, 2)))
-        );
-        assert!(world.get::<cards::OnBattlefield>(growth.into()).is_none());
-        assert!(world.get::<cards::EffectivePT>(growth.into()).is_none());
+        assert!(game.has::<cards::OnBattlefield>(bears));
+        assert_eq!(game.pt(bears), Some(crate::pt!(2, 2)));
+        assert!(!game.has::<cards::OnBattlefield>(growth));
+        assert!(game.pt(growth).is_none());
         Ok(())
     }
 
@@ -87,7 +83,7 @@ mod tests {
             p1.cast(jump).targeting(bears).pass_priority(),
             p2.pass_priority(),
         ])?;
-        assert!(game.app.world().get::<cards::Flying>(bears.into()).is_some());
+        assert!(game.has::<cards::Flying>(bears));
         assert_eq!(game.zone_of(jump), GRAVEYARD);
         Ok(())
     }
@@ -117,7 +113,7 @@ mod tests {
                 .count()
         });
         assert_eq!(grants, 2);
-        assert!(game.app.world().get::<cards::Flying>(bears.into()).is_some());
+        assert!(game.has::<cards::Flying>(bears));
         Ok(())
     }
 
@@ -133,9 +129,9 @@ mod tests {
             p1.cast(jump).targeting(bears).pass_priority(),
             p2.pass_priority(),
         ])?;
-        assert!(game.app.world().get::<cards::Flying>(bears.into()).is_some());
+        assert!(game.has::<cards::Flying>(bears));
         game.play([p1.end_turn(), p2.end_turn()])?;
-        assert!(game.app.world().get::<cards::Flying>(bears.into()).is_none());
+        assert!(!game.has::<cards::Flying>(bears));
         Ok(())
     }
 
@@ -160,11 +156,8 @@ mod tests {
         });
         assert_eq!(timestamps.len(), 2);
         assert!(timestamps[0] < timestamps[1]);
-        assert_eq!(
-            game.app.world().get::<cards::EffectivePT>(bears.into()).copied(),
-            Some(cards::EffectivePT(crate::pt!(5, 5)))
-        );
-        assert!(game.app.world().get::<cards::Flying>(bears.into()).is_some());
+        assert_eq!(game.pt(bears), Some(crate::pt!(5, 5)));
+        assert!(game.has::<cards::Flying>(bears));
         Ok(())
     }
 

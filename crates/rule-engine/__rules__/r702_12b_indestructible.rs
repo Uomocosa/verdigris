@@ -30,7 +30,6 @@ pub fn r702_12b_indestructible(
 
 #[cfg(test)]
 mod tests {
-    use crate::damage;
     use crate::mana;
     use crate::testing::*;
     use crate::{BATTLEFIELD, GRAVEYARD, HAND};
@@ -66,8 +65,7 @@ mod tests {
             p2.pass_priority(),
         ])?;
         assert_eq!(game.zone_of(myr), BATTLEFIELD);
-        let damage = game.app.world().get::<damage::Damage>(myr.into()).unwrap();
-        assert_eq!(**damage, 3);
+        assert_eq!(game.damage(myr), 3);
         Ok(())
     }
 

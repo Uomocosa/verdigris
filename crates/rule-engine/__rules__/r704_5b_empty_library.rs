@@ -26,7 +26,6 @@ pub fn r704_5b_empty_library(
 mod tests {
     use crate::HAND;
     use crate::mana;
-    use crate::players;
     use crate::testing::*;
 
     #[test]
@@ -37,9 +36,9 @@ mod tests {
         ]);
         let [divination] = game.player(p1).cards_in(HAND).exactly::<1>(DIVINATION)?;
         game.play([p1.cast(divination)])?;
-        assert!(game.app.world().get::<players::Lost>(*p1).is_none());
+        assert!(!game.has_lost(p1));
         game.play([p1.pass_priority(), p2.pass_priority()])?;
-        assert!(game.app.world().get::<players::Lost>(*p1).is_some());
+        assert!(game.has_lost(p1));
         Ok(())
     }
 }

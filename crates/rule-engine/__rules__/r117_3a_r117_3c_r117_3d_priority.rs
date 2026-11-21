@@ -71,7 +71,7 @@ mod tests {
 
         for (holder, next) in holders.into_iter().zip(expected) {
             game.play([holder.pass_priority()])?;
-            assert_eq!(game.app.world().resource::<turns::Priority>().player, next);
+            assert_eq!(game.priority_player(), next);
         }
         Ok(())
     }
@@ -100,6 +100,6 @@ mod tests {
             err.rejection(),
             Some(&actions::Rejected::NoPriority { player: *p2 })
         );
-        assert_eq!(game.app.world().resource::<turns::Priority>().player, p1);
+        assert_eq!(game.priority_player(), p1);
     }
 }

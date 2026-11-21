@@ -292,14 +292,8 @@ mod tests {
         );
         game.play([p1.pass_priority(), p2.pass_priority()])?;
 
-        assert_eq!(
-            game.app.world().get::<damage::Damage>(first.into()).copied(),
-            Some(damage::Damage(1))
-        );
-        assert_eq!(
-            game.app.world().get::<damage::Damage>(second.into()).copied(),
-            Some(damage::Damage(1))
-        );
+        assert_eq!(game.get::<damage::Damage>(first), Some(damage::Damage(1)));
+        assert_eq!(game.get::<damage::Damage>(second), Some(damage::Damage(1)));
         Ok(())
     }
 

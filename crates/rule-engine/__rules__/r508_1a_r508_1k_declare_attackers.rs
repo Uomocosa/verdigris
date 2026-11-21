@@ -101,8 +101,8 @@ mod tests {
             p1.declare_attackers([attacking]),
         ])?;
 
-        assert!(game.app.world().get::<crate::cards::Attacking>(attacking.into()).is_some());
-        assert!(game.app.world().get::<crate::cards::Attacking>(defending.into()).is_none());
+        assert!(game.is_attacking(attacking));
+        assert!(!game.is_attacking(defending));
         Ok(())
     }
 
@@ -129,7 +129,7 @@ mod tests {
                 attackers: vec![defending.into()]
             })
         );
-        assert!(game.app.world().get::<crate::cards::Attacking>(defending.into()).is_none());
+        assert!(!game.is_attacking(defending));
         Ok(())
     }
 
@@ -153,14 +153,13 @@ mod tests {
                 attackers: vec![tapped.into()]
             })
         );
-        assert!(game.app.world().get::<crate::cards::Attacking>(tapped.into()).is_none());
+        assert!(!game.is_attacking(tapped));
         Ok(())
     }
 
     #[test]
     fn a_creature_that_entered_this_turn_cannot_attack() -> TestResult {
         use crate::HAND;
-        use crate::cards;
         use crate::mana;
 
         let (mut game, [p1, p2]) =
@@ -180,7 +179,7 @@ mod tests {
                 attackers: vec![corpse.into()]
             })
         );
-        assert!(game.app.world().get::<cards::Attacking>(corpse.into()).is_none());
+        assert!(!game.is_attacking(corpse));
         Ok(())
     }
 }

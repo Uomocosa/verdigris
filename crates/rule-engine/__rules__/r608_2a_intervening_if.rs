@@ -34,7 +34,6 @@ pub fn r608_2a_intervening_if(
 
 #[cfg(test)]
 mod tests {
-    use crate::players;
     use crate::testing::*;
     use crate::turns;
     use crate::{BATTLEFIELD, HAND};
@@ -57,7 +56,7 @@ mod tests {
             p2.pass_priority(),
         ])?;
         assert_eq!(game.life(p1), 37);
-        assert!(game.app.world().get::<players::Won>(*p1).is_none());
+        assert!(!game.has_won(p1));
         assert_eq!(game.zone_of(sovereign), BATTLEFIELD);
         Ok(())
     }

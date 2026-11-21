@@ -33,9 +33,9 @@ mod tests {
             p1.declare_attackers([attacking]),
         ])?;
 
-        assert!(game.app.world().get::<crate::cards::Attacking>(attacking.into()).is_some());
-        assert!(game.app.world().get::<crate::cards::Tapped>(attacking.into()).is_some());
-        assert!(game.app.world().get::<crate::cards::Tapped>(defending.into()).is_none());
+        assert!(game.is_attacking(attacking));
+        assert!(game.is_tapped(attacking));
+        assert!(!game.is_tapped(defending));
         Ok(())
     }
 
@@ -52,8 +52,8 @@ mod tests {
             p1.declare_attackers([attacking]),
         ])?;
 
-        assert!(game.app.world().get::<crate::cards::Attacking>(attacking.into()).is_some());
-        assert!(game.app.world().get::<crate::cards::Tapped>(attacking.into()).is_none());
+        assert!(game.is_attacking(attacking));
+        assert!(!game.is_tapped(attacking));
         Ok(())
     }
 }

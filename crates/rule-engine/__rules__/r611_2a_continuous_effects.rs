@@ -49,7 +49,6 @@ pub fn r611_2a_continuous_effects(
 
 #[cfg(test)]
 mod tests {
-    use crate::cards;
     use crate::damage;
     use crate::effects;
     use crate::mana;
@@ -68,10 +67,7 @@ mod tests {
             p1.cast(growth).targeting(bears).pass_priority(),
             p2.pass_priority(),
         ])?;
-        assert_eq!(
-            game.app.world().get::<cards::EffectivePT>(bears.into()).copied(),
-            Some(cards::EffectivePT(crate::pt!(5, 5)))
-        );
+        assert_eq!(game.pt(bears), Some(crate::pt!(5, 5)));
         assert_eq!(game.zone_of(growth), GRAVEYARD);
         Ok(())
     }
@@ -95,12 +91,9 @@ mod tests {
         ])?;
 
         assert_eq!(game.zone_of(bears), BATTLEFIELD);
-        let damage = game.app.world().get::<damage::Damage>(bears.into()).copied();
+        let damage = game.get::<damage::Damage>(bears);
         assert_eq!(damage, Some(damage::Damage(3)));
-        assert_eq!(
-            game.app.world().get::<cards::EffectivePT>(bears.into()).copied(),
-            Some(cards::EffectivePT(crate::pt!(5, 5)))
-        );
+        assert_eq!(game.pt(bears), Some(crate::pt!(5, 5)));
         Ok(())
     }
 
@@ -126,10 +119,7 @@ mod tests {
         });
         assert_eq!(timestamps.len(), 2);
         assert_ne!(timestamps[0], timestamps[1]);
-        assert_eq!(
-            game.app.world().get::<cards::EffectivePT>(bears.into()).copied(),
-            Some(cards::EffectivePT(crate::pt!(8, 8)))
-        );
+        assert_eq!(game.pt(bears), Some(crate::pt!(8, 8)));
         Ok(())
     }
 }

@@ -99,7 +99,7 @@ mod tests {
 
         assert_eq!(game.mana_pool(p1), mana![G]);
         assert!(game.last_rejection().is_none());
-        assert!(game.app.world().get::<cards::Tapped>(forest.into()).is_some());
+        assert!(game.is_tapped(forest));
         assert_eq!(game.zone_of(forest), BATTLEFIELD);
         Ok(())
     }
@@ -159,7 +159,7 @@ mod tests {
         );
 
         assert_eq!(game.mana_pool(p1), cards::ManaPool::EMPTY);
-        assert!(game.app.world().get::<cards::Tapped>(forest.into()).is_none());
+        assert!(!game.is_tapped(forest));
         assert_eq!(
             game.last_rejection(),
             Some(&actions::Rejected::CannotActivateManaAbility {
@@ -178,7 +178,7 @@ mod tests {
 
         assert_eq!(game.mana_pool(p1), mana![W]);
         assert!(game.last_rejection().is_none());
-        assert!(game.app.world().get::<cards::Tapped>(tundra.into()).is_some());
+        assert!(game.is_tapped(tundra));
         Ok(())
     }
 

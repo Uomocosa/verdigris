@@ -21,7 +21,6 @@ pub fn r704_5a_zero_life(
 mod tests {
     use crate::HAND;
     use crate::mana;
-    use crate::players;
     use crate::testing::*;
 
     #[test]
@@ -33,7 +32,7 @@ mod tests {
             p1.cast(bolt).targeting(p2).pass_priority(),
             p2.pass_priority(),
         ])?;
-        assert!(game.app.world().get::<players::Lost>(*p2).is_some());
+        assert!(game.has_lost(p2));
         Ok(())
     }
 }

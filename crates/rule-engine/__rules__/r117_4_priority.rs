@@ -108,7 +108,7 @@ mod tests {
         let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
         game.play([p1.cast(bolt).targeting(p2).pass_priority()])?;
 
-        assert_ne!(game.app.world().resource::<turns::Priority>().player, p1);
+        assert_ne!(game.priority_player(), p1);
         game.play([p2.pass_priority()])?;
 
         let priority = *game.app.world().resource::<turns::Priority>();

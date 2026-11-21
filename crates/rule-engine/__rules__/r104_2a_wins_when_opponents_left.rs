@@ -28,14 +28,13 @@ pub fn r104_2a_wins_when_opponents_left(
 
 #[cfg(test)]
 mod tests {
-    use crate::players;
     use crate::testing::*;
 
     #[test]
     fn last_player_wins_when_their_opponent_has_left() -> TestResult {
         let (mut game, [p1, _p2]) = MockGame::new([P1, P2.life(0)]);
         game.play([p1.pass_priority()])?;
-        assert!(game.app.world().get::<players::Won>(*p1).is_some());
+        assert!(game.has_won(p1));
         Ok(())
     }
 
@@ -45,11 +44,11 @@ mod tests {
 
         game.play([p1.pass_priority()])?;
 
-        assert!(game.app.world().get::<players::Lost>(*p2).is_some());
-        assert!(game.app.world().get::<players::Lost>(*p3).is_some());
-        assert!(game.app.world().get::<players::Won>(*p1).is_some());
-        assert!(game.app.world().get::<players::Won>(*p2).is_none());
-        assert!(game.app.world().get::<players::Won>(*p3).is_none());
+        assert!(game.has_lost(p2));
+        assert!(game.has_lost(p3));
+        assert!(game.has_won(p1));
+        assert!(!game.has_won(p2));
+        assert!(!game.has_won(p3));
         Ok(())
     }
 
@@ -59,9 +58,9 @@ mod tests {
 
         game.play([p1.pass_priority()])?;
 
-        assert!(game.app.world().get::<players::Lost>(*p2).is_some());
-        assert!(game.app.world().get::<players::Won>(*p1).is_none());
-        assert!(game.app.world().get::<players::Won>(*p3).is_none());
+        assert!(game.has_lost(p2));
+        assert!(!game.has_won(p1));
+        assert!(!game.has_won(p3));
         Ok(())
     }
 }

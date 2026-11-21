@@ -34,7 +34,6 @@ pub fn r117_5_r704_3_state_based_actions(world: &mut World) {
 mod tests {
     use crate::HAND;
     use crate::mana;
-    use crate::players;
     use crate::testing::*;
 
     #[test]
@@ -46,8 +45,8 @@ mod tests {
             p1.cast(bolt).targeting(p2).pass_priority(),
             p2.pass_priority(),
         ])?;
-        assert!(game.app.world().get::<players::Lost>(*p2).is_some());
-        assert!(game.app.world().get::<players::Won>(*p1).is_some());
+        assert!(game.has_lost(p2));
+        assert!(game.has_won(p1));
         Ok(())
     }
 }

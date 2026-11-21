@@ -51,10 +51,7 @@ mod tests {
         ])?;
         game.play([p1.pass_priority(), p2.pass_priority()])?;
 
-        assert_eq!(
-            game.app.world().resource::<turns::Turn>().step,
-            turns::Step::EndOfCombat
-        );
+        assert_eq!(game.turn().step, turns::Step::EndOfCombat);
         Ok(())
     }
 
@@ -72,10 +69,7 @@ mod tests {
         ])?;
         game.play([p1.pass_priority(), p2.pass_priority()])?;
 
-        assert_eq!(
-            game.app.world().resource::<turns::Turn>().step,
-            turns::Step::DeclareBlockers
-        );
+        assert_eq!(game.turn().step, turns::Step::DeclareBlockers);
         Ok(())
     }
 }

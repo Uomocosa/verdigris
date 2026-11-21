@@ -63,7 +63,6 @@ pub fn r603_4_intervening_if(
 #[cfg(test)]
 mod tests {
     use crate::BATTLEFIELD;
-    use crate::players;
     use crate::testing::*;
     use crate::turns;
 
@@ -75,7 +74,7 @@ mod tests {
         let [sovereign] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(FELIDAR_SOVEREIGN)?;
         assert_eq!(game.zone_of(sovereign), BATTLEFIELD);
         game.play([p1.pass_priority(), p1.pass_priority(), p2.pass_priority()])?;
-        assert!(game.app.world().get::<players::Won>(*p1).is_some());
+        assert!(game.has_won(p1));
         Ok(())
     }
 
@@ -87,7 +86,7 @@ mod tests {
         let [sovereign] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(FELIDAR_SOVEREIGN)?;
         game.play([p1.pass_priority(), p1.pass_priority(), p2.pass_priority()])?;
         assert_eq!(game.zone_of(sovereign), BATTLEFIELD);
-        assert!(game.app.world().get::<players::Won>(*p1).is_none());
+        assert!(!game.has_won(p1));
         assert_eq!(game.trigger_sources().len(), 0);
         Ok(())
     }

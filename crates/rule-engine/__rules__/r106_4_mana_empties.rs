@@ -32,10 +32,7 @@ mod tests {
 
         game.play([p1.pass_priority(), p2.pass_priority()])?;
 
-        assert_eq!(
-            game.app.world().resource::<turns::Turn>().step,
-            turns::Step::BeginningOfCombat
-        );
+        assert_eq!(game.turn().step, turns::Step::BeginningOfCombat);
         Ok(())
     }
 

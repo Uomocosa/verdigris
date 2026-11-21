@@ -47,10 +47,7 @@ mod tests {
 
         game.play([p1.pass_priority(), p2.pass_priority(), p1.pass_priority()])?;
 
-        assert_eq!(
-            game.app.world().resource::<turns::Turn>().step,
-            turns::Step::Draw
-        );
+        assert_eq!(game.turn().step, turns::Step::Draw);
         assert_eq!(game.player(p1).cards_in(HAND).len(), hand_before);
         Ok(())
     }

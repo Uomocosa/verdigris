@@ -60,7 +60,7 @@ mod tests {
 
         game.play([p1.end_turn(), p2.end_turn()])?;
 
-        let turn = *game.app.world().resource::<turns::Turn>();
+        let turn = *game.turn();
         let priority = *game.app.world().resource::<turns::Priority>();
         assert_eq!(turn.number, 2);
         assert_eq!(turn.active, p2);
@@ -71,7 +71,7 @@ mod tests {
 
         game.app.update();
 
-        let turn = *game.app.world().resource::<turns::Turn>();
+        let turn = *game.turn();
         let priority = *game.app.world().resource::<turns::Priority>();
         assert_eq!(turn.step, turns::Step::Upkeep);
         assert_eq!(priority.player, p2);

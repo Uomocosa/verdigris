@@ -69,15 +69,15 @@ mod tests {
             p2.pass_to(turns::Step::DeclareBlockers),
         ])?;
         game.play([p1.pass_priority(), p2.declare_blockers([(bears, rats)])])?;
-        assert!(game.app.world().get::<crate::cards::Blocking>(bears.into()).is_some());
+        assert!(game.is_blocking(bears));
 
         game.play([
             p1.pass_to(turns::Step::PostcombatMain),
             p2.pass_to(turns::Step::PostcombatMain),
         ])?;
 
-        assert!(game.app.world().get::<crate::cards::Blocking>(bears.into()).is_none());
-        assert!(game.app.world().get::<crate::cards::Blocked>(rats.into()).is_none());
+        assert!(!game.is_blocking(bears));
+        assert!(!game.has::<crate::cards::Blocked>(rats));
         Ok(())
     }
 
@@ -103,7 +103,7 @@ mod tests {
         ])?;
 
         assert_eq!(game.zone_of(bears), GRAVEYARD);
-        assert!(game.app.world().get::<crate::cards::Attacking>(bears.into()).is_none());
+        assert!(!game.is_attacking(bears));
         Ok(())
     }
 
@@ -119,18 +119,15 @@ mod tests {
             p2.pass_to(turns::Step::DeclareAttackers),
             p1.declare_attackers([bears]),
         ])?;
-        assert!(game.app.world().get::<crate::cards::Attacking>(bears.into()).is_some());
+        assert!(game.is_attacking(bears));
 
         game.play([
             p1.pass_to(turns::Step::PostcombatMain),
             p2.pass_to(turns::Step::PostcombatMain),
         ])?;
 
-        assert_eq!(
-            game.app.world().resource::<turns::Turn>().step,
-            turns::Step::PostcombatMain
-        );
-        assert!(game.app.world().get::<crate::cards::Attacking>(bears.into()).is_none());
+        assert_eq!(game.turn().step, turns::Step::PostcombatMain);
+        assert!(!game.is_attacking(bears));
         Ok(())
     }
 }

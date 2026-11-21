@@ -42,10 +42,7 @@ mod tests {
         game.play([p1.end_turn(), p2.end_turn()])?;
         game.play([p2.pass_to(turns::Step::Upkeep)])?;
 
-        assert_eq!(
-            game.app.world().resource::<turns::Turn>().step,
-            turns::Step::Upkeep
-        );
+        assert_eq!(game.turn().step, turns::Step::Upkeep);
         Ok(())
     }
 
@@ -61,8 +58,8 @@ mod tests {
         game.play([p1.end_turn(), p2.end_turn()])?;
         game.play([p2.pass_to(turns::Step::Upkeep)])?;
 
-        assert!(game.app.world().get::<crate::cards::Tapped>(p2_bears.into()).is_none());
-        assert!(game.app.world().get::<crate::cards::Tapped>(p1_bears.into()).is_some());
+        assert!(!game.is_tapped(p2_bears));
+        assert!(game.is_tapped(p1_bears));
         Ok(())
     }
 }
