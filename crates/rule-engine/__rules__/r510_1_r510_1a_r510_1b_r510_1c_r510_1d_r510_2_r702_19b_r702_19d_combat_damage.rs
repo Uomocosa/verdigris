@@ -184,8 +184,8 @@ mod tests {
             p2.pass_priority(),
         ])?;
 
-        assert_eq!(game.zone_of(rats), GRAVEYARD);
-        assert_eq!(game.zone_of(bears), GRAVEYARD);
+        assert!(game.player(p1).cards_in(GRAVEYARD).has(rats));
+        assert!(game.player(p2).cards_in(GRAVEYARD).has(bears));
         Ok(())
     }
 
@@ -211,7 +211,7 @@ mod tests {
         ])?;
 
         assert_eq!(game.player(p2).life(), 18);
-        assert_eq!(game.zone_of(bears), BATTLEFIELD);
+        assert!(game.player(p1).cards_in(BATTLEFIELD).has(bears));
         Ok(())
     }
 
@@ -329,8 +329,8 @@ mod tests {
         ])?;
 
         assert_eq!(game.life(p2), 19);
-        assert_eq!(game.zone_of(bears), GRAVEYARD);
-        assert_eq!(game.zone_of(companion), GRAVEYARD);
+        assert!(game.player(p2).cards_in(GRAVEYARD).has(bears));
+        assert!(game.player(p1).cards_in(GRAVEYARD).has(companion));
         Ok(())
     }
 
@@ -356,7 +356,7 @@ mod tests {
         ])?;
 
         assert_eq!(game.player(p2).life(), 20);
-        assert_eq!(game.zone_of(myr), BATTLEFIELD);
+        assert!(game.player(p1).cards_in(BATTLEFIELD).has(myr));
         Ok(())
     }
 }

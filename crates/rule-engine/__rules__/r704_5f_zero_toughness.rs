@@ -44,7 +44,7 @@ mod tests {
         ])?;
         assert!(!game.player(p2).cards_in(BATTLEFIELD).has(GRIZZLY_BEARS));
         assert!(game.player(p2).cards_in(GRAVEYARD).has(GRIZZLY_BEARS));
-        assert_eq!(game.zone_of(disfigure), GRAVEYARD);
+        assert!(game.player(p1).cards_in(GRAVEYARD).has(disfigure));
         Ok(())
     }
 }

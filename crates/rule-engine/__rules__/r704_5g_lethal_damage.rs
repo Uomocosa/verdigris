@@ -38,7 +38,7 @@ mod tests {
             p1.cast(bolt).targeting(bears).pass_priority(),
             p2.pass_priority(),
         ])?;
-        assert_eq!(game.zone_of(bears), GRAVEYARD);
+        assert!(game.player(p2).cards_in(GRAVEYARD).has(bears));
         Ok(())
     }
 }

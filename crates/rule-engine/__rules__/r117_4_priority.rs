@@ -45,7 +45,7 @@ pub fn r117_4_priority(
 mod tests {
     use crate::mana;
     use crate::testing::*;
-    use crate::{GRAVEYARD, HAND, STACK};
+    use crate::{GRAVEYARD, HAND};
 
     #[test]
     fn all_players_passing_resolves_the_spell() -> TestResult {
@@ -56,7 +56,7 @@ mod tests {
             p1.cast(bolt).targeting(p2).pass_priority(),
             p2.pass_priority(),
         ])?;
-        assert_eq!(game.zone_of(bolt), GRAVEYARD);
+        assert!(game.player(p1).cards_in(GRAVEYARD).has(bolt));
         Ok(())
     }
 
@@ -73,8 +73,8 @@ mod tests {
             p2.pass_priority(),
         ])?;
 
-        assert_eq!(game.zone_of(second), GRAVEYARD);
-        assert_eq!(game.zone_of(first), STACK);
+        assert!(game.player(p1).cards_in(GRAVEYARD).has(second));
+        assert!(game.stack().has(first));
         assert_eq!(game.life(p2), 17);
         Ok(())
     }
@@ -94,8 +94,8 @@ mod tests {
             p2.pass_priority(),
         ])?;
 
-        assert_eq!(game.zone_of(second), GRAVEYARD);
-        assert_eq!(game.zone_of(first), GRAVEYARD);
+        assert!(game.player(p1).cards_in(GRAVEYARD).has(second));
+        assert!(game.player(p1).cards_in(GRAVEYARD).has(first));
         assert_eq!(game.life(p2), 14);
         Ok(())
     }
