@@ -1,9 +1,7 @@
-use crate::BATTLEFIELD;
-use bevy::prelude::{Commands, Entity, MessageWriter, Query};
+use bevy::prelude::{Commands, Entity, MessageWriter, Query, With};
 
 use crate::cards;
 use crate::damage;
-use crate::zones;
 
 /// 704.5h If a creature has toughness greater than 0, and it’s been dealt damage by a source with
 /// deathtouch since the last time state-based actions were checked, that creature is destroyed.
@@ -11,23 +9,17 @@ use crate::zones;
 pub fn r704_5h_deathtouch_damage(
     mut destructions: MessageWriter<damage::Destruction>,
     mut commands: Commands,
-    cards: Query<(
-        Entity,
-        &cards::CardDefinition,
-        &damage::DealtByDeathtouch,
-        &zones::InZone,
-    )>,
-    zone_entities: Query<(Entity, &zones::Zone, Option<&cards::Owner>)>,
+    cards: Query<
+        (Entity, &cards::EffectivePT, &damage::DealtByDeathtouch),
+        With<cards::OnBattlefield>,
+    >,
+    marked: Query<Entity, With<damage::DealtByDeathtouch>>,
 ) {
-    for (creature, definition, _, in_zone) in cards.iter() {
+    for creature in marked.iter() {
         commands.entity(creature).remove::<damage::DealtByDeathtouch>();
-        if !BATTLEFIELD.contains_card(**in_zone, &zone_entities) {
-            continue;
-        }
-        let Some(power_toughness) = definition.power_toughness else {
-            continue;
-        };
-        if power_toughness.toughness > 0 {
+    }
+    for (creature, effective, _) in cards.iter() {
+        if effective.toughness > 0 {
             destructions.write(damage::Destruction(creature));
         }
     }

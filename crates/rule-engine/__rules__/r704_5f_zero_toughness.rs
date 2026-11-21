@@ -1,10 +1,8 @@
-use crate::BATTLEFIELD;
 use crate::GRAVEYARD;
-use bevy::prelude::{Commands, Entity, Query, ResMut};
+use bevy::prelude::{Commands, Entity, Query, ResMut, With};
 
 use crate::StateBasedActionsPerformed;
 use crate::cards;
-use crate::effects;
 use crate::zones;
 
 /// 704.5f If a creature has toughness 0 or less, it’s put into its owner’s graveyard. Regeneration
@@ -12,23 +10,11 @@ use crate::zones;
 pub fn r704_5f_zero_toughness(
     mut commands: Commands,
     mut state_based_actions_performed: ResMut<StateBasedActionsPerformed>,
-    cards: Query<(
-        Entity,
-        &cards::CardDefinition,
-        &cards::Owner,
-        &zones::InZone,
-        Option<&effects::PowerToughnessModifier>,
-    )>,
+    cards: Query<(Entity, &cards::EffectivePT, &cards::Owner), With<cards::OnBattlefield>>,
     zone_entities: Query<(Entity, &zones::Zone, Option<&cards::Owner>)>,
 ) {
-    for (creature, definition, owner, in_zone, modifier) in cards.iter() {
-        if !BATTLEFIELD.contains_card(**in_zone, &zone_entities) {
-            continue;
-        }
-        let Some(power_toughness) = definition.effective_power_toughness(modifier) else {
-            continue;
-        };
-        if power_toughness.toughness > 0 {
+    for (creature, effective, owner) in cards.iter() {
+        if effective.toughness > 0 {
             continue;
         }
         if let Some(graveyard) = GRAVEYARD.find_entity(Some(**owner), &zone_entities) {

@@ -1,35 +1,18 @@
-use crate::BATTLEFIELD;
-use bevy::prelude::{Entity, MessageWriter, Query};
+use bevy::prelude::{Entity, MessageWriter, Query, With};
 
 use crate::cards;
 use crate::damage;
-use crate::effects;
-use crate::zones;
 
 /// 704.5g If a creature has toughness greater than 0, it has damage marked on it, and the total
 /// damage marked on it is greater than or equal to its toughness, that creature has been dealt
 /// lethal damage and is destroyed. Regeneration can replace this event.
 pub fn r704_5g_lethal_damage(
     mut destructions: MessageWriter<damage::Destruction>,
-    cards: Query<(
-        Entity,
-        &cards::CardDefinition,
-        &damage::Damage,
-        &zones::InZone,
-        Option<&effects::PowerToughnessModifier>,
-    )>,
-    zone_entities: Query<(Entity, &zones::Zone, Option<&cards::Owner>)>,
+    cards: Query<(Entity, &cards::EffectivePT, &damage::Damage), With<cards::OnBattlefield>>,
 ) {
-    for (creature, definition, damage, in_zone, modifier) in cards.iter() {
-        if !BATTLEFIELD.contains_card(**in_zone, &zone_entities) {
-            continue;
-        }
-        let Some(power_toughness) = definition.effective_power_toughness(modifier) else {
-            continue;
-        };
+    for (creature, effective, damage) in cards.iter() {
         let marked = damage::Damage::signed_amount(**damage);
-        let is_lethal =
-            power_toughness.toughness > 0 && marked > 0 && marked >= power_toughness.toughness;
+        let is_lethal = effective.toughness > 0 && marked > 0 && marked >= effective.toughness;
         if !is_lethal {
             continue;
         }

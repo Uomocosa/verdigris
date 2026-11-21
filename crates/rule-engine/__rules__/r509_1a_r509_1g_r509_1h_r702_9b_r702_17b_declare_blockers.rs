@@ -1,4 +1,4 @@
-use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query, Res};
+use bevy::prelude::{Commands, Entity, Has, MessageReader, MessageWriter, Query, Res};
 
 use crate::BATTLEFIELD;
 use crate::actions;
@@ -40,7 +40,8 @@ pub fn r509_1a_r509_1g_r509_1h_r702_9b_r702_17b_declare_blockers(
         &zones::InZone,
         Option<&cards::Tapped>,
     )>,
-    attacking: Query<(&cards::Attacking, &cards::CardDefinition)>,
+    attacking: Query<(&cards::Attacking, Has<cards::Flying>)>,
+    flight: Query<(Has<cards::Flying>, Has<cards::Reach>)>,
     zone_entities: Query<(Entity, &zones::Zone, Option<&cards::Owner>)>,
 ) {
     let priority = priority.into_inner();
@@ -73,16 +74,13 @@ pub fn r509_1a_r509_1g_r509_1h_r702_9b_r702_17b_declare_blockers(
                         && tapped.is_none()
                 });
             let attacker_legal =
-                attacking.get(assignment.attacker).is_ok_and(|(_, attacker_definition)| {
-                    let does_attacker_fly =
-                        attacker_definition.keywords.contains(&cards::Keyword::Flying);
-                    if !does_attacker_fly {
+                attacking.get(assignment.attacker).is_ok_and(|(_, attacker_flies)| {
+                    if !attacker_flies {
                         return true;
                     }
-                    cards.get(assignment.blocker).is_ok_and(|(definition, ..)| {
-                        definition.keywords.contains(&cards::Keyword::Flying)
-                            || definition.keywords.contains(&cards::Keyword::Reach)
-                    })
+                    flight
+                        .get(assignment.blocker)
+                        .is_ok_and(|(blocker_flies, blocker_reach)| blocker_flies || blocker_reach)
                 });
             blocker_legal && attacker_legal
         });

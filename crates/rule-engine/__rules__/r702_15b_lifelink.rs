@@ -1,4 +1,4 @@
-use bevy::prelude::{MessageReader, Query};
+use bevy::prelude::{MessageReader, Query, With};
 
 use crate::cards;
 use crate::damage;
@@ -10,18 +10,15 @@ use crate::players;
 pub fn r702_15b_lifelink(
     mut damage_dealt: MessageReader<damage::DamageDealt>,
     mut lives: Query<&mut players::Life>,
-    sources: Query<(&cards::CardDefinition, &cards::Owner)>,
+    sources: Query<&cards::Owner, With<cards::Lifelink>>,
 ) {
     for event in damage_dealt.read() {
         if event.amount == 0 {
             continue;
         }
-        let Ok((definition, owner)) = sources.get(event.source) else {
+        let Ok(owner) = sources.get(event.source) else {
             continue;
         };
-        if !definition.keywords.contains(&cards::Keyword::Lifelink) {
-            continue;
-        }
         if let Ok(mut life) = lives.get_mut(**owner) {
             *life =
                 players::Life((**life).saturating_add(damage::Damage::signed_amount(event.amount)));
