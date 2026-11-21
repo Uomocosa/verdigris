@@ -62,7 +62,7 @@ mod tests {
         assert!(game.player(p1).cards_in(HAND).has(GRIZZLY_BEARS));
         assert!(game.player(p1).cards_in(HAND).has(LIGHTNING_BOLT));
         assert!(game.player(p1).cards_in(GRAVEYARD).has(divination));
-        assert!(game.player(p1).cards_in(LIBRARY).has(MURDER));
+        game.player(p1).cards_in(LIBRARY).exactly::<1>(MURDER)?;
         Ok(())
     }
 }
