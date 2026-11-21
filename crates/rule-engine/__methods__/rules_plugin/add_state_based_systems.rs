@@ -25,6 +25,7 @@ pub fn add_state_based_systems(app: &mut App) {
         Update,
         (
             rules::r603_2_r603_6a_triggered_abilities::r603_2_r603_6a_triggered_abilities,
+            rules::r603_6c_r700_4_leaves_the_battlefield::r603_6c_r700_4_leaves_the_battlefield,
             rules::r603_4_intervening_if::r603_4_intervening_if,
             rules::r603_3_triggers_on_stack::r603_3_triggers_on_stack,
             rules::r117_5_r704_3_state_based_actions::r117_5_r704_3_state_based_actions,
@@ -48,7 +49,7 @@ mod tests {
         let mut app = App::new();
         add_state_based_systems(&mut app);
 
-        assert_eq!(app.get_schedule(Update).map(Schedule::systems_len), Some(5));
+        assert_eq!(app.get_schedule(Update).map(Schedule::systems_len), Some(6));
         assert_eq!(
             app.get_schedule(StateBasedActions).map(Schedule::systems_len),
             Some(10)

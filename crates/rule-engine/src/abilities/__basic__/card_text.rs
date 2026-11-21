@@ -29,3 +29,8 @@ pub fn when(
 ) -> abilities::TriggeredAbility {
     whenever(trigger, effect)
 }
+
+#[must_use]
+pub const fn when_this_dies() -> abilities::TriggerEvent {
+    abilities::TriggerEvent::Dies
+}

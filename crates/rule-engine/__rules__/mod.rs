@@ -31,6 +31,7 @@ pub mod r603_2_r603_6a_triggered_abilities;
 pub mod r603_3_triggers_on_stack;
 pub mod r603_3b_apnap_trigger_order;
 pub mod r603_4_intervening_if;
+pub mod r603_6c_r700_4_leaves_the_battlefield;
 pub mod r608_2_r608_2c_resolve;
 pub mod r608_2a_intervening_if;
 pub mod r608_2b_illegal_targets;

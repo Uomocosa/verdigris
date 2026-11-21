@@ -9,6 +9,7 @@ use crate::turns;
 pub enum TriggerEvent {
     Enters(cards::ObjectFilter),
     BeginningOfStep(turns::Step, effects::PlayerRef),
+    Dies,
 }
 
 #[atomic_delegates]
