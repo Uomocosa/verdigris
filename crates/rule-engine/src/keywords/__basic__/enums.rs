@@ -9,4 +9,5 @@ pub enum Keyword {
     Vigilance,
     Defender,
     Haste,
+    Hexproof,
 }

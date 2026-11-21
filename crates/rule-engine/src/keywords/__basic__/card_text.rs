@@ -44,3 +44,8 @@ pub const fn defender() -> keywords::Keyword {
 pub const fn haste() -> keywords::Keyword {
     keywords::Keyword::Haste
 }
+
+#[must_use]
+pub const fn hexproof() -> keywords::Keyword {
+    keywords::Keyword::Hexproof
+}

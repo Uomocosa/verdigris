@@ -6,6 +6,7 @@ use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query, ResMu
 use crate::actions;
 use crate::cards;
 use crate::effects;
+use crate::keywords;
 use crate::players;
 use crate::stack;
 use crate::zones;
@@ -28,6 +29,11 @@ use crate::zones;
 /// that spell. (Any abilities that trigger when those objects and/or players become the target of a
 /// spell trigger at this point; they’ll wait to be put on the stack until the spell has finished
 /// being cast.)
+///
+/// # See also
+///
+/// 702.11b “Hexproof” on a permanent means “This permanent can’t be the target of spells or
+/// abilities your opponents control.”
 pub fn r601_2c_targets(
     mut actions: MessageReader<actions::PlayerAction>,
     mut rejected: MessageWriter<actions::Rejected>,
@@ -171,7 +177,10 @@ fn legal_targets(
                 zones.contains(STACK, **in_zone) && filter.does_spell_match(definition)
             }
             effects::FilterKind::Creature | effects::FilterKind::AnyTarget => {
-                filter.does_creature_match(definition) && battlefield.contains(entity)
+                filter.does_creature_match(definition)
+                    && battlefield.contains(entity)
+                    && (**owner == controller
+                        || !definition.keywords.contains(&keywords::Keyword::Hexproof))
             }
             effects::FilterKind::Player => false,
         };
@@ -187,7 +196,7 @@ mod tests {
     use crate::actions;
     use crate::mana;
     use crate::testing::*;
-    use crate::{BATTLEFIELD, HAND};
+    use crate::{BATTLEFIELD, GRAVEYARD, HAND};
 
     #[test]
     fn bolt_lists_every_legal_target() -> TestResult {
@@ -374,6 +383,43 @@ mod tests {
             game.target_choice(),
             Some(pick(1).from([*p1, *p2, *p3, *p4]))
         );
+        Ok(())
+    }
+
+    #[test]
+    fn an_opponent_cannot_target_a_creature_with_hexproof() -> TestResult {
+        let (mut game, [p1, ..]) = MockGame::new([
+            P1.hand([DOOM_BLADE]).mana_pool(mana![1, B]),
+            P2.battlefield([GLADECOVER_SCOUT]),
+        ]);
+        let [blade] = game.player(p1).cards_in(HAND).exactly::<1>(DOOM_BLADE)?;
+
+        let err = game.play([p1.cast(blade)]).unwrap_err();
+
+        assert_eq!(
+            err.rejection(),
+            Some(&actions::Rejected::NoLegalTargets {
+                spell: blade.into()
+            })
+        );
+        assert!(game.player(p1).cards_in(HAND).has(blade));
+        Ok(())
+    }
+
+    #[test]
+    fn a_controller_can_target_their_own_creature_with_hexproof() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.hand([DOOM_BLADE]).mana_pool(mana![1, B]).battlefield([GLADECOVER_SCOUT]),
+            P2,
+        ]);
+        let [blade] = game.player(p1).cards_in(HAND).exactly::<1>(DOOM_BLADE)?;
+        let [scout] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GLADECOVER_SCOUT)?;
+        game.play([
+            p1.cast(blade).targeting(scout).pass_priority(),
+            p2.pass_priority(),
+        ])?;
+        assert!(game.player(p1).cards_in(GRAVEYARD).has(scout));
+        assert!(game.player(p1).cards_in(GRAVEYARD).has(blade));
         Ok(())
     }
 }
