@@ -1,5 +1,5 @@
 mod constants;
-pub use constants::{EXEMPTIONS, RULES_ROOT};
+pub use constants::RULES_ROOT;
 #[path = "../__methods__/mod.rs"]
 mod methods;
 pub mod rules;

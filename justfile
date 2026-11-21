@@ -56,6 +56,7 @@ clippy:
 [group('dev')]
 [doc('Run verdigris-lint (all lele-lint and lele-bevy-lint rules) over every workspace crate dir.')]
 lint:
+    cargo run --quiet -p verdigris-lint -- --config lele.toml --sync-config --check crates/rule-engine
     cargo run --quiet -p verdigris-lint -- --config lele.toml crates/rule-engine
     cargo run --quiet -p verdigris-lint -- --config lele.toml crates/parser
     cargo run --quiet -p verdigris-lint -- --config lele.toml crates/game

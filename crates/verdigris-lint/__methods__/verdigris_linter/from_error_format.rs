@@ -21,9 +21,6 @@ pub fn from_error_format(error_format: ErrorFormat) -> VerdigrisLinter {
     rules::rule_placement::RulePlacement::register(&mut verdigris_rules);
     rules::rule_comments::RuleComments::register(&mut verdigris_rules);
     linter.extend_rules(verdigris_rules);
-    for exemption in VerdigrisLinter::exemptions() {
-        linter.exempt(exemption);
-    }
     VerdigrisLinter(linter)
 }
 
