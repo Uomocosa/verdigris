@@ -3,23 +3,23 @@ use crate::zones;
 
 #[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
 pub enum CardsError {
-    #[error("{player} has no {card} in {zone:?}")]
+    #[error("{owner} has no {card}{location}", location = owner.location(*zone))]
     Missing {
-        player: testing::PlayerSeat,
+        owner: testing::ZoneOwner,
         card: String,
         zone: zones::Zone,
     },
-    #[error("{player} has {count} {card} in {zone:?}, expected exactly {expected}")]
+    #[error("{owner} has {count} {card}{location}, expected exactly {expected}", location = owner.location(*zone))]
     WrongCount {
-        player: testing::PlayerSeat,
+        owner: testing::ZoneOwner,
         card: String,
         zone: zones::Zone,
         count: usize,
         expected: usize,
     },
-    #[error("{player} has {count} {card} in {zone:?}; index {index} is out of range")]
+    #[error("{owner} has {count} {card}{location}; index {index} is out of range", location = owner.location(*zone))]
     OutOfRange {
-        player: testing::PlayerSeat,
+        owner: testing::ZoneOwner,
         card: String,
         zone: zones::Zone,
         count: usize,

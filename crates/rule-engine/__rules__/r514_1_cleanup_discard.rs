@@ -47,7 +47,7 @@ mod tests {
         let (mut game, [p1, p2]) = MockGame::new([P1, P2]);
         game.play([p1.end_turn(), p2.end_turn()])?;
 
-        assert_eq!(game.player(p1).cards_in(HAND).len(), 0);
+        assert_eq!(game.player(p1).cards_in(HAND).count(), 0);
         Ok(())
     }
 
@@ -70,7 +70,7 @@ mod tests {
         game.play([p1.end_turn(), p2.end_turn()])?;
         game.play([p1.discard([bears])])?;
         assert_eq!(game.zone_of(bears), GRAVEYARD);
-        assert_eq!(game.player(p1).cards_in(HAND).len(), 7);
+        assert_eq!(game.player(p1).cards_in(HAND).count(), 7);
         Ok(())
     }
 }

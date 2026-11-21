@@ -95,13 +95,6 @@ impl MockGame {
         }
     }
 
-    pub fn zone_size(&self, player: testing::TestPlayer, zone: impl Into<zones::Zone>) -> usize {
-        let Some(entity) = self.zone_entity(player, zone) else {
-            return 0;
-        };
-        self.app.world().get::<zones::ZoneContents>(entity).map_or(0, |contents| contents.len())
-    }
-
     pub fn act(&mut self, player: impl Into<Entity>, action: actions::Action) {
         let player = player.into();
         let _ = self.app.world_mut().write_message(actions::PlayerAction { player, action });
@@ -130,6 +123,9 @@ impl MockGame {
 impl MockGame {
     #[must_use]
     pub fn p(&self, seat: usize) -> testing::TestPlayer {}
+
+    #[must_use]
+    pub fn stack(&self) -> testing::CardsInZone {}
 
     #[must_use]
     pub fn zone_of(&self, card: impl Into<Entity>) -> zones::Zone {}
@@ -170,8 +166,10 @@ impl MockGame {
         &self,
         player: Entity,
         zone: zones::Zone,
-    ) -> Vec<(testing::TestCard, cards::CardName)> {
+    ) -> Vec<testing::ZoneObject> {
     }
+
+    pub(crate) fn stack_objects(&self) -> Vec<testing::ZoneObject> {}
 
     pub(crate) fn rejection_count(&self) -> usize {}
 }
@@ -185,7 +183,7 @@ mod tests {
     use crate::players;
     use crate::testing::*;
     use crate::turns;
-    use crate::{BATTLEFIELD, HAND, LIBRARY, STACK};
+    use crate::{BATTLEFIELD, HAND, LIBRARY};
 
     use super::MockGame;
 
@@ -203,8 +201,8 @@ mod tests {
         assert_eq!(game.priority_player(), p1);
         assert_eq!(game.priority().player, p1);
         assert_eq!(game.priority().consecutive_passes, 0);
-        assert_eq!(game.zone_size(p2, BATTLEFIELD), 1);
-        assert_eq!(game.zone_size(p1, STACK), 0);
+        assert_eq!(game.player(p2).cards_in(BATTLEFIELD).count(), 1);
+        assert_eq!(game.stack().count(), 0);
 
         let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
         assert!(!game.is_attacking(bears));
@@ -224,7 +222,7 @@ mod tests {
 
         for player in [p1, p2] {
             let library = game.player(player).cards_in(LIBRARY);
-            assert_eq!(library.len(), 12);
+            assert_eq!(library.count(), 12);
             library.exactly::<12>(GRIZZLY_BEARS)?;
         }
         assert!(game.player(p1).cards_in(HAND).has_no(GRIZZLY_BEARS));
@@ -315,21 +313,6 @@ mod tests {
         assert!(game.player(p1).cards_in(HAND).has_no(LIGHTNING_BOLT));
         assert!(game.target_choice().is_none());
         assert!(game.last_rejection().is_none());
-    }
-
-    #[test]
-    fn zone_size_counts_a_triggered_ability_on_the_stack() -> TestResult {
-        let (mut game, [p1, p2]) = MockGame::new([
-            P1.battlefield([SOUL_WARDEN]).hand([GRIZZLY_BEARS]).mana_pool(mana![1, G]),
-            P2,
-        ]);
-        assert_eq!(game.zone_size(p1, STACK), 0);
-        let [bears] = game.player(p1).cards_in(HAND).exactly::<1>(GRIZZLY_BEARS)?;
-        game.play([p1.cast(bears).pass_priority(), p2.pass_priority()])?;
-        assert_eq!(game.zone_size(p1, STACK), 1);
-        assert_eq!(game.zone_size(p1, HAND), 0);
-        assert_eq!(game.zone_size(p1, LIBRARY), 12);
-        Ok(())
     }
 
     #[test]

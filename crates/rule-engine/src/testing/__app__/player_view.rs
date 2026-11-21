@@ -34,7 +34,7 @@ impl PlayerView<'_> {
     #[must_use]
     pub fn cards_in(&self, zone: zones::Zone) -> testing::CardsInZone {
         let cards = self.game.cards_in_zone(*self.player, zone);
-        testing::CardsInZone::from_cards(cards, zone, self.player)
+        testing::CardsInZone::from_objects(cards, zone, testing::ZoneOwner::from(self.player))
     }
 }
 
@@ -51,6 +51,6 @@ mod tests {
         assert_eq!(view.id(), p1);
         assert_eq!(view.life(), 20);
         assert_eq!(view.mana_pool(), mana![R]);
-        assert_eq!(view.cards_in(HAND).len(), 1);
+        assert_eq!(view.cards_in(HAND).count(), 1);
     }
 }

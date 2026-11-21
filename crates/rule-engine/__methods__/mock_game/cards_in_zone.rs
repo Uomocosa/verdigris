@@ -8,7 +8,7 @@ pub fn cards_in_zone(
     game: &testing::MockGame,
     player: Entity,
     zone: zones::Zone,
-) -> Vec<(testing::TestCard, cards::CardName)> {
+) -> Vec<testing::ZoneObject> {
     let world = game.app.world();
     let Some(zone_entity) = world
         .iter_entities()
@@ -27,7 +27,10 @@ pub fn cards_in_zone(
         })
         .filter_map(|entity| {
             let definition = entity.get::<cards::CardDefinition>()?;
-            Some((testing::TestCard(entity.id()), definition.name.clone()))
+            Some(testing::ZoneObject::Card {
+                card: testing::TestCard(entity.id()),
+                name: definition.name.clone(),
+            })
         })
         .collect()
 }
@@ -45,7 +48,13 @@ mod tests {
         let (game, [p1, ..]) = MockGame::new([P1.hand([LIGHTNING_BOLT, LIGHTNING_BOLT]), P2]);
         let found = cards_in_zone(&game, *p1, HAND);
         assert_eq!(found.len(), 2);
-        let names: Vec<_> = found.iter().map(|(_, name)| name.as_str()).collect();
+        let names: Vec<_> = found
+            .iter()
+            .filter_map(|object| match object {
+                ZoneObject::Card { name, .. } => Some(name.as_str()),
+                ZoneObject::Trigger { .. } => None,
+            })
+            .collect();
         assert_eq!(names, ["Lightning Bolt", "Lightning Bolt"]);
         assert_eq!(cards_in_zone(&game, *p1, BATTLEFIELD).len(), 0);
     }

@@ -6,11 +6,12 @@ mod basic;
 mod fixtures;
 
 pub use app::{
-    AutoPassUntil, CardQuery, Cards, CardsError, CardsInZone, MockGame, MockGameBuilder, P1, P2,
-    P3, P4, P5, P6, P7, P8, PlayError, PlayStep, PlayerSeat, PlayerSetup, PlayerView, Targets,
-    TestAbility, TestCard, TestError, TestPlayer, TestPlayerActions, TestResult,
+    AutoPassUntil, Card, CardQuery, Cards, CardsError, CardsInZone, MockGame, MockGameBuilder, P1,
+    P2, P3, P4, P5, P6, P7, P8, PlayError, PlayStep, PlayerSeat, PlayerSetup, PlayerView, Targets,
+    TestAbility, TestCard, TestError, TestPlayer, TestPlayerActions, TestResult, TestTrigger,
+    TriggerQuery, ZoneObject, ZoneOwner,
 };
-pub use basic::{newtypes::TestCardName, structs::Card};
+pub use basic::newtypes::TestCardName;
 pub use fixtures::{
     CANCEL, CHILD_OF_NIGHT, DARKSTEEL_MYR, DISFIGURE, DISPEL, DIVINATION, DOOM_BLADE,
     ESSENCE_SCATTER, ExpectedTargets, FELIDAR_SOVEREIGN, FOREST, GARRUKS_COMPANION, GIANT_GROWTH,

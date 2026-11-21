@@ -1,25 +1,24 @@
 use atomic_delegate_macros::atomic_delegates;
 
-use crate::cards;
 use crate::testing;
 use crate::zones;
 
 pub struct CardsInZone {
-    pub(crate) cards: Vec<(testing::TestCard, cards::CardName)>,
+    pub(crate) objects: Vec<testing::ZoneObject>,
     zone: zones::Zone,
-    player: testing::TestPlayer,
+    owner: testing::ZoneOwner,
 }
 
 impl CardsInZone {
-    pub(crate) const fn from_cards(
-        cards: Vec<(testing::TestCard, cards::CardName)>,
+    pub(crate) const fn from_objects(
+        objects: Vec<testing::ZoneObject>,
         zone: zones::Zone,
-        player: testing::TestPlayer,
+        owner: testing::ZoneOwner,
     ) -> Self {
         Self {
-            cards,
+            objects,
             zone,
-            player,
+            owner,
         }
     }
 }
@@ -27,40 +26,53 @@ impl CardsInZone {
 #[rustfmt::skip]
 impl CardsInZone {
     #[must_use]
-    pub const fn is_empty(&self) -> bool { self.cards.is_empty() }
+    pub const fn is_empty(&self) -> bool { self.objects.is_empty() }
 
     #[must_use]
-    pub const fn len(&self) -> usize { self.cards.len() }
+    pub const fn count(&self) -> usize { self.objects.len() }
 
     #[must_use]
     pub fn has_no(&self, card: impl Into<testing::CardQuery>) -> bool { !self.has(card) }
+
+    #[must_use]
+    pub fn has_no_trigger(&self, query: testing::TriggerQuery) -> bool { !self.has_trigger(query) }
+
+    #[must_use]
+    pub fn has_trigger(&self, query: testing::TriggerQuery) -> bool { self.objects.iter().any(|object| query.matches(object).is_some()) }
+
+    pub fn exactly<const N: usize>(&self, card: impl Into<testing::CardQuery>) -> Result<[testing::TestCard; N], testing::CardsError> { self.matching(card).exactly::<N>() }
 }
 
 impl CardsInZone {
     #[must_use]
+    pub fn has(&self, card: impl Into<testing::CardQuery>) -> bool {
+        let query: testing::CardQuery = card.into();
+        self.objects.iter().any(|object| query.matches(object).is_some())
+    }
+
+    #[must_use]
     pub fn matching(&self, card: impl Into<testing::CardQuery>) -> testing::Cards {
-        let card = card.into();
-        let matching = self.matching_cards(card);
-        testing::Cards::from_matches(matching, card.label(), self.zone, self.player)
+        let query: testing::CardQuery = card.into();
+        let found: Vec<testing::TestCard> =
+            self.objects.iter().filter_map(|object| query.matches(object)).collect();
+        testing::Cards::from_matches(found, query.label(), self.zone, self.owner)
     }
+}
 
-    pub fn exactly<const N: usize>(
+#[atomic_delegates]
+impl CardsInZone {
+    pub fn exactly_trigger<const N: usize>(
         &self,
-        card: impl Into<testing::CardQuery>,
-    ) -> Result<[testing::TestCard; N], testing::CardsError> {
-        let matching = self.matching(card);
-        matching.exactly::<N>()
+        query: testing::TriggerQuery,
+    ) -> Result<[testing::TestTrigger; N], testing::CardsError> {
     }
 }
 
-#[atomic_delegates]
+#[rustfmt::skip]
 impl CardsInZone {
-    pub fn has(&self, card: impl Into<testing::CardQuery>) -> bool {}
-}
+    pub(crate) const fn owner(&self) -> testing::ZoneOwner { self.owner }
 
-#[atomic_delegates]
-impl CardsInZone {
-    pub(crate) fn matching_cards(&self, card: testing::CardQuery) -> Vec<testing::TestCard> {}
+    pub(crate) const fn zone(&self) -> zones::Zone { self.zone }
 }
 
 #[cfg(test)]
@@ -74,7 +86,7 @@ mod tests {
         let (game, [p1, ..]) = MockGame::new([P1.hand([LIGHTNING_BOLT, LIGHTNING_BOLT]), P2]);
         let cards = game.player(p1).cards_in(HAND);
 
-        assert_eq!(cards.len(), 2);
+        assert_eq!(cards.count(), 2);
         assert!(!cards.is_empty());
         assert!(cards.has(LIGHTNING_BOLT));
         assert!(cards.has_no(MURDER));
@@ -100,12 +112,12 @@ mod tests {
         let cards = game.player(p1).cards_in(BATTLEFIELD);
 
         assert!(cards.is_empty());
-        assert_eq!(cards.len(), 0);
+        assert_eq!(cards.count(), 0);
         assert!(cards.has_no(GRIZZLY_BEARS));
         assert_eq!(
             cards.exactly::<1>(GRIZZLY_BEARS),
             Err(CardsError::WrongCount {
-                player: PlayerSeat(1),
+                owner: p1.into(),
                 card: "Grizzly Bears".to_string(),
                 zone: BATTLEFIELD,
                 count: 0,

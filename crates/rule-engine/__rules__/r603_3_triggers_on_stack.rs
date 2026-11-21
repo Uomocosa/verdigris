@@ -122,7 +122,6 @@ fn spawn_trigger(world: &mut World, trigger: stack::PendingTrigger) {
 #[cfg(test)]
 mod tests {
     use crate::HAND;
-    use crate::STACK;
     use crate::mana;
     use crate::stack;
     use crate::testing::*;
@@ -135,18 +134,13 @@ mod tests {
         ]);
         let [bears] = game.player(p1).cards_in(HAND).exactly::<1>(GRIZZLY_BEARS)?;
         game.play([p1.cast(bears).pass_priority(), p2.pass_priority()])?;
-        let world = game.app.world();
-        assert_eq!(game.zone_size(p1, STACK), 1);
-        let trigger = world
-            .iter_entities()
-            .find_map(|entity| {
-                entity
-                    .get::<stack::TriggeredAbilityOnStack>()
-                    .map(|ability| (entity.id(), *ability))
-            })
-            .unwrap();
-        assert_eq!(trigger.1.controller, *p1);
-        assert!(world.get::<crate::cards::CardDefinition>(trigger.0).is_none());
+        assert_eq!(game.stack().count(), 1);
+        assert!(game.stack().has_trigger(SOUL_WARDEN.trigger()));
+        assert!(game.stack().has_no(SOUL_WARDEN));
+        let [trigger] = game.stack().exactly_trigger::<1>(SOUL_WARDEN.trigger())?;
+        let ability = game.get::<stack::TriggeredAbilityOnStack>(trigger).unwrap();
+        assert_eq!(ability.controller, *p1);
+        assert!(!game.has::<crate::cards::CardDefinition>(trigger));
         Ok(())
     }
 }

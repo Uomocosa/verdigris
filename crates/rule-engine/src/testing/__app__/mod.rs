@@ -1,6 +1,7 @@
 mod active_auto_pass;
 #[path = "__basic__/mod.rs"]
 mod basic;
+mod card;
 mod card_query;
 mod cards;
 mod cards_error;
@@ -20,8 +21,13 @@ mod test_error;
 mod test_player;
 mod test_player_actions;
 mod test_result;
+mod test_trigger;
+mod trigger_query;
+mod zone_object;
+mod zone_owner;
 
 pub use basic::enums::{AutoPassUntil, PlayStep};
+pub use card::Card;
 pub use card_query::CardQuery;
 pub use cards::Cards;
 pub use cards_error::CardsError;
@@ -40,6 +46,10 @@ pub use test_error::TestError;
 pub use test_player::TestPlayer;
 pub use test_player_actions::TestPlayerActions;
 pub use test_result::TestResult;
+pub use test_trigger::TestTrigger;
+pub use trigger_query::TriggerQuery;
+pub use zone_object::ZoneObject;
+pub use zone_owner::ZoneOwner;
 
 pub use active_auto_pass::ActiveAutoPass;
 pub use pass_budget::PassBudget;

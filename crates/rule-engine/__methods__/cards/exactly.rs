@@ -4,7 +4,7 @@ pub fn exactly<const N: usize>(
     cards: &testing::Cards,
 ) -> Result<[testing::TestCard; N], testing::CardsError> {
     <[testing::TestCard; N]>::try_from(cards.all()).map_err(|_| testing::CardsError::WrongCount {
-        player: cards.seat(),
+        owner: cards.owner(),
         card: cards.card().to_string(),
         zone: cards.zone(),
         count: cards.len(),
@@ -36,7 +36,7 @@ mod tests {
         assert_eq!(
             exactly::<2>(&cards),
             Err(CardsError::WrongCount {
-                player: PlayerSeat(1),
+                owner: p1.into(),
                 card: "Lightning Bolt".to_string(),
                 zone: HAND,
                 count: 1,

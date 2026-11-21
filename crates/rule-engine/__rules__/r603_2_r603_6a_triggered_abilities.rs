@@ -48,7 +48,6 @@ pub fn r603_2_r603_6a_triggered_abilities(
 
 #[cfg(test)]
 mod tests {
-    use crate::STACK;
     use crate::mana;
     use crate::testing::*;
     use crate::turns;
@@ -77,7 +76,7 @@ mod tests {
         let [bears] = game.player(p1).cards_in(HAND).exactly::<1>(GRIZZLY_BEARS)?;
         game.play([p1.cast(bears).pass_priority(), p2.pass_priority()])?;
         assert_eq!(game.life(p1), 20);
-        assert_eq!(game.zone_size(p1, STACK), 1);
+        assert_eq!(game.stack().count(), 1);
         Ok(())
     }
 
@@ -87,7 +86,7 @@ mod tests {
         let [warden] = game.player(p1).cards_in(HAND).exactly::<1>(SOUL_WARDEN)?;
         game.play([p1.cast(warden).pass_priority(), p2.pass_priority()])?;
         assert_eq!(game.life(p1), 20);
-        assert_eq!(game.zone_size(p1, STACK), 0);
+        assert_eq!(game.stack().count(), 0);
         assert!(game.player(p1).cards_in(BATTLEFIELD).has(SOUL_WARDEN));
         Ok(())
     }

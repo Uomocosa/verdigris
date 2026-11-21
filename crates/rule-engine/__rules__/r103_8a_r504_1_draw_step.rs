@@ -43,12 +43,12 @@ mod tests {
         let (mut game, [p1, p2]) = MockGame::builder()
             .turn(1, turns::Step::Upkeep)
             .players([P1.library([GRIZZLY_BEARS, LIGHTNING_BOLT]), P2]);
-        let hand_before = game.player(p1).cards_in(HAND).len();
+        let hand_before = game.player(p1).cards_in(HAND).count();
 
         game.play([p1.pass_priority(), p2.pass_priority(), p1.pass_priority()])?;
 
         assert_eq!(game.turn().step, turns::Step::Draw);
-        assert_eq!(game.player(p1).cards_in(HAND).len(), hand_before);
+        assert_eq!(game.player(p1).cards_in(HAND).count(), hand_before);
         Ok(())
     }
 
