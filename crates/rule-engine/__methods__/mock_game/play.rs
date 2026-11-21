@@ -175,7 +175,7 @@ mod tests {
         assert_eq!(game.player(p2).life(), 20);
         assert!(game.player(p1).cards_in(GRAVEYARD).exactly::<1>(LIGHTNING_BOLT).is_ok());
         assert!(game.player(p2).cards_in(GRAVEYARD).exactly::<1>(NEGATE).is_ok());
-        let turn = *game.app.world().resource::<turns::Turn>();
+        let turn = *game.turn();
         assert_eq!(turn.number, 2);
         assert_eq!(turn.active, p2);
         Ok(())
@@ -211,7 +211,7 @@ mod tests {
 
         game.play([p1.pass_to(MAIN_2), p2.pass_to(MAIN_2)])?;
 
-        let turn = *game.app.world().resource::<turns::Turn>();
+        let turn = *game.turn();
         assert_eq!(turn.number, 1);
         assert_eq!(turn.active, p1);
         assert_eq!(turn.step, turns::Step::PostcombatMain);
@@ -224,10 +224,7 @@ mod tests {
 
         game.play([p1.end_phase(), p2.end_phase()])?;
 
-        assert_eq!(
-            game.app.world().resource::<turns::Turn>().step,
-            turns::Step::BeginningOfCombat
-        );
+        assert_eq!(game.turn().step, turns::Step::BeginningOfCombat);
         Ok(())
     }
 
@@ -237,10 +234,7 @@ mod tests {
 
         game.play([p1.end_current_step(), p2.end_current_step()])?;
 
-        assert_eq!(
-            game.app.world().resource::<turns::Turn>().step,
-            turns::Step::BeginningOfCombat
-        );
+        assert_eq!(game.turn().step, turns::Step::BeginningOfCombat);
         Ok(())
     }
 

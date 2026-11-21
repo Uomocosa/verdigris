@@ -92,7 +92,7 @@ mod tests {
             MockGame::builder().turn(3, turns::Step::PostcombatMain).players([P1, P2.life(7)]);
 
         assert_eq!(game.life(p1), 20);
-        let turn = game.app.world().resource::<turns::Turn>();
+        let turn = game.turn();
         assert_eq!(turn.number, 3);
         assert_eq!(turn.step, turns::Step::PostcombatMain);
     }

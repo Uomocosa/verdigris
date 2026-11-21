@@ -211,11 +211,11 @@ mod tests {
         assert!(game.player(p1).cards_in(HAND).has_no(GRIZZLY_BEARS));
         assert!(game.player(p2).cards_in(HAND).has_no(GRIZZLY_BEARS));
 
-        let turn = game.app.world().resource::<turns::Turn>();
+        let turn = game.turn();
         assert_eq!(turn.number, 1);
         assert_eq!(turn.active, p1);
         assert_eq!(turn.step, turns::Step::PrecombatMain);
-        assert_eq!(game.app.world().resource::<turns::Priority>().player, p1);
+        assert_eq!(game.priority_player(), p1);
         Ok(())
     }
 
@@ -238,14 +238,11 @@ mod tests {
         assert!(game.player(p2).cards_in(LIBRARY).has_no(GRIZZLY_BEARS));
         assert_eq!(game.mana_pool(p1), mana![R]);
 
-        let turn = game.app.world().resource::<turns::Turn>();
+        let turn = game.turn();
         assert_eq!(turn.number, 3);
         assert_eq!(turn.active, game.p(2));
         assert_eq!(turn.step, turns::Step::PostcombatMain);
-        assert_eq!(
-            game.app.world().resource::<turns::Priority>().player,
-            game.p(2)
-        );
+        assert_eq!(game.priority_player(), game.p(2));
     }
 
     #[test]
@@ -259,11 +256,11 @@ mod tests {
         assert_eq!(game.mana_pool(p1), mana![2, U]);
         assert_eq!(game.mana_pool(p2), mana![]);
 
-        let turn = game.app.world().resource::<turns::Turn>();
+        let turn = game.turn();
         assert_eq!(turn.number, 1);
         assert_eq!(turn.step, turns::Step::PrecombatMain);
         assert_eq!(turn.active, p1);
-        assert_eq!(game.app.world().resource::<turns::Priority>().player, p1);
+        assert_eq!(game.priority_player(), p1);
     }
 
     #[test]
@@ -274,11 +271,11 @@ mod tests {
 
         assert!(game.player(p2).cards_in(BATTLEFIELD).has(GRIZZLY_BEARS));
 
-        let turn = game.app.world().resource::<turns::Turn>();
+        let turn = game.turn();
         assert_eq!(turn.number, 3);
         assert_eq!(turn.step, turns::Step::PostcombatMain);
         assert_eq!(turn.active, p2);
-        assert_eq!(game.app.world().resource::<turns::Priority>().player, p2);
+        assert_eq!(game.priority_player(), p2);
     }
 
     #[test]
