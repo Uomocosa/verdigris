@@ -109,19 +109,19 @@ mod tests {
     #[test]
     fn a_second_land_in_the_same_turn_is_rejected() -> TestResult {
         let (mut game, [p1, ..]) = MockGame::new([P1.hand([FOREST, FOREST]), P2]);
-        let [first, second] = game.player(p1).cards_in(HAND).exactly::<2>(FOREST)?;
+        let [forest_1, forest_2] = game.player(p1).cards_in(HAND).exactly::<2>(FOREST)?;
 
-        game.play([p1.play_land(first)])?;
-        game.act(p1, actions::Action::PlayLand(second.into()));
+        game.play([p1.play_land(forest_1)])?;
+        game.act(p1, actions::Action::PlayLand(forest_2.into()));
 
-        assert!(game.player(p1).cards_in(BATTLEFIELD).has(first));
+        assert!(game.player(p1).cards_in(BATTLEFIELD).has(forest_1));
         assert_eq!(
             game.last_rejection(),
             Some(&actions::Rejected::CannotPlayLand {
-                land: second.into()
+                land: forest_2.into()
             })
         );
-        assert!(game.player(p1).cards_in(HAND).has(second));
+        assert!(game.player(p1).cards_in(HAND).has(forest_2));
         Ok(())
     }
 

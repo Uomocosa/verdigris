@@ -57,14 +57,14 @@ mod tests {
         let (mut game, [p1, p2]) = MockGame::builder()
             .turn(2, turns::Step::Upkeep)
             .players([P1.library([GRIZZLY_BEARS, LIGHTNING_BOLT]), P2]);
-        let [top] = game.player(p1).cards_in(LIBRARY).exactly::<1>(GRIZZLY_BEARS)?;
+        let [bears] = game.player(p1).cards_in(LIBRARY).exactly::<1>(GRIZZLY_BEARS)?;
 
         game.play([p1.pass_priority(), p2.pass_priority(), p1.pass_priority()])?;
 
-        assert!(game.player(p1).cards_in(HAND).has(top));
+        assert!(game.player(p1).cards_in(HAND).has(bears));
         assert_eq!(
             game.player(p1).cards_in(HAND).exactly::<1>(GRIZZLY_BEARS)?[0],
-            top
+            bears
         );
         Ok(())
     }

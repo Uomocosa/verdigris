@@ -185,11 +185,11 @@ mod tests {
     #[test]
     fn a_second_tundra_taps_for_blue_mana() -> TestResult {
         let (mut game, [p1, ..]) = MockGame::new([P1.battlefield([TUNDRA, TUNDRA]), P2]);
-        let [first, second] = game.player(p1).cards_in(BATTLEFIELD).exactly::<2>(TUNDRA)?;
+        let [tundra_1, tundra_2] = game.player(p1).cards_in(BATTLEFIELD).exactly::<2>(TUNDRA)?;
 
         game.play([p1
-            .activate_ability(first.mana_ability(cards::Color::White))
-            .activate_ability(second.mana_ability(cards::Color::Blue))])?;
+            .activate_ability(tundra_1.mana_ability(cards::Color::White))
+            .activate_ability(tundra_2.mana_ability(cards::Color::Blue))])?;
 
         assert_eq!(game.mana_pool(p1), mana![W, U]);
         assert!(game.last_rejection().is_none());

@@ -66,15 +66,15 @@ mod tests {
             P1.hand([LIGHTNING_BOLT, LIGHTNING_BOLT]).mana_pool(mana![R, R]),
             P2,
         ]);
-        let [first, second] = game.player(p1).cards_in(HAND).exactly::<2>(LIGHTNING_BOLT)?;
+        let [bolt_1, bolt_2] = game.player(p1).cards_in(HAND).exactly::<2>(LIGHTNING_BOLT)?;
         game.play([
-            p1.cast(first).targeting(p2),
-            p1.cast(second).targeting(p2).pass_priority(),
+            p1.cast(bolt_1).targeting(p2),
+            p1.cast(bolt_2).targeting(p2).pass_priority(),
             p2.pass_priority(),
         ])?;
 
-        assert!(game.player(p1).cards_in(GRAVEYARD).has(second));
-        assert!(game.stack().has(first));
+        assert!(game.player(p1).cards_in(GRAVEYARD).has(bolt_2));
+        assert!(game.stack().has(bolt_1));
         assert_eq!(game.life(p2), 17);
         Ok(())
     }
@@ -85,17 +85,17 @@ mod tests {
             P1.hand([LIGHTNING_BOLT, LIGHTNING_BOLT]).mana_pool(mana![R, R]),
             P2,
         ]);
-        let [first, second] = game.player(p1).cards_in(HAND).exactly::<2>(LIGHTNING_BOLT)?;
+        let [bolt_1, bolt_2] = game.player(p1).cards_in(HAND).exactly::<2>(LIGHTNING_BOLT)?;
         game.play([
-            p1.cast(first).targeting(p2),
-            p1.cast(second).targeting(p2).pass_priority(),
+            p1.cast(bolt_1).targeting(p2),
+            p1.cast(bolt_2).targeting(p2).pass_priority(),
             p2.pass_priority(),
             p1.pass_priority(),
             p2.pass_priority(),
         ])?;
 
-        assert!(game.player(p1).cards_in(GRAVEYARD).has(second));
-        assert!(game.player(p1).cards_in(GRAVEYARD).has(first));
+        assert!(game.player(p1).cards_in(GRAVEYARD).has(bolt_2));
+        assert!(game.player(p1).cards_in(GRAVEYARD).has(bolt_1));
         assert_eq!(game.life(p2), 14);
         Ok(())
     }
