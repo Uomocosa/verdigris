@@ -74,7 +74,10 @@ impl MockGame {
     pub fn turn(&self) -> &turns::Turn { self.app.world().resource::<turns::Turn>() }
 
     #[must_use]
-    pub fn priority_player(&self) -> Entity { self.app.world().resource::<turns::Priority>().player }
+    pub fn priority(&self) -> turns::Priority { *self.app.world().resource::<turns::Priority>() }
+
+    #[must_use]
+    pub fn priority_player(&self) -> Entity { self.priority().player }
 }
 
 impl MockGame {
@@ -87,6 +90,13 @@ impl MockGame {
         }
     }
 
+    pub fn zone_size(&self, player: testing::TestPlayer, zone: zones::Zone) -> usize {
+        let Some(entity) = self.zone_entity(player, zone) else {
+            return 0;
+        };
+        self.app.world().get::<zones::ZoneContents>(entity).map_or(0, |contents| contents.len())
+    }
+
     pub fn act(&mut self, player: impl Into<Entity>, action: actions::Action) {
         let player = player.into();
         let _ = self.app.world_mut().write_message(actions::PlayerAction { player, action });
@@ -94,7 +104,7 @@ impl MockGame {
     }
 
     pub fn pass_priority(&mut self) {
-        let player = self.app.world().resource::<turns::Priority>().player;
+        let player = self.priority().player;
         let _ = self.app.world_mut().write_message(actions::PlayerAction {
             player,
             action: actions::Action::PassPriority,
@@ -103,7 +113,7 @@ impl MockGame {
     }
 
     pub fn pass_priority_all(&mut self) {
-        let passes = self.app.world().resource::<turns::Priority>().consecutive_passes;
+        let passes = self.priority().consecutive_passes;
         let player_count = u32::try_from(self.players.len()).unwrap_or(u32::MAX);
         for _ in passes..player_count {
             self.pass_priority();
@@ -170,7 +180,7 @@ mod tests {
     use crate::players;
     use crate::testing::*;
     use crate::turns;
-    use crate::{BATTLEFIELD, HAND, LIBRARY};
+    use crate::{BATTLEFIELD, HAND, LIBRARY, STACK};
 
     use super::MockGame;
 
@@ -186,6 +196,10 @@ mod tests {
         assert_eq!(game.damage(p1), 0);
         assert_eq!(game.turn().number, 1);
         assert_eq!(game.priority_player(), p1);
+        assert_eq!(game.priority().player, p1);
+        assert_eq!(game.priority().consecutive_passes, 0);
+        assert_eq!(game.zone_size(p2, BATTLEFIELD), 1);
+        assert_eq!(game.zone_size(p1, STACK), 0);
 
         let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
         assert!(!game.is_attacking(bears));
@@ -296,6 +310,21 @@ mod tests {
         assert!(game.player(p1).cards_in(HAND).has_no(LIGHTNING_BOLT));
         assert!(game.target_choice().is_none());
         assert!(game.last_rejection().is_none());
+    }
+
+    #[test]
+    fn zone_size_counts_a_triggered_ability_on_the_stack() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.battlefield([SOUL_WARDEN]).hand([GRIZZLY_BEARS]).mana_pool(mana![1, G]),
+            P2,
+        ]);
+        assert_eq!(game.zone_size(p1, STACK), 0);
+        let [bears] = game.player(p1).cards_in(HAND).exactly::<1>(GRIZZLY_BEARS)?;
+        game.play([p1.cast(bears).pass_priority(), p2.pass_priority()])?;
+        assert_eq!(game.zone_size(p1, STACK), 1);
+        assert_eq!(game.zone_size(p1, HAND), 0);
+        assert_eq!(game.zone_size(p1, LIBRARY), 12);
+        Ok(())
     }
 
     #[test]

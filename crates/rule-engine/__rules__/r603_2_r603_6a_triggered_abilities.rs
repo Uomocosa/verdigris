@@ -52,7 +52,6 @@ mod tests {
     use crate::mana;
     use crate::testing::*;
     use crate::turns;
-    use crate::zones;
     use crate::{BATTLEFIELD, HAND};
 
     #[test]
@@ -78,11 +77,7 @@ mod tests {
         let [bears] = game.player(p1).cards_in(HAND).exactly::<1>(GRIZZLY_BEARS)?;
         game.play([p1.cast(bears).pass_priority(), p2.pass_priority()])?;
         assert_eq!(game.life(p1), 20);
-        let stack = game.zone_entity(p1, STACK).unwrap();
-        assert_eq!(
-            game.app.world().get::<zones::ZoneContents>(stack).map(|contents| contents.len()),
-            Some(1)
-        );
+        assert_eq!(game.zone_size(p1, STACK), 1);
         Ok(())
     }
 
@@ -92,10 +87,7 @@ mod tests {
         let [warden] = game.player(p1).cards_in(HAND).exactly::<1>(SOUL_WARDEN)?;
         game.play([p1.cast(warden).pass_priority(), p2.pass_priority()])?;
         assert_eq!(game.life(p1), 20);
-        let stack = game.zone_entity(p1, STACK).unwrap();
-        let stack_contents =
-            game.app.world().get::<zones::ZoneContents>(stack).map_or(0, |contents| contents.len());
-        assert_eq!(stack_contents, 0);
+        assert_eq!(game.zone_size(p1, STACK), 0);
         assert!(game.player(p1).cards_in(BATTLEFIELD).has(SOUL_WARDEN));
         Ok(())
     }

@@ -49,7 +49,7 @@ mod tests {
 
         game.play([p1.pass_priority(), p2.pass_priority()])?;
 
-        let priority = *game.app.world().resource::<turns::Priority>();
+        let priority = game.priority();
         let turn = *game.turn();
         assert_eq!(turn.step, turns::Step::BeginningOfCombat);
         assert_eq!(priority.player, p1);

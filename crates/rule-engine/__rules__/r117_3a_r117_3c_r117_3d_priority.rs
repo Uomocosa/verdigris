@@ -48,7 +48,6 @@ mod tests {
     use crate::actions;
     use crate::mana;
     use crate::testing::*;
-    use crate::turns;
 
     #[test]
     fn passing_moves_priority_to_the_next_player_in_turn_order() -> TestResult {
@@ -56,7 +55,7 @@ mod tests {
 
         game.play([p1.pass_priority()])?;
 
-        let priority = *game.app.world().resource::<turns::Priority>();
+        let priority = game.priority();
         assert_eq!(priority.player, p2);
         assert_eq!(priority.consecutive_passes, 1);
         assert_ne!(priority.player, p1);
@@ -84,7 +83,7 @@ mod tests {
 
         game.play([p1.pass_priority(), p2.cast(bolt)])?;
 
-        let priority = *game.app.world().resource::<turns::Priority>();
+        let priority = game.priority();
         assert_eq!(priority.player, p2);
         assert_eq!(priority.consecutive_passes, 0);
         Ok(())

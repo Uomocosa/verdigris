@@ -45,7 +45,6 @@ pub fn r117_4_priority(
 mod tests {
     use crate::mana;
     use crate::testing::*;
-    use crate::turns;
     use crate::{GRAVEYARD, HAND, STACK};
 
     #[test]
@@ -111,7 +110,7 @@ mod tests {
         assert_ne!(game.priority_player(), p1);
         game.play([p2.pass_priority()])?;
 
-        let priority = *game.app.world().resource::<turns::Priority>();
+        let priority = game.priority();
         assert_eq!(priority.player, p1);
         assert_eq!(priority.consecutive_passes, 0);
         Ok(())

@@ -126,7 +126,6 @@ mod tests {
     use crate::mana;
     use crate::stack;
     use crate::testing::*;
-    use crate::zones;
 
     #[test]
     fn soul_warden_trigger_goes_on_the_stack_before_priority() -> TestResult {
@@ -137,11 +136,7 @@ mod tests {
         let [bears] = game.player(p1).cards_in(HAND).exactly::<1>(GRIZZLY_BEARS)?;
         game.play([p1.cast(bears).pass_priority(), p2.pass_priority()])?;
         let world = game.app.world();
-        let stack = game.zone_entity(p1, STACK).unwrap();
-        assert_eq!(
-            world.get::<zones::ZoneContents>(stack).map(|contents| contents.len()),
-            Some(1)
-        );
+        assert_eq!(game.zone_size(p1, STACK), 1);
         let trigger = world
             .iter_entities()
             .find_map(|entity| {
