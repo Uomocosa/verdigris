@@ -17,4 +17,7 @@ pub struct Lost;
 pub struct Won;
 
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Drawn;
+
+#[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct AttemptedDrawFromEmptyLibrary;

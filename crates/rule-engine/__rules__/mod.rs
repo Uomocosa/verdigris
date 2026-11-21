@@ -1,6 +1,7 @@
 pub mod r103_8a_r504_1_draw_step;
 pub mod r104_2a_wins_when_opponents_left;
 pub mod r104_3a_concede;
+pub mod r104_4a_draw;
 pub mod r106_4_mana_empties;
 pub mod r117_3a_r117_3c_r117_3d_priority;
 pub mod r117_4_priority;
