@@ -57,8 +57,7 @@ use crate::turns;
 /// assigns its damage divided as its controller chooses among them; each of its blockers still
 /// assigns damage to it. Trample: a single blocker is assigned lethal damage first (toughness minus
 /// damage already marked on it) and any excess goes to the defending player; a blocked attacker
-/// with no blockers left assigns all its damage to the defending player. Trample over two or more
-/// blockers is deferred alongside the divided-damage choice.
+/// with no blockers left assigns all its damage to the defending player.
 pub fn r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_r702_19b_r702_19d_combat_damage(
     mut step_started: MessageReader<turns::StepStarted>,
     mut actions: MessageReader<actions::PlayerAction>,
@@ -331,6 +330,60 @@ mod tests {
         assert_eq!(game.life(p2), 19);
         assert!(game.player(p2).cards_in(GRAVEYARD).has(bears));
         assert!(game.player(p1).cards_in(GRAVEYARD).has(companion));
+        Ok(())
+    }
+
+    #[test]
+    fn trample_assigns_excess_damage_past_two_blockers_to_the_defending_player() -> TestResult {
+        use crate::BATTLEFIELD;
+        use crate::actions;
+        use crate::turns;
+
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.battlefield([GARRUKS_COMPANION]),
+            P2.battlefield([TYPHOID_RATS, TYPHOID_RATS]),
+        ]);
+        let [companion] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GARRUKS_COMPANION)?;
+        let [first, second] = game.player(p2).cards_in(BATTLEFIELD).exactly::<2>(TYPHOID_RATS)?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareAttackers),
+            p2.pass_to(turns::Step::DeclareAttackers),
+            p1.declare_attackers([companion]),
+        ])?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareBlockers),
+            p2.pass_to(turns::Step::DeclareBlockers),
+        ])?;
+        game.play([
+            p1.pass_priority(),
+            p2.declare_blockers([(first, companion), (second, companion)]),
+        ])?;
+        game.play([
+            p1.pass_to(turns::Step::CombatDamage),
+            p2.pass_to(turns::Step::CombatDamage),
+        ])?;
+        game.act(
+            p1,
+            actions::Action::AssignCombatDamage(vec![
+                actions::DamageAssignment {
+                    target: first.into(),
+                    amount: 1,
+                },
+                actions::DamageAssignment {
+                    target: second.into(),
+                    amount: 1,
+                },
+                actions::DamageAssignment {
+                    target: p2.into(),
+                    amount: 1,
+                },
+            ]),
+        );
+        game.play([p1.pass_priority(), p2.pass_priority()])?;
+
+        assert_eq!(game.player(p2).life(), 19);
+        assert!(game.player(p2).cards_in(GRAVEYARD).has(first));
+        assert!(game.player(p2).cards_in(GRAVEYARD).has(second));
         Ok(())
     }
 

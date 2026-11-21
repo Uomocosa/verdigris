@@ -36,6 +36,23 @@ pub fn assigned_damage(
     if !covers_all {
         return None;
     }
+    for required in &choice.needed {
+        let Some(defender) = required.trample_defender else {
+            continue;
+        };
+        if !assignments.iter().any(|assignment| assignment.target == defender) {
+            continue;
+        }
+        let all_lethal = required.lethal_by_target.iter().all(|(blocker, lethal)| {
+            assignments
+                .iter()
+                .find(|assignment| assignment.target == *blocker)
+                .is_some_and(|assignment| assignment.amount >= *lethal)
+        });
+        if !all_lethal {
+            return None;
+        }
+    }
     Some(
         attributed
             .into_iter()
@@ -50,6 +67,8 @@ pub fn assigned_damage(
 
 #[cfg(test)]
 mod tests {
+    use std::collections::BTreeMap;
+
     use bevy::prelude::Entity;
 
     use crate::BATTLEFIELD;
@@ -79,6 +98,8 @@ mod tests {
                 source,
                 amount: 2,
                 legal: [first, second].into_iter().collect(),
+                trample_defender: None,
+                lethal_by_target: BTreeMap::new(),
             }],
         };
         let split = [
@@ -118,6 +139,8 @@ mod tests {
                 source,
                 amount: 2,
                 legal: [first, second].into_iter().collect(),
+                trample_defender: None,
+                lethal_by_target: BTreeMap::new(),
             }],
         };
 

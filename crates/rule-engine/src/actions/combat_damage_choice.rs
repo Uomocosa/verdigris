@@ -23,6 +23,8 @@ impl CombatDamageChoice {
 
 #[cfg(test)]
 mod tests {
+    use std::collections::BTreeMap;
+
     use bevy::prelude::Entity;
 
     use crate::BATTLEFIELD;
@@ -44,6 +46,8 @@ mod tests {
                 source,
                 amount: 2,
                 legal: [first, second].into_iter().collect(),
+                trample_defender: None,
+                lethal_by_target: BTreeMap::new(),
             }],
         };
 
@@ -54,6 +58,8 @@ mod tests {
                 source,
                 amount: 2,
                 legal: [first, second].into_iter().collect(),
+                trample_defender: None,
+                lethal_by_target: BTreeMap::new(),
             }]
         );
     }

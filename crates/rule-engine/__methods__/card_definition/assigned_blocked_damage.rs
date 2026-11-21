@@ -1,5 +1,7 @@
 use bevy::prelude::{Entity, Query};
 
+use std::collections::BTreeSet;
+
 use crate::actions;
 use crate::cards;
 use crate::damage;
@@ -78,11 +80,22 @@ pub fn assigned_blocked_damage(
             });
         }
         [] => {}
-        _ => needed.push(actions::RequiredCombatDamage {
-            source,
-            amount,
-            legal: blockers_of.iter().map(|(blocker, _)| *blocker).collect(),
-        }),
+        _ => {
+            let mut legal: BTreeSet<Entity> =
+                blockers_of.iter().map(|(blocker, _)| *blocker).collect();
+            let trample_defender =
+                definition.keywords.contains(&keywords::Keyword::Trample).then_some(defending);
+            if let Some(defender) = trample_defender {
+                legal.insert(defender);
+            }
+            needed.push(actions::RequiredCombatDamage {
+                source,
+                amount,
+                legal,
+                trample_defender,
+                lethal_by_target: blockers_of.iter().copied().collect(),
+            });
+        }
     }
     writes
 }

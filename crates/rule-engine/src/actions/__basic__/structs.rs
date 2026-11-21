@@ -1,6 +1,6 @@
 use bevy::prelude::Entity;
 
-use std::collections::BTreeSet;
+use std::collections::{BTreeMap, BTreeSet};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TargetChoice {
@@ -33,6 +33,8 @@ pub struct RequiredCombatDamage {
     pub source: Entity,
     pub amount: u32,
     pub legal: BTreeSet<Entity>,
+    pub trample_defender: Option<Entity>,
+    pub lethal_by_target: BTreeMap<Entity, u32>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
