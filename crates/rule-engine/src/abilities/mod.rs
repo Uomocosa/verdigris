@@ -1,7 +1,7 @@
 #[path = "__basic__/mod.rs"]
 mod basic;
 
-pub use basic::card_text::{at, beginning_of, when, whenever};
+pub use basic::card_text::{at, when, whenever};
 pub use basic::structs::TriggeredAbility;
 
 mod ability;
