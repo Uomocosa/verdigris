@@ -4,12 +4,13 @@ use bevy::prelude::{Component, EntityCommands};
 use crate::abilities;
 use crate::cards;
 use crate::effects;
+use crate::keywords;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Characteristics {
     pub on_battlefield: bool,
     pub power_toughness: Option<cards::PowerToughness>,
-    pub keywords: Vec<cards::Keyword>,
+    pub keywords: Vec<keywords::Keyword>,
     pub triggered_abilities: Vec<abilities::TriggeredAbility>,
 }
 

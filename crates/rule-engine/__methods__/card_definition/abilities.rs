@@ -19,8 +19,8 @@ mod tests {
     use crate::ANOTHER_CREATURE;
     use crate::YOU;
     use crate::abilities;
-    use crate::cards;
     use crate::effects;
+    use crate::keywords;
     use crate::testing;
 
     use super::abilities as apply_abilities;
@@ -35,11 +35,11 @@ mod tests {
         let definition = apply_abilities(
             definition,
             [
-                abilities::Ability::from(cards::vigilance()),
+                abilities::Ability::from(keywords::vigilance()),
                 abilities::Ability::from(triggered),
             ],
         );
-        assert_eq!(definition.keywords, vec![cards::Keyword::Vigilance]);
+        assert_eq!(definition.keywords, vec![keywords::Keyword::Vigilance]);
         assert_eq!(definition.triggered_abilities, [triggered]);
     }
 }

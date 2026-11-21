@@ -1,6 +1,7 @@
 use crate::card;
 use crate::cards;
 use crate::cost;
+use crate::keywords;
 use crate::pt;
 use crate::testing;
 
@@ -9,7 +10,7 @@ pub const DARKSTEEL_MYR: testing::Card = testing::Card {
     definition: || {
         card! {
             cards::artifact_creature("Darksteel Myr", cost![3], pt!(0, 1));
-            cards::indestructible(),
+            keywords::indestructible(),
         }
     },
 };
@@ -18,6 +19,7 @@ pub const DARKSTEEL_MYR: testing::Card = testing::Card {
 mod tests {
     use crate::cards;
     use crate::cost;
+    use crate::keywords;
     use crate::pt;
 
     use super::DARKSTEEL_MYR;
@@ -32,6 +34,6 @@ mod tests {
         );
         assert_eq!(myr.cost, cost![3]);
         assert_eq!(myr.power_toughness, Some(pt!(0, 1)));
-        assert_eq!(myr.keywords, vec![cards::Keyword::Indestructible]);
+        assert_eq!(myr.keywords, vec![keywords::Keyword::Indestructible]);
     }
 }

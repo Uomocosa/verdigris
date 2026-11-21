@@ -6,6 +6,7 @@ use crate::actions;
 use crate::cards;
 use crate::damage;
 use crate::effects;
+use crate::keywords;
 #[cfg(feature = "testing")]
 use crate::testing;
 
@@ -18,7 +19,7 @@ pub struct CardDefinition {
     pub land_types: Vec<cards::LandType>,
     pub power_toughness: Option<cards::PowerToughness>,
     pub effect: Option<effects::Effect>,
-    pub keywords: Vec<cards::Keyword>,
+    pub keywords: Vec<keywords::Keyword>,
     pub triggered_abilities: Vec<abilities::TriggeredAbility>,
 }
 
@@ -57,7 +58,7 @@ impl CardDefinition {
 
 impl CardDefinition {
     #[must_use]
-    pub fn keyword(mut self, keyword: cards::Keyword) -> Self {
+    pub fn keyword(mut self, keyword: keywords::Keyword) -> Self {
         self.keywords.push(keyword);
         self
     }
@@ -94,6 +95,7 @@ mod tests {
     use crate::cards;
     use crate::cost;
     use crate::effects;
+    use crate::keywords;
     use crate::pt;
 
     #[test]
@@ -102,8 +104,8 @@ mod tests {
         assert_eq!(bears.types, vec![cards::CardType::Creature]);
         assert_eq!(bears.colors(), vec![cards::Color::Green]);
         let myr = cards::artifact_creature("Darksteel Myr", cost![3], pt!(0, 1))
-            .keyword(cards::indestructible());
-        assert_eq!(myr.keywords, vec![cards::Keyword::Indestructible]);
+            .keyword(keywords::indestructible());
+        assert_eq!(myr.keywords, vec![keywords::Keyword::Indestructible]);
         let spell = cards::instant("Murder", cards::Cost::default()).spell(effects::destroy());
         assert_eq!(spell.effect, Some(effects::destroy()));
     }
@@ -112,9 +114,9 @@ mod tests {
     fn card_macro_lists_one_ability_per_line() {
         let definition = card! {
             cards::creature("Grizzly Bears", cost![1, G], pt!(2, 2));
-            cards::vigilance(),
+            keywords::vigilance(),
         };
-        assert_eq!(definition.keywords, vec![cards::Keyword::Vigilance]);
+        assert_eq!(definition.keywords, vec![keywords::Keyword::Vigilance]);
         assert_eq!(definition.triggered_abilities, Vec::new());
     }
 

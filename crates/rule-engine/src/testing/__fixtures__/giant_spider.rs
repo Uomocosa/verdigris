@@ -1,6 +1,7 @@
 use crate::card;
 use crate::cards;
 use crate::cost;
+use crate::keywords;
 use crate::pt;
 use crate::testing;
 
@@ -9,7 +10,7 @@ pub const GIANT_SPIDER: testing::Card = testing::Card {
     definition: || {
         card! {
             cards::creature("Giant Spider", cost![3, G], pt!(2, 4));
-            cards::reach(),
+            keywords::reach(),
         }
     },
 };
@@ -18,6 +19,7 @@ pub const GIANT_SPIDER: testing::Card = testing::Card {
 mod tests {
     use crate::cards;
     use crate::cost;
+    use crate::keywords;
     use crate::pt;
 
     use super::GIANT_SPIDER;
@@ -29,6 +31,6 @@ mod tests {
         assert_eq!(spider.types, vec![cards::CardType::Creature]);
         assert_eq!(spider.cost, cost![3, G]);
         assert_eq!(spider.power_toughness, Some(pt!(2, 4)));
-        assert_eq!(spider.keywords, vec![cards::Keyword::Reach]);
+        assert_eq!(spider.keywords, vec![keywords::Keyword::Reach]);
     }
 }

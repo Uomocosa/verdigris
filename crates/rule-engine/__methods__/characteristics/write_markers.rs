@@ -2,6 +2,7 @@ use bevy::prelude::EntityCommands;
 
 use crate::abilities;
 use crate::cards;
+use crate::keywords;
 
 pub fn write_markers(
     characteristics: &cards::Characteristics,
@@ -26,48 +27,48 @@ pub fn write_markers(
             entity.remove::<cards::EffectivePT>();
         }
     }
-    let desired = |keyword: cards::Keyword| {
+    let desired = |keyword: keywords::Keyword| {
         characteristics.on_battlefield && characteristics.keywords.contains(&keyword)
     };
     cards::Characteristics::sync_marker(
         entity,
-        desired(cards::Keyword::Indestructible),
+        desired(keywords::Keyword::Indestructible),
         current.indestructible,
         cards::Indestructible,
     );
     cards::Characteristics::sync_marker(
         entity,
-        desired(cards::Keyword::Deathtouch),
+        desired(keywords::Keyword::Deathtouch),
         current.deathtouch,
         cards::Deathtouch,
     );
     cards::Characteristics::sync_marker(
         entity,
-        desired(cards::Keyword::Lifelink),
+        desired(keywords::Keyword::Lifelink),
         current.lifelink,
         cards::Lifelink,
     );
     cards::Characteristics::sync_marker(
         entity,
-        desired(cards::Keyword::Trample),
+        desired(keywords::Keyword::Trample),
         current.trample,
         cards::Trample,
     );
     cards::Characteristics::sync_marker(
         entity,
-        desired(cards::Keyword::Flying),
+        desired(keywords::Keyword::Flying),
         current.flying,
         cards::Flying,
     );
     cards::Characteristics::sync_marker(
         entity,
-        desired(cards::Keyword::Reach),
+        desired(keywords::Keyword::Reach),
         current.reach,
         cards::Reach,
     );
     cards::Characteristics::sync_marker(
         entity,
-        desired(cards::Keyword::Vigilance),
+        desired(keywords::Keyword::Vigilance),
         current.vigilance,
         cards::Vigilance,
     );

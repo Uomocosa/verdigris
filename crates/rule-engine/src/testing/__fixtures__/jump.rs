@@ -2,13 +2,14 @@ use crate::CREATURE;
 use crate::cards;
 use crate::cost;
 use crate::effects;
+use crate::keywords;
 use crate::testing;
 
 pub const JUMP: testing::Card = testing::Card {
     name: testing::TestCardName("Jump"),
     definition: || {
         cards::instant("Jump", cost![U])
-            .spell(effects::gains(cards::flying()).to(effects::target(1, CREATURE)))
+            .spell(effects::gains(keywords::flying()).to(effects::target(1, CREATURE)))
     },
 };
 
@@ -18,6 +19,7 @@ mod tests {
     use crate::cards;
     use crate::cost;
     use crate::effects;
+    use crate::keywords;
 
     use super::JUMP;
 
@@ -30,7 +32,7 @@ mod tests {
         assert_eq!(jump.colors(), vec![cards::Color::Blue]);
         assert_eq!(
             jump.effect,
-            Some(effects::gains(cards::flying()).to(effects::target(1, CREATURE)))
+            Some(effects::gains(keywords::flying()).to(effects::target(1, CREATURE)))
         );
     }
 }

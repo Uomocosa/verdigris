@@ -1,6 +1,7 @@
 use crate::card;
 use crate::cards;
 use crate::cost;
+use crate::keywords;
 use crate::pt;
 use crate::testing;
 
@@ -9,7 +10,7 @@ pub const GARRUKS_COMPANION: testing::Card = testing::Card {
     definition: || {
         card! {
             cards::creature("Garruk's Companion", cost![G, G], pt!(3, 2));
-            cards::trample(),
+            keywords::trample(),
         }
     },
 };
@@ -18,6 +19,7 @@ pub const GARRUKS_COMPANION: testing::Card = testing::Card {
 mod tests {
     use crate::cards;
     use crate::cost;
+    use crate::keywords;
     use crate::pt;
 
     use super::GARRUKS_COMPANION;
@@ -29,6 +31,6 @@ mod tests {
         assert_eq!(companion.types, vec![cards::CardType::Creature]);
         assert_eq!(companion.cost, cost![G, G]);
         assert_eq!(companion.power_toughness, Some(pt!(3, 2)));
-        assert_eq!(companion.keywords, vec![cards::Keyword::Trample]);
+        assert_eq!(companion.keywords, vec![keywords::Keyword::Trample]);
     }
 }

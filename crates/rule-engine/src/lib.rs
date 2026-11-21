@@ -6,6 +6,7 @@ mod basic;
 pub mod cards;
 pub mod damage;
 pub mod effects;
+pub mod keywords;
 pub mod players;
 #[path = "../__rules__/mod.rs"]
 mod rules;

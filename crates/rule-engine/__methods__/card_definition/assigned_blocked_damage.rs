@@ -3,6 +3,7 @@ use bevy::prelude::{Entity, Query};
 use crate::actions;
 use crate::cards;
 use crate::damage;
+use crate::keywords;
 
 pub fn assigned_blocked_damage(
     definition: &cards::CardDefinition,
@@ -48,7 +49,7 @@ pub fn assigned_blocked_damage(
     }
     match blockers_of.as_slice() {
         [(blocker, lethal)] => {
-            let into_blocker = if definition.keywords.contains(&cards::Keyword::Trample) {
+            let into_blocker = if definition.keywords.contains(&keywords::Keyword::Trample) {
                 amount.min(*lethal)
             } else {
                 amount
@@ -69,7 +70,7 @@ pub fn assigned_blocked_damage(
                 });
             }
         }
-        [] if definition.keywords.contains(&cards::Keyword::Trample) => {
+        [] if definition.keywords.contains(&keywords::Keyword::Trample) => {
             writes.push(damage::DamageDealt {
                 source,
                 target: defending,

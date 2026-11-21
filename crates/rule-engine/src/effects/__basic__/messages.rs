@@ -1,6 +1,6 @@
 use bevy::prelude::{Entity, Message};
 
-use crate::cards;
+use crate::keywords;
 
 #[derive(Message, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct PowerToughnessModified {
@@ -12,5 +12,5 @@ pub struct PowerToughnessModified {
 #[derive(Message, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct KeywordGranted {
     pub target: Entity,
-    pub keyword: cards::Keyword,
+    pub keyword: keywords::Keyword,
 }

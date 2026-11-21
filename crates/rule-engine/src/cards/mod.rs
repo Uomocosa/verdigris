@@ -1,17 +1,14 @@
 #[path = "__basic__/mod.rs"]
 mod basic;
 
-pub use basic::card_text::{
-    artifact_creature, creature, deathtouch, flying, indestructible, instant, land, lifelink,
-    reach, sorcery, trample, vigilance,
-};
+pub use basic::card_text::{artifact_creature, creature, instant, land, sorcery};
 pub use basic::components::{
     Attacking, Blocked, Blocking, Deathtouch, EffectivePT, EnteredOnTurn, Flying, Indestructible,
     Lifelink, OnBattlefield, Owner, Reach, Tapped, Trample, TriggeredAtStep, TriggeredEnters,
     Vigilance,
 };
 pub use basic::current_markers::{CurrentMarkers, CurrentMarkersItem};
-pub use basic::enums::{CardType, Color, Keyword, ManaSymbol, Supertype};
+pub use basic::enums::{CardType, Color, ManaSymbol, Supertype};
 pub use basic::messages::Entered;
 pub use basic::newtypes::CardName;
 pub use basic::structs::PowerToughness;

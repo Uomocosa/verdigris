@@ -1,6 +1,7 @@
 use crate::card;
 use crate::cards;
 use crate::cost;
+use crate::keywords;
 use crate::pt;
 use crate::testing;
 
@@ -9,7 +10,7 @@ pub const WIND_DRAKE: testing::Card = testing::Card {
     definition: || {
         card! {
             cards::creature("Wind Drake", cost![2, U], pt!(2, 2));
-            cards::flying(),
+            keywords::flying(),
         }
     },
 };
@@ -18,6 +19,7 @@ pub const WIND_DRAKE: testing::Card = testing::Card {
 mod tests {
     use crate::cards;
     use crate::cost;
+    use crate::keywords;
     use crate::pt;
 
     use super::WIND_DRAKE;
@@ -29,6 +31,6 @@ mod tests {
         assert_eq!(drake.types, vec![cards::CardType::Creature]);
         assert_eq!(drake.cost, cost![2, U]);
         assert_eq!(drake.power_toughness, Some(pt!(2, 2)));
-        assert_eq!(drake.keywords, vec![cards::Keyword::Flying]);
+        assert_eq!(drake.keywords, vec![keywords::Keyword::Flying]);
     }
 }

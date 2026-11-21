@@ -52,6 +52,7 @@ pub fn r613_1_layers(
 mod tests {
     use crate::cards;
     use crate::effects;
+    use crate::keywords;
     use crate::mana;
     use crate::testing::*;
     use crate::{BATTLEFIELD, GRAVEYARD, HAND};
@@ -111,7 +112,7 @@ mod tests {
                 .iter()
                 .filter(|effect| {
                     effect.affected == bears
-                        && effect.change == effects::Layered::GainKeyword(cards::Keyword::Flying)
+                        && effect.change == effects::Layered::GainKeyword(keywords::Keyword::Flying)
                 })
                 .count()
         });

@@ -1,5 +1,5 @@
-use crate::cards;
 use crate::effects;
+use crate::keywords;
 
 #[must_use]
 pub const fn damage(amount: u32) -> effects::Effect {
@@ -74,7 +74,7 @@ pub const fn gets(power: i32, toughness: i32) -> effects::Effect {
 }
 
 #[must_use]
-pub const fn gains(keyword: cards::Keyword) -> effects::Effect {
+pub const fn gains(keyword: keywords::Keyword) -> effects::Effect {
     effects::Effect {
         kind: effects::EffectKind::GainKeyword(keyword),
         then: None,

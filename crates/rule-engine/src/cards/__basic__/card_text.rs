@@ -80,38 +80,3 @@ pub fn land(
         keywords: Vec::new(),
     }
 }
-
-#[must_use]
-pub const fn indestructible() -> cards::Keyword {
-    cards::Keyword::Indestructible
-}
-
-#[must_use]
-pub const fn deathtouch() -> cards::Keyword {
-    cards::Keyword::Deathtouch
-}
-
-#[must_use]
-pub const fn lifelink() -> cards::Keyword {
-    cards::Keyword::Lifelink
-}
-
-#[must_use]
-pub const fn trample() -> cards::Keyword {
-    cards::Keyword::Trample
-}
-
-#[must_use]
-pub const fn flying() -> cards::Keyword {
-    cards::Keyword::Flying
-}
-
-#[must_use]
-pub const fn reach() -> cards::Keyword {
-    cards::Keyword::Reach
-}
-
-#[must_use]
-pub const fn vigilance() -> cards::Keyword {
-    cards::Keyword::Vigilance
-}

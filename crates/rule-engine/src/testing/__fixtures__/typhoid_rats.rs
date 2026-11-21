@@ -1,6 +1,7 @@
 use crate::card;
 use crate::cards;
 use crate::cost;
+use crate::keywords;
 use crate::pt;
 use crate::testing;
 
@@ -9,7 +10,7 @@ pub const TYPHOID_RATS: testing::Card = testing::Card {
     definition: || {
         card! {
             cards::creature("Typhoid Rats", cost![B], pt!(1, 1));
-            cards::deathtouch(),
+            keywords::deathtouch(),
         }
     },
 };
@@ -18,6 +19,7 @@ pub const TYPHOID_RATS: testing::Card = testing::Card {
 mod tests {
     use crate::cards;
     use crate::cost;
+    use crate::keywords;
     use crate::pt;
 
     use super::TYPHOID_RATS;
@@ -29,6 +31,6 @@ mod tests {
         assert_eq!(rats.types, vec![cards::CardType::Creature]);
         assert_eq!(rats.cost, cost![B]);
         assert_eq!(rats.power_toughness, Some(pt!(1, 1)));
-        assert_eq!(rats.keywords, vec![cards::Keyword::Deathtouch]);
+        assert_eq!(rats.keywords, vec![keywords::Keyword::Deathtouch]);
     }
 }

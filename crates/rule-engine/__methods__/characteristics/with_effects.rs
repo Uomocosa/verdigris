@@ -37,6 +37,7 @@ mod tests {
 
     use crate::cards;
     use crate::effects;
+    use crate::keywords;
     use crate::testing;
 
     use super::with_effects;
@@ -79,12 +80,12 @@ mod tests {
         );
         let grant = effects::ContinuousEffect {
             affected: Entity::PLACEHOLDER,
-            change: effects::Layered::GainKeyword(cards::Keyword::Flying),
+            change: effects::Layered::GainKeyword(keywords::Keyword::Flying),
             until: effects::Duration::UntilEndOfTurn,
             timestamp: 0,
         };
         let granted = with_effects(from_printed_value, &[grant]);
-        assert!(granted.keywords.contains(&cards::Keyword::Flying));
+        assert!(granted.keywords.contains(&keywords::Keyword::Flying));
         assert_eq!(
             granted.power_toughness,
             Some(cards::PowerToughness {

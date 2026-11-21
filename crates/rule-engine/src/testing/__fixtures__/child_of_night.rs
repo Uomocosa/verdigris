@@ -1,6 +1,7 @@
 use crate::card;
 use crate::cards;
 use crate::cost;
+use crate::keywords;
 use crate::pt;
 use crate::testing;
 
@@ -9,15 +10,15 @@ pub const CHILD_OF_NIGHT: testing::Card = testing::Card {
     definition: || {
         card! {
             cards::creature("Child of Night", cost![1, B], pt!(2, 1));
-            cards::lifelink(),
+            keywords::lifelink(),
         }
     },
 };
 
 #[cfg(test)]
 mod tests {
-    use crate::cards;
     use crate::cost;
+    use crate::keywords;
     use crate::pt;
 
     use super::CHILD_OF_NIGHT;
@@ -28,6 +29,6 @@ mod tests {
         assert_eq!(*vampire.name, "Child of Night");
         assert_eq!(vampire.cost, cost![1, B]);
         assert_eq!(vampire.power_toughness, Some(pt!(2, 1)));
-        assert_eq!(vampire.keywords, vec![cards::Keyword::Lifelink]);
+        assert_eq!(vampire.keywords, vec![keywords::Keyword::Lifelink]);
     }
 }
