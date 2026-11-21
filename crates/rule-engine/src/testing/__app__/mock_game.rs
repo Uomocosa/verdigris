@@ -128,9 +128,6 @@ impl MockGame {
     pub fn stack(&self) -> testing::CardsInZone {}
 
     #[must_use]
-    pub fn zone_of(&self, card: impl Into<Entity>) -> zones::Zone {}
-
-    #[must_use]
     pub fn target_choice(&self) -> Option<testing::ExpectedTargets> {}
 
     #[must_use]

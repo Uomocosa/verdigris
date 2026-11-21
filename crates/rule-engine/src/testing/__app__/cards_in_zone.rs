@@ -40,7 +40,7 @@ impl CardsInZone {
     #[must_use]
     pub fn has_trigger(&self, query: testing::TriggerQuery) -> bool { self.objects.iter().any(|object| query.matches(object).is_some()) }
 
-    pub fn exactly<const N: usize>(&self, card: impl Into<testing::CardQuery>) -> Result<[testing::TestCard; N], testing::CardsError> { self.matching(card).exactly::<N>() }
+    pub fn exactly<const N: usize>(&self, card: testing::Card) -> Result<[testing::TestCard; N], testing::CardsError> { self.matching(card).exactly::<N>() }
 }
 
 impl CardsInZone {
@@ -102,7 +102,6 @@ mod tests {
         let [found] = cards.exactly::<1>(LIGHTNING_BOLT)?;
 
         assert!(cards.has(found));
-        assert_eq!(cards.exactly::<1>(found), Ok([found]));
         Ok(())
     }
 
