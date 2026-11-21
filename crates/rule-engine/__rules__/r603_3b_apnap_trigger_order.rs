@@ -103,10 +103,11 @@ mod tests {
             P2,
         ]);
         let [bears] = game.player(p1).cards_in(HAND).exactly::<1>(GRIZZLY_BEARS)?;
-        let [first, second] = game.player(p1).cards_in(BATTLEFIELD).exactly::<2>(SOUL_WARDEN)?;
+        let [warden_1, warden_2] =
+            game.player(p1).cards_in(BATTLEFIELD).exactly::<2>(SOUL_WARDEN)?;
         game.play([p1.cast(bears).pass_priority(), p2.pass_priority()])?;
         assert_eq!(game.trigger_sources().len(), 0);
-        game.play([p1.order_triggers([first, second])])?;
+        game.play([p1.order_triggers([warden_1, warden_2])])?;
         assert_eq!(game.trigger_sources().len(), 2);
         game.play([p1.pass_priority(), p2.pass_priority()])?;
         game.play([p1.pass_priority(), p2.pass_priority()])?;
@@ -121,7 +122,8 @@ mod tests {
             P2,
         ]);
         let [bears] = game.player(p1).cards_in(HAND).exactly::<1>(GRIZZLY_BEARS)?;
-        let [first, second] = game.player(p1).cards_in(BATTLEFIELD).exactly::<2>(SOUL_WARDEN)?;
+        let [warden_1, warden_2] =
+            game.player(p1).cards_in(BATTLEFIELD).exactly::<2>(SOUL_WARDEN)?;
         game.play([p1.cast(bears).pass_priority(), p2.pass_priority()])?;
         let pending = game.app.world().resource::<actions::PendingChoice>().as_ref().cloned();
         let Some(actions::Choice::OrderTriggers(choice)) = pending else {
@@ -130,13 +132,13 @@ mod tests {
         assert_eq!(choice.player, *p1);
         let mut triggers = choice.triggers;
         triggers.sort();
-        let mut expected = [Entity::from(first), Entity::from(second)];
+        let mut expected = [Entity::from(warden_1), Entity::from(warden_2)];
         expected.sort();
         assert_eq!(triggers, expected);
-        game.play([p1.order_triggers([first, second])])?;
+        game.play([p1.order_triggers([warden_1, warden_2])])?;
         assert_eq!(
             game.trigger_sources(),
-            vec![Entity::from(first), Entity::from(second)]
+            vec![Entity::from(warden_1), Entity::from(warden_2)]
         );
         Ok(())
     }

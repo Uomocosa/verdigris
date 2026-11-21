@@ -94,11 +94,11 @@ mod tests {
             P1.hand([JUMP, JUMP]).battlefield([GRIZZLY_BEARS]).mana_pool(mana![U, U]),
             P2,
         ]);
-        let [first, second] = game.player(p1).cards_in(HAND).exactly::<2>(JUMP)?;
+        let [jump_1, jump_2] = game.player(p1).cards_in(HAND).exactly::<2>(JUMP)?;
         let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
         game.play([
-            p1.cast(first).targeting(bears),
-            p1.cast(second).targeting(bears).pass_priority(),
+            p1.cast(jump_1).targeting(bears),
+            p1.cast(jump_2).targeting(bears).pass_priority(),
             p2.pass_priority(),
             p1.pass_priority(),
             p2.pass_priority(),

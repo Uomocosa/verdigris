@@ -105,11 +105,11 @@ mod tests {
                 .mana_pool(mana![G, G]),
             P2,
         ]);
-        let [first, second] = game.player(p1).cards_in(HAND).exactly::<2>(GIANT_GROWTH)?;
+        let [growth_1, growth_2] = game.player(p1).cards_in(HAND).exactly::<2>(GIANT_GROWTH)?;
         let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
         game.play([
-            p1.cast(first).targeting(bears),
-            p1.cast(second).targeting(bears).pass_priority(),
+            p1.cast(growth_1).targeting(bears),
+            p1.cast(growth_2).targeting(bears).pass_priority(),
             p2.pass_priority(),
             p1.pass_priority(),
             p2.pass_priority(),
