@@ -344,7 +344,7 @@ mod tests {
             P2.battlefield([TYPHOID_RATS, TYPHOID_RATS]),
         ]);
         let [companion] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GARRUKS_COMPANION)?;
-        let [first, second] = game.player(p2).cards_in(BATTLEFIELD).exactly::<2>(TYPHOID_RATS)?;
+        let [rats_1, rats_2] = game.player(p2).cards_in(BATTLEFIELD).exactly::<2>(TYPHOID_RATS)?;
         game.play([
             p1.pass_to(turns::Step::DeclareAttackers),
             p2.pass_to(turns::Step::DeclareAttackers),
@@ -356,7 +356,7 @@ mod tests {
         ])?;
         game.play([
             p1.pass_priority(),
-            p2.declare_blockers([(first, companion), (second, companion)]),
+            p2.declare_blockers([(rats_1, companion), (rats_2, companion)]),
         ])?;
         game.play([
             p1.pass_to(turns::Step::CombatDamage),
@@ -366,11 +366,11 @@ mod tests {
             p1,
             actions::Action::AssignCombatDamage(vec![
                 actions::DamageAssignment {
-                    target: first.into(),
+                    target: rats_1.into(),
                     amount: 1,
                 },
                 actions::DamageAssignment {
-                    target: second.into(),
+                    target: rats_2.into(),
                     amount: 1,
                 },
                 actions::DamageAssignment {
@@ -382,8 +382,8 @@ mod tests {
         game.play([p1.pass_priority(), p2.pass_priority()])?;
 
         assert_eq!(game.player(p2).life(), 19);
-        assert!(game.player(p2).cards_in(GRAVEYARD).has(first));
-        assert!(game.player(p2).cards_in(GRAVEYARD).has(second));
+        assert!(game.player(p2).cards_in(GRAVEYARD).has(rats_1));
+        assert!(game.player(p2).cards_in(GRAVEYARD).has(rats_2));
         Ok(())
     }
 

@@ -77,14 +77,14 @@ mod tests {
             P1.battlefield([ISAMARU_HOUND_OF_KONDA, ISAMARU_HOUND_OF_KONDA]),
             P2,
         ]);
-        let [kept, buried] =
+        let [isamaru_1, isamaru_2] =
             game.player(p1).cards_in(BATTLEFIELD).exactly::<2>(ISAMARU_HOUND_OF_KONDA)?;
 
         game.play([p1.pass_priority()])?;
-        game.act(p1, actions::Action::ChooseLegendary(kept.into()));
+        game.act(p1, actions::Action::ChooseLegendary(isamaru_1.into()));
 
-        assert!(game.player(p1).cards_in(BATTLEFIELD).has(kept));
-        assert!(game.player(p1).cards_in(GRAVEYARD).has(buried));
+        assert!(game.player(p1).cards_in(BATTLEFIELD).has(isamaru_1));
+        assert!(game.player(p1).cards_in(GRAVEYARD).has(isamaru_2));
         Ok(())
     }
 }

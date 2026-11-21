@@ -111,3 +111,26 @@ assert_eq!(
 **New test cards outside `src/testing/__fixtures__/cards/`.**
 Stray fixture locations make cards undiscoverable; every test card lives in
 `crates/rule-engine/src/testing/__fixtures__/cards/`.
+
+**A test binding named for its role instead of the card it holds.**
+`kept`, `buried`, `attacking`, `blocker`, `dead` say what the scenario expects, not which
+permanent the test is about: the binding cannot be grepped by card, and it goes stale as soon as
+the assertion changes. Keep the card name as the stem; add a suffix only to tell two of the same
+card apart (`_1`/`_2`, `_opponent`, `_blocking`). The zone or the assertion already carries the
+role.
+
+```rust
+// Bad: which Isamaru is which, and what happens when the assertion changes?
+let [kept, buried] =
+    game.player(p1).cards_in(BATTLEFIELD).exactly::<2>(ISAMARU_HOUND_OF_KONDA)?;
+game.act(p1, actions::Action::ChooseLegendary(kept.into()));
+assert!(game.player(p1).cards_in(GRAVEYARD).has(buried));
+// Good
+let [isamaru_1, isamaru_2] =
+    game.player(p1).cards_in(BATTLEFIELD).exactly::<2>(ISAMARU_HOUND_OF_KONDA)?;
+game.act(p1, actions::Action::ChooseLegendary(isamaru_1.into()));
+assert!(game.player(p1).cards_in(GRAVEYARD).has(isamaru_2));
+```
+
+Also good: `bolt`, `bolt_opponent`, `rats_1`, `bears_blocking`. Not a card, so the role stays:
+`let [p1, p2] = ..`, `let zone = game.zone_entity(..)`.
