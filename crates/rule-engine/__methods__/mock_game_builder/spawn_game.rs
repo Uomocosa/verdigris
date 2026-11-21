@@ -8,7 +8,7 @@ use crate::damage;
 use crate::testing;
 use crate::turns;
 use crate::zones;
-use crate::{BATTLEFIELD, EXILE, GRAVEYARD, HAND, LIBRARY, STACK};
+use crate::{BATTLEFIELD, EXILE, GRAVEYARD, HAND, LIBRARY};
 
 pub fn spawn_game(
     builder: &testing::MockGameBuilder,
@@ -47,7 +47,7 @@ pub fn spawn_game(
                 .collect()
         })
         .collect();
-    let stack = app.world_mut().spawn((STACK,)).id();
+    let stack = app.world_mut().spawn((zones::Zone::Stack,)).id();
 
     for (index, (player, setup)) in entities.iter().zip(players).enumerate() {
         let Some(player_zones) = zone_maps.get(index) else {

@@ -2,6 +2,7 @@
 mod basic;
 
 pub use basic::components::{InZone, ZoneContents};
+pub use basic::enums::SharedZone;
 
 mod zone;
 pub use zone::Zone;

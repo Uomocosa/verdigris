@@ -4,9 +4,10 @@ use crate::zones;
 
 pub fn find(
     lookup: &zones::ZoneLookup,
-    zone: zones::Zone,
+    zone: impl Into<zones::Zone>,
     owner: Option<Entity>,
 ) -> Option<Entity> {
+    let zone = zone.into();
     lookup.iter().find_map(|(entity, found_zone, found_owner)| {
         if *found_zone != zone {
             return None;

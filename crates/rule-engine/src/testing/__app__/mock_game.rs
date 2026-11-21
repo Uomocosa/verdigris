@@ -82,7 +82,12 @@ impl MockGame {
 
 impl MockGame {
     #[must_use]
-    pub fn zone_entity(&self, player: testing::TestPlayer, zone: zones::Zone) -> Option<Entity> {
+    pub fn zone_entity(
+        &self,
+        player: testing::TestPlayer,
+        zone: impl Into<zones::Zone>,
+    ) -> Option<Entity> {
+        let zone = zone.into();
         if zone == zones::Zone::Stack {
             Some(self.stack)
         } else {
@@ -90,7 +95,7 @@ impl MockGame {
         }
     }
 
-    pub fn zone_size(&self, player: testing::TestPlayer, zone: zones::Zone) -> usize {
+    pub fn zone_size(&self, player: testing::TestPlayer, zone: impl Into<zones::Zone>) -> usize {
         let Some(entity) = self.zone_entity(player, zone) else {
             return 0;
         };

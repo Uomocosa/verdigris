@@ -14,13 +14,13 @@ pub struct ZoneLookup<'w, 's>(
 #[rustfmt::skip]
 impl ZoneLookup<'_, '_> {
     #[must_use]
-    pub fn contains(&self, zone: zones::Zone, card_zone: Entity) -> bool { self.get(card_zone).is_ok_and(|(_, found_zone, _)| *found_zone == zone) }
+    pub fn contains(&self, zone: impl Into<zones::Zone>, card_zone: Entity) -> bool { self.get(card_zone).is_ok_and(|(_, found_zone, _)| *found_zone == zone.into()) }
 }
 
 #[atomic_delegates]
 impl ZoneLookup<'_, '_> {
     #[must_use]
-    pub fn find(&self, zone: zones::Zone, owner: Option<Entity>) -> Option<Entity> {}
+    pub fn find(&self, zone: impl Into<zones::Zone>, owner: Option<Entity>) -> Option<Entity> {}
 }
 
 #[cfg(test)]

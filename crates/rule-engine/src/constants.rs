@@ -20,7 +20,7 @@ pub const BATTLEFIELD: zones::Zone = zones::Zone::Battlefield;
 pub const GRAVEYARD: zones::Zone = zones::Zone::Graveyard;
 pub const LIBRARY: zones::Zone = zones::Zone::Library;
 pub const EXILE: zones::Zone = zones::Zone::Exile;
-pub const STACK: zones::Zone = zones::Zone::Stack;
+pub const STACK: zones::SharedZone = zones::SharedZone::Stack;
 
 pub const UNTAP: turns::Step = turns::Step::Untap;
 pub const UPKEEP: turns::Step = turns::Step::Upkeep;
