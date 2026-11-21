@@ -20,5 +20,5 @@ pub struct ResolutionLookups<'w, 's> {
     pub abilities: Query<'w, 's, &'static stack::TriggeredAbilityOnStack>,
     pub owners: Query<'w, 's, &'static cards::Owner>,
     pub chosen_targets: Query<'w, 's, &'static stack::ChosenTarget>,
-    pub lives: Query<'w, 's, &'static players::Life>,
+    pub lives: Query<'w, 's, (Entity, &'static players::Life)>,
 }

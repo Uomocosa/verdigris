@@ -1,5 +1,5 @@
 use crate::{BATTLEFIELD, STACK};
-use bevy::prelude::{MessageReader, MessageWriter, ParamSet};
+use bevy::prelude::{Commands, MessageReader, MessageWriter, ParamSet};
 
 use crate::damage;
 use crate::effects;
@@ -19,6 +19,7 @@ use crate::zones;
 /// owner’s library instead of into its owner’s graveyard.”) Don’t just apply effects step by step
 /// without thinking in these cases—read the whole text and apply the rules of English to the text.
 pub fn r608_2_r608_2c_resolve(
+    mut commands: Commands,
     mut resolutions: MessageReader<stack::Resolution>,
     mut damage_dealt: MessageWriter<damage::DamageDealt>,
     mut destructions: MessageWriter<damage::Destruction>,
@@ -38,10 +39,7 @@ pub fn r608_2_r608_2c_resolve(
 ) {
     for resolution in resolutions.read() {
         let spell = **resolution;
-        let Ok(in_zone) = lookups.in_zone.get(spell) else {
-            continue;
-        };
-        if !zones.contains(STACK, **in_zone) {
+        if !lookups.in_zone.get(spell).is_ok_and(|zone| zones.contains(STACK, **zone)) {
             continue;
         }
         let Some(effect) = lookups
@@ -59,6 +57,10 @@ pub fn r608_2_r608_2c_resolve(
         let controller = lookups.abilities.get(spell).map_or(**owner, |ability| ability.controller);
         let chosen_target = lookups.chosen_targets.get(spell).ok().map(|chosen| **chosen);
         let player_target = chosen_target.filter(|target| lookups.lives.get(*target).is_ok());
+        let target_zone = chosen_target.and_then(|target| lookups.in_zone.get(target).ok());
+        let target_on_battlefield =
+            target_zone.is_some_and(|zone| zones.contains(BATTLEFIELD, **zone));
+        let target_on_stack = target_zone.is_some_and(|zone| zones.contains(STACK, **zone));
         for kind in [Some(effect.kind), effect.then].into_iter().flatten() {
             match kind {
                 effects::EffectKind::Damage(amount) => {
@@ -76,16 +78,14 @@ pub fn r608_2_r608_2c_resolve(
                 }
                 effects::EffectKind::Destroy => {
                     if let Some(target) = chosen_target
-                        && let Ok(target_zone) = lookups.in_zone.get(target)
-                        && zones.contains(BATTLEFIELD, **target_zone)
+                        && target_on_battlefield
                     {
                         destructions.write(damage::Destruction(target));
                     }
                 }
                 effects::EffectKind::Counter => {
                     if let Some(target) = chosen_target
-                        && let Ok(target_zone) = lookups.in_zone.get(target)
-                        && zones.contains(STACK, **target_zone)
+                        && target_on_stack
                     {
                         countered.write(stack::Countered(target));
                     }
@@ -114,8 +114,7 @@ pub fn r608_2_r608_2c_resolve(
                 }
                 effects::EffectKind::ModifyPowerToughness { power, toughness } => {
                     if let Some(target) = chosen_target
-                        && let Ok(target_zone) = lookups.in_zone.get(target)
-                        && zones.contains(BATTLEFIELD, **target_zone)
+                        && target_on_battlefield
                     {
                         effect_messages.p0().write(effects::PowerToughnessModified {
                             target,
@@ -126,11 +125,13 @@ pub fn r608_2_r608_2c_resolve(
                 }
                 effects::EffectKind::GainKeyword(keyword) => {
                     if let Some(target) = chosen_target
-                        && let Ok(target_zone) = lookups.in_zone.get(target)
-                        && zones.contains(BATTLEFIELD, **target_zone)
+                        && target_on_battlefield
                     {
                         effect_messages.p1().write(effects::KeywordGranted { target, keyword });
                     }
+                }
+                effects::EffectKind::WinTheGame => {
+                    commands.entity(controller).insert(players::Won);
                 }
             }
         }

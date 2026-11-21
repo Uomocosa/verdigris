@@ -13,5 +13,7 @@ pub struct CurrentMarkers<'a> {
     pub trample: Has<cards::Trample>,
     pub flying: Has<cards::Flying>,
     pub reach: Has<cards::Reach>,
+    pub vigilance: Has<cards::Vigilance>,
     pub enters: Option<&'a cards::TriggeredEnters>,
+    pub at_step: Option<&'a cards::TriggeredAtStep>,
 }

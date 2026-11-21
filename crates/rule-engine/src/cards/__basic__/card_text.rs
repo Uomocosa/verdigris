@@ -110,3 +110,8 @@ pub const fn flying() -> cards::Keyword {
 pub const fn reach() -> cards::Keyword {
     cards::Keyword::Reach
 }
+
+#[must_use]
+pub const fn vigilance() -> cards::Keyword {
+    cards::Keyword::Vigilance
+}

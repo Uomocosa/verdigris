@@ -1,0 +1,54 @@
+use crate::UPKEEP;
+use crate::YOU;
+use crate::cards;
+use crate::cost;
+use crate::effects;
+use crate::pt;
+use crate::testing;
+
+pub const FELIDAR_SOVEREIGN: testing::Card = testing::Card {
+    name: testing::TestCardName("Felidar Sovereign"),
+    definition: || {
+        cards::creature("Felidar Sovereign", cost![4, W, W], pt!(4, 6))
+            .keyword(cards::vigilance())
+            .keyword(cards::lifelink())
+            .triggered(cards::TriggeredAbility {
+                event: cards::TriggerEvent::BeginningOfStep(UPKEEP, YOU),
+                intervening_if: Some(cards::Condition::LifeAtLeast(YOU, 40)),
+                effect: effects::win_the_game(),
+            })
+    },
+};
+
+#[cfg(test)]
+mod tests {
+    use crate::UPKEEP;
+    use crate::YOU;
+    use crate::cards;
+    use crate::cost;
+    use crate::effects;
+    use crate::pt;
+
+    use super::FELIDAR_SOVEREIGN;
+
+    #[test]
+    fn test_usage() {
+        let sovereign = (FELIDAR_SOVEREIGN.definition)();
+        assert_eq!(*sovereign.name, "Felidar Sovereign");
+        assert_eq!(sovereign.types, vec![cards::CardType::Creature]);
+        assert_eq!(sovereign.cost, cost![4, W, W]);
+        assert_eq!(sovereign.power_toughness, Some(pt!(4, 6)));
+        assert_eq!(
+            sovereign.keywords,
+            vec![cards::Keyword::Vigilance, cards::Keyword::Lifelink]
+        );
+        assert_eq!(
+            sovereign.triggered_abilities,
+            [cards::TriggeredAbility {
+                event: cards::TriggerEvent::BeginningOfStep(UPKEEP, YOU),
+                intervening_if: Some(cards::Condition::LifeAtLeast(YOU, 40)),
+                effect: effects::win_the_game(),
+            }]
+        );
+    }
+}

@@ -74,6 +74,7 @@ pub fn r603_3b_apnap_trigger_order(
                     stack::TriggeredAbilityOnStack {
                         source: trigger.source,
                         controller: trigger.controller,
+                        intervening_if: trigger.ability.intervening_if,
                         effect: trigger.ability.effect,
                     },
                 ));

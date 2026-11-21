@@ -45,5 +45,11 @@ pub struct Flying;
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Reach;
 
+#[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Vigilance;
+
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Deref)]
 pub struct TriggeredEnters(pub cards::TriggeredAbility);
+
+#[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Deref)]
+pub struct TriggeredAtStep(pub cards::TriggeredAbility);

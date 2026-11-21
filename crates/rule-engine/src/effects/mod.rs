@@ -3,6 +3,7 @@ mod basic;
 
 pub use basic::card_text::{
     counter, damage, destroy, discard, draw, gain_life, gains, gets, lose_life, target,
+    win_the_game,
 };
 pub use basic::components::ContinuousEffect;
 pub use basic::enums::{Duration, EffectKind, FilterKind, Layered};

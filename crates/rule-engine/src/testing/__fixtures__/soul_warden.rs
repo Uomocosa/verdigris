@@ -11,6 +11,7 @@ pub const SOUL_WARDEN: testing::Card = testing::Card {
     definition: || {
         cards::creature("Soul Warden", cost![W], pt!(1, 1)).triggered(cards::TriggeredAbility {
             event: ANOTHER_CREATURE.enters(),
+            intervening_if: None,
             effect: effects::gain_life(1).to_player(YOU),
         })
     },
@@ -38,6 +39,7 @@ mod tests {
             warden.triggered_abilities,
             [cards::TriggeredAbility {
                 event: ANOTHER_CREATURE.enters(),
+                intervening_if: None,
                 effect: effects::gain_life(1).to_player(YOU),
             }]
         );

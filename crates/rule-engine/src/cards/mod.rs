@@ -3,11 +3,12 @@ mod basic;
 
 pub use basic::card_text::{
     artifact_creature, creature, deathtouch, flying, indestructible, instant, land, lifelink,
-    reach, sorcery, trample,
+    reach, sorcery, trample, vigilance,
 };
 pub use basic::components::{
     Attacking, Blocked, Blocking, Deathtouch, EffectivePT, EnteredOnTurn, Flying, Indestructible,
-    Lifelink, OnBattlefield, Owner, Reach, Tapped, Trample, TriggeredEnters,
+    Lifelink, OnBattlefield, Owner, Reach, Tapped, Trample, TriggeredAtStep, TriggeredEnters,
+    Vigilance,
 };
 pub use basic::current_markers::{CurrentMarkers, CurrentMarkersItem};
 pub use basic::enums::{CardType, Color, Keyword, ManaSymbol, Supertype, TriggerEvent};
@@ -23,6 +24,9 @@ pub use card_definition::CardDefinition;
 
 mod characteristics;
 pub use characteristics::Characteristics;
+
+mod condition;
+pub use condition::Condition;
 
 mod cost;
 pub use cost::Cost;

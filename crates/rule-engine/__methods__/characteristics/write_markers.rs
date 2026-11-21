@@ -64,6 +64,12 @@ pub fn write_markers(
         current.reach,
         cards::Reach,
     );
+    cards::Characteristics::sync_marker(
+        entity,
+        desired(cards::Keyword::Vigilance),
+        current.vigilance,
+        cards::Vigilance,
+    );
     let desired_enters = characteristics
         .on_battlefield
         .then(|| {
@@ -80,6 +86,24 @@ pub fn write_markers(
             entity.insert(enters);
         } else {
             entity.remove::<cards::TriggeredEnters>();
+        }
+    }
+    let desired_at_step = characteristics
+        .on_battlefield
+        .then(|| {
+            characteristics
+                .triggered_abilities
+                .iter()
+                .find(|ability| matches!(ability.event, cards::TriggerEvent::BeginningOfStep(_, _)))
+                .copied()
+                .map(cards::TriggeredAtStep)
+        })
+        .flatten();
+    if current.at_step != desired_at_step.as_ref() {
+        if let Some(at_step) = desired_at_step {
+            entity.insert(at_step);
+        } else {
+            entity.remove::<cards::TriggeredAtStep>();
         }
     }
 }
@@ -160,7 +184,9 @@ mod tests {
                 world.get::<cards::Trample>(bears).is_some(),
                 world.get::<cards::Flying>(bears).is_some(),
                 world.get::<cards::Reach>(bears).is_some(),
+                world.get::<cards::Vigilance>(bears).is_some(),
                 world.get::<cards::TriggeredEnters>(bears).is_some(),
+                world.get::<cards::TriggeredAtStep>(bears).is_some(),
             )
         };
         let before = snapshot(&app);
@@ -180,7 +206,9 @@ mod tests {
             cards::Trample,
             cards::Flying,
             cards::Reach,
+            cards::Vigilance,
             cards::TriggeredEnters,
+            cards::TriggeredAtStep,
         )>();
         assert_ne!(snapshot(&app), before);
         app.update();

@@ -113,6 +113,7 @@ fn spawn_trigger(world: &mut World, trigger: stack::PendingTrigger) {
         stack::TriggeredAbilityOnStack {
             source: trigger.source,
             controller: trigger.controller,
+            intervening_if: trigger.ability.intervening_if,
             effect: trigger.ability.effect,
         },
     ));

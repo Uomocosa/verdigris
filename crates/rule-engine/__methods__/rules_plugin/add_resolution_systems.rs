@@ -8,6 +8,7 @@ pub fn add_resolution_systems(app: &mut App) {
         Update,
         (
             rules::r117_4_priority::r117_4_priority,
+            rules::r608_2a_intervening_if::r608_2a_intervening_if,
             rules::r608_2b_illegal_targets::r608_2b_illegal_targets,
             rules::r608_2_r608_2c_resolve::r608_2_r608_2c_resolve,
             rules::r611_2a_continuous_effects::r611_2a_continuous_effects,
@@ -38,7 +39,7 @@ mod tests {
 
         assert_eq!(
             app.get_schedule(Update).map(Schedule::systems_len),
-            Some(12)
+            Some(13)
         );
     }
 }

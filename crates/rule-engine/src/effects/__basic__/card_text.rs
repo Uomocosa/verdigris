@@ -83,6 +83,15 @@ pub const fn gains(keyword: cards::Keyword) -> effects::Effect {
 }
 
 #[must_use]
+pub const fn win_the_game() -> effects::Effect {
+    effects::Effect {
+        kind: effects::EffectKind::WinTheGame,
+        then: None,
+        target: None,
+    }
+}
+
+#[must_use]
 pub const fn target(count: u32, filter: effects::Filter) -> effects::Target {
     effects::Target { count, filter }
 }

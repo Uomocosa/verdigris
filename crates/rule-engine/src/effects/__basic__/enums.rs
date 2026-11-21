@@ -11,6 +11,7 @@ pub enum EffectKind {
     Discard(u32),
     ModifyPowerToughness { power: i32, toughness: i32 },
     GainKeyword(cards::Keyword),
+    WinTheGame,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

@@ -1,4 +1,6 @@
 use crate::cards;
+use crate::effects;
+use crate::turns;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum CardType {
@@ -28,6 +30,7 @@ pub enum Keyword {
     Trample,
     Flying,
     Reach,
+    Vigilance,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -52,4 +55,5 @@ pub enum ManaSymbol {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum TriggerEvent {
     Enters(cards::ObjectFilter),
+    BeginningOfStep(turns::Step, effects::PlayerRef),
 }

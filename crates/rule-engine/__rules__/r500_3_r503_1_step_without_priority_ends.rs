@@ -41,7 +41,9 @@ pub fn r500_3_r503_1_step_without_priority_ends(
         }
         turns::Step::Untap => {
             turn.step = turns::Step::Upkeep;
+            priority.consecutive_passes = 0;
             priority.player = turn.active;
+            step_started.write(turns::StepStarted(turns::Step::Upkeep));
         }
         _ => {}
     }
