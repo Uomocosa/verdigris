@@ -69,7 +69,7 @@ mod tests {
         let [bears] = game.player(p1).cards_in(HAND).exactly::<1>(GRIZZLY_BEARS)?;
         game.play([p1.end_turn(), p2.end_turn()])?;
         game.play([p1.discard([bears])])?;
-        assert_eq!(game.zone_of(bears), GRAVEYARD);
+        assert!(game.player(p1).cards_in(GRAVEYARD).has(bears));
         assert_eq!(game.player(p1).cards_in(HAND).count(), 7);
         Ok(())
     }

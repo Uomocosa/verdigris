@@ -61,7 +61,7 @@ mod tests {
 
         game.play([p1.pass_priority(), p2.pass_priority(), p1.pass_priority()])?;
 
-        assert_eq!(game.zone_of(top), HAND);
+        assert!(game.player(p1).cards_in(HAND).has(top));
         assert_eq!(
             game.player(p1).cards_in(HAND).exactly::<1>(GRIZZLY_BEARS)?[0],
             top

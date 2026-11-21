@@ -68,7 +68,7 @@ mod tests {
             p2.pass_priority(),
         ])?;
         assert_eq!(game.pt(bears), Some(crate::pt!(5, 5)));
-        assert_eq!(game.zone_of(growth), GRAVEYARD);
+        assert!(game.player(p1).cards_in(GRAVEYARD).has(growth));
         Ok(())
     }
 
@@ -90,7 +90,7 @@ mod tests {
             p2.pass_priority(),
         ])?;
 
-        assert_eq!(game.zone_of(bears), BATTLEFIELD);
+        assert!(game.player(p2).cards_in(BATTLEFIELD).has(bears));
         let damage = game.get::<damage::Damage>(bears);
         assert_eq!(damage, Some(damage::Damage(3)));
         assert_eq!(game.pt(bears), Some(crate::pt!(5, 5)));

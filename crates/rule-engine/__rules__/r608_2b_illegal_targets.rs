@@ -97,7 +97,6 @@ fn target_is_legal(
 mod tests {
     use bevy::prelude::Entity;
 
-    use crate::STACK;
     use crate::cards;
     use crate::mana;
     use crate::testing::*;
@@ -112,7 +111,7 @@ mod tests {
             p1.cast(bolt).targeting(p2).pass_priority(),
             p2.pass_priority(),
         ])?;
-        assert_eq!(game.zone_of(bolt), GRAVEYARD);
+        assert!(game.player(p1).cards_in(GRAVEYARD).has(bolt));
         Ok(())
     }
 
@@ -131,12 +130,12 @@ mod tests {
             p1.cast(murder).targeting(bears).pass_priority(),
             p2.pass_priority(),
         ])?;
-        assert_eq!(game.zone_of(bears), GRAVEYARD);
-        assert_eq!(game.zone_of(murder), GRAVEYARD);
-        assert_eq!(game.zone_of(bolt), STACK);
+        assert!(game.player(p2).cards_in(GRAVEYARD).has(bears));
+        assert!(game.player(p1).cards_in(GRAVEYARD).has(murder));
+        assert!(game.stack().has(bolt));
 
         game.play([p1.pass_priority(), p2.pass_priority()])?;
-        assert_eq!(game.zone_of(bolt), GRAVEYARD);
+        assert!(game.player(p1).cards_in(GRAVEYARD).has(bolt));
         assert_eq!(game.life(p2), 20);
         Ok(())
     }
@@ -158,8 +157,8 @@ mod tests {
         game.app.world_mut().entity_mut(Entity::from(bears)).insert(definition);
 
         game.play([p1.pass_priority(), p2.pass_priority()])?;
-        assert_eq!(game.zone_of(bears), BATTLEFIELD);
-        assert_eq!(game.zone_of(blade), GRAVEYARD);
+        assert!(game.player(p2).cards_in(BATTLEFIELD).has(bears));
+        assert!(game.player(p1).cards_in(GRAVEYARD).has(blade));
         Ok(())
     }
 }

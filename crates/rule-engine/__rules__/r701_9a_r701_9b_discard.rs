@@ -94,8 +94,8 @@ mod tests {
 
         game.play([p2.discard([bears, bolt])])?;
 
-        assert_eq!(game.zone_of(bears), GRAVEYARD);
-        assert_eq!(game.zone_of(bolt), GRAVEYARD);
+        assert!(game.player(p2).cards_in(GRAVEYARD).has(bears));
+        assert!(game.player(p2).cards_in(GRAVEYARD).has(bolt));
         assert!(game.player(p2).cards_in(HAND).has(MURDER));
         Ok(())
     }
@@ -109,10 +109,6 @@ mod tests {
         let [mind_rot] = game.player(p1).cards_in(HAND).exactly::<1>(MIND_ROT)?;
         game.play([p1.cast(mind_rot).targeting(p2).end_turn(), p2.end_turn()])?;
 
-        assert_eq!(
-            game.zone_of(game.player(p2).cards_in(GRAVEYARD).exactly::<1>(GRIZZLY_BEARS)?[0]),
-            GRAVEYARD
-        );
         assert!(game.player(p2).cards_in(GRAVEYARD).has(GRIZZLY_BEARS));
         assert!(game.player(p2).cards_in(HAND).has_no(GRIZZLY_BEARS));
         Ok(())

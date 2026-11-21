@@ -68,7 +68,7 @@ mod tests {
             err.rejection(),
             Some(&actions::Rejected::CannotPay { spell: bolt.into() })
         );
-        assert_eq!(game.zone_of(bolt), HAND);
+        assert!(game.player(p1).cards_in(HAND).has(bolt));
         Ok(())
     }
 }
