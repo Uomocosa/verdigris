@@ -59,8 +59,8 @@ mod tests {
         ])?;
 
         assert_eq!(game.life(p1), 22);
-        assert_eq!(game.zone_of(vampire), GRAVEYARD);
-        assert_eq!(game.zone_of(bears), GRAVEYARD);
+        assert!(game.player(p1).cards_in(GRAVEYARD).has(vampire));
+        assert!(game.player(p2).cards_in(GRAVEYARD).has(bears));
         Ok(())
     }
 

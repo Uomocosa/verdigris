@@ -102,7 +102,7 @@ mod tests {
             p2.pass_priority(),
         ])?;
 
-        assert_eq!(game.zone_of(bears), GRAVEYARD);
+        assert!(game.player(p1).cards_in(GRAVEYARD).has(bears));
         assert!(!game.is_attacking(bears));
         Ok(())
     }

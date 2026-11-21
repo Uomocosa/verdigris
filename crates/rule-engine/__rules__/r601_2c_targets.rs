@@ -185,7 +185,7 @@ mod tests {
     use crate::actions;
     use crate::mana;
     use crate::testing::*;
-    use crate::{BATTLEFIELD, HAND, STACK};
+    use crate::{BATTLEFIELD, HAND};
 
     #[test]
     fn bolt_lists_every_legal_target() -> TestResult {
@@ -214,7 +214,7 @@ mod tests {
                 spell: murder.into()
             })
         );
-        assert_eq!(game.zone_of(murder), HAND);
+        assert!(game.player(p1).cards_in(HAND).has(murder));
         Ok(())
     }
 
@@ -263,7 +263,7 @@ mod tests {
                 spell: blade.into()
             })
         );
-        assert_eq!(game.zone_of(blade), HAND);
+        assert!(game.player(p1).cards_in(HAND).has(blade));
         Ok(())
     }
 
@@ -313,8 +313,8 @@ mod tests {
                 spell: scatter.into()
             })
         );
-        assert_eq!(game.zone_of(scatter), HAND);
-        assert_eq!(game.zone_of(bolt), STACK);
+        assert!(game.player(p2).cards_in(HAND).has(scatter));
+        assert!(game.stack().has(bolt));
         Ok(())
     }
 
@@ -335,8 +335,8 @@ mod tests {
                 spell: negate.into()
             })
         );
-        assert_eq!(game.zone_of(negate), HAND);
-        assert_eq!(game.zone_of(bears), STACK);
+        assert!(game.player(p2).cards_in(HAND).has(negate));
+        assert!(game.stack().has(bears));
         Ok(())
     }
 
@@ -357,8 +357,8 @@ mod tests {
                 spell: dispel.into()
             })
         );
-        assert_eq!(game.zone_of(dispel), HAND);
-        assert_eq!(game.zone_of(divination), STACK);
+        assert!(game.player(p2).cards_in(HAND).has(dispel));
+        assert!(game.stack().has(divination));
         Ok(())
     }
 

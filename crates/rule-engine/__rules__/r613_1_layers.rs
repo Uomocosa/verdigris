@@ -84,7 +84,7 @@ mod tests {
             p2.pass_priority(),
         ])?;
         assert!(game.has::<cards::Flying>(bears));
-        assert_eq!(game.zone_of(jump), GRAVEYARD);
+        assert!(game.player(p1).cards_in(GRAVEYARD).has(jump));
         Ok(())
     }
 
