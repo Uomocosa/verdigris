@@ -2,8 +2,8 @@
 mod basic;
 
 pub use basic::card_text::{
-    artifact_creature, beginning_of, creature, deathtouch, flying, indestructible, instant, land,
-    lifelink, reach, sorcery, trample, vigilance,
+    artifact_creature, at, beginning_of, creature, deathtouch, flying, indestructible, instant,
+    land, lifelink, reach, sorcery, trample, vigilance, when, whenever,
 };
 pub use basic::components::{
     Attacking, Blocked, Blocking, Deathtouch, EffectivePT, EnteredOnTurn, Flying, Indestructible,
@@ -18,6 +18,9 @@ pub use basic::structs::{PowerToughness, TriggeredAbility};
 
 mod object_filter;
 pub use object_filter::ObjectFilter;
+
+mod ability;
+pub use ability::Ability;
 
 mod card_definition;
 pub use card_definition::CardDefinition;

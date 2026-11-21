@@ -30,6 +30,9 @@ impl From<testing::Card> for CardDefinition {
 #[atomic_delegates]
 impl CardDefinition {
     #[must_use]
+    pub fn abilities<const N: usize>(self, list: [cards::Ability; N]) -> Self {}
+
+    #[must_use]
     pub fn spell(self, effect: effects::Effect) -> Self {}
 
     #[must_use]
@@ -46,6 +49,9 @@ impl CardDefinition {
 
     #[must_use]
     pub fn when(self, trigger: impl Into<cards::Trigger>, effect: effects::Effect) -> Self { self.whenever(trigger, effect) }
+
+    #[must_use]
+    pub fn whenever(self, trigger: impl Into<cards::Trigger>, effect: effects::Effect) -> Self { self.triggered(cards::whenever(trigger, effect)) }
 }
 
 impl CardDefinition {
@@ -53,16 +59,6 @@ impl CardDefinition {
     pub fn keyword(mut self, keyword: cards::Keyword) -> Self {
         self.keywords.push(keyword);
         self
-    }
-
-    #[must_use]
-    pub fn whenever(self, trigger: impl Into<cards::Trigger>, effect: effects::Effect) -> Self {
-        let trigger = trigger.into();
-        self.triggered(cards::TriggeredAbility {
-            event: trigger.event,
-            intervening_if: trigger.intervening_if,
-            effect,
-        })
     }
 
     #[must_use]
@@ -93,6 +89,7 @@ impl CardDefinition {
 
 #[cfg(test)]
 mod tests {
+    use crate::card;
     use crate::cards;
     use crate::cost;
     use crate::effects;
@@ -108,5 +105,24 @@ mod tests {
         assert_eq!(myr.keywords, vec![cards::Keyword::Indestructible]);
         let spell = cards::instant("Murder", cards::Cost::default()).spell(effects::destroy());
         assert_eq!(spell.effect, Some(effects::destroy()));
+    }
+
+    #[test]
+    fn card_macro_lists_one_ability_per_line() {
+        let definition = card! {
+            cards::creature("Grizzly Bears", cost![1, G], pt!(2, 2));
+            cards::vigilance(),
+        };
+        assert_eq!(definition.keywords, vec![cards::Keyword::Vigilance]);
+        assert_eq!(definition.triggered_abilities, Vec::new());
+    }
+
+    #[test]
+    fn card_macro_accepts_zero_abilities() {
+        let definition = card! {
+            cards::creature("Grizzly Bears", cost![1, G], pt!(2, 2));
+        };
+        assert_eq!(definition.keywords, Vec::new());
+        assert_eq!(definition.triggered_abilities, Vec::new());
     }
 }

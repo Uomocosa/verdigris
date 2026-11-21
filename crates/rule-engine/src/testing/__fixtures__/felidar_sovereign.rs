@@ -1,5 +1,6 @@
 use crate::UPKEEP;
 use crate::YOU;
+use crate::card;
 use crate::cards;
 use crate::cost;
 use crate::effects;
@@ -9,13 +10,12 @@ use crate::testing;
 pub const FELIDAR_SOVEREIGN: testing::Card = testing::Card {
     name: testing::TestCardName("Felidar Sovereign"),
     definition: || {
-        cards::creature("Felidar Sovereign", cost![4, W, W], pt!(4, 6))
-            .keyword(cards::vigilance())
-            .keyword(cards::lifelink())
-            .at(
-                cards::beginning_of(UPKEEP, YOU).if_(YOU.has_life_at_least(40)),
-                effects::win_the_game(),
-            )
+        card! {
+            cards::creature("Felidar Sovereign", cost![4, W, W], pt!(4, 6));
+            cards::vigilance(),
+            cards::lifelink(),
+            cards::at(cards::beginning_of(UPKEEP, YOU).if_(YOU.has_life_at_least(40)), effects::win_the_game()),
+        }
     },
 };
 

@@ -1,5 +1,6 @@
 use crate::ANOTHER_CREATURE;
 use crate::YOU;
+use crate::card;
 use crate::cards;
 use crate::cost;
 use crate::effects;
@@ -9,10 +10,10 @@ use crate::testing;
 pub const SOUL_WARDEN: testing::Card = testing::Card {
     name: testing::TestCardName("Soul Warden"),
     definition: || {
-        cards::creature("Soul Warden", cost![W], pt!(1, 1)).whenever(
-            ANOTHER_CREATURE.enters(),
-            effects::gain_life(1).to_player(YOU),
-        )
+        card! {
+            cards::creature("Soul Warden", cost![W], pt!(1, 1));
+            cards::whenever(ANOTHER_CREATURE.enters(), effects::gain_life(1).to_player(YOU)),
+        }
     },
 };
 
