@@ -39,3 +39,8 @@ pub const fn vigilance() -> keywords::Keyword {
 pub const fn defender() -> keywords::Keyword {
     keywords::Keyword::Defender
 }
+
+#[must_use]
+pub const fn haste() -> keywords::Keyword {
+    keywords::Keyword::Haste
+}

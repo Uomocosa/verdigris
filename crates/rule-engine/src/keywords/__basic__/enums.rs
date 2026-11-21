@@ -8,4 +8,5 @@ pub enum Keyword {
     Reach,
     Vigilance,
     Defender,
+    Haste,
 }

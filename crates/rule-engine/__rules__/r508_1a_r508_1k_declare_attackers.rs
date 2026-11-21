@@ -17,6 +17,9 @@ use crate::zones;
 ///
 /// # See also
 ///
+/// 702.10b If a creature has haste, it can attack even if it hasn’t been controlled by its
+/// controller continuously since their most recent turn began. (See rule 302.6.)
+///
 /// 508.1c The active player checks each creature they control to see whether it’s affected by
 /// any restrictions (effects that say a creature can’t attack, or that it can’t attack unless
 /// some condition is met). If any restrictions are being disobeyed, the declaration of
@@ -70,9 +73,10 @@ pub fn r508_1a_r508_1k_declare_attackers(
                     && **in_zone == battlefield
                     && tapped.is_none()
                     && !definition.keywords.contains(&keywords::Keyword::Defender)
-                    && entered_on.get(*attacker).is_ok_and(|on_turn| {
-                        on_turn.is_none_or(|turn_number| **turn_number != turn.number)
-                    })
+                    && (definition.keywords.contains(&keywords::Keyword::Haste)
+                        || entered_on.get(*attacker).is_ok_and(|on_turn| {
+                            on_turn.is_none_or(|turn_number| **turn_number != turn.number)
+                        }))
             })
         });
         if !all_legal {
@@ -205,6 +209,28 @@ mod tests {
             })
         );
         assert!(!game.is_attacking(wall));
+        Ok(())
+    }
+
+    #[test]
+    fn a_creature_with_haste_can_attack_the_turn_it_entered() -> TestResult {
+        use crate::HAND;
+        use crate::mana;
+
+        let (mut game, [p1, p2]) =
+            MockGame::new([P1.hand([RAGING_GOBLIN]).mana_pool(mana![R]), P2]);
+        let [goblin] = game.player(p1).cards_in(HAND).exactly::<1>(RAGING_GOBLIN)?;
+        game.play([p1.cast(goblin).pass_priority(), p2.pass_priority()])?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareAttackers),
+            p2.pass_to(turns::Step::DeclareAttackers),
+        ])?;
+
+        game.act(p1, actions::Action::DeclareAttackers(vec![goblin.into()]));
+
+        assert!(game.player(p1).cards_in(BATTLEFIELD).has(goblin));
+        assert!(game.is_attacking(goblin));
+        assert_eq!(game.last_rejection(), None);
         Ok(())
     }
 }
