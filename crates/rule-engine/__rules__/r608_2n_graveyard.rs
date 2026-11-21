@@ -64,7 +64,7 @@ mod tests {
             p1.cast(bolt).targeting(p2).pass_priority(),
             p2.pass_priority(),
         ])?;
-        assert_eq!(game.zone_of(bolt), GRAVEYARD);
+        assert!(game.player(p1).cards_in(GRAVEYARD).has(bolt));
         assert!(game.player(p1).cards_in(GRAVEYARD).has(LIGHTNING_BOLT));
         Ok(())
     }

@@ -69,11 +69,11 @@ pub fn r601_2a_cast(
 
 #[cfg(test)]
 mod tests {
+    use crate::HAND;
     use crate::actions;
     use crate::mana;
     use crate::testing::*;
     use crate::turns;
-    use crate::{HAND, STACK};
 
     #[test]
     fn casting_an_instant_moves_it_to_the_stack() -> TestResult {
@@ -81,7 +81,7 @@ mod tests {
             MockGame::new([P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]), P2]);
         let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
         game.play([p1.cast(bolt)])?;
-        assert_eq!(game.zone_of(bolt), STACK);
+        assert!(game.stack().has(bolt));
         Ok(())
     }
 
@@ -99,7 +99,7 @@ mod tests {
                 spell: divination.into()
             })
         );
-        assert_eq!(game.zone_of(divination), HAND);
+        assert!(game.player(p1).cards_in(HAND).has(divination));
         Ok(())
     }
 
@@ -119,7 +119,7 @@ mod tests {
                 spell: divination.into()
             })
         );
-        assert_eq!(game.zone_of(divination), HAND);
+        assert!(game.player(p1).cards_in(HAND).has(divination));
         Ok(())
     }
 }

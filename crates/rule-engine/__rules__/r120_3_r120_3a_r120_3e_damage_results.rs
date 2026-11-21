@@ -58,7 +58,7 @@ mod tests {
             p2.cast(bolt).targeting(corpse).pass_priority(),
             p1.pass_priority(),
         ])?;
-        assert_eq!(game.zone_of(corpse), GRAVEYARD);
+        assert!(game.player(p1).cards_in(GRAVEYARD).has(corpse));
         assert_eq!(game.life(p1), 20);
         Ok(())
     }

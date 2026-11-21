@@ -61,11 +61,8 @@ mod tests {
         game.play([p1.cast(divination).pass_priority(), p2.pass_priority()])?;
         assert!(game.player(p1).cards_in(HAND).has(GRIZZLY_BEARS));
         assert!(game.player(p1).cards_in(HAND).has(LIGHTNING_BOLT));
-        assert_eq!(game.zone_of(divination), GRAVEYARD);
-        assert_eq!(
-            game.zone_of(game.player(p1).cards_in(LIBRARY).exactly::<1>(MURDER)?[0]),
-            LIBRARY
-        );
+        assert!(game.player(p1).cards_in(GRAVEYARD).has(divination));
+        assert!(game.player(p1).cards_in(LIBRARY).has(MURDER));
         Ok(())
     }
 }

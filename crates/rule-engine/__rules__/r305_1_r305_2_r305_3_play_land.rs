@@ -101,7 +101,7 @@ mod tests {
 
         game.play([p1.play_land(forest)])?;
 
-        assert_eq!(game.zone_of(forest), BATTLEFIELD);
+        assert!(game.player(p1).cards_in(BATTLEFIELD).has(forest));
         assert!(game.last_rejection().is_none());
         Ok(())
     }
@@ -114,14 +114,14 @@ mod tests {
         game.play([p1.play_land(first)])?;
         game.act(p1, actions::Action::PlayLand(second.into()));
 
-        assert_eq!(game.zone_of(first), BATTLEFIELD);
+        assert!(game.player(p1).cards_in(BATTLEFIELD).has(first));
         assert_eq!(
             game.last_rejection(),
             Some(&actions::Rejected::CannotPlayLand {
                 land: second.into()
             })
         );
-        assert_eq!(game.zone_of(second), HAND);
+        assert!(game.player(p1).cards_in(HAND).has(second));
         Ok(())
     }
 
@@ -141,7 +141,7 @@ mod tests {
                 land: forest.into()
             })
         );
-        assert_eq!(game.zone_of(forest), HAND);
+        assert!(game.player(p1).cards_in(HAND).has(forest));
         Ok(())
     }
 }

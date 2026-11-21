@@ -62,7 +62,7 @@ mod tests {
             MockGame::new([P1.hand([GRIZZLY_BEARS]).mana_pool(mana![1, G]), P2]);
         let [bears] = game.player(p1).cards_in(HAND).exactly::<1>(GRIZZLY_BEARS)?;
         game.play([p1.cast(bears).pass_priority(), p2.pass_priority()])?;
-        assert_eq!(game.zone_of(bears), BATTLEFIELD);
+        assert!(game.player(p1).cards_in(BATTLEFIELD).has(bears));
         Ok(())
     }
 }
