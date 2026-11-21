@@ -15,8 +15,7 @@ Run tasks through the justfile; never pipe `just` into `tail`/`head`/`grep` (app
 ```bash
 just fmt        # cargo fmt --all -- --check
 just clippy     # clippy, warnings deny
-just lint       # lele-lint on every crate (root lele.toml)
-just bevy-lint  # lele-bevy-lint on rule-engine and game
+just lint       # lele-lint, lele-bevy-lint and the verdigris rules on every crate
 just test       # nextest workspace
 just ci         # build + full prek gate
 ```
@@ -36,7 +35,7 @@ If a git hook fails, stop and report the root cause; never use `--no-verify`.
 ## Working with AI assistants
 
 1. Read the relevant files and existing patterns before changing anything.
-2. Run `just fmt`, `just clippy`, `just lint`, `just bevy-lint`, `just test` after changes.
+2. Run `just fmt`, `just clippy`, `just lint`, `just test` after changes.
 3. Keep the change behaviour-preserving unless the task says otherwise.
 4. Never stage, commit, push, merge, rebase, or amend without an explicit user command.
 

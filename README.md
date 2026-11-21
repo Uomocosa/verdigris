@@ -16,10 +16,11 @@ A Magic: The Gathering rules enforcer and playable game in Bevy, with multiplaye
 ```bash
 just setup   # install the prek git hooks (one-time per clone)
 just t       # run the tests (nextest, optional name pattern)
-just ci      # build, then the full prek gate (fmt, clippy, lint, bevy-lint, test)
+just ci      # build, then the full prek gate (fmt, clippy, lint, test)
 ```
 
-`just lint` and `just bevy-lint` read the root `lele.toml`; boundaries are workspace-relative.
+`just lint` reads the root `lele.toml` and runs lele-lint, lele-bevy-lint and the verdigris
+rules; boundaries are workspace-relative.
 
 ## Adding a rule
 

@@ -27,12 +27,21 @@ quoted_rules() {
 # several systems. Collect the RuleSet:: names from every block that registers
 # this system: one name is its set; several names mean it is only being ordered
 # between sets (the layers system), so report that set rather than a single lie.
+# A block with no RuleSet:: is registered in a named schedule; report the RuleSet
+# that drives that schedule (see set_for_schedule).
 rule_set_of() {
     awk -v name="$1" '
         function add_unique(list, value) {
             if (index(" " list " ", " " value " ") == 0)
                 return (list == "" ? value : list " " value)
             return list
+        }
+        # A system registered in a named schedule rather than with .in_set() still
+        # runs under the RuleSet that drives that schedule (StateBasedActions is
+        # run by r117_5 inside RuleSet::StateBased), so report the RuleSet name.
+        function set_for_schedule(schedule) {
+            if (schedule == "StateBasedActions") return "StateBased"
+            return "no set (" schedule ")"
         }
         function parse_block(block,    rest, tok, r, rs, schedule, tmp, parts, found) {
             tmp = block
@@ -72,7 +81,7 @@ rule_set_of() {
         END {
             if (!(name in seen)) exit
             n = split(sets[name], order, " ")
-            if (n == 0) print "no set (" schedules[name] ")"
+            if (n == 0) print set_for_schedule(schedules[name])
             else if (n == 1) print order[1]
             else {
                 printf "ordered ("
