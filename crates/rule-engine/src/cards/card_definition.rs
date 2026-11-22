@@ -1,3 +1,5 @@
+use std::collections::BTreeSet;
+
 use atomic_delegate_macros::atomic_delegates;
 use bevy::prelude::{Component, Entity, Query};
 
@@ -84,6 +86,7 @@ impl CardDefinition {
             Option<&damage::Damage>,
             Option<&cards::EffectivePT>,
         )>,
+        participants: &BTreeSet<Entity>,
         needed: &mut Vec<actions::RequiredCombatDamage>,
     ) -> Vec<damage::DamageDealt> {
     }

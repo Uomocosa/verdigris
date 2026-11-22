@@ -26,6 +26,8 @@ pub fn register_messages_and_resources(app: &mut App) {
         .add_message::<turns::StepStarted>()
         .add_message::<turns::AllPlayersPassed>();
     app.init_resource::<actions::PendingChoice>();
+    app.init_resource::<turns::CombatDamageSteps>();
+    app.init_resource::<turns::CombatDamageParticipants>();
     app.init_resource::<StateBasedActionsPerformed>();
     app.init_resource::<effects::Timestamp>();
     app.init_resource::<stack::TriggerQueue>();

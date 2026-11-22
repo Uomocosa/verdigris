@@ -10,4 +10,6 @@ pub enum Keyword {
     Defender,
     Haste,
     Hexproof,
+    FirstStrike,
+    DoubleStrike,
 }

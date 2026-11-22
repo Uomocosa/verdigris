@@ -15,6 +15,7 @@ pub mod r404_1_graveyard_top;
 pub mod r500_1_r500_2_step_ends;
 pub mod r500_3_r503_1_step_without_priority_ends;
 pub mod r502_3_untap;
+pub mod r506_1_r510_4_r702_4b_r702_7b_combat_damage_steps;
 pub mod r506_2a_r507_1_r508_1b_defending_player;
 pub mod r506_4_r511_3_remove_from_combat;
 pub mod r508_1a_r508_1k_declare_attackers;

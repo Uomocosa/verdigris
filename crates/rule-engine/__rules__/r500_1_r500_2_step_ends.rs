@@ -1,4 +1,4 @@
-use bevy::prelude::{MessageReader, MessageWriter, ResMut};
+use bevy::prelude::{MessageReader, MessageWriter, Res, ResMut};
 
 use crate::turns;
 
@@ -16,7 +16,9 @@ pub fn r500_1_r500_2_step_ends(
     mut step_started: MessageWriter<turns::StepStarted>,
     mut turn: ResMut<turns::Turn>,
     mut priority: ResMut<turns::Priority>,
+    combat_damage_steps: Res<turns::CombatDamageSteps>,
 ) {
+    let combat_damage_steps = *combat_damage_steps.into_inner();
     for _ in all_players_passed.read() {
         let next = match turn.step {
             turns::Step::Untap => turns::Step::Upkeep,
@@ -26,7 +28,13 @@ pub fn r500_1_r500_2_step_ends(
             turns::Step::BeginningOfCombat => turns::Step::DeclareAttackers,
             turns::Step::DeclareAttackers | turns::Step::Cleanup => continue,
             turns::Step::DeclareBlockers => turns::Step::CombatDamage,
-            turns::Step::CombatDamage => turns::Step::EndOfCombat,
+            turns::Step::CombatDamage => match combat_damage_steps {
+                turns::CombatDamageSteps::FirstOfTwo => turns::Step::SecondCombatDamage,
+                turns::CombatDamageSteps::Single | turns::CombatDamageSteps::SecondOfTwo => {
+                    turns::Step::EndOfCombat
+                }
+            },
+            turns::Step::SecondCombatDamage => turns::Step::EndOfCombat,
             turns::Step::EndOfCombat => turns::Step::PostcombatMain,
             turns::Step::PostcombatMain => turns::Step::End,
             turns::Step::End => turns::Step::Cleanup,

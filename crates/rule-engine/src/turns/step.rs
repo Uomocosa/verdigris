@@ -10,6 +10,7 @@ pub enum Step {
     DeclareAttackers,
     DeclareBlockers,
     CombatDamage,
+    SecondCombatDamage,
     EndOfCombat,
     PostcombatMain,
     End,
@@ -26,6 +27,7 @@ impl Step {
             | Self::DeclareAttackers
             | Self::DeclareBlockers
             | Self::CombatDamage
+            | Self::SecondCombatDamage
             | Self::EndOfCombat => turns::Phase::Combat,
             Self::PostcombatMain => turns::Phase::PostcombatMain,
             Self::End | Self::Cleanup => turns::Phase::Ending,
@@ -50,6 +52,7 @@ mod tests {
             (Step::DeclareAttackers, turns::Phase::Combat),
             (Step::DeclareBlockers, turns::Phase::Combat),
             (Step::CombatDamage, turns::Phase::Combat),
+            (Step::SecondCombatDamage, turns::Phase::Combat),
             (Step::EndOfCombat, turns::Phase::Combat),
             (Step::PostcombatMain, turns::Phase::PostcombatMain),
             (Step::End, turns::Phase::Ending),

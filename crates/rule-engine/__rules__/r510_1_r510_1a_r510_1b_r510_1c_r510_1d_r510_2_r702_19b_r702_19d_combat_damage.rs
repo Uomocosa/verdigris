@@ -81,10 +81,15 @@ pub fn r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_r702_19b_r702_19d_combat_da
     )>,
     defenders: Query<Entity, With<players::DefendingPlayer>>,
     turn: Res<turns::Turn>,
+    participants: Res<turns::CombatDamageParticipants>,
 ) {
     let turn = turn.into_inner();
+    let participants = participants.into_inner();
     for step in step_started.read() {
-        if **step != turns::Step::CombatDamage {
+        if !matches!(
+            **step,
+            turns::Step::CombatDamage | turns::Step::SecondCombatDamage
+        ) {
             continue;
         }
         let Some(defending) = defenders.iter().next() else {
@@ -92,14 +97,11 @@ pub fn r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_r702_19b_r702_19d_combat_da
         };
         let mut needed: Vec<actions::RequiredCombatDamage> = Vec::new();
         for (attacker, definition, effective, blocked) in attackers.iter() {
-            let power_toughness = **effective;
-            if power_toughness.power <= 0 {
-                continue;
-            }
-            let Ok(amount) = u32::try_from(power_toughness.power) else {
-                continue;
-            };
+            let amount = u32::try_from(effective.power).unwrap_or(0);
             if blocked.is_none() {
+                if amount == 0 || !participants.contains(&attacker) {
+                    continue;
+                }
                 dealt.write(damage::DamageDealt {
                     source: attacker,
                     target: defending,
@@ -111,6 +113,7 @@ pub fn r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_r702_19b_r702_19d_combat_da
                     amount,
                     defending,
                     &blockers,
+                    participants,
                     &mut needed,
                 ) {
                     dealt.write(write);

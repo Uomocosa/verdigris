@@ -18,6 +18,7 @@ pub fn assigned_blocked_damage(
         Option<&damage::Damage>,
         Option<&cards::EffectivePT>,
     )>,
+    participants: &BTreeSet<Entity>,
     needed: &mut Vec<actions::RequiredCombatDamage>,
 ) -> Vec<damage::DamageDealt> {
     let mut writes = Vec::new();
@@ -33,6 +34,9 @@ pub fn assigned_blocked_damage(
             })
             .saturating_sub(marked.map_or(0, |damage| **damage));
         blockers_of.push((blocker, lethal));
+        if !participants.contains(&blocker) {
+            continue;
+        }
         let Some(blocker_power_toughness) = effective.map(|power_toughness| **power_toughness)
         else {
             continue;
@@ -48,6 +52,9 @@ pub fn assigned_blocked_damage(
             target: source,
             amount: blocker_amount,
         });
+    }
+    if amount == 0 || !participants.contains(&source) {
+        return writes;
     }
     match blockers_of.as_slice() {
         [(blocker, lethal)] => {
@@ -102,6 +109,8 @@ pub fn assigned_blocked_damage(
 
 #[cfg(test)]
 mod tests {
+    use std::collections::BTreeSet;
+
     use bevy::prelude::Entity;
 
     use crate::BATTLEFIELD;
@@ -138,6 +147,7 @@ mod tests {
         let source = Entity::from(companion);
         let defending = Entity::from(p2);
         let bears_blocking = Entity::from(bears);
+        let participants = BTreeSet::from([source, bears_blocking]);
         let mut needed = Vec::new();
 
         let writes = game.with_query::<(
@@ -146,7 +156,14 @@ mod tests {
             Option<&damage::Damage>,
             Option<&cards::EffectivePT>,
         ), Vec<damage::DamageDealt>>(|blockers| {
-            attacker.assigned_blocked_damage(source, 3, defending, &blockers, &mut needed)
+            attacker.assigned_blocked_damage(
+                source,
+                3,
+                defending,
+                &blockers,
+                &participants,
+                &mut needed,
+            )
         });
 
         assert_eq!(
@@ -204,6 +221,7 @@ mod tests {
         let source = Entity::from(companion);
         let defending = Entity::from(p2);
         let spider_blocking = Entity::from(spider);
+        let participants = BTreeSet::from([source, spider_blocking]);
         let mut needed = Vec::new();
 
         let writes = game.with_query::<(
@@ -212,7 +230,14 @@ mod tests {
             Option<&damage::Damage>,
             Option<&cards::EffectivePT>,
         ), Vec<damage::DamageDealt>>(|blockers| {
-            attacker.assigned_blocked_damage(source, 3, defending, &blockers, &mut needed)
+            attacker.assigned_blocked_damage(
+                source,
+                3,
+                defending,
+                &blockers,
+                &participants,
+                &mut needed,
+            )
         });
 
         assert_eq!(

@@ -49,3 +49,13 @@ pub const fn haste() -> keywords::Keyword {
 pub const fn hexproof() -> keywords::Keyword {
     keywords::Keyword::Hexproof
 }
+
+#[must_use]
+pub const fn first_strike() -> keywords::Keyword {
+    keywords::Keyword::FirstStrike
+}
+
+#[must_use]
+pub const fn double_strike() -> keywords::Keyword {
+    keywords::Keyword::DoubleStrike
+}
