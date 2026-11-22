@@ -50,6 +50,7 @@ pub mod r702_15b_lifelink;
 pub mod r704_5a_zero_life;
 pub mod r704_5b_empty_library;
 pub mod r704_5c_poison;
+pub mod r704_5d_token_outside_battlefield;
 pub mod r704_5f_zero_toughness;
 pub mod r704_5g_lethal_damage;
 pub mod r704_5h_deathtouch_damage;
