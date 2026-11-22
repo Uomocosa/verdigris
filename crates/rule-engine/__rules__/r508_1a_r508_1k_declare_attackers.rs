@@ -1,4 +1,4 @@
-use bevy::prelude::{Commands, MessageReader, MessageWriter, Query, Res};
+use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query, Res};
 
 use crate::BATTLEFIELD;
 use crate::actions;
@@ -16,6 +16,16 @@ use crate::zones;
 /// whichever comes first. See rule 506.4.
 ///
 /// # See also
+///
+/// 508.1d The active player checks each creature they control to see whether it’s affected by any
+/// requirements (effects that say a creature attacks if able, or that it attacks if some condition
+/// is met). If the number of requirements that are being obeyed is fewer than the maximum possible
+/// number of requirements that could be obeyed without disobeying any restrictions, the declaration
+/// of attackers is illegal. If a creature can’t attack unless a player pays a cost, that player is
+/// not required to pay that cost, even if attacking with that creature would increase the number of
+/// requirements being obeyed. If a requirement that says a creature attacks if able during a
+/// certain turn refers to a turn with multiple combat phases, the creature attacks if able during
+/// each declare attackers step in that turn.
 ///
 /// 702.10b If a creature has haste, it can attack even if it hasn’t been controlled by its
 /// controller continuously since their most recent turn began. (See rule 302.6.)
@@ -37,6 +47,7 @@ pub fn r508_1a_r508_1k_declare_attackers(
     priority: Res<turns::Priority>,
     turn: Res<turns::Turn>,
     cards: Query<(
+        Entity,
         &cards::CardDefinition,
         &cards::Owner,
         &zones::InZone,
@@ -67,7 +78,7 @@ pub fn r508_1a_r508_1k_declare_attackers(
             continue;
         };
         let all_legal = attackers.iter().all(|attacker| {
-            cards.get(*attacker).is_ok_and(|(definition, owner, in_zone, tapped)| {
+            cards.get(*attacker).is_ok_and(|(_, definition, owner, in_zone, tapped)| {
                 definition.types.contains(&cards::CardType::Creature)
                     && **owner == action.player
                     && **in_zone == battlefield
@@ -79,7 +90,20 @@ pub fn r508_1a_r508_1k_declare_attackers(
                         }))
             })
         });
-        if !all_legal {
+        let requirement_unmet = cards.iter().any(|(entity, definition, owner, in_zone, tapped)| {
+            **owner == action.player
+                && **in_zone == battlefield
+                && definition.types.contains(&cards::CardType::Creature)
+                && definition.keywords.contains(&keywords::Keyword::MustAttackIfAble)
+                && tapped.is_none()
+                && !definition.keywords.contains(&keywords::Keyword::Defender)
+                && (definition.keywords.contains(&keywords::Keyword::Haste)
+                    || entered_on.get(entity).is_ok_and(|on_turn| {
+                        on_turn.is_none_or(|turn_number| **turn_number != turn.number)
+                    }))
+                && !attackers.contains(&entity)
+        });
+        if !all_legal || requirement_unmet {
             rejected.write(actions::Rejected::CannotAttack {
                 attackers: attackers.clone(),
             });
@@ -231,6 +255,39 @@ mod tests {
         assert!(game.player(p1).cards_in(BATTLEFIELD).has(goblin));
         assert!(game.is_attacking(goblin));
         assert_eq!(game.last_rejection(), None);
+        Ok(())
+    }
+
+    #[test]
+    fn a_creature_that_must_attack_cannot_be_left_out_of_the_declaration() -> TestResult {
+        let (mut game, [p1, p2]) =
+            MockGame::new([P1.battlefield([MASTER_OF_THE_FEAST, GRIZZLY_BEARS]), P2]);
+        let [feast] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(MASTER_OF_THE_FEAST)?;
+        let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareAttackers),
+            p2.pass_to(turns::Step::DeclareAttackers),
+        ])?;
+
+        game.act(p1, actions::Action::DeclareAttackers(vec![]));
+        assert_eq!(
+            game.last_rejection(),
+            Some(&actions::Rejected::CannotAttack { attackers: vec![] })
+        );
+        assert!(!game.is_attacking(feast));
+
+        game.act(p1, actions::Action::DeclareAttackers(vec![bears.into()]));
+        assert_eq!(
+            game.last_rejection(),
+            Some(&actions::Rejected::CannotAttack {
+                attackers: vec![bears.into()]
+            })
+        );
+        assert!(!game.is_attacking(bears));
+
+        game.play([p1.declare_attackers([feast, bears])])?;
+        assert!(game.is_attacking(feast));
+        assert!(game.is_attacking(bears));
         Ok(())
     }
 }

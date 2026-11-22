@@ -12,4 +12,5 @@ pub enum Keyword {
     Hexproof,
     FirstStrike,
     DoubleStrike,
+    MustAttackIfAble,
 }

@@ -59,3 +59,8 @@ pub const fn first_strike() -> keywords::Keyword {
 pub const fn double_strike() -> keywords::Keyword {
     keywords::Keyword::DoubleStrike
 }
+
+#[must_use]
+pub const fn must_attack_if_able() -> keywords::Keyword {
+    keywords::Keyword::MustAttackIfAble
+}
