@@ -5,6 +5,7 @@ use crate::keywords;
 pub enum Ability {
     Keyword(keywords::Keyword),
     Triggered(abilities::TriggeredAbility),
+    Static(abilities::Static),
 }
 
 impl From<keywords::Keyword> for Ability {
@@ -16,5 +17,11 @@ impl From<keywords::Keyword> for Ability {
 impl From<abilities::TriggeredAbility> for Ability {
     fn from(ability: abilities::TriggeredAbility) -> Self {
         Self::Triggered(ability)
+    }
+}
+
+impl From<abilities::Static> for Ability {
+    fn from(ability: abilities::Static) -> Self {
+        Self::Static(ability)
     }
 }

@@ -1,3 +1,4 @@
+pub mod all;
 pub mod card_definition;
 #[cfg(feature = "testing")]
 pub mod cards;

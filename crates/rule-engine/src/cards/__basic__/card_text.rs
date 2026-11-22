@@ -15,6 +15,7 @@ pub fn creature(
         effect: None,
         aura: None,
         triggered_abilities: Vec::new(),
+        static_abilities: Vec::new(),
         keywords: Vec::new(),
         does_enter_tapped: false,
     }
@@ -35,6 +36,7 @@ pub fn artifact_creature(
         effect: None,
         aura: None,
         triggered_abilities: Vec::new(),
+        static_abilities: Vec::new(),
         keywords: Vec::new(),
         does_enter_tapped: false,
     }
@@ -51,6 +53,7 @@ pub fn instant(name: impl Into<cards::CardName>, cost: cards::Cost) -> cards::Ca
         effect: None,
         aura: None,
         triggered_abilities: Vec::new(),
+        static_abilities: Vec::new(),
         keywords: Vec::new(),
         does_enter_tapped: false,
     }
@@ -67,6 +70,7 @@ pub fn sorcery(name: impl Into<cards::CardName>, cost: cards::Cost) -> cards::Ca
         effect: None,
         aura: None,
         triggered_abilities: Vec::new(),
+        static_abilities: Vec::new(),
         keywords: Vec::new(),
         does_enter_tapped: false,
     }
@@ -86,6 +90,7 @@ pub fn land(
         effect: None,
         aura: None,
         triggered_abilities: Vec::new(),
+        static_abilities: Vec::new(),
         keywords: Vec::new(),
         does_enter_tapped: false,
     }

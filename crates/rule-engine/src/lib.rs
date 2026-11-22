@@ -13,6 +13,7 @@ pub mod players;
 pub mod rules;
 mod rules_plugin;
 pub mod stack;
+pub mod statics;
 #[cfg(feature = "testing")]
 pub mod testing;
 pub mod turns;

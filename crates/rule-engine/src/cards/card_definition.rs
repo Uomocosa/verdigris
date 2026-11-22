@@ -24,6 +24,7 @@ pub struct CardDefinition {
     pub aura: Option<effects::Effect>,
     pub keywords: Vec<keywords::Keyword>,
     pub triggered_abilities: Vec<abilities::TriggeredAbility>,
+    pub static_abilities: Vec<abilities::Static>,
     pub does_enter_tapped: bool,
 }
 
@@ -41,6 +42,7 @@ impl CardDefinition {
             aura: None,
             keywords: Vec::new(),
             triggered_abilities: Vec::new(),
+            static_abilities: Vec::new(),
             does_enter_tapped: false,
         }
     }
@@ -127,12 +129,14 @@ impl CardDefinition {
 
 #[cfg(test)]
 mod tests {
+    use crate::CREATURE;
     use crate::card;
     use crate::cards;
     use crate::cost;
     use crate::effects;
     use crate::keywords;
     use crate::pt;
+    use crate::statics;
 
     #[test]
     fn test_usage() {
@@ -151,9 +155,17 @@ mod tests {
         let definition = card! {
             cards::creature("Grizzly Bears", cost![1, G], pt!(2, 2));
             keywords::vigilance(),
+            statics::all(CREATURE).gain(keywords::vigilance()),
         };
         assert_eq!(definition.keywords, vec![keywords::Keyword::Vigilance]);
         assert_eq!(definition.triggered_abilities, Vec::new());
+        assert_eq!(definition.static_abilities.len(), 1);
+        assert_eq!(
+            definition.static_abilities[0].change,
+            effects::Change::Characteristic(effects::Layered::GainKeyword(
+                keywords::Keyword::Vigilance
+            ))
+        );
     }
 
     #[test]

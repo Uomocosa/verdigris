@@ -7,3 +7,9 @@ pub struct TriggeredAbility {
     pub intervening_if: Option<abilities::Condition>,
     pub effect: effects::Effect,
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Static {
+    pub filter: effects::Filter,
+    pub change: effects::Change,
+}

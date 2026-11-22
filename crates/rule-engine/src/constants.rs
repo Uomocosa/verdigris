@@ -39,16 +39,19 @@ pub const CREATURE: effects::Filter = effects::Filter {
     kind: effects::FilterKind::Creature,
     controlled_by: None,
     excluded_color: None,
+    attacking: false,
 };
 pub const ANY_TARGET: effects::Filter = effects::Filter {
     kind: effects::FilterKind::AnyTarget,
     controlled_by: None,
     excluded_color: None,
+    attacking: false,
 };
 pub const PLAYER: effects::Filter = effects::Filter {
     kind: effects::FilterKind::Player,
     controlled_by: None,
     excluded_color: None,
+    attacking: false,
 };
 
 /// 115.5 A spell or ability on the stack is an illegal target for itself.
@@ -60,21 +63,25 @@ pub const SPELL: effects::Filter = effects::Filter {
     kind: effects::FilterKind::Spell,
     controlled_by: None,
     excluded_color: None,
+    attacking: false,
 };
 pub const CREATURE_SPELL: effects::Filter = effects::Filter {
     kind: effects::FilterKind::CreatureSpell,
     controlled_by: None,
     excluded_color: None,
+    attacking: false,
 };
 pub const NONCREATURE_SPELL: effects::Filter = effects::Filter {
     kind: effects::FilterKind::NoncreatureSpell,
     controlled_by: None,
     excluded_color: None,
+    attacking: false,
 };
 pub const INSTANT_SPELL: effects::Filter = effects::Filter {
     kind: effects::FilterKind::InstantSpell,
     controlled_by: None,
     excluded_color: None,
+    attacking: false,
 };
 
 /// 105.1 There are five colors in the Magic game: white, blue, black, red, and green.
@@ -83,4 +90,5 @@ pub const NONBLACK_CREATURE: effects::Filter = effects::Filter {
     kind: effects::FilterKind::Creature,
     controlled_by: None,
     excluded_color: Some(cards::Color::Black),
+    attacking: false,
 };

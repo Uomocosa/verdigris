@@ -8,12 +8,16 @@ pub struct Filter {
     pub kind: effects::FilterKind,
     pub controlled_by: Option<effects::PlayerRef>,
     pub excluded_color: Option<cards::Color>,
+    pub attacking: bool,
 }
 
 #[atomic_delegates]
 impl Filter {
     #[must_use]
     pub fn controlled_by(self, player: effects::PlayerRef) -> Self {}
+
+    #[must_use]
+    pub fn attacking(self) -> Self {}
 }
 
 impl Filter {
