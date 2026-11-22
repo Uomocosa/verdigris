@@ -43,6 +43,7 @@ pub mod r608_2b_illegal_targets;
 pub mod r608_2n_graveyard;
 pub mod r608_3a_permanent_enters;
 pub mod r611_2a_continuous_effects;
+pub mod r611_3a_static_effects;
 pub mod r613_1_layers;
 pub mod r701_17a_r701_17b_mill;
 pub mod r701_6a_counter;

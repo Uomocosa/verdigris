@@ -10,6 +10,7 @@ pub use basic::enums::{Change, Duration, EffectKind, FilterKind, Layered};
 pub use basic::messages::{KeywordGranted, MillRequested, PowerToughnessModified, TokensRequested};
 
 mod token_definition;
+pub use basic::components::SourceTimestamp;
 pub use basic::structs::Target;
 pub use token_definition::TokenDefinition;
 

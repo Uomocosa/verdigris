@@ -1,4 +1,5 @@
 use bevy::prelude::{Component, Entity};
+use derive_more::Deref;
 
 use crate::effects;
 
@@ -10,3 +11,6 @@ pub struct ContinuousEffect {
     pub until: effects::Duration,
     pub timestamp: u64,
 }
+
+#[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Deref)]
+pub struct SourceTimestamp(pub u64);

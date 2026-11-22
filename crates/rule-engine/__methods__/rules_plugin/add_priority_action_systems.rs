@@ -22,6 +22,15 @@ pub fn add_priority_action_systems(app: &mut App) {
             .chain()
             .in_set(RuleSet::PriorityAction),
     );
+    app.add_systems(
+        Update,
+        comprehensive_rules::r611_3a_static_effects::r611_3a_static_effects
+            .in_set(RuleSet::PriorityAction)
+            .after(
+                comprehensive_rules::r508_1a_r508_1k_declare_attackers::r508_1a_r508_1k_declare_attackers,
+            )
+            .before(comprehensive_rules::r508_1f_tap_attackers::r508_1f_tap_attackers),
+    );
 }
 
 #[cfg(test)]
@@ -37,7 +46,7 @@ mod tests {
 
         assert_eq!(
             app.get_schedule(Update).map(Schedule::systems_len),
-            Some(11)
+            Some(12)
         );
     }
 }
