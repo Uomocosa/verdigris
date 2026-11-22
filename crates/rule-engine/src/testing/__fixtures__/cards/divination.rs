@@ -23,6 +23,6 @@ mod tests {
         assert_eq!(spell.type_line.types, vec![cards::CardType::Sorcery]);
         assert_eq!(spell.cost, cost![2, U]);
         assert_eq!(spell.colors(), vec![cards::Color::Blue]);
-        assert_eq!(spell.effect, Some(effects::draw(2)));
+        assert_eq!(spell.spell_ability().copied(), Some(effects::draw(2)));
     }
 }

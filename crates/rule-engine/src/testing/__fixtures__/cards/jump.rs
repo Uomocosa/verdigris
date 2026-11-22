@@ -31,7 +31,7 @@ mod tests {
         assert_eq!(jump.cost, cost![U]);
         assert_eq!(jump.colors(), vec![cards::Color::Blue]);
         assert_eq!(
-            jump.effect,
+            jump.spell_ability().copied(),
             Some(effects::gains(keywords::flying()).to(effects::target(1, CREATURE)))
         );
     }

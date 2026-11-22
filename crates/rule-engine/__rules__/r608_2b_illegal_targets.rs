@@ -42,7 +42,7 @@ pub fn r608_2b_illegal_targets(
         if !zones.contains(STACK, **in_zone) {
             continue;
         }
-        let Some(effect) = definition.effect else {
+        let Some(effect) = definition.spell_ability() else {
             continue;
         };
         let Some(requirement) = effect.target else {

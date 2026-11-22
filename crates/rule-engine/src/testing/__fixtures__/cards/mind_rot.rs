@@ -29,7 +29,7 @@ mod tests {
         assert_eq!(spell.cost, cost![2, B]);
         assert_eq!(spell.colors(), vec![cards::Color::Black]);
         assert_eq!(
-            spell.effect,
+            spell.spell_ability().copied(),
             Some(effects::discard(2).to(effects::target(1, PLAYER)))
         );
     }

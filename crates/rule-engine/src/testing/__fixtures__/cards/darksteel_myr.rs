@@ -34,6 +34,9 @@ mod tests {
         );
         assert_eq!(myr.cost, cost![3]);
         assert_eq!(myr.power_toughness, Some(pt!(0, 1)));
-        assert_eq!(myr.keywords, vec![keywords::StaticKeyword::Indestructible]);
+        assert_eq!(
+            myr.keywords().collect::<Vec<_>>(),
+            vec![keywords::StaticKeyword::Indestructible]
+        );
     }
 }

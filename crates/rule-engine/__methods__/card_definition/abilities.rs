@@ -5,13 +5,7 @@ pub fn abilities<const N: usize>(
     mut definition: cards::CardDefinition,
     list: [abilities::Ability; N],
 ) -> cards::CardDefinition {
-    for ability in list {
-        match ability {
-            abilities::Ability::Keyword(keyword) => definition.keywords.push(keyword),
-            abilities::Ability::Triggered(ability) => definition.triggered_abilities.push(ability),
-            abilities::Ability::Static(ability) => definition.static_abilities.push(ability),
-        }
-    }
+    definition.text.extend(list);
     definition
 }
 
@@ -45,10 +39,16 @@ mod tests {
             ],
         );
         assert_eq!(
-            definition.keywords,
+            definition.keywords().collect::<Vec<_>>(),
             vec![keywords::StaticKeyword::Vigilance]
         );
-        assert_eq!(definition.triggered_abilities, [triggered]);
-        assert_eq!(definition.static_abilities, [static_ability]);
+        assert_eq!(
+            definition.triggered_abilities().copied().collect::<Vec<_>>(),
+            [triggered]
+        );
+        assert_eq!(
+            definition.continuous_abilities().copied().collect::<Vec<_>>(),
+            [static_ability]
+        );
     }
 }

@@ -5,7 +5,7 @@ pub fn triggered(
     mut definition: cards::CardDefinition,
     ability: abilities::TriggeredAbility,
 ) -> cards::CardDefinition {
-    definition.triggered_abilities.push(ability);
+    definition.text.push(abilities::Ability::Triggered(ability));
     definition
 }
 
@@ -28,7 +28,7 @@ mod tests {
             effect: effects::gain_life(1).to_player(YOU),
         };
         assert_eq!(
-            triggered(definition, ability).triggered_abilities,
+            triggered(definition, ability).triggered_abilities().copied().collect::<Vec<_>>(),
             [ability]
         );
     }

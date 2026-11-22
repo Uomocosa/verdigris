@@ -37,7 +37,7 @@ mod tests {
         assert_eq!(night.cost, cost![2, B]);
         assert_eq!(night.colors(), vec![cards::Color::Black]);
         assert_eq!(
-            night.static_abilities,
+            night.continuous_abilities().copied().collect::<Vec<_>>(),
             [abilities::Continuous {
                 filter: CREATURE.controlled_by(OPPONENT),
                 change: effects::Change::Characteristic(effects::Layered::LoseKeyword(

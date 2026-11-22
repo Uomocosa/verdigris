@@ -34,7 +34,7 @@ mod tests {
         assert_eq!(crawler.cost, cost![2, G]);
         assert_eq!(crawler.power_toughness, Some(pt!(3, 2)));
         assert_eq!(
-            crawler.triggered_abilities,
+            crawler.triggered_abilities().copied().collect::<Vec<_>>(),
             [abilities::TriggeredAbility {
                 event: abilities::when_this_dies(),
                 intervening_if: None,

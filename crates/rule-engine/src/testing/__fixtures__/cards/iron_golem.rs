@@ -37,7 +37,7 @@ mod tests {
         assert_eq!(golem.cost, cost![4]);
         assert_eq!(golem.power_toughness, Some(pt!(5, 3)));
         assert_eq!(
-            golem.keywords,
+            golem.keywords().collect::<Vec<_>>(),
             vec![
                 keywords::StaticKeyword::Vigilance,
                 keywords::StaticKeyword::MustAttackIfAble,

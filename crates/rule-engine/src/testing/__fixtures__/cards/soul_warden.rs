@@ -38,7 +38,7 @@ mod tests {
         assert_eq!(warden.cost, cost![W]);
         assert_eq!(warden.power_toughness, Some(pt!(1, 1)));
         assert_eq!(
-            warden.triggered_abilities,
+            warden.triggered_abilities().copied().collect::<Vec<_>>(),
             [abilities::TriggeredAbility {
                 event: ANOTHER_CREATURE.enters(),
                 intervening_if: None,

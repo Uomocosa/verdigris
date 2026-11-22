@@ -29,7 +29,7 @@ mod tests {
         assert_eq!(counter.cost, cost![1, U]);
         assert_eq!(counter.colors(), vec![cards::Color::Blue]);
         assert_eq!(
-            counter.effect,
+            counter.spell_ability().copied(),
             Some(effects::counter().to(effects::target(1, NONCREATURE_SPELL)))
         );
     }

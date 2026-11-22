@@ -61,7 +61,7 @@ pub fn r601_2c_targets(
                 }
                 let controller = **owner;
                 let target = definition
-                    .effect
+                    .spell_ability()
                     .and_then(|effect| effect.target)
                     .or_else(|| definition.aura.and_then(|aura| aura.target));
                 let Some(target) = target else {
@@ -180,7 +180,7 @@ fn legal_targets(
                 filter.does_creature_match(definition)
                     && battlefield.contains(entity)
                     && (**owner == controller
-                        || !definition.keywords.contains(&keywords::StaticKeyword::Hexproof))
+                        || !definition.has_keyword(keywords::StaticKeyword::Hexproof))
             }
             effects::FilterKind::Player => false,
         };

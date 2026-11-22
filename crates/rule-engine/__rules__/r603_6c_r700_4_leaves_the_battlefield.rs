@@ -29,7 +29,7 @@ pub fn r603_6c_r700_4_leaves_the_battlefield(
         if !zones.contains(GRAVEYARD, **in_zone) {
             continue;
         }
-        for ability in &definition.triggered_abilities {
+        for ability in definition.triggered_abilities() {
             if !matches!(ability.event, abilities::TriggerEvent::Dies) {
                 continue;
             }

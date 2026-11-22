@@ -29,7 +29,7 @@ mod tests {
         assert_eq!(removal.cost, cost![1, B]);
         assert_eq!(removal.colors(), vec![cards::Color::Black]);
         assert_eq!(
-            removal.effect,
+            removal.spell_ability().copied(),
             Some(effects::destroy().to(effects::target(1, NONBLACK_CREATURE)))
         );
     }

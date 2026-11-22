@@ -31,6 +31,9 @@ mod tests {
         assert_eq!(wall.type_line.types, vec![cards::CardType::Creature]);
         assert_eq!(wall.cost, cost![1, R, R]);
         assert_eq!(wall.power_toughness, Some(pt!(0, 8)));
-        assert_eq!(wall.keywords, vec![keywords::StaticKeyword::Defender]);
+        assert_eq!(
+            wall.keywords().collect::<Vec<_>>(),
+            vec![keywords::StaticKeyword::Defender]
+        );
     }
 }

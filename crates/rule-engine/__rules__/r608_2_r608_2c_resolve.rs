@@ -148,7 +148,7 @@ fn effect_of(lookups: &stack::ResolutionLookups<'_, '_>, spell: Entity) -> Optio
         .definitions
         .get(spell)
         .ok()
-        .and_then(|definition| definition.effect)
+        .and_then(|definition| definition.spell_ability().copied())
         .or_else(|| lookups.abilities.get(spell).ok().map(|ability| ability.effect))
 }
 

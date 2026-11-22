@@ -57,7 +57,7 @@ pub fn r611_3a_static_effects(
             commands.entity(entity).despawn();
             continue;
         }
-        let still_applies = source_definition.static_abilities.iter().any(|ability| {
+        let still_applies = source_definition.continuous_abilities().any(|ability| {
             ability.change == effect.change
                 && ability.filter.kind == effects::FilterKind::Creature
                 && candidates.get(effect.affected).is_ok_and(
@@ -80,7 +80,7 @@ pub fn r611_3a_static_effects(
         }
     }
     for (source, definition, owner, in_zone) in sources.iter() {
-        if definition.static_abilities.is_empty() {
+        if definition.continuous_abilities().next().is_none() {
             continue;
         }
         if !zones.contains(BATTLEFIELD, **in_zone) {
@@ -94,7 +94,7 @@ pub fn r611_3a_static_effects(
             },
             |existing| **existing,
         );
-        for ability in &definition.static_abilities {
+        for ability in definition.continuous_abilities() {
             if ability.filter.kind != effects::FilterKind::Creature {
                 continue;
             }

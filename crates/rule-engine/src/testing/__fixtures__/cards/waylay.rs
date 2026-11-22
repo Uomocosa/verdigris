@@ -45,7 +45,7 @@ mod tests {
         assert_eq!(knight.power_toughness, Some(pt!(2, 2)));
         assert_eq!(knight.colors(), vec![cards::Color::White]);
         assert_eq!(
-            knight.triggered_abilities,
+            knight.triggered_abilities().copied().collect::<Vec<_>>(),
             [abilities::TriggeredAbility {
                 event: abilities::TriggerEvent::BeginningOfNextCleanup,
                 intervening_if: None,
@@ -58,7 +58,7 @@ mod tests {
         assert_eq!(waylay.type_line.types, vec![cards::CardType::Instant]);
         assert_eq!(waylay.cost, cost![2, W]);
         assert_eq!(
-            waylay.effect,
+            waylay.spell_ability().copied(),
             Some(effects::creates(3, KNIGHT_TOKEN.definition.into()))
         );
     }

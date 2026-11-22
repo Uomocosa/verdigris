@@ -29,7 +29,7 @@ mod tests {
         assert_eq!(disfigure.cost, cost![B]);
         assert_eq!(disfigure.colors(), vec![cards::Color::Black]);
         assert_eq!(
-            disfigure.effect,
+            disfigure.spell_ability().copied(),
             Some(effects::gets(-2, -2).to(effects::target(1, CREATURE)))
         );
     }

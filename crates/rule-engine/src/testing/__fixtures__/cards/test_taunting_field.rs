@@ -37,7 +37,7 @@ mod tests {
         assert_eq!(field.cost, cost![1, G]);
         assert_eq!(field.colors(), vec![cards::Color::Green]);
         assert_eq!(
-            field.static_abilities,
+            field.continuous_abilities().copied().collect::<Vec<_>>(),
             [abilities::Continuous {
                 filter: CREATURE.controlled_by(OPPONENT),
                 change: effects::Change::Characteristic(effects::Layered::GainKeyword(

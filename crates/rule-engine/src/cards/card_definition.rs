@@ -18,12 +18,8 @@ pub struct CardDefinition {
     pub cost: cards::Cost,
     pub type_line: cards::TypeLine,
     pub power_toughness: Option<cards::PowerToughness>,
-    pub effect: Option<effects::Effect>,
+    pub text: Vec<abilities::Ability>,
     pub aura: Option<effects::Effect>,
-    pub keywords: Vec<keywords::StaticKeyword>,
-    pub triggered_abilities: Vec<abilities::TriggeredAbility>,
-    pub static_abilities: Vec<abilities::Continuous>,
-    pub does_enter_tapped: bool,
 }
 
 impl CardDefinition {
@@ -38,12 +34,8 @@ impl CardDefinition {
                 subtypes: Vec::new(),
             },
             power_toughness: None,
-            effect: None,
+            text: Vec::new(),
             aura: None,
-            keywords: Vec::new(),
-            triggered_abilities: Vec::new(),
-            static_abilities: Vec::new(),
-            does_enter_tapped: false,
         }
     }
 }
@@ -67,10 +59,25 @@ impl CardDefinition {
 
     #[must_use]
     pub fn colors(&self) -> Vec<cards::Color> {}
+
+    #[must_use]
+    pub fn spell_ability(&self) -> Option<&effects::Effect> {}
+
+    pub fn triggered_abilities(&self) -> impl Iterator<Item = &abilities::TriggeredAbility> {}
+
+    pub fn continuous_abilities(&self) -> impl Iterator<Item = &abilities::Continuous> {}
+
+    pub fn keywords(&self) -> impl Iterator<Item = keywords::StaticKeyword> + '_ {}
+
+    #[must_use]
+    pub fn enters_tapped(&self) -> bool {}
 }
 
 #[rustfmt::skip]
 impl CardDefinition {
+    #[must_use]
+    pub fn has_keyword(&self, keyword: keywords::StaticKeyword) -> bool { self.keywords().any(|candidate| candidate == keyword) }
+
     #[must_use]
     pub fn at(self, trigger: impl Into<abilities::Trigger>, effect: effects::Effect) -> Self { self.whenever(trigger, effect) }
 
@@ -90,7 +97,7 @@ impl CardDefinition {
 
     #[must_use]
     pub fn keyword(mut self, keyword: keywords::StaticKeyword) -> Self {
-        self.keywords.push(keyword);
+        self.text.push(abilities::Ability::from(keyword));
         self
     }
 
@@ -101,8 +108,10 @@ impl CardDefinition {
     }
 
     #[must_use]
-    pub const fn enters_tapped(mut self) -> Self {
-        self.does_enter_tapped = true;
+    pub fn with_enters_tapped(mut self) -> Self {
+        self.text.push(abilities::Ability::from(
+            abilities::Replacement::EntersTapped,
+        ));
         self
     }
 }
@@ -145,9 +154,12 @@ mod tests {
         assert_eq!(bears.colors(), vec![cards::Color::Green]);
         let myr = cards::artifact_creature("Darksteel Myr", cost![3], pt!(0, 1))
             .keyword(keywords::indestructible());
-        assert_eq!(myr.keywords, vec![keywords::StaticKeyword::Indestructible]);
+        assert_eq!(
+            myr.keywords().collect::<Vec<_>>(),
+            vec![keywords::StaticKeyword::Indestructible]
+        );
         let spell = cards::instant("Murder", cards::Cost::default()).spell(effects::destroy());
-        assert_eq!(spell.effect, Some(effects::destroy()));
+        assert_eq!(spell.spell_ability(), Some(&effects::destroy()));
     }
 
     #[test]
@@ -158,13 +170,14 @@ mod tests {
             statics::all(CREATURE).gain(keywords::vigilance()),
         };
         assert_eq!(
-            definition.keywords,
+            definition.keywords().collect::<Vec<_>>(),
             vec![keywords::StaticKeyword::Vigilance]
         );
-        assert_eq!(definition.triggered_abilities, Vec::new());
-        assert_eq!(definition.static_abilities.len(), 1);
+        assert_eq!(definition.triggered_abilities().count(), 0);
+        let continuous = definition.continuous_abilities().collect::<Vec<_>>();
+        assert_eq!(continuous.len(), 1);
         assert_eq!(
-            definition.static_abilities[0].change,
+            continuous[0].change,
             effects::Change::Characteristic(effects::Layered::GainKeyword(
                 keywords::StaticKeyword::Vigilance
             ))
@@ -176,7 +189,16 @@ mod tests {
         let definition = card! {
             cards::creature("Grizzly Bears", cost![1, G], pt!(2, 2));
         };
-        assert_eq!(definition.keywords, Vec::new());
-        assert_eq!(definition.triggered_abilities, Vec::new());
+        assert_eq!(definition.keywords().count(), 0);
+        assert_eq!(definition.triggered_abilities().count(), 0);
+    }
+
+    #[test]
+    fn card_macro_accepts_an_enters_tapped_replacement() {
+        let definition = card! {
+            cards::land("Gruul Guildgate", []);
+            statics::enters_tapped(),
+        };
+        assert!(definition.enters_tapped());
     }
 }

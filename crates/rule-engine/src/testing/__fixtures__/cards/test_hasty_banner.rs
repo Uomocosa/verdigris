@@ -37,7 +37,7 @@ mod tests {
         assert_eq!(banner.cost, cost![1, R]);
         assert_eq!(banner.colors(), vec![cards::Color::Red]);
         assert_eq!(
-            banner.static_abilities,
+            banner.continuous_abilities().copied().collect::<Vec<_>>(),
             [abilities::Continuous {
                 filter: CREATURE.controlled_by(YOU),
                 change: effects::Change::Characteristic(effects::Layered::GainKeyword(

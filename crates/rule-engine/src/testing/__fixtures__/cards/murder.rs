@@ -26,7 +26,7 @@ mod tests {
         assert_eq!(*removal.name, "Murder");
         assert_eq!(removal.type_line.types, vec![cards::CardType::Instant]);
         assert_eq!(
-            removal.effect,
+            removal.spell_ability().copied(),
             Some(effects::destroy().to(effects::target(1, CREATURE)))
         );
     }

@@ -31,6 +31,9 @@ mod tests {
         assert_eq!(goblin.type_line.types, vec![cards::CardType::Creature]);
         assert_eq!(goblin.cost, cost![R]);
         assert_eq!(goblin.power_toughness, Some(pt!(1, 1)));
-        assert_eq!(goblin.keywords, vec![keywords::StaticKeyword::Haste]);
+        assert_eq!(
+            goblin.keywords().collect::<Vec<_>>(),
+            vec![keywords::StaticKeyword::Haste]
+        );
     }
 }

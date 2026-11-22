@@ -48,14 +48,14 @@ mod tests {
         assert_eq!(feast.cost, cost![4, B]);
         assert_eq!(feast.power_toughness, Some(pt!(5, 5)));
         assert_eq!(
-            feast.keywords,
+            feast.keywords().collect::<Vec<_>>(),
             vec![
                 keywords::StaticKeyword::Flying,
                 keywords::StaticKeyword::MustAttackIfAble
             ]
         );
         assert_eq!(
-            feast.triggered_abilities,
+            feast.triggered_abilities().copied().collect::<Vec<_>>(),
             [abilities::TriggeredAbility {
                 event: abilities::TriggerEvent::BeginningOfStep(UPKEEP, YOU),
                 intervening_if: None,

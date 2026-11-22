@@ -39,7 +39,7 @@ mod tests {
         assert_eq!(alarm.type_line.types, vec![cards::CardType::Instant]);
         assert_eq!(alarm.cost, cost![1, W]);
         assert_eq!(
-            alarm.effect,
+            alarm.spell_ability().copied(),
             Some(effects::creates(2, SOLDIER_TOKEN.definition.into()))
         );
     }

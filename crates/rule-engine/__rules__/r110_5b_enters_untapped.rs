@@ -13,7 +13,7 @@ pub fn r110_5b_enters_untapped(
         let Ok(definition) = definitions.get(**entry) else {
             continue;
         };
-        if definition.does_enter_tapped {
+        if definition.enters_tapped() {
             commands.entity(**entry).insert(cards::Tapped);
         } else {
             commands.entity(**entry).remove::<cards::Tapped>();
@@ -29,7 +29,7 @@ mod tests {
 
     const GRUUL_GUILDGATE: Card = Card {
         name: TestCardName("Gruul Guildgate"),
-        definition: || cards::land("Gruul Guildgate", []).enters_tapped(),
+        definition: || cards::land("Gruul Guildgate", []).with_enters_tapped(),
     };
 
     #[test]

@@ -14,12 +14,8 @@ pub fn creature(
             subtypes: Vec::new(),
         },
         power_toughness: Some(power_toughness),
-        effect: None,
+        text: Vec::new(),
         aura: None,
-        triggered_abilities: Vec::new(),
-        static_abilities: Vec::new(),
-        keywords: Vec::new(),
-        does_enter_tapped: false,
     }
 }
 
@@ -37,12 +33,8 @@ pub fn artifact_creature(
             subtypes: Vec::new(),
         },
         power_toughness: Some(power_toughness),
-        effect: None,
+        text: Vec::new(),
         aura: None,
-        triggered_abilities: Vec::new(),
-        static_abilities: Vec::new(),
-        keywords: Vec::new(),
-        does_enter_tapped: false,
     }
 }
 
@@ -56,12 +48,8 @@ pub fn instant(name: impl Into<cards::CardName>, cost: cards::Cost) -> cards::Ca
             subtypes: Vec::new(),
         },
         power_toughness: None,
-        effect: None,
+        text: Vec::new(),
         aura: None,
-        triggered_abilities: Vec::new(),
-        static_abilities: Vec::new(),
-        keywords: Vec::new(),
-        does_enter_tapped: false,
     }
 }
 
@@ -75,12 +63,8 @@ pub fn sorcery(name: impl Into<cards::CardName>, cost: cards::Cost) -> cards::Ca
             subtypes: Vec::new(),
         },
         power_toughness: None,
-        effect: None,
+        text: Vec::new(),
         aura: None,
-        triggered_abilities: Vec::new(),
-        static_abilities: Vec::new(),
-        keywords: Vec::new(),
-        does_enter_tapped: false,
     }
 }
 
@@ -97,11 +81,7 @@ pub fn land(
             subtypes: land_subtypes.into_iter().map(cards::Subtype::from).collect(),
         },
         power_toughness: None,
-        effect: None,
+        text: Vec::new(),
         aura: None,
-        triggered_abilities: Vec::new(),
-        static_abilities: Vec::new(),
-        keywords: Vec::new(),
-        does_enter_tapped: false,
     }
 }

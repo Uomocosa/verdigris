@@ -7,8 +7,8 @@ pub fn from_printed(
     cards::Characteristics {
         on_battlefield,
         power_toughness: definition.power_toughness,
-        keywords: definition.keywords.clone(),
-        triggered_abilities: definition.triggered_abilities.clone(),
+        keywords: definition.keywords().collect(),
+        triggered_abilities: definition.triggered_abilities().copied().collect(),
     }
 }
 

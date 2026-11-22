@@ -29,7 +29,7 @@ mod tests {
         assert_eq!(growth.cost, cost![G]);
         assert_eq!(growth.colors(), vec![cards::Color::Green]);
         assert_eq!(
-            growth.effect,
+            growth.spell_ability().copied(),
             Some(effects::gets(3, 3).to(effects::target(1, CREATURE)))
         );
     }

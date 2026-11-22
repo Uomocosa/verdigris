@@ -44,10 +44,10 @@ pub fn r506_1_r510_4_r702_4b_r702_7b_combat_damage_steps(
     blockers: Query<(Entity, &cards::CardDefinition), With<cards::Blocking>>,
 ) {
     let has_first_strike = |definition: &cards::CardDefinition| {
-        definition.keywords.contains(&keywords::StaticKeyword::FirstStrike)
+        definition.has_keyword(keywords::StaticKeyword::FirstStrike)
     };
     let has_double_strike = |definition: &cards::CardDefinition| {
-        definition.keywords.contains(&keywords::StaticKeyword::DoubleStrike)
+        definition.has_keyword(keywords::StaticKeyword::DoubleStrike)
     };
     let does_assign_in_first_step = |definition: &cards::CardDefinition| {
         has_first_strike(definition) || has_double_strike(definition)

@@ -31,7 +31,7 @@ mod tests {
         assert_eq!(spell.cost.red, 1);
         assert_eq!(spell.colors(), vec![cards::Color::Red]);
         assert_eq!(
-            spell.effect,
+            spell.spell_ability().copied(),
             Some(effects::damage(1).to(effects::target(1, ANY_TARGET)))
         );
     }

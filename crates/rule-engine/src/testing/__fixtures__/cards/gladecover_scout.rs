@@ -31,6 +31,9 @@ mod tests {
         assert_eq!(scout.type_line.types, vec![cards::CardType::Creature]);
         assert_eq!(scout.cost, cost![G]);
         assert_eq!(scout.power_toughness, Some(pt!(1, 1)));
-        assert_eq!(scout.keywords, vec![keywords::StaticKeyword::Hexproof]);
+        assert_eq!(
+            scout.keywords().collect::<Vec<_>>(),
+            vec![keywords::StaticKeyword::Hexproof]
+        );
     }
 }

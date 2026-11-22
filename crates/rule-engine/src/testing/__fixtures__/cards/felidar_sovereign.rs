@@ -46,14 +46,14 @@ mod tests {
         assert_eq!(sovereign.cost, cost![4, W, W]);
         assert_eq!(sovereign.power_toughness, Some(pt!(4, 6)));
         assert_eq!(
-            sovereign.keywords,
+            sovereign.keywords().collect::<Vec<_>>(),
             vec![
                 keywords::StaticKeyword::Vigilance,
                 keywords::StaticKeyword::Lifelink
             ]
         );
         assert_eq!(
-            sovereign.triggered_abilities,
+            sovereign.triggered_abilities().copied().collect::<Vec<_>>(),
             [abilities::TriggeredAbility {
                 event: abilities::TriggerEvent::BeginningOfStep(UPKEEP, YOU),
                 intervening_if: Some(abilities::Condition::LifeAtLeast(YOU, 40)),

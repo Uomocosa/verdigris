@@ -1,0 +1,38 @@
+use crate::abilities;
+use crate::cards;
+
+pub fn triggered_abilities(
+    definition: &cards::CardDefinition,
+) -> impl Iterator<Item = &abilities::TriggeredAbility> {
+    definition.text.iter().filter_map(|ability| match ability {
+        abilities::Ability::Triggered(triggered) => Some(triggered),
+        _ => None,
+    })
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::ANOTHER_CREATURE;
+    use crate::YOU;
+    use crate::abilities;
+    use crate::cards;
+    use crate::cost;
+    use crate::effects;
+    use crate::pt;
+
+    use super::triggered_abilities;
+
+    #[test]
+    fn test_usage() {
+        let ability = abilities::whenever(
+            ANOTHER_CREATURE.enters(),
+            effects::gain_life(1).to_player(YOU),
+        );
+        let definition =
+            cards::creature("Grizzly Bears", cost![1, G], pt!(2, 2)).triggered(ability);
+        assert_eq!(
+            triggered_abilities(&definition).copied().collect::<Vec<_>>(),
+            [ability]
+        );
+    }
+}
