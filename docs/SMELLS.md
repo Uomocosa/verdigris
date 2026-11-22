@@ -134,3 +134,37 @@ assert!(game.player(p1).cards_in(GRAVEYARD).has(isamaru_2));
 
 Also good: `bolt`, `bolt_opponent`, `rats_1`, `bears_blocking`. Not a card, so the role stays:
 `let [p1, p2] = ..`, `let zone = game.zone_entity(..)`.
+
+**A field or ability variant with no CR counterpart.**
+A `CardDefinition` field or an `Ability`/`StaticAbility` variant that neither appears on the
+printed card nor belongs to a CR rule is a second source of truth: it must be kept in sync with
+the text box, and nothing in the type says which rule owns it. `does_enter_tapped: bool`
+duplicates "enters tapped" (614.1c); `aura: Option<Effect>` duplicates "Enchant creature" plus a
+continuous ability on the enchanted object (702.5, 303.4); a separate `keywords` vec duplicates
+the text box; `Keyword` as its own `Ability` category puts a 702 ability outside 113.3; a
+"keyword" absent from CR 702 is just an effect with a misleading name. Parallel bools on one
+axis of `Filter` (`is_this_object`, `is_enchanted_object`) also belong here: they make
+impossible combinations representable.
+
+```rust
+// Bad — fields that repeat the card text or invent categories
+struct CardDefinition {
+    name: cards::CardName,
+    does_enter_tapped: bool,
+    aura: Option<effects::Effect>,
+    keywords: Vec<keywords::StaticKeyword>,
+}
+
+// Good — one text box, each line an ability in its CR 113.3 category
+card! {
+    cards::CardDefinition::from_enchantment("Holy Strength", cost![W])
+        .subtype(cards::EnchantmentType::Aura.into());
+    keywords::enchant(CREATURE),       // 702.5, a static ability
+    statics::enchanted().get_pt(1, 2), // 303.4, a continuous ability
+}
+```
+
+**Fix:** model it as a type-line entry (a supertype or subtype under 205), or as an `Ability` of
+the right CR 113.3 category — `StaticAbility::Keyword`, `StaticAbility::Replacement` or
+`StaticAbility::Continuous`. For filter flags on one axis, use one enum-valued field such as
+`object: Option<effects::ObjectRelation>` instead of parallel bools.

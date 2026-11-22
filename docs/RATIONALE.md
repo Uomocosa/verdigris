@@ -18,7 +18,7 @@ card! {
 Each domain owns one return type, so there is exactly one place to look for each kind
 of item: `cards` (base card + battlefield markers like `cards::Flying`), `abilities`
 (`Ability`, `TriggeredAbility`, `Trigger`, `TriggerEvent`, `Condition`,
-`whenever`/`at`/`when`), `keywords` (`Keyword` + `keywords::flying()` etc.),
+`whenever`/`at`/`when`), `keywords` (`StaticKeyword` + `keywords::flying()` etc.),
 `effects` (what happens on resolution), `turns` (steps, phases, timing:
 `turns::beginning_of`).
 
@@ -57,3 +57,33 @@ assert_eq!(
     }]
 );
 ```
+
+**5. CardDefinition mirrors the printed card.**
+A card is stored as the five things printed on it: its name, mana cost (CR 202), type line
+(205 — supertypes, types, subtypes), text box (207 — `text: Vec<Ability>` in printed order)
+and power/toughness (208). `Ability` has only the CR 113.3 categories: `Spell` (113.3a),
+`Triggered` (113.3c) and `Static` (113.3d) today, `Activated` (113.3b) when a card needs one.
+Nothing else is a top-level card field.
+
+```rust
+pub struct CardDefinition {
+    pub name: cards::CardName,
+    pub cost: cards::Cost,
+    pub type_line: cards::TypeLine,
+    pub power_toughness: Option<cards::PowerToughness>,
+    pub text: Vec<abilities::Ability>, // printed order
+}
+```
+
+Everything else lives at the level the CR gives it. Keywords (702) are static abilities in
+`StaticAbility::Keyword`, not a separate `keywords` field or an `Ability` category of their own.
+"Enters tapped" is a static replacement ability (`StaticAbility::Replacement`, 614.1c), not a
+bool. An Aura's "Enchant creature" is the `Enchant` keyword (702.5) and its "Enchanted creature
+gets +1/+2" is a continuous ability on the enchanted object (303.4); there is no `aura` field.
+"Attacks/blocks each combat if able" are continuous rule abilities (`Change::Rule`), not
+keywords. A basic land's "{T}: Add {G}" is not printed at all: rule 305.6 derives it from the
+land subtype.
+
+**Why:** the card text maps 1:1 to the struct, so a definition can be checked line by line
+against the Oracle text. The CR is the spec: every field and every `Ability` variant has a
+printed counterpart or a CR rule that owns it, and no field exists without one.

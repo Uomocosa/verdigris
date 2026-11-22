@@ -63,6 +63,7 @@ Never create task files in `~/.claude/`, `~/.opencode/`, `~/.config/`, `/tmp`, o
 Before writing or reviewing card definitions or adding domain items, read
 `docs/RATIONALE.md` and `docs/SMELLS.md` (verdigris-specific; they extend the fleet
 lele-syntax-rs RATIONALE/SMELLS).
+Card modelling follows the printed card and the Comprehensive Rules; see RATIONALE "CardDefinition mirrors the printed card" and SMELLS "Field or ability variant with no CR counterpart".
 
 ## lele.toml is user policy
 

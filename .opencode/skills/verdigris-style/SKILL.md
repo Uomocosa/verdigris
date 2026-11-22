@@ -158,7 +158,7 @@ sources: Query<&cards::Owner, With<cards::Lifelink>>,
 // Bad
 sources: Query<(&cards::CardDefinition, &cards::Owner)>
 // ... in the body:
-if !definition.keywords.contains(&cards::Keyword::Lifelink) { continue; }
+if !definition.keywords().any(|keyword| keyword == keywords::StaticKeyword::Lifelink) { continue; }
 ```
 
 (The names above land in later phases; the example shows the target shape.)
