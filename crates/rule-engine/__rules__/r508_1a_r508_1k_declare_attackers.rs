@@ -99,10 +99,7 @@ pub fn r508_1a_r508_1k_declare_attackers(
             **owner == action.player
                 && **in_zone == battlefield
                 && definition.types.contains(&cards::CardType::Creature)
-                && answers
-                    .characteristics(entity)
-                    .keywords
-                    .contains(&keywords::Keyword::MustAttackIfAble)
+                && answers.ask::<rules::MustAttack>(entity)
                 && tapped.is_none()
                 && !answers.characteristics(entity).keywords.contains(&keywords::Keyword::Defender)
                 && (answers.ask::<rules::IgnoresSummoningSickness>(entity)
@@ -398,6 +395,46 @@ mod tests {
 
         game.play([p1.declare_attackers([bears])])?;
         assert!(game.is_attacking(bears));
+        Ok(())
+    }
+
+    #[test]
+    fn a_static_must_attack_rule_answer_forces_an_attack() -> TestResult {
+        use bevy::ecs::system::RunSystemOnce;
+
+        use crate::keywords;
+        use crate::rules;
+
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.battlefield([GRIZZLY_BEARS]),
+            P2.battlefield([TEST_CALL_TO_ARMS]),
+        ]);
+        let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareAttackers),
+            p2.pass_to(turns::Step::DeclareAttackers),
+        ])?;
+
+        game.act(p1, actions::Action::DeclareAttackers(vec![]));
+        assert_eq!(
+            game.last_rejection(),
+            Some(&actions::Rejected::CannotAttack { attackers: vec![] })
+        );
+        assert!(!game.is_attacking(bears));
+
+        game.play([p1.declare_attackers([bears])])?;
+        assert!(game.is_attacking(bears));
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                assert!(
+                    !answers
+                        .characteristics(bears.into())
+                        .keywords
+                        .contains(&keywords::Keyword::MustAttackIfAble)
+                );
+            })
+            .unwrap();
         Ok(())
     }
 }

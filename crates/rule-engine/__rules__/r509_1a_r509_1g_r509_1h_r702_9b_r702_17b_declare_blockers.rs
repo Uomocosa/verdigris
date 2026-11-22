@@ -3,7 +3,6 @@ use bevy::prelude::{Commands, Entity, Has, MessageReader, MessageWriter, Query, 
 use crate::BATTLEFIELD;
 use crate::actions;
 use crate::cards;
-use crate::keywords;
 use crate::rules;
 use crate::turns;
 use crate::zones;
@@ -105,10 +104,7 @@ pub fn r509_1a_r509_1g_r509_1h_r702_9b_r702_17b_declare_blockers(
             **owner == action.player
                 && **in_zone == battlefield
                 && definition.types.contains(&cards::CardType::Creature)
-                && answers
-                    .characteristics(entity)
-                    .keywords
-                    .contains(&keywords::Keyword::MustBlockIfAble)
+                && answers.ask::<rules::MustBlock>(entity)
                 && tapped.is_none()
                 && !assignments.iter().any(|assignment| assignment.blocker == entity)
                 && attacking.iter().any(|(_, attacker_flies)| {
@@ -400,6 +396,55 @@ mod tests {
 
         game.play([p2.declare_blockers([(bears_2, bears_1)])])?;
         assert!(game.is_blocking(bears_2));
+        Ok(())
+    }
+
+    #[test]
+    fn a_static_must_block_rule_answer_forces_a_block() -> TestResult {
+        use bevy::ecs::system::RunSystemOnce;
+
+        use crate::keywords;
+        use crate::rules;
+
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.battlefield([GRIZZLY_BEARS, TEST_LURE_OF_BATTLE]),
+            P2.battlefield([GRIZZLY_BEARS]),
+        ]);
+        let [bears_1] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        let [bears_2] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareAttackers),
+            p2.pass_to(turns::Step::DeclareAttackers),
+            p1.declare_attackers([bears_1]),
+        ])?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareBlockers),
+            p2.pass_to(turns::Step::DeclareBlockers),
+        ])?;
+        game.play([p1.pass_priority()])?;
+
+        game.act(p2, actions::Action::DeclareBlockers(vec![]));
+        assert_eq!(
+            game.last_rejection(),
+            Some(&actions::Rejected::CannotBlock {
+                assignments: vec![]
+            })
+        );
+        assert!(!game.is_blocking(bears_2));
+
+        game.play([p2.declare_blockers([(bears_2, bears_1)])])?;
+        assert!(game.is_blocking(bears_2));
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                assert!(
+                    !answers
+                        .characteristics(bears_2.into())
+                        .keywords
+                        .contains(&keywords::Keyword::MustBlockIfAble)
+                );
+            })
+            .unwrap();
         Ok(())
     }
 

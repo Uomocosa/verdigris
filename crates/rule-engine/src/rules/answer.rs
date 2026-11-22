@@ -2,6 +2,8 @@
 pub enum Answer {
     TapsWhenAttacking(bool),
     IgnoresSummoningSickness(bool),
+    MustAttack(bool),
+    MustBlock(bool),
 }
 
 impl Answer {
@@ -9,7 +11,7 @@ impl Answer {
     pub(crate) const fn taps_when_attacking(self) -> Option<bool> {
         match self {
             Self::TapsWhenAttacking(taps) => Some(taps),
-            Self::IgnoresSummoningSickness(_) => None,
+            Self::IgnoresSummoningSickness(_) | Self::MustAttack(_) | Self::MustBlock(_) => None,
         }
     }
 
@@ -17,7 +19,27 @@ impl Answer {
     pub(crate) const fn ignores_summoning_sickness(self) -> Option<bool> {
         match self {
             Self::IgnoresSummoningSickness(ignores) => Some(ignores),
-            Self::TapsWhenAttacking(_) => None,
+            Self::TapsWhenAttacking(_) | Self::MustAttack(_) | Self::MustBlock(_) => None,
+        }
+    }
+
+    #[must_use]
+    pub(crate) const fn must_attack(self) -> Option<bool> {
+        match self {
+            Self::MustAttack(must) => Some(must),
+            Self::TapsWhenAttacking(_) | Self::IgnoresSummoningSickness(_) | Self::MustBlock(_) => {
+                None
+            }
+        }
+    }
+
+    #[must_use]
+    pub(crate) const fn must_block(self) -> Option<bool> {
+        match self {
+            Self::MustBlock(must) => Some(must),
+            Self::TapsWhenAttacking(_)
+            | Self::IgnoresSummoningSickness(_)
+            | Self::MustAttack(_) => None,
         }
     }
 }
@@ -44,5 +66,12 @@ mod tests {
             rules::Answer::TapsWhenAttacking(false).ignores_summoning_sickness(),
             None
         );
+        assert_eq!(rules::Answer::MustAttack(true).must_attack(), Some(true));
+        assert_eq!(
+            rules::Answer::IgnoresSummoningSickness(true).must_attack(),
+            None
+        );
+        assert_eq!(rules::Answer::MustBlock(false).must_block(), Some(false));
+        assert_eq!(rules::Answer::TapsWhenAttacking(true).must_block(), None);
     }
 }

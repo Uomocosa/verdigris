@@ -2,6 +2,8 @@
 pub enum Question {
     TapsWhenAttacking,
     IgnoresSummoningSickness,
+    MustAttack,
+    MustBlock,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
