@@ -16,6 +16,7 @@ pub fn add_state_based_systems(app: &mut App) {
             rules::r702_12b_indestructible::r702_12b_indestructible,
             rules::r704_5a_zero_life::r704_5a_zero_life,
             rules::r704_5b_empty_library::r704_5b_empty_library,
+            rules::r704_5c_poison::r704_5c_poison,
             rules::r104_2a_wins_when_opponents_left::r104_2a_wins_when_opponents_left,
             rules::r104_4a_draw::r104_4a_draw,
         )
@@ -52,7 +53,7 @@ mod tests {
         assert_eq!(app.get_schedule(Update).map(Schedule::systems_len), Some(6));
         assert_eq!(
             app.get_schedule(StateBasedActions).map(Schedule::systems_len),
-            Some(10)
+            Some(11)
         );
     }
 }

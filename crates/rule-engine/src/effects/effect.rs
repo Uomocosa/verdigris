@@ -6,6 +6,7 @@ use crate::effects;
 pub struct Effect {
     pub kind: effects::EffectKind,
     pub then: Option<effects::EffectKind>,
+    pub finally: Option<effects::EffectKind>,
     pub target: Option<effects::Target>,
 }
 
@@ -21,7 +22,11 @@ impl Effect {
 impl Effect {
     #[must_use]
     pub const fn and(mut self, next: Self) -> Self {
-        self.then = Some(next.kind);
+        if self.then.is_none() {
+            self.then = Some(next.kind);
+        } else {
+            self.finally = Some(next.kind);
+        }
         self
     }
 }
@@ -39,5 +44,7 @@ mod tests {
         let sequence = effects::draw(2).and(effects::lose_life(2));
         assert_eq!(sequence.kind, effects::EffectKind::Draw(2));
         assert_eq!(sequence.then, Some(effects::EffectKind::LoseLife(2)));
+        let longer = sequence.and(effects::poison(3));
+        assert_eq!(longer.finally, Some(effects::EffectKind::Poison(3)));
     }
 }

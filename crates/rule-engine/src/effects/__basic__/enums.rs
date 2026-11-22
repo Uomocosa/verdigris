@@ -7,6 +7,7 @@ pub enum EffectKind {
     Counter,
     Draw(u32),
     LoseLife(u32),
+    Poison(u32),
     GainLife(u32),
     Discard(u32),
     ModifyPowerToughness { power: i32, toughness: i32 },

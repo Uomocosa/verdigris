@@ -2,7 +2,7 @@
 mod basic;
 
 pub use basic::card_text::{
-    counter, damage, destroy, discard, draw, gain_life, gains, gets, lose_life, target,
+    counter, damage, destroy, discard, draw, gain_life, gains, gets, lose_life, poison, target,
     win_the_game,
 };
 pub use basic::components::ContinuousEffect;

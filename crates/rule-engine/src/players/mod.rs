@@ -2,7 +2,7 @@
 mod basic;
 
 pub use basic::components::{
-    AttemptedDrawFromEmptyLibrary, DefendingPlayer, Drawn, Life, Lost, Player, Won,
+    AttemptedDrawFromEmptyLibrary, DefendingPlayer, Drawn, Life, Lost, Player, PoisonCounters, Won,
 };
 pub use basic::messages::{DiscardRequested, DrawRequested, LifeGained, LifeLost};
 

@@ -1,4 +1,5 @@
 mod cancel;
+mod caress_of_phyrexia;
 mod child_of_night;
 mod darksteel_myr;
 mod disfigure;
@@ -33,6 +34,7 @@ mod watchwolf;
 mod wind_drake;
 
 pub use cancel::CANCEL;
+pub use caress_of_phyrexia::CARESS_OF_PHYREXIA;
 pub use child_of_night::CHILD_OF_NIGHT;
 pub use darksteel_myr::DARKSTEEL_MYR;
 pub use disfigure::DISFIGURE;

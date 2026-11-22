@@ -1,5 +1,5 @@
 use crate::{BATTLEFIELD, STACK};
-use bevy::prelude::{Commands, MessageReader, MessageWriter, ParamSet};
+use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, ParamSet};
 
 use crate::damage;
 use crate::effects;
@@ -42,13 +42,7 @@ pub fn r608_2_r608_2c_resolve(
         if !lookups.in_zone.get(spell).is_ok_and(|zone| zones.contains(STACK, **zone)) {
             continue;
         }
-        let Some(effect) = lookups
-            .definitions
-            .get(spell)
-            .ok()
-            .and_then(|definition| definition.effect)
-            .or_else(|| lookups.abilities.get(spell).ok().map(|ability| ability.effect))
-        else {
+        let Some(effect) = effect_of(&lookups, spell) else {
             continue;
         };
         let Ok(owner) = lookups.owners.get(spell) else {
@@ -61,7 +55,7 @@ pub fn r608_2_r608_2c_resolve(
         let target_on_battlefield =
             target_zone.is_some_and(|zone| zones.contains(BATTLEFIELD, **zone));
         let target_on_stack = target_zone.is_some_and(|zone| zones.contains(STACK, **zone));
-        for kind in [Some(effect.kind), effect.then].into_iter().flatten() {
+        for kind in [Some(effect.kind), effect.then, effect.finally].into_iter().flatten() {
             match kind {
                 effects::EffectKind::Damage(amount) => {
                     if let Some(target) = chosen_target
@@ -101,6 +95,9 @@ pub fn r608_2_r608_2c_resolve(
                         player_effects.p0().write(players::LifeLost { player, amount });
                     }
                 }
+                effects::EffectKind::Poison(amount) => {
+                    add_poison_counters(&mut commands, &lookups, player_target, amount);
+                }
                 effects::EffectKind::GainLife(amount) => {
                     player_effects.p2().write(players::LifeGained {
                         player: player_target.unwrap_or(controller),
@@ -136,6 +133,29 @@ pub fn r608_2_r608_2c_resolve(
             }
         }
     }
+}
+
+fn effect_of(lookups: &stack::ResolutionLookups<'_, '_>, spell: Entity) -> Option<effects::Effect> {
+    lookups
+        .definitions
+        .get(spell)
+        .ok()
+        .and_then(|definition| definition.effect)
+        .or_else(|| lookups.abilities.get(spell).ok().map(|ability| ability.effect))
+}
+
+fn add_poison_counters(
+    commands: &mut Commands,
+    lookups: &stack::ResolutionLookups<'_, '_>,
+    player: Option<Entity>,
+    amount: u32,
+) {
+    let Some(player) = player else {
+        return;
+    };
+    let counters =
+        lookups.poison.get(player).map_or(0, |counters| **counters).saturating_add(amount);
+    commands.entity(player).insert(players::PoisonCounters(counters));
 }
 
 #[cfg(test)]
