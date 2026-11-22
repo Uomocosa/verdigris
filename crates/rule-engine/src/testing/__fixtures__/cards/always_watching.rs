@@ -34,7 +34,7 @@ mod tests {
     fn test_usage() {
         let watching = (ALWAYS_WATCHING.definition)();
         assert_eq!(*watching.name, "Always Watching");
-        assert_eq!(watching.types, vec![cards::CardType::Enchantment]);
+        assert_eq!(watching.type_line.types, vec![cards::CardType::Enchantment]);
         assert_eq!(watching.cost, cost![1, W, W]);
         assert_eq!(watching.colors(), vec![cards::Color::White]);
         assert_eq!(

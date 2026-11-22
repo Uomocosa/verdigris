@@ -44,7 +44,7 @@ mod tests {
     fn test_usage() {
         let feast = (MASTER_OF_THE_FEAST.definition)();
         assert_eq!(*feast.name, "Master of the Feast");
-        assert_eq!(feast.types, vec![cards::CardType::Creature]);
+        assert_eq!(feast.type_line.types, vec![cards::CardType::Creature]);
         assert_eq!(feast.cost, cost![4, B]);
         assert_eq!(feast.power_toughness, Some(pt!(5, 5)));
         assert_eq!(

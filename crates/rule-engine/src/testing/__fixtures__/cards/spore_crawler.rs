@@ -30,7 +30,7 @@ mod tests {
     fn test_usage() {
         let crawler = (SPORE_CRAWLER.definition)();
         assert_eq!(*crawler.name, "Spore Crawler");
-        assert_eq!(crawler.types, vec![cards::CardType::Creature]);
+        assert_eq!(crawler.type_line.types, vec![cards::CardType::Creature]);
         assert_eq!(crawler.cost, cost![2, G]);
         assert_eq!(crawler.power_toughness, Some(pt!(3, 2)));
         assert_eq!(

@@ -29,7 +29,7 @@ mod tests {
     fn test_usage() {
         let spell = (CARESS_OF_PHYREXIA.definition)();
         assert_eq!(*spell.name, "Caress of Phyrexia");
-        assert_eq!(spell.types, vec![cards::CardType::Sorcery]);
+        assert_eq!(spell.type_line.types, vec![cards::CardType::Sorcery]);
         assert_eq!(spell.cost, cost![3, B, B]);
         assert_eq!(spell.colors(), vec![cards::Color::Black]);
         assert_eq!(

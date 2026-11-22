@@ -28,7 +28,7 @@ mod tests {
     fn test_usage() {
         let drake = (WIND_DRAKE.definition)();
         assert_eq!(*drake.name, "Wind Drake");
-        assert_eq!(drake.types, vec![cards::CardType::Creature]);
+        assert_eq!(drake.type_line.types, vec![cards::CardType::Creature]);
         assert_eq!(drake.cost, cost![2, U]);
         assert_eq!(drake.power_toughness, Some(pt!(2, 2)));
         assert_eq!(drake.keywords, vec![keywords::Keyword::Flying]);

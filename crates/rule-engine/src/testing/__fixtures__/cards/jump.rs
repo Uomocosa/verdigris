@@ -27,7 +27,7 @@ mod tests {
     fn test_usage() {
         let jump = (JUMP.definition)();
         assert_eq!(*jump.name, "Jump");
-        assert_eq!(jump.types, vec![cards::CardType::Instant]);
+        assert_eq!(jump.type_line.types, vec![cards::CardType::Instant]);
         assert_eq!(jump.cost, cost![U]);
         assert_eq!(jump.colors(), vec![cards::Color::Blue]);
         assert_eq!(

@@ -42,7 +42,7 @@ mod tests {
     fn test_usage() {
         let sovereign = (FELIDAR_SOVEREIGN.definition)();
         assert_eq!(*sovereign.name, "Felidar Sovereign");
-        assert_eq!(sovereign.types, vec![cards::CardType::Creature]);
+        assert_eq!(sovereign.type_line.types, vec![cards::CardType::Creature]);
         assert_eq!(sovereign.cost, cost![4, W, W]);
         assert_eq!(sovereign.power_toughness, Some(pt!(4, 6)));
         assert_eq!(

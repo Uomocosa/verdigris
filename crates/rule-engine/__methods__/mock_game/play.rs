@@ -33,21 +33,24 @@ pub fn play(
                 };
                 let produces = match ability {
                     testing::TestAbility::Mana { produces, .. } => Some(*produces),
-                    testing::TestAbility::Only { .. } => {
-                        game.app.world().get::<cards::CardDefinition>(source).and_then(
-                            |definition| match definition.land_types.as_slice() {
-                                [land_type] => Some(land_type.color()),
-                                _ => None,
-                            },
-                        )
-                    }
+                    testing::TestAbility::Only { .. } => game
+                        .app
+                        .world()
+                        .get::<cards::CardDefinition>(source)
+                        .and_then(|definition| {
+                            let land_types = definition.type_line.land_types().collect::<Vec<_>>();
+                            land_types
+                                .first()
+                                .filter(|_| land_types.len() == 1)
+                                .map(|land| land.color())
+                        }),
                 };
                 let Some(produces) = produces else {
                     let count = game
                         .app
                         .world()
                         .get::<cards::CardDefinition>(source)
-                        .map_or(0, |definition| definition.land_types.len());
+                        .map_or(0, |definition| definition.type_line.land_types().count());
                     return Err(testing::PlayError::AmbiguousAbility {
                         index,
                         card: source,
@@ -80,9 +83,7 @@ pub fn play(
         }
         loop {
             let holder = game.app.world().resource::<turns::Priority>().player;
-            let Some(position) =
-                auto_passes.iter().position(|auto_pass| auto_pass.player == holder)
-            else {
+            let Some(position) = auto_passes.iter().position(|pass| pass.player == holder) else {
                 break;
             };
             let now = *game.app.world().resource::<turns::Turn>();

@@ -20,7 +20,7 @@ mod tests {
     fn test_usage() {
         let corpse = (WALKING_CORPSE.definition)();
         assert_eq!(*corpse.name, "Walking Corpse");
-        assert_eq!(corpse.types, vec![cards::CardType::Creature]);
+        assert_eq!(corpse.type_line.types, vec![cards::CardType::Creature]);
         assert_eq!(corpse.power_toughness, Some(pt!(2, 2)));
         assert_eq!(corpse.cost, cost![1, B]);
         assert_eq!(corpse.colors(), vec![cards::Color::Black]);

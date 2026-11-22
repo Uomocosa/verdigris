@@ -33,7 +33,7 @@ mod tests {
     fn test_usage() {
         let dread = (TEST_WALL_OF_DREAD.definition)();
         assert_eq!(*dread.name, "Test Wall of Dread");
-        assert_eq!(dread.types, vec![cards::CardType::Enchantment]);
+        assert_eq!(dread.type_line.types, vec![cards::CardType::Enchantment]);
         assert_eq!(dread.cost, cost![2, B]);
         assert_eq!(dread.colors(), vec![cards::Color::Black]);
         assert_eq!(

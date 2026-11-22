@@ -83,7 +83,7 @@ pub fn r509_1a_r509_1g_r509_1h_r702_9b_r702_17b_declare_blockers(
         let all_legal = assignments.iter().all(|assignment| {
             let blocker_legal = cards.get(assignment.blocker).is_ok_and(
                 |(_, definition, owner, in_zone, tapped)| {
-                    definition.types.contains(&cards::CardType::Creature)
+                    definition.type_line.types.contains(&cards::CardType::Creature)
                         && **owner == action.player
                         && **in_zone == battlefield
                         && tapped.is_none()
@@ -103,7 +103,7 @@ pub fn r509_1a_r509_1g_r509_1h_r702_9b_r702_17b_declare_blockers(
         let requirement_unmet = cards.iter().any(|(entity, definition, owner, in_zone, tapped)| {
             **owner == action.player
                 && **in_zone == battlefield
-                && definition.types.contains(&cards::CardType::Creature)
+                && definition.type_line.types.contains(&cards::CardType::Creature)
                 && answers.ask::<rules::MustBlock>(entity)
                 && tapped.is_none()
                 && !assignments.iter().any(|assignment| assignment.blocker == entity)

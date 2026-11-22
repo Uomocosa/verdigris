@@ -43,7 +43,7 @@ pub fn r608_3a_permanent_enters(
         if !zones.contains(STACK, **in_zone) {
             continue;
         }
-        let is_permanent = !definition.types.iter().any(|card_type| {
+        let is_permanent = !definition.type_line.types.iter().any(|card_type| {
             matches!(
                 card_type,
                 cards::CardType::Instant | cards::CardType::Sorcery

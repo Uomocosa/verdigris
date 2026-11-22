@@ -63,7 +63,7 @@ pub fn r601_2a_cast(
             rejected.write(actions::Rejected::CannotCast { spell });
             continue;
         }
-        if definition.types.contains(&cards::CardType::Land) {
+        if definition.type_line.types.contains(&cards::CardType::Land) {
             rejected.write(actions::Rejected::CannotCast { spell });
             continue;
         }
@@ -71,7 +71,7 @@ pub fn r601_2a_cast(
             rejected.write(actions::Rejected::CannotCast { spell });
             continue;
         };
-        let is_instant = definition.types.contains(&cards::CardType::Instant);
+        let is_instant = definition.type_line.types.contains(&cards::CardType::Instant);
         if !is_instant {
             let do_stack_is_empty = !cards.iter().any(|(_, _, zone)| **zone == stack);
             let is_main_phase = matches!(

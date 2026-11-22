@@ -8,9 +8,11 @@ pub fn creature(
     cards::CardDefinition {
         name: name.into(),
         cost,
-        supertypes: Vec::new(),
-        types: vec![cards::CardType::Creature],
-        land_types: Vec::new(),
+        type_line: cards::TypeLine {
+            supertypes: Vec::new(),
+            types: vec![cards::CardType::Creature],
+            subtypes: Vec::new(),
+        },
         power_toughness: Some(power_toughness),
         effect: None,
         aura: None,
@@ -29,9 +31,11 @@ pub fn artifact_creature(
     cards::CardDefinition {
         name: name.into(),
         cost,
-        supertypes: Vec::new(),
-        types: vec![cards::CardType::Artifact, cards::CardType::Creature],
-        land_types: Vec::new(),
+        type_line: cards::TypeLine {
+            supertypes: Vec::new(),
+            types: vec![cards::CardType::Artifact, cards::CardType::Creature],
+            subtypes: Vec::new(),
+        },
         power_toughness: Some(power_toughness),
         effect: None,
         aura: None,
@@ -46,9 +50,11 @@ pub fn instant(name: impl Into<cards::CardName>, cost: cards::Cost) -> cards::Ca
     cards::CardDefinition {
         name: name.into(),
         cost,
-        supertypes: Vec::new(),
-        types: vec![cards::CardType::Instant],
-        land_types: Vec::new(),
+        type_line: cards::TypeLine {
+            supertypes: Vec::new(),
+            types: vec![cards::CardType::Instant],
+            subtypes: Vec::new(),
+        },
         power_toughness: None,
         effect: None,
         aura: None,
@@ -63,9 +69,11 @@ pub fn sorcery(name: impl Into<cards::CardName>, cost: cards::Cost) -> cards::Ca
     cards::CardDefinition {
         name: name.into(),
         cost,
-        supertypes: Vec::new(),
-        types: vec![cards::CardType::Sorcery],
-        land_types: Vec::new(),
+        type_line: cards::TypeLine {
+            supertypes: Vec::new(),
+            types: vec![cards::CardType::Sorcery],
+            subtypes: Vec::new(),
+        },
         power_toughness: None,
         effect: None,
         aura: None,
@@ -78,14 +86,16 @@ pub fn sorcery(name: impl Into<cards::CardName>, cost: cards::Cost) -> cards::Ca
 
 pub fn land(
     name: impl Into<cards::CardName>,
-    land_types: impl IntoIterator<Item = cards::LandType>,
+    land_subtypes: impl IntoIterator<Item = cards::LandType>,
 ) -> cards::CardDefinition {
     cards::CardDefinition {
         name: name.into(),
         cost: cards::Cost::default(),
-        supertypes: Vec::new(),
-        types: vec![cards::CardType::Land],
-        land_types: land_types.into_iter().collect(),
+        type_line: cards::TypeLine {
+            supertypes: Vec::new(),
+            types: vec![cards::CardType::Land],
+            subtypes: land_subtypes.into_iter().map(cards::Subtype::from).collect(),
+        },
         power_toughness: None,
         effect: None,
         aura: None,

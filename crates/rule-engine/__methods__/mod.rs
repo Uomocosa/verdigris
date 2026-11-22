@@ -24,5 +24,6 @@ pub mod test_card;
 #[cfg(feature = "testing")]
 pub mod test_player_actions;
 pub mod trigger_event;
+pub mod type_line;
 pub mod zone_lookup;
 pub mod zone_ref;

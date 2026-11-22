@@ -32,7 +32,7 @@ mod tests {
     fn test_usage() {
         let fervor = (TEST_BATTLE_FERVOR.definition)();
         assert_eq!(*fervor.name, "Test Battle Fervor");
-        assert_eq!(fervor.types, vec![cards::CardType::Enchantment]);
+        assert_eq!(fervor.type_line.types, vec![cards::CardType::Enchantment]);
         assert_eq!(fervor.cost, cost![1, R]);
         assert_eq!(fervor.colors(), vec![cards::Color::Red]);
         assert_eq!(

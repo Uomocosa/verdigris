@@ -20,7 +20,7 @@ mod tests {
     fn test_usage() {
         let one = (ENDLESS_ONE.definition)();
         assert_eq!(*one.name, "Endless One");
-        assert_eq!(one.types, vec![cards::CardType::Creature]);
+        assert_eq!(one.type_line.types, vec![cards::CardType::Creature]);
         assert_eq!(one.cost, cost![X]);
         assert_eq!(one.power_toughness, Some(pt!(0, 0)));
     }

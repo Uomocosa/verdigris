@@ -23,7 +23,7 @@ mod tests {
     fn test_usage() {
         let bolt = (LIGHTNING_BOLT.definition)();
         assert_eq!(*bolt.name, "Lightning Bolt");
-        assert_eq!(bolt.types, vec![cards::CardType::Instant]);
+        assert_eq!(bolt.type_line.types, vec![cards::CardType::Instant]);
         assert_eq!(
             bolt.effect,
             Some(effects::damage(3).to(effects::target(1, crate::ANY_TARGET)))

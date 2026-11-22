@@ -25,7 +25,7 @@ mod tests {
     fn test_usage() {
         let removal = (DOOM_BLADE.definition)();
         assert_eq!(*removal.name, "Doom Blade");
-        assert_eq!(removal.types, vec![cards::CardType::Instant]);
+        assert_eq!(removal.type_line.types, vec![cards::CardType::Instant]);
         assert_eq!(removal.cost, cost![1, B]);
         assert_eq!(removal.colors(), vec![cards::Color::Black]);
         assert_eq!(

@@ -33,7 +33,7 @@ mod tests {
     fn test_usage() {
         let drums = (TEST_WAR_DRUMS.definition)();
         assert_eq!(*drums.name, "Test War Drums");
-        assert_eq!(drums.types, vec![cards::CardType::Enchantment]);
+        assert_eq!(drums.type_line.types, vec![cards::CardType::Enchantment]);
         assert_eq!(drums.cost, cost![2, R]);
         assert_eq!(drums.colors(), vec![cards::Color::Red]);
         assert_eq!(

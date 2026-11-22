@@ -25,7 +25,7 @@ mod tests {
     fn test_usage() {
         let spell = (TOME_SCOUR.definition)();
         assert_eq!(*spell.name, "Tome Scour");
-        assert_eq!(spell.types, vec![cards::CardType::Sorcery]);
+        assert_eq!(spell.type_line.types, vec![cards::CardType::Sorcery]);
         assert_eq!(spell.cost, cost![U]);
         assert_eq!(spell.colors(), vec![cards::Color::Blue]);
         assert_eq!(

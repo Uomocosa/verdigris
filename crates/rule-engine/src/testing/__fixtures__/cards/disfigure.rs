@@ -25,7 +25,7 @@ mod tests {
     fn test_usage() {
         let disfigure = (DISFIGURE.definition)();
         assert_eq!(*disfigure.name, "Disfigure");
-        assert_eq!(disfigure.types, vec![cards::CardType::Instant]);
+        assert_eq!(disfigure.type_line.types, vec![cards::CardType::Instant]);
         assert_eq!(disfigure.cost, cost![B]);
         assert_eq!(disfigure.colors(), vec![cards::Color::Black]);
         assert_eq!(

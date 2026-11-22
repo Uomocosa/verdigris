@@ -28,7 +28,7 @@ mod tests {
     fn test_usage() {
         let companion = (GARRUKS_COMPANION.definition)();
         assert_eq!(*companion.name, "Garruk's Companion");
-        assert_eq!(companion.types, vec![cards::CardType::Creature]);
+        assert_eq!(companion.type_line.types, vec![cards::CardType::Creature]);
         assert_eq!(companion.cost, cost![G, G]);
         assert_eq!(companion.power_toughness, Some(pt!(3, 2)));
         assert_eq!(companion.keywords, vec![keywords::Keyword::Trample]);

@@ -31,7 +31,7 @@ mod tests {
         let golem = (IRON_GOLEM.definition)();
         assert_eq!(*golem.name, "Iron Golem");
         assert_eq!(
-            golem.types,
+            golem.type_line.types,
             vec![cards::CardType::Artifact, cards::CardType::Creature]
         );
         assert_eq!(golem.cost, cost![4]);

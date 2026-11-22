@@ -16,9 +16,7 @@ use crate::testing;
 pub struct CardDefinition {
     pub name: cards::CardName,
     pub cost: cards::Cost,
-    pub supertypes: Vec<cards::Supertype>,
-    pub types: Vec<cards::CardType>,
-    pub land_types: Vec<cards::LandType>,
+    pub type_line: cards::TypeLine,
     pub power_toughness: Option<cards::PowerToughness>,
     pub effect: Option<effects::Effect>,
     pub aura: Option<effects::Effect>,
@@ -34,9 +32,11 @@ impl CardDefinition {
         Self {
             name: name.into(),
             cost,
-            supertypes: Vec::new(),
-            types: vec![cards::CardType::Enchantment],
-            land_types: Vec::new(),
+            type_line: cards::TypeLine {
+                supertypes: Vec::new(),
+                types: vec![cards::CardType::Enchantment],
+                subtypes: Vec::new(),
+            },
             power_toughness: None,
             effect: None,
             aura: None,
@@ -96,7 +96,7 @@ impl CardDefinition {
 
     #[must_use]
     pub fn supertype(mut self, supertype: cards::Supertype) -> Self {
-        self.supertypes.push(supertype);
+        self.type_line.supertypes.push(supertype);
         self
     }
 
@@ -141,7 +141,7 @@ mod tests {
     #[test]
     fn test_usage() {
         let bears = cards::creature("Grizzly Bears", cost![1, G], pt!(2, 2));
-        assert_eq!(bears.types, vec![cards::CardType::Creature]);
+        assert_eq!(bears.type_line.types, vec![cards::CardType::Creature]);
         assert_eq!(bears.colors(), vec![cards::Color::Green]);
         let myr = cards::artifact_creature("Darksteel Myr", cost![3], pt!(0, 1))
             .keyword(keywords::indestructible());

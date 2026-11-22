@@ -24,7 +24,7 @@ mod tests {
     fn test_usage() {
         let removal = (MURDER.definition)();
         assert_eq!(*removal.name, "Murder");
-        assert_eq!(removal.types, vec![cards::CardType::Instant]);
+        assert_eq!(removal.type_line.types, vec![cards::CardType::Instant]);
         assert_eq!(
             removal.effect,
             Some(effects::destroy().to(effects::target(1, CREATURE)))

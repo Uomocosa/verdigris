@@ -33,7 +33,7 @@ mod tests {
     fn test_usage() {
         let banner = (TEST_HASTY_BANNER.definition)();
         assert_eq!(*banner.name, "Test Hasty Banner");
-        assert_eq!(banner.types, vec![cards::CardType::Enchantment]);
+        assert_eq!(banner.type_line.types, vec![cards::CardType::Enchantment]);
         assert_eq!(banner.cost, cost![1, R]);
         assert_eq!(banner.colors(), vec![cards::Color::Red]);
         assert_eq!(

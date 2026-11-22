@@ -16,10 +16,10 @@ mod tests {
     fn test_usage() {
         let tundra = (TUNDRA.definition)();
         assert_eq!(*tundra.name, "Tundra");
-        assert_eq!(tundra.supertypes, Vec::<cards::Supertype>::new());
-        assert_eq!(tundra.types, vec![cards::CardType::Land]);
+        assert_eq!(tundra.type_line.supertypes, Vec::<cards::Supertype>::new());
+        assert_eq!(tundra.type_line.types, vec![cards::CardType::Land]);
         assert_eq!(
-            tundra.land_types,
+            tundra.type_line.land_types().collect::<Vec<_>>(),
             vec![cards::LandType::Plains, cards::LandType::Island]
         );
     }

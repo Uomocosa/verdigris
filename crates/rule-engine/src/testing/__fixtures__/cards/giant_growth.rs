@@ -25,7 +25,7 @@ mod tests {
     fn test_usage() {
         let growth = (GIANT_GROWTH.definition)();
         assert_eq!(*growth.name, "Giant Growth");
-        assert_eq!(growth.types, vec![cards::CardType::Instant]);
+        assert_eq!(growth.type_line.types, vec![cards::CardType::Instant]);
         assert_eq!(growth.cost, cost![G]);
         assert_eq!(growth.colors(), vec![cards::Color::Green]);
         assert_eq!(

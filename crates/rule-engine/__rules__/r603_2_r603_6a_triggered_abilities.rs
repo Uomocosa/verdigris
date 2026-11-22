@@ -32,7 +32,7 @@ pub fn r603_2_r603_6a_triggered_abilities(
         let Ok(definition) = entered_cards.get(permanent) else {
             continue;
         };
-        if !definition.types.contains(&cards::CardType::Creature) {
+        if !definition.type_line.types.contains(&cards::CardType::Creature) {
             continue;
         }
         for (source, owner, enters) in sources.iter() {

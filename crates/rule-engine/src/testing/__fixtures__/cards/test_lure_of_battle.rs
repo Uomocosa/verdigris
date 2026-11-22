@@ -32,7 +32,7 @@ mod tests {
     fn test_usage() {
         let lure = (TEST_LURE_OF_BATTLE.definition)();
         assert_eq!(*lure.name, "Test Lure of Battle");
-        assert_eq!(lure.types, vec![cards::CardType::Enchantment]);
+        assert_eq!(lure.type_line.types, vec![cards::CardType::Enchantment]);
         assert_eq!(lure.cost, cost![1, G]);
         assert_eq!(lure.colors(), vec![cards::Color::Green]);
         assert_eq!(

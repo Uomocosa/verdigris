@@ -27,7 +27,7 @@ impl Filter {
 impl Filter {
     #[must_use]
     pub fn does_creature_match(self, definition: &cards::CardDefinition) -> bool {
-        let is_creature = definition.types.contains(&cards::CardType::Creature);
+        let is_creature = definition.type_line.types.contains(&cards::CardType::Creature);
         let has_excluded_color =
             self.excluded_color.is_some_and(|excluded| definition.colors().contains(&excluded));
         is_creature && !has_excluded_color
@@ -35,8 +35,8 @@ impl Filter {
 
     #[must_use]
     pub fn does_spell_match(self, definition: &cards::CardDefinition) -> bool {
-        let is_creature = definition.types.contains(&cards::CardType::Creature);
-        let is_instant = definition.types.contains(&cards::CardType::Instant);
+        let is_creature = definition.type_line.types.contains(&cards::CardType::Creature);
+        let is_instant = definition.type_line.types.contains(&cards::CardType::Instant);
         match self.kind {
             effects::FilterKind::Spell => true,
             effects::FilterKind::CreatureSpell => is_creature,

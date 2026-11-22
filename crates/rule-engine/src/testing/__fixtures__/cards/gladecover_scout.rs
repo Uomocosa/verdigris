@@ -28,7 +28,7 @@ mod tests {
     fn test_usage() {
         let scout = (GLADECOVER_SCOUT.definition)();
         assert_eq!(*scout.name, "Gladecover Scout");
-        assert_eq!(scout.types, vec![cards::CardType::Creature]);
+        assert_eq!(scout.type_line.types, vec![cards::CardType::Creature]);
         assert_eq!(scout.cost, cost![G]);
         assert_eq!(scout.power_toughness, Some(pt!(1, 1)));
         assert_eq!(scout.keywords, vec![keywords::Keyword::Hexproof]);

@@ -28,7 +28,7 @@ mod tests {
     fn test_usage() {
         let spider = (GIANT_SPIDER.definition)();
         assert_eq!(*spider.name, "Giant Spider");
-        assert_eq!(spider.types, vec![cards::CardType::Creature]);
+        assert_eq!(spider.type_line.types, vec![cards::CardType::Creature]);
         assert_eq!(spider.cost, cost![3, G]);
         assert_eq!(spider.power_toughness, Some(pt!(2, 4)));
         assert_eq!(spider.keywords, vec![keywords::Keyword::Reach]);

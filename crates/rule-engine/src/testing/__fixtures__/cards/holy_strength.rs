@@ -28,7 +28,7 @@ mod tests {
     fn test_usage() {
         let strength = (HOLY_STRENGTH.definition)();
         assert_eq!(*strength.name, "Holy Strength");
-        assert_eq!(strength.types, vec![cards::CardType::Enchantment]);
+        assert_eq!(strength.type_line.types, vec![cards::CardType::Enchantment]);
         assert_eq!(strength.cost, cost![W]);
         assert_eq!(strength.colors(), vec![cards::Color::White]);
         assert_eq!(

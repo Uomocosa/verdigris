@@ -25,7 +25,7 @@ mod tests {
     fn test_usage() {
         let counter = (CANCEL.definition)();
         assert_eq!(*counter.name, "Cancel");
-        assert_eq!(counter.types, vec![cards::CardType::Instant]);
+        assert_eq!(counter.type_line.types, vec![cards::CardType::Instant]);
         assert_eq!(counter.cost, cost![1, U, U]);
         assert_eq!(counter.colors(), vec![cards::Color::Blue]);
         assert_eq!(

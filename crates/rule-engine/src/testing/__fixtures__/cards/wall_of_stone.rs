@@ -28,7 +28,7 @@ mod tests {
     fn test_usage() {
         let wall = (WALL_OF_STONE.definition)();
         assert_eq!(*wall.name, "Wall of Stone");
-        assert_eq!(wall.types, vec![cards::CardType::Creature]);
+        assert_eq!(wall.type_line.types, vec![cards::CardType::Creature]);
         assert_eq!(wall.cost, cost![1, R, R]);
         assert_eq!(wall.power_toughness, Some(pt!(0, 8)));
         assert_eq!(wall.keywords, vec![keywords::Keyword::Defender]);

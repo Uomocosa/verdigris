@@ -33,7 +33,7 @@ mod tests {
     fn test_usage() {
         let night = (TEST_NIGHT_OF_THE_HUNT.definition)();
         assert_eq!(*night.name, "Test Night of the Hunt");
-        assert_eq!(night.types, vec![cards::CardType::Enchantment]);
+        assert_eq!(night.type_line.types, vec![cards::CardType::Enchantment]);
         assert_eq!(night.cost, cost![2, B]);
         assert_eq!(night.colors(), vec![cards::Color::Black]);
         assert_eq!(

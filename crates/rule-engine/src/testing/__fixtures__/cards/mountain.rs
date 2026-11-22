@@ -18,8 +18,11 @@ mod tests {
     fn test_usage() {
         let mountain = (MOUNTAIN.definition)();
         assert_eq!(*mountain.name, "Mountain");
-        assert_eq!(mountain.supertypes, vec![cards::Supertype::Basic]);
-        assert_eq!(mountain.types, vec![cards::CardType::Land]);
-        assert_eq!(mountain.land_types, vec![cards::LandType::Mountain]);
+        assert_eq!(mountain.type_line.supertypes, vec![cards::Supertype::Basic]);
+        assert_eq!(mountain.type_line.types, vec![cards::CardType::Land]);
+        assert_eq!(
+            mountain.type_line.land_types().collect::<Vec<_>>(),
+            vec![cards::LandType::Mountain]
+        );
     }
 }

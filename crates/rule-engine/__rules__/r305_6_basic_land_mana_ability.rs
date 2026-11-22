@@ -63,7 +63,7 @@ pub fn r305_6_basic_land_mana_ability(
             continue;
         };
         let Some(land_type) =
-            definition.land_types.iter().copied().find(|land_type| land_type.color() == produces)
+            definition.type_line.land_types().find(|land_type| land_type.color() == produces)
         else {
             rejected.write(actions::Rejected::CannotActivateManaAbility { permanent });
             continue;

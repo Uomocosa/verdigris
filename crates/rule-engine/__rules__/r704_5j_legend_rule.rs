@@ -37,7 +37,7 @@ pub fn r704_5j_legend_rule(
 
     let mut legendary_by_owner_and_name: BTreeMap<(Entity, &str), Vec<Entity>> = BTreeMap::new();
     for (entity, definition, owner) in permanents.iter() {
-        if definition.supertypes.contains(&cards::Supertype::Legendary) {
+        if definition.type_line.supertypes.contains(&cards::Supertype::Legendary) {
             legendary_by_owner_and_name
                 .entry((**owner, definition.name.as_str()))
                 .or_default()

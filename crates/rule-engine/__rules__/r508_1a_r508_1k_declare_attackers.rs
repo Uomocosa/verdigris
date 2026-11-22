@@ -81,7 +81,7 @@ pub fn r508_1a_r508_1k_declare_attackers(
         };
         let all_legal = attackers.iter().all(|attacker| {
             cards.get(*attacker).is_ok_and(|(_, definition, owner, in_zone, tapped)| {
-                definition.types.contains(&cards::CardType::Creature)
+                definition.type_line.types.contains(&cards::CardType::Creature)
                     && **owner == action.player
                     && **in_zone == battlefield
                     && tapped.is_none()
@@ -98,7 +98,7 @@ pub fn r508_1a_r508_1k_declare_attackers(
         let requirement_unmet = cards.iter().any(|(entity, definition, owner, in_zone, tapped)| {
             **owner == action.player
                 && **in_zone == battlefield
-                && definition.types.contains(&cards::CardType::Creature)
+                && definition.type_line.types.contains(&cards::CardType::Creature)
                 && answers.ask::<rules::MustAttack>(entity)
                 && tapped.is_none()
                 && !answers.characteristics(entity).keywords.contains(&keywords::Keyword::Defender)

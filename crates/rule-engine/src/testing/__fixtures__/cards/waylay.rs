@@ -41,7 +41,7 @@ mod tests {
     fn test_usage() {
         let knight = (KNIGHT_TOKEN.definition)();
         assert_eq!(*knight.name, "Knight");
-        assert_eq!(knight.types, vec![cards::CardType::Creature]);
+        assert_eq!(knight.type_line.types, vec![cards::CardType::Creature]);
         assert_eq!(knight.power_toughness, Some(pt!(2, 2)));
         assert_eq!(knight.colors(), vec![cards::Color::White]);
         assert_eq!(
@@ -55,7 +55,7 @@ mod tests {
 
         let waylay = (WAYLAY.definition)();
         assert_eq!(*waylay.name, "Waylay");
-        assert_eq!(waylay.types, vec![cards::CardType::Instant]);
+        assert_eq!(waylay.type_line.types, vec![cards::CardType::Instant]);
         assert_eq!(waylay.cost, cost![2, W]);
         assert_eq!(
             waylay.effect,

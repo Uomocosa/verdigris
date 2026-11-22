@@ -40,9 +40,10 @@ pub fn r601_2h_pay(
             commands.entity(spell).remove::<stack::CastingStage>();
             continue;
         }
-        let does_owner_control_an_untapped_land = untapped_lands
-            .iter()
-            .any(|(land_owner, land)| **land_owner == **owner && !land.land_types.is_empty());
+        let does_owner_control_an_untapped_land =
+            untapped_lands.iter().any(|(land_owner, land)| {
+                **land_owner == **owner && land.type_line.land_types().next().is_some()
+            });
         if !does_owner_control_an_untapped_land {
             rejected.write(actions::Rejected::CannotPay { spell });
             if let Some(hand) = zones.find(HAND, Some(**owner)) {

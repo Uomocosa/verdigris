@@ -65,7 +65,7 @@ pub fn r305_1_r305_2_r305_3_play_land(
         let do_special_action_conditions_hold = action.player == priority.player
             && **owner == action.player
             && **in_zone == hand
-            && definition.types.contains(&cards::CardType::Land)
+            && definition.type_line.types.contains(&cards::CardType::Land)
             && is_stack_empty
             && is_main_phase
             && turn.active == action.player;

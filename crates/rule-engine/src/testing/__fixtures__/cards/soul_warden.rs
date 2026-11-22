@@ -34,7 +34,7 @@ mod tests {
     fn test_usage() {
         let warden = (SOUL_WARDEN.definition)();
         assert_eq!(*warden.name, "Soul Warden");
-        assert_eq!(warden.types, vec![cards::CardType::Creature]);
+        assert_eq!(warden.type_line.types, vec![cards::CardType::Creature]);
         assert_eq!(warden.cost, cost![W]);
         assert_eq!(warden.power_toughness, Some(pt!(1, 1)));
         assert_eq!(

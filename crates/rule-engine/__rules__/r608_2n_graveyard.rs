@@ -34,7 +34,7 @@ pub fn r608_2n_graveyard(
         let Some(definition) = definition else {
             continue;
         };
-        let is_instant_or_sorcery = definition.types.iter().any(|card_type| {
+        let is_instant_or_sorcery = definition.type_line.types.iter().any(|card_type| {
             matches!(
                 card_type,
                 cards::CardType::Instant | cards::CardType::Sorcery

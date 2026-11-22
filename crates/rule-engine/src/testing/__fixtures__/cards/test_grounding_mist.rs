@@ -33,7 +33,7 @@ mod tests {
     fn test_usage() {
         let mist = (TEST_GROUNDING_MIST.definition)();
         assert_eq!(*mist.name, "Test Grounding Mist");
-        assert_eq!(mist.types, vec![cards::CardType::Enchantment]);
+        assert_eq!(mist.type_line.types, vec![cards::CardType::Enchantment]);
         assert_eq!(mist.cost, cost![1, G]);
         assert_eq!(mist.colors(), vec![cards::Color::Green]);
         assert_eq!(

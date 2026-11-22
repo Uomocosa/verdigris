@@ -32,7 +32,7 @@ mod tests {
     fn test_usage() {
         let arms = (TEST_CALL_TO_ARMS.definition)();
         assert_eq!(*arms.name, "Test Call to Arms");
-        assert_eq!(arms.types, vec![cards::CardType::Enchantment]);
+        assert_eq!(arms.type_line.types, vec![cards::CardType::Enchantment]);
         assert_eq!(arms.cost, cost![1, R]);
         assert_eq!(arms.colors(), vec![cards::Color::Red]);
         assert_eq!(

@@ -30,3 +30,9 @@ pub use land_type::LandType;
 
 mod mana_pool;
 pub use mana_pool::ManaPool;
+
+mod subtype;
+pub use subtype::Subtype;
+
+mod type_line;
+pub use type_line::TypeLine;

@@ -33,7 +33,7 @@ mod tests {
     fn test_usage() {
         let field = (TEST_TAUNTING_FIELD.definition)();
         assert_eq!(*field.name, "Test Taunting Field");
-        assert_eq!(field.types, vec![cards::CardType::Enchantment]);
+        assert_eq!(field.type_line.types, vec![cards::CardType::Enchantment]);
         assert_eq!(field.cost, cost![1, G]);
         assert_eq!(field.colors(), vec![cards::Color::Green]);
         assert_eq!(

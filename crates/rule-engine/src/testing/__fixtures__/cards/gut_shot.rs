@@ -26,7 +26,7 @@ mod tests {
     fn test_usage() {
         let spell = (GUT_SHOT.definition)();
         assert_eq!(*spell.name, "Gut Shot");
-        assert_eq!(spell.types, vec![cards::CardType::Instant]);
+        assert_eq!(spell.type_line.types, vec![cards::CardType::Instant]);
         assert_eq!(spell.cost.phyrexian, Some(cards::Color::Red));
         assert_eq!(spell.cost.red, 1);
         assert_eq!(spell.colors(), vec![cards::Color::Red]);

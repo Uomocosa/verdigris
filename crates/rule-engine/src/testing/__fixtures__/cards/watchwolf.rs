@@ -20,7 +20,7 @@ mod tests {
     fn test_usage() {
         let wolf = (WATCHWOLF.definition)();
         assert_eq!(*wolf.name, "Watchwolf");
-        assert_eq!(wolf.types, vec![cards::CardType::Creature]);
+        assert_eq!(wolf.type_line.types, vec![cards::CardType::Creature]);
         assert_eq!(wolf.cost, cost![G, W]);
         assert_eq!(wolf.power_toughness, Some(pt!(3, 3)));
     }

@@ -29,7 +29,7 @@ mod tests {
         let myr = (DARKSTEEL_MYR.definition)();
         assert_eq!(*myr.name, "Darksteel Myr");
         assert_eq!(
-            myr.types,
+            myr.type_line.types,
             vec![cards::CardType::Artifact, cards::CardType::Creature]
         );
         assert_eq!(myr.cost, cost![3]);
