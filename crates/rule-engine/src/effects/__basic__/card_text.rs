@@ -42,6 +42,16 @@ pub const fn draw(count: u32) -> effects::Effect {
 }
 
 #[must_use]
+pub const fn mills(count: u32) -> effects::Effect {
+    effects::Effect {
+        kind: effects::EffectKind::Mill(count),
+        then: None,
+        finally: None,
+        target: None,
+    }
+}
+
+#[must_use]
 pub const fn lose_life(amount: u32) -> effects::Effect {
     effects::Effect {
         kind: effects::EffectKind::LoseLife(amount),

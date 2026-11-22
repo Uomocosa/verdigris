@@ -6,6 +6,7 @@ pub enum EffectKind {
     Destroy,
     Counter,
     Draw(u32),
+    Mill(u32),
     LoseLife(u32),
     Poison(u32),
     GainLife(u32),

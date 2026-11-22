@@ -33,6 +33,7 @@ pub fn r608_2_r608_2c_resolve(
     mut effect_messages: ParamSet<(
         MessageWriter<effects::PowerToughnessModified>,
         MessageWriter<effects::KeywordGranted>,
+        MessageWriter<effects::MillRequested>,
     )>,
     lookups: stack::ResolutionLookups<'_, '_>,
     zones: zones::ZoneLookup,
@@ -90,6 +91,9 @@ pub fn r608_2_r608_2c_resolve(
                         count,
                     });
                 }
+                effects::EffectKind::Mill(count) => {
+                    request_mill(&mut effect_messages.p2(), player_target, controller, count);
+                }
                 effects::EffectKind::LoseLife(amount) => {
                     if let Some(player) = player_target {
                         player_effects.p0().write(players::LifeLost { player, amount });
@@ -142,6 +146,18 @@ fn effect_of(lookups: &stack::ResolutionLookups<'_, '_>, spell: Entity) -> Optio
         .ok()
         .and_then(|definition| definition.effect)
         .or_else(|| lookups.abilities.get(spell).ok().map(|ability| ability.effect))
+}
+
+fn request_mill(
+    mills: &mut MessageWriter<effects::MillRequested>,
+    player_target: Option<Entity>,
+    controller: Entity,
+    count: u32,
+) {
+    mills.write(effects::MillRequested {
+        player: player_target.unwrap_or(controller),
+        count,
+    });
 }
 
 fn add_poison_counters(

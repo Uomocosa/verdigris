@@ -2,12 +2,12 @@
 mod basic;
 
 pub use basic::card_text::{
-    counter, damage, destroy, discard, draw, gain_life, gains, gets, lose_life, poison, target,
-    win_the_game,
+    counter, damage, destroy, discard, draw, gain_life, gains, gets, lose_life, mills, poison,
+    target, win_the_game,
 };
 pub use basic::components::ContinuousEffect;
 pub use basic::enums::{Duration, EffectKind, FilterKind, Layered};
-pub use basic::messages::{KeywordGranted, PowerToughnessModified};
+pub use basic::messages::{KeywordGranted, MillRequested, PowerToughnessModified};
 pub use basic::structs::Target;
 
 mod timestamp;

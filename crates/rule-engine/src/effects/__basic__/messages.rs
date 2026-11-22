@@ -10,6 +10,12 @@ pub struct PowerToughnessModified {
 }
 
 #[derive(Message, Debug, Clone, Copy, PartialEq, Eq)]
+pub struct MillRequested {
+    pub player: Entity,
+    pub count: u32,
+}
+
+#[derive(Message, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct KeywordGranted {
     pub target: Entity,
     pub keyword: keywords::Keyword,

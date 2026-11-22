@@ -13,6 +13,7 @@ pub fn add_resolution_systems(app: &mut App) {
             rules::r608_2_r608_2c_resolve::r608_2_r608_2c_resolve,
             rules::r611_2a_continuous_effects::r611_2a_continuous_effects,
             rules::r121_1_r121_2_draw::r121_1_r121_2_draw,
+            rules::r701_17a_r701_17b_mill::r701_17a_r701_17b_mill,
             rules::r119_3_life_loss::r119_3_life_loss,
             rules::r701_9a_r701_9b_discard::r701_9a_r701_9b_discard,
             rules::r701_6a_counter::r701_6a_counter,
@@ -39,7 +40,7 @@ mod tests {
 
         assert_eq!(
             app.get_schedule(Update).map(Schedule::systems_len),
-            Some(13)
+            Some(14)
         );
     }
 }
