@@ -8,6 +8,7 @@ use crate::cost;
 use crate::effects;
 use crate::keywords;
 use crate::pt;
+use crate::statics;
 use crate::testing;
 use crate::turns;
 
@@ -17,7 +18,7 @@ pub const MASTER_OF_THE_FEAST: testing::Card = testing::Card {
         card! {
             cards::creature("Master of the Feast", cost![4, B], pt!(5, 5));
             keywords::flying(),
-            keywords::must_attack_if_able(),
+            statics::this().must_attack(),
             abilities::at(
                 turns::beginning_of(UPKEEP, YOU),
                 effects::draw(1).to_player(OPPONENT),
@@ -28,6 +29,7 @@ pub const MASTER_OF_THE_FEAST: testing::Card = testing::Card {
 
 #[cfg(test)]
 mod tests {
+    use crate::CREATURE;
     use crate::OPPONENT;
     use crate::UPKEEP;
     use crate::YOU;
@@ -37,6 +39,7 @@ mod tests {
     use crate::effects;
     use crate::keywords;
     use crate::pt;
+    use crate::rules;
 
     use super::MASTER_OF_THE_FEAST;
 
@@ -49,10 +52,20 @@ mod tests {
         assert_eq!(feast.power_toughness, Some(pt!(5, 5)));
         assert_eq!(
             feast.keywords().collect::<Vec<_>>(),
-            vec![
-                keywords::StaticKeyword::Flying,
-                keywords::StaticKeyword::MustAttackIfAble
-            ]
+            vec![keywords::StaticKeyword::Flying]
+        );
+        assert_eq!(
+            feast.continuous_abilities().copied().collect::<Vec<_>>(),
+            [abilities::Continuous {
+                filter: effects::Filter {
+                    is_this_object: true,
+                    ..CREATURE
+                },
+                change: effects::Change::Rule {
+                    question: rules::Question::MustAttack,
+                    answer: rules::Answer::MustAttack(true),
+                },
+            }]
         );
         assert_eq!(
             feast.triggered_abilities().copied().collect::<Vec<_>>(),

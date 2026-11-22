@@ -65,6 +65,7 @@ pub fn r611_3a_static_effects(
                         zones.contains(BATTLEFIELD, **zone)
                             && candidate_matches(
                                 ability.filter,
+                                effect.affected == source,
                                 **source_owner,
                                 **owner,
                                 attacking.is_some(),
@@ -112,6 +113,7 @@ pub fn r611_3a_static_effects(
                 }
                 if !candidate_matches(
                     ability.filter,
+                    candidate == source,
                     **owner,
                     **candidate_owner,
                     attacking.is_some(),
@@ -138,6 +140,7 @@ pub fn r611_3a_static_effects(
 
 fn candidate_matches(
     filter: effects::Filter,
+    is_source: bool,
     controller: Entity,
     candidate_owner: Entity,
     is_attacking: bool,
@@ -145,6 +148,9 @@ fn candidate_matches(
     definition: &cards::CardDefinition,
     players: &[Entity],
 ) -> bool {
+    if filter.is_this_object && !is_source {
+        return false;
+    }
     if let Some(controller_ref) = filter.controlled_by
         && !controller_ref.resolve(controller, players).contains(&candidate_owner)
     {
@@ -228,6 +234,28 @@ mod tests {
             granted.iter().filter(|effect| effect.affected == foe).count()
         });
         assert_eq!(affecting, 0);
+        Ok(())
+    }
+
+    #[test]
+    fn this_object_effect_applies_only_to_its_source() -> TestResult {
+        use bevy::ecs::system::RunSystemOnce;
+
+        use crate::rules;
+
+        let (mut game, [p1, _]) = MockGame::new([P1.battlefield([IRON_GOLEM, GRIZZLY_BEARS]), P2]);
+        let [golem] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(IRON_GOLEM)?;
+        let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        game.pass_priority();
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                assert!(answers.ask::<rules::MustAttack>(golem.into()));
+                assert!(answers.ask::<rules::MustBlock>(golem.into()));
+                assert!(!answers.ask::<rules::MustAttack>(bears.into()));
+                assert!(!answers.ask::<rules::MustBlock>(bears.into()));
+            })
+            .unwrap();
         Ok(())
     }
 

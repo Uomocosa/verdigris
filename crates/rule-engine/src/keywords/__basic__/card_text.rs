@@ -59,13 +59,3 @@ pub const fn first_strike() -> keywords::StaticKeyword {
 pub const fn double_strike() -> keywords::StaticKeyword {
     keywords::StaticKeyword::DoubleStrike
 }
-
-#[must_use]
-pub const fn must_attack_if_able() -> keywords::StaticKeyword {
-    keywords::StaticKeyword::MustAttackIfAble
-}
-
-#[must_use]
-pub const fn must_block_if_able() -> keywords::StaticKeyword {
-    keywords::StaticKeyword::MustBlockIfAble
-}

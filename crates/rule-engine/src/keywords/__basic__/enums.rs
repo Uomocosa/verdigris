@@ -12,6 +12,4 @@ pub enum StaticKeyword {
     Hexproof,
     FirstStrike,
     DoubleStrike,
-    MustAttackIfAble,
-    MustBlockIfAble,
 }

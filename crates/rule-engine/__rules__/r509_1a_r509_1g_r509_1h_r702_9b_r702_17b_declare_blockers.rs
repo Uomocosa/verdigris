@@ -403,7 +403,6 @@ mod tests {
     fn a_static_must_block_rule_answer_forces_a_block() -> TestResult {
         use bevy::ecs::system::RunSystemOnce;
 
-        use crate::keywords;
         use crate::rules;
 
         let (mut game, [p1, p2]) = MockGame::new([
@@ -437,12 +436,7 @@ mod tests {
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
-                assert!(
-                    !answers
-                        .characteristics(bears_2.into())
-                        .keywords
-                        .contains(&keywords::StaticKeyword::MustBlockIfAble)
-                );
+                assert!(answers.ask::<rules::MustBlock>(bears_2.into()));
             })
             .unwrap();
         Ok(())

@@ -1,5 +1,4 @@
 use crate::cards;
-use crate::keywords;
 use crate::rules;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -9,7 +8,7 @@ pub struct MustBlock;
 impl rules::traits::rule_question::RuleQuestion for MustBlock {
     type Answer = bool;
     const QUESTION: rules::Question = rules::Question::MustBlock;
-    fn default(characteristics: &cards::Characteristics) -> bool { characteristics.keywords.contains(&keywords::StaticKeyword::MustBlockIfAble) }
+    fn default(_characteristics: &cards::Characteristics) -> bool { false }
     fn into_answer(answer: bool) -> rules::Answer { rules::Answer::MustBlock(answer) }
     fn from_answer(answer: rules::Answer) -> Option<bool> { answer.must_block() }
 }
@@ -28,10 +27,10 @@ mod tests {
         let bears = cards::creature("Grizzly Bears", cost![1, G], pt!(2, 2));
         let bears_characteristics = cards::Characteristics::from_printed(&bears, true);
         assert!(!rules::MustBlock::default(&bears_characteristics));
-        let forced = cards::Characteristics {
-            keywords: vec![keywords::StaticKeyword::MustBlockIfAble],
+        let vigilant = cards::Characteristics {
+            keywords: vec![keywords::StaticKeyword::Vigilance],
             ..bears_characteristics
         };
-        assert!(rules::MustBlock::default(&forced));
+        assert!(!rules::MustBlock::default(&vigilant));
     }
 }

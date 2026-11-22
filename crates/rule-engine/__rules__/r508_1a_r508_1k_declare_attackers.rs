@@ -405,7 +405,6 @@ mod tests {
     fn a_static_must_attack_rule_answer_forces_an_attack() -> TestResult {
         use bevy::ecs::system::RunSystemOnce;
 
-        use crate::keywords;
         use crate::rules;
 
         let (mut game, [p1, p2]) = MockGame::new([
@@ -430,12 +429,7 @@ mod tests {
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
-                assert!(
-                    !answers
-                        .characteristics(bears.into())
-                        .keywords
-                        .contains(&keywords::StaticKeyword::MustAttackIfAble)
-                );
+                assert!(answers.ask::<rules::MustAttack>(bears.into()));
             })
             .unwrap();
         Ok(())

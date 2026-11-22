@@ -3,6 +3,7 @@ use crate::cards;
 use crate::cost;
 use crate::keywords;
 use crate::pt;
+use crate::statics;
 use crate::testing;
 
 pub const IRON_GOLEM: testing::Card = testing::Card {
@@ -11,18 +12,22 @@ pub const IRON_GOLEM: testing::Card = testing::Card {
         card! {
             cards::artifact_creature("Iron Golem", cost![4], pt!(5, 3));
             keywords::vigilance(),
-            keywords::must_attack_if_able(),
-            keywords::must_block_if_able(),
+            statics::this().must_attack(),
+            statics::this().must_block(),
         }
     },
 };
 
 #[cfg(test)]
 mod tests {
+    use crate::CREATURE;
+    use crate::abilities;
     use crate::cards;
     use crate::cost;
+    use crate::effects;
     use crate::keywords;
     use crate::pt;
+    use crate::rules;
 
     use super::IRON_GOLEM;
 
@@ -38,10 +43,31 @@ mod tests {
         assert_eq!(golem.power_toughness, Some(pt!(5, 3)));
         assert_eq!(
             golem.keywords().collect::<Vec<_>>(),
-            vec![
-                keywords::StaticKeyword::Vigilance,
-                keywords::StaticKeyword::MustAttackIfAble,
-                keywords::StaticKeyword::MustBlockIfAble,
+            vec![keywords::StaticKeyword::Vigilance]
+        );
+        assert_eq!(
+            golem.continuous_abilities().copied().collect::<Vec<_>>(),
+            [
+                abilities::Continuous {
+                    filter: effects::Filter {
+                        is_this_object: true,
+                        ..CREATURE
+                    },
+                    change: effects::Change::Rule {
+                        question: rules::Question::MustAttack,
+                        answer: rules::Answer::MustAttack(true),
+                    },
+                },
+                abilities::Continuous {
+                    filter: effects::Filter {
+                        is_this_object: true,
+                        ..CREATURE
+                    },
+                    change: effects::Change::Rule {
+                        question: rules::Question::MustBlock,
+                        answer: rules::Answer::MustBlock(true),
+                    },
+                },
             ]
         );
     }

@@ -3,7 +3,6 @@ use crate::OPPONENT;
 use crate::card;
 use crate::cards;
 use crate::cost;
-use crate::keywords;
 use crate::statics;
 use crate::testing;
 
@@ -12,7 +11,7 @@ pub const TEST_TAUNTING_FIELD: testing::Card = testing::Card {
     definition: || {
         card! {
             cards::CardDefinition::from_enchantment("Test Taunting Field", cost![1, G]);
-            statics::all(CREATURE.controlled_by(OPPONENT)).gain(keywords::must_block_if_able()),
+            statics::all(CREATURE.controlled_by(OPPONENT)).must_block(),
         }
     },
 };
@@ -25,7 +24,7 @@ mod tests {
     use crate::cards;
     use crate::cost;
     use crate::effects;
-    use crate::keywords;
+    use crate::rules;
 
     use super::TEST_TAUNTING_FIELD;
 
@@ -40,9 +39,10 @@ mod tests {
             field.continuous_abilities().copied().collect::<Vec<_>>(),
             [abilities::Continuous {
                 filter: CREATURE.controlled_by(OPPONENT),
-                change: effects::Change::Characteristic(effects::Layered::GainKeyword(
-                    keywords::StaticKeyword::MustBlockIfAble,
-                )),
+                change: effects::Change::Rule {
+                    question: rules::Question::MustBlock,
+                    answer: rules::Answer::MustBlock(true),
+                },
             }]
         );
     }

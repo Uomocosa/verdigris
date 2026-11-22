@@ -3,7 +3,6 @@ use crate::YOU;
 use crate::card;
 use crate::cards;
 use crate::cost;
-use crate::keywords;
 use crate::statics;
 use crate::testing;
 
@@ -12,7 +11,7 @@ pub const TEST_WAR_DRUMS: testing::Card = testing::Card {
     definition: || {
         card! {
             cards::CardDefinition::from_enchantment("Test War Drums", cost![2, R]);
-            statics::all(CREATURE.controlled_by(YOU)).gain(keywords::must_attack_if_able()),
+            statics::all(CREATURE.controlled_by(YOU)).must_attack(),
         }
     },
 };
@@ -25,7 +24,7 @@ mod tests {
     use crate::cards;
     use crate::cost;
     use crate::effects;
-    use crate::keywords;
+    use crate::rules;
 
     use super::TEST_WAR_DRUMS;
 
@@ -40,9 +39,10 @@ mod tests {
             drums.continuous_abilities().copied().collect::<Vec<_>>(),
             [abilities::Continuous {
                 filter: CREATURE.controlled_by(YOU),
-                change: effects::Change::Characteristic(effects::Layered::GainKeyword(
-                    keywords::StaticKeyword::MustAttackIfAble,
-                )),
+                change: effects::Change::Rule {
+                    question: rules::Question::MustAttack,
+                    answer: rules::Answer::MustAttack(true),
+                },
             }]
         );
     }

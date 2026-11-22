@@ -10,6 +10,7 @@ pub struct Filter {
     pub excluded_color: Option<cards::Color>,
     pub attacking: bool,
     pub nontoken: bool,
+    pub is_this_object: bool,
 }
 
 #[atomic_delegates]

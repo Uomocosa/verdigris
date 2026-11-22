@@ -41,6 +41,7 @@ pub const CREATURE: effects::Filter = effects::Filter {
     excluded_color: None,
     attacking: false,
     nontoken: false,
+    is_this_object: false,
 };
 pub const ANY_TARGET: effects::Filter = effects::Filter {
     kind: effects::FilterKind::AnyTarget,
@@ -48,6 +49,7 @@ pub const ANY_TARGET: effects::Filter = effects::Filter {
     excluded_color: None,
     attacking: false,
     nontoken: false,
+    is_this_object: false,
 };
 pub const PLAYER: effects::Filter = effects::Filter {
     kind: effects::FilterKind::Player,
@@ -55,6 +57,7 @@ pub const PLAYER: effects::Filter = effects::Filter {
     excluded_color: None,
     attacking: false,
     nontoken: false,
+    is_this_object: false,
 };
 
 /// 115.5 A spell or ability on the stack is an illegal target for itself.
@@ -68,6 +71,7 @@ pub const SPELL: effects::Filter = effects::Filter {
     excluded_color: None,
     attacking: false,
     nontoken: false,
+    is_this_object: false,
 };
 pub const CREATURE_SPELL: effects::Filter = effects::Filter {
     kind: effects::FilterKind::CreatureSpell,
@@ -75,6 +79,7 @@ pub const CREATURE_SPELL: effects::Filter = effects::Filter {
     excluded_color: None,
     attacking: false,
     nontoken: false,
+    is_this_object: false,
 };
 pub const NONCREATURE_SPELL: effects::Filter = effects::Filter {
     kind: effects::FilterKind::NoncreatureSpell,
@@ -82,6 +87,7 @@ pub const NONCREATURE_SPELL: effects::Filter = effects::Filter {
     excluded_color: None,
     attacking: false,
     nontoken: false,
+    is_this_object: false,
 };
 pub const INSTANT_SPELL: effects::Filter = effects::Filter {
     kind: effects::FilterKind::InstantSpell,
@@ -89,6 +95,7 @@ pub const INSTANT_SPELL: effects::Filter = effects::Filter {
     excluded_color: None,
     attacking: false,
     nontoken: false,
+    is_this_object: false,
 };
 
 /// 105.1 There are five colors in the Magic game: white, blue, black, red, and green.
@@ -99,4 +106,5 @@ pub const NONBLACK_CREATURE: effects::Filter = effects::Filter {
     excluded_color: Some(cards::Color::Black),
     attacking: false,
     nontoken: false,
+    is_this_object: false,
 };
