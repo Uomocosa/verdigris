@@ -1,3 +1,4 @@
+use crate::OPPONENT;
 use crate::UPKEEP;
 use crate::YOU;
 use crate::abilities;
@@ -19,7 +20,7 @@ pub const MASTER_OF_THE_FEAST: testing::Card = testing::Card {
             keywords::must_attack_if_able(),
             abilities::at(
                 turns::beginning_of(UPKEEP, YOU),
-                effects::draw(1),
+                effects::draw(1).to_player(OPPONENT),
             ),
         }
     },
@@ -27,6 +28,7 @@ pub const MASTER_OF_THE_FEAST: testing::Card = testing::Card {
 
 #[cfg(test)]
 mod tests {
+    use crate::OPPONENT;
     use crate::UPKEEP;
     use crate::YOU;
     use crate::abilities;
@@ -57,7 +59,7 @@ mod tests {
             [abilities::TriggeredAbility {
                 event: abilities::TriggerEvent::BeginningOfStep(UPKEEP, YOU),
                 intervening_if: None,
-                effect: effects::draw(1),
+                effect: effects::draw(1).to_player(OPPONENT),
             }]
         );
     }

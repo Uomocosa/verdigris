@@ -54,7 +54,11 @@ pub fn r608_2_r608_2c_resolve(
         };
         let controller = lookups.abilities.get(spell).map_or(**owner, |ability| ability.controller);
         let chosen_target = lookups.chosen_targets.get(spell).ok().map(|chosen| **chosen);
-        let player_target = chosen_target.filter(|target| lookups.lives.get(*target).is_ok());
+        let player_targets =
+            chosen_target.filter(|target| lookups.lives.get(*target).is_ok()).map_or_else(
+                || resolve_player_targets(&lookups, effect, controller),
+                |player| vec![player],
+            );
         let target_zone = chosen_target.and_then(|target| lookups.in_zone.get(target).ok());
         let target_on_battlefield =
             target_zone.is_some_and(|zone| zones.contains(BATTLEFIELD, **zone));
@@ -86,32 +90,30 @@ pub fn r608_2_r608_2c_resolve(
                     });
                 }
                 effects::EffectKind::Draw(count) => {
-                    draws.write(players::DrawRequested {
-                        player: player_target.unwrap_or(**owner),
-                        count,
-                    });
+                    for player in players_or_fallback(&player_targets, **owner) {
+                        draws.write(players::DrawRequested { player, count });
+                    }
                 }
                 effects::EffectKind::Mill(count) => {
-                    request_mill(&mut effect_messages.p2(), player_target, controller, count);
+                    for player in players_or_fallback(&player_targets, controller) {
+                        effect_messages.p2().write(effects::MillRequested { player, count });
+                    }
                 }
                 effects::EffectKind::LoseLife(amount) => {
-                    if let Some(player) = player_target {
-                        player_effects.p0().write(players::LifeLost { player, amount });
-                    }
+                    request_life_loss(&mut player_effects.p0(), &player_targets, amount);
                 }
                 effects::EffectKind::Poison(amount) => {
-                    add_poison_counters(&mut commands, &lookups, player_target, amount);
+                    for player in &player_targets {
+                        add_poison_counters(&mut commands, &lookups, *player, amount);
+                    }
                 }
                 effects::EffectKind::GainLife(amount) => {
-                    player_effects.p2().write(players::LifeGained {
-                        player: player_target.unwrap_or(controller),
-                        amount,
-                    });
+                    for player in players_or_fallback(&player_targets, controller) {
+                        player_effects.p2().write(players::LifeGained { player, amount });
+                    }
                 }
                 effects::EffectKind::Discard(count) => {
-                    if let Some(player) = player_target {
-                        player_effects.p1().write(players::DiscardRequested { player, count });
-                    }
+                    request_discard(&mut player_effects.p1(), &player_targets, count);
                 }
                 effects::EffectKind::ModifyPowerToughness { power, toughness } => {
                     if let Some(target) = chosen_target
@@ -171,27 +173,58 @@ fn request_damage(
     });
 }
 
-fn request_mill(
-    mills: &mut MessageWriter<effects::MillRequested>,
-    player_target: Option<Entity>,
-    controller: Entity,
+fn request_life_loss(
+    life_lost: &mut MessageWriter<players::LifeLost>,
+    players: &[Entity],
+    amount: u32,
+) {
+    for player in players {
+        life_lost.write(players::LifeLost {
+            player: *player,
+            amount,
+        });
+    }
+}
+
+fn request_discard(
+    discarded: &mut MessageWriter<players::DiscardRequested>,
+    players: &[Entity],
     count: u32,
 ) {
-    mills.write(effects::MillRequested {
-        player: player_target.unwrap_or(controller),
-        count,
-    });
+    for player in players {
+        discarded.write(players::DiscardRequested {
+            player: *player,
+            count,
+        });
+    }
+}
+
+fn players_or_fallback(players: &[Entity], fallback: Entity) -> Vec<Entity> {
+    if players.is_empty() {
+        vec![fallback]
+    } else {
+        players.to_vec()
+    }
+}
+
+fn resolve_player_targets(
+    lookups: &stack::ResolutionLookups<'_, '_>,
+    effect: effects::Effect,
+    controller: Entity,
+) -> Vec<Entity> {
+    let Some(player) = effect.target.and_then(|target| target.filter.controlled_by) else {
+        return Vec::new();
+    };
+    let players: Vec<Entity> = lookups.lives.iter().map(|(player, _)| player).collect();
+    player.resolve(controller, &players)
 }
 
 fn add_poison_counters(
     commands: &mut Commands,
     lookups: &stack::ResolutionLookups<'_, '_>,
-    player: Option<Entity>,
+    player: Entity,
     amount: u32,
 ) {
-    let Some(player) = player else {
-        return;
-    };
     let counters =
         lookups.poison.get(player).map_or(0, |counters| **counters).saturating_add(amount);
     commands.entity(player).insert(players::PoisonCounters(counters));
@@ -201,7 +234,47 @@ fn add_poison_counters(
 mod tests {
     use crate::mana;
     use crate::testing::*;
+    use crate::turns;
     use crate::{BATTLEFIELD, GRAVEYARD, HAND};
+
+    #[test]
+    fn each_opponent_draws_at_the_beginning_of_master_of_the_feasts_upkeep() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::builder()
+            .turn(1, turns::Step::Untap)
+            .players([P1.battlefield([MASTER_OF_THE_FEAST]), P2]);
+        let p1_hand_before = game.player(p1).cards_in(HAND).count();
+        let p2_hand_before = game.player(p2).cards_in(HAND).count();
+
+        game.play([p1.pass_priority(), p1.pass_priority(), p2.pass_priority()])?;
+
+        assert_eq!(game.player(p1).cards_in(HAND).count(), p1_hand_before);
+        assert_eq!(game.player(p2).cards_in(HAND).count(), p2_hand_before + 1);
+        Ok(())
+    }
+
+    #[test]
+    fn in_a_three_player_game_both_opponents_draw_at_masters_upkeep() -> TestResult {
+        let (mut game, [p1, p2, p3]) = MockGame::builder().turn(1, turns::Step::Untap).players([
+            P1.battlefield([MASTER_OF_THE_FEAST]),
+            P2,
+            P3,
+        ]);
+        let p1_hand_before = game.player(p1).cards_in(HAND).count();
+        let p2_hand_before = game.player(p2).cards_in(HAND).count();
+        let p3_hand_before = game.player(p3).cards_in(HAND).count();
+
+        game.play([
+            p1.pass_priority(),
+            p1.pass_priority(),
+            p2.pass_priority(),
+            p3.pass_priority(),
+        ])?;
+
+        assert_eq!(game.player(p1).cards_in(HAND).count(), p1_hand_before);
+        assert_eq!(game.player(p2).cards_in(HAND).count(), p2_hand_before + 1);
+        assert_eq!(game.player(p3).cards_in(HAND).count(), p3_hand_before + 1);
+        Ok(())
+    }
 
     #[test]
     fn bolt_deals_damage_to_a_player() -> TestResult {
