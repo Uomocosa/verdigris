@@ -22,6 +22,7 @@ pub fn add_resolution_systems(app: &mut App) {
             rules::r608_2n_graveyard::r608_2n_graveyard,
             rules::r608_3a_permanent_enters::r608_3a_permanent_enters,
             rules::r701_7a_create_tokens::r701_7a_create_tokens,
+            rules::r110_5b_enters_untapped::r110_5b_enters_untapped,
         )
             .chain()
             .in_set(RuleSet::Resolution),
@@ -41,7 +42,7 @@ mod tests {
 
         assert_eq!(
             app.get_schedule(Update).map(Schedule::systems_len),
-            Some(15)
+            Some(16)
         );
     }
 }

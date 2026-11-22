@@ -30,6 +30,7 @@ use crate::zones;
 pub fn r305_1_r305_2_r305_3_play_land(
     mut actions: MessageReader<actions::PlayerAction>,
     mut rejected: MessageWriter<actions::Rejected>,
+    mut entered: MessageWriter<cards::Entered>,
     mut commands: Commands,
     priority: Res<turns::Priority>,
     turn: Res<turns::Turn>,
@@ -83,6 +84,7 @@ pub fn r305_1_r305_2_r305_3_play_land(
         record.record_play(turn.number);
         if let Some(battlefield) = zones.find(BATTLEFIELD, Some(action.player)) {
             commands.entity(land).insert(zones::InZone(battlefield));
+            entered.write(cards::Entered(land));
         }
     }
 }

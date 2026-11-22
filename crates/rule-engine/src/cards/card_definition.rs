@@ -23,6 +23,7 @@ pub struct CardDefinition {
     pub effect: Option<effects::Effect>,
     pub keywords: Vec<keywords::Keyword>,
     pub triggered_abilities: Vec<abilities::TriggeredAbility>,
+    pub does_enter_tapped: bool,
 }
 
 #[cfg(feature = "testing")]
@@ -68,6 +69,12 @@ impl CardDefinition {
     #[must_use]
     pub fn supertype(mut self, supertype: cards::Supertype) -> Self {
         self.supertypes.push(supertype);
+        self
+    }
+
+    #[must_use]
+    pub const fn enters_tapped(mut self) -> Self {
+        self.does_enter_tapped = true;
         self
     }
 }
