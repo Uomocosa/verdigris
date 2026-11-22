@@ -2,13 +2,16 @@ use bevy::prelude::{App, IntoScheduleConfigs, Update};
 
 use crate::RuleSet;
 use crate::rules;
+use crate::turns;
 
 pub fn add_cleanup_systems(app: &mut App) {
+    app.init_resource::<turns::CleanupReentry>();
     app.add_systems(
         Update,
         (
             rules::r514_1_cleanup_discard::r514_1_cleanup_discard,
             rules::r514_2_cleanup_step::r514_2_cleanup_step,
+            rules::r514_3a_cleanup_reentry::r514_3a_cleanup_reentry,
         )
             .chain()
             .in_set(RuleSet::Cleanup),
@@ -26,6 +29,6 @@ mod tests {
         let mut app = App::new();
         add_cleanup_systems(&mut app);
 
-        assert_eq!(app.get_schedule(Update).map(Schedule::systems_len), Some(2));
+        assert_eq!(app.get_schedule(Update).map(Schedule::systems_len), Some(3));
     }
 }

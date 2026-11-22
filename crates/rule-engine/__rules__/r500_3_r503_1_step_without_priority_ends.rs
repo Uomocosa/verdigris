@@ -25,10 +25,25 @@ pub fn r500_3_r503_1_step_without_priority_ends(
     mut turn: ResMut<turns::Turn>,
     mut priority: ResMut<turns::Priority>,
     turn_order: Res<turns::TurnOrder>,
+    mut reentry: ResMut<turns::CleanupReentry>,
 ) {
     let turn_order = turn_order.into_inner();
     match turn.step {
         turns::Step::Cleanup => {
+            if reentry.should_repeat {
+                reentry.should_repeat = false;
+                reentry.is_priority_window = false;
+                reentry.is_extra_cleanup = true;
+                step_started.write(turns::StepStarted(turns::Step::Cleanup));
+                return;
+            }
+            if reentry.is_extra_cleanup {
+                reentry.is_extra_cleanup = false;
+                return;
+            }
+            if reentry.is_priority_window {
+                return;
+            }
             let Some(next) = turn_order.next_after(turn.active) else {
                 return;
             };

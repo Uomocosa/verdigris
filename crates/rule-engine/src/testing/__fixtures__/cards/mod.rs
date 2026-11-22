@@ -37,6 +37,7 @@ mod typhoid_rats;
 mod walking_corpse;
 mod wall_of_stone;
 mod watchwolf;
+mod waylay;
 mod wind_drake;
 
 pub use cancel::CANCEL;
@@ -78,4 +79,5 @@ pub use typhoid_rats::TYPHOID_RATS;
 pub use walking_corpse::WALKING_CORPSE;
 pub use wall_of_stone::WALL_OF_STONE;
 pub use watchwolf::WATCHWOLF;
+pub use waylay::{KNIGHT_TOKEN, WAYLAY};
 pub use wind_drake::WIND_DRAKE;
