@@ -109,7 +109,24 @@ mod tests {
     }
 
     #[test]
-    #[ignore = "needs simultaneous enters: 603.6a"]
+    fn soul_warden_triggers_for_each_token_created_in_one_event() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.battlefield([SOUL_WARDEN]).hand([RAISE_THE_ALARM]).mana_pool(mana![1, W]),
+            P2,
+        ]);
+        let [alarm] = game.player(p1).cards_in(HAND).exactly::<1>(RAISE_THE_ALARM)?;
+        let [warden] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(SOUL_WARDEN)?;
+        game.play([p1.cast(alarm).pass_priority(), p2.pass_priority()])?;
+        assert_eq!(game.life(p1), 20);
+        game.play([p1.order_triggers([warden, warden])])?;
+        game.play([p1.pass_priority(), p2.pass_priority()])?;
+        game.play([p1.pass_priority(), p2.pass_priority()])?;
+        assert_eq!(game.life(p1), 22);
+        Ok(())
+    }
+
+    #[test]
+    #[ignore = "needs two permanents (one Soul Warden) put onto the battlefield in one event: 603.6a"]
     fn soul_warden_sees_a_creature_entering_at_the_same_time() {}
 
     #[test]
