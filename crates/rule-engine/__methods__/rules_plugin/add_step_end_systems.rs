@@ -1,15 +1,15 @@
 use bevy::prelude::{App, IntoScheduleConfigs, Update};
 
 use crate::RuleSet;
-use crate::rules;
+use crate::comprehensive_rules;
 
 pub fn add_step_end_systems(app: &mut App) {
     app.add_systems(
         Update,
         (
-            rules::r500_1_r500_2_step_ends::r500_1_r500_2_step_ends,
-            rules::r508_8_skip_combat_steps::r508_8_skip_combat_steps,
-            rules::r404_1_graveyard_top::r404_1_graveyard_top,
+            comprehensive_rules::r500_1_r500_2_step_ends::r500_1_r500_2_step_ends,
+            comprehensive_rules::r508_8_skip_combat_steps::r508_8_skip_combat_steps,
+            comprehensive_rules::r404_1_graveyard_top::r404_1_graveyard_top,
         )
             .chain()
             .in_set(RuleSet::StepEnd),

@@ -4,7 +4,7 @@ use crate::MAX_STATE_BASED_PASSES;
 use crate::StateBasedActions;
 use crate::StateBasedActionsPerformed;
 use crate::actions;
-use crate::rules;
+use crate::comprehensive_rules;
 use crate::stack;
 
 /// 117.5. Each time a player would get priority, the game first performs all applicable
@@ -25,7 +25,7 @@ pub fn r117_5_r704_3_state_based_actions(world: &mut World) {
             ) {
                 return;
             }
-            rules::r603_3_triggers_on_stack::r603_3_triggers_on_stack(world);
+            comprehensive_rules::r603_3_triggers_on_stack::r603_3_triggers_on_stack(world);
         }
     }
 }

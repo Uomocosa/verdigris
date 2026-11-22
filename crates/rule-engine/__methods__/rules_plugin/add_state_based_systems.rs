@@ -2,36 +2,36 @@ use bevy::prelude::{App, IntoScheduleConfigs, Update};
 
 use crate::RuleSet;
 use crate::StateBasedActions;
-use crate::rules;
+use crate::comprehensive_rules;
 
 pub fn add_state_based_systems(app: &mut App) {
     app.add_systems(
         StateBasedActions,
         (
-            rules::r613_1_layers::r613_1_layers,
-            rules::r704_5f_zero_toughness::r704_5f_zero_toughness,
-            rules::r704_5g_lethal_damage::r704_5g_lethal_damage,
-            rules::r704_5h_deathtouch_damage::r704_5h_deathtouch_damage,
-            rules::r704_5j_legend_rule::r704_5j_legend_rule,
-            rules::r702_12b_indestructible::r702_12b_indestructible,
-            rules::r704_5d_token_outside_battlefield::r704_5d_token_outside_battlefield,
-            rules::r704_5a_zero_life::r704_5a_zero_life,
-            rules::r704_5b_empty_library::r704_5b_empty_library,
-            rules::r704_5c_poison::r704_5c_poison,
-            rules::r104_2a_wins_when_opponents_left::r104_2a_wins_when_opponents_left,
-            rules::r104_4a_draw::r104_4a_draw,
+            comprehensive_rules::r613_1_layers::r613_1_layers,
+            comprehensive_rules::r704_5f_zero_toughness::r704_5f_zero_toughness,
+            comprehensive_rules::r704_5g_lethal_damage::r704_5g_lethal_damage,
+            comprehensive_rules::r704_5h_deathtouch_damage::r704_5h_deathtouch_damage,
+            comprehensive_rules::r704_5j_legend_rule::r704_5j_legend_rule,
+            comprehensive_rules::r702_12b_indestructible::r702_12b_indestructible,
+            comprehensive_rules::r704_5d_token_outside_battlefield::r704_5d_token_outside_battlefield,
+            comprehensive_rules::r704_5a_zero_life::r704_5a_zero_life,
+            comprehensive_rules::r704_5b_empty_library::r704_5b_empty_library,
+            comprehensive_rules::r704_5c_poison::r704_5c_poison,
+            comprehensive_rules::r104_2a_wins_when_opponents_left::r104_2a_wins_when_opponents_left,
+            comprehensive_rules::r104_4a_draw::r104_4a_draw,
         )
             .chain(),
     );
     app.add_systems(
         Update,
         (
-            rules::r603_2_r603_6a_triggered_abilities::r603_2_r603_6a_triggered_abilities,
-            rules::r603_6c_r700_4_leaves_the_battlefield::r603_6c_r700_4_leaves_the_battlefield,
-            rules::r603_4_intervening_if::r603_4_intervening_if,
-            rules::r603_3_triggers_on_stack::r603_3_triggers_on_stack,
-            rules::r117_5_r704_3_state_based_actions::r117_5_r704_3_state_based_actions,
-            rules::r603_3b_apnap_trigger_order::r603_3b_apnap_trigger_order,
+            comprehensive_rules::r603_2_r603_6a_triggered_abilities::r603_2_r603_6a_triggered_abilities,
+            comprehensive_rules::r603_6c_r700_4_leaves_the_battlefield::r603_6c_r700_4_leaves_the_battlefield,
+            comprehensive_rules::r603_4_intervening_if::r603_4_intervening_if,
+            comprehensive_rules::r603_3_triggers_on_stack::r603_3_triggers_on_stack,
+            comprehensive_rules::r117_5_r704_3_state_based_actions::r117_5_r704_3_state_based_actions,
+            comprehensive_rules::r603_3b_apnap_trigger_order::r603_3b_apnap_trigger_order,
         )
             .chain()
             .in_set(RuleSet::StateBased),

@@ -29,10 +29,11 @@ pub fn r611_2a_continuous_effects(
     for modification in modifications.read() {
         commands.spawn(effects::ContinuousEffect {
             affected: modification.target,
-            change: effects::Layered::ModifyPT {
+            source: None,
+            change: effects::Change::Characteristic(effects::Layered::ModifyPT {
                 power: modification.power,
                 toughness: modification.toughness,
-            },
+            }),
             until: effects::Duration::UntilEndOfTurn,
             timestamp: timestamp.advance(),
         });
@@ -40,7 +41,8 @@ pub fn r611_2a_continuous_effects(
     for grant in grants.read() {
         commands.spawn(effects::ContinuousEffect {
             affected: grant.target,
-            change: effects::Layered::GainKeyword(grant.keyword),
+            source: None,
+            change: effects::Change::Characteristic(effects::Layered::GainKeyword(grant.keyword)),
             until: effects::Duration::UntilEndOfTurn,
             timestamp: timestamp.advance(),
         });

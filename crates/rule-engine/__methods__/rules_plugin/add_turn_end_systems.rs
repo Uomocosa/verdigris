@@ -1,12 +1,12 @@
 use bevy::prelude::{App, IntoScheduleConfigs, Update};
 
 use crate::RuleSet;
-use crate::rules;
+use crate::comprehensive_rules;
 
 pub fn add_turn_end_systems(app: &mut App) {
     app.add_systems(
         Update,
-        rules::r500_3_r503_1_step_without_priority_ends::r500_3_r503_1_step_without_priority_ends
+        comprehensive_rules::r500_3_r503_1_step_without_priority_ends::r500_3_r503_1_step_without_priority_ends
             .in_set(RuleSet::TurnEnd),
     );
 }

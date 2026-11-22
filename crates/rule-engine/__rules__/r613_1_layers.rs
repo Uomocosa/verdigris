@@ -108,7 +108,10 @@ mod tests {
                 .iter()
                 .filter(|effect| {
                     effect.affected == bears
-                        && effect.change == effects::Layered::GainKeyword(keywords::Keyword::Flying)
+                        && effect.change
+                            == effects::Change::Characteristic(effects::Layered::GainKeyword(
+                                keywords::Keyword::Flying,
+                            ))
                 })
                 .count()
         });

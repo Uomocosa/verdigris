@@ -1,5 +1,6 @@
 use crate::effects;
 use crate::keywords;
+use crate::rules;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum EffectKind {
@@ -40,9 +41,20 @@ pub enum FilterKind {
 pub enum Layered {
     ModifyPT { power: i32, toughness: i32 },
     GainKeyword(keywords::Keyword),
+    LoseKeyword(keywords::Keyword),
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum Change {
+    Characteristic(Layered),
+    Rule {
+        question: rules::Question,
+        answer: rules::Answer,
+    },
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Duration {
     UntilEndOfTurn,
+    WhileSourceOnBattlefield,
 }

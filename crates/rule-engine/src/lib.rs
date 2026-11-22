@@ -4,12 +4,13 @@ pub mod actions;
 #[path = "__basic__/mod.rs"]
 mod basic;
 pub mod cards;
+#[path = "../__rules__/mod.rs"]
+mod comprehensive_rules;
 pub mod damage;
 pub mod effects;
 pub mod keywords;
 pub mod players;
-#[path = "../__rules__/mod.rs"]
-mod rules;
+pub mod rules;
 mod rules_plugin;
 pub mod stack;
 #[cfg(feature = "testing")]
