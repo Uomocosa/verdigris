@@ -12,6 +12,15 @@ use crate::stack;
 /// an event puts one or more permanents onto the battlefield, all permanents on the battlefield
 /// (including the newcomers) are checked for any enters-the-battlefield triggers that match the
 /// event.
+///
+/// # See also
+///
+/// 603.10. Normally, objects that exist immediately after an event are checked to see if the event
+/// matched any trigger conditions, and continuous effects that exist at that time are used to
+/// determine what the trigger conditions are and what the objects involved in the event look like.
+/// However, some triggered abilities are exceptions to this rule; the game “looks back in time” to
+/// determine if those abilities trigger, using the existence of those abilities and the appearance
+/// of objects immediately prior to the event. The list of exceptions is as follows:
 pub fn r603_2_r603_6a_triggered_abilities(
     mut entered: MessageReader<cards::Entered>,
     mut queue: ResMut<stack::TriggerQueue>,
@@ -51,7 +60,7 @@ mod tests {
     use crate::mana;
     use crate::testing::*;
     use crate::turns;
-    use crate::{BATTLEFIELD, HAND};
+    use crate::{BATTLEFIELD, GRAVEYARD, HAND};
 
     #[test]
     fn soul_warden_gains_life_when_another_creature_enters() -> TestResult {
@@ -130,6 +139,15 @@ mod tests {
     fn soul_warden_sees_a_creature_entering_at_the_same_time() {}
 
     #[test]
-    #[ignore = "needs a 0/0 creature card: 603.10"]
-    fn creature_that_dies_on_entering_still_triggers_soul_warden() {}
+    fn creature_that_dies_on_entering_still_triggers_soul_warden() -> TestResult {
+        let (mut game, [p1, p2]) =
+            MockGame::new([P1.battlefield([SOUL_WARDEN]).hand([ENDLESS_ONE]), P2]);
+        let [one] = game.player(p1).cards_in(HAND).exactly::<1>(ENDLESS_ONE)?;
+        game.play([p1.cast(one).pass_priority(), p2.pass_priority()])?;
+        assert_eq!(game.life(p1), 20);
+        assert!(game.player(p1).cards_in(GRAVEYARD).has(one));
+        game.play([p1.pass_priority(), p2.pass_priority()])?;
+        assert_eq!(game.life(p1), 21);
+        Ok(())
+    }
 }

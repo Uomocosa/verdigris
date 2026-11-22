@@ -22,6 +22,9 @@ macro_rules! mana_symbol {
 
 #[macro_export]
 macro_rules! cost {
+    (X $(,)?) => {
+        $crate::cards::Cost::default().with_variable()
+    };
     ($($symbol:tt),* $(,)?) => {
         $crate::cards::Cost::default()$(.plus($crate::mana_symbol!($symbol)))*
     };
