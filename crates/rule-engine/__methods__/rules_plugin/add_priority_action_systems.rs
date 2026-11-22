@@ -9,6 +9,7 @@ pub fn add_priority_action_systems(app: &mut App) {
         (
             rules::r601_2a_cast::r601_2a_cast,
             rules::r601_2c_targets::r601_2c_targets,
+            rules::r119_4_pay_life::r119_4_pay_life,
             rules::r601_2h_pay::r601_2h_pay,
             rules::r508_1a_r508_1k_declare_attackers::r508_1a_r508_1k_declare_attackers,
             rules::r508_1f_tap_attackers::r508_1f_tap_attackers,
@@ -36,7 +37,7 @@ mod tests {
 
         assert_eq!(
             app.get_schedule(Update).map(Schedule::systems_len),
-            Some(10)
+            Some(11)
         );
     }
 }

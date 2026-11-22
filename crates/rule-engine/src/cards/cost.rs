@@ -9,9 +9,23 @@ pub struct Cost {
     pub green: u8,
     pub generic: u32,
     pub variable: u32,
+    pub phyrexian: Option<cards::Color>,
 }
 
 impl Cost {
+    #[must_use]
+    pub const fn with_phyrexian(mut self, color: cards::Color) -> Self {
+        self.phyrexian = Some(color);
+        match color {
+            cards::Color::White => self.white = 1,
+            cards::Color::Blue => self.blue = 1,
+            cards::Color::Black => self.black = 1,
+            cards::Color::Red => self.red = 1,
+            cards::Color::Green => self.green = 1,
+        }
+        self
+    }
+
     #[must_use]
     pub const fn with_variable(mut self) -> Self {
         self.variable = self.variable.saturating_add(1);
@@ -63,5 +77,8 @@ mod tests {
         assert_eq!(cards::Cost::default().plus(cards::ManaSymbol::Red).red, 1);
         assert_eq!(cost.variable, 0);
         assert_eq!(cards::Cost::default().with_variable().variable, 1);
+        let phyrexian = cards::Cost::default().with_phyrexian(cards::Color::Red);
+        assert_eq!(phyrexian.red, 1);
+        assert_eq!(phyrexian.phyrexian, Some(cards::Color::Red));
     }
 }
