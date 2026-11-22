@@ -1,0 +1,70 @@
+use bevy::prelude::{Commands, MessageReader, MessageWriter, Res};
+
+use crate::BATTLEFIELD;
+use crate::cards;
+use crate::damage;
+use crate::effects;
+use crate::turns;
+use crate::zones;
+
+/// 701.7a To create one or more tokens with certain characteristics, put the specified number of
+/// tokens with the specified characteristics onto the battlefield.
+///
+/// # Notes
+///
+/// 701.7b orders replacement effects before and after continuous effects that modify a token's
+/// characteristics. No replacement effect exists yet, so a token is put onto the battlefield with
+/// the characteristics its creation effect defines.
+pub fn r701_7a_create_tokens(
+    mut requested: MessageReader<effects::TokensRequested>,
+    mut entered: MessageWriter<cards::Entered>,
+    mut commands: Commands,
+    zones: zones::ZoneLookup,
+    turn: Res<turns::Turn>,
+) {
+    let turn = turn.into_inner();
+    for request in requested.read() {
+        let Some(battlefield) = zones.find(BATTLEFIELD, Some(request.controller)) else {
+            continue;
+        };
+        for _ in 0..request.count {
+            let token = commands
+                .spawn((
+                    request.token.definition(),
+                    zones::InZone(battlefield),
+                    cards::Owner(request.controller),
+                    damage::Damage(0),
+                    cards::EnteredOnTurn(turn.number),
+                    cards::Token,
+                ))
+                .id();
+            entered.write(cards::Entered(token));
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::cards;
+    use crate::mana;
+    use crate::testing::*;
+    use crate::{BATTLEFIELD, GRAVEYARD, HAND};
+
+    #[test]
+    fn raise_the_alarm_creates_two_soldier_tokens() -> TestResult {
+        let (mut game, [p1, p2]) =
+            MockGame::new([P1.hand([RAISE_THE_ALARM]).mana_pool(mana![1, W]), P2]);
+        let [raise_the_alarm] = game.player(p1).cards_in(HAND).exactly::<1>(RAISE_THE_ALARM)?;
+        game.play([p1.cast(raise_the_alarm).pass_priority(), p2.pass_priority()])?;
+
+        assert_eq!(game.player(p1).cards_in(BATTLEFIELD).count(), 2);
+        assert_eq!(
+            game.player(p1).cards_in(BATTLEFIELD).matching(SOLDIER_TOKEN).len(),
+            2
+        );
+        assert!(game.player(p1).cards_in(GRAVEYARD).has(RAISE_THE_ALARM));
+        let [soldier, _] = game.player(p1).cards_in(BATTLEFIELD).exactly::<2>(SOLDIER_TOKEN)?;
+        assert!(game.has::<cards::Token>(soldier));
+        Ok(())
+    }
+}

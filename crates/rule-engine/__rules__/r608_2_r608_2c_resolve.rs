@@ -7,6 +7,13 @@ use crate::players;
 use crate::stack;
 use crate::zones;
 
+type EffectMessageWriters<'a, 'b, 'c, 'd> = (
+    MessageWriter<'a, effects::PowerToughnessModified>,
+    MessageWriter<'b, effects::KeywordGranted>,
+    MessageWriter<'c, effects::MillRequested>,
+    MessageWriter<'d, effects::TokensRequested>,
+);
+
 /// 608.2. If the object that’s resolving is an instant spell, a sorcery spell, or an ability, its
 /// resolution may involve several steps. The steps described in rules 608.2a and 608.2b are
 /// followed first. The steps described in rules 608.2c–m are then followed as appropriate, in no
@@ -30,11 +37,7 @@ pub fn r608_2_r608_2c_resolve(
         MessageWriter<players::DiscardRequested>,
         MessageWriter<players::LifeGained>,
     )>,
-    mut effect_messages: ParamSet<(
-        MessageWriter<effects::PowerToughnessModified>,
-        MessageWriter<effects::KeywordGranted>,
-        MessageWriter<effects::MillRequested>,
-    )>,
+    mut effect_messages: ParamSet<EffectMessageWriters<'_, '_, '_, '_>>,
     lookups: stack::ResolutionLookups<'_, '_>,
     zones: zones::ZoneLookup,
 ) {
@@ -59,17 +62,7 @@ pub fn r608_2_r608_2c_resolve(
         for kind in [Some(effect.kind), effect.then, effect.finally].into_iter().flatten() {
             match kind {
                 effects::EffectKind::Damage(amount) => {
-                    if let Some(target) = chosen_target
-                        && (lookups.lives.get(target).is_ok()
-                            || lookups.definitions.get(target).is_ok()
-                            || lookups.abilities.get(target).is_ok())
-                    {
-                        damage_dealt.write(damage::DamageDealt {
-                            source: spell,
-                            target,
-                            amount,
-                        });
-                    }
+                    request_damage(&mut damage_dealt, &lookups, spell, chosen_target, amount);
                 }
                 effects::EffectKind::Destroy => {
                     if let Some(target) = chosen_target
@@ -84,6 +77,13 @@ pub fn r608_2_r608_2c_resolve(
                     {
                         countered.write(stack::Countered(target));
                     }
+                }
+                effects::EffectKind::CreateTokens { count, definition } => {
+                    effect_messages.p3().write(effects::TokensRequested {
+                        count,
+                        token: definition,
+                        controller,
+                    });
                 }
                 effects::EffectKind::Draw(count) => {
                     draws.write(players::DrawRequested {
@@ -146,6 +146,29 @@ fn effect_of(lookups: &stack::ResolutionLookups<'_, '_>, spell: Entity) -> Optio
         .ok()
         .and_then(|definition| definition.effect)
         .or_else(|| lookups.abilities.get(spell).ok().map(|ability| ability.effect))
+}
+
+fn request_damage(
+    damage_dealt: &mut MessageWriter<damage::DamageDealt>,
+    lookups: &stack::ResolutionLookups<'_, '_>,
+    spell: Entity,
+    target: Option<Entity>,
+    amount: u32,
+) {
+    let Some(target) = target else {
+        return;
+    };
+    if lookups.lives.get(target).is_err()
+        && lookups.definitions.get(target).is_err()
+        && lookups.abilities.get(target).is_err()
+    {
+        return;
+    }
+    damage_dealt.write(damage::DamageDealt {
+        source: spell,
+        target,
+        amount,
+    });
 }
 
 fn request_mill(

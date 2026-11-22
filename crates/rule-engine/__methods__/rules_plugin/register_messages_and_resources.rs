@@ -21,6 +21,7 @@ pub fn register_messages_and_resources(app: &mut App) {
         .add_message::<players::LifeGained>()
         .add_message::<players::DiscardRequested>()
         .add_message::<effects::MillRequested>()
+        .add_message::<effects::TokensRequested>()
         .add_message::<effects::PowerToughnessModified>()
         .add_message::<effects::KeywordGranted>()
         .add_message::<cards::Entered>()

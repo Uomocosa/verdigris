@@ -21,6 +21,7 @@ pub fn add_resolution_systems(app: &mut App) {
             rules::r702_15b_lifelink::r702_15b_lifelink,
             rules::r608_2n_graveyard::r608_2n_graveyard,
             rules::r608_3a_permanent_enters::r608_3a_permanent_enters,
+            rules::r701_7a_create_tokens::r701_7a_create_tokens,
         )
             .chain()
             .in_set(RuleSet::Resolution),
@@ -40,7 +41,7 @@ mod tests {
 
         assert_eq!(
             app.get_schedule(Update).map(Schedule::systems_len),
-            Some(14)
+            Some(15)
         );
     }
 }

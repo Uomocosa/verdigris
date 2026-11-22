@@ -32,6 +32,16 @@ pub const fn counter() -> effects::Effect {
 }
 
 #[must_use]
+pub const fn creates(count: u32, definition: effects::TokenDefinition) -> effects::Effect {
+    effects::Effect {
+        kind: effects::EffectKind::CreateTokens { count, definition },
+        then: None,
+        finally: None,
+        target: None,
+    }
+}
+
+#[must_use]
 pub const fn draw(count: u32) -> effects::Effect {
     effects::Effect {
         kind: effects::EffectKind::Draw(count),

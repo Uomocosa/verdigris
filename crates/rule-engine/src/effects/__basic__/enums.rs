@@ -1,3 +1,4 @@
+use crate::effects;
 use crate::keywords;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -5,13 +6,20 @@ pub enum EffectKind {
     Damage(u32),
     Destroy,
     Counter,
+    CreateTokens {
+        count: u32,
+        definition: effects::TokenDefinition,
+    },
     Draw(u32),
     Mill(u32),
     LoseLife(u32),
     Poison(u32),
     GainLife(u32),
     Discard(u32),
-    ModifyPowerToughness { power: i32, toughness: i32 },
+    ModifyPowerToughness {
+        power: i32,
+        toughness: i32,
+    },
     GainKeyword(keywords::Keyword),
     WinTheGame,
 }

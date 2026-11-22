@@ -25,6 +25,9 @@ pub struct Tapped;
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct OnBattlefield;
 
+#[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Token;
+
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Deref)]
 pub struct EffectivePT(pub cards::PowerToughness);
 
