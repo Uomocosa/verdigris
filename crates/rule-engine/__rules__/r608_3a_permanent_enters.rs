@@ -1,5 +1,5 @@
-use crate::{BATTLEFIELD, STACK};
-use bevy::prelude::{Commands, MessageReader, MessageWriter, Query, Res};
+use crate::{BATTLEFIELD, GRAVEYARD, STACK};
+use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query, Res, With};
 
 use crate::cards;
 use crate::stack;
@@ -14,18 +14,30 @@ use crate::zones;
 /// 608.3. If the object that’s resolving is a permanent spell, its resolution may involve several
 /// steps. The instructions in rules 608.3a and b are always performed first. Then one of the steps
 /// in rule 608.3c–e is performed, if appropriate.
+///
+/// 608.3b If the object that’s resolving has a target, it checks whether the target is still legal,
+/// as described in 608.2b. If a spell with an illegal target is a bestowed Aura spell (see rule
+/// 702.103e) or a mutating creature spell (see rule 702.140b), it becomes a creature spell and will
+/// resolve as described in rule 608.3a. Otherwise, the spell doesn’t resolve. It is removed from the
+/// stack and put into its owner’s graveyard.
 pub fn r608_3a_permanent_enters(
     mut resolutions: MessageReader<stack::Resolution>,
     mut entered: MessageWriter<cards::Entered>,
     mut commands: Commands,
-    cards: Query<(&cards::CardDefinition, &cards::Owner, &zones::InZone)>,
+    cards: Query<(
+        &cards::CardDefinition,
+        &cards::Owner,
+        &zones::InZone,
+        Option<&stack::ChosenTarget>,
+    )>,
+    battlefield: Query<Entity, With<cards::OnBattlefield>>,
     zones: zones::ZoneLookup,
     turn: Res<turns::Turn>,
 ) {
     let turn = turn.into_inner();
     for resolution in resolutions.read() {
         let spell = **resolution;
-        let Ok((definition, owner, in_zone)) = cards.get(spell) else {
+        let Ok((definition, owner, in_zone, chosen)) = cards.get(spell) else {
             continue;
         };
         if !zones.contains(STACK, **in_zone) {
@@ -39,6 +51,23 @@ pub fn r608_3a_permanent_enters(
         });
         if !is_permanent {
             continue;
+        }
+        if let Some(aura) = definition.aura
+            && let Some(requirement) = aura.target
+        {
+            let is_legal = chosen.is_some_and(|chosen| {
+                let target = **chosen;
+                let still_matches = cards.get(target).is_ok_and(|(definition, _, _, _)| {
+                    requirement.filter.does_creature_match(definition)
+                });
+                still_matches && battlefield.contains(target)
+            });
+            if !is_legal {
+                if let Some(graveyard) = zones.find(GRAVEYARD, Some(**owner)) {
+                    commands.entity(spell).insert(zones::InZone(graveyard));
+                }
+                continue;
+            }
         }
         if let Some(battlefield) = zones.find(BATTLEFIELD, Some(**owner)) {
             commands.entity(spell).insert((
@@ -54,7 +83,7 @@ pub fn r608_3a_permanent_enters(
 mod tests {
     use crate::mana;
     use crate::testing::*;
-    use crate::{BATTLEFIELD, HAND};
+    use crate::{BATTLEFIELD, GRAVEYARD, HAND};
 
     #[test]
     fn cast_bears_enters_the_battlefield() -> TestResult {
@@ -63,6 +92,30 @@ mod tests {
         let [bears] = game.player(p1).cards_in(HAND).exactly::<1>(GRIZZLY_BEARS)?;
         game.play([p1.cast(bears).pass_priority(), p2.pass_priority()])?;
         assert!(game.player(p1).cards_in(BATTLEFIELD).has(bears));
+        Ok(())
+    }
+
+    #[test]
+    fn aura_with_an_illegal_target_goes_to_the_graveyard() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.hand([HOLY_STRENGTH]).mana_pool(mana![W]),
+            P2.hand([LIGHTNING_BOLT]).mana_pool(mana![R]).battlefield([GRIZZLY_BEARS]),
+        ]);
+        let [strength] = game.player(p1).cards_in(HAND).exactly::<1>(HOLY_STRENGTH)?;
+        let [bolt] = game.player(p2).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
+        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+
+        game.play([
+            p1.cast(strength).targeting(bears).pass_priority(),
+            p2.cast(bolt).targeting(bears).pass_priority(),
+            p1.pass_priority(),
+        ])?;
+        assert!(game.player(p2).cards_in(GRAVEYARD).has(bears));
+        assert!(game.stack().has(strength));
+
+        game.play([p1.pass_priority(), p2.pass_priority()])?;
+        assert!(game.player(p1).cards_in(GRAVEYARD).has(strength));
+        assert!(!game.player(p1).cards_in(BATTLEFIELD).has(strength));
         Ok(())
     }
 }

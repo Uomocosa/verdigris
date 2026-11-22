@@ -60,11 +60,11 @@ pub fn r601_2c_targets(
                     continue;
                 }
                 let controller = **owner;
-                let Some(effect) = definition.effect else {
-                    commands.entity(spell).insert(stack::CastingStage::AwaitingPayment);
-                    continue;
-                };
-                let Some(target) = effect.target else {
+                let target = definition
+                    .effect
+                    .and_then(|effect| effect.target)
+                    .or_else(|| definition.aura.and_then(|aura| aura.target));
+                let Some(target) = target else {
                     commands.entity(spell).insert(stack::CastingStage::AwaitingPayment);
                     continue;
                 };

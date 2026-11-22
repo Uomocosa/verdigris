@@ -21,9 +21,29 @@ pub struct CardDefinition {
     pub land_types: Vec<cards::LandType>,
     pub power_toughness: Option<cards::PowerToughness>,
     pub effect: Option<effects::Effect>,
+    pub aura: Option<effects::Effect>,
     pub keywords: Vec<keywords::Keyword>,
     pub triggered_abilities: Vec<abilities::TriggeredAbility>,
     pub does_enter_tapped: bool,
+}
+
+impl CardDefinition {
+    #[must_use]
+    pub fn from_enchantment(name: impl Into<cards::CardName>, cost: cards::Cost) -> Self {
+        Self {
+            name: name.into(),
+            cost,
+            supertypes: Vec::new(),
+            types: vec![cards::CardType::Enchantment],
+            land_types: Vec::new(),
+            power_toughness: None,
+            effect: None,
+            aura: None,
+            keywords: Vec::new(),
+            triggered_abilities: Vec::new(),
+            does_enter_tapped: false,
+        }
+    }
 }
 
 #[cfg(feature = "testing")]
@@ -60,6 +80,12 @@ impl CardDefinition {
 }
 
 impl CardDefinition {
+    #[must_use]
+    pub const fn aura(mut self, effect: effects::Effect) -> Self {
+        self.aura = Some(effect);
+        self
+    }
+
     #[must_use]
     pub fn keyword(mut self, keyword: keywords::Keyword) -> Self {
         self.keywords.push(keyword);
