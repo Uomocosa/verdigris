@@ -49,10 +49,33 @@ pub fn r611_3a_static_effects(
         let Some(source) = effect.source else {
             continue;
         };
-        let source_remains = sources
-            .get(source)
-            .is_ok_and(|(_, _, _, in_zone)| zones.contains(BATTLEFIELD, **in_zone));
-        if !source_remains {
+        let Ok((_, source_definition, source_owner, source_zone)) = sources.get(source) else {
+            commands.entity(entity).despawn();
+            continue;
+        };
+        if !zones.contains(BATTLEFIELD, **source_zone) {
+            commands.entity(entity).despawn();
+            continue;
+        }
+        let still_applies = source_definition.static_abilities.iter().any(|ability| {
+            ability.change == effect.change
+                && ability.filter.kind == effects::FilterKind::Creature
+                && candidates.get(effect.affected).is_ok_and(
+                    |(_, definition, owner, zone, attacking, token)| {
+                        zones.contains(BATTLEFIELD, **zone)
+                            && candidate_matches(
+                                ability.filter,
+                                **source_owner,
+                                **owner,
+                                attacking.is_some(),
+                                token.is_some(),
+                                definition,
+                                players,
+                            )
+                    },
+                )
+        });
+        if !still_applies {
             commands.entity(entity).despawn();
         }
     }
@@ -278,6 +301,36 @@ mod tests {
         assert!(game.has::<cards::Vigilance>(bears));
         assert_eq!(game.pt(bears), Some(crate::pt!(2, 2)));
         assert!(!game.has::<cards::Vigilance>(bears));
+        Ok(())
+    }
+
+    #[test]
+    fn cover_of_dusk_stops_applying_once_the_creature_stops_attacking() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.battlefield([TEST_COVER_OF_DUSK, GRIZZLY_BEARS]),
+            P2.battlefield([GRIZZLY_BEARS]),
+        ]);
+        let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareAttackers),
+            p2.pass_to(turns::Step::DeclareAttackers),
+            p1.declare_attackers([bears]),
+        ])?;
+        assert!(game.is_attacking(bears));
+        let shielding = game.with_query::<&effects::ContinuousEffect, usize>(|granted| {
+            granted.iter().filter(|effect| effect.affected == bears).count()
+        });
+        assert_eq!(shielding, 1);
+        game.play([
+            p1.pass_to(turns::Step::PostcombatMain),
+            p2.pass_to(turns::Step::PostcombatMain),
+        ])?;
+        assert_eq!(game.turn().step, turns::Step::PostcombatMain);
+        assert!(!game.is_attacking(bears));
+        let lingering = game.with_query::<&effects::ContinuousEffect, usize>(|granted| {
+            granted.iter().filter(|effect| effect.affected == bears).count()
+        });
+        assert_eq!(lingering, 0);
         Ok(())
     }
 
