@@ -1,11 +1,7 @@
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Question {
     TapsWhenAttacking,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum Answer {
-    TapsWhenAttacking(bool),
+    IgnoresSummoningSickness,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

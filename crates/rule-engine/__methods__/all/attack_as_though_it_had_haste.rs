@@ -1,0 +1,37 @@
+use crate::abilities;
+use crate::effects;
+use crate::rules;
+use crate::statics;
+
+pub fn attack_as_though_it_had_haste(all: statics::All) -> abilities::Static {
+    abilities::Static {
+        filter: *all,
+        change: effects::Change::Rule {
+            question: rules::Question::IgnoresSummoningSickness,
+            answer: rules::Answer::IgnoresSummoningSickness(true),
+        },
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::CREATURE;
+    use crate::effects;
+    use crate::rules;
+    use crate::statics;
+
+    use super::attack_as_though_it_had_haste;
+
+    #[test]
+    fn test_usage() {
+        let ability = attack_as_though_it_had_haste(statics::all(CREATURE));
+        assert_eq!(ability.filter, CREATURE);
+        assert_eq!(
+            ability.change,
+            effects::Change::Rule {
+                question: rules::Question::IgnoresSummoningSickness,
+                answer: rules::Answer::IgnoresSummoningSickness(true),
+            }
+        );
+    }
+}

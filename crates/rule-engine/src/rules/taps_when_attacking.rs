@@ -11,7 +11,7 @@ impl rules::traits::rule_question::RuleQuestion for TapsWhenAttacking {
     const QUESTION: rules::Question = rules::Question::TapsWhenAttacking;
     fn default(characteristics: &cards::Characteristics) -> bool { !characteristics.keywords.contains(&keywords::Keyword::Vigilance) }
     fn into_answer(answer: bool) -> rules::Answer { rules::Answer::TapsWhenAttacking(answer) }
-    fn from_answer(answer: rules::Answer) -> Option<bool> { Some(answer).map(|rules::Answer::TapsWhenAttacking(taps)| taps) }
+    fn from_answer(answer: rules::Answer) -> Option<bool> { answer.taps_when_attacking() }
 }
 
 #[cfg(test)]

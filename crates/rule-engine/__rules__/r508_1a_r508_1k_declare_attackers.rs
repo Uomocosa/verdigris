@@ -89,10 +89,7 @@ pub fn r508_1a_r508_1k_declare_attackers(
                         .characteristics(*attacker)
                         .keywords
                         .contains(&keywords::Keyword::Defender)
-                    && (answers
-                        .characteristics(*attacker)
-                        .keywords
-                        .contains(&keywords::Keyword::Haste)
+                    && (answers.ask::<rules::IgnoresSummoningSickness>(*attacker)
                         || entered_on.get(*attacker).is_ok_and(|on_turn| {
                             on_turn.is_none_or(|turn_number| **turn_number != turn.number)
                         }))
@@ -108,7 +105,7 @@ pub fn r508_1a_r508_1k_declare_attackers(
                     .contains(&keywords::Keyword::MustAttackIfAble)
                 && tapped.is_none()
                 && !answers.characteristics(entity).keywords.contains(&keywords::Keyword::Defender)
-                && (answers.characteristics(entity).keywords.contains(&keywords::Keyword::Haste)
+                && (answers.ask::<rules::IgnoresSummoningSickness>(entity)
                     || entered_on.get(entity).is_ok_and(|on_turn| {
                         on_turn.is_none_or(|turn_number| **turn_number != turn.number)
                     }))
@@ -340,6 +337,45 @@ mod tests {
         ])?;
 
         assert!(game.is_attacking(wall));
+        Ok(())
+    }
+
+    #[test]
+    fn a_static_attack_as_though_it_had_haste_allows_a_new_creature_to_attack() -> TestResult {
+        use bevy::ecs::system::RunSystemOnce;
+
+        use crate::HAND;
+        use crate::keywords;
+        use crate::mana;
+        use crate::rules;
+
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.battlefield([TEST_BATTLE_FERVOR]).hand([WALKING_CORPSE]).mana_pool(mana![1, B]),
+            P2,
+        ]);
+        let [corpse] = game.player(p1).cards_in(HAND).exactly::<1>(WALKING_CORPSE)?;
+        game.play([p1.cast(corpse).pass_priority(), p2.pass_priority()])?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareAttackers),
+            p2.pass_to(turns::Step::DeclareAttackers),
+        ])?;
+
+        game.act(p1, actions::Action::DeclareAttackers(vec![corpse.into()]));
+
+        assert!(game.player(p1).cards_in(BATTLEFIELD).has(corpse));
+        assert!(game.is_attacking(corpse));
+        assert_eq!(game.last_rejection(), None);
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                assert!(
+                    !answers
+                        .characteristics(corpse.into())
+                        .keywords
+                        .contains(&keywords::Keyword::Haste)
+                );
+            })
+            .unwrap();
         Ok(())
     }
 

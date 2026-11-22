@@ -21,6 +21,9 @@ impl All {
     pub fn lose(self, keyword: keywords::Keyword) -> abilities::Static {}
 
     #[must_use]
+    pub fn attack_as_though_it_had_haste(self) -> abilities::Static {}
+
+    #[must_use]
     pub fn attack_without_tapping(self) -> abilities::Static {}
 
     #[must_use]

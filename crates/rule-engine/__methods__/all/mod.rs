@@ -1,9 +1,11 @@
+mod attack_as_though_it_had_haste;
 mod attack_without_tapping;
 mod gain;
 mod get_pt;
 mod lose;
 mod rule;
 mod tap_when_attacking;
+pub use attack_as_though_it_had_haste::attack_as_though_it_had_haste;
 pub use attack_without_tapping::attack_without_tapping;
 pub use gain::gain;
 pub use get_pt::get_pt;
