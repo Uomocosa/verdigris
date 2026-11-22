@@ -1,10 +1,12 @@
 mod attack_without_tapping;
 mod gain;
+mod get_pt;
 mod lose;
 mod rule;
 mod tap_when_attacking;
 pub use attack_without_tapping::attack_without_tapping;
 pub use gain::gain;
+pub use get_pt::get_pt;
 pub use lose::lose;
 pub use rule::rule;
 pub use tap_when_attacking::tap_when_attacking;

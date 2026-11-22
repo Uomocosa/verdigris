@@ -15,6 +15,9 @@ impl All {
     pub fn gain(self, keyword: keywords::Keyword) -> abilities::Static {}
 
     #[must_use]
+    pub fn get_pt(self, power: i32, toughness: i32) -> abilities::Static {}
+
+    #[must_use]
     pub fn lose(self, keyword: keywords::Keyword) -> abilities::Static {}
 
     #[must_use]

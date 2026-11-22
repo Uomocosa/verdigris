@@ -9,6 +9,7 @@ pub struct Filter {
     pub controlled_by: Option<effects::PlayerRef>,
     pub excluded_color: Option<cards::Color>,
     pub attacking: bool,
+    pub nontoken: bool,
 }
 
 #[atomic_delegates]
@@ -18,6 +19,9 @@ impl Filter {
 
     #[must_use]
     pub fn attacking(self) -> Self {}
+
+    #[must_use]
+    pub fn nontoken(self) -> Self {}
 }
 
 impl Filter {
