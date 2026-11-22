@@ -13,4 +13,5 @@ pub enum Keyword {
     FirstStrike,
     DoubleStrike,
     MustAttackIfAble,
+    MustBlockIfAble,
 }

@@ -1,8 +1,9 @@
-use bevy::prelude::{Commands, Has, MessageReader, MessageWriter, Query, Res};
+use bevy::prelude::{Commands, Entity, Has, MessageReader, MessageWriter, Query, Res};
 
 use crate::BATTLEFIELD;
 use crate::actions;
 use crate::cards;
+use crate::keywords;
 use crate::turns;
 use crate::zones;
 
@@ -28,6 +29,18 @@ use crate::zones;
 ///
 /// 702.17b A creature with flying can’t be blocked except by creatures with flying and/or reach.
 /// (See rule 509, “Declare Blockers Step,” and rule 702.9, “Flying.”)
+///
+/// # See also
+///
+/// 509.1c The defending player checks each creature they control to see whether it’s affected by any
+/// requirements (effects that say a creature must block, or that it must block if some condition is
+/// met). If the number of requirements that are being obeyed is fewer than the maximum possible
+/// number of requirements that could be obeyed without disobeying any restrictions, the declaration
+/// of blockers is illegal. If a creature can’t block unless a player pays a cost, that player is not
+/// required to pay that cost, even if blocking with that creature would increase the number of
+/// requirements being obeyed. If a requirement that says a creature blocks if able during a certain
+/// turn refers to a turn with multiple combat phases, the creature blocks if able during each declare
+/// blockers step in that turn.
 pub fn r509_1a_r509_1g_r509_1h_r702_9b_r702_17b_declare_blockers(
     mut actions: MessageReader<actions::PlayerAction>,
     mut rejected: MessageWriter<actions::Rejected>,
@@ -35,6 +48,7 @@ pub fn r509_1a_r509_1g_r509_1h_r702_9b_r702_17b_declare_blockers(
     priority: Res<turns::Priority>,
     turn: Res<turns::Turn>,
     cards: Query<(
+        Entity,
         &cards::CardDefinition,
         &cards::Owner,
         &zones::InZone,
@@ -66,13 +80,14 @@ pub fn r509_1a_r509_1g_r509_1h_r702_9b_r702_17b_declare_blockers(
             continue;
         };
         let all_legal = assignments.iter().all(|assignment| {
-            let blocker_legal =
-                cards.get(assignment.blocker).is_ok_and(|(definition, owner, in_zone, tapped)| {
+            let blocker_legal = cards.get(assignment.blocker).is_ok_and(
+                |(_, definition, owner, in_zone, tapped)| {
                     definition.types.contains(&cards::CardType::Creature)
                         && **owner == action.player
                         && **in_zone == battlefield
                         && tapped.is_none()
-                });
+                },
+            );
             let attacker_legal =
                 attacking.get(assignment.attacker).is_ok_and(|(_, attacker_flies)| {
                     if !attacker_flies {
@@ -84,7 +99,21 @@ pub fn r509_1a_r509_1g_r509_1h_r702_9b_r702_17b_declare_blockers(
                 });
             blocker_legal && attacker_legal
         });
-        if !all_legal {
+        let requirement_unmet = cards.iter().any(|(entity, definition, owner, in_zone, tapped)| {
+            **owner == action.player
+                && **in_zone == battlefield
+                && definition.types.contains(&cards::CardType::Creature)
+                && definition.keywords.contains(&keywords::Keyword::MustBlockIfAble)
+                && tapped.is_none()
+                && !assignments.iter().any(|assignment| assignment.blocker == entity)
+                && attacking.iter().any(|(_, attacker_flies)| {
+                    !attacker_flies
+                        || flight.get(entity).is_ok_and(|(blocker_flies, blocker_reach)| {
+                            blocker_flies || blocker_reach
+                        })
+                })
+        });
+        if !all_legal || requirement_unmet {
             rejected.write(actions::Rejected::CannotBlock {
                 assignments: assignments.clone(),
             });
@@ -300,6 +329,39 @@ mod tests {
             Some(&actions::Rejected::CannotBlock { assignments })
         );
         assert!(!game.is_blocking(bears_2));
+        Ok(())
+    }
+
+    #[test]
+    fn a_creature_that_must_block_cannot_be_left_out_of_the_declaration() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.battlefield([GRIZZLY_BEARS]),
+            P2.battlefield([IRON_GOLEM]),
+        ]);
+        let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        let [golem] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(IRON_GOLEM)?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareAttackers),
+            p2.pass_to(turns::Step::DeclareAttackers),
+            p1.declare_attackers([bears]),
+        ])?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareBlockers),
+            p2.pass_to(turns::Step::DeclareBlockers),
+        ])?;
+        game.play([p1.pass_priority()])?;
+
+        game.act(p2, actions::Action::DeclareBlockers(vec![]));
+        assert_eq!(
+            game.last_rejection(),
+            Some(&actions::Rejected::CannotBlock {
+                assignments: vec![]
+            })
+        );
+        assert!(!game.is_blocking(golem));
+
+        game.play([p2.declare_blockers([(golem, bears)])])?;
+        assert!(game.is_blocking(golem));
         Ok(())
     }
 }
