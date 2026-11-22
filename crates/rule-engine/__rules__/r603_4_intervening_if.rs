@@ -34,15 +34,20 @@ pub fn r603_4_intervening_if(
     let turn = turn.into_inner();
     for step in steps.read() {
         for (source, owner, at_step) in sources.iter() {
-            let abilities::TriggerEvent::BeginningOfStep(expected, who) = at_step.event else {
-                continue;
-            };
-            if **step != expected {
-                continue;
-            }
             let controller = **owner;
-            let players: Vec<Entity> = lives.iter().map(|(player, _)| player).collect();
-            if !who.resolve(controller, &players).contains(&turn.active) {
+            let triggered = match at_step.event {
+                abilities::TriggerEvent::BeginningOfStep(expected, who) => {
+                    **step == expected && {
+                        let players: Vec<Entity> = lives.iter().map(|(player, _)| player).collect();
+                        who.resolve(controller, &players).contains(&turn.active)
+                    }
+                }
+                abilities::TriggerEvent::BeginningOfNextCleanup => {
+                    **step == turns::Step::Cleanup && turn.active == controller
+                }
+                abilities::TriggerEvent::Enters(_) | abilities::TriggerEvent::Dies => false,
+            };
+            if !triggered {
                 continue;
             }
             let ability = **at_step;

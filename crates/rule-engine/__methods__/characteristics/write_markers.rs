@@ -82,7 +82,8 @@ pub fn write_markers(
                         desired_enters = Some(cards::TriggeredEnters(*ability));
                     }
                 }
-                abilities::TriggerEvent::BeginningOfStep(_, _) => {
+                abilities::TriggerEvent::BeginningOfStep(_, _)
+                | abilities::TriggerEvent::BeginningOfNextCleanup => {
                     if desired_at_step.is_none() {
                         desired_at_step = Some(cards::TriggeredAtStep(*ability));
                     }

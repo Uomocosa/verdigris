@@ -2,8 +2,8 @@
 mod basic;
 
 pub use basic::card_text::{
-    counter, creates, damage, destroy, discard, draw, gain_life, gains, gets, lose_life, mills,
-    poison, target, win_the_game,
+    counter, creates, damage, destroy, discard, draw, exile, gain_life, gains, gets, lose_life,
+    mills, poison, target, win_the_game,
 };
 pub use basic::components::ContinuousEffect;
 pub use basic::enums::{Duration, EffectKind, FilterKind, Layered};

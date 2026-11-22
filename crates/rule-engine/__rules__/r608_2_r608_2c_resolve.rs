@@ -1,4 +1,4 @@
-use crate::{BATTLEFIELD, STACK};
+use crate::{BATTLEFIELD, EXILE, STACK};
 use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, ParamSet};
 
 use crate::damage;
@@ -57,23 +57,29 @@ pub fn r608_2_r608_2c_resolve(
         let player_targets =
             chosen_target.filter(|target| lookups.lives.get(*target).is_ok()).map_or_else(
                 || resolve_player_targets(&lookups, effect, controller),
-                |player| vec![player],
+                |p| vec![p],
             );
         let target_zone = chosen_target.and_then(|target| lookups.in_zone.get(target).ok());
         let target_on_battlefield =
             target_zone.is_some_and(|zone| zones.contains(BATTLEFIELD, **zone));
         let target_on_stack = target_zone.is_some_and(|zone| zones.contains(STACK, **zone));
+        let battlefield_target = chosen_target.filter(|_| target_on_battlefield);
         for kind in std::iter::once(effect.kind).chain(effect.follow_ups.into_iter().flatten()) {
             match kind {
                 effects::EffectKind::Damage(amount) => {
                     request_damage(&mut damage_dealt, &lookups, spell, chosen_target, amount);
                 }
                 effects::EffectKind::Destroy => {
-                    if let Some(target) = chosen_target
-                        && target_on_battlefield
-                    {
+                    if let Some(target) = battlefield_target {
                         destructions.write(damage::Destruction(target));
                     }
+                }
+                #[rustfmt::skip]
+                effects::EffectKind::Exile => {
+                    let source = chosen_target.or_else(|| lookups.abilities.get(spell).ok().map(|a| a.source));
+                    let exile = source.and_then(|t| lookups.owners.get(t).ok())
+                        .and_then(|o| zones.find(EXILE, Some(**o))).zip(source);
+                    if let Some((exile, target)) = exile { commands.entity(target).insert(zones::InZone(exile)); }
                 }
                 effects::EffectKind::Counter => {
                     if let Some(target) = chosen_target
@@ -116,9 +122,7 @@ pub fn r608_2_r608_2c_resolve(
                     request_discard(&mut player_effects.p1(), &player_targets, count);
                 }
                 effects::EffectKind::ModifyPowerToughness { power, toughness } => {
-                    if let Some(target) = chosen_target
-                        && target_on_battlefield
-                    {
+                    if let Some(target) = battlefield_target {
                         effect_messages.p0().write(effects::PowerToughnessModified {
                             target,
                             power,
@@ -127,9 +131,7 @@ pub fn r608_2_r608_2c_resolve(
                     }
                 }
                 effects::EffectKind::GainKeyword(keyword) => {
-                    if let Some(target) = chosen_target
-                        && target_on_battlefield
-                    {
+                    if let Some(target) = battlefield_target {
                         effect_messages.p1().write(effects::KeywordGranted { target, keyword });
                     }
                 }

@@ -5,6 +5,7 @@ use crate::keywords;
 pub enum EffectKind {
     Damage(u32),
     Destroy,
+    Exile,
     Counter,
     CreateTokens {
         count: u32,

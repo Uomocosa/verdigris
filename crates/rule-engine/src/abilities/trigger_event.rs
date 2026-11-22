@@ -9,7 +9,15 @@ use crate::turns;
 pub enum TriggerEvent {
     Enters(cards::ObjectFilter),
     BeginningOfStep(turns::Step, effects::PlayerRef),
+    BeginningOfNextCleanup,
     Dies,
+}
+
+impl TriggerEvent {
+    #[must_use]
+    pub const fn beginning_of_next_cleanup() -> Self {
+        Self::BeginningOfNextCleanup
+    }
 }
 
 #[atomic_delegates]
@@ -34,6 +42,10 @@ mod tests {
                 event: abilities::TriggerEvent::BeginningOfStep(UPKEEP, YOU),
                 intervening_if: Some(abilities::Condition::LifeAtLeast(YOU, 40)),
             }
+        );
+        assert_eq!(
+            abilities::TriggerEvent::beginning_of_next_cleanup(),
+            abilities::TriggerEvent::BeginningOfNextCleanup
         );
     }
 }

@@ -20,6 +20,15 @@ pub const fn destroy() -> effects::Effect {
 }
 
 #[must_use]
+pub const fn exile() -> effects::Effect {
+    effects::Effect {
+        kind: effects::EffectKind::Exile,
+        follow_ups: [None; 4],
+        target: None,
+    }
+}
+
+#[must_use]
 pub const fn counter() -> effects::Effect {
     effects::Effect {
         kind: effects::EffectKind::Counter,
