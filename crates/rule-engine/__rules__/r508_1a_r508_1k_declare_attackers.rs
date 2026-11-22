@@ -4,6 +4,7 @@ use crate::BATTLEFIELD;
 use crate::actions;
 use crate::cards;
 use crate::keywords;
+use crate::rules;
 use crate::turns;
 use crate::zones;
 
@@ -54,6 +55,7 @@ pub fn r508_1a_r508_1k_declare_attackers(
         Option<&cards::Tapped>,
     )>,
     entered_on: Query<Option<&cards::EnteredOnTurn>>,
+    answers: rules::Rules,
     zones: zones::ZoneLookup,
 ) {
     let priority = priority.into_inner();
@@ -83,8 +85,14 @@ pub fn r508_1a_r508_1k_declare_attackers(
                     && **owner == action.player
                     && **in_zone == battlefield
                     && tapped.is_none()
-                    && !definition.keywords.contains(&keywords::Keyword::Defender)
-                    && (definition.keywords.contains(&keywords::Keyword::Haste)
+                    && !answers
+                        .characteristics(*attacker)
+                        .keywords
+                        .contains(&keywords::Keyword::Defender)
+                    && (answers
+                        .characteristics(*attacker)
+                        .keywords
+                        .contains(&keywords::Keyword::Haste)
                         || entered_on.get(*attacker).is_ok_and(|on_turn| {
                             on_turn.is_none_or(|turn_number| **turn_number != turn.number)
                         }))
@@ -94,10 +102,13 @@ pub fn r508_1a_r508_1k_declare_attackers(
             **owner == action.player
                 && **in_zone == battlefield
                 && definition.types.contains(&cards::CardType::Creature)
-                && definition.keywords.contains(&keywords::Keyword::MustAttackIfAble)
+                && answers
+                    .characteristics(entity)
+                    .keywords
+                    .contains(&keywords::Keyword::MustAttackIfAble)
                 && tapped.is_none()
-                && !definition.keywords.contains(&keywords::Keyword::Defender)
-                && (definition.keywords.contains(&keywords::Keyword::Haste)
+                && !answers.characteristics(entity).keywords.contains(&keywords::Keyword::Defender)
+                && (answers.characteristics(entity).keywords.contains(&keywords::Keyword::Haste)
                     || entered_on.get(entity).is_ok_and(|on_turn| {
                         on_turn.is_none_or(|turn_number| **turn_number != turn.number)
                     }))
@@ -287,6 +298,69 @@ mod tests {
 
         game.play([p1.declare_attackers([feast, bears])])?;
         assert!(game.is_attacking(feast));
+        assert!(game.is_attacking(bears));
+        Ok(())
+    }
+
+    #[test]
+    fn a_static_haste_grant_allows_attacking_the_turn_it_entered() -> TestResult {
+        use crate::HAND;
+        use crate::mana;
+
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.battlefield([TEST_HASTY_BANNER]).hand([WALKING_CORPSE]).mana_pool(mana![1, B]),
+            P2,
+        ]);
+        let [corpse] = game.player(p1).cards_in(HAND).exactly::<1>(WALKING_CORPSE)?;
+        game.play([p1.cast(corpse).pass_priority(), p2.pass_priority()])?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareAttackers),
+            p2.pass_to(turns::Step::DeclareAttackers),
+        ])?;
+
+        game.act(p1, actions::Action::DeclareAttackers(vec![corpse.into()]));
+
+        assert!(game.player(p1).cards_in(BATTLEFIELD).has(corpse));
+        assert!(game.is_attacking(corpse));
+        assert_eq!(game.last_rejection(), None);
+        Ok(())
+    }
+
+    #[test]
+    fn a_static_defender_loss_allows_attacking() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.battlefield([WALL_OF_STONE]),
+            P2.battlefield([TEST_WALL_OF_DREAD]),
+        ]);
+        let [wall] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(WALL_OF_STONE)?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareAttackers),
+            p2.pass_to(turns::Step::DeclareAttackers),
+            p1.declare_attackers([wall]),
+        ])?;
+
+        assert!(game.is_attacking(wall));
+        Ok(())
+    }
+
+    #[test]
+    fn a_static_must_attack_grant_forces_an_attack() -> TestResult {
+        let (mut game, [p1, p2]) =
+            MockGame::new([P1.battlefield([TEST_WAR_DRUMS, GRIZZLY_BEARS]), P2]);
+        let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareAttackers),
+            p2.pass_to(turns::Step::DeclareAttackers),
+        ])?;
+
+        game.act(p1, actions::Action::DeclareAttackers(vec![]));
+        assert_eq!(
+            game.last_rejection(),
+            Some(&actions::Rejected::CannotAttack { attackers: vec![] })
+        );
+        assert!(!game.is_attacking(bears));
+
+        game.play([p1.declare_attackers([bears])])?;
         assert!(game.is_attacking(bears));
         Ok(())
     }

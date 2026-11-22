@@ -4,6 +4,7 @@ use crate::BATTLEFIELD;
 use crate::actions;
 use crate::cards;
 use crate::keywords;
+use crate::rules;
 use crate::turns;
 use crate::zones;
 
@@ -56,6 +57,7 @@ pub fn r509_1a_r509_1g_r509_1h_r702_9b_r702_17b_declare_blockers(
     )>,
     attacking: Query<(&cards::Attacking, Has<cards::Flying>)>,
     flight: Query<(Has<cards::Flying>, Has<cards::Reach>)>,
+    answers: rules::Rules,
     zones: zones::ZoneLookup,
 ) {
     let priority = priority.into_inner();
@@ -103,7 +105,10 @@ pub fn r509_1a_r509_1g_r509_1h_r702_9b_r702_17b_declare_blockers(
             **owner == action.player
                 && **in_zone == battlefield
                 && definition.types.contains(&cards::CardType::Creature)
-                && definition.keywords.contains(&keywords::Keyword::MustBlockIfAble)
+                && answers
+                    .characteristics(entity)
+                    .keywords
+                    .contains(&keywords::Keyword::MustBlockIfAble)
                 && tapped.is_none()
                 && !assignments.iter().any(|assignment| assignment.blocker == entity)
                 && attacking.iter().any(|(_, attacker_flies)| {
@@ -362,6 +367,62 @@ mod tests {
 
         game.play([p2.declare_blockers([(golem, bears)])])?;
         assert!(game.is_blocking(golem));
+        Ok(())
+    }
+
+    #[test]
+    fn a_static_must_block_grant_forces_a_block() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.battlefield([GRIZZLY_BEARS, TEST_TAUNTING_FIELD]),
+            P2.battlefield([GRIZZLY_BEARS]),
+        ]);
+        let [bears_1] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        let [bears_2] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareAttackers),
+            p2.pass_to(turns::Step::DeclareAttackers),
+            p1.declare_attackers([bears_1]),
+        ])?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareBlockers),
+            p2.pass_to(turns::Step::DeclareBlockers),
+        ])?;
+        game.play([p1.pass_priority()])?;
+
+        game.act(p2, actions::Action::DeclareBlockers(vec![]));
+        assert_eq!(
+            game.last_rejection(),
+            Some(&actions::Rejected::CannotBlock {
+                assignments: vec![]
+            })
+        );
+        assert!(!game.is_blocking(bears_2));
+
+        game.play([p2.declare_blockers([(bears_2, bears_1)])])?;
+        assert!(game.is_blocking(bears_2));
+        Ok(())
+    }
+
+    #[test]
+    fn a_static_flying_loss_allows_a_ground_creature_to_block() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.battlefield([WIND_DRAKE]),
+            P2.battlefield([GRIZZLY_BEARS, TEST_GROUNDING_MIST]),
+        ]);
+        let [drake] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(WIND_DRAKE)?;
+        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareAttackers),
+            p2.pass_to(turns::Step::DeclareAttackers),
+            p1.declare_attackers([drake]),
+        ])?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareBlockers),
+            p2.pass_to(turns::Step::DeclareBlockers),
+        ])?;
+        game.play([p1.pass_priority(), p2.declare_blockers([(bears, drake)])])?;
+
+        assert!(game.is_blocking(bears));
         Ok(())
     }
 }

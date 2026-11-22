@@ -15,6 +15,9 @@ pub struct Rules<'w, 's> {
 #[atomic_delegates]
 impl Rules<'_, '_> {
     pub fn ask<Q: rules::traits::rule_question::RuleQuestion>(&self, entity: Entity) -> Q::Answer {}
+
+    #[must_use]
+    pub fn characteristics(&self, entity: Entity) -> cards::Characteristics {}
 }
 
 #[cfg(test)]
