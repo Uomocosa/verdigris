@@ -27,48 +27,48 @@ pub fn write_markers(
             entity.remove::<cards::EffectivePT>();
         }
     }
-    let desired = |keyword: keywords::Keyword| {
+    let desired = |keyword: keywords::StaticKeyword| {
         characteristics.on_battlefield && characteristics.keywords.contains(&keyword)
     };
     cards::Characteristics::sync_marker(
         entity,
-        desired(keywords::Keyword::Indestructible),
+        desired(keywords::StaticKeyword::Indestructible),
         current.indestructible,
         cards::Indestructible,
     );
     cards::Characteristics::sync_marker(
         entity,
-        desired(keywords::Keyword::Deathtouch),
+        desired(keywords::StaticKeyword::Deathtouch),
         current.deathtouch,
         cards::Deathtouch,
     );
     cards::Characteristics::sync_marker(
         entity,
-        desired(keywords::Keyword::Lifelink),
+        desired(keywords::StaticKeyword::Lifelink),
         current.lifelink,
         cards::Lifelink,
     );
     cards::Characteristics::sync_marker(
         entity,
-        desired(keywords::Keyword::Trample),
+        desired(keywords::StaticKeyword::Trample),
         current.trample,
         cards::Trample,
     );
     cards::Characteristics::sync_marker(
         entity,
-        desired(keywords::Keyword::Flying),
+        desired(keywords::StaticKeyword::Flying),
         current.flying,
         cards::Flying,
     );
     cards::Characteristics::sync_marker(
         entity,
-        desired(keywords::Keyword::Reach),
+        desired(keywords::StaticKeyword::Reach),
         current.reach,
         cards::Reach,
     );
     cards::Characteristics::sync_marker(
         entity,
-        desired(keywords::Keyword::Vigilance),
+        desired(keywords::StaticKeyword::Vigilance),
         current.vigilance,
         cards::Vigilance,
     );

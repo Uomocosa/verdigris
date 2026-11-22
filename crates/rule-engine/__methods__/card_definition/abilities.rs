@@ -44,7 +44,10 @@ mod tests {
                 abilities::Ability::from(static_ability),
             ],
         );
-        assert_eq!(definition.keywords, vec![keywords::Keyword::Vigilance]);
+        assert_eq!(
+            definition.keywords,
+            vec![keywords::StaticKeyword::Vigilance]
+        );
         assert_eq!(definition.triggered_abilities, [triggered]);
         assert_eq!(definition.static_abilities, [static_ability]);
     }

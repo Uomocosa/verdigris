@@ -180,7 +180,7 @@ fn legal_targets(
                 filter.does_creature_match(definition)
                     && battlefield.contains(entity)
                     && (**owner == controller
-                        || !definition.keywords.contains(&keywords::Keyword::Hexproof))
+                        || !definition.keywords.contains(&keywords::StaticKeyword::Hexproof))
             }
             effects::FilterKind::Player => false,
         };

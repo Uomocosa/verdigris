@@ -37,7 +37,7 @@ mod tests {
         assert_eq!(arms.colors(), vec![cards::Color::Red]);
         assert_eq!(
             arms.static_abilities,
-            [abilities::Static {
+            [abilities::Continuous {
                 filter: CREATURE.controlled_by(OPPONENT),
                 change: effects::Change::Rule {
                     question: rules::Question::MustAttack,

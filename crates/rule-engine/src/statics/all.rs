@@ -12,31 +12,31 @@ pub struct All(pub effects::Filter);
 #[atomic_delegates]
 impl All {
     #[must_use]
-    pub fn gain(self, keyword: keywords::Keyword) -> abilities::Static {}
+    pub fn gain(self, keyword: keywords::StaticKeyword) -> abilities::Continuous {}
 
     #[must_use]
-    pub fn get_pt(self, power: i32, toughness: i32) -> abilities::Static {}
+    pub fn get_pt(self, power: i32, toughness: i32) -> abilities::Continuous {}
 
     #[must_use]
-    pub fn lose(self, keyword: keywords::Keyword) -> abilities::Static {}
+    pub fn lose(self, keyword: keywords::StaticKeyword) -> abilities::Continuous {}
 
     #[must_use]
-    pub fn attack_as_though_it_had_haste(self) -> abilities::Static {}
+    pub fn attack_as_though_it_had_haste(self) -> abilities::Continuous {}
 
     #[must_use]
-    pub fn must_attack(self) -> abilities::Static {}
+    pub fn must_attack(self) -> abilities::Continuous {}
 
     #[must_use]
-    pub fn must_block(self) -> abilities::Static {}
+    pub fn must_block(self) -> abilities::Continuous {}
 
     #[must_use]
-    pub fn attack_without_tapping(self) -> abilities::Static {}
+    pub fn attack_without_tapping(self) -> abilities::Continuous {}
 
     #[must_use]
-    pub fn tap_when_attacking(self) -> abilities::Static {}
+    pub fn tap_when_attacking(self) -> abilities::Continuous {}
 
     #[must_use]
-    pub fn rule<Q: RuleQuestion>(self, answer: Q::Answer) -> abilities::Static {}
+    pub fn rule<Q: RuleQuestion>(self, answer: Q::Answer) -> abilities::Continuous {}
 }
 
 #[cfg(test)]

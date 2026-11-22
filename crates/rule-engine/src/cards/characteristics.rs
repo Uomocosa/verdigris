@@ -10,7 +10,7 @@ use crate::keywords;
 pub struct Characteristics {
     pub on_battlefield: bool,
     pub power_toughness: Option<cards::PowerToughness>,
-    pub keywords: Vec<keywords::Keyword>,
+    pub keywords: Vec<keywords::StaticKeyword>,
     pub triggered_abilities: Vec<abilities::TriggeredAbility>,
 }
 

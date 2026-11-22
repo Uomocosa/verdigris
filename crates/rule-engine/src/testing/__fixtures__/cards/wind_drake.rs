@@ -31,6 +31,6 @@ mod tests {
         assert_eq!(drake.type_line.types, vec![cards::CardType::Creature]);
         assert_eq!(drake.cost, cost![2, U]);
         assert_eq!(drake.power_toughness, Some(pt!(2, 2)));
-        assert_eq!(drake.keywords, vec![keywords::Keyword::Flying]);
+        assert_eq!(drake.keywords, vec![keywords::StaticKeyword::Flying]);
     }
 }

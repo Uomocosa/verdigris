@@ -58,7 +58,7 @@ pub fn assigned_blocked_damage(
     }
     match blockers_of.as_slice() {
         [(blocker, lethal)] => {
-            let into_blocker = if definition.keywords.contains(&keywords::Keyword::Trample) {
+            let into_blocker = if definition.keywords.contains(&keywords::StaticKeyword::Trample) {
                 amount.min(*lethal)
             } else {
                 amount
@@ -79,7 +79,7 @@ pub fn assigned_blocked_damage(
                 });
             }
         }
-        [] if definition.keywords.contains(&keywords::Keyword::Trample) => {
+        [] if definition.keywords.contains(&keywords::StaticKeyword::Trample) => {
             writes.push(damage::DamageDealt {
                 source,
                 target: defending,
@@ -90,8 +90,10 @@ pub fn assigned_blocked_damage(
         _ => {
             let mut legal: BTreeSet<Entity> =
                 blockers_of.iter().map(|(blocker, _)| *blocker).collect();
-            let trample_defender =
-                definition.keywords.contains(&keywords::Keyword::Trample).then_some(defending);
+            let trample_defender = definition
+                .keywords
+                .contains(&keywords::StaticKeyword::Trample)
+                .then_some(defending);
             if let Some(defender) = trample_defender {
                 legal.insert(defender);
             }

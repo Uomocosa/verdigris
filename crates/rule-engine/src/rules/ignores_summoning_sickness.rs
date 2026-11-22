@@ -9,7 +9,7 @@ pub struct IgnoresSummoningSickness;
 impl rules::traits::rule_question::RuleQuestion for IgnoresSummoningSickness {
     type Answer = bool;
     const QUESTION: rules::Question = rules::Question::IgnoresSummoningSickness;
-    fn default(characteristics: &cards::Characteristics) -> bool { characteristics.keywords.contains(&keywords::Keyword::Haste) }
+    fn default(characteristics: &cards::Characteristics) -> bool { characteristics.keywords.contains(&keywords::StaticKeyword::Haste) }
     fn into_answer(answer: bool) -> rules::Answer { rules::Answer::IgnoresSummoningSickness(answer) }
     fn from_answer(answer: rules::Answer) -> Option<bool> { answer.ignores_summoning_sickness() }
 }
@@ -31,7 +31,7 @@ mod tests {
             &bears_characteristics
         ));
         let hasty = cards::Characteristics {
-            keywords: vec![keywords::Keyword::Haste],
+            keywords: vec![keywords::StaticKeyword::Haste],
             ..bears_characteristics
         };
         assert!(rules::IgnoresSummoningSickness::default(&hasty));

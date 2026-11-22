@@ -39,9 +39,9 @@ mod tests {
         assert_eq!(
             golem.keywords,
             vec![
-                keywords::Keyword::Vigilance,
-                keywords::Keyword::MustAttackIfAble,
-                keywords::Keyword::MustBlockIfAble,
+                keywords::StaticKeyword::Vigilance,
+                keywords::StaticKeyword::MustAttackIfAble,
+                keywords::StaticKeyword::MustBlockIfAble,
             ]
         );
     }

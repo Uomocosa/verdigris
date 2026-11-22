@@ -441,7 +441,7 @@ mod tests {
                     !answers
                         .characteristics(bears_2.into())
                         .keywords
-                        .contains(&keywords::Keyword::MustBlockIfAble)
+                        .contains(&keywords::StaticKeyword::MustBlockIfAble)
                 );
             })
             .unwrap();

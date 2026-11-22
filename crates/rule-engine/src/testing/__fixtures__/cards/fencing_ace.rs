@@ -31,6 +31,6 @@ mod tests {
         assert_eq!(ace.type_line.types, vec![cards::CardType::Creature]);
         assert_eq!(ace.cost, cost![1, W]);
         assert_eq!(ace.power_toughness, Some(pt!(1, 1)));
-        assert_eq!(ace.keywords, vec![keywords::Keyword::DoubleStrike]);
+        assert_eq!(ace.keywords, vec![keywords::StaticKeyword::DoubleStrike]);
     }
 }

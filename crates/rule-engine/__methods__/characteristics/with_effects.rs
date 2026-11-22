@@ -88,13 +88,13 @@ mod tests {
             affected: Entity::PLACEHOLDER,
             source: None,
             change: effects::Change::Characteristic(effects::Layered::GainKeyword(
-                keywords::Keyword::Flying,
+                keywords::StaticKeyword::Flying,
             )),
             until: effects::Duration::UntilEndOfTurn,
             timestamp: 0,
         };
         let granted = with_effects(from_printed_value, &[grant]);
-        assert!(granted.keywords.contains(&keywords::Keyword::Flying));
+        assert!(granted.keywords.contains(&keywords::StaticKeyword::Flying));
         assert_eq!(
             granted.power_toughness,
             Some(cards::PowerToughness {
@@ -112,7 +112,7 @@ mod tests {
             affected: Entity::PLACEHOLDER,
             source: None,
             change: effects::Change::Characteristic(effects::Layered::GainKeyword(
-                keywords::Keyword::Flying,
+                keywords::StaticKeyword::Flying,
             )),
             until: effects::Duration::UntilEndOfTurn,
             timestamp: 0,
@@ -121,13 +121,13 @@ mod tests {
             affected: Entity::PLACEHOLDER,
             source: None,
             change: effects::Change::Characteristic(effects::Layered::LoseKeyword(
-                keywords::Keyword::Flying,
+                keywords::StaticKeyword::Flying,
             )),
             until: effects::Duration::UntilEndOfTurn,
             timestamp: 1,
         };
         let removed = with_effects(from_printed_value, &[gain, lose]);
-        assert!(!removed.keywords.contains(&keywords::Keyword::Flying));
+        assert!(!removed.keywords.contains(&keywords::StaticKeyword::Flying));
         assert_eq!(
             removed.power_toughness,
             Some(cards::PowerToughness {
@@ -145,7 +145,7 @@ mod tests {
             affected: Entity::PLACEHOLDER,
             source: None,
             change: effects::Change::Characteristic(effects::Layered::LoseKeyword(
-                keywords::Keyword::Flying,
+                keywords::StaticKeyword::Flying,
             )),
             until: effects::Duration::UntilEndOfTurn,
             timestamp: 0,
@@ -154,12 +154,12 @@ mod tests {
             affected: Entity::PLACEHOLDER,
             source: None,
             change: effects::Change::Characteristic(effects::Layered::GainKeyword(
-                keywords::Keyword::Flying,
+                keywords::StaticKeyword::Flying,
             )),
             until: effects::Duration::UntilEndOfTurn,
             timestamp: 1,
         };
         let regained = with_effects(from_printed_value, &[lose, gain]);
-        assert!(regained.keywords.contains(&keywords::Keyword::Flying));
+        assert!(regained.keywords.contains(&keywords::StaticKeyword::Flying));
     }
 }

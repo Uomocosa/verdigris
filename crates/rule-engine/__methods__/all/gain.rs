@@ -3,8 +3,8 @@ use crate::effects;
 use crate::keywords;
 use crate::statics;
 
-pub fn gain(all: statics::All, keyword: keywords::Keyword) -> abilities::Static {
-    abilities::Static {
+pub fn gain(all: statics::All, keyword: keywords::StaticKeyword) -> abilities::Continuous {
+    abilities::Continuous {
         filter: *all,
         change: effects::Change::Characteristic(effects::Layered::GainKeyword(keyword)),
     }
@@ -26,7 +26,7 @@ mod tests {
         assert_eq!(
             ability.change,
             effects::Change::Characteristic(effects::Layered::GainKeyword(
-                keywords::Keyword::Vigilance
+                keywords::StaticKeyword::Vigilance
             ))
         );
     }

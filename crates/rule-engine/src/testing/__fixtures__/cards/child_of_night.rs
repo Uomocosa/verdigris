@@ -29,6 +29,6 @@ mod tests {
         assert_eq!(*vampire.name, "Child of Night");
         assert_eq!(vampire.cost, cost![1, B]);
         assert_eq!(vampire.power_toughness, Some(pt!(2, 1)));
-        assert_eq!(vampire.keywords, vec![keywords::Keyword::Lifelink]);
+        assert_eq!(vampire.keywords, vec![keywords::StaticKeyword::Lifelink]);
     }
 }

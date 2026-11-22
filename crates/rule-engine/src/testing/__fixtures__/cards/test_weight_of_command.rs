@@ -37,7 +37,7 @@ mod tests {
         assert_eq!(weight.colors(), vec![cards::Color::Blue]);
         assert_eq!(
             weight.static_abilities,
-            [abilities::Static {
+            [abilities::Continuous {
                 filter: CREATURE.controlled_by(OPPONENT),
                 change: effects::Change::Rule {
                     question: rules::Question::TapsWhenAttacking,

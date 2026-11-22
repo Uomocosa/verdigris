@@ -3,8 +3,8 @@ use crate::effects;
 use crate::rules;
 use crate::statics;
 
-pub fn attack_without_tapping(all: statics::All) -> abilities::Static {
-    abilities::Static {
+pub fn attack_without_tapping(all: statics::All) -> abilities::Continuous {
+    abilities::Continuous {
         filter: *all,
         change: effects::Change::Rule {
             question: rules::Question::TapsWhenAttacking,

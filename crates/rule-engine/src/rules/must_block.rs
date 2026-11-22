@@ -9,7 +9,7 @@ pub struct MustBlock;
 impl rules::traits::rule_question::RuleQuestion for MustBlock {
     type Answer = bool;
     const QUESTION: rules::Question = rules::Question::MustBlock;
-    fn default(characteristics: &cards::Characteristics) -> bool { characteristics.keywords.contains(&keywords::Keyword::MustBlockIfAble) }
+    fn default(characteristics: &cards::Characteristics) -> bool { characteristics.keywords.contains(&keywords::StaticKeyword::MustBlockIfAble) }
     fn into_answer(answer: bool) -> rules::Answer { rules::Answer::MustBlock(answer) }
     fn from_answer(answer: rules::Answer) -> Option<bool> { answer.must_block() }
 }
@@ -29,7 +29,7 @@ mod tests {
         let bears_characteristics = cards::Characteristics::from_printed(&bears, true);
         assert!(!rules::MustBlock::default(&bears_characteristics));
         let forced = cards::Characteristics {
-            keywords: vec![keywords::Keyword::MustBlockIfAble],
+            keywords: vec![keywords::StaticKeyword::MustBlockIfAble],
             ..bears_characteristics
         };
         assert!(rules::MustBlock::default(&forced));

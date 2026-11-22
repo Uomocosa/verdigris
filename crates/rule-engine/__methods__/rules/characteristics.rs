@@ -44,7 +44,7 @@ mod tests {
                 assert!(
                     !characteristics(&answers, *bears)
                         .keywords
-                        .contains(&keywords::Keyword::Vigilance)
+                        .contains(&keywords::StaticKeyword::Vigilance)
                 );
             })
             .unwrap();

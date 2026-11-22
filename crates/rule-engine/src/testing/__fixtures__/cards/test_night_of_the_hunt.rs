@@ -38,10 +38,10 @@ mod tests {
         assert_eq!(night.colors(), vec![cards::Color::Black]);
         assert_eq!(
             night.static_abilities,
-            [abilities::Static {
+            [abilities::Continuous {
                 filter: CREATURE.controlled_by(OPPONENT),
                 change: effects::Change::Characteristic(effects::Layered::LoseKeyword(
-                    keywords::Keyword::Vigilance,
+                    keywords::StaticKeyword::Vigilance,
                 )),
             }]
         );

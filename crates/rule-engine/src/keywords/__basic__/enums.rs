@@ -1,5 +1,5 @@
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum Keyword {
+pub enum StaticKeyword {
     Indestructible,
     Deathtouch,
     Lifelink,

@@ -9,7 +9,7 @@ pub struct MustAttack;
 impl rules::traits::rule_question::RuleQuestion for MustAttack {
     type Answer = bool;
     const QUESTION: rules::Question = rules::Question::MustAttack;
-    fn default(characteristics: &cards::Characteristics) -> bool { characteristics.keywords.contains(&keywords::Keyword::MustAttackIfAble) }
+    fn default(characteristics: &cards::Characteristics) -> bool { characteristics.keywords.contains(&keywords::StaticKeyword::MustAttackIfAble) }
     fn into_answer(answer: bool) -> rules::Answer { rules::Answer::MustAttack(answer) }
     fn from_answer(answer: rules::Answer) -> Option<bool> { answer.must_attack() }
 }
@@ -29,7 +29,7 @@ mod tests {
         let bears_characteristics = cards::Characteristics::from_printed(&bears, true);
         assert!(!rules::MustAttack::default(&bears_characteristics));
         let forced = cards::Characteristics {
-            keywords: vec![keywords::Keyword::MustAttackIfAble],
+            keywords: vec![keywords::StaticKeyword::MustAttackIfAble],
             ..bears_characteristics
         };
         assert!(rules::MustAttack::default(&forced));

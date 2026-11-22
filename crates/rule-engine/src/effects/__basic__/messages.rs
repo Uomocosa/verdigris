@@ -26,5 +26,5 @@ pub struct TokensRequested {
 #[derive(Message, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct KeywordGranted {
     pub target: Entity,
-    pub keyword: keywords::Keyword,
+    pub keyword: keywords::StaticKeyword,
 }

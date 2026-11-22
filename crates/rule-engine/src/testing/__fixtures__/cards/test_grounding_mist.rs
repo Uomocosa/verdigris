@@ -38,10 +38,10 @@ mod tests {
         assert_eq!(mist.colors(), vec![cards::Color::Green]);
         assert_eq!(
             mist.static_abilities,
-            [abilities::Static {
+            [abilities::Continuous {
                 filter: CREATURE.controlled_by(OPPONENT),
                 change: effects::Change::Characteristic(effects::Layered::LoseKeyword(
-                    keywords::Keyword::Flying,
+                    keywords::StaticKeyword::Flying,
                 )),
             }]
         );

@@ -31,6 +31,6 @@ mod tests {
         assert_eq!(rats.type_line.types, vec![cards::CardType::Creature]);
         assert_eq!(rats.cost, cost![B]);
         assert_eq!(rats.power_toughness, Some(pt!(1, 1)));
-        assert_eq!(rats.keywords, vec![keywords::Keyword::Deathtouch]);
+        assert_eq!(rats.keywords, vec![keywords::StaticKeyword::Deathtouch]);
     }
 }

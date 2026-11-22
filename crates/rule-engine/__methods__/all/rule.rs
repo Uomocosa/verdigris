@@ -3,8 +3,8 @@ use crate::effects;
 use crate::rules::traits::rule_question::RuleQuestion;
 use crate::statics;
 
-pub fn rule<Q: RuleQuestion>(all: statics::All, answer: Q::Answer) -> abilities::Static {
-    abilities::Static {
+pub fn rule<Q: RuleQuestion>(all: statics::All, answer: Q::Answer) -> abilities::Continuous {
+    abilities::Continuous {
         filter: *all,
         change: effects::Change::Rule {
             question: Q::QUESTION,

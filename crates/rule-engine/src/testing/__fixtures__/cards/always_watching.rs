@@ -40,17 +40,17 @@ mod tests {
         assert_eq!(
             watching.static_abilities,
             [
-                abilities::Static {
+                abilities::Continuous {
                     filter: CREATURE.controlled_by(YOU).nontoken(),
                     change: effects::Change::Characteristic(effects::Layered::ModifyPT {
                         power: 1,
                         toughness: 1,
                     }),
                 },
-                abilities::Static {
+                abilities::Continuous {
                     filter: CREATURE.controlled_by(YOU).nontoken(),
                     change: effects::Change::Characteristic(effects::Layered::GainKeyword(
-                        keywords::Keyword::Vigilance,
+                        keywords::StaticKeyword::Vigilance,
                     )),
                 },
             ]

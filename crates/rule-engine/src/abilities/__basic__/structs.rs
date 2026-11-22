@@ -9,7 +9,7 @@ pub struct TriggeredAbility {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct Static {
+pub struct Continuous {
     pub filter: effects::Filter,
     pub change: effects::Change,
 }

@@ -20,9 +20,9 @@ pub struct CardDefinition {
     pub power_toughness: Option<cards::PowerToughness>,
     pub effect: Option<effects::Effect>,
     pub aura: Option<effects::Effect>,
-    pub keywords: Vec<keywords::Keyword>,
+    pub keywords: Vec<keywords::StaticKeyword>,
     pub triggered_abilities: Vec<abilities::TriggeredAbility>,
-    pub static_abilities: Vec<abilities::Static>,
+    pub static_abilities: Vec<abilities::Continuous>,
     pub does_enter_tapped: bool,
 }
 
@@ -89,7 +89,7 @@ impl CardDefinition {
     }
 
     #[must_use]
-    pub fn keyword(mut self, keyword: keywords::Keyword) -> Self {
+    pub fn keyword(mut self, keyword: keywords::StaticKeyword) -> Self {
         self.keywords.push(keyword);
         self
     }
@@ -145,7 +145,7 @@ mod tests {
         assert_eq!(bears.colors(), vec![cards::Color::Green]);
         let myr = cards::artifact_creature("Darksteel Myr", cost![3], pt!(0, 1))
             .keyword(keywords::indestructible());
-        assert_eq!(myr.keywords, vec![keywords::Keyword::Indestructible]);
+        assert_eq!(myr.keywords, vec![keywords::StaticKeyword::Indestructible]);
         let spell = cards::instant("Murder", cards::Cost::default()).spell(effects::destroy());
         assert_eq!(spell.effect, Some(effects::destroy()));
     }
@@ -157,13 +157,16 @@ mod tests {
             keywords::vigilance(),
             statics::all(CREATURE).gain(keywords::vigilance()),
         };
-        assert_eq!(definition.keywords, vec![keywords::Keyword::Vigilance]);
+        assert_eq!(
+            definition.keywords,
+            vec![keywords::StaticKeyword::Vigilance]
+        );
         assert_eq!(definition.triggered_abilities, Vec::new());
         assert_eq!(definition.static_abilities.len(), 1);
         assert_eq!(
             definition.static_abilities[0].change,
             effects::Change::Characteristic(effects::Layered::GainKeyword(
-                keywords::Keyword::Vigilance
+                keywords::StaticKeyword::Vigilance
             ))
         );
     }

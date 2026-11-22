@@ -37,7 +37,7 @@ mod tests {
         assert_eq!(fervor.colors(), vec![cards::Color::Red]);
         assert_eq!(
             fervor.static_abilities,
-            [abilities::Static {
+            [abilities::Continuous {
                 filter: CREATURE.controlled_by(YOU),
                 change: effects::Change::Rule {
                     question: rules::Question::IgnoresSummoningSickness,

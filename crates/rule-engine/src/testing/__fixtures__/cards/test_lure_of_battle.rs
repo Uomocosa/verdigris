@@ -37,7 +37,7 @@ mod tests {
         assert_eq!(lure.colors(), vec![cards::Color::Green]);
         assert_eq!(
             lure.static_abilities,
-            [abilities::Static {
+            [abilities::Continuous {
                 filter: CREATURE.controlled_by(OPPONENT),
                 change: effects::Change::Rule {
                     question: rules::Question::MustBlock,

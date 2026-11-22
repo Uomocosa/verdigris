@@ -2,7 +2,7 @@
 mod basic;
 
 pub use basic::card_text::{at, when, when_this_dies, whenever};
-pub use basic::structs::{Static, TriggeredAbility};
+pub use basic::structs::{Continuous, TriggeredAbility};
 
 mod ability;
 pub use ability::Ability;

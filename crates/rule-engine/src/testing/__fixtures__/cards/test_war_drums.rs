@@ -38,10 +38,10 @@ mod tests {
         assert_eq!(drums.colors(), vec![cards::Color::Red]);
         assert_eq!(
             drums.static_abilities,
-            [abilities::Static {
+            [abilities::Continuous {
                 filter: CREATURE.controlled_by(YOU),
                 change: effects::Change::Characteristic(effects::Layered::GainKeyword(
-                    keywords::Keyword::MustAttackIfAble,
+                    keywords::StaticKeyword::MustAttackIfAble,
                 )),
             }]
         );

@@ -50,8 +50,8 @@ mod tests {
         assert_eq!(
             feast.keywords,
             vec![
-                keywords::Keyword::Flying,
-                keywords::Keyword::MustAttackIfAble
+                keywords::StaticKeyword::Flying,
+                keywords::StaticKeyword::MustAttackIfAble
             ]
         );
         assert_eq!(

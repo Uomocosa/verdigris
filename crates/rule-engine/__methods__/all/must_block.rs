@@ -3,8 +3,8 @@ use crate::effects;
 use crate::rules;
 use crate::statics;
 
-pub fn must_block(all: statics::All) -> abilities::Static {
-    abilities::Static {
+pub fn must_block(all: statics::All) -> abilities::Continuous {
+    abilities::Continuous {
         filter: *all,
         change: effects::Change::Rule {
             question: rules::Question::MustBlock,

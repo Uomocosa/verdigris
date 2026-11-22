@@ -3,8 +3,8 @@ use crate::effects;
 use crate::rules;
 use crate::statics;
 
-pub fn attack_as_though_it_had_haste(all: statics::All) -> abilities::Static {
-    abilities::Static {
+pub fn attack_as_though_it_had_haste(all: statics::All) -> abilities::Continuous {
+    abilities::Continuous {
         filter: *all,
         change: effects::Change::Rule {
             question: rules::Question::IgnoresSummoningSickness,

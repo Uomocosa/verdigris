@@ -22,7 +22,7 @@ pub enum EffectKind {
         power: i32,
         toughness: i32,
     },
-    GainKeyword(keywords::Keyword),
+    GainKeyword(keywords::StaticKeyword),
     WinTheGame,
 }
 
@@ -40,8 +40,8 @@ pub enum FilterKind {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Layered {
     ModifyPT { power: i32, toughness: i32 },
-    GainKeyword(keywords::Keyword),
-    LoseKeyword(keywords::Keyword),
+    GainKeyword(keywords::StaticKeyword),
+    LoseKeyword(keywords::StaticKeyword),
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

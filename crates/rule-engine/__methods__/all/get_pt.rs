@@ -2,8 +2,8 @@ use crate::abilities;
 use crate::effects;
 use crate::statics;
 
-pub fn get_pt(all: statics::All, power: i32, toughness: i32) -> abilities::Static {
-    abilities::Static {
+pub fn get_pt(all: statics::All, power: i32, toughness: i32) -> abilities::Continuous {
+    abilities::Continuous {
         filter: *all,
         change: effects::Change::Characteristic(effects::Layered::ModifyPT { power, toughness }),
     }

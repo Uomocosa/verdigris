@@ -37,7 +37,7 @@ mod tests {
         assert_eq!(cover.colors(), vec![cards::Color::White]);
         assert_eq!(
             cover.static_abilities,
-            [abilities::Static {
+            [abilities::Continuous {
                 filter: CREATURE.controlled_by(YOU).attacking(),
                 change: effects::Change::Rule {
                     question: rules::Question::TapsWhenAttacking,

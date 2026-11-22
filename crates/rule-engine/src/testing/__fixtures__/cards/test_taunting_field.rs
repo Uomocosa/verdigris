@@ -38,10 +38,10 @@ mod tests {
         assert_eq!(field.colors(), vec![cards::Color::Green]);
         assert_eq!(
             field.static_abilities,
-            [abilities::Static {
+            [abilities::Continuous {
                 filter: CREATURE.controlled_by(OPPONENT),
                 change: effects::Change::Characteristic(effects::Layered::GainKeyword(
-                    keywords::Keyword::MustBlockIfAble,
+                    keywords::StaticKeyword::MustBlockIfAble,
                 )),
             }]
         );

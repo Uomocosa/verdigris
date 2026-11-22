@@ -88,7 +88,7 @@ pub fn r508_1a_r508_1k_declare_attackers(
                     && !answers
                         .characteristics(*attacker)
                         .keywords
-                        .contains(&keywords::Keyword::Defender)
+                        .contains(&keywords::StaticKeyword::Defender)
                     && (answers.ask::<rules::IgnoresSummoningSickness>(*attacker)
                         || entered_on.get(*attacker).is_ok_and(|on_turn| {
                             on_turn.is_none_or(|turn_number| **turn_number != turn.number)
@@ -101,7 +101,10 @@ pub fn r508_1a_r508_1k_declare_attackers(
                 && definition.type_line.types.contains(&cards::CardType::Creature)
                 && answers.ask::<rules::MustAttack>(entity)
                 && tapped.is_none()
-                && !answers.characteristics(entity).keywords.contains(&keywords::Keyword::Defender)
+                && !answers
+                    .characteristics(entity)
+                    .keywords
+                    .contains(&keywords::StaticKeyword::Defender)
                 && (answers.ask::<rules::IgnoresSummoningSickness>(entity)
                     || entered_on.get(entity).is_ok_and(|on_turn| {
                         on_turn.is_none_or(|turn_number| **turn_number != turn.number)
@@ -369,7 +372,7 @@ mod tests {
                     !answers
                         .characteristics(corpse.into())
                         .keywords
-                        .contains(&keywords::Keyword::Haste)
+                        .contains(&keywords::StaticKeyword::Haste)
                 );
             })
             .unwrap();
@@ -431,7 +434,7 @@ mod tests {
                     !answers
                         .characteristics(bears.into())
                         .keywords
-                        .contains(&keywords::Keyword::MustAttackIfAble)
+                        .contains(&keywords::StaticKeyword::MustAttackIfAble)
                 );
             })
             .unwrap();

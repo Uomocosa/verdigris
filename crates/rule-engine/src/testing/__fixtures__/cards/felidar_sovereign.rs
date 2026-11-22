@@ -47,7 +47,10 @@ mod tests {
         assert_eq!(sovereign.power_toughness, Some(pt!(4, 6)));
         assert_eq!(
             sovereign.keywords,
-            vec![keywords::Keyword::Vigilance, keywords::Keyword::Lifelink]
+            vec![
+                keywords::StaticKeyword::Vigilance,
+                keywords::StaticKeyword::Lifelink
+            ]
         );
         assert_eq!(
             sovereign.triggered_abilities,

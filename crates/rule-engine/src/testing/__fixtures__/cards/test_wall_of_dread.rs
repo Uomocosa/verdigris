@@ -38,10 +38,10 @@ mod tests {
         assert_eq!(dread.colors(), vec![cards::Color::Black]);
         assert_eq!(
             dread.static_abilities,
-            [abilities::Static {
+            [abilities::Continuous {
                 filter: CREATURE.controlled_by(OPPONENT),
                 change: effects::Change::Characteristic(effects::Layered::LoseKeyword(
-                    keywords::Keyword::Defender,
+                    keywords::StaticKeyword::Defender,
                 )),
             }]
         );

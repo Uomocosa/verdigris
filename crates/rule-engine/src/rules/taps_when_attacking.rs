@@ -9,7 +9,7 @@ pub struct TapsWhenAttacking;
 impl rules::traits::rule_question::RuleQuestion for TapsWhenAttacking {
     type Answer = bool;
     const QUESTION: rules::Question = rules::Question::TapsWhenAttacking;
-    fn default(characteristics: &cards::Characteristics) -> bool { !characteristics.keywords.contains(&keywords::Keyword::Vigilance) }
+    fn default(characteristics: &cards::Characteristics) -> bool { !characteristics.keywords.contains(&keywords::StaticKeyword::Vigilance) }
     fn into_answer(answer: bool) -> rules::Answer { rules::Answer::TapsWhenAttacking(answer) }
     fn from_answer(answer: rules::Answer) -> Option<bool> { answer.taps_when_attacking() }
 }
@@ -29,7 +29,7 @@ mod tests {
         let bears_characteristics = cards::Characteristics::from_printed(&bears, true);
         assert!(rules::TapsWhenAttacking::default(&bears_characteristics));
         let vigilant = cards::Characteristics {
-            keywords: vec![keywords::Keyword::Vigilance],
+            keywords: vec![keywords::StaticKeyword::Vigilance],
             ..bears_characteristics
         };
         assert!(!rules::TapsWhenAttacking::default(&vigilant));

@@ -110,7 +110,7 @@ pub const fn gets(power: i32, toughness: i32) -> effects::Effect {
 }
 
 #[must_use]
-pub const fn gains(keyword: keywords::Keyword) -> effects::Effect {
+pub const fn gains(keyword: keywords::StaticKeyword) -> effects::Effect {
     effects::Effect {
         kind: effects::EffectKind::GainKeyword(keyword),
         follow_ups: [None; 4],

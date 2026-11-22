@@ -31,6 +31,6 @@ mod tests {
         assert_eq!(companion.type_line.types, vec![cards::CardType::Creature]);
         assert_eq!(companion.cost, cost![G, G]);
         assert_eq!(companion.power_toughness, Some(pt!(3, 2)));
-        assert_eq!(companion.keywords, vec![keywords::Keyword::Trample]);
+        assert_eq!(companion.keywords, vec![keywords::StaticKeyword::Trample]);
     }
 }
