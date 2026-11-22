@@ -5,8 +5,7 @@ use crate::effects;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Effect {
     pub kind: effects::EffectKind,
-    pub then: Option<effects::EffectKind>,
-    pub finally: Option<effects::EffectKind>,
+    pub follow_ups: [Option<effects::EffectKind>; 4],
     pub target: Option<effects::Target>,
 }
 
@@ -21,13 +20,46 @@ impl Effect {
 
 impl Effect {
     #[must_use]
-    pub const fn and(mut self, next: Self) -> Self {
-        if self.then.is_none() {
-            self.then = Some(next.kind);
-        } else {
-            self.finally = Some(next.kind);
+    pub const fn and(self, next: Self) -> Self {
+        let Self {
+            kind,
+            follow_ups,
+            target,
+        } = self;
+        match follow_ups {
+            [None, second, third, fourth] => Self {
+                kind,
+                follow_ups: [Some(next.kind), second, third, fourth],
+                target,
+            },
+            [first, None, third, fourth] => Self {
+                kind,
+                follow_ups: [first, Some(next.kind), third, fourth],
+                target,
+            },
+            [first, second, None, fourth] => Self {
+                kind,
+                follow_ups: [first, second, Some(next.kind), fourth],
+                target,
+            },
+            [first, second, third, None] => Self {
+                kind,
+                follow_ups: [first, second, third, Some(next.kind)],
+                target,
+            },
+            _ => {
+                Self::assert_chain_has_room(self);
+                self
+            }
         }
-        self
+    }
+
+    pub(crate) const fn assert_chain_has_room(self) {
+        let is_full = matches!(self.follow_ups, [Some(_), Some(_), Some(_), Some(_)]);
+        assert!(
+            !is_full,
+            "an Effect chain holds at most 4 follow-up effects"
+        );
     }
 }
 
@@ -43,8 +75,25 @@ mod tests {
         assert_eq!(effect.target, Some(effects::target(1, ANY_TARGET)));
         let sequence = effects::draw(2).and(effects::lose_life(2));
         assert_eq!(sequence.kind, effects::EffectKind::Draw(2));
-        assert_eq!(sequence.then, Some(effects::EffectKind::LoseLife(2)));
+        assert_eq!(
+            sequence.follow_ups[0],
+            Some(effects::EffectKind::LoseLife(2))
+        );
         let longer = sequence.and(effects::poison(3));
-        assert_eq!(longer.finally, Some(effects::EffectKind::Poison(3)));
+        assert_eq!(longer.follow_ups[1], Some(effects::EffectKind::Poison(3)));
+        let full = longer.and(effects::gain_life(1)).and(effects::discard(1));
+        assert_eq!(full.follow_ups[2], Some(effects::EffectKind::GainLife(1)));
+        assert_eq!(full.follow_ups[3], Some(effects::EffectKind::Discard(1)));
+    }
+
+    #[test]
+    #[should_panic(expected = "an Effect chain holds at most 4 follow-up effects")]
+    fn a_fifth_follow_up_overflows_the_chain() {
+        let _ = effects::draw(1)
+            .and(effects::lose_life(1))
+            .and(effects::gain_life(1))
+            .and(effects::mills(1))
+            .and(effects::discard(1))
+            .and(effects::poison(1));
     }
 }

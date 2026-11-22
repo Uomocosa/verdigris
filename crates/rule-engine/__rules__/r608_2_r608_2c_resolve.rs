@@ -59,7 +59,7 @@ pub fn r608_2_r608_2c_resolve(
         let target_on_battlefield =
             target_zone.is_some_and(|zone| zones.contains(BATTLEFIELD, **zone));
         let target_on_stack = target_zone.is_some_and(|zone| zones.contains(STACK, **zone));
-        for kind in [Some(effect.kind), effect.then, effect.finally].into_iter().flatten() {
+        for kind in std::iter::once(effect.kind).chain(effect.follow_ups.into_iter().flatten()) {
             match kind {
                 effects::EffectKind::Damage(amount) => {
                     request_damage(&mut damage_dealt, &lookups, spell, chosen_target, amount);
