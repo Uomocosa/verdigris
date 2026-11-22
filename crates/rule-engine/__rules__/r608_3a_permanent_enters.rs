@@ -52,13 +52,11 @@ pub fn r608_3a_permanent_enters(
         if !is_permanent {
             continue;
         }
-        if let Some(aura) = definition.aura
-            && let Some(requirement) = aura.target
-        {
+        if let Some(enchant_filter) = definition.enchant() {
             let is_legal = chosen.is_some_and(|chosen| {
                 let target = **chosen;
                 let still_matches = cards.get(target).is_ok_and(|(definition, _, _, _)| {
-                    requirement.filter.does_creature_match(definition)
+                    enchant_filter.does_creature_match(definition)
                 });
                 still_matches && battlefield.contains(target)
             });
@@ -67,6 +65,9 @@ pub fn r608_3a_permanent_enters(
                     commands.entity(spell).insert(zones::InZone(graveyard));
                 }
                 continue;
+            }
+            if let Some(chosen) = chosen {
+                commands.entity(spell).insert(cards::Enchanting(**chosen));
             }
         }
         if let Some(battlefield) = zones.find(BATTLEFIELD, Some(**owner)) {

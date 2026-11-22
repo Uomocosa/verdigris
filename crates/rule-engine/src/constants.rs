@@ -41,7 +41,7 @@ pub const CREATURE: effects::Filter = effects::Filter {
     excluded_color: None,
     attacking: false,
     nontoken: false,
-    is_this_object: false,
+    object: None,
 };
 pub const ANY_TARGET: effects::Filter = effects::Filter {
     kind: effects::FilterKind::AnyTarget,
@@ -49,7 +49,7 @@ pub const ANY_TARGET: effects::Filter = effects::Filter {
     excluded_color: None,
     attacking: false,
     nontoken: false,
-    is_this_object: false,
+    object: None,
 };
 pub const PLAYER: effects::Filter = effects::Filter {
     kind: effects::FilterKind::Player,
@@ -57,7 +57,7 @@ pub const PLAYER: effects::Filter = effects::Filter {
     excluded_color: None,
     attacking: false,
     nontoken: false,
-    is_this_object: false,
+    object: None,
 };
 
 /// 115.5 A spell or ability on the stack is an illegal target for itself.
@@ -71,7 +71,7 @@ pub const SPELL: effects::Filter = effects::Filter {
     excluded_color: None,
     attacking: false,
     nontoken: false,
-    is_this_object: false,
+    object: None,
 };
 pub const CREATURE_SPELL: effects::Filter = effects::Filter {
     kind: effects::FilterKind::CreatureSpell,
@@ -79,7 +79,7 @@ pub const CREATURE_SPELL: effects::Filter = effects::Filter {
     excluded_color: None,
     attacking: false,
     nontoken: false,
-    is_this_object: false,
+    object: None,
 };
 pub const NONCREATURE_SPELL: effects::Filter = effects::Filter {
     kind: effects::FilterKind::NoncreatureSpell,
@@ -87,7 +87,7 @@ pub const NONCREATURE_SPELL: effects::Filter = effects::Filter {
     excluded_color: None,
     attacking: false,
     nontoken: false,
-    is_this_object: false,
+    object: None,
 };
 pub const INSTANT_SPELL: effects::Filter = effects::Filter {
     kind: effects::FilterKind::InstantSpell,
@@ -95,7 +95,7 @@ pub const INSTANT_SPELL: effects::Filter = effects::Filter {
     excluded_color: None,
     attacking: false,
     nontoken: false,
-    is_this_object: false,
+    object: None,
 };
 
 /// 105.1 There are five colors in the Magic game: white, blue, black, red, and green.
@@ -106,5 +106,5 @@ pub const NONBLACK_CREATURE: effects::Filter = effects::Filter {
     excluded_color: Some(cards::Color::Black),
     attacking: false,
     nontoken: false,
-    is_this_object: false,
+    object: None,
 };

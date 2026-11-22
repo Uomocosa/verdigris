@@ -15,7 +15,19 @@ pub const fn this() -> statics::All {
         excluded_color: None,
         attacking: false,
         nontoken: false,
-        is_this_object: true,
+        object: Some(effects::ObjectRelation::ThisObject),
+    })
+}
+
+#[must_use]
+pub const fn enchanted() -> statics::All {
+    statics::All(effects::Filter {
+        kind: effects::FilterKind::Creature,
+        controlled_by: None,
+        excluded_color: None,
+        attacking: false,
+        nontoken: false,
+        object: Some(effects::ObjectRelation::EnchantedObject),
     })
 }
 

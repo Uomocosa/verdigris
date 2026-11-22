@@ -58,7 +58,7 @@ mod tests {
             feast.continuous_abilities().copied().collect::<Vec<_>>(),
             [abilities::Continuous {
                 filter: effects::Filter {
-                    is_this_object: true,
+                    object: Some(effects::ObjectRelation::ThisObject),
                     ..CREATURE
                 },
                 change: effects::Change::Rule {

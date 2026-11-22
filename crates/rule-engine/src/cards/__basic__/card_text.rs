@@ -15,7 +15,6 @@ pub fn creature(
         },
         power_toughness: Some(power_toughness),
         text: Vec::new(),
-        aura: None,
     }
 }
 
@@ -34,7 +33,6 @@ pub fn artifact_creature(
         },
         power_toughness: Some(power_toughness),
         text: Vec::new(),
-        aura: None,
     }
 }
 
@@ -49,7 +47,6 @@ pub fn instant(name: impl Into<cards::CardName>, cost: cards::Cost) -> cards::Ca
         },
         power_toughness: None,
         text: Vec::new(),
-        aura: None,
     }
 }
 
@@ -64,7 +61,6 @@ pub fn sorcery(name: impl Into<cards::CardName>, cost: cards::Cost) -> cards::Ca
         },
         power_toughness: None,
         text: Vec::new(),
-        aura: None,
     }
 }
 
@@ -82,6 +78,5 @@ pub fn land(
         },
         power_toughness: None,
         text: Vec::new(),
-        aura: None,
     }
 }

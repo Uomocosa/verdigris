@@ -1,4 +1,10 @@
+use crate::effects;
 use crate::keywords;
+
+#[must_use]
+pub const fn enchant(filter: effects::Filter) -> keywords::StaticKeyword {
+    keywords::StaticKeyword::Enchant(filter)
+}
 
 #[must_use]
 pub const fn indestructible() -> keywords::StaticKeyword {

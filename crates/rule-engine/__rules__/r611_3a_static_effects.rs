@@ -6,6 +6,18 @@ use crate::effects;
 use crate::turns;
 use crate::zones;
 
+type StaticSources<'w, 's, 'definition, 'owner, 'zone, 'enchanting> = Query<
+    'w,
+    's,
+    (
+        Entity,
+        &'definition cards::CardDefinition,
+        &'owner cards::Owner,
+        &'zone zones::InZone,
+        Option<&'enchanting cards::Enchanting>,
+    ),
+>;
+
 type StaticCandidates<'w, 's, 'definition, 'owner, 'zone, 'attacking, 'token> = Query<
     'w,
     's,
@@ -28,12 +40,7 @@ type StaticCandidates<'w, 's, 'definition, 'owner, 'zone, 'attacking, 'token> = 
 /// 611.3b The effect applies at all times that the permanent generating it is on the battlefield or the object generating it is in the appropriate zone.
 pub fn r611_3a_static_effects(
     mut commands: Commands,
-    sources: Query<(
-        Entity,
-        &cards::CardDefinition,
-        &cards::Owner,
-        &zones::InZone,
-    )>,
+    sources: StaticSources<'_, '_, '_, '_, '_, '_>,
     candidates: StaticCandidates<'_, '_, '_, '_, '_, '_, '_>,
     stamped: Query<&effects::SourceTimestamp>,
     applied: Query<(Entity, &effects::ContinuousEffect)>,
@@ -49,10 +56,12 @@ pub fn r611_3a_static_effects(
         let Some(source) = effect.source else {
             continue;
         };
-        let Ok((_, source_definition, source_owner, source_zone)) = sources.get(source) else {
+        let Ok((_, source_definition, source_owner, source_zone, enchanting)) = sources.get(source)
+        else {
             commands.entity(entity).despawn();
             continue;
         };
+        let enchanted = enchanting.map(|entity| **entity);
         if !zones.contains(BATTLEFIELD, **source_zone) {
             commands.entity(entity).despawn();
             continue;
@@ -65,7 +74,9 @@ pub fn r611_3a_static_effects(
                         zones.contains(BATTLEFIELD, **zone)
                             && candidate_matches(
                                 ability.filter,
-                                effect.affected == source,
+                                source,
+                                effect.affected,
+                                enchanted,
                                 **source_owner,
                                 **owner,
                                 attacking.is_some(),
@@ -80,21 +91,15 @@ pub fn r611_3a_static_effects(
             commands.entity(entity).despawn();
         }
     }
-    for (source, definition, owner, in_zone) in sources.iter() {
+    for (source, definition, owner, in_zone, enchanting) in sources.iter() {
+        let enchanted = enchanting.map(|entity| **entity);
         if definition.continuous_abilities().next().is_none() {
             continue;
         }
         if !zones.contains(BATTLEFIELD, **in_zone) {
             continue;
         }
-        let stamp = stamped.get(source).map_or_else(
-            |_| {
-                let next = timestamp.advance();
-                commands.entity(source).insert(effects::SourceTimestamp(next));
-                next
-            },
-            |existing| **existing,
-        );
+        let stamp = stamp_for(source, &mut commands, &stamped, &mut timestamp);
         for ability in definition.continuous_abilities() {
             if ability.filter.kind != effects::FilterKind::Creature {
                 continue;
@@ -113,7 +118,9 @@ pub fn r611_3a_static_effects(
                 }
                 if !candidate_matches(
                     ability.filter,
-                    candidate == source,
+                    source,
+                    candidate,
+                    enchanted,
                     **owner,
                     **candidate_owner,
                     attacking.is_some(),
@@ -138,9 +145,27 @@ pub fn r611_3a_static_effects(
     }
 }
 
+fn stamp_for(
+    source: Entity,
+    commands: &mut Commands,
+    stamped: &Query<&effects::SourceTimestamp>,
+    timestamp: &mut ResMut<effects::Timestamp>,
+) -> u64 {
+    stamped.get(source).map_or_else(
+        |_| {
+            let next = timestamp.advance();
+            commands.entity(source).insert(effects::SourceTimestamp(next));
+            next
+        },
+        |existing| **existing,
+    )
+}
+
 fn candidate_matches(
     filter: effects::Filter,
-    is_source: bool,
+    source: Entity,
+    candidate: Entity,
+    enchanted: Option<Entity>,
     controller: Entity,
     candidate_owner: Entity,
     is_attacking: bool,
@@ -148,8 +173,12 @@ fn candidate_matches(
     definition: &cards::CardDefinition,
     players: &[Entity],
 ) -> bool {
-    if filter.is_this_object && !is_source {
-        return false;
+    match filter.object {
+        Some(effects::ObjectRelation::ThisObject) if candidate != source => return false,
+        Some(effects::ObjectRelation::EnchantedObject) if enchanted != Some(candidate) => {
+            return false;
+        }
+        _ => {}
     }
     if let Some(controller_ref) = filter.controlled_by
         && !controller_ref.resolve(controller, players).contains(&candidate_owner)
@@ -256,6 +285,22 @@ mod tests {
                 assert!(!answers.ask::<rules::MustBlock>(bears.into()));
             })
             .unwrap();
+        Ok(())
+    }
+
+    #[test]
+    fn enchanted_creature_gets_holy_strengths_power_and_toughness_bonus() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.hand([HOLY_STRENGTH]).mana_pool(mana![W]),
+            P2.battlefield([GRIZZLY_BEARS]),
+        ]);
+        let [strength] = game.player(p1).cards_in(HAND).exactly::<1>(HOLY_STRENGTH)?;
+        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        game.play([
+            p1.cast(strength).targeting(bears).pass_priority(),
+            p2.pass_priority(),
+        ])?;
+        assert_eq!(game.pt(bears), Some(crate::pt!(3, 4)));
         Ok(())
     }
 

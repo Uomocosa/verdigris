@@ -19,7 +19,6 @@ pub struct CardDefinition {
     pub type_line: cards::TypeLine,
     pub power_toughness: Option<cards::PowerToughness>,
     pub text: Vec<abilities::Ability>,
-    pub aura: Option<effects::Effect>,
 }
 
 impl CardDefinition {
@@ -35,7 +34,6 @@ impl CardDefinition {
             },
             power_toughness: None,
             text: Vec::new(),
-            aura: None,
         }
     }
 }
@@ -71,6 +69,9 @@ impl CardDefinition {
 
     #[must_use]
     pub fn enters_tapped(&self) -> bool {}
+
+    #[must_use]
+    pub fn enchant(&self) -> Option<effects::Filter> {}
 }
 
 #[rustfmt::skip]
@@ -90,12 +91,6 @@ impl CardDefinition {
 
 impl CardDefinition {
     #[must_use]
-    pub const fn aura(mut self, effect: effects::Effect) -> Self {
-        self.aura = Some(effect);
-        self
-    }
-
-    #[must_use]
     pub fn keyword(mut self, keyword: keywords::StaticKeyword) -> Self {
         self.text.push(abilities::Ability::from(keyword));
         self
@@ -104,6 +99,12 @@ impl CardDefinition {
     #[must_use]
     pub fn supertype(mut self, supertype: cards::Supertype) -> Self {
         self.type_line.supertypes.push(supertype);
+        self
+    }
+
+    #[must_use]
+    pub fn subtype(mut self, subtype: cards::Subtype) -> Self {
+        self.type_line.subtypes.push(subtype);
         self
     }
 

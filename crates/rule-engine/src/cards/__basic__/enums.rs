@@ -1,4 +1,9 @@
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum EnchantmentType {
+    Aura,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum CardType {
     Creature,
     Instant,

@@ -38,6 +38,12 @@ pub enum FilterKind {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum ObjectRelation {
+    ThisObject,
+    EnchantedObject,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Layered {
     ModifyPT { power: i32, toughness: i32 },
     GainKeyword(keywords::StaticKeyword),

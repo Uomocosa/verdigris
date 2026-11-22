@@ -50,7 +50,7 @@ mod tests {
             [
                 abilities::Continuous {
                     filter: effects::Filter {
-                        is_this_object: true,
+                        object: Some(effects::ObjectRelation::ThisObject),
                         ..CREATURE
                     },
                     change: effects::Change::Rule {
@@ -60,7 +60,7 @@ mod tests {
                 },
                 abilities::Continuous {
                     filter: effects::Filter {
-                        is_this_object: true,
+                        object: Some(effects::ObjectRelation::ThisObject),
                         ..CREATURE
                     },
                     change: effects::Change::Rule {

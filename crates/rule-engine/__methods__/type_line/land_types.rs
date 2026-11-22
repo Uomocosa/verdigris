@@ -1,8 +1,9 @@
 use crate::cards;
 
 pub fn land_types(type_line: &cards::TypeLine) -> impl Iterator<Item = cards::LandType> + '_ {
-    type_line.subtypes.iter().map(|subtype| match subtype {
-        cards::Subtype::Land(land_type) => *land_type,
+    type_line.subtypes.iter().filter_map(|subtype| match subtype {
+        cards::Subtype::Land(land_type) => Some(*land_type),
+        cards::Subtype::Enchantment(_) => None,
     })
 }
 

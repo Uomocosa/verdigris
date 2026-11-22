@@ -63,7 +63,7 @@ pub fn r601_2c_targets(
                 let target = definition
                     .spell_ability()
                     .and_then(|effect| effect.target)
-                    .or_else(|| definition.aura.and_then(|aura| aura.target));
+                    .or_else(|| definition.enchant().map(|filter| effects::target(1, filter)));
                 let Some(target) = target else {
                     commands.entity(spell).insert(stack::CastingStage::AwaitingPayment);
                     continue;

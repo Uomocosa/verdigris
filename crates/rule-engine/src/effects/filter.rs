@@ -3,14 +3,14 @@ use atomic_delegate_macros::atomic_delegates;
 use crate::cards;
 use crate::effects;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Filter {
     pub kind: effects::FilterKind,
     pub controlled_by: Option<effects::PlayerRef>,
     pub excluded_color: Option<cards::Color>,
     pub attacking: bool,
     pub nontoken: bool,
-    pub is_this_object: bool,
+    pub object: Option<effects::ObjectRelation>,
 }
 
 #[atomic_delegates]

@@ -6,7 +6,7 @@ pub use basic::card_text::{
     mills, poison, target, win_the_game,
 };
 pub use basic::components::ContinuousEffect;
-pub use basic::enums::{Change, Duration, EffectKind, FilterKind, Layered};
+pub use basic::enums::{Change, Duration, EffectKind, FilterKind, Layered, ObjectRelation};
 pub use basic::messages::{KeywordGranted, MillRequested, PowerToughnessModified, TokensRequested};
 
 mod token_definition;
