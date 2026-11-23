@@ -53,7 +53,7 @@ mod tests {
     }
 
     #[test]
-    fn keywords_grant_their_changes() -> TestResult {
+    fn reach_grants_no_keyword_change() -> TestResult {
         let (mut game, [_, p2]) = MockGame::new([P1, P2.battlefield([GIANT_SPIDER])]);
         let [spider] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GIANT_SPIDER)?;
         game.pass_priority();
@@ -61,7 +61,7 @@ mod tests {
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
                 assert!(
-                    mods(&answers, *spider)
+                    !mods(&answers, *spider)
                         .contains(&effects::Change::Waive(rules::declare_blocker::FLYING.key))
                 );
             })

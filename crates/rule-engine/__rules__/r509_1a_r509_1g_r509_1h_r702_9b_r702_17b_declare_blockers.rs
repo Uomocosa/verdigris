@@ -1,11 +1,9 @@
-use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query, Res};
+use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query, Res, With};
 
-use crate::BATTLEFIELD;
 use crate::actions;
 use crate::cards;
 use crate::rules;
 use crate::turns;
-use crate::zones;
 
 /// 509.1a The defending player chooses which creatures they control, if any, will block. The chosen
 /// creatures must be untapped and they can’t also be battles. For each of the chosen creatures, the
@@ -47,15 +45,9 @@ pub fn r509_1a_r509_1g_r509_1h_r702_9b_r702_17b_declare_blockers(
     mut commands: Commands,
     priority: Res<turns::Priority>,
     turn: Res<turns::Turn>,
-    cards: Query<(
-        Entity,
-        &cards::CardDefinition,
-        &cards::Owner,
-        &zones::InZone,
-    )>,
+    blockers: Query<(Entity, &cards::Owner), With<cards::Creature>>,
     attacking: Query<(Entity, &cards::Attacking)>,
     answers: rules::Rules,
-    zones: zones::ZoneLookup,
 ) {
     let priority = priority.into_inner();
     let turn = turn.into_inner();
@@ -72,32 +64,16 @@ pub fn r509_1a_r509_1g_r509_1h_r702_9b_r702_17b_declare_blockers(
             });
             continue;
         }
-        let Some(battlefield) = zones.find(BATTLEFIELD, Some(action.player)) else {
-            rejected.write(actions::Rejected::CannotBlock {
-                assignments: assignments.clone(),
-            });
-            continue;
-        };
         let all_legal = assignments.iter().all(|assignment| {
-            let blocker_ok =
-                cards.get(assignment.blocker).is_ok_and(|(_, definition, owner, in_zone)| {
-                    definition.type_line.types.contains(&cards::CardType::Creature)
-                        && **owner == action.player
-                        && **in_zone == battlefield
-                });
-            let attacker_ok = attacking.get(assignment.attacker).is_ok();
-            blocker_ok
-                && attacker_ok
+            attacking.get(assignment.attacker).is_ok()
                 && answers.legal::<rules::DeclareBlocker>(&rules::BlockCtx {
                     blocker: assignment.blocker,
                     attacker: assignment.attacker,
                     player: action.player,
                 })
         });
-        let requirement_unmet = cards.iter().any(|(entity, definition, owner, in_zone)| {
+        let requirement_unmet = blockers.iter().any(|(entity, owner)| {
             **owner == action.player
-                && **in_zone == battlefield
-                && definition.type_line.types.contains(&cards::CardType::Creature)
                 && answers.demanded::<rules::DeclareBlocker>(entity)
                 && !assignments.iter().any(|assignment| assignment.blocker == entity)
                 && attacking.iter().any(|(attacker, _)| {
@@ -554,6 +530,63 @@ mod tests {
 
         game.play([p2.declare_blockers([(bears, rats)])])?;
         assert!(game.is_blocking(bears));
+        Ok(())
+    }
+
+    #[test]
+    fn an_attacker_that_waives_flying_can_be_blocked_by_a_non_flier() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.battlefield([TEST_LOW_SKIMMER]),
+            P2.battlefield([GRIZZLY_BEARS]),
+        ]);
+        let [skimmer] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TEST_LOW_SKIMMER)?;
+        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareAttackers),
+            p2.pass_to(turns::Step::DeclareAttackers),
+            p1.declare_attackers([skimmer]),
+        ])?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareBlockers),
+            p2.pass_to(turns::Step::DeclareBlockers),
+            p1.pass_priority(),
+            p2.declare_blockers([(bears, skimmer)]),
+        ])?;
+
+        assert!(game.is_blocking(bears));
+        Ok(())
+    }
+
+    #[test]
+    fn a_creature_controlled_by_the_attacker_cannot_block() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.battlefield([TYPHOID_RATS, GRIZZLY_BEARS]),
+            P2.battlefield([GRIZZLY_BEARS]),
+        ]);
+        let [rats] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TYPHOID_RATS)?;
+        let [bears_1] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareAttackers),
+            p2.pass_to(turns::Step::DeclareAttackers),
+            p1.declare_attackers([rats]),
+        ])?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareBlockers),
+            p2.pass_to(turns::Step::DeclareBlockers),
+        ])?;
+        game.play([p1.pass_priority()])?;
+        let assignments = vec![actions::BlockAssignment {
+            blocker: bears_1.into(),
+            attacker: rats.into(),
+        }];
+
+        game.act(p2, actions::Action::DeclareBlockers(assignments.clone()));
+
+        assert_eq!(
+            game.last_rejection(),
+            Some(&actions::Rejected::CannotBlock { assignments })
+        );
+        assert!(!game.is_blocking(bears_1));
         Ok(())
     }
 }

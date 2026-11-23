@@ -3,6 +3,8 @@ use atomic_delegate_macros::atomic_delegate;
 use crate::rules;
 use crate::rules::traits::legality_rule::LegalityRule;
 
+pub const CREATURE: rules::ClauseId<rules::BlockCtx> = rules::ClauseId::new("509.1a/creature");
+pub const CONTROLS: rules::ClauseId<rules::BlockCtx> = rules::ClauseId::new("509.1a/controls");
 pub const UNTAPPED: rules::ClauseId<rules::BlockCtx> = rules::ClauseId::new("509.1a/untapped");
 pub const FLYING: rules::ClauseId<rules::BlockCtx> = rules::ClauseId::new("702.9b/flying");
 
@@ -26,6 +28,8 @@ mod tests {
     use crate::rules;
     use crate::rules::traits::legality_rule::LegalityRule;
 
+    use super::CONTROLS;
+    use super::CREATURE;
     use super::DeclareBlocker;
     use super::FLYING;
     use super::UNTAPPED;
@@ -34,16 +38,33 @@ mod tests {
     fn test_usage() {
         assert_eq!(DeclareBlocker::ID, rules::RuleId("509.1a"));
         let clauses = DeclareBlocker::clauses();
-        assert_eq!(clauses.len(), 2);
-        assert_eq!(clauses[0].key, UNTAPPED.key);
-        assert_eq!(clauses[0].text, "The chosen creatures must be untapped");
+        assert_eq!(clauses.len(), 4);
+        assert_eq!(clauses[0].key, CREATURE.key);
+        assert_eq!(
+            clauses[0].text,
+            "The defending player chooses which creatures they control"
+        );
         assert_eq!(clauses[0].role, rules::Role::Subject);
-        assert_eq!(clauses[0].requires, !rules::has::<cards::Tapped>());
-        assert_eq!(clauses[1].key, FLYING.key);
+        assert_eq!(clauses[0].requires, rules::has::<cards::Creature>());
+        assert_eq!(clauses[1].key, CONTROLS.key);
+        assert_eq!(clauses[1].text, "creatures they control");
         assert_eq!(clauses[1].role, rules::Role::Subject);
         assert_eq!(
             clauses[1].requires,
-            !rules::other(rules::has::<cards::Flying>()) | rules::has::<cards::Flying>()
+            rules::points_to::<cards::Owner>(rules::Role::Player)
+                & rules::has::<cards::OnBattlefield>()
+        );
+        assert_eq!(clauses[2].key, UNTAPPED.key);
+        assert_eq!(clauses[2].text, "The chosen creatures must be untapped");
+        assert_eq!(clauses[2].role, rules::Role::Subject);
+        assert_eq!(clauses[2].requires, !rules::has::<cards::Tapped>());
+        assert_eq!(clauses[3].key, FLYING.key);
+        assert_eq!(clauses[3].role, rules::Role::Other);
+        assert_eq!(
+            clauses[3].requires,
+            !rules::other(rules::has::<cards::Flying>())
+                | rules::has::<cards::Flying>()
+                | rules::has::<cards::Reach>()
         );
     }
 
