@@ -61,7 +61,8 @@ mod tests {
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
                 assert!(
-                    mods(&answers, *spider).contains(&effects::Change::Waive(rules::FLYING.key))
+                    mods(&answers, *spider)
+                        .contains(&effects::Change::Waive(rules::declare_blocker::FLYING.key))
                 );
             })
             .unwrap();

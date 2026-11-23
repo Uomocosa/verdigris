@@ -24,8 +24,10 @@ impl StaticKeyword {
     #[must_use]
     pub fn keyword_changes(self) -> Vec<effects::Change> {
         match self {
-            Self::Reach => vec![effects::Change::Waive(rules::FLYING.key)],
-            Self::Haste => vec![effects::Change::Waive(rules::SUMMONING_SICK.key)],
+            Self::Reach => vec![effects::Change::Waive(rules::declare_blocker::FLYING.key)],
+            Self::Haste => vec![effects::Change::Waive(
+                rules::declare_attacker::SUMMONING_SICK.key,
+            )],
             Self::Vigilance => vec![effects::Change::Skip(TAP_ATTACKERS)],
             _ => Vec::new(),
         }
@@ -45,11 +47,13 @@ mod tests {
     fn test_usage() {
         assert_eq!(
             StaticKeyword::Reach.keyword_changes(),
-            vec![effects::Change::Waive(rules::FLYING.key)]
+            vec![effects::Change::Waive(rules::declare_blocker::FLYING.key)]
         );
         assert_eq!(
             StaticKeyword::Haste.keyword_changes(),
-            vec![effects::Change::Waive(rules::SUMMONING_SICK.key)]
+            vec![effects::Change::Waive(
+                rules::declare_attacker::SUMMONING_SICK.key
+            )]
         );
         assert_eq!(
             keywords::StaticKeyword::Vigilance.keyword_changes(),

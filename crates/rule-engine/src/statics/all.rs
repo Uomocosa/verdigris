@@ -5,7 +5,6 @@ use crate::abilities;
 use crate::effects;
 use crate::keywords;
 use crate::rules;
-use crate::rules::traits::rule_question::RuleQuestion;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deref)]
 pub struct All(pub effects::Filter);
@@ -35,9 +34,6 @@ impl All {
 
     #[must_use]
     pub fn tap_when_attacking(self) -> abilities::Continuous {}
-
-    #[must_use]
-    pub fn rule<Q: RuleQuestion>(self, answer: Q::Answer) -> abilities::Continuous {}
 
     #[must_use]
     pub fn waive<Ctx>(self, clause: rules::ClauseId<Ctx>) -> abilities::Continuous {}

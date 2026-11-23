@@ -3,12 +3,12 @@ use crate::rules;
 
 pub fn legality_rule_clauses() -> Vec<rules::Clause> {
     vec![
-        rules::UNTAPPED.clause(
+        rules::declare_blocker::UNTAPPED.clause(
             "The chosen creatures must be untapped",
             rules::Role::Subject,
             !rules::has::<cards::Tapped>(),
         ),
-        rules::FLYING.clause(
+        rules::declare_blocker::FLYING.clause(
             "can’t be blocked except by creatures with flying and/or reach",
             rules::Role::Subject,
             !rules::other(rules::has::<cards::Flying>()) | rules::has::<cards::Flying>(),

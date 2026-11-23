@@ -1,12 +1,4 @@
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum Question {
-    TapsWhenAttacking,
-    IgnoresSummoningSickness,
-    MustAttack,
-    MustBlock,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Characteristic {
     Power,
     Toughness,
@@ -23,9 +15,4 @@ pub enum Comparison {
 pub enum Role {
     Subject,
     Other,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Combine {
-    LatestTimestamp,
 }

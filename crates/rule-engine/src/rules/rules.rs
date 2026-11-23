@@ -17,8 +17,6 @@ pub struct Rules<'w, 's> {
 
 #[atomic_delegates]
 impl Rules<'_, '_> {
-    pub fn ask<Q: rules::traits::rule_question::RuleQuestion>(&self, entity: Entity) -> Q::Answer {}
-
     #[must_use]
     pub fn characteristics(&self, entity: Entity) -> cards::Characteristics {}
 
@@ -51,6 +49,7 @@ mod tests {
     use bevy::ecs::system::RunSystemOnce;
 
     use crate::BATTLEFIELD;
+    use crate::TAP_ATTACKERS;
     use crate::rules;
     use crate::testing::*;
 
@@ -65,8 +64,8 @@ mod tests {
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
-                assert!(answers.ask::<rules::TapsWhenAttacking>(*bears));
-                assert!(!answers.ask::<rules::TapsWhenAttacking>(*sovereign));
+                assert!(answers.performs(*bears, TAP_ATTACKERS));
+                assert!(!answers.performs(*sovereign, TAP_ATTACKERS));
             })
             .unwrap();
         Ok(())

@@ -1,11 +1,9 @@
-mod ask;
 mod characteristics;
 mod demanded;
 mod eval;
 mod legal;
 mod mods;
 mod performs;
-pub use ask::ask;
 pub use characteristics::characteristics;
 pub use demanded::demanded;
 pub use eval::eval;

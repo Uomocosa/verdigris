@@ -54,10 +54,6 @@ pub enum Layered {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Change {
     Characteristic(Layered),
-    Rule {
-        question: rules::Question,
-        answer: rules::Answer,
-    },
     Waive(rules::ClauseKey),
     Restrict(rules::RuleId, rules::Predicate),
     Demand(rules::RuleId),

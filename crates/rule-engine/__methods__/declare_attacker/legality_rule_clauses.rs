@@ -8,12 +8,12 @@ pub fn legality_rule_clauses() -> Vec<rules::Clause> {
             rules::Role::Subject,
             !rules::has::<cards::Tapped>(),
         ),
-        rules::SUMMONING_SICK.clause(
+        rules::declare_attacker::SUMMONING_SICK.clause(
             "have been controlled by the active player continuously since the turn began",
             rules::Role::Subject,
             !rules::has::<cards::SummoningSick>(),
         ),
-        rules::DEFENDER.clause(
+        rules::declare_attacker::DEFENDER.clause(
             "A creature with defender can't attack.",
             rules::Role::Subject,
             !rules::has::<cards::Defender>(),
