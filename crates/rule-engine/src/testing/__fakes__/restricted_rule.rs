@@ -1,22 +1,33 @@
 use atomic_delegate_macros::atomic_delegate;
+use bevy::prelude::Entity;
 
 use crate::rules;
-use crate::rules::traits::legality_rule::LegalityRule;
+use crate::rules::traits::event::Event;
 
-pub struct RestrictedRule;
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct RestrictedRule {
+    pub attacker: Entity,
+    pub player: Entity,
+}
 
-impl LegalityRule for RestrictedRule {
-    type Ctx = rules::AttackCtx;
+#[rustfmt::skip]
+impl rules::traits::context::Context for RestrictedRule {
+    fn subject(&self) -> Entity { self.attacker }
+    fn other(&self) -> Option<Entity> { None }
+    fn player(&self) -> Entity { self.player }
+}
+
+impl Event for RestrictedRule {
     const ID: rules::EventId = rules::EventId("test/restriction");
 
-    #[atomic_delegate(RestrictedRule, LegalityRule)]
+    #[atomic_delegate(RestrictedRule, Event)]
     fn clauses() -> Vec<rules::Clause> {}
 }
 
 #[cfg(test)]
 mod tests {
     use crate::rules;
-    use crate::rules::traits::legality_rule::LegalityRule;
+    use crate::rules::traits::event::Event;
     use crate::testing;
 
     use super::RestrictedRule;

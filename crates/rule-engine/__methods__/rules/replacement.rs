@@ -38,7 +38,7 @@ mod tests {
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
                 assert_eq!(
-                    replacement(&answers, player, rules::DRAW_FROM_EMPTY_LIBRARY),
+                    replacement(&answers, player, rules::DrawFromEmptyLibrary::ID),
                     Some(rules::Outcome::WinTheGame)
                 );
                 assert_eq!(replacement(&answers, player, rules::LoseGame::ID), None);

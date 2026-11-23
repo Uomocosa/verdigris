@@ -2,7 +2,7 @@ use crate::HAND;
 use crate::cards;
 use crate::rules;
 
-pub fn legality_rule_clauses() -> Vec<rules::Clause> {
+pub fn event_clauses() -> Vec<rules::Clause> {
     vec![
         rules::play_land::PRIORITY.clause(
             "A player who has priority",
@@ -50,11 +50,11 @@ mod tests {
     use crate::cards;
     use crate::rules;
 
-    use super::legality_rule_clauses;
+    use super::event_clauses;
 
     #[test]
     fn test_usage() {
-        let clauses = legality_rule_clauses();
+        let clauses = event_clauses();
         assert_eq!(clauses.len(), 7);
         assert_eq!(clauses[0].key, rules::ClauseKey("305.1/priority"));
         assert_eq!(

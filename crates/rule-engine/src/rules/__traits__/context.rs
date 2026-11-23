@@ -17,11 +17,11 @@ mod tests {
     fn test_usage() {
         let attacker = Entity::PLACEHOLDER;
         let player = Entity::from_raw_u32(1).unwrap();
-        let attack = rules::AttackCtx { attacker, player };
+        let attack = rules::DeclareAttacker { attacker, player };
         assert_eq!(attack.subject(), attacker);
         assert_eq!(attack.other(), None);
         assert_eq!(attack.player(), player);
-        let block = rules::BlockCtx {
+        let block = rules::DeclareBlocker {
             blocker: Entity::from_raw_u32(1).unwrap(),
             attacker,
             player,

@@ -1,14 +1,14 @@
 use crate::abilities;
 use crate::effects;
 use crate::rules;
-use crate::rules::traits::legality_rule::LegalityRule;
+use crate::rules::traits::event::Event;
 use crate::statics;
 
 pub fn cant_lose_the_game(all: statics::All) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
         modification: effects::Modification::Rule(rules::RuleChange {
-            target: rules::Target::Event(rules::LosesTheGame::ID),
+            target: rules::Target::Event(rules::LoseGame::ID),
             change: rules::Change::Cant,
         }),
     }

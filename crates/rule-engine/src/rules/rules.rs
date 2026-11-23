@@ -37,11 +37,7 @@ impl Rules<'_, '_> {
     }
 
     #[must_use]
-    pub fn legality<R: rules::traits::legality_rule::LegalityRule>(
-        &self,
-        context: &R::Ctx,
-    ) -> rules::Legality {
-    }
+    pub fn legality<E: rules::traits::event::Event>(&self, event: &E) -> rules::Legality {}
 
     #[must_use]
     pub fn performs(&self, entity: Entity, step: rules::ActionId) -> bool {}
@@ -58,8 +54,8 @@ impl Rules<'_, '_> {
 
 impl Rules<'_, '_> {
     #[must_use]
-    pub fn legal<R: rules::traits::legality_rule::LegalityRule>(&self, context: &R::Ctx) -> bool {
-        let outcome = self.legality::<R>(context);
+    pub fn legal<E: rules::traits::event::Event>(&self, event: &E) -> bool {
+        let outcome = self.legality::<E>(event);
         outcome == rules::Legality::Legal
     }
 }
@@ -67,8 +63,8 @@ impl Rules<'_, '_> {
 #[rustfmt::skip]
 impl Rules<'_, '_> {
     #[must_use]
-    pub fn required<R: rules::traits::legality_rule::LegalityRule>(&self, entity: Entity) -> bool {
-        self.changes(entity, rules::Target::Event(R::ID)).contains(&rules::Change::Must)
+    pub fn required<E: rules::traits::event::Event>(&self, entity: Entity) -> bool {
+        self.changes(entity, rules::Target::Event(E::ID)).contains(&rules::Change::Must)
     }
 }
 

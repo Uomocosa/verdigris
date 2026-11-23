@@ -1,23 +1,32 @@
 use atomic_delegate_macros::atomic_delegate;
+use bevy::prelude::Entity;
 
 use crate::rules;
-use crate::rules::traits::legality_rule::LegalityRule;
+use crate::rules::traits::event::Event;
 
-pub const PRIORITY: rules::ClauseId<rules::CastSpellCtx> = rules::ClauseId::new("601.2a/priority");
-pub const FROM_HAND: rules::ClauseId<rules::CastSpellCtx> =
-    rules::ClauseId::new("601.2a/from-hand");
-pub const OWNS: rules::ClauseId<rules::CastSpellCtx> = rules::ClauseId::new("601.2a/owns");
-pub const NOT_A_LAND: rules::ClauseId<rules::CastSpellCtx> =
-    rules::ClauseId::new("601.2a/not-a-land");
-pub const TIMING: rules::ClauseId<rules::CastSpellCtx> = rules::ClauseId::new("601.2a/timing");
+pub const PRIORITY: rules::ClauseId<rules::CastSpell> = rules::ClauseId::new("601.2a/priority");
+pub const FROM_HAND: rules::ClauseId<rules::CastSpell> = rules::ClauseId::new("601.2a/from-hand");
+pub const OWNS: rules::ClauseId<rules::CastSpell> = rules::ClauseId::new("601.2a/owns");
+pub const NOT_A_LAND: rules::ClauseId<rules::CastSpell> = rules::ClauseId::new("601.2a/not-a-land");
+pub const TIMING: rules::ClauseId<rules::CastSpell> = rules::ClauseId::new("601.2a/timing");
 
-pub struct CastSpell;
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct CastSpell {
+    pub spell: Entity,
+    pub player: Entity,
+}
 
-impl LegalityRule for CastSpell {
-    type Ctx = rules::CastSpellCtx;
+#[rustfmt::skip]
+impl rules::traits::context::Context for CastSpell {
+    fn subject(&self) -> Entity { self.spell }
+    fn other(&self) -> Option<Entity> { None }
+    fn player(&self) -> Entity { self.player }
+}
+
+impl Event for CastSpell {
     const ID: rules::EventId = rules::EventId("601.2a");
 
-    #[atomic_delegate(CastSpell, LegalityRule)]
+    #[atomic_delegate(CastSpell, Event)]
     fn clauses() -> Vec<rules::Clause> {}
 }
 
@@ -26,7 +35,7 @@ mod tests {
     use crate::HAND;
     use crate::cards;
     use crate::rules;
-    use crate::rules::traits::legality_rule::LegalityRule;
+    use crate::rules::traits::event::Event;
 
     use super::CastSpell;
     use super::FROM_HAND;

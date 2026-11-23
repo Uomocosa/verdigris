@@ -1,7 +1,7 @@
 use crate::abilities;
 use crate::effects;
 use crate::rules;
-use crate::rules::traits::legality_rule::LegalityRule;
+use crate::rules::traits::event::Event;
 use crate::statics;
 
 pub fn must_block(all: statics::All) -> abilities::Continuous {
@@ -19,7 +19,7 @@ mod tests {
     use crate::CREATURE;
     use crate::effects;
     use crate::rules;
-    use crate::rules::traits::legality_rule::LegalityRule;
+    use crate::rules::traits::event::Event;
     use crate::statics;
 
     use super::must_block;

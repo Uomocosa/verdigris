@@ -1,25 +1,34 @@
 use atomic_delegate_macros::atomic_delegate;
+use bevy::prelude::Entity;
 
 use crate::rules;
-use crate::rules::traits::legality_rule::LegalityRule;
+use crate::rules::traits::event::Event;
 
-pub const PRIORITY: rules::ClauseId<rules::PlayLandCtx> = rules::ClauseId::new("305.1/priority");
-pub const FROM_HAND: rules::ClauseId<rules::PlayLandCtx> = rules::ClauseId::new("305.1/from-hand");
-pub const LAND_CARD: rules::ClauseId<rules::PlayLandCtx> = rules::ClauseId::new("305.1/land-card");
-pub const MAIN_PHASE: rules::ClauseId<rules::PlayLandCtx> =
-    rules::ClauseId::new("305.1/main-phase");
-pub const EMPTY_STACK: rules::ClauseId<rules::PlayLandCtx> =
-    rules::ClauseId::new("305.1/empty-stack");
-pub const OWNS: rules::ClauseId<rules::PlayLandCtx> = rules::ClauseId::new("305.1/owns");
-pub const OWN_TURN: rules::ClauseId<rules::PlayLandCtx> = rules::ClauseId::new("305.3/own-turn");
+pub const PRIORITY: rules::ClauseId<rules::PlayLand> = rules::ClauseId::new("305.1/priority");
+pub const FROM_HAND: rules::ClauseId<rules::PlayLand> = rules::ClauseId::new("305.1/from-hand");
+pub const LAND_CARD: rules::ClauseId<rules::PlayLand> = rules::ClauseId::new("305.1/land-card");
+pub const MAIN_PHASE: rules::ClauseId<rules::PlayLand> = rules::ClauseId::new("305.1/main-phase");
+pub const EMPTY_STACK: rules::ClauseId<rules::PlayLand> = rules::ClauseId::new("305.1/empty-stack");
+pub const OWNS: rules::ClauseId<rules::PlayLand> = rules::ClauseId::new("305.1/owns");
+pub const OWN_TURN: rules::ClauseId<rules::PlayLand> = rules::ClauseId::new("305.3/own-turn");
 
-pub struct PlayLand;
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct PlayLand {
+    pub land: Entity,
+    pub player: Entity,
+}
 
-impl LegalityRule for PlayLand {
-    type Ctx = rules::PlayLandCtx;
+#[rustfmt::skip]
+impl rules::traits::context::Context for PlayLand {
+    fn subject(&self) -> Entity { self.land }
+    fn other(&self) -> Option<Entity> { None }
+    fn player(&self) -> Entity { self.player }
+}
+
+impl Event for PlayLand {
     const ID: rules::EventId = rules::EventId("305.1");
 
-    #[atomic_delegate(PlayLand, LegalityRule)]
+    #[atomic_delegate(PlayLand, Event)]
     fn clauses() -> Vec<rules::Clause> {}
 }
 
@@ -28,7 +37,7 @@ mod tests {
     use crate::HAND;
     use crate::cards;
     use crate::rules;
-    use crate::rules::traits::legality_rule::LegalityRule;
+    use crate::rules::traits::event::Event;
 
     use super::EMPTY_STACK;
     use super::FROM_HAND;

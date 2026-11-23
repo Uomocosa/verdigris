@@ -20,12 +20,12 @@ pub fn changes(
 
 #[cfg(test)]
 mod tests {
+    use crate::rules::traits::event::Event;
     use bevy::ecs::system::RunSystemOnce;
     use bevy::prelude::Entity;
 
     use crate::BATTLEFIELD;
     use crate::rules;
-    use crate::rules::traits::legality_rule::LegalityRule;
     use crate::testing::*;
 
     use super::changes;

@@ -26,7 +26,7 @@ mod tests {
     fn test_usage() {
         let ability = as_though(
             statics::all(CREATURE),
-            rules::ClauseId::<rules::AttackCtx>::new("test/untapped"),
+            rules::ClauseId::<rules::DeclareAttacker>::new("test/untapped"),
         );
         assert_eq!(ability.filter, CREATURE);
         assert_eq!(

@@ -26,7 +26,7 @@ mod tests {
     use crate::cost;
     use crate::effects;
     use crate::rules;
-    use crate::rules::traits::legality_rule::LegalityRule;
+    use crate::rules::traits::event::Event;
 
     use super::TEST_SKY_COURT;
 

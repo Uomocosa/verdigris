@@ -73,7 +73,7 @@ pub fn r508_1a_r508_1k_declare_attackers(
             continue;
         }
         let all_legal = attackers.iter().all(|attacker| {
-            answers.legal::<rules::DeclareAttacker>(&rules::AttackCtx {
+            answers.legal::<rules::DeclareAttacker>(&rules::DeclareAttacker {
                 attacker: *attacker,
                 player: action.player,
             })
@@ -81,7 +81,7 @@ pub fn r508_1a_r508_1k_declare_attackers(
         let requirement_unmet = candidates.iter().any(|(entity, owner)| {
             **owner == action.player
                 && answers.required::<rules::DeclareAttacker>(entity)
-                && answers.legal::<rules::DeclareAttacker>(&rules::AttackCtx {
+                && answers.legal::<rules::DeclareAttacker>(&rules::DeclareAttacker {
                     attacker: entity,
                     player: action.player,
                 })

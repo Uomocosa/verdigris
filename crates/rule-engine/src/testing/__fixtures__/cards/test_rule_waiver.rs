@@ -26,7 +26,7 @@ mod tests {
     use crate::effects;
     use crate::pt;
     use crate::rules;
-    use crate::rules::traits::legality_rule::LegalityRule;
+    use crate::rules::traits::event::Event;
     use crate::testing;
 
     use super::TEST_RULE_WAIVER;

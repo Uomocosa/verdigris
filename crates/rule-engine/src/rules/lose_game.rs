@@ -8,10 +8,15 @@ use crate::rules::traits::event::Event;
 pub struct LoseGame(pub Entity);
 
 #[rustfmt::skip]
+impl rules::traits::context::Context for LoseGame {
+    fn subject(&self) -> Entity { **self }
+    fn other(&self) -> Option<Entity> { None }
+    fn player(&self) -> Entity { **self }
+}
+
+#[rustfmt::skip]
 impl Event for LoseGame {
-    type Legality = rules::LosesTheGame;
     const ID: rules::EventId = rules::EventId("104.3");
-    fn context(self) -> rules::PlayerCtx { rules::PlayerCtx::from(*self) }
 }
 
 #[cfg(test)]
@@ -19,8 +24,8 @@ mod tests {
     use bevy::prelude::Entity;
 
     use crate::rules;
+    use crate::rules::traits::context::Context;
     use crate::rules::traits::event::Event;
-    use crate::rules::traits::legality_rule::LegalityRule;
 
     use super::LoseGame;
 
@@ -28,12 +33,10 @@ mod tests {
     fn test_usage() {
         let player = Entity::PLACEHOLDER;
         let event = LoseGame(player);
-        assert_eq!(*event, player);
-        assert_eq!(
-            rules::traits::context::Context::player(&event.context()),
-            player
-        );
-        assert_eq!(rules::LosesTheGame::ID, rules::EventId("104.3"));
+        assert_eq!(event.subject(), player);
+        assert_eq!(event.other(), None);
+        assert_eq!(event.player(), player);
         assert_eq!(LoseGame::ID, rules::EventId("104.3"));
+        assert_eq!(LoseGame::clauses(), Vec::new());
     }
 }

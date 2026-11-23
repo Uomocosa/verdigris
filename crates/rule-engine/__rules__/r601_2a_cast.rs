@@ -50,7 +50,7 @@ pub fn r601_2a_cast(
             rejected.write(actions::Rejected::CannotCast { spell });
             continue;
         }
-        if !answers.legal::<rules::CastSpell>(&rules::CastSpellCtx {
+        if !answers.legal::<rules::CastSpell>(&rules::CastSpell {
             spell,
             player: action.player,
         }) {

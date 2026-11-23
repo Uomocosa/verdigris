@@ -1,22 +1,33 @@
 use atomic_delegate_macros::atomic_delegate;
+use bevy::prelude::Entity;
 
 use crate::rules;
-use crate::rules::traits::legality_rule::LegalityRule;
+use crate::rules::traits::event::Event;
 
-pub struct AbsoluteRule;
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct AbsoluteRule {
+    pub attacker: Entity,
+    pub player: Entity,
+}
 
-impl LegalityRule for AbsoluteRule {
-    type Ctx = rules::AttackCtx;
+#[rustfmt::skip]
+impl rules::traits::context::Context for AbsoluteRule {
+    fn subject(&self) -> Entity { self.attacker }
+    fn other(&self) -> Option<Entity> { None }
+    fn player(&self) -> Entity { self.player }
+}
+
+impl Event for AbsoluteRule {
     const ID: rules::EventId = rules::EventId("test/absolute");
 
-    #[atomic_delegate(AbsoluteRule, LegalityRule)]
+    #[atomic_delegate(AbsoluteRule, Event)]
     fn clauses() -> Vec<rules::Clause> {}
 }
 
 #[cfg(test)]
 mod tests {
     use crate::rules;
-    use crate::rules::traits::legality_rule::LegalityRule;
+    use crate::rules::traits::event::Event;
     use crate::testing;
 
     use super::AbsoluteRule;

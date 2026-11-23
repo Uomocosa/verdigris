@@ -1,20 +1,35 @@
 use atomic_delegate_macros::atomic_delegate;
+use bevy::prelude::Entity;
 
 use crate::rules;
-use crate::rules::traits::legality_rule::LegalityRule;
+use crate::rules::traits::event::Event;
 
-pub const CREATURE: rules::ClauseId<rules::BlockCtx> = rules::ClauseId::new("509.1a/creature");
-pub const CONTROLS: rules::ClauseId<rules::BlockCtx> = rules::ClauseId::new("509.1a/controls");
-pub const UNTAPPED: rules::ClauseId<rules::BlockCtx> = rules::ClauseId::new("509.1a/untapped");
-pub const FLYING: rules::ClauseId<rules::BlockCtx> = rules::ClauseId::new("702.9b/flying");
+pub const CREATURE: rules::ClauseId<rules::DeclareBlocker> =
+    rules::ClauseId::new("509.1a/creature");
+pub const CONTROLS: rules::ClauseId<rules::DeclareBlocker> =
+    rules::ClauseId::new("509.1a/controls");
+pub const UNTAPPED: rules::ClauseId<rules::DeclareBlocker> =
+    rules::ClauseId::new("509.1a/untapped");
+pub const FLYING: rules::ClauseId<rules::DeclareBlocker> = rules::ClauseId::new("702.9b/flying");
 
-pub struct DeclareBlocker;
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct DeclareBlocker {
+    pub blocker: Entity,
+    pub attacker: Entity,
+    pub player: Entity,
+}
 
-impl LegalityRule for DeclareBlocker {
-    type Ctx = rules::BlockCtx;
+#[rustfmt::skip]
+impl rules::traits::context::Context for DeclareBlocker {
+    fn subject(&self) -> Entity { self.blocker }
+    fn other(&self) -> Option<Entity> { Some(self.attacker) }
+    fn player(&self) -> Entity { self.player }
+}
+
+impl Event for DeclareBlocker {
     const ID: rules::EventId = rules::EventId("509.1a");
 
-    #[atomic_delegate(DeclareBlocker, LegalityRule)]
+    #[atomic_delegate(DeclareBlocker, Event)]
     fn clauses() -> Vec<rules::Clause> {}
 }
 
@@ -26,7 +41,7 @@ mod tests {
     use crate::UNTAP_STEP;
     use crate::cards;
     use crate::rules;
-    use crate::rules::traits::legality_rule::LegalityRule;
+    use crate::rules::traits::event::Event;
 
     use super::CONTROLS;
     use super::CREATURE;

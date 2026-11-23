@@ -1,7 +1,7 @@
 use crate::cards;
 use crate::rules;
 
-pub fn legality_rule_clauses() -> Vec<rules::Clause> {
+pub fn event_clauses() -> Vec<rules::Clause> {
     vec![
         rules::declare_blocker::CREATURE.clause(
             "The defending player chooses which creatures they control",
@@ -34,11 +34,11 @@ mod tests {
     use crate::cards;
     use crate::rules;
 
-    use super::legality_rule_clauses;
+    use super::event_clauses;
 
     #[test]
     fn test_usage() {
-        let clauses = legality_rule_clauses();
+        let clauses = event_clauses();
         assert_eq!(clauses.len(), 4);
         assert_eq!(clauses[0].key, rules::ClauseKey("509.1a/creature"));
         assert_eq!(clauses[0].condition, rules::has::<cards::Creature>());

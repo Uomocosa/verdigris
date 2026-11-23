@@ -1,14 +1,14 @@
 use crate::abilities;
 use crate::effects;
 use crate::rules;
-use crate::rules::traits::legality_rule::LegalityRule;
+use crate::rules::traits::event::Event;
 use crate::statics;
 
-pub fn requirement<R: LegalityRule>(all: statics::All) -> abilities::Continuous {
+pub fn requirement<E: Event>(all: statics::All) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
         modification: effects::Modification::Rule(rules::RuleChange {
-            target: rules::Target::Event(R::ID),
+            target: rules::Target::Event(E::ID),
             change: rules::Change::Must,
         }),
     }

@@ -28,7 +28,7 @@ mod tests {
     use crate::keywords;
     use crate::pt;
     use crate::rules;
-    use crate::rules::traits::legality_rule::LegalityRule;
+    use crate::rules::traits::event::Event;
 
     use super::IRON_GOLEM;
 

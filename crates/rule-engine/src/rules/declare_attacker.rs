@@ -1,22 +1,37 @@
 use atomic_delegate_macros::atomic_delegate;
+use bevy::prelude::Entity;
 
 use crate::rules;
-use crate::rules::traits::legality_rule::LegalityRule;
+use crate::rules::traits::event::Event;
 
-pub const CREATURE: rules::ClauseId<rules::AttackCtx> = rules::ClauseId::new("508.1a/creature");
-pub const CONTROLS: rules::ClauseId<rules::AttackCtx> = rules::ClauseId::new("508.1a/controls");
-pub const UNTAPPED: rules::ClauseId<rules::AttackCtx> = rules::ClauseId::new("508.1a/untapped");
-pub const SUMMONING_SICK: rules::ClauseId<rules::AttackCtx> =
+pub const CREATURE: rules::ClauseId<rules::DeclareAttacker> =
+    rules::ClauseId::new("508.1a/creature");
+pub const CONTROLS: rules::ClauseId<rules::DeclareAttacker> =
+    rules::ClauseId::new("508.1a/controls");
+pub const UNTAPPED: rules::ClauseId<rules::DeclareAttacker> =
+    rules::ClauseId::new("508.1a/untapped");
+pub const SUMMONING_SICK: rules::ClauseId<rules::DeclareAttacker> =
     rules::ClauseId::new("508.1a/controlled-since-turn-began");
-pub const DEFENDER: rules::ClauseId<rules::AttackCtx> = rules::ClauseId::new("702.3b/defender");
+pub const DEFENDER: rules::ClauseId<rules::DeclareAttacker> =
+    rules::ClauseId::new("702.3b/defender");
 
-pub struct DeclareAttacker;
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct DeclareAttacker {
+    pub attacker: Entity,
+    pub player: Entity,
+}
 
-impl LegalityRule for DeclareAttacker {
-    type Ctx = rules::AttackCtx;
+#[rustfmt::skip]
+impl rules::traits::context::Context for DeclareAttacker {
+    fn subject(&self) -> Entity { self.attacker }
+    fn other(&self) -> Option<Entity> { None }
+    fn player(&self) -> Entity { self.player }
+}
+
+impl Event for DeclareAttacker {
     const ID: rules::EventId = rules::EventId("508.1a");
 
-    #[atomic_delegate(DeclareAttacker, LegalityRule)]
+    #[atomic_delegate(DeclareAttacker, Event)]
     fn clauses() -> Vec<rules::Clause> {}
 }
 
@@ -24,7 +39,7 @@ impl LegalityRule for DeclareAttacker {
 mod tests {
     use crate::cards;
     use crate::rules;
-    use crate::rules::traits::legality_rule::LegalityRule;
+    use crate::rules::traits::event::Event;
 
     use super::CONTROLS;
     use super::CREATURE;

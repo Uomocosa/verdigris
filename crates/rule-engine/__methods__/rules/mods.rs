@@ -20,12 +20,12 @@ pub fn mods(answers: &rules::Rules, entity: Entity) -> Vec<effects::Modification
 
 #[cfg(test)]
 mod tests {
+    use crate::rules::traits::event::Event;
     use bevy::ecs::system::RunSystemOnce;
 
     use crate::BATTLEFIELD;
     use crate::effects;
     use crate::rules;
-    use crate::rules::traits::legality_rule::LegalityRule;
     use crate::testing::*;
 
     use super::mods;

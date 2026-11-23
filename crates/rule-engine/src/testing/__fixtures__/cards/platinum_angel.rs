@@ -34,7 +34,7 @@ mod tests {
     use crate::keywords;
     use crate::pt;
     use crate::rules;
-    use crate::rules::traits::legality_rule::LegalityRule;
+    use crate::rules::traits::event::Event;
 
     use super::PLATINUM_ANGEL;
 
@@ -63,14 +63,14 @@ mod tests {
                 abilities::Continuous {
                     filter: PLAYER.controlled_by(YOU),
                     modification: effects::Modification::Rule(rules::RuleChange {
-                        target: rules::Target::Event(rules::LosesTheGame::ID),
+                        target: rules::Target::Event(rules::LoseGame::ID),
                         change: rules::Change::Cant,
                     }),
                 },
                 abilities::Continuous {
                     filter: PLAYER.controlled_by(OPPONENT),
                     modification: effects::Modification::Rule(rules::RuleChange {
-                        target: rules::Target::Event(rules::WinsTheGame::ID),
+                        target: rules::Target::Event(rules::WinGame::ID),
                         change: rules::Change::Cant,
                     }),
                 },

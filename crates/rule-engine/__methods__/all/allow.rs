@@ -31,7 +31,7 @@ mod tests {
     fn test_usage() {
         let ability = allow(
             statics::all(CREATURE),
-            rules::ClauseId::<rules::AttackCtx>::new("test/untapped"),
+            rules::ClauseId::<rules::DeclareAttacker>::new("test/untapped"),
             rules::has::<cards::Flying>(),
         );
         assert_eq!(ability.filter, CREATURE);

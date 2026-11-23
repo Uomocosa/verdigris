@@ -6,7 +6,7 @@ use crate::cards;
 use crate::cost;
 use crate::effects;
 use crate::rules;
-use crate::rules::traits::legality_rule::LegalityRule;
+use crate::rules::traits::event::Event;
 use crate::testing;
 
 pub const TEST_PLAYER_RESTRICTION: testing::Card = testing::Card {
@@ -37,7 +37,7 @@ mod tests {
     use crate::cost;
     use crate::effects;
     use crate::rules;
-    use crate::rules::traits::legality_rule::LegalityRule;
+    use crate::rules::traits::event::Event;
     use crate::testing;
 
     use super::TEST_PLAYER_RESTRICTION;

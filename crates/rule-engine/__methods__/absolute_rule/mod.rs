@@ -1,2 +1,2 @@
-mod legality_rule_clauses;
-pub use legality_rule_clauses::legality_rule_clauses;
+mod event_clauses;
+pub use event_clauses::event_clauses;

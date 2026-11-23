@@ -14,22 +14,11 @@ pub use basic::type_aliases::TargetOf;
 #[path = "__traits__/mod.rs"]
 pub mod traits;
 
-mod attack_ctx;
-pub use attack_ctx::AttackCtx;
-mod block_ctx;
-pub use block_ctx::BlockCtx;
-
 pub mod cast_spell;
 pub use cast_spell::CastSpell;
 
-mod cast_spell_ctx;
-pub use cast_spell_ctx::CastSpellCtx;
-
 mod lose_game;
 pub use lose_game::LoseGame;
-
-mod loses_the_game;
-pub use loses_the_game::LosesTheGame;
 
 mod clause;
 pub use clause::Clause;
@@ -41,16 +30,10 @@ pub mod declare_blocker;
 pub use declare_blocker::DeclareBlocker;
 
 mod draw_from_empty_library;
-pub use draw_from_empty_library::{DRAW_FROM_EMPTY_LIBRARY, DrawFromEmptyLibrary};
-
-mod draws_from_empty_library;
-pub use draws_from_empty_library::DrawsFromEmptyLibrary;
+pub use draw_from_empty_library::DrawFromEmptyLibrary;
 
 mod win_game;
 pub use win_game::WinGame;
-
-mod wins_the_game;
-pub use wins_the_game::WinsTheGame;
 
 pub mod land_plays;
 pub use land_plays::LandPlays;
@@ -67,17 +50,11 @@ pub use declare_attacker::DeclareAttacker;
 pub mod play_land;
 pub use play_land::PlayLand;
 
-mod play_land_ctx;
-pub use play_land_ctx::PlayLandCtx;
-
 mod predicate;
 pub use predicate::Predicate;
 
 mod predicate_registry;
 pub use predicate_registry::PredicateRegistry;
-
-mod player_ctx;
-pub use player_ctx::PlayerCtx;
 
 mod rules;
 pub use rules::Rules;

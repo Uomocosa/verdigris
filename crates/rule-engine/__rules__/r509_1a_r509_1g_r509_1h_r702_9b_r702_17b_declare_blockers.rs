@@ -66,7 +66,7 @@ pub fn r509_1a_r509_1g_r509_1h_r702_9b_r702_17b_declare_blockers(
         }
         let all_legal = assignments.iter().all(|assignment| {
             attacking.get(assignment.attacker).is_ok()
-                && answers.legal::<rules::DeclareBlocker>(&rules::BlockCtx {
+                && answers.legal::<rules::DeclareBlocker>(&rules::DeclareBlocker {
                     blocker: assignment.blocker,
                     attacker: assignment.attacker,
                     player: action.player,
@@ -77,7 +77,7 @@ pub fn r509_1a_r509_1g_r509_1h_r702_9b_r702_17b_declare_blockers(
                 && answers.required::<rules::DeclareBlocker>(entity)
                 && !assignments.iter().any(|assignment| assignment.blocker == entity)
                 && attacking.iter().any(|(attacker, _)| {
-                    answers.legal::<rules::DeclareBlocker>(&rules::BlockCtx {
+                    answers.legal::<rules::DeclareBlocker>(&rules::DeclareBlocker {
                         blocker: entity,
                         attacker,
                         player: action.player,

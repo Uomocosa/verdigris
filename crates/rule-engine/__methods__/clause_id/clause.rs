@@ -24,7 +24,7 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let id = rules::ClauseId::<rules::BlockCtx>::new("509.1a/untapped");
+        let id = rules::ClauseId::<rules::DeclareBlocker>::new("509.1a/untapped");
         let built = clause(
             id,
             "The chosen creatures must be untapped",

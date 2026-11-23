@@ -5,6 +5,7 @@ use crate::cards;
 use crate::cost;
 use crate::pt;
 use crate::rules;
+use crate::rules::traits::event::Event;
 use crate::statics;
 use crate::testing;
 
@@ -16,7 +17,7 @@ pub const LABORATORY_MANIAC: testing::Card = testing::Card {
                 .subtype(cards::CreatureType::Human.into())
                 .subtype(cards::CreatureType::Wizard.into());
             statics::all(PLAYER.controlled_by(YOU)).instead(
-                rules::DRAW_FROM_EMPTY_LIBRARY,
+                rules::DrawFromEmptyLibrary::ID,
                 rules::Outcome::WinTheGame,
             ),
         }
@@ -33,6 +34,7 @@ mod tests {
     use crate::effects;
     use crate::pt;
     use crate::rules;
+    use crate::rules::traits::event::Event;
 
     use super::LABORATORY_MANIAC;
 
@@ -55,7 +57,7 @@ mod tests {
             [abilities::Continuous {
                 filter: PLAYER.controlled_by(YOU),
                 modification: effects::Modification::Rule(rules::RuleChange {
-                    target: rules::Target::Event(rules::DRAW_FROM_EMPTY_LIBRARY),
+                    target: rules::Target::Event(rules::DrawFromEmptyLibrary::ID),
                     change: rules::Change::Instead(rules::Outcome::WinTheGame),
                 }),
             }]

@@ -46,14 +46,14 @@ pub fn r614_1a_r616_1_replacement_effects(
     }
     for would in losses.read() {
         let rules::Would(event) = would;
-        if answers.legal::<rules::LosesTheGame>(&event.context()) {
+        if answers.legal(event) {
             commands.entity(**event).insert(players::Lost);
             **state_based_actions_performed = true;
         }
     }
     for would in wins.p0().read() {
         let rules::Would(event) = would;
-        if answers.legal::<rules::WinsTheGame>(&event.context()) {
+        if answers.legal(event) {
             commands.entity(**event).insert(players::Won);
             **state_based_actions_performed = true;
         }

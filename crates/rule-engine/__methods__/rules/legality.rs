@@ -1,11 +1,10 @@
 use crate::rules;
-use crate::rules::traits::context::Context;
-use crate::rules::traits::legality_rule::LegalityRule;
+use crate::rules::traits::event::Event;
 
-pub fn legality<R: LegalityRule>(answers: &rules::Rules, context: &R::Ctx) -> rules::Legality {
-    let subject = context.subject();
-    let other = context.other();
-    let player = context.player();
+pub fn legality<E: Event>(answers: &rules::Rules, event: &E) -> rules::Legality {
+    let subject = event.subject();
+    let other = event.other();
+    let player = event.player();
     let waived = |clause: &rules::Clause| {
         if clause.absolute {
             return false;
@@ -27,7 +26,7 @@ pub fn legality<R: LegalityRule>(answers: &rules::Rules, context: &R::Ctx) -> ru
             })
         })
     };
-    let base = R::clauses()
+    let base = E::clauses()
         .iter()
         .filter(|clause| !waived(clause))
         .all(|clause| answers.eval(&clause.condition, subject, other, Some(player)));
@@ -39,7 +38,7 @@ pub fn legality<R: LegalityRule>(answers: &rules::Rules, context: &R::Ctx) -> ru
     .into_iter()
     .filter_map(|(role, entity)| entity.map(|entity| (role, entity)))
     .any(|(role, entity)| {
-        answers.changes(entity, rules::Target::Event(R::ID)).iter().any(|change| match change {
+        answers.changes(entity, rules::Target::Event(E::ID)).iter().any(|change| match change {
             rules::Change::Cant => true,
             rules::Change::OnlyIf {
                 role: required,
@@ -77,7 +76,7 @@ mod tests {
                 assert_eq!(
                     legality::<TestRule>(
                         &answers,
-                        &rules::AttackCtx {
+                        &TestRule {
                             attacker: *bears,
                             player: p1.into()
                         }
@@ -100,7 +99,7 @@ mod tests {
                 assert_eq!(
                     legality::<TestRule>(
                         &answers,
-                        &rules::AttackCtx {
+                        &TestRule {
                             attacker: *bears,
                             player: p2.into()
                         }
@@ -123,7 +122,7 @@ mod tests {
                 assert_eq!(
                     legality::<TestRule>(
                         &answers,
-                        &rules::AttackCtx {
+                        &TestRule {
                             attacker: *waiver,
                             player: p1.into()
                         }
@@ -147,7 +146,7 @@ mod tests {
                 assert_eq!(
                     legality::<RestrictedRule>(
                         &answers,
-                        &rules::AttackCtx {
+                        &RestrictedRule {
                             attacker: *restriction,
                             player: p1.into()
                         }
@@ -179,7 +178,7 @@ mod tests {
                 assert_eq!(
                     legality::<TestRule>(
                         &answers,
-                        &rules::AttackCtx {
+                        &TestRule {
                             attacker: *drake,
                             player: p2.into()
                         }
@@ -211,7 +210,7 @@ mod tests {
                 assert_eq!(
                     legality::<TestRule>(
                         &answers,
-                        &rules::AttackCtx {
+                        &TestRule {
                             attacker: *bears,
                             player: p2.into()
                         }
@@ -234,7 +233,7 @@ mod tests {
                 assert_eq!(
                     legality::<AbsoluteRule>(
                         &answers,
-                        &rules::AttackCtx {
+                        &AbsoluteRule {
                             attacker: *waiver,
                             player: p1.into()
                         }
@@ -258,7 +257,7 @@ mod tests {
                 assert_eq!(
                     legality::<TestRule>(
                         &answers,
-                        &rules::AttackCtx {
+                        &TestRule {
                             attacker: *bears,
                             player: p1.into()
                         }

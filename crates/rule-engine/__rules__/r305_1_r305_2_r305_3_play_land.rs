@@ -48,7 +48,7 @@ pub fn r305_1_r305_2_r305_3_play_land(
             rejected.write(actions::Rejected::CannotPlayLand { land });
             continue;
         }
-        let is_legal = answers.legal::<rules::PlayLand>(&rules::PlayLandCtx {
+        let is_legal = answers.legal::<rules::PlayLand>(&rules::PlayLand {
             land,
             player: action.player,
         });

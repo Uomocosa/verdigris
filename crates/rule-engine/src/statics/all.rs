@@ -60,17 +60,14 @@ impl All {
     }
 
     #[must_use]
-    pub fn restriction<R: rules::traits::legality_rule::LegalityRule>(
+    pub fn restriction<E: rules::traits::event::Event>(
         self,
         requirement: rules::Predicate,
     ) -> abilities::Continuous {
     }
 
     #[must_use]
-    pub fn requirement<R: rules::traits::legality_rule::LegalityRule>(
-        self,
-    ) -> abilities::Continuous {
-    }
+    pub fn requirement<E: rules::traits::event::Event>(self) -> abilities::Continuous {}
 
     #[must_use]
     pub fn skip(self, step: rules::ActionId) -> abilities::Continuous {}
