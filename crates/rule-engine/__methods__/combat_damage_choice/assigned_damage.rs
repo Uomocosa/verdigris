@@ -9,7 +9,7 @@ pub fn assigned_damage(
     choice: &actions::CombatDamageChoice,
     player: Entity,
     assignments: &[actions::DamageAssignment],
-) -> Option<Vec<damage::DamageDealt>> {
+) -> Option<Vec<damage::AssignedDamage>> {
     if player != choice.player || assignments.is_empty() {
         return None;
     }
@@ -56,7 +56,7 @@ pub fn assigned_damage(
     Some(
         attributed
             .into_iter()
-            .map(|(source, target, amount)| damage::DamageDealt {
+            .map(|(source, target, amount)| damage::AssignedDamage {
                 source,
                 target,
                 amount,

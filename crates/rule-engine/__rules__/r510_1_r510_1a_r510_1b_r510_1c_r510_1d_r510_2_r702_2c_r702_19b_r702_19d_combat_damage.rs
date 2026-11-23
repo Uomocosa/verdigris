@@ -1,10 +1,25 @@
-use bevy::prelude::{Entity, MessageReader, MessageWriter, Query, Res, ResMut, With};
+use bevy::prelude::{Entity, MessageReader, MessageWriter, ParamSet, Query, Res, ResMut, With};
 
 use crate::actions;
 use crate::cards;
 use crate::damage;
 use crate::players;
+use crate::rules;
 use crate::turns;
+
+type CombatLookups<'w, 's> = (
+    Query<
+        'w,
+        's,
+        (
+            Entity,
+            &'s cards::Blocking,
+            Option<&'s damage::Damage>,
+            Option<&'s cards::EffectivePT>,
+        ),
+    >,
+    Query<'w, 's, &'s cards::Owner>,
+);
 
 /// 510.1. First, the active player announces how each attacking creature assigns its combat damage,
 /// then the defending player announces how each blocking creature assigns its combat damage. This
@@ -67,7 +82,7 @@ pub fn r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_r702_2c_r702_19b_r702_19d_c
     mut actions: MessageReader<actions::PlayerAction>,
     mut rejected: MessageWriter<actions::Rejected>,
     mut pending: ResMut<actions::PendingChoice>,
-    mut dealt: MessageWriter<damage::DamageDealt>,
+    mut dealt: MessageWriter<rules::Would<rules::DealDamage>>,
     attackers: Query<
         (
             Entity,
@@ -77,12 +92,7 @@ pub fn r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_r702_2c_r702_19b_r702_19d_c
         ),
         With<cards::Attacking>,
     >,
-    blockers: Query<(
-        Entity,
-        &cards::Blocking,
-        Option<&damage::Damage>,
-        Option<&cards::EffectivePT>,
-    )>,
+    mut lookups: ParamSet<CombatLookups<'_, '_>>,
     defenders: Query<Entity, With<players::DefendingPlayer>>,
     turn: Res<turns::Turn>,
     participants: Res<turns::CombatDamageParticipants>,
@@ -109,22 +119,23 @@ pub fn r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_r702_2c_r702_19b_r702_19d_c
                 if amount == 0 || !participants.contains(&attacker) {
                     continue;
                 }
-                dealt.write(damage::DamageDealt {
+                dealt.write(rules::Would(rules::DealDamage {
                     source: attacker,
-                    target: defending,
+                    recipient: defending,
                     amount,
-                });
+                    controller: recipient_controller(&lookups.p1(), defending),
+                }));
             } else {
                 for write in definition.assigned_blocked_damage(
                     attacker,
                     amount,
                     defending,
-                    &blockers,
+                    &lookups.p0(),
                     participants,
                     &mut needed,
                     markers.deathtouch,
                 ) {
-                    dealt.write(write);
+                    dealt.write(announce_damage(write, &lookups.p1()));
                 }
             }
         }
@@ -154,10 +165,26 @@ pub fn r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_r702_2c_r702_19b_r702_19d_c
             continue;
         };
         for write in writes {
-            dealt.write(write);
+            dealt.write(announce_damage(write, &lookups.p1()));
         }
         *pending = actions::PendingChoice(None);
     }
+}
+
+fn announce_damage(
+    assigned: damage::AssignedDamage,
+    owners: &Query<&cards::Owner>,
+) -> rules::Would<rules::DealDamage> {
+    rules::Would(rules::DealDamage {
+        source: assigned.source,
+        recipient: assigned.target,
+        amount: assigned.amount,
+        controller: recipient_controller(owners, assigned.target),
+    })
+}
+
+fn recipient_controller(owners: &Query<&cards::Owner>, recipient: Entity) -> Entity {
+    owners.get(recipient).map_or(recipient, |owner| **owner)
 }
 
 #[cfg(test)]

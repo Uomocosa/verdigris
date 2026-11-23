@@ -1,8 +1,8 @@
 use crate::{BATTLEFIELD, EXILE, STACK};
 use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, ParamSet};
 
-use crate::damage;
 use crate::effects;
+use crate::keywords;
 use crate::players;
 use crate::rules;
 use crate::stack;
@@ -37,9 +37,9 @@ type PlayerEffectWriters<'a, 'b, 'c, 'd, 'e> = (
 pub fn r608_2_r608_2c_resolve(
     mut commands: Commands,
     mut resolutions: MessageReader<stack::Resolution>,
-    mut damage_dealt: MessageWriter<damage::DamageDealt>,
-    mut destructions: MessageWriter<damage::Destruction>,
-    mut countered: MessageWriter<stack::Countered>,
+    mut damage_dealt: MessageWriter<rules::Would<rules::DealDamage>>,
+    mut destructions: MessageWriter<rules::Would<rules::Destroy>>,
+    mut countered: MessageWriter<rules::Would<rules::Counter>>,
     mut player_effects: ParamSet<PlayerEffectWriters<'_, '_, '_, '_, '_>>,
     mut effect_messages: ParamSet<EffectMessageWriters<'_, '_, '_, '_>>,
     lookups: stack::ResolutionLookups<'_, '_>,
@@ -71,26 +71,30 @@ pub fn r608_2_r608_2c_resolve(
         for kind in std::iter::once(effect.kind).chain(effect.follow_ups.into_iter().flatten()) {
             match kind {
                 effects::EffectKind::Damage(amount) => {
-                    request_damage(&mut damage_dealt, &lookups, spell, chosen_target, amount);
+                    request_damage(
+                        &mut damage_dealt,
+                        &lookups,
+                        spell,
+                        chosen_target,
+                        controller,
+                        amount,
+                    );
                 }
                 effects::EffectKind::Destroy => {
-                    if let Some(target) = battlefield_target {
-                        destructions.write(damage::Destruction(target));
-                    }
+                    request_destroy(&mut destructions, &lookups, battlefield_target, controller);
                 }
                 #[rustfmt::skip]
                 effects::EffectKind::Exile => {
-                    let source = chosen_target.or_else(|| lookups.abilities.get(spell).ok().map(|a| a.source));
-                    let exile = source.and_then(|t| lookups.owners.get(t).ok())
-                        .and_then(|o| zones.find(EXILE, Some(**o))).zip(source);
-                    if let Some((exile, target)) = exile { commands.entity(target).insert(zones::InZone(exile)); }
+                    request_exile(&mut commands, &lookups, &zones, spell, chosen_target);
                 }
                 effects::EffectKind::Counter => {
-                    if let Some(target) = chosen_target
-                        && target_on_stack
-                    {
-                        countered.write(stack::Countered(target));
-                    }
+                    request_counter(
+                        &mut countered,
+                        &lookups,
+                        chosen_target,
+                        target_on_stack,
+                        controller,
+                    );
                 }
                 effects::EffectKind::CreateTokens { count, definition } => {
                     request_tokens(&mut effect_messages.p3(), controller, count, definition);
@@ -110,9 +114,7 @@ pub fn r608_2_r608_2c_resolve(
                     request_life_loss(&mut player_effects.p0(), &player_targets, amount);
                 }
                 effects::EffectKind::Poison(amount) => {
-                    for player in &player_targets {
-                        add_poison_counters(&mut commands, &lookups, *player, amount);
-                    }
+                    request_poison(&mut commands, &lookups, &player_targets, amount);
                 }
                 effects::EffectKind::GainLife(amount) => {
                     request_life_gain(
@@ -126,18 +128,15 @@ pub fn r608_2_r608_2c_resolve(
                     request_discard(&mut player_effects.p1(), &player_targets, count);
                 }
                 effects::EffectKind::ModifyPowerToughness { power, toughness } => {
-                    if let Some(target) = battlefield_target {
-                        effect_messages.p0().write(effects::PowerToughnessModified {
-                            target,
-                            power,
-                            toughness,
-                        });
-                    }
+                    request_modify_power_toughness(
+                        &mut effect_messages,
+                        battlefield_target,
+                        power,
+                        toughness,
+                    );
                 }
                 effects::EffectKind::GainKeyword(keyword) => {
-                    if let Some(target) = battlefield_target {
-                        effect_messages.p1().write(effects::KeywordGranted { target, keyword });
-                    }
+                    request_gain_keyword(&mut effect_messages, battlefield_target, keyword);
                 }
                 effects::EffectKind::WinTheGame => {
                     player_effects.p4().write(rules::Would(rules::WinGame(controller)));
@@ -177,11 +176,97 @@ fn effect_of(lookups: &stack::ResolutionLookups<'_, '_>, spell: Entity) -> Optio
         .or_else(|| lookups.abilities.get(spell).ok().map(|ability| ability.effect))
 }
 
+fn request_destroy(
+    destructions: &mut MessageWriter<rules::Would<rules::Destroy>>,
+    lookups: &stack::ResolutionLookups<'_, '_>,
+    target: Option<Entity>,
+    controller: Entity,
+) {
+    if let Some(target) = target {
+        destructions.write(rules::Would(rules::Destroy {
+            permanent: target,
+            controller: permanent_controller(lookups, target, controller),
+        }));
+    }
+}
+
+fn request_counter(
+    countered: &mut MessageWriter<rules::Would<rules::Counter>>,
+    lookups: &stack::ResolutionLookups<'_, '_>,
+    target: Option<Entity>,
+    target_on_stack: bool,
+    controller: Entity,
+) {
+    if let Some(target) = target
+        && target_on_stack
+    {
+        countered.write(rules::Would(rules::Counter {
+            spell: target,
+            controller: permanent_controller(lookups, target, controller),
+        }));
+    }
+}
+
+fn request_exile(
+    commands: &mut Commands,
+    lookups: &stack::ResolutionLookups<'_, '_>,
+    zones: &zones::ZoneLookup,
+    spell: Entity,
+    chosen_target: Option<Entity>,
+) {
+    let source =
+        chosen_target.or_else(|| lookups.abilities.get(spell).ok().map(|ability| ability.source));
+    let exile = source
+        .and_then(|target| lookups.owners.get(target).ok())
+        .and_then(|owner| zones.find(EXILE, Some(**owner)))
+        .zip(source);
+    if let Some((exile, target)) = exile {
+        commands.entity(target).insert(zones::InZone(exile));
+    }
+}
+
+fn request_modify_power_toughness(
+    effect_messages: &mut ParamSet<EffectMessageWriters<'_, '_, '_, '_>>,
+    target: Option<Entity>,
+    power: i32,
+    toughness: i32,
+) {
+    if let Some(target) = target {
+        effect_messages.p0().write(effects::PowerToughnessModified {
+            target,
+            power,
+            toughness,
+        });
+    }
+}
+
+fn request_gain_keyword(
+    effect_messages: &mut ParamSet<EffectMessageWriters<'_, '_, '_, '_>>,
+    target: Option<Entity>,
+    keyword: keywords::StaticKeyword,
+) {
+    if let Some(target) = target {
+        effect_messages.p1().write(effects::KeywordGranted { target, keyword });
+    }
+}
+
+fn request_poison(
+    commands: &mut Commands,
+    lookups: &stack::ResolutionLookups<'_, '_>,
+    players: &[Entity],
+    amount: u32,
+) {
+    for player in players {
+        add_poison_counters(commands, lookups, *player, amount);
+    }
+}
+
 fn request_damage(
-    damage_dealt: &mut MessageWriter<damage::DamageDealt>,
+    damage_dealt: &mut MessageWriter<rules::Would<rules::DealDamage>>,
     lookups: &stack::ResolutionLookups<'_, '_>,
     spell: Entity,
     target: Option<Entity>,
+    controller: Entity,
     amount: u32,
 ) {
     let Some(target) = target else {
@@ -193,11 +278,23 @@ fn request_damage(
     {
         return;
     }
-    damage_dealt.write(damage::DamageDealt {
+    damage_dealt.write(rules::Would(rules::DealDamage {
         source: spell,
-        target,
+        recipient: target,
         amount,
-    });
+        controller: permanent_controller(lookups, target, controller),
+    }));
+}
+
+fn permanent_controller(
+    lookups: &stack::ResolutionLookups<'_, '_>,
+    target: Entity,
+    fallback: Entity,
+) -> Entity {
+    if lookups.lives.get(target).is_ok() {
+        return target;
+    }
+    lookups.owners.get(target).map_or(fallback, |owner| **owner)
 }
 
 fn request_draws(

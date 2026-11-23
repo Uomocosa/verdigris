@@ -3,7 +3,6 @@ use bevy::prelude::App;
 use crate::StateBasedActionsPerformed;
 use crate::actions;
 use crate::cards;
-use crate::damage;
 use crate::effects;
 use crate::rules;
 use crate::stack;
@@ -13,9 +12,6 @@ pub fn register_messages_and_resources(app: &mut App) {
     app.add_message::<actions::PlayerAction>()
         .add_message::<actions::Rejected>()
         .add_message::<stack::Resolution>()
-        .add_message::<stack::Countered>()
-        .add_message::<damage::DamageDealt>()
-        .add_message::<damage::Destruction>()
         .add_message::<rules::Would<rules::LoseGame>>()
         .add_message::<rules::Would<rules::WinGame>>()
         .add_message::<rules::Would<rules::DrawFromEmptyLibrary>>()
@@ -25,6 +21,9 @@ pub fn register_messages_and_resources(app: &mut App) {
         .add_message::<rules::Would<rules::GainLife>>()
         .add_message::<rules::Would<rules::Mill>>()
         .add_message::<rules::Would<rules::CreateTokens>>()
+        .add_message::<rules::Would<rules::Destroy>>()
+        .add_message::<rules::Would<rules::Counter>>()
+        .add_message::<rules::Would<rules::DealDamage>>()
         .add_message::<rules::Proceeds<rules::LoseGame>>()
         .add_message::<rules::Proceeds<rules::WinGame>>()
         .add_message::<rules::Proceeds<rules::DrawFromEmptyLibrary>>()
@@ -34,6 +33,9 @@ pub fn register_messages_and_resources(app: &mut App) {
         .add_message::<rules::Proceeds<rules::GainLife>>()
         .add_message::<rules::Proceeds<rules::Mill>>()
         .add_message::<rules::Proceeds<rules::CreateTokens>>()
+        .add_message::<rules::Proceeds<rules::Destroy>>()
+        .add_message::<rules::Proceeds<rules::Counter>>()
+        .add_message::<rules::Proceeds<rules::DealDamage>>()
         .add_message::<effects::PowerToughnessModified>()
         .add_message::<effects::KeywordGranted>()
         .add_message::<cards::Entered>()

@@ -17,7 +17,7 @@ impl CombatDamageChoice {
         &self,
         player: Entity,
         assignments: &[actions::DamageAssignment],
-    ) -> Option<Vec<damage::DamageDealt>> {
+    ) -> Option<Vec<damage::AssignedDamage>> {
     }
 }
 

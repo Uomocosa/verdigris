@@ -23,6 +23,15 @@ pub use any_event::AnyEvent;
 mod create_tokens;
 pub use create_tokens::CreateTokens;
 
+mod counter;
+pub use counter::Counter;
+
+mod deal_damage;
+pub use deal_damage::DealDamage;
+
+mod destroy;
+pub use destroy::Destroy;
+
 mod discard;
 pub use discard::Discard;
 

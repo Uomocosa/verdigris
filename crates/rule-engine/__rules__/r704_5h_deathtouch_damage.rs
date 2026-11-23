@@ -2,15 +2,21 @@ use bevy::prelude::{Commands, Entity, MessageWriter, Query, With};
 
 use crate::cards;
 use crate::damage;
+use crate::rules;
 
 /// 704.5h If a creature has toughness greater than 0, and it’s been dealt damage by a source with
 /// deathtouch since the last time state-based actions were checked, that creature is destroyed.
 /// Regeneration can replace this event.
 pub fn r704_5h_deathtouch_damage(
-    mut destructions: MessageWriter<damage::Destruction>,
+    mut destructions: MessageWriter<rules::Would<rules::Destroy>>,
     mut commands: Commands,
     cards: Query<
-        (Entity, &cards::EffectivePT, &damage::DealtByDeathtouch),
+        (
+            Entity,
+            &cards::Owner,
+            &cards::EffectivePT,
+            &damage::DealtByDeathtouch,
+        ),
         With<cards::OnBattlefield>,
     >,
     marked: Query<Entity, With<damage::DealtByDeathtouch>>,
@@ -18,9 +24,12 @@ pub fn r704_5h_deathtouch_damage(
     for creature in marked.iter() {
         commands.entity(creature).remove::<damage::DealtByDeathtouch>();
     }
-    for (creature, effective, _) in cards.iter() {
+    for (creature, owner, effective, _) in cards.iter() {
         if effective.toughness > 0 {
-            destructions.write(damage::Destruction(creature));
+            destructions.write(rules::Would(rules::Destroy {
+                permanent: creature,
+                controller: **owner,
+            }));
         }
     }
 }

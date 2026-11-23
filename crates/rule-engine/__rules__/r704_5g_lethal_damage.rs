@@ -2,21 +2,28 @@ use bevy::prelude::{Entity, MessageWriter, Query, With};
 
 use crate::cards;
 use crate::damage;
+use crate::rules;
 
 /// 704.5g If a creature has toughness greater than 0, it has damage marked on it, and the total
 /// damage marked on it is greater than or equal to its toughness, that creature has been dealt
 /// lethal damage and is destroyed. Regeneration can replace this event.
 pub fn r704_5g_lethal_damage(
-    mut destructions: MessageWriter<damage::Destruction>,
-    cards: Query<(Entity, &cards::EffectivePT, &damage::Damage), With<cards::OnBattlefield>>,
+    mut destructions: MessageWriter<rules::Would<rules::Destroy>>,
+    cards: Query<
+        (Entity, &cards::Owner, &cards::EffectivePT, &damage::Damage),
+        With<cards::OnBattlefield>,
+    >,
 ) {
-    for (creature, effective, damage) in cards.iter() {
+    for (creature, owner, effective, damage) in cards.iter() {
         let marked = damage::Damage::signed_amount(**damage);
         let is_lethal = effective.toughness > 0 && marked > 0 && marked >= effective.toughness;
         if !is_lethal {
             continue;
         }
-        destructions.write(damage::Destruction(creature));
+        destructions.write(rules::Would(rules::Destroy {
+            permanent: creature,
+            controller: **owner,
+        }));
     }
 }
 

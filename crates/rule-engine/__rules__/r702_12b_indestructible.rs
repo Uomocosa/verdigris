@@ -3,21 +3,21 @@ use bevy::prelude::{Commands, MessageReader, Query, ResMut, With, Without};
 
 use crate::StateBasedActionsPerformed;
 use crate::cards;
-use crate::damage;
+use crate::rules;
 use crate::zones;
 
 /// 702.12b A permanent with indestructible can’t be destroyed. Such permanents aren’t destroyed by
 /// lethal damage, and they ignore the state-based action that checks for lethal damage (see rule
 /// 704.5g).
 pub fn r702_12b_indestructible(
-    mut destructions: MessageReader<damage::Destruction>,
+    mut destructions: MessageReader<rules::Proceeds<rules::Destroy>>,
     mut commands: Commands,
     mut state_based_actions_performed: ResMut<StateBasedActionsPerformed>,
     cards: Query<&cards::Owner, (With<cards::OnBattlefield>, Without<cards::Indestructible>)>,
     zones: zones::ZoneLookup,
 ) {
     for destruction in destructions.read() {
-        let permanent = **destruction;
+        let permanent = destruction.permanent;
         let Ok(owner) = cards.get(permanent) else {
             continue;
         };
@@ -83,6 +83,23 @@ mod tests {
         ])?;
         assert!(game.player(p2).cards_in(BATTLEFIELD).has(myr));
         assert!(game.player(p1).cards_in(GRAVEYARD).has(blade));
+        Ok(())
+    }
+
+    #[test]
+    fn safe_haven_stops_murder_from_destroying_the_protected_creature() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.hand([MURDER]).mana_pool(mana![1, B, B]),
+            P2.battlefield([TEST_SAFE_HAVEN, GRIZZLY_BEARS]),
+        ]);
+        let [murder] = game.player(p1).cards_in(HAND).exactly::<1>(MURDER)?;
+        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        game.play([
+            p1.cast(murder).targeting(bears).pass_priority(),
+            p2.pass_priority(),
+        ])?;
+        assert!(game.player(p2).cards_in(BATTLEFIELD).has(bears));
+        assert!(game.player(p1).cards_in(GRAVEYARD).has(murder));
         Ok(())
     }
 }

@@ -403,4 +403,118 @@ mod tests {
             .unwrap();
         Ok(())
     }
+
+    #[test]
+    fn a_cant_aimed_at_destroy_is_illegal_for_the_protected_creature() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.battlefield([TEST_SAFE_HAVEN, GRIZZLY_BEARS]),
+            P2.battlefield([GRIZZLY_BEARS]),
+        ]);
+        let [protected] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        let [exposed] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        game.pass_priority();
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                assert_eq!(
+                    legality::<rules::Destroy>(
+                        &answers,
+                        &rules::Destroy {
+                            permanent: *protected,
+                            controller: p1.into(),
+                        }
+                    ),
+                    rules::Legality::Illegal
+                );
+                assert_eq!(
+                    legality::<rules::Destroy>(
+                        &answers,
+                        &rules::Destroy {
+                            permanent: *exposed,
+                            controller: p2.into(),
+                        }
+                    ),
+                    rules::Legality::Legal
+                );
+            })
+            .unwrap();
+        Ok(())
+    }
+
+    #[test]
+    fn a_cant_aimed_at_counter_is_illegal_for_the_protected_controller() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.battlefield([TEST_SAFE_HAVEN, GRIZZLY_BEARS]),
+            P2.battlefield([GRIZZLY_BEARS]),
+        ]);
+        let [protected] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        game.pass_priority();
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                assert_eq!(
+                    legality::<rules::Counter>(
+                        &answers,
+                        &rules::Counter {
+                            spell: *protected,
+                            controller: p1.into(),
+                        }
+                    ),
+                    rules::Legality::Illegal
+                );
+                assert_eq!(
+                    legality::<rules::Counter>(
+                        &answers,
+                        &rules::Counter {
+                            spell: *protected,
+                            controller: p2.into(),
+                        }
+                    ),
+                    rules::Legality::Legal
+                );
+            })
+            .unwrap();
+        Ok(())
+    }
+
+    #[test]
+    fn a_cant_aimed_at_deal_damage_is_illegal_for_the_protected_recipient() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.battlefield([TEST_SAFE_HAVEN, GRIZZLY_BEARS]),
+            P2.battlefield([GRIZZLY_BEARS]),
+        ]);
+        let [protected] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        let [exposed] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        game.pass_priority();
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                assert_eq!(
+                    legality::<rules::DealDamage>(
+                        &answers,
+                        &rules::DealDamage {
+                            source: *exposed,
+                            recipient: *protected,
+                            amount: 3,
+                            controller: p1.into(),
+                        }
+                    ),
+                    rules::Legality::Illegal
+                );
+                assert_eq!(
+                    legality::<rules::DealDamage>(
+                        &answers,
+                        &rules::DealDamage {
+                            source: *exposed,
+                            recipient: *exposed,
+                            amount: 3,
+                            controller: p2.into(),
+                        }
+                    ),
+                    rules::Legality::Legal
+                );
+            })
+            .unwrap();
+        Ok(())
+    }
 }

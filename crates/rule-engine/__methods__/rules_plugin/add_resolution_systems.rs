@@ -35,6 +35,12 @@ pub fn add_resolution_systems(app: &mut App) {
                 comprehensive_rules::r614_1a_r616_1_replacement_effects::r614_1a_r616_1_replacement_effects::<
                     rules::CreateTokens,
                 >,
+                comprehensive_rules::r614_1a_r616_1_replacement_effects::r614_1a_r616_1_replacement_effects::<
+                    rules::Counter,
+                >,
+                comprehensive_rules::r614_1a_r616_1_replacement_effects::r614_1a_r616_1_replacement_effects::<
+                    rules::DealDamage,
+                >,
             )
                 .chain(),
             (
@@ -71,7 +77,7 @@ mod tests {
 
         assert_eq!(
             app.get_schedule(Update).map(Schedule::systems_len),
-            Some(23)
+            Some(25)
         );
     }
 }

@@ -13,6 +13,9 @@ pub enum AnyEvent {
     GainLife(rules::GainLife),
     Mill(rules::Mill),
     CreateTokens(rules::CreateTokens),
+    Destroy(rules::Destroy),
+    Counter(rules::Counter),
+    DealDamage(rules::DealDamage),
 }
 
 impl AnyEvent {
@@ -43,6 +46,15 @@ impl AnyEvent {
                 commands.write_message(rules::Would(happened));
             }
             Self::CreateTokens(happened) => {
+                commands.write_message(rules::Would(happened));
+            }
+            Self::Destroy(happened) => {
+                commands.write_message(rules::Would(happened));
+            }
+            Self::Counter(happened) => {
+                commands.write_message(rules::Would(happened));
+            }
+            Self::DealDamage(happened) => {
                 commands.write_message(rules::Would(happened));
             }
         }

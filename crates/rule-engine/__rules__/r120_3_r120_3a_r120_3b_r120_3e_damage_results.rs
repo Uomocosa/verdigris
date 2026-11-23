@@ -3,6 +3,7 @@ use bevy::prelude::{Commands, Has, MessageReader, Query};
 use crate::cards;
 use crate::damage;
 use crate::players;
+use crate::rules;
 
 /// 120.3. Damage may have one or more of the following results, depending on whether the recipient
 /// of the damage is a player or permanent, the characteristics of the damage’s source, and the
@@ -17,7 +18,7 @@ use crate::players;
 /// 120.3e Damage dealt to a creature by a source with neither wither nor infect causes that much
 /// damage to be marked on that creature.
 pub fn r120_3_r120_3a_r120_3b_r120_3e_damage_results(
-    mut damage_dealt: MessageReader<damage::DamageDealt>,
+    mut damage_dealt: MessageReader<rules::Proceeds<rules::DealDamage>>,
     mut commands: Commands,
     mut lives: Query<&mut players::Life>,
     mut poisoned: Query<&mut players::PoisonCounters>,
@@ -29,27 +30,29 @@ pub fn r120_3_r120_3a_r120_3b_r120_3e_damage_results(
         if event.amount == 0 {
             continue;
         }
-        if lives.get_mut(event.target).is_ok() {
+        if lives.get_mut(event.recipient).is_ok() {
             if infect_sources.get(event.source).is_ok_and(|has| has) {
-                if let Ok(mut counters) = poisoned.get_mut(event.target) {
+                if let Ok(mut counters) = poisoned.get_mut(event.recipient) {
                     *counters = players::PoisonCounters((**counters).saturating_add(event.amount));
                 } else {
-                    commands.entity(event.target).insert(players::PoisonCounters(event.amount));
+                    commands.entity(event.recipient).insert(players::PoisonCounters(event.amount));
                 }
                 continue;
             }
-            if let Ok(mut life) = lives.get_mut(event.target) {
+            if let Ok(mut life) = lives.get_mut(event.recipient) {
                 *life = players::Life(
                     (**life).saturating_sub(damage::Damage::signed_amount(event.amount)),
                 );
                 continue;
             }
         }
-        let marked = targets.get(event.target).ok().flatten().map_or(0, |damage| **damage);
-        commands.entity(event.target).insert(damage::Damage(marked.saturating_add(event.amount)));
+        let marked = targets.get(event.recipient).ok().flatten().map_or(0, |damage| **damage);
+        commands
+            .entity(event.recipient)
+            .insert(damage::Damage(marked.saturating_add(event.amount)));
         let has_deathtouch = sources.get(event.source).is_ok_and(|has| has);
         if has_deathtouch {
-            commands.entity(event.target).insert(damage::DealtByDeathtouch);
+            commands.entity(event.recipient).insert(damage::DealtByDeathtouch);
         }
     }
 }

@@ -21,7 +21,7 @@ pub fn assigned_blocked_damage(
     participants: &BTreeSet<Entity>,
     needed: &mut Vec<actions::RequiredCombatDamage>,
     source_has_deathtouch: bool,
-) -> Vec<damage::DamageDealt> {
+) -> Vec<damage::AssignedDamage> {
     let mut writes = Vec::new();
     let mut blockers_of: Vec<(Entity, u32)> = Vec::new();
     for (blocker, blocking, marked, effective) in blockers.iter() {
@@ -53,7 +53,7 @@ pub fn assigned_blocked_damage(
         let Ok(blocker_amount) = u32::try_from(blocker_power_toughness.power) else {
             continue;
         };
-        writes.push(damage::DamageDealt {
+        writes.push(damage::AssignedDamage {
             source: blocker,
             target: source,
             amount: blocker_amount,
@@ -70,7 +70,7 @@ pub fn assigned_blocked_damage(
                 amount
             };
             if into_blocker > 0 {
-                writes.push(damage::DamageDealt {
+                writes.push(damage::AssignedDamage {
                     source,
                     target: *blocker,
                     amount: into_blocker,
@@ -78,7 +78,7 @@ pub fn assigned_blocked_damage(
             }
             let into_defender = amount.saturating_sub(into_blocker);
             if into_defender > 0 {
-                writes.push(damage::DamageDealt {
+                writes.push(damage::AssignedDamage {
                     source,
                     target: defending,
                     amount: into_defender,
@@ -86,7 +86,7 @@ pub fn assigned_blocked_damage(
             }
         }
         [] if definition.has_keyword(keywords::StaticKeyword::Trample) => {
-            writes.push(damage::DamageDealt {
+            writes.push(damage::AssignedDamage {
                 source,
                 target: defending,
                 amount,
@@ -161,7 +161,7 @@ mod tests {
             &cards::Blocking,
             Option<&damage::Damage>,
             Option<&cards::EffectivePT>,
-        ), Vec<damage::DamageDealt>>(|blockers| {
+        ), Vec<damage::AssignedDamage>>(|blockers| {
             attacker.assigned_blocked_damage(
                 source,
                 3,
@@ -176,17 +176,17 @@ mod tests {
         assert_eq!(
             writes,
             vec![
-                damage::DamageDealt {
+                damage::AssignedDamage {
                     source: bears_blocking,
                     target: source,
                     amount: 2,
                 },
-                damage::DamageDealt {
+                damage::AssignedDamage {
                     source,
                     target: bears_blocking,
                     amount: 2,
                 },
-                damage::DamageDealt {
+                damage::AssignedDamage {
                     source,
                     target: defending,
                     amount: 1,
@@ -236,7 +236,7 @@ mod tests {
             &cards::Blocking,
             Option<&damage::Damage>,
             Option<&cards::EffectivePT>,
-        ), Vec<damage::DamageDealt>>(|blockers| {
+        ), Vec<damage::AssignedDamage>>(|blockers| {
             attacker.assigned_blocked_damage(
                 source,
                 3,
@@ -251,17 +251,17 @@ mod tests {
         assert_eq!(
             writes,
             vec![
-                damage::DamageDealt {
+                damage::AssignedDamage {
                     source: spider_blocking,
                     target: source,
                     amount: 2,
                 },
-                damage::DamageDealt {
+                damage::AssignedDamage {
                     source,
                     target: spider_blocking,
                     amount: 1,
                 },
-                damage::DamageDealt {
+                damage::AssignedDamage {
                     source,
                     target: defending,
                     amount: 2,

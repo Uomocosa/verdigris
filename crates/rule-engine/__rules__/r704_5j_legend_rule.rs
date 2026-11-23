@@ -5,13 +5,13 @@ use bevy::prelude::{Entity, MessageReader, MessageWriter, Query, ResMut, With};
 use crate::StateBasedActionsPerformed;
 use crate::actions;
 use crate::cards;
-use crate::damage;
+use crate::rules;
 
 /// 704.5j If two or more legendary permanents with the same name are controlled by the same
 /// player, that player chooses one of them, and the rest are put into their owners’ graveyards.
 /// This is called the “legend rule.”
 pub fn r704_5j_legend_rule(
-    mut destructions: MessageWriter<damage::Destruction>,
+    mut destructions: MessageWriter<rules::Would<rules::Destroy>>,
     mut pending: ResMut<actions::PendingChoice>,
     mut performed: ResMut<StateBasedActionsPerformed>,
     mut actions: MessageReader<actions::PlayerAction>,
@@ -29,7 +29,10 @@ pub fn r704_5j_legend_rule(
         }
         *pending = actions::PendingChoice(None);
         for other in choice.legal.iter().copied().filter(|other| other != chosen) {
-            destructions.write(damage::Destruction(other));
+            destructions.write(rules::Would(rules::Destroy {
+                permanent: other,
+                controller: choice.player,
+            }));
         }
         **performed = true;
         return;

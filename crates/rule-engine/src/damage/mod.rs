@@ -2,7 +2,7 @@
 mod basic;
 
 pub use basic::components::DealtByDeathtouch;
-pub use basic::messages::{DamageDealt, Destruction};
+pub use basic::structs::AssignedDamage;
 
 mod damage;
 pub use damage::Damage;

@@ -8,14 +8,20 @@ pub fn replacement<E: Event>(
     let affected = event.player();
     let subject = event.subject();
     let other = event.other();
-    answers.changes(affected, rules::Target::Event(E::ID)).into_iter().find_map(|change| {
-        match change {
-            rules::Change::Instead { when, then } => {
-                let bound = when.bind(event);
-                answers.eval(&bound, subject, other, Some(affected)).then_some(then)
+    let mut entities = vec![subject];
+    if affected != subject {
+        entities.push(affected);
+    }
+    entities.into_iter().find_map(|entity| {
+        answers.changes(entity, rules::Target::Event(E::ID)).into_iter().find_map(|change| {
+            match change {
+                rules::Change::Instead { when, then } => {
+                    let bound = when.bind(event);
+                    answers.eval(&bound, subject, other, Some(affected)).then_some(then)
+                }
+                _ => None,
             }
-            _ => None,
-        }
+        })
     })
 }
 

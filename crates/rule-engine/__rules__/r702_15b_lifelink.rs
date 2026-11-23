@@ -3,12 +3,13 @@ use bevy::prelude::{MessageReader, Query, With};
 use crate::cards;
 use crate::damage;
 use crate::players;
+use crate::rules;
 
 /// 702.15b Damage dealt by a source with lifelink causes that source’s controller, or its owner if it
 /// has no controller, to gain that much life (in addition to any other results that damage causes).
 /// See rule 120.3.
 pub fn r702_15b_lifelink(
-    mut damage_dealt: MessageReader<damage::DamageDealt>,
+    mut damage_dealt: MessageReader<rules::Proceeds<rules::DealDamage>>,
     mut lives: Query<&mut players::Life>,
     sources: Query<&cards::Owner, With<cards::Lifelink>>,
 ) {
