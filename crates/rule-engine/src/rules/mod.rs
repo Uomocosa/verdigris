@@ -18,6 +18,9 @@ pub use attack_ctx::AttackCtx;
 mod block_ctx;
 pub use block_ctx::BlockCtx;
 
+mod clause_id;
+pub use clause_id::ClauseId;
+
 mod predicate;
 pub use predicate::Predicate;
 
