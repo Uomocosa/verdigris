@@ -1,3 +1,5 @@
+use atomic_delegate_macros::atomic_delegates;
+
 use crate::cards;
 use crate::rules;
 use crate::turns;
@@ -19,6 +21,7 @@ pub enum Predicate {
     StackEmpty,
     ActivePlayer(rules::Role),
     HasPriority(rules::Role),
+    EventField(rules::Field, rules::Comparison, u32),
 }
 
 #[rustfmt::skip]
@@ -55,6 +58,12 @@ impl std::ops::BitOr for Predicate {
         }
         Self::Any(disjuncts)
     }
+}
+
+#[atomic_delegates]
+impl Predicate {
+    #[must_use]
+    pub fn bind<E: rules::traits::event::Event>(&self, event: &E) -> Self {}
 }
 
 #[cfg(test)]

@@ -7,6 +7,10 @@ pub fn instantiate<E: Event>(template: &rules::EventTemplate, event: &E) -> rule
         rules::Role::Other => event.other().unwrap_or_else(|| event.player()),
         rules::Role::Player => event.player(),
     };
+    let amount = |amount: &rules::Amount| match amount {
+        rules::Amount::Fixed(fixed) => *fixed,
+        rules::Amount::FromEvent(field) => event.field(*field).unwrap_or(0),
+    };
     match template {
         rules::EventTemplate::WinGame { who } => {
             rules::AnyEvent::WinGame(rules::WinGame(holder(who)))
@@ -14,6 +18,20 @@ pub fn instantiate<E: Event>(template: &rules::EventTemplate, event: &E) -> rule
         rules::EventTemplate::LoseGame { who } => {
             rules::AnyEvent::LoseGame(rules::LoseGame(holder(who)))
         }
+        rules::EventTemplate::Draw {
+            who,
+            amount: template_amount,
+        } => rules::AnyEvent::Draw(rules::Draw {
+            player: holder(who),
+            amount: amount(template_amount),
+        }),
+        rules::EventTemplate::LoseLife {
+            who,
+            amount: template_amount,
+        } => rules::AnyEvent::LoseLife(rules::LoseLife {
+            player: holder(who),
+            amount: amount(template_amount),
+        }),
     }
 }
 

@@ -99,6 +99,7 @@ pub fn eval(
         rules::Predicate::HasPriority(role) => target(role).is_some_and(|holder| {
             answers.priority.single().is_ok_and(|priority| priority.player == holder)
         }),
+        rules::Predicate::EventField(..) => false,
     }
 }
 

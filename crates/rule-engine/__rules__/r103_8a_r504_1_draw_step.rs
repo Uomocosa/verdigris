@@ -1,6 +1,7 @@
 use bevy::prelude::{Entity, MessageReader, MessageWriter, Query, Res, With};
 
 use crate::players;
+use crate::rules;
 use crate::turns;
 
 /// 504.1. First, the active player draws a card. This turn-based action doesn’t use the stack.
@@ -9,7 +10,7 @@ use crate::turns;
 /// Step”) of their first turn.
 pub fn r103_8a_r504_1_draw_step(
     mut step_started: MessageReader<turns::StepStarted>,
-    mut draws: MessageWriter<players::DrawRequested>,
+    mut draws: MessageWriter<rules::Would<rules::Draw>>,
     turn: Res<turns::Turn>,
     turn_order: Res<turns::TurnOrder>,
     players: Query<Entity, With<players::Player>>,
@@ -24,10 +25,10 @@ pub fn r103_8a_r504_1_draw_step(
             if is_first_turn_skip {
                 continue;
             }
-            draws.write(players::DrawRequested {
+            draws.write(rules::Would(rules::Draw {
                 player: turn.active,
-                count: 1,
-            });
+                amount: 1,
+            }));
         }
     }
 }

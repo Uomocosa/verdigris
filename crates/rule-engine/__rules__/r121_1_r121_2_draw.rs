@@ -1,7 +1,6 @@
 use crate::{HAND, LIBRARY};
 use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query};
 
-use crate::players;
 use crate::rules;
 use crate::zones;
 
@@ -17,30 +16,32 @@ use crate::zones;
 /// The top card of a library is the first card in its `ZoneContents`, and `MockGameBuilder` lists a
 /// library top first.
 pub fn r121_1_r121_2_draw(
-    mut draws: MessageReader<players::DrawRequested>,
+    mut draws: MessageReader<rules::Proceeds<rules::Draw>>,
     mut attempted: MessageWriter<rules::Would<rules::DrawFromEmptyLibrary>>,
     mut commands: Commands,
     zones: zones::ZoneLookup,
     zone_contents: Query<&zones::ZoneContents>,
 ) {
     for draw in draws.read() {
-        let Some(library) = zones.find(LIBRARY, Some(draw.player)) else {
+        let player = draw.player;
+        let count = draw.amount;
+        let Some(library) = zones.find(LIBRARY, Some(player)) else {
             continue;
         };
         let drawn_from_top: Vec<Entity> = zone_contents
             .get(library)
             .map(|contents| {
-                let requested = usize::try_from(draw.count).unwrap_or(usize::MAX);
+                let requested = usize::try_from(count).unwrap_or(usize::MAX);
                 contents.iter().take(requested).copied().collect()
             })
             .unwrap_or_default();
-        if let Some(hand) = zones.find(HAND, Some(draw.player)) {
+        if let Some(hand) = zones.find(HAND, Some(player)) {
             for card in &drawn_from_top {
                 commands.entity(*card).insert(zones::InZone(hand));
             }
         }
-        if u32::try_from(drawn_from_top.len()).unwrap_or(u32::MAX) < draw.count {
-            attempted.write(rules::Would(rules::DrawFromEmptyLibrary(draw.player)));
+        if u32::try_from(drawn_from_top.len()).unwrap_or(u32::MAX) < count {
+            attempted.write(rules::Would(rules::DrawFromEmptyLibrary(player)));
         }
     }
 }
@@ -49,6 +50,7 @@ pub fn r121_1_r121_2_draw(
 mod tests {
     use crate::mana;
     use crate::testing::*;
+    use crate::turns;
     use crate::{GRAVEYARD, HAND, LIBRARY};
 
     #[test]
@@ -65,6 +67,43 @@ mod tests {
         assert!(game.player(p1).cards_in(HAND).has(LIGHTNING_BOLT));
         assert!(game.player(p1).cards_in(GRAVEYARD).has(divination));
         game.player(p1).cards_in(LIBRARY).exactly::<1>(MURDER)?;
+        Ok(())
+    }
+
+    #[test]
+    fn sign_in_blood_draw_two_is_replaced_by_lose_two_with_painful_lessons() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.hand([SIGN_IN_BLOOD])
+                .library([LIGHTNING_BOLT, MURDER])
+                .battlefield([TEST_PAINFUL_LESSONS])
+                .mana_pool(mana![B, B]),
+            P2,
+        ]);
+        let [sign_in_blood] = game.player(p1).cards_in(HAND).exactly::<1>(SIGN_IN_BLOOD)?;
+        game.play([
+            p1.cast(sign_in_blood).targeting(p1).end_turn(),
+            p2.end_turn(),
+        ])?;
+        assert!(!game.player(p1).cards_in(HAND).has(LIGHTNING_BOLT));
+        assert!(!game.player(p1).cards_in(HAND).has(MURDER));
+        assert_eq!(game.life(p1), 16);
+        Ok(())
+    }
+
+    #[test]
+    fn draw_step_draw_one_is_not_replaced_with_painful_lessons() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::builder().turn(2, turns::Step::Upkeep).players([
+            P1.battlefield([TEST_PAINFUL_LESSONS]).library([GRIZZLY_BEARS, LIGHTNING_BOLT]),
+            P2,
+        ]);
+        let [bears] = game.player(p1).cards_in(LIBRARY).exactly::<1>(GRIZZLY_BEARS)?;
+        let hand_before = game.player(p1).cards_in(HAND).count();
+
+        game.play([p1.pass_priority(), p2.pass_priority(), p1.pass_priority()])?;
+
+        assert!(game.player(p1).cards_in(HAND).has(bears));
+        assert_eq!(game.player(p1).cards_in(HAND).count(), hand_before + 1);
+        assert_eq!(game.life(p1), 20);
         Ok(())
     }
 }

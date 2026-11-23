@@ -5,8 +5,20 @@ use crate::rules::traits::event::Event;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum EventTemplate {
-    WinGame { who: rules::Role },
-    LoseGame { who: rules::Role },
+    WinGame {
+        who: rules::Role,
+    },
+    LoseGame {
+        who: rules::Role,
+    },
+    Draw {
+        who: rules::Role,
+        amount: rules::Amount,
+    },
+    LoseLife {
+        who: rules::Role,
+        amount: rules::Amount,
+    },
 }
 
 #[atomic_delegates]

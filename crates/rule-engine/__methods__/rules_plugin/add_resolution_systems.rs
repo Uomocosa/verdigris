@@ -2,6 +2,7 @@ use bevy::prelude::{App, IntoScheduleConfigs, Update};
 
 use crate::RuleSet;
 use crate::comprehensive_rules;
+use crate::rules;
 
 pub fn add_resolution_systems(app: &mut App) {
     app.add_systems(
@@ -12,6 +13,12 @@ pub fn add_resolution_systems(app: &mut App) {
             comprehensive_rules::r608_2b_illegal_targets::r608_2b_illegal_targets,
             comprehensive_rules::r608_2_r608_2c_resolve::r608_2_r608_2c_resolve,
             comprehensive_rules::r611_2a_continuous_effects::r611_2a_continuous_effects,
+            comprehensive_rules::r614_1a_r616_1_replacement_effects::r614_1a_r616_1_replacement_effects::<
+                rules::Draw,
+            >,
+            comprehensive_rules::r614_1a_r616_1_replacement_effects::r614_1a_r616_1_replacement_effects::<
+                rules::LoseLife,
+            >,
             comprehensive_rules::r121_1_r121_2_draw::r121_1_r121_2_draw,
             comprehensive_rules::r701_17a_r701_17b_mill::r701_17a_r701_17b_mill,
             comprehensive_rules::r119_3_life_loss::r119_3_life_loss,
@@ -43,7 +50,7 @@ mod tests {
 
         assert_eq!(
             app.get_schedule(Update).map(Schedule::systems_len),
-            Some(17)
+            Some(19)
         );
     }
 }

@@ -11,7 +11,8 @@ pub fn replacement<E: Event>(
     answers.changes(affected, rules::Target::Event(E::ID)).into_iter().find_map(|change| {
         match change {
             rules::Change::Instead { when, then } => {
-                answers.eval(&when, subject, other, Some(affected)).then_some(then)
+                let bound = when.bind(event);
+                answers.eval(&bound, subject, other, Some(affected)).then_some(then)
             }
             _ => None,
         }

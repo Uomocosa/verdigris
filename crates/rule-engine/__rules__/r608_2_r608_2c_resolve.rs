@@ -15,11 +15,12 @@ type EffectMessageWriters<'a, 'b, 'c, 'd> = (
     MessageWriter<'d, effects::TokensRequested>,
 );
 
-type PlayerEffectWriters<'a, 'b, 'c, 'd> = (
-    MessageWriter<'a, players::LifeLost>,
+type PlayerEffectWriters<'a, 'b, 'c, 'd, 'e> = (
+    MessageWriter<'a, rules::Would<rules::LoseLife>>,
     MessageWriter<'b, players::DiscardRequested>,
     MessageWriter<'c, players::LifeGained>,
-    MessageWriter<'d, rules::Would<rules::WinGame>>,
+    MessageWriter<'d, rules::Would<rules::Draw>>,
+    MessageWriter<'e, rules::Would<rules::WinGame>>,
 );
 
 /// 608.2. If the object that’s resolving is an instant spell, a sorcery spell, or an ability, its
@@ -39,8 +40,7 @@ pub fn r608_2_r608_2c_resolve(
     mut damage_dealt: MessageWriter<damage::DamageDealt>,
     mut destructions: MessageWriter<damage::Destruction>,
     mut countered: MessageWriter<stack::Countered>,
-    mut draws: MessageWriter<players::DrawRequested>,
-    mut player_effects: ParamSet<PlayerEffectWriters<'_, '_, '_, '_>>,
+    mut player_effects: ParamSet<PlayerEffectWriters<'_, '_, '_, '_, '_>>,
     mut effect_messages: ParamSet<EffectMessageWriters<'_, '_, '_, '_>>,
     lookups: stack::ResolutionLookups<'_, '_>,
     zones: zones::ZoneLookup,
@@ -100,9 +100,7 @@ pub fn r608_2_r608_2c_resolve(
                     });
                 }
                 effects::EffectKind::Draw(count) => {
-                    for player in players_or_fallback(&player_targets, **owner) {
-                        draws.write(players::DrawRequested { player, count });
-                    }
+                    request_draws(&mut player_effects.p3(), &player_targets, **owner, count);
                 }
                 effects::EffectKind::Mill(count) => {
                     for player in players_or_fallback(&player_targets, controller) {
@@ -140,7 +138,7 @@ pub fn r608_2_r608_2c_resolve(
                     }
                 }
                 effects::EffectKind::WinTheGame => {
-                    player_effects.p3().write(rules::Would(rules::WinGame(controller)));
+                    player_effects.p4().write(rules::Would(rules::WinGame(controller)));
                 }
             }
         }
@@ -200,16 +198,30 @@ fn request_damage(
     });
 }
 
+fn request_draws(
+    draws: &mut MessageWriter<rules::Would<rules::Draw>>,
+    players: &[Entity],
+    fallback: Entity,
+    count: u32,
+) {
+    for player in players_or_fallback(players, fallback) {
+        draws.write(rules::Would(rules::Draw {
+            player,
+            amount: count,
+        }));
+    }
+}
+
 fn request_life_loss(
-    life_lost: &mut MessageWriter<players::LifeLost>,
+    life_lost: &mut MessageWriter<rules::Would<rules::LoseLife>>,
     players: &[Entity],
     amount: u32,
 ) {
     for player in players {
-        life_lost.write(players::LifeLost {
+        life_lost.write(rules::Would(rules::LoseLife {
             player: *player,
             amount,
-        });
+        }));
     }
 }
 

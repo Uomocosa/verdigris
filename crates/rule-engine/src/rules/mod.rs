@@ -1,12 +1,12 @@
 #[path = "__basic__/mod.rs"]
 mod basic;
 
-pub use basic::enums::{Change, Characteristic, Comparison, Legality, Role, Target};
+pub use basic::enums::{Amount, Change, Characteristic, Comparison, Field, Legality, Role, Target};
 pub use basic::messages::{Proceeds, Would};
 pub use basic::newtypes::{ActionId, ClauseKey, ComponentKey, EventId, RuleId};
 pub use basic::predicate_builders::{
-    active_player, at_least, at_most, card_type, equal_to, has, has_priority, in_zone, main_phase,
-    other, points_to, stack_empty, step_is,
+    active_player, at_least, at_most, card_type, equal_to, event_field, has, has_priority, in_zone,
+    main_phase, other, points_to, stack_empty, step_is,
 };
 pub use basic::structs::RuleChange;
 pub use basic::type_aliases::TargetOf;
@@ -20,11 +20,17 @@ pub use cast_spell::CastSpell;
 mod any_event;
 pub use any_event::AnyEvent;
 
+mod draw;
+pub use draw::Draw;
+
 mod event_template;
 pub use event_template::EventTemplate;
 
 mod lose_game;
 pub use lose_game::LoseGame;
+
+mod lose_life;
+pub use lose_life::LoseLife;
 
 mod clause;
 pub use clause::Clause;

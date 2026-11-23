@@ -7,6 +7,10 @@ pub trait Event: Context + Clone + Send + Sync + 'static {
     fn clauses() -> Vec<rules::Clause> {
         Vec::new()
     }
+    #[must_use]
+    fn field(&self, _field: rules::Field) -> Option<u32> {
+        None
+    }
 }
 
 #[cfg(test)]

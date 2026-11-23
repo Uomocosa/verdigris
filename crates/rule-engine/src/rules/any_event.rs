@@ -7,6 +7,8 @@ pub enum AnyEvent {
     WinGame(rules::WinGame),
     LoseGame(rules::LoseGame),
     DrawFromEmptyLibrary(rules::DrawFromEmptyLibrary),
+    Draw(rules::Draw),
+    LoseLife(rules::LoseLife),
 }
 
 impl AnyEvent {
@@ -19,6 +21,12 @@ impl AnyEvent {
                 commands.write_message(rules::Would(happened));
             }
             Self::DrawFromEmptyLibrary(happened) => {
+                commands.write_message(rules::Would(happened));
+            }
+            Self::Draw(happened) => {
+                commands.write_message(rules::Would(happened));
+            }
+            Self::LoseLife(happened) => {
                 commands.write_message(rules::Would(happened));
             }
         }

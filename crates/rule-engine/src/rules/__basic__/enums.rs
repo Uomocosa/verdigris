@@ -14,6 +14,17 @@ pub enum Comparison {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum Field {
+    Amount,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum Amount {
+    Fixed(u32),
+    FromEvent(Field),
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Role {
     Subject,
     Other,

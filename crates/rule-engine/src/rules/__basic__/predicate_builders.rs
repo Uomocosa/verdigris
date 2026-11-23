@@ -72,3 +72,12 @@ pub const fn active_player(role: rules::Role) -> rules::Predicate {
 pub const fn has_priority(role: rules::Role) -> rules::Predicate {
     rules::Predicate::HasPriority(role)
 }
+
+#[must_use]
+pub const fn event_field(
+    field: rules::Field,
+    comparison: rules::Comparison,
+    threshold: u32,
+) -> rules::Predicate {
+    rules::Predicate::EventField(field, comparison, threshold)
+}
