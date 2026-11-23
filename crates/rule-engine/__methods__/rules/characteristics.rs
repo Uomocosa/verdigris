@@ -14,6 +14,7 @@ pub fn characteristics(answers: &rules::Rules, entity: Entity) -> cards::Charact
         .map_or(
             cards::Characteristics {
                 on_battlefield: true,
+                types: Vec::new(),
                 power_toughness: None,
                 keywords: Vec::new(),
                 triggered_abilities: Vec::new(),

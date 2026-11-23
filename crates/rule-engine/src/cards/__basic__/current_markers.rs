@@ -18,4 +18,5 @@ pub struct CurrentMarkers<'a> {
     pub defender: Has<cards::Defender>,
     pub enters: Option<&'a cards::TriggeredEnters>,
     pub at_step: Option<&'a cards::TriggeredAtStep>,
+    pub creature: Has<cards::Creature>,
 }

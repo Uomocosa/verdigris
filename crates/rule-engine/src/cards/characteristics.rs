@@ -9,6 +9,7 @@ use crate::keywords;
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Characteristics {
     pub on_battlefield: bool,
+    pub types: Vec<cards::CardType>,
     pub power_toughness: Option<cards::PowerToughness>,
     pub keywords: Vec<keywords::StaticKeyword>,
     pub triggered_abilities: Vec<abilities::TriggeredAbility>,
@@ -76,6 +77,7 @@ mod tests {
         let bears = cards::creature("Grizzly Bears", cost![1, G], pt!(2, 2));
         let characteristics = Characteristics::from_printed(&bears, true);
         assert!(characteristics.on_battlefield);
+        assert_eq!(characteristics.types, vec![cards::CardType::Creature]);
         assert_eq!(characteristics.power_toughness, Some(pt!(2, 2)));
         assert_eq!(characteristics.keywords, Vec::new());
         assert_eq!(characteristics.triggered_abilities, Vec::new());

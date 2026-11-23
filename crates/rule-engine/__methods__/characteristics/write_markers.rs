@@ -80,6 +80,13 @@ pub fn write_markers(
         current.defender,
         cards::Defender,
     );
+    cards::Characteristics::sync_marker(
+        entity,
+        characteristics.on_battlefield
+            && characteristics.types.contains(&cards::CardType::Creature),
+        current.creature,
+        cards::Creature,
+    );
     characteristics.write_triggered_markers(entity, current);
 }
 
@@ -140,6 +147,35 @@ mod tests {
     }
 
     #[test]
+    fn a_creature_on_the_battlefield_gets_the_creature_marker() {
+        let mut app = App::new();
+        let bears = (testing::GRIZZLY_BEARS.definition)();
+        let strength = (testing::HOLY_STRENGTH.definition)();
+        let bears_characteristics =
+            cards::Characteristics::from_printed(&bears, true).with_effects(&[]);
+        let strength_characteristics =
+            cards::Characteristics::from_printed(&strength, true).with_effects(&[]);
+        let bears_entity = app.world_mut().spawn(bears).id();
+        let strength_entity = app.world_mut().spawn(strength).id();
+        app.add_systems(
+            Update,
+            move |mut commands: Commands, markers: Query<cards::CurrentMarkers<'_>>| {
+                let bears_current = markers.get(bears_entity).expect("test spawns the card");
+                bears_characteristics
+                    .write_markers(&mut commands.entity(bears_entity), bears_current);
+                let strength_current = markers.get(strength_entity).expect("test spawns the card");
+                strength_characteristics
+                    .write_markers(&mut commands.entity(strength_entity), strength_current);
+            },
+        );
+        app.update();
+
+        let world = app.world();
+        assert!(world.get::<cards::Creature>(bears_entity).is_some());
+        assert!(world.get::<cards::Creature>(strength_entity).is_none());
+    }
+
+    #[test]
     fn removing_derived_components_and_rerunning_layers_is_identity() {
         let mut app = App::new();
         app.add_plugins(RulesPlugin);
@@ -184,6 +220,7 @@ mod tests {
                     world.get::<cards::Reach>(bears).is_some(),
                     world.get::<cards::Vigilance>(bears).is_some(),
                     world.get::<cards::Defender>(bears).is_some(),
+                    world.get::<cards::Creature>(bears).is_some(),
                     world.get::<cards::TriggeredEnters>(bears).is_some(),
                     world.get::<cards::TriggeredAtStep>(bears).is_some(),
                 ),
@@ -209,6 +246,7 @@ mod tests {
             cards::Reach,
             cards::Vigilance,
             cards::Defender,
+            cards::Creature,
             cards::TriggeredEnters,
             cards::TriggeredAtStep,
         )>();

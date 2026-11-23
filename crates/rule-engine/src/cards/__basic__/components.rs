@@ -17,9 +17,6 @@ pub struct Enchanting(pub Entity);
 pub struct Blocked;
 
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
-pub struct OnBattlefield;
-
-#[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Token;
 
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Deref)]

@@ -4,7 +4,7 @@ mod basic;
 pub use basic::card_text::{artifact_creature, creature, instant, land, sorcery};
 pub use basic::components::{
     Blocked, Blocking, Deathtouch, EffectivePT, Enchanting, Indestructible, Infect, Lifelink,
-    OnBattlefield, Owner, Token, Trample, TriggeredAtStep, TriggeredEnters,
+    Owner, Token, Trample, TriggeredAtStep, TriggeredEnters,
 };
 pub use basic::current_markers::{CurrentMarkers, CurrentMarkersItem};
 pub use basic::enums::{CardType, Color, EnchantmentType, ManaSymbol, Supertype};
@@ -27,6 +27,9 @@ pub use characteristics::Characteristics;
 mod cost;
 pub use cost::Cost;
 
+mod creature;
+pub use creature::Creature;
+
 mod defender;
 pub use defender::Defender;
 
@@ -38,6 +41,9 @@ pub use land_type::LandType;
 
 mod mana_pool;
 pub use mana_pool::ManaPool;
+
+mod on_battlefield;
+pub use on_battlefield::OnBattlefield;
 
 mod reach;
 pub use reach::Reach;

@@ -39,11 +39,13 @@ pub fn register_messages_and_resources(app: &mut App) {
         let world = app.world_mut();
         registry.register_predicate_component::<cards::Tapped>(world);
         registry.register_predicate_component::<cards::Attacking>(world);
+        registry.register_predicate_component::<cards::Creature>(world);
         registry.register_predicate_component::<cards::Flying>(world);
         registry.register_predicate_component::<cards::Reach>(world);
         registry.register_predicate_component::<cards::Vigilance>(world);
         registry.register_predicate_component::<cards::Defender>(world);
         registry.register_predicate_component::<cards::SummoningSick>(world);
+        registry.register_predicate_component::<cards::OnBattlefield>(world);
     }
     app.world_mut().spawn((registry,));
 }
