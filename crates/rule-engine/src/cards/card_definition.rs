@@ -133,6 +133,7 @@ impl CardDefinition {
         )>,
         participants: &BTreeSet<Entity>,
         needed: &mut Vec<actions::RequiredCombatDamage>,
+        source_has_deathtouch: bool,
     ) -> Vec<damage::DamageDealt> {
     }
 }

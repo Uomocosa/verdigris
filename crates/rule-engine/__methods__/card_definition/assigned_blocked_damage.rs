@@ -20,6 +20,7 @@ pub fn assigned_blocked_damage(
     )>,
     participants: &BTreeSet<Entity>,
     needed: &mut Vec<actions::RequiredCombatDamage>,
+    source_has_deathtouch: bool,
 ) -> Vec<damage::DamageDealt> {
     let mut writes = Vec::new();
     let mut blockers_of: Vec<(Entity, u32)> = Vec::new();
@@ -27,12 +28,16 @@ pub fn assigned_blocked_damage(
         if **blocking != source {
             continue;
         }
-        let lethal = effective
-            .map(|power_toughness| **power_toughness)
-            .map_or(0, |power_toughness| {
-                u32::try_from(power_toughness.toughness).unwrap_or_default()
-            })
-            .saturating_sub(marked.map_or(0, |damage| **damage));
+        let lethal = if source_has_deathtouch {
+            1
+        } else {
+            effective
+                .map(|power_toughness| **power_toughness)
+                .map_or(0, |power_toughness| {
+                    u32::try_from(power_toughness.toughness).unwrap_or_default()
+                })
+                .saturating_sub(marked.map_or(0, |damage| **damage))
+        };
         blockers_of.push((blocker, lethal));
         if !participants.contains(&blocker) {
             continue;
@@ -163,6 +168,7 @@ mod tests {
                 &blockers,
                 &participants,
                 &mut needed,
+                false,
             )
         });
 
@@ -237,6 +243,7 @@ mod tests {
                 &blockers,
                 &participants,
                 &mut needed,
+                true,
             )
         });
 

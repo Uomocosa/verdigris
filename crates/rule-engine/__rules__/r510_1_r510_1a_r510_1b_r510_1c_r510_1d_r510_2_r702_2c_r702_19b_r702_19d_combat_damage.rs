@@ -49,6 +49,10 @@ use crate::turns;
 /// defending player and/or planeswalker as though all blocking creatures have been assigned lethal
 /// damage.
 ///
+/// 702.2c Any nonzero amount of combat damage assigned to a creature by a source with deathtouch
+/// is considered to be lethal damage for the purposes of determining if a proposed combat damage
+/// assignment is valid, regardless of that creature’s toughness. See rules 510.1c–d.
+///
 /// # Notes
 ///
 /// Scope: unblocked creatures deal damage to the defending player (two-player games; planeswalker
@@ -58,7 +62,7 @@ use crate::turns;
 /// assigns damage to it. Trample: a single blocker is assigned lethal damage first (toughness minus
 /// damage already marked on it) and any excess goes to the defending player; a blocked attacker
 /// with no blockers left assigns all its damage to the defending player.
-pub fn r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_r702_19b_r702_19d_combat_damage(
+pub fn r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_r702_2c_r702_19b_r702_19d_combat_damage(
     mut step_started: MessageReader<turns::StepStarted>,
     mut actions: MessageReader<actions::PlayerAction>,
     mut rejected: MessageWriter<actions::Rejected>,
@@ -68,8 +72,8 @@ pub fn r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_r702_19b_r702_19d_combat_da
         (
             Entity,
             &cards::CardDefinition,
-            &cards::EffectivePT,
             Option<&cards::Blocked>,
+            cards::CurrentMarkers<'_>,
         ),
         With<cards::Attacking>,
     >,
@@ -96,7 +100,10 @@ pub fn r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_r702_19b_r702_19d_combat_da
             continue;
         };
         let mut needed: Vec<actions::RequiredCombatDamage> = Vec::new();
-        for (attacker, definition, effective, blocked) in attackers.iter() {
+        for (attacker, definition, blocked, markers) in attackers.iter() {
+            let Some(effective) = markers.effective else {
+                continue;
+            };
             let amount = u32::try_from(effective.power).unwrap_or(0);
             if blocked.is_none() {
                 if amount == 0 || !participants.contains(&attacker) {
@@ -115,6 +122,7 @@ pub fn r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_r702_19b_r702_19d_combat_da
                     &blockers,
                     participants,
                     &mut needed,
+                    markers.deathtouch,
                 ) {
                     dealt.write(write);
                 }
@@ -387,6 +395,49 @@ mod tests {
         assert_eq!(game.player(p2).life(), 19);
         assert!(game.player(p2).cards_in(GRAVEYARD).has(rats_1));
         assert!(game.player(p2).cards_in(GRAVEYARD).has(rats_2));
+        Ok(())
+    }
+
+    #[test]
+    fn deathtouch_assigns_one_damage_to_a_blocker_and_tramples_the_rest() -> TestResult {
+        use crate::BATTLEFIELD;
+        use crate::GRAVEYARD;
+        use crate::HAND;
+
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.battlefield([GARRUKS_COMPANION]).hand([BLADEBRAND]).mana_pool(mana![1, B]),
+            P2.battlefield([GRIZZLY_BEARS]),
+        ]);
+        let [companion] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GARRUKS_COMPANION)?;
+        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        let [bladebrand] = game.player(p1).cards_in(HAND).exactly::<1>(BLADEBRAND)?;
+        game.play([
+            p1.cast(bladebrand).targeting(companion).pass_priority(),
+            p2.pass_priority(),
+        ])?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareAttackers),
+            p2.pass_to(turns::Step::DeclareAttackers),
+            p1.declare_attackers([companion]),
+        ])?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareBlockers),
+            p2.pass_to(turns::Step::DeclareBlockers),
+        ])?;
+        game.play([
+            p1.pass_priority(),
+            p2.declare_blockers([(bears, companion)]),
+        ])?;
+        game.play([
+            p1.pass_to(turns::Step::CombatDamage),
+            p2.pass_to(turns::Step::CombatDamage),
+            p1.pass_priority(),
+            p2.pass_priority(),
+        ])?;
+
+        assert_eq!(game.damage(bears), 1);
+        assert_eq!(game.life(p2), 18);
+        assert!(game.player(p2).cards_in(GRAVEYARD).has(bears));
         Ok(())
     }
 
