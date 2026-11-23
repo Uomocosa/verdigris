@@ -3,6 +3,17 @@ use crate::rules;
 
 pub fn legality_rule_clauses() -> Vec<rules::Clause> {
     vec![
+        rules::declare_attacker::CREATURE.clause(
+            "The active player chooses which creatures that they control",
+            rules::Role::Subject,
+            rules::has::<cards::Creature>(),
+        ),
+        rules::declare_attacker::CONTROLS.clause(
+            "creatures that they control",
+            rules::Role::Subject,
+            rules::points_to::<cards::Owner>(rules::Role::Player)
+                & rules::has::<cards::OnBattlefield>(),
+        ),
         rules::declare_attacker::UNTAPPED.clause(
             "The chosen creatures must be untapped",
             rules::Role::Subject,
@@ -31,15 +42,23 @@ mod tests {
     #[test]
     fn test_usage() {
         let clauses = legality_rule_clauses();
-        assert_eq!(clauses.len(), 3);
-        assert_eq!(clauses[0].key, rules::ClauseKey("508.1a/untapped"));
-        assert_eq!(clauses[0].requires, !rules::has::<cards::Tapped>());
+        assert_eq!(clauses.len(), 5);
+        assert_eq!(clauses[0].key, rules::ClauseKey("508.1a/creature"));
+        assert_eq!(clauses[0].requires, rules::has::<cards::Creature>());
+        assert_eq!(clauses[1].key, rules::ClauseKey("508.1a/controls"));
         assert_eq!(
-            clauses[1].key,
+            clauses[1].requires,
+            rules::points_to::<cards::Owner>(rules::Role::Player)
+                & rules::has::<cards::OnBattlefield>()
+        );
+        assert_eq!(clauses[2].key, rules::ClauseKey("508.1a/untapped"));
+        assert_eq!(clauses[2].requires, !rules::has::<cards::Tapped>());
+        assert_eq!(
+            clauses[3].key,
             rules::ClauseKey("508.1a/controlled-since-turn-began")
         );
-        assert_eq!(clauses[1].requires, !rules::has::<cards::SummoningSick>());
-        assert_eq!(clauses[2].key, rules::ClauseKey("702.3b/defender"));
-        assert_eq!(clauses[2].requires, !rules::has::<cards::Defender>());
+        assert_eq!(clauses[3].requires, !rules::has::<cards::SummoningSick>());
+        assert_eq!(clauses[4].key, rules::ClauseKey("702.3b/defender"));
+        assert_eq!(clauses[4].requires, !rules::has::<cards::Defender>());
     }
 }

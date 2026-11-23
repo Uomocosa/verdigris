@@ -1,11 +1,9 @@
-use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query, Res};
+use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query, Res, With};
 
-use crate::BATTLEFIELD;
 use crate::actions;
 use crate::cards;
 use crate::rules;
 use crate::turns;
-use crate::zones;
 
 /// 508.1a The active player chooses which creatures that they control, if any, will attack. The
 /// chosen creatures must be untapped, they can’t also be battles, and each one must either have
@@ -46,14 +44,8 @@ pub fn r508_1a_r508_1k_declare_attackers(
     mut commands: Commands,
     priority: Res<turns::Priority>,
     turn: Res<turns::Turn>,
-    cards: Query<(
-        Entity,
-        &cards::CardDefinition,
-        &cards::Owner,
-        &zones::InZone,
-    )>,
+    candidates: Query<(Entity, &cards::Owner), With<cards::Creature>>,
     answers: rules::Rules,
-    zones: zones::ZoneLookup,
 ) {
     let priority = priority.into_inner();
     let turn = turn.into_inner();
@@ -70,27 +62,14 @@ pub fn r508_1a_r508_1k_declare_attackers(
             });
             continue;
         }
-        let Some(battlefield) = zones.find(BATTLEFIELD, Some(action.player)) else {
-            rejected.write(actions::Rejected::CannotAttack {
-                attackers: attackers.clone(),
-            });
-            continue;
-        };
         let all_legal = attackers.iter().all(|attacker| {
-            cards.get(*attacker).is_ok_and(|(_, definition, owner, in_zone)| {
-                definition.type_line.types.contains(&cards::CardType::Creature)
-                    && **owner == action.player
-                    && **in_zone == battlefield
-                    && answers.legal::<rules::DeclareAttacker>(&rules::AttackCtx {
-                        attacker: *attacker,
-                        player: action.player,
-                    })
+            answers.legal::<rules::DeclareAttacker>(&rules::AttackCtx {
+                attacker: *attacker,
+                player: action.player,
             })
         });
-        let requirement_unmet = cards.iter().any(|(entity, definition, owner, in_zone)| {
+        let requirement_unmet = candidates.iter().any(|(entity, owner)| {
             **owner == action.player
-                && **in_zone == battlefield
-                && definition.type_line.types.contains(&cards::CardType::Creature)
                 && answers.demanded::<rules::DeclareAttacker>(entity)
                 && answers.legal::<rules::DeclareAttacker>(&rules::AttackCtx {
                     attacker: entity,
@@ -137,7 +116,7 @@ mod tests {
     }
 
     #[test]
-    fn cannot_declare_another_players_creature() -> TestResult {
+    fn a_creature_controlled_by_the_opponent_cannot_attack() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield([GRIZZLY_BEARS]),
             P2.battlefield([GRIZZLY_BEARS]),
@@ -157,6 +136,27 @@ mod tests {
             })
         );
         assert!(!game.is_attacking(bears));
+        Ok(())
+    }
+
+    #[test]
+    fn a_noncreature_permanent_cannot_attack() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([P1.battlefield([TUNDRA]), P2]);
+        let [tundra] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TUNDRA)?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareAttackers),
+            p2.pass_to(turns::Step::DeclareAttackers),
+        ])?;
+
+        game.act(p1, actions::Action::DeclareAttackers(vec![tundra.into()]));
+
+        assert_eq!(
+            game.last_rejection(),
+            Some(&actions::Rejected::CannotAttack {
+                attackers: vec![tundra.into()]
+            })
+        );
+        assert!(!game.is_attacking(tundra));
         Ok(())
     }
 
