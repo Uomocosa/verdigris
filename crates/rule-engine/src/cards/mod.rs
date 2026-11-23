@@ -4,8 +4,8 @@ mod basic;
 pub use basic::card_text::{artifact_creature, creature, instant, land, sorcery};
 pub use basic::components::{
     Attacking, Blocked, Blocking, Deathtouch, EffectivePT, Enchanting, EnteredOnTurn, Flying,
-    Indestructible, Lifelink, OnBattlefield, Owner, Reach, Tapped, Token, Trample, TriggeredAtStep,
-    TriggeredEnters, Vigilance,
+    Indestructible, Infect, Lifelink, OnBattlefield, Owner, Reach, Tapped, Token, Trample,
+    TriggeredAtStep, TriggeredEnters, Vigilance,
 };
 pub use basic::current_markers::{CurrentMarkers, CurrentMarkersItem};
 pub use basic::enums::{CardType, Color, EnchantmentType, ManaSymbol, Supertype};

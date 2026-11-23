@@ -9,6 +9,7 @@ pub struct CurrentMarkers<'a> {
     pub effective: Option<&'a cards::EffectivePT>,
     pub indestructible: Has<cards::Indestructible>,
     pub deathtouch: Has<cards::Deathtouch>,
+    pub infect: Has<cards::Infect>,
     pub lifelink: Has<cards::Lifelink>,
     pub trample: Has<cards::Trample>,
     pub flying: Has<cards::Flying>,

@@ -9,7 +9,7 @@ pub mod r117_4_priority;
 pub mod r117_5_r704_3_state_based_actions;
 pub mod r119_3_life_loss;
 pub mod r119_4_pay_life;
-pub mod r120_3_r120_3a_r120_3e_damage_results;
+pub mod r120_3_r120_3a_r120_3b_r120_3e_damage_results;
 pub mod r121_1_r121_2_draw;
 pub mod r305_1_r305_2_r305_3_play_land;
 pub mod r305_6_basic_land_mana_ability;

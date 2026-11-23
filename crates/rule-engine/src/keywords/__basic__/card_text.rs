@@ -65,3 +65,8 @@ pub const fn first_strike() -> keywords::StaticKeyword {
 pub const fn double_strike() -> keywords::StaticKeyword {
     keywords::StaticKeyword::DoubleStrike
 }
+
+#[must_use]
+pub const fn infect() -> keywords::StaticKeyword {
+    keywords::StaticKeyword::Infect
+}

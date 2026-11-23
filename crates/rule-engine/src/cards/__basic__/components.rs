@@ -41,6 +41,9 @@ pub struct Indestructible;
 pub struct Deathtouch;
 
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Infect;
+
+#[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Lifelink;
 
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]

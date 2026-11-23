@@ -15,11 +15,8 @@ pub fn write_markers(
         current.on_battlefield,
         cards::OnBattlefield,
     );
-    let desired_effective = if characteristics.on_battlefield {
-        characteristics.power_toughness
-    } else {
-        None
-    };
+    let desired_effective =
+        characteristics.power_toughness.filter(|_| characteristics.on_battlefield);
     if desired_effective != current.effective.copied().map(|effective| *effective) {
         if let Some(effective) = desired_effective {
             entity.insert(cards::EffectivePT(effective));
@@ -41,6 +38,12 @@ pub fn write_markers(
         desired(keywords::StaticKeyword::Deathtouch),
         current.deathtouch,
         cards::Deathtouch,
+    );
+    cards::Characteristics::sync_marker(
+        entity,
+        desired(keywords::StaticKeyword::Infect),
+        current.infect,
+        cards::Infect,
     );
     cards::Characteristics::sync_marker(
         entity,
@@ -180,6 +183,7 @@ mod tests {
                 world.get::<cards::EffectivePT>(bears).copied().map(|effective| *effective),
                 world.get::<cards::Indestructible>(bears).is_some(),
                 world.get::<cards::Deathtouch>(bears).is_some(),
+                world.get::<cards::Infect>(bears).is_some(),
                 world.get::<cards::Lifelink>(bears).is_some(),
                 world.get::<cards::Trample>(bears).is_some(),
                 world.get::<cards::Flying>(bears).is_some(),
@@ -202,6 +206,7 @@ mod tests {
             cards::EffectivePT,
             cards::Indestructible,
             cards::Deathtouch,
+            cards::Infect,
             cards::Lifelink,
             cards::Trample,
             cards::Flying,
