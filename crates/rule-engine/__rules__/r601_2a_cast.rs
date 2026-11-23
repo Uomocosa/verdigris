@@ -1,9 +1,8 @@
-use crate::{HAND, STACK};
-use bevy::prelude::{Commands, MessageReader, MessageWriter, Query, Res};
+use crate::STACK;
+use bevy::prelude::{Commands, MessageReader, MessageWriter};
 
 use crate::actions;
-use crate::cards;
-use crate::turns;
+use crate::rules;
 use crate::zones;
 
 /// 601.2a To propose the casting of a spell, a player first moves that card (or that copy of a
@@ -35,57 +34,24 @@ pub fn r601_2a_cast(
     mut actions: MessageReader<actions::PlayerAction>,
     mut rejected: MessageWriter<actions::Rejected>,
     mut commands: Commands,
-    priority: Res<turns::Priority>,
-    turn: Res<turns::Turn>,
-    cards: Query<(&cards::CardDefinition, &cards::Owner, &zones::InZone)>,
-    zones: zones::ZoneLookup,
+    answers: rules::Rules,
 ) {
-    let priority = priority.into_inner();
-    let turn = turn.into_inner();
     for action in actions.read() {
         let actions::Action::Cast(spell) = &action.action else {
             continue;
         };
         let spell = *spell;
-        if action.player != priority.player {
+        if !answers.legal::<rules::CastSpell>(&rules::CastSpellCtx {
+            spell,
+            player: action.player,
+        }) {
             rejected.write(actions::Rejected::CannotCast { spell });
             continue;
         }
-        let Ok((definition, owner, in_zone)) = cards.get(spell) else {
+        let Some(stack) = answers.zones.find(STACK, None) else {
             rejected.write(actions::Rejected::CannotCast { spell });
             continue;
         };
-        let Some(hand) = zones.find(HAND, Some(action.player)) else {
-            rejected.write(actions::Rejected::CannotCast { spell });
-            continue;
-        };
-        if **owner != action.player || **in_zone != hand {
-            rejected.write(actions::Rejected::CannotCast { spell });
-            continue;
-        }
-        if definition.type_line.types.contains(&cards::CardType::Land) {
-            rejected.write(actions::Rejected::CannotCast { spell });
-            continue;
-        }
-        let Some(stack) = zones.find(STACK, None) else {
-            rejected.write(actions::Rejected::CannotCast { spell });
-            continue;
-        };
-        let is_instant = definition.type_line.types.contains(&cards::CardType::Instant);
-        if !is_instant {
-            let do_stack_is_empty = !cards.iter().any(|(_, _, zone)| **zone == stack);
-            let is_main_phase = matches!(
-                turn.step,
-                turns::Step::PrecombatMain | turns::Step::PostcombatMain
-            );
-            let is_active_player = turn.active == action.player;
-            let do_sorcery_speed_conditions_hold =
-                do_stack_is_empty && is_main_phase && is_active_player;
-            if !do_sorcery_speed_conditions_hold {
-                rejected.write(actions::Rejected::CannotCast { spell });
-                continue;
-            }
-        }
         commands.entity(spell).insert(zones::InZone(stack));
     }
 }
@@ -149,6 +115,122 @@ mod tests {
     #[test]
     fn a_land_cannot_be_cast_as_a_spell() -> TestResult {
         let (mut game, [p1, ..]) = MockGame::new([P1.hand([FOREST]), P2]);
+        let [forest] = game.player(p1).cards_in(HAND).exactly::<1>(FOREST)?;
+
+        game.act(p1, actions::Action::Cast(forest.into()));
+
+        assert_eq!(
+            game.last_rejection(),
+            Some(&actions::Rejected::CannotCast {
+                spell: forest.into()
+            })
+        );
+        assert!(game.player(p1).cards_in(HAND).has(forest));
+        assert!(!game.stack().has(forest));
+        Ok(())
+    }
+
+    #[test]
+    fn a_sorcery_cannot_be_cast_during_combat() -> TestResult {
+        let (mut game, [p1, ..]) = MockGame::builder()
+            .turn(1, turns::Step::DeclareAttackers)
+            .players([P1.hand([DIVINATION]).mana_pool(mana![2, U]), P2]);
+        let [divination] = game.player(p1).cards_in(HAND).exactly::<1>(DIVINATION)?;
+
+        game.act(p1, actions::Action::Cast(divination.into()));
+
+        assert_eq!(
+            game.last_rejection(),
+            Some(&actions::Rejected::CannotCast {
+                spell: divination.into()
+            })
+        );
+        assert!(game.player(p1).cards_in(HAND).has(divination));
+        assert!(!game.stack().has(divination));
+        Ok(())
+    }
+
+    #[test]
+    fn leyline_of_anticipation_lets_a_player_cast_a_sorcery_on_an_opponents_turn() -> TestResult {
+        let (mut game, [p1, p2]) =
+            MockGame::builder().turn(2, turns::Step::PrecombatMain).players([
+                P1.battlefield([LEYLINE_OF_ANTICIPATION]).hand([DIVINATION]).mana_pool(mana![2, U]),
+                P2.active(),
+            ]);
+        game.play([p2.pass_priority()])?;
+        let [divination] = game.player(p1).cards_in(HAND).exactly::<1>(DIVINATION)?;
+
+        game.play([p1.cast(divination)])?;
+
+        assert!(game.stack().has(divination));
+        Ok(())
+    }
+
+    #[test]
+    fn leyline_of_anticipation_lets_a_player_cast_a_sorcery_during_combat() -> TestResult {
+        let (mut game, [p1, ..]) =
+            MockGame::builder().turn(1, turns::Step::DeclareAttackers).players([
+                P1.battlefield([LEYLINE_OF_ANTICIPATION]).hand([DIVINATION]).mana_pool(mana![2, U]),
+                P2,
+            ]);
+        let [divination] = game.player(p1).cards_in(HAND).exactly::<1>(DIVINATION)?;
+
+        game.play([p1.cast(divination)])?;
+
+        assert!(game.stack().has(divination));
+        Ok(())
+    }
+
+    #[test]
+    fn leyline_of_anticipation_lets_a_player_cast_a_sorcery_while_the_stack_is_not_empty()
+    -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.battlefield([LEYLINE_OF_ANTICIPATION])
+                .hand([LIGHTNING_BOLT, DIVINATION])
+                .mana_pool(mana![R, 2, U]),
+            P2.hand([DISPEL]).mana_pool(mana![U]),
+        ]);
+        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
+        let [dispel] = game.player(p2).cards_in(HAND).exactly::<1>(DISPEL)?;
+        game.play([
+            p1.cast(bolt).targeting(p2).pass_priority(),
+            p2.cast(dispel).targeting(bolt),
+        ])?;
+        let [divination] = game.player(p1).cards_in(HAND).exactly::<1>(DIVINATION)?;
+
+        game.play([p2.pass_priority(), p1.cast(divination)])?;
+
+        assert!(game.stack().has(divination));
+        Ok(())
+    }
+
+    #[test]
+    fn leyline_of_anticipation_does_not_let_an_opponent_cast_a_sorcery_at_instant_speed()
+    -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.battlefield([LEYLINE_OF_ANTICIPATION]),
+            P2.hand([DIVINATION]).mana_pool(mana![2, U]),
+        ]);
+        game.play([p1.pass_priority()])?;
+        let [divination] = game.player(p2).cards_in(HAND).exactly::<1>(DIVINATION)?;
+
+        game.act(p2, actions::Action::Cast(divination.into()));
+
+        assert_eq!(
+            game.last_rejection(),
+            Some(&actions::Rejected::CannotCast {
+                spell: divination.into()
+            })
+        );
+        assert!(game.player(p2).cards_in(HAND).has(divination));
+        assert!(!game.stack().has(divination));
+        Ok(())
+    }
+
+    #[test]
+    fn a_land_cannot_be_cast_as_a_spell_even_with_leyline_of_anticipation() -> TestResult {
+        let (mut game, [p1, ..]) =
+            MockGame::new([P1.battlefield([LEYLINE_OF_ANTICIPATION]).hand([FOREST]), P2]);
         let [forest] = game.player(p1).cards_in(HAND).exactly::<1>(FOREST)?;
 
         game.act(p1, actions::Action::Cast(forest.into()));

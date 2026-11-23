@@ -18,6 +18,12 @@ pub use attack_ctx::AttackCtx;
 mod block_ctx;
 pub use block_ctx::BlockCtx;
 
+pub mod cast_spell;
+pub use cast_spell::CastSpell;
+
+mod cast_spell_ctx;
+pub use cast_spell_ctx::CastSpellCtx;
+
 mod lose_game;
 pub use lose_game::LoseGame;
 

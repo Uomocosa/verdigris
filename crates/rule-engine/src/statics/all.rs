@@ -25,6 +25,9 @@ impl All {
     pub fn attack_as_though_it_had_haste(self) -> abilities::Continuous {}
 
     #[must_use]
+    pub fn cast_spells_as_though_they_had_flash(self) -> abilities::Continuous {}
+
+    #[must_use]
     pub fn must_attack(self) -> abilities::Continuous {}
 
     #[must_use]
