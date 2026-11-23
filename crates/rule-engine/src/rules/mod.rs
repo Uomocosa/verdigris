@@ -91,3 +91,6 @@ pub use predicate_registry::PredicateRegistry;
 
 mod rules;
 pub use rules::Rules;
+
+mod rule_registry;
+pub use rule_registry::RuleRegistry;

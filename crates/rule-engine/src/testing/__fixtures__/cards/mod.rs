@@ -161,3 +161,6 @@ pub use wall_of_stone::WALL_OF_STONE;
 pub use watchwolf::WATCHWOLF;
 pub use waylay::{KNIGHT_TOKEN, WAYLAY};
 pub use wind_drake::WIND_DRAKE;
+
+mod all_cards;
+pub use all_cards::ALL_CARDS;
