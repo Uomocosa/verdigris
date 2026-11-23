@@ -52,11 +52,11 @@ pub enum Layered {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum Change {
+pub enum Modification {
     Characteristic(Layered),
-    Waive(rules::ClauseKey),
-    Restrict(rules::RuleId, rules::Predicate),
-    Demand(rules::RuleId),
+    AsThough(rules::ClauseKey),
+    Restriction(rules::RuleId, rules::Predicate),
+    Requirement(rules::RuleId),
     Skip(rules::StepId),
     Perform(rules::StepId),
 }

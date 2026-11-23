@@ -36,17 +36,20 @@ impl All {
     pub fn tap_when_attacking(self) -> abilities::Continuous {}
 
     #[must_use]
-    pub fn waive<Ctx>(self, clause: rules::ClauseId<Ctx>) -> abilities::Continuous {}
+    pub fn as_though<Ctx>(self, clause: rules::ClauseId<Ctx>) -> abilities::Continuous {}
 
     #[must_use]
-    pub fn restrict<R: rules::traits::legality_rule::LegalityRule>(
+    pub fn restriction<R: rules::traits::legality_rule::LegalityRule>(
         self,
         requirement: rules::Predicate,
     ) -> abilities::Continuous {
     }
 
     #[must_use]
-    pub fn demand<R: rules::traits::legality_rule::LegalityRule>(self) -> abilities::Continuous {}
+    pub fn requirement<R: rules::traits::legality_rule::LegalityRule>(
+        self,
+    ) -> abilities::Continuous {
+    }
 
     #[must_use]
     pub fn skip(self, step: rules::StepId) -> abilities::Continuous {}

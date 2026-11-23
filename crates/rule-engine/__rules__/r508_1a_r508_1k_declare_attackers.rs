@@ -70,7 +70,7 @@ pub fn r508_1a_r508_1k_declare_attackers(
         });
         let requirement_unmet = candidates.iter().any(|(entity, owner)| {
             **owner == action.player
-                && answers.demanded::<rules::DeclareAttacker>(entity)
+                && answers.required::<rules::DeclareAttacker>(entity)
                 && answers.legal::<rules::DeclareAttacker>(&rules::AttackCtx {
                     attacker: entity,
                     player: action.player,
@@ -416,7 +416,7 @@ mod tests {
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
-                assert!(answers.demanded::<rules::DeclareAttacker>(bears.into()));
+                assert!(answers.required::<rules::DeclareAttacker>(bears.into()));
             })
             .unwrap();
         Ok(())

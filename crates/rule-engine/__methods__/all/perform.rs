@@ -6,7 +6,7 @@ use crate::statics;
 pub fn perform(all: statics::All, step: rules::StepId) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
-        change: effects::Change::Perform(step),
+        modification: effects::Modification::Perform(step),
     }
 }
 
@@ -25,8 +25,8 @@ mod tests {
         let ability = perform(statics::all(CREATURE), testing::TEST_STEP);
         assert_eq!(ability.filter, CREATURE);
         assert_eq!(
-            ability.change,
-            effects::Change::Perform(rules::StepId("test/step"))
+            ability.modification,
+            effects::Modification::Perform(rules::StepId("test/step"))
         );
     }
 }

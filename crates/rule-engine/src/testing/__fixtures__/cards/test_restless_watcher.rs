@@ -11,7 +11,7 @@ pub const TEST_RESTLESS_WATCHER: testing::Card = testing::Card {
     definition: || {
         card! {
             cards::creature("Test Restless Watcher", cost![2, U], pt!(2, 2));
-            statics::this().waive(rules::declare_attacker::UNTAPPED),
+            statics::this().as_though(rules::declare_attacker::UNTAPPED),
         }
     },
 };
@@ -42,7 +42,9 @@ mod tests {
                     object: Some(effects::ObjectRelation::ThisObject),
                     ..CREATURE
                 },
-                change: effects::Change::Waive(rules::declare_attacker::UNTAPPED.key),
+                modification: effects::Modification::AsThough(
+                    rules::declare_attacker::UNTAPPED.key
+                ),
             }]
         );
     }

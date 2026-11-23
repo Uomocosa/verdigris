@@ -7,7 +7,7 @@ use crate::statics;
 pub fn must_attack(all: statics::All) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
-        change: effects::Change::Demand(rules::DeclareAttacker::ID),
+        modification: effects::Modification::Requirement(rules::DeclareAttacker::ID),
     }
 }
 
@@ -26,8 +26,8 @@ mod tests {
         let ability = must_attack(statics::all(CREATURE));
         assert_eq!(ability.filter, CREATURE);
         assert_eq!(
-            ability.change,
-            effects::Change::Demand(rules::DeclareAttacker::ID)
+            ability.modification,
+            effects::Modification::Requirement(rules::DeclareAttacker::ID)
         );
         assert_eq!(rules::DeclareAttacker::ID, rules::RuleId("508.1a"));
     }

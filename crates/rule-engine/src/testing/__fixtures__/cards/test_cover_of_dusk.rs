@@ -39,7 +39,7 @@ mod tests {
             cover.continuous_abilities().cloned().collect::<Vec<_>>(),
             [abilities::Continuous {
                 filter: CREATURE.controlled_by(YOU).attacking(),
-                change: effects::Change::Skip(TAP_ATTACKERS),
+                modification: effects::Modification::Skip(TAP_ATTACKERS),
             }]
         );
     }

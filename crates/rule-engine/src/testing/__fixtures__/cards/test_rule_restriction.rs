@@ -11,7 +11,7 @@ pub const TEST_RULE_RESTRICTION: testing::Card = testing::Card {
     definition: || {
         card! {
             cards::creature("Test Rule Restriction", cost![2], pt!(1, 1));
-            statics::this().restrict::<testing::RestrictedRule>(rules::at_least(rules::Characteristic::Power, 3)),
+            statics::this().restriction::<testing::RestrictedRule>(rules::at_least(rules::Characteristic::Power, 3)),
         }
     },
 };
@@ -44,7 +44,7 @@ mod tests {
                     object: Some(effects::ObjectRelation::ThisObject),
                     ..CREATURE
                 },
-                change: effects::Change::Restrict(
+                modification: effects::Modification::Restriction(
                     testing::RestrictedRule::ID,
                     rules::at_least(rules::Characteristic::Power, 3),
                 ),

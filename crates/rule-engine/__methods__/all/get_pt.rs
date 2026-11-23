@@ -5,7 +5,10 @@ use crate::statics;
 pub fn get_pt(all: statics::All, power: i32, toughness: i32) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
-        change: effects::Change::Characteristic(effects::Layered::ModifyPT { power, toughness }),
+        modification: effects::Modification::Characteristic(effects::Layered::ModifyPT {
+            power,
+            toughness,
+        }),
     }
 }
 
@@ -22,8 +25,8 @@ mod tests {
         let ability = get_pt(statics::all(CREATURE), 1, 1);
         assert_eq!(ability.filter, CREATURE);
         assert_eq!(
-            ability.change,
-            effects::Change::Characteristic(effects::Layered::ModifyPT {
+            ability.modification,
+            effects::Modification::Characteristic(effects::Layered::ModifyPT {
                 power: 1,
                 toughness: 1,
             })

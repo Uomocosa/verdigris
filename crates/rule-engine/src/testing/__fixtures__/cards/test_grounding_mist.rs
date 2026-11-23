@@ -40,7 +40,7 @@ mod tests {
             mist.continuous_abilities().cloned().collect::<Vec<_>>(),
             [abilities::Continuous {
                 filter: CREATURE.controlled_by(OPPONENT),
-                change: effects::Change::Characteristic(effects::Layered::LoseKeyword(
+                modification: effects::Modification::Characteristic(effects::Layered::LoseKeyword(
                     keywords::StaticKeyword::Flying,
                 )),
             }]

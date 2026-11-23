@@ -6,7 +6,7 @@ use crate::statics;
 pub fn attack_without_tapping(all: statics::All) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
-        change: effects::Change::Skip(TAP_ATTACKERS),
+        modification: effects::Modification::Skip(TAP_ATTACKERS),
     }
 }
 
@@ -23,6 +23,9 @@ mod tests {
     fn test_usage() {
         let ability = attack_without_tapping(statics::all(CREATURE));
         assert_eq!(ability.filter, CREATURE);
-        assert_eq!(ability.change, effects::Change::Skip(TAP_ATTACKERS),);
+        assert_eq!(
+            ability.modification,
+            effects::Modification::Skip(TAP_ATTACKERS),
+        );
     }
 }

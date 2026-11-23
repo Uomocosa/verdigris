@@ -5,13 +5,13 @@ use crate::rules;
 
 pub fn performs(answers: &rules::Rules, entity: Entity, step: rules::StepId) -> bool {
     let mut performs = true;
-    for change in answers.mods(entity) {
-        if let effects::Change::Skip(skipped) = change
+    for modification in answers.mods(entity) {
+        if let effects::Modification::Skip(skipped) = modification
             && skipped == step
         {
             performs = false;
         }
-        if let effects::Change::Perform(performed) = change
+        if let effects::Modification::Perform(performed) = modification
             && performed == step
         {
             performs = true;

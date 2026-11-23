@@ -45,23 +45,23 @@ mod tests {
             "The defending player chooses which creatures they control"
         );
         assert_eq!(clauses[0].role, rules::Role::Subject);
-        assert_eq!(clauses[0].requires, rules::has::<cards::Creature>());
+        assert_eq!(clauses[0].condition, rules::has::<cards::Creature>());
         assert_eq!(clauses[1].key, CONTROLS.key);
         assert_eq!(clauses[1].text, "creatures they control");
         assert_eq!(clauses[1].role, rules::Role::Subject);
         assert_eq!(
-            clauses[1].requires,
+            clauses[1].condition,
             rules::points_to::<cards::Owner>(rules::Role::Player)
                 & rules::has::<cards::OnBattlefield>()
         );
         assert_eq!(clauses[2].key, UNTAPPED.key);
         assert_eq!(clauses[2].text, "The chosen creatures must be untapped");
         assert_eq!(clauses[2].role, rules::Role::Subject);
-        assert_eq!(clauses[2].requires, !rules::has::<cards::Tapped>());
+        assert_eq!(clauses[2].condition, !rules::has::<cards::Tapped>());
         assert_eq!(clauses[3].key, FLYING.key);
         assert_eq!(clauses[3].role, rules::Role::Other);
         assert_eq!(
-            clauses[3].requires,
+            clauses[3].condition,
             !rules::other(rules::has::<cards::Flying>())
                 | rules::has::<cards::Flying>()
                 | rules::has::<cards::Reach>()

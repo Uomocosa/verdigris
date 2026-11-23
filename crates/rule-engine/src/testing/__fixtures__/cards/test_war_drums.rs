@@ -40,7 +40,7 @@ mod tests {
             drums.continuous_abilities().cloned().collect::<Vec<_>>(),
             [abilities::Continuous {
                 filter: CREATURE.controlled_by(YOU),
-                change: effects::Change::Demand(rules::DeclareAttacker::ID),
+                modification: effects::Modification::Requirement(rules::DeclareAttacker::ID),
             }]
         );
     }

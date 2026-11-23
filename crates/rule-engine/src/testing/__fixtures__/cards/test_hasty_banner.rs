@@ -40,7 +40,7 @@ mod tests {
             banner.continuous_abilities().cloned().collect::<Vec<_>>(),
             [abilities::Continuous {
                 filter: CREATURE.controlled_by(YOU),
-                change: effects::Change::Characteristic(effects::Layered::GainKeyword(
+                modification: effects::Modification::Characteristic(effects::Layered::GainKeyword(
                     keywords::StaticKeyword::Haste,
                 )),
             }]

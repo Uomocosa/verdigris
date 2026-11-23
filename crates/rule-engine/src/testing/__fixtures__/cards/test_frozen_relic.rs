@@ -42,7 +42,7 @@ mod tests {
                     object: Some(effects::ObjectRelation::ThisObject),
                     ..CREATURE
                 },
-                change: effects::Change::Skip(UNTAP_STEP),
+                modification: effects::Modification::Skip(UNTAP_STEP),
             }]
         );
     }

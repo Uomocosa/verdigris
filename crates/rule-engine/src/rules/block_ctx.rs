@@ -10,7 +10,7 @@ pub struct BlockCtx {
 }
 
 #[rustfmt::skip]
-impl rules::traits::pair_ctx::PairCtx for BlockCtx {
+impl rules::traits::context::Context for BlockCtx {
     fn subject(&self) -> Entity { self.blocker }
     fn other(&self) -> Option<Entity> { Some(self.attacker) }
     fn player(&self) -> Entity { self.player }
@@ -20,7 +20,7 @@ impl rules::traits::pair_ctx::PairCtx for BlockCtx {
 mod tests {
     use bevy::prelude::Entity;
 
-    use crate::rules::traits::pair_ctx::PairCtx;
+    use crate::rules::traits::context::Context;
 
     use super::BlockCtx;
 

@@ -11,7 +11,7 @@ pub const TEST_SKY_COURT: testing::Card = testing::Card {
     definition: || {
         card! {
             cards::CardDefinition::from_enchantment("Test Sky Court", cost![2, U]);
-            statics::all(CREATURE).restrict::<rules::DeclareBlocker>(
+            statics::all(CREATURE).restriction::<rules::DeclareBlocker>(
                 !rules::has::<cards::Flying>() | rules::other(rules::has::<cards::Flying>()),
             ),
         }
@@ -41,7 +41,7 @@ mod tests {
             court.continuous_abilities().cloned().collect::<Vec<_>>(),
             [abilities::Continuous {
                 filter: CREATURE,
-                change: effects::Change::Restrict(
+                modification: effects::Modification::Restriction(
                     rules::DeclareBlocker::ID,
                     !rules::has::<cards::Flying>() | rules::other(rules::has::<cards::Flying>()),
                 ),

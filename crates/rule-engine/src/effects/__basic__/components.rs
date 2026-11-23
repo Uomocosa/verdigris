@@ -7,7 +7,7 @@ use crate::effects;
 pub struct ContinuousEffect {
     pub affected: Entity,
     pub source: Option<Entity>,
-    pub change: effects::Change,
+    pub modification: effects::Modification,
     pub until: effects::Duration,
     pub timestamp: u64,
 }

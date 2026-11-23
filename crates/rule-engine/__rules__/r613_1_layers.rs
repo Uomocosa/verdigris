@@ -108,8 +108,8 @@ mod tests {
                 .iter()
                 .filter(|effect| {
                     effect.affected == bears
-                        && effect.change
-                            == effects::Change::Characteristic(effects::Layered::GainKeyword(
+                        && effect.modification
+                            == effects::Modification::Characteristic(effects::Layered::GainKeyword(
                                 keywords::StaticKeyword::Flying,
                             ))
                 })

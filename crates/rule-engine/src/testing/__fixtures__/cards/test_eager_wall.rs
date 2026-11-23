@@ -13,7 +13,7 @@ pub const TEST_EAGER_WALL: testing::Card = testing::Card {
         card! {
             cards::creature("Test Eager Wall", cost![1, W], pt!(0, 4));
             keywords::defender(),
-            statics::this().waive(rules::declare_attacker::DEFENDER),
+            statics::this().as_though(rules::declare_attacker::DEFENDER),
         }
     },
 };
@@ -49,7 +49,9 @@ mod tests {
                     object: Some(effects::ObjectRelation::ThisObject),
                     ..CREATURE
                 },
-                change: effects::Change::Waive(rules::declare_attacker::DEFENDER.key),
+                modification: effects::Modification::AsThough(
+                    rules::declare_attacker::DEFENDER.key
+                ),
             }]
         );
     }

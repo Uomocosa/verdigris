@@ -13,7 +13,7 @@ pub const TEST_LOW_SKIMMER: testing::Card = testing::Card {
         card! {
             cards::creature("Test Low Skimmer", cost![1, U], pt!(1, 1));
             keywords::flying(),
-            statics::this().waive(rules::declare_blocker::FLYING),
+            statics::this().as_though(rules::declare_blocker::FLYING),
         }
     },
 };
@@ -49,7 +49,7 @@ mod tests {
                     object: Some(effects::ObjectRelation::ThisObject),
                     ..CREATURE
                 },
-                change: effects::Change::Waive(rules::declare_blocker::FLYING.key),
+                modification: effects::Modification::AsThough(rules::declare_blocker::FLYING.key),
             }]
         );
     }

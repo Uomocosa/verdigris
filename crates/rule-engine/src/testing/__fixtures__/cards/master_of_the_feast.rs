@@ -62,7 +62,7 @@ mod tests {
                     object: Some(effects::ObjectRelation::ThisObject),
                     ..CREATURE
                 },
-                change: effects::Change::Demand(rules::DeclareAttacker::ID),
+                modification: effects::Modification::Requirement(rules::DeclareAttacker::ID),
             }]
         );
         assert_eq!(

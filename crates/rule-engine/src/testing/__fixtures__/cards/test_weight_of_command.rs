@@ -39,7 +39,7 @@ mod tests {
             weight.continuous_abilities().cloned().collect::<Vec<_>>(),
             [abilities::Continuous {
                 filter: CREATURE.controlled_by(OPPONENT),
-                change: effects::Change::Perform(TAP_ATTACKERS),
+                modification: effects::Modification::Perform(TAP_ATTACKERS),
             }]
         );
     }

@@ -1,8 +1,8 @@
 use crate::rules;
-use crate::rules::traits::pair_ctx::PairCtx;
+use crate::rules::traits::context::Context;
 
 pub trait LegalityRule: 'static {
-    type Ctx: PairCtx;
+    type Ctx: Context;
     const ID: rules::RuleId;
     fn clauses() -> Vec<rules::Clause>;
 }

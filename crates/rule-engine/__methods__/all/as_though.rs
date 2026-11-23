@@ -3,10 +3,10 @@ use crate::effects;
 use crate::rules;
 use crate::statics;
 
-pub fn waive<Ctx>(all: statics::All, clause: rules::ClauseId<Ctx>) -> abilities::Continuous {
+pub fn as_though<Ctx>(all: statics::All, clause: rules::ClauseId<Ctx>) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
-        change: effects::Change::Waive(clause.key),
+        modification: effects::Modification::AsThough(clause.key),
     }
 }
 
@@ -17,18 +17,18 @@ mod tests {
     use crate::rules;
     use crate::statics;
 
-    use super::waive;
+    use super::as_though;
 
     #[test]
     fn test_usage() {
-        let ability = waive(
+        let ability = as_though(
             statics::all(CREATURE),
             rules::ClauseId::<rules::AttackCtx>::new("test/untapped"),
         );
         assert_eq!(ability.filter, CREATURE);
         assert_eq!(
-            ability.change,
-            effects::Change::Waive(rules::ClauseKey("test/untapped"))
+            ability.modification,
+            effects::Modification::AsThough(rules::ClauseKey("test/untapped"))
         );
     }
 }

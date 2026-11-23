@@ -39,7 +39,9 @@ mod tests {
             fervor.continuous_abilities().cloned().collect::<Vec<_>>(),
             [abilities::Continuous {
                 filter: CREATURE.controlled_by(YOU),
-                change: effects::Change::Waive(rules::declare_attacker::SUMMONING_SICK.key),
+                modification: effects::Modification::AsThough(
+                    rules::declare_attacker::SUMMONING_SICK.key
+                ),
             }]
         );
     }

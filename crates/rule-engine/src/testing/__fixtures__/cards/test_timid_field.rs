@@ -12,7 +12,7 @@ pub const TEST_TIMID_FIELD: testing::Card = testing::Card {
         card! {
             cards::CardDefinition::from_enchantment("Test Timid Field", cost![1, W]);
             statics::all(CREATURE)
-                .restrict::<rules::DeclareBlocker>(rules::at_least(
+                .restriction::<rules::DeclareBlocker>(rules::at_least(
                     rules::Characteristic::Power,
                     3,
                 )),
@@ -43,7 +43,7 @@ mod tests {
             field.continuous_abilities().cloned().collect::<Vec<_>>(),
             [abilities::Continuous {
                 filter: CREATURE,
-                change: effects::Change::Restrict(
+                modification: effects::Modification::Restriction(
                     rules::DeclareBlocker::ID,
                     rules::at_least(rules::Characteristic::Power, 3),
                 ),

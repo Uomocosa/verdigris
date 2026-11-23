@@ -11,7 +11,7 @@ pub const TEST_TAPPED_SENTRY: testing::Card = testing::Card {
     definition: || {
         card! {
             cards::creature("Test Tapped Sentry", cost![1, W], pt!(1, 4));
-            statics::this().waive(rules::declare_blocker::UNTAPPED),
+            statics::this().as_though(rules::declare_blocker::UNTAPPED),
         }
     },
 };
@@ -42,7 +42,7 @@ mod tests {
                     object: Some(effects::ObjectRelation::ThisObject),
                     ..CREATURE
                 },
-                change: effects::Change::Waive(rules::declare_blocker::UNTAPPED.key),
+                modification: effects::Modification::AsThough(rules::declare_blocker::UNTAPPED.key),
             }]
         );
     }

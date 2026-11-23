@@ -74,7 +74,7 @@ pub fn r509_1a_r509_1g_r509_1h_r702_9b_r702_17b_declare_blockers(
         });
         let requirement_unmet = blockers.iter().any(|(entity, owner)| {
             **owner == action.player
-                && answers.demanded::<rules::DeclareBlocker>(entity)
+                && answers.required::<rules::DeclareBlocker>(entity)
                 && !assignments.iter().any(|assignment| assignment.blocker == entity)
                 && attacking.iter().any(|(attacker, _)| {
                     answers.legal::<rules::DeclareBlocker>(&rules::BlockCtx {
@@ -430,7 +430,7 @@ mod tests {
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
-                assert!(answers.demanded::<rules::DeclareBlocker>(bears_2.into()));
+                assert!(answers.required::<rules::DeclareBlocker>(bears_2.into()));
             })
             .unwrap();
         Ok(())

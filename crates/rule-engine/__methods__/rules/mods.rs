@@ -4,18 +4,18 @@ use crate::effects;
 use crate::keywords;
 use crate::rules;
 
-pub fn mods(answers: &rules::Rules, entity: Entity) -> Vec<effects::Change> {
-    let mut changes: Vec<effects::Change> = answers
+pub fn mods(answers: &rules::Rules, entity: Entity) -> Vec<effects::Modification> {
+    let mut modifications: Vec<effects::Modification> = answers
         .characteristics(entity)
         .keywords
         .into_iter()
-        .flat_map(keywords::StaticKeyword::keyword_changes)
+        .flat_map(keywords::StaticKeyword::keyword_modifications)
         .collect();
     let mut ordered: Vec<effects::ContinuousEffect> =
         answers.effects.iter().filter(|effect| effect.affected == entity).cloned().collect();
     ordered.sort_by_key(|effect| effect.timestamp);
-    changes.extend(ordered.into_iter().map(|effect| effect.change));
-    changes
+    modifications.extend(ordered.into_iter().map(|effect| effect.modification));
+    modifications
 }
 
 #[cfg(test)]
@@ -38,13 +38,13 @@ mod tests {
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
-                let changes = mods(&answers, *waiver);
+                let modifications = mods(&answers, *waiver);
                 assert_eq!(
-                    changes,
+                    modifications,
                     [
-                        effects::Change::Waive(UNTAPPED.key),
-                        effects::Change::Demand(TestRule::ID),
-                        effects::Change::Skip(TEST_STEP),
+                        effects::Modification::AsThough(UNTAPPED.key),
+                        effects::Modification::Requirement(TestRule::ID),
+                        effects::Modification::Skip(TEST_STEP),
                     ]
                 );
             })
@@ -61,8 +61,9 @@ mod tests {
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
                 assert!(
-                    !mods(&answers, *spider)
-                        .contains(&effects::Change::Waive(rules::declare_blocker::FLYING.key))
+                    !mods(&answers, *spider).contains(&effects::Modification::AsThough(
+                        rules::declare_blocker::FLYING.key
+                    ))
                 );
             })
             .unwrap();

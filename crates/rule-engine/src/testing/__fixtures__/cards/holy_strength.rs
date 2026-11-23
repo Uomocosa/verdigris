@@ -52,7 +52,7 @@ mod tests {
                     object: Some(effects::ObjectRelation::EnchantedObject),
                     ..CREATURE
                 },
-                change: effects::Change::Characteristic(effects::Layered::ModifyPT {
+                modification: effects::Modification::Characteristic(effects::Layered::ModifyPT {
                     power: 1,
                     toughness: 2,
                 }),

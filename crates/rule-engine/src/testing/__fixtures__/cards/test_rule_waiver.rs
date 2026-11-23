@@ -10,8 +10,8 @@ pub const TEST_RULE_WAIVER: testing::Card = testing::Card {
     definition: || {
         card! {
             cards::creature("Test Rule Waiver", cost![1], pt!(1, 1));
-            statics::this().waive(testing::UNTAPPED),
-            statics::this().demand::<testing::TestRule>(),
+            statics::this().as_though(testing::UNTAPPED),
+            statics::this().requirement::<testing::TestRule>(),
             statics::this().skip(testing::TEST_STEP),
         }
     },
@@ -45,21 +45,21 @@ mod tests {
                         object: Some(effects::ObjectRelation::ThisObject),
                         ..CREATURE
                     },
-                    change: effects::Change::Waive(testing::UNTAPPED.key),
+                    modification: effects::Modification::AsThough(testing::UNTAPPED.key),
                 },
                 abilities::Continuous {
                     filter: effects::Filter {
                         object: Some(effects::ObjectRelation::ThisObject),
                         ..CREATURE
                     },
-                    change: effects::Change::Demand(testing::TestRule::ID),
+                    modification: effects::Modification::Requirement(testing::TestRule::ID),
                 },
                 abilities::Continuous {
                     filter: effects::Filter {
                         object: Some(effects::ObjectRelation::ThisObject),
                         ..CREATURE
                     },
-                    change: effects::Change::Skip(testing::TEST_STEP),
+                    modification: effects::Modification::Skip(testing::TEST_STEP),
                 },
             ]
         );

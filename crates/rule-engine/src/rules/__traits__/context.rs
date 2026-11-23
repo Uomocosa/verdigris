@@ -1,6 +1,6 @@
 use bevy::prelude::Entity;
 
-pub trait PairCtx {
+pub trait Context {
     fn subject(&self) -> Entity;
     fn other(&self) -> Option<Entity>;
     fn player(&self) -> Entity;
@@ -11,7 +11,7 @@ mod tests {
     use bevy::prelude::Entity;
 
     use crate::rules;
-    use crate::rules::traits::pair_ctx::PairCtx;
+    use crate::rules::traits::context::Context;
 
     #[test]
     fn test_usage() {

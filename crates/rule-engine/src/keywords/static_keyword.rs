@@ -22,12 +22,12 @@ pub enum StaticKeyword {
 
 impl StaticKeyword {
     #[must_use]
-    pub fn keyword_changes(self) -> Vec<effects::Change> {
+    pub fn keyword_modifications(self) -> Vec<effects::Modification> {
         match self {
-            Self::Haste => vec![effects::Change::Waive(
+            Self::Haste => vec![effects::Modification::AsThough(
                 rules::declare_attacker::SUMMONING_SICK.key,
             )],
-            Self::Vigilance => vec![effects::Change::Skip(TAP_ATTACKERS)],
+            Self::Vigilance => vec![effects::Modification::Skip(TAP_ATTACKERS)],
             _ => Vec::new(),
         }
     }
@@ -44,16 +44,16 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        assert_eq!(StaticKeyword::Reach.keyword_changes(), vec![]);
+        assert_eq!(StaticKeyword::Reach.keyword_modifications(), vec![]);
         assert_eq!(
-            StaticKeyword::Haste.keyword_changes(),
-            vec![effects::Change::Waive(
+            StaticKeyword::Haste.keyword_modifications(),
+            vec![effects::Modification::AsThough(
                 rules::declare_attacker::SUMMONING_SICK.key
             )]
         );
         assert_eq!(
-            keywords::StaticKeyword::Vigilance.keyword_changes(),
-            vec![effects::Change::Skip(TAP_ATTACKERS)]
+            keywords::StaticKeyword::Vigilance.keyword_modifications(),
+            vec![effects::Modification::Skip(TAP_ATTACKERS)]
         );
     }
 }

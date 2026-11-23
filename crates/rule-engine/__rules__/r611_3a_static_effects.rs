@@ -67,7 +67,7 @@ pub fn r611_3a_static_effects(
             continue;
         }
         let still_applies = source_definition.continuous_abilities().any(|ability| {
-            ability.change == effect.change
+            ability.modification == effect.modification
                 && ability.filter.kind == effects::FilterKind::Creature
                 && candidates.get(effect.affected).is_ok_and(
                     |(_, definition, owner, zone, attacking, token)| {
@@ -130,13 +130,13 @@ pub fn r611_3a_static_effects(
                 ) {
                     continue;
                 }
-                if already_applied(&applied, source, candidate, &ability.change) {
+                if already_applied(&applied, source, candidate, &ability.modification) {
                     continue;
                 }
                 commands.spawn(effects::ContinuousEffect {
                     affected: candidate,
                     source: Some(source),
-                    change: ability.change.clone(),
+                    modification: ability.modification.clone(),
                     until: effects::Duration::WhileSourceOnBattlefield,
                     timestamp: stamp,
                 });
@@ -198,12 +198,12 @@ fn already_applied(
     applied: &Query<(Entity, &effects::ContinuousEffect)>,
     source: Entity,
     affected: Entity,
-    change: &effects::Change,
+    modification: &effects::Modification,
 ) -> bool {
     applied.iter().any(|(_, effect)| {
         effect.source == Some(source)
             && effect.affected == affected
-            && &effect.change == change
+            && &effect.modification == modification
             && effect.until == effects::Duration::WhileSourceOnBattlefield
     })
 }
@@ -279,10 +279,10 @@ mod tests {
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
-                assert!(answers.demanded::<rules::DeclareAttacker>(golem.into()));
-                assert!(answers.demanded::<rules::DeclareBlocker>(golem.into()));
-                assert!(!answers.demanded::<rules::DeclareAttacker>(bears.into()));
-                assert!(!answers.demanded::<rules::DeclareBlocker>(bears.into()));
+                assert!(answers.required::<rules::DeclareAttacker>(golem.into()));
+                assert!(answers.required::<rules::DeclareBlocker>(golem.into()));
+                assert!(!answers.required::<rules::DeclareAttacker>(bears.into()));
+                assert!(!answers.required::<rules::DeclareBlocker>(bears.into()));
             })
             .unwrap();
         Ok(())

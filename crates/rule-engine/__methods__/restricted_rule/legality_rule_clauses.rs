@@ -21,6 +21,6 @@ mod tests {
         let clauses = legality_rule_clauses();
         assert_eq!(clauses.len(), 1);
         assert_eq!(clauses[0].key, testing::UNTAPPED.key);
-        assert_eq!(clauses[0].requires, rules::Predicate::True);
+        assert_eq!(clauses[0].condition, rules::Predicate::True);
     }
 }

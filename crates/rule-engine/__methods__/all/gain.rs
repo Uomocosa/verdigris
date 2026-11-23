@@ -6,7 +6,7 @@ use crate::statics;
 pub fn gain(all: statics::All, keyword: keywords::StaticKeyword) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
-        change: effects::Change::Characteristic(effects::Layered::GainKeyword(keyword)),
+        modification: effects::Modification::Characteristic(effects::Layered::GainKeyword(keyword)),
     }
 }
 
@@ -24,8 +24,8 @@ mod tests {
         let ability = gain(statics::all(CREATURE), keywords::vigilance());
         assert_eq!(ability.filter, CREATURE);
         assert_eq!(
-            ability.change,
-            effects::Change::Characteristic(effects::Layered::GainKeyword(
+            ability.modification,
+            effects::Modification::Characteristic(effects::Layered::GainKeyword(
                 keywords::StaticKeyword::Vigilance
             ))
         );

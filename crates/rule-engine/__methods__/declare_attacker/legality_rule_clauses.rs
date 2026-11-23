@@ -44,21 +44,21 @@ mod tests {
         let clauses = legality_rule_clauses();
         assert_eq!(clauses.len(), 5);
         assert_eq!(clauses[0].key, rules::ClauseKey("508.1a/creature"));
-        assert_eq!(clauses[0].requires, rules::has::<cards::Creature>());
+        assert_eq!(clauses[0].condition, rules::has::<cards::Creature>());
         assert_eq!(clauses[1].key, rules::ClauseKey("508.1a/controls"));
         assert_eq!(
-            clauses[1].requires,
+            clauses[1].condition,
             rules::points_to::<cards::Owner>(rules::Role::Player)
                 & rules::has::<cards::OnBattlefield>()
         );
         assert_eq!(clauses[2].key, rules::ClauseKey("508.1a/untapped"));
-        assert_eq!(clauses[2].requires, !rules::has::<cards::Tapped>());
+        assert_eq!(clauses[2].condition, !rules::has::<cards::Tapped>());
         assert_eq!(
             clauses[3].key,
             rules::ClauseKey("508.1a/controlled-since-turn-began")
         );
-        assert_eq!(clauses[3].requires, !rules::has::<cards::SummoningSick>());
+        assert_eq!(clauses[3].condition, !rules::has::<cards::SummoningSick>());
         assert_eq!(clauses[4].key, rules::ClauseKey("702.3b/defender"));
-        assert_eq!(clauses[4].requires, !rules::has::<cards::Defender>());
+        assert_eq!(clauses[4].condition, !rules::has::<cards::Defender>());
     }
 }

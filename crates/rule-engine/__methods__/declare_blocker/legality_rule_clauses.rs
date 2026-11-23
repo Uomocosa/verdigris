@@ -41,18 +41,18 @@ mod tests {
         let clauses = legality_rule_clauses();
         assert_eq!(clauses.len(), 4);
         assert_eq!(clauses[0].key, rules::ClauseKey("509.1a/creature"));
-        assert_eq!(clauses[0].requires, rules::has::<cards::Creature>());
+        assert_eq!(clauses[0].condition, rules::has::<cards::Creature>());
         assert_eq!(clauses[1].key, rules::ClauseKey("509.1a/controls"));
         assert_eq!(
-            clauses[1].requires,
+            clauses[1].condition,
             rules::points_to::<cards::Owner>(rules::Role::Player)
                 & rules::has::<cards::OnBattlefield>()
         );
         assert_eq!(clauses[2].key, rules::ClauseKey("509.1a/untapped"));
-        assert_eq!(clauses[2].requires, !rules::has::<cards::Tapped>());
+        assert_eq!(clauses[2].condition, !rules::has::<cards::Tapped>());
         assert_eq!(clauses[3].key, rules::ClauseKey("702.9b/flying"));
         assert_eq!(
-            clauses[3].requires,
+            clauses[3].condition,
             !rules::other(rules::has::<cards::Flying>())
                 | rules::has::<cards::Flying>()
                 | rules::has::<cards::Reach>()

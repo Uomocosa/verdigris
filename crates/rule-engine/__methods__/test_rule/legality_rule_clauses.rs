@@ -22,6 +22,6 @@ mod tests {
         let clauses = legality_rule_clauses();
         assert_eq!(clauses.len(), 1);
         assert_eq!(clauses[0].key, rules::ClauseKey("test/untapped"));
-        assert_eq!(clauses[0].requires, !rules::has::<cards::Tapped>());
+        assert_eq!(clauses[0].condition, !rules::has::<cards::Tapped>());
     }
 }

@@ -6,13 +6,13 @@ pub fn with_effects(
     effects: &[effects::ContinuousEffect],
 ) -> cards::Characteristics {
     for effect in effects {
-        if let effects::Change::Characteristic(change) = &effect.change {
-            if let effects::Layered::GainKeyword(keyword) = change
+        if let effects::Modification::Characteristic(modification) = &effect.modification {
+            if let effects::Layered::GainKeyword(keyword) = modification
                 && !characteristics.keywords.contains(keyword)
             {
                 characteristics.keywords.push(*keyword);
             }
-            if let effects::Layered::LoseKeyword(keyword) = change {
+            if let effects::Layered::LoseKeyword(keyword) = modification {
                 characteristics.keywords.retain(|kept| kept != keyword);
             }
         }
@@ -23,10 +23,10 @@ pub fn with_effects(
     let mut power = base.power;
     let mut toughness = base.toughness;
     for effect in effects {
-        if let effects::Change::Characteristic(effects::Layered::ModifyPT {
+        if let effects::Modification::Characteristic(effects::Layered::ModifyPT {
             power: delta_power,
             toughness: delta_toughness,
-        }) = &effect.change
+        }) = &effect.modification
         {
             power = power.saturating_add(*delta_power);
             toughness = toughness.saturating_add(*delta_toughness);
@@ -61,7 +61,7 @@ mod tests {
         let effect = effects::ContinuousEffect {
             affected: Entity::PLACEHOLDER,
             source: None,
-            change: effects::Change::Characteristic(effects::Layered::ModifyPT {
+            modification: effects::Modification::Characteristic(effects::Layered::ModifyPT {
                 power: 1,
                 toughness: 3,
             }),
@@ -87,7 +87,7 @@ mod tests {
         let grant = effects::ContinuousEffect {
             affected: Entity::PLACEHOLDER,
             source: None,
-            change: effects::Change::Characteristic(effects::Layered::GainKeyword(
+            modification: effects::Modification::Characteristic(effects::Layered::GainKeyword(
                 keywords::StaticKeyword::Flying,
             )),
             until: effects::Duration::UntilEndOfTurn,
@@ -111,7 +111,7 @@ mod tests {
         let gain = effects::ContinuousEffect {
             affected: Entity::PLACEHOLDER,
             source: None,
-            change: effects::Change::Characteristic(effects::Layered::GainKeyword(
+            modification: effects::Modification::Characteristic(effects::Layered::GainKeyword(
                 keywords::StaticKeyword::Flying,
             )),
             until: effects::Duration::UntilEndOfTurn,
@@ -120,7 +120,7 @@ mod tests {
         let lose = effects::ContinuousEffect {
             affected: Entity::PLACEHOLDER,
             source: None,
-            change: effects::Change::Characteristic(effects::Layered::LoseKeyword(
+            modification: effects::Modification::Characteristic(effects::Layered::LoseKeyword(
                 keywords::StaticKeyword::Flying,
             )),
             until: effects::Duration::UntilEndOfTurn,
@@ -144,7 +144,7 @@ mod tests {
         let lose = effects::ContinuousEffect {
             affected: Entity::PLACEHOLDER,
             source: None,
-            change: effects::Change::Characteristic(effects::Layered::LoseKeyword(
+            modification: effects::Modification::Characteristic(effects::Layered::LoseKeyword(
                 keywords::StaticKeyword::Flying,
             )),
             until: effects::Duration::UntilEndOfTurn,
@@ -153,7 +153,7 @@ mod tests {
         let gain = effects::ContinuousEffect {
             affected: Entity::PLACEHOLDER,
             source: None,
-            change: effects::Change::Characteristic(effects::Layered::GainKeyword(
+            modification: effects::Modification::Characteristic(effects::Layered::GainKeyword(
                 keywords::StaticKeyword::Flying,
             )),
             until: effects::Duration::UntilEndOfTurn,

@@ -11,5 +11,5 @@ pub struct TriggeredAbility {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Continuous {
     pub filter: effects::Filter,
-    pub change: effects::Change,
+    pub modification: effects::Modification,
 }

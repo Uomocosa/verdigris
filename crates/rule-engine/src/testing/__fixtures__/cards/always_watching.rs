@@ -42,16 +42,18 @@ mod tests {
             [
                 abilities::Continuous {
                     filter: CREATURE.controlled_by(YOU).nontoken(),
-                    change: effects::Change::Characteristic(effects::Layered::ModifyPT {
-                        power: 1,
-                        toughness: 1,
-                    }),
+                    modification: effects::Modification::Characteristic(
+                        effects::Layered::ModifyPT {
+                            power: 1,
+                            toughness: 1,
+                        }
+                    ),
                 },
                 abilities::Continuous {
                     filter: CREATURE.controlled_by(YOU).nontoken(),
-                    change: effects::Change::Characteristic(effects::Layered::GainKeyword(
-                        keywords::StaticKeyword::Vigilance,
-                    )),
+                    modification: effects::Modification::Characteristic(
+                        effects::Layered::GainKeyword(keywords::StaticKeyword::Vigilance,)
+                    ),
                 },
             ]
         );

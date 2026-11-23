@@ -7,7 +7,7 @@ use crate::statics;
 pub fn must_block(all: statics::All) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
-        change: effects::Change::Demand(rules::DeclareBlocker::ID),
+        modification: effects::Modification::Requirement(rules::DeclareBlocker::ID),
     }
 }
 
@@ -26,8 +26,8 @@ mod tests {
         let ability = must_block(statics::all(CREATURE));
         assert_eq!(ability.filter, CREATURE);
         assert_eq!(
-            ability.change,
-            effects::Change::Demand(rules::DeclareBlocker::ID)
+            ability.modification,
+            effects::Modification::Requirement(rules::DeclareBlocker::ID)
         );
         assert_eq!(rules::DeclareBlocker::ID, rules::RuleId("509.1a"));
     }

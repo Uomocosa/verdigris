@@ -179,8 +179,8 @@ mod tests {
         let continuous = definition.continuous_abilities().collect::<Vec<_>>();
         assert_eq!(continuous.len(), 1);
         assert_eq!(
-            continuous[0].change,
-            effects::Change::Characteristic(effects::Layered::GainKeyword(
+            continuous[0].modification,
+            effects::Modification::Characteristic(effects::Layered::GainKeyword(
                 keywords::StaticKeyword::Vigilance
             ))
         );

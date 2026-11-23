@@ -6,7 +6,7 @@ use crate::statics;
 pub fn skip(all: statics::All, step: rules::StepId) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
-        change: effects::Change::Skip(step),
+        modification: effects::Modification::Skip(step),
     }
 }
 
@@ -25,8 +25,8 @@ mod tests {
         let ability = skip(statics::all(CREATURE), testing::TEST_STEP);
         assert_eq!(ability.filter, CREATURE);
         assert_eq!(
-            ability.change,
-            effects::Change::Skip(rules::StepId("test/step"))
+            ability.modification,
+            effects::Modification::Skip(rules::StepId("test/step"))
         );
     }
 }

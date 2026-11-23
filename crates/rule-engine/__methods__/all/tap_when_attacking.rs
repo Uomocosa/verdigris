@@ -6,7 +6,7 @@ use crate::statics;
 pub fn tap_when_attacking(all: statics::All) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
-        change: effects::Change::Perform(TAP_ATTACKERS),
+        modification: effects::Modification::Perform(TAP_ATTACKERS),
     }
 }
 
@@ -23,6 +23,9 @@ mod tests {
     fn test_usage() {
         let ability = tap_when_attacking(statics::all(CREATURE));
         assert_eq!(ability.filter, CREATURE);
-        assert_eq!(ability.change, effects::Change::Perform(TAP_ATTACKERS),);
+        assert_eq!(
+            ability.modification,
+            effects::Modification::Perform(TAP_ATTACKERS),
+        );
     }
 }

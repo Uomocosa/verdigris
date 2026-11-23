@@ -4,11 +4,11 @@ use crate::effects;
 use crate::rules;
 use crate::rules::traits::legality_rule::LegalityRule;
 
-pub fn demanded<R: LegalityRule>(answers: &rules::Rules, entity: Entity) -> bool {
+pub fn required<R: LegalityRule>(answers: &rules::Rules, entity: Entity) -> bool {
     answers
         .mods(entity)
         .iter()
-        .any(|change| matches!(change, effects::Change::Demand(id) if *id == R::ID))
+        .any(|modification| matches!(modification, effects::Modification::Requirement(id) if *id == R::ID))
 }
 
 #[cfg(test)]
@@ -19,7 +19,7 @@ mod tests {
     use crate::rules;
     use crate::testing::*;
 
-    use super::demanded;
+    use super::required;
 
     #[test]
     fn test_usage() -> TestResult {
@@ -31,8 +31,8 @@ mod tests {
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
-                assert!(demanded::<TestRule>(&answers, *waiver));
-                assert!(!demanded::<TestRule>(&answers, *bears));
+                assert!(required::<TestRule>(&answers, *waiver));
+                assert!(!required::<TestRule>(&answers, *bears));
             })
             .unwrap();
         Ok(())

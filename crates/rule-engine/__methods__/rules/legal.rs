@@ -1,7 +1,7 @@
 use crate::effects;
 use crate::rules;
+use crate::rules::traits::context::Context;
 use crate::rules::traits::legality_rule::LegalityRule;
-use crate::rules::traits::pair_ctx::PairCtx;
 
 pub fn legal<R: LegalityRule>(answers: &rules::Rules, context: &R::Ctx) -> bool {
     let subject = context.subject();
@@ -17,15 +17,15 @@ pub fn legal<R: LegalityRule>(answers: &rules::Rules, context: &R::Ctx) -> bool 
             answers
                 .mods(entity)
                 .iter()
-                .any(|change| matches!(change, effects::Change::Waive(key) if *key == clause.key))
+                .any(|modification| matches!(modification, effects::Modification::AsThough(key) if *key == clause.key))
         })
     };
     let base = R::clauses()
         .iter()
         .filter(|clause| !waived(clause))
-        .all(|clause| answers.eval(&clause.requires, subject, other, Some(player)));
-    let restricted = answers.mods(subject).iter().any(|change| {
-        matches!(change, effects::Change::Restrict(id, requirement) if *id == R::ID && !answers.eval(requirement, subject, other, Some(player)))
+        .all(|clause| answers.eval(&clause.condition, subject, other, Some(player)));
+    let restricted = answers.mods(subject).iter().any(|modification| {
+        matches!(modification, effects::Modification::Restriction(id, requirement) if *id == R::ID && !answers.eval(requirement, subject, other, Some(player)))
     });
     base && !restricted
 }

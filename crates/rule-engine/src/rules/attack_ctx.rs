@@ -9,7 +9,7 @@ pub struct AttackCtx {
 }
 
 #[rustfmt::skip]
-impl rules::traits::pair_ctx::PairCtx for AttackCtx {
+impl rules::traits::context::Context for AttackCtx {
     fn subject(&self) -> Entity { self.attacker }
     fn other(&self) -> Option<Entity> { None }
     fn player(&self) -> Entity { self.player }
@@ -19,7 +19,7 @@ impl rules::traits::pair_ctx::PairCtx for AttackCtx {
 mod tests {
     use bevy::prelude::Entity;
 
-    use crate::rules::traits::pair_ctx::PairCtx;
+    use crate::rules::traits::context::Context;
 
     use super::AttackCtx;
 
