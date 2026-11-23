@@ -9,6 +9,6 @@ pub enum TestAbility {
     },
     Mana {
         source: Entity,
-        produces: cards::Color,
+        produces: cards::ManaType,
     },
 }

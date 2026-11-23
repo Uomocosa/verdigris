@@ -7,7 +7,7 @@ use crate::cards;
 pub enum Action {
     ActivateManaAbility {
         source: Entity,
-        produces: cards::Color,
+        produces: cards::ManaType,
     },
     Cast(Entity),
     PlayLand(Entity),

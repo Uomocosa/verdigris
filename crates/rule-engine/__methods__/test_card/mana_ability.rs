@@ -1,7 +1,7 @@
 use crate::cards;
 use crate::testing;
 
-pub fn mana_ability(card: testing::TestCard, produces: cards::Color) -> testing::TestAbility {
+pub fn mana_ability(card: testing::TestCard, produces: cards::ManaType) -> testing::TestAbility {
     testing::TestAbility::Mana {
         source: *card,
         produces,
@@ -24,10 +24,10 @@ mod tests {
         let card = testing::TestCard(entity);
 
         assert_eq!(
-            mana_ability(card, cards::Color::Blue),
+            mana_ability(card, cards::ManaType::from(cards::Color::Blue)),
             testing::TestAbility::Mana {
                 source: entity,
-                produces: cards::Color::Blue,
+                produces: cards::ManaType::from(cards::Color::Blue),
             }
         );
     }

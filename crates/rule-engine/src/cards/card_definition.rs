@@ -78,6 +78,8 @@ impl CardDefinition {
 
     pub fn triggered_abilities(&self) -> impl Iterator<Item = &abilities::TriggeredAbility> {}
 
+    pub fn activated_abilities(&self) -> impl Iterator<Item = &abilities::ActivatedAbility> {}
+
     pub fn continuous_abilities(&self) -> impl Iterator<Item = &abilities::Continuous> {}
 
     pub fn keywords(&self) -> impl Iterator<Item = keywords::StaticKeyword> + '_ {}

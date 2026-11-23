@@ -1,4 +1,5 @@
 mod abilities;
+mod activated_abilities;
 mod assigned_blocked_damage;
 mod colors;
 mod continuous_abilities;
@@ -10,6 +11,7 @@ mod spell_ability;
 mod triggered;
 mod triggered_abilities;
 pub use abilities::abilities;
+pub use activated_abilities::activated_abilities;
 pub use assigned_blocked_damage::assigned_blocked_damage;
 pub use colors::colors;
 pub use continuous_abilities::continuous_abilities;

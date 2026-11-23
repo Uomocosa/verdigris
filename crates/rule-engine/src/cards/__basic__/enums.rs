@@ -47,5 +47,6 @@ pub enum ManaSymbol {
     Black,
     Red,
     Green,
+    Colorless,
     Generic(u32),
 }

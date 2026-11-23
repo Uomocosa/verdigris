@@ -305,7 +305,7 @@ mod tests {
             p2.pass_to(turns::Step::DeclareBlockers),
         ])?;
         game.play([
-            p1.activate_ability(tundra.mana_ability(cards::Color::Blue))
+            p1.activate_ability(tundra.mana_ability(cards::ManaType::from(cards::Color::Blue)))
                 .cast(jump)
                 .targeting(bears_1)
                 .pass_priority(),

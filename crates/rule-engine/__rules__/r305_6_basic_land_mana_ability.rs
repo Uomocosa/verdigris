@@ -62,8 +62,15 @@ pub fn r305_6_basic_land_mana_ability(
             rejected.write(actions::Rejected::CannotActivateManaAbility { permanent });
             continue;
         };
+        if definition.activated_abilities().any(|ability| ability.produces == produces) {
+            continue;
+        }
+        let cards::ManaType::Color(color) = produces else {
+            rejected.write(actions::Rejected::CannotActivateManaAbility { permanent });
+            continue;
+        };
         let Some(land_type) =
-            definition.type_line.land_types().find(|land_type| land_type.color() == produces)
+            definition.type_line.land_types().find(|land_type| land_type.color() == color)
         else {
             rejected.write(actions::Rejected::CannotActivateManaAbility { permanent });
             continue;
@@ -123,7 +130,7 @@ mod tests {
             p1,
             actions::Action::ActivateManaAbility {
                 source: forest.into(),
-                produces: cards::Color::Green,
+                produces: cards::ManaType::from(cards::Color::Green),
             },
         );
 
@@ -131,7 +138,7 @@ mod tests {
             p1,
             actions::Action::ActivateManaAbility {
                 source: forest.into(),
-                produces: cards::Color::Green,
+                produces: cards::ManaType::from(cards::Color::Green),
             },
         );
 
@@ -154,7 +161,7 @@ mod tests {
             p1,
             actions::Action::ActivateManaAbility {
                 source: forest.into(),
-                produces: cards::Color::White,
+                produces: cards::ManaType::from(cards::Color::White),
             },
         );
 
@@ -174,7 +181,9 @@ mod tests {
         let (mut game, [p1, ..]) = MockGame::new([P1.battlefield([TUNDRA]), P2]);
         let [tundra] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TUNDRA)?;
 
-        game.play([p1.activate_ability(tundra.mana_ability(cards::Color::White))])?;
+        game.play([
+            p1.activate_ability(tundra.mana_ability(cards::ManaType::from(cards::Color::White)))
+        ])?;
 
         assert_eq!(game.mana_pool(p1), mana![W]);
         assert!(game.last_rejection().is_none());
@@ -188,8 +197,8 @@ mod tests {
         let [tundra_1, tundra_2] = game.player(p1).cards_in(BATTLEFIELD).exactly::<2>(TUNDRA)?;
 
         game.play([p1
-            .activate_ability(tundra_1.mana_ability(cards::Color::White))
-            .activate_ability(tundra_2.mana_ability(cards::Color::Blue))])?;
+            .activate_ability(tundra_1.mana_ability(cards::ManaType::from(cards::Color::White)))
+            .activate_ability(tundra_2.mana_ability(cards::ManaType::from(cards::Color::Blue)))])?;
 
         assert_eq!(game.mana_pool(p1), mana![W, U]);
         assert!(game.last_rejection().is_none());
@@ -205,14 +214,14 @@ mod tests {
             p1,
             actions::Action::ActivateManaAbility {
                 source: tundra.into(),
-                produces: cards::Color::White,
+                produces: cards::ManaType::from(cards::Color::White),
             },
         );
         game.act(
             p1,
             actions::Action::ActivateManaAbility {
                 source: tundra.into(),
-                produces: cards::Color::Blue,
+                produces: cards::ManaType::from(cards::Color::Blue),
             },
         );
 

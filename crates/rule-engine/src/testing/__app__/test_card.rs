@@ -11,7 +11,7 @@ pub struct TestCard(#[deref] pub(crate) Entity);
 #[atomic_delegates]
 impl TestCard {
     #[must_use]
-    pub fn mana_ability(self, produces: cards::Color) -> testing::TestAbility {}
+    pub fn mana_ability(self, produces: cards::ManaType) -> testing::TestAbility {}
 }
 
 #[rustfmt::skip]

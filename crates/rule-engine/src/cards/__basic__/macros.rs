@@ -15,6 +15,9 @@ macro_rules! mana_symbol {
     (G) => {
         $crate::cards::ManaSymbol::Green
     };
+    (C) => {
+        $crate::cards::ManaSymbol::Colorless
+    };
     ($amount:literal) => {
         $crate::cards::ManaSymbol::Generic($amount)
     };

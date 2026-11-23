@@ -42,7 +42,7 @@ pub fn play(
                             land_types
                                 .first()
                                 .filter(|_| land_types.len() == 1)
-                                .map(|land| land.color())
+                                .map(|land| cards::ManaType::from(land.color()))
                         }),
                 };
                 let Some(produces) = produces else {
@@ -274,7 +274,9 @@ mod tests {
         let (mut game, [p1, ..]) = MockGame::new([P1.battlefield([TUNDRA]), P2]);
         let [tundra] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TUNDRA)?;
 
-        game.play([p1.activate_ability(tundra.mana_ability(cards::Color::Blue))])?;
+        game.play([
+            p1.activate_ability(tundra.mana_ability(cards::ManaType::from(cards::Color::Blue)))
+        ])?;
 
         assert_eq!(game.mana_pool(p1), mana![U]);
         Ok(())

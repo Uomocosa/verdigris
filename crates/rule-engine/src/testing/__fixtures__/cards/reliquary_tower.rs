@@ -1,5 +1,6 @@
 use crate::PLAYER;
 use crate::YOU;
+use crate::abilities;
 use crate::card;
 use crate::cards;
 use crate::statics;
@@ -10,6 +11,7 @@ pub const RELIQUARY_TOWER: testing::Card = testing::Card {
     definition: || {
         card! {
             cards::land("Reliquary Tower", []);
+            abilities::tap_add(cards::ManaType::Colorless),
             statics::all(PLAYER.controlled_by(YOU)).no_maximum_hand_size(),
         }
     },
@@ -32,6 +34,10 @@ mod tests {
         let tower = (RELIQUARY_TOWER.definition)();
         assert_eq!(*tower.name, "Reliquary Tower");
         assert_eq!(tower.type_line.types, vec![cards::CardType::Land]);
+        assert_eq!(
+            tower.activated_abilities().copied().collect::<Vec<_>>(),
+            [abilities::tap_add(cards::ManaType::Colorless)]
+        );
         assert_eq!(
             tower.continuous_abilities().cloned().collect::<Vec<_>>(),
             [abilities::Continuous {

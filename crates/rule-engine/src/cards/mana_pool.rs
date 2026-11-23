@@ -52,6 +52,10 @@ impl ManaPool {
                 green: self.green.saturating_add(1),
                 ..self
             },
+            cards::ManaSymbol::Colorless => Self {
+                colorless: self.colorless.saturating_add(1),
+                ..self
+            },
             cards::ManaSymbol::Generic(amount) => Self {
                 colorless: self.colorless.saturating_add(amount),
                 ..self

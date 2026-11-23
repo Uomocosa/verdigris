@@ -48,6 +48,9 @@ pub use land_type::LandType;
 mod mana_pool;
 pub use mana_pool::ManaPool;
 
+mod mana_type;
+pub use mana_type::ManaType;
+
 mod owner;
 pub use owner::Owner;
 

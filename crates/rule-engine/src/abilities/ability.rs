@@ -9,6 +9,7 @@ pub enum Ability {
     Spell(effects::Effect),
     Triggered(abilities::TriggeredAbility),
     Static(abilities::StaticAbility),
+    Activated(abilities::ActivatedAbility),
 }
 
 impl From<keywords::StaticKeyword> for Ability {
