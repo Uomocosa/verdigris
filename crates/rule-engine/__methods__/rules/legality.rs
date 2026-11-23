@@ -39,7 +39,7 @@ pub fn legality<E: Event>(answers: &rules::Rules, event: &E) -> rules::Legality 
     .filter_map(|(role, entity)| entity.map(|entity| (role, entity)))
     .any(|(role, entity)| {
         answers.changes(entity, rules::Target::Event(E::ID)).iter().any(|change| match change {
-            rules::Change::Cant => true,
+            rules::Change::Cant { role: protected } if *protected == role => true,
             rules::Change::OnlyIf {
                 role: required,
                 condition,
@@ -506,6 +506,18 @@ mod tests {
                         &answers,
                         &rules::DealDamage {
                             source: *exposed,
+                            recipient: *exposed,
+                            amount: 3,
+                            controller: p2.into(),
+                        }
+                    ),
+                    rules::Legality::Legal
+                );
+                assert_eq!(
+                    legality::<rules::DealDamage>(
+                        &answers,
+                        &rules::DealDamage {
+                            source: *protected,
                             recipient: *exposed,
                             amount: 3,
                             controller: p2.into(),

@@ -12,10 +12,10 @@ pub const TEST_CANT_DISCARD: testing::Card = testing::Card {
     definition: || {
         card! {
             cards::CardDefinition::from_enchantment("Test Cant Discard", cost![2]);
-            statics::all(PLAYER.controlled_by(YOU)).cant::<rules::Discard>(),
-            statics::all(PLAYER.controlled_by(YOU)).cant::<rules::GainLife>(),
-            statics::all(PLAYER.controlled_by(YOU)).cant::<rules::Mill>(),
-            statics::all(PLAYER.controlled_by(YOU)).cant::<rules::CreateTokens>(),
+            statics::all(PLAYER.controlled_by(YOU)).cant::<rules::Discard>(rules::Role::Player),
+            statics::all(PLAYER.controlled_by(YOU)).cant::<rules::GainLife>(rules::Role::Player),
+            statics::all(PLAYER.controlled_by(YOU)).cant::<rules::Mill>(rules::Role::Player),
+            statics::all(PLAYER.controlled_by(YOU)).cant::<rules::CreateTokens>(rules::Role::Player),
         }
     },
 };
@@ -46,28 +46,36 @@ mod tests {
                     filter: PLAYER.controlled_by(YOU),
                     modification: effects::Modification::Rule(rules::RuleChange {
                         target: rules::Target::Event(rules::Discard::ID),
-                        change: rules::Change::Cant,
+                        change: rules::Change::Cant {
+                            role: rules::Role::Player,
+                        },
                     }),
                 },
                 abilities::Continuous {
                     filter: PLAYER.controlled_by(YOU),
                     modification: effects::Modification::Rule(rules::RuleChange {
                         target: rules::Target::Event(rules::GainLife::ID),
-                        change: rules::Change::Cant,
+                        change: rules::Change::Cant {
+                            role: rules::Role::Player,
+                        },
                     }),
                 },
                 abilities::Continuous {
                     filter: PLAYER.controlled_by(YOU),
                     modification: effects::Modification::Rule(rules::RuleChange {
                         target: rules::Target::Event(rules::Mill::ID),
-                        change: rules::Change::Cant,
+                        change: rules::Change::Cant {
+                            role: rules::Role::Player,
+                        },
                     }),
                 },
                 abilities::Continuous {
                     filter: PLAYER.controlled_by(YOU),
                     modification: effects::Modification::Rule(rules::RuleChange {
                         target: rules::Target::Event(rules::CreateTokens::ID),
-                        change: rules::Change::Cant,
+                        change: rules::Change::Cant {
+                            role: rules::Role::Player,
+                        },
                     }),
                 },
             ]

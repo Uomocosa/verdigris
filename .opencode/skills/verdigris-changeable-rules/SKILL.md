@@ -47,7 +47,7 @@ pub enum Change {
     AsThough,                                   // Clause: treat as satisfied
     Allow(rules::Predicate),                    // Clause: satisfied if this holds instead
     OnlyIf { role: rules::Role, condition: rules::Predicate }, // Event: veto unless it holds
-    Cant,                                       // Event: absolute veto
+    Cant { role: rules::Role },                   // Event: absolute veto for that role
     Must,                                       // Event: requirement (508.1d / 509.1c)
     // quantity
     Set(u32), Increase(u32), Decrease(u32), NoMaximum,
@@ -97,7 +97,8 @@ pending choice like the opening-hand choices, never as an implicit default.
 - Do look up changes with ONE helper (`Rules::changes(entity, target)`), never by matching
   `Modification` variants in each evaluator.
 - Do look a change up on the entity its `Role` names (subject, other, player), for clauses and
-  for `OnlyIf` alike.
+  for `OnlyIf` alike. `Cant` names the role it protects and vetoes only when the carrying
+  entity is the event's entity of that role (exactly like `OnlyIf`).
 - Don't create an empty "rule" type only to hang a veto on: the event is the target.
 - Don't special-case a card in a `__rules__` system; express it as a `RuleChange`.
 - Keep the CR numbers as IDs and the verbatim-text tests.

@@ -46,7 +46,9 @@ pub enum Change {
         role: rules::Role,
         condition: rules::Predicate,
     },
-    Cant,
+    Cant {
+        role: rules::Role,
+    },
     Must,
     Set(u32),
     Increase(u32),

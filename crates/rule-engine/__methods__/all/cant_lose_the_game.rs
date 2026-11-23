@@ -9,7 +9,9 @@ pub fn cant_lose_the_game(all: statics::All) -> abilities::Continuous {
         filter: *all,
         modification: effects::Modification::Rule(rules::RuleChange {
             target: rules::Target::Event(rules::LoseGame::ID),
-            change: rules::Change::Cant,
+            change: rules::Change::Cant {
+                role: rules::Role::Player,
+            },
         }),
     }
 }
@@ -31,7 +33,9 @@ mod tests {
             ability.modification,
             effects::Modification::Rule(rules::RuleChange {
                 target: rules::Target::Event(rules::EventId("104.3")),
-                change: rules::Change::Cant,
+                change: rules::Change::Cant {
+                    role: rules::Role::Player,
+                },
             })
         );
     }

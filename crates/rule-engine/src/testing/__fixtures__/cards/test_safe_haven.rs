@@ -13,9 +13,9 @@ pub const TEST_SAFE_HAVEN: testing::Card = testing::Card {
     definition: || {
         card! {
             cards::CardDefinition::from_enchantment("Test Safe Haven", cost![2]);
-            statics::all(CREATURE.controlled_by(YOU)).cant::<rules::Destroy>(),
-            statics::all(PLAYER.controlled_by(YOU)).cant::<rules::Counter>(),
-            statics::all(CREATURE.controlled_by(YOU)).cant::<rules::DealDamage>(),
+            statics::all(CREATURE.controlled_by(YOU)).cant::<rules::Destroy>(rules::Role::Subject),
+            statics::all(PLAYER.controlled_by(YOU)).cant::<rules::Counter>(rules::Role::Player),
+            statics::all(CREATURE.controlled_by(YOU)).cant::<rules::DealDamage>(rules::Role::Subject),
         }
     },
 };
@@ -47,21 +47,27 @@ mod tests {
                     filter: CREATURE.controlled_by(YOU),
                     modification: effects::Modification::Rule(rules::RuleChange {
                         target: rules::Target::Event(rules::Destroy::ID),
-                        change: rules::Change::Cant,
+                        change: rules::Change::Cant {
+                            role: rules::Role::Subject
+                        },
                     }),
                 },
                 abilities::Continuous {
                     filter: PLAYER.controlled_by(YOU),
                     modification: effects::Modification::Rule(rules::RuleChange {
                         target: rules::Target::Event(rules::Counter::ID),
-                        change: rules::Change::Cant,
+                        change: rules::Change::Cant {
+                            role: rules::Role::Player
+                        },
                     }),
                 },
                 abilities::Continuous {
                     filter: CREATURE.controlled_by(YOU),
                     modification: effects::Modification::Rule(rules::RuleChange {
                         target: rules::Target::Event(rules::DealDamage::ID),
-                        change: rules::Change::Cant,
+                        change: rules::Change::Cant {
+                            role: rules::Role::Subject
+                        },
                     }),
                 },
             ]

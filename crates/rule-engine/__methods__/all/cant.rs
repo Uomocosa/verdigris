@@ -4,12 +4,12 @@ use crate::rules;
 use crate::rules::traits::event::Event;
 use crate::statics;
 
-pub fn cant<E: Event>(all: statics::All) -> abilities::Continuous {
+pub fn cant<E: Event>(all: statics::All, role: rules::Role) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
         modification: effects::Modification::Rule(rules::RuleChange {
             target: rules::Target::Event(E::ID),
-            change: rules::Change::Cant,
+            change: rules::Change::Cant { role },
         }),
     }
 }
@@ -26,13 +26,15 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let ability = cant::<rules::Draw>(statics::all(PLAYER));
+        let ability = cant::<rules::Draw>(statics::all(PLAYER), rules::Role::Player);
         assert_eq!(ability.filter, PLAYER);
         assert_eq!(
             ability.modification,
             effects::Modification::Rule(rules::RuleChange {
                 target: rules::Target::Event(rules::Draw::ID),
-                change: rules::Change::Cant,
+                change: rules::Change::Cant {
+                    role: rules::Role::Player,
+                },
             })
         );
     }

@@ -49,7 +49,7 @@ impl All {
     pub fn cant_lose_the_game(self) -> abilities::Continuous {}
 
     #[must_use]
-    pub fn cant<E: rules::traits::event::Event>(self) -> abilities::Continuous {}
+    pub fn cant<E: rules::traits::event::Event>(self, role: rules::Role) -> abilities::Continuous {}
 
     #[must_use]
     pub fn cant_win_the_game(self) -> abilities::Continuous {}

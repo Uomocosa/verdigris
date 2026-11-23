@@ -64,14 +64,18 @@ mod tests {
                     filter: PLAYER.controlled_by(YOU),
                     modification: effects::Modification::Rule(rules::RuleChange {
                         target: rules::Target::Event(rules::LoseGame::ID),
-                        change: rules::Change::Cant,
+                        change: rules::Change::Cant {
+                            role: rules::Role::Player,
+                        },
                     }),
                 },
                 abilities::Continuous {
                     filter: PLAYER.controlled_by(OPPONENT),
                     modification: effects::Modification::Rule(rules::RuleChange {
                         target: rules::Target::Event(rules::WinGame::ID),
-                        change: rules::Change::Cant,
+                        change: rules::Change::Cant {
+                            role: rules::Role::Player,
+                        },
                     }),
                 },
             ]
