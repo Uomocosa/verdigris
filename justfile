@@ -67,10 +67,13 @@ lint:
 [group('dev')]
 [doc('Regenerate __methods__ indexes after adding/removing atomic shells.')]
 sync-methods:
-    lele-lint --sync-methods --config lele.toml crates/rule-engine
-    lele-lint --sync-methods --config lele.toml crates/parser
-    lele-lint --sync-methods --config lele.toml crates/game
-    lele-lint --sync-methods --config lele.toml crates/verdigris-lint
+    #!/usr/bin/env bash
+    set -euo pipefail
+    for dir in crates/*/; do
+        if [ -d "${dir}__methods__" ]; then
+            cargo run --quiet -p verdigris-lint -- --sync-methods --config lele.toml "${dir%/}"
+        fi
+    done
 
 [group('gate')]
 [doc('Run the full workspace test suite (nextest).')]
