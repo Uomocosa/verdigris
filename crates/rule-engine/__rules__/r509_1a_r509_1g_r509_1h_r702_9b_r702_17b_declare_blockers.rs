@@ -91,6 +91,7 @@ pub fn r509_1a_r509_1g_r509_1h_r702_9b_r702_17b_declare_blockers(
                 && answers.legal::<rules::DeclareBlocker>(&rules::BlockCtx {
                     blocker: assignment.blocker,
                     attacker: assignment.attacker,
+                    player: action.player,
                 })
         });
         let requirement_unmet = cards.iter().any(|(entity, definition, owner, in_zone)| {
@@ -103,6 +104,7 @@ pub fn r509_1a_r509_1g_r509_1h_r702_9b_r702_17b_declare_blockers(
                     answers.legal::<rules::DeclareBlocker>(&rules::BlockCtx {
                         blocker: entity,
                         attacker,
+                        player: action.player,
                     })
                 })
         });

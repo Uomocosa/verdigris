@@ -81,7 +81,10 @@ pub fn r508_1a_r508_1k_declare_attackers(
                 definition.type_line.types.contains(&cards::CardType::Creature)
                     && **owner == action.player
                     && **in_zone == battlefield
-                    && answers.legal::<rules::DeclareAttacker>(&rules::AttackCtx(*attacker))
+                    && answers.legal::<rules::DeclareAttacker>(&rules::AttackCtx {
+                        attacker: *attacker,
+                        player: action.player,
+                    })
             })
         });
         let requirement_unmet = cards.iter().any(|(entity, definition, owner, in_zone)| {
@@ -89,7 +92,10 @@ pub fn r508_1a_r508_1k_declare_attackers(
                 && **in_zone == battlefield
                 && definition.type_line.types.contains(&cards::CardType::Creature)
                 && answers.demanded::<rules::DeclareAttacker>(entity)
-                && answers.legal::<rules::DeclareAttacker>(&rules::AttackCtx(entity))
+                && answers.legal::<rules::DeclareAttacker>(&rules::AttackCtx {
+                    attacker: entity,
+                    player: action.player,
+                })
                 && !attackers.contains(&entity)
         });
         if !all_legal || requirement_unmet {

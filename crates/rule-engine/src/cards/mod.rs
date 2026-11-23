@@ -3,8 +3,8 @@ mod basic;
 
 pub use basic::card_text::{artifact_creature, creature, instant, land, sorcery};
 pub use basic::components::{
-    Blocked, Blocking, Deathtouch, EffectivePT, Enchanting, Indestructible, Infect, Lifelink,
-    Owner, Token, Trample, TriggeredAtStep, TriggeredEnters,
+    Blocked, Deathtouch, EffectivePT, Indestructible, Infect, Lifelink, Token, Trample,
+    TriggeredAtStep, TriggeredEnters,
 };
 pub use basic::current_markers::{CurrentMarkers, CurrentMarkersItem};
 pub use basic::enums::{CardType, Color, EnchantmentType, ManaSymbol, Supertype};
@@ -14,6 +14,12 @@ pub use basic::structs::PowerToughness;
 
 mod attacking;
 pub use attacking::Attacking;
+
+mod blocking;
+pub use blocking::Blocking;
+
+mod enchanting;
+pub use enchanting::Enchanting;
 
 mod object_filter;
 pub use object_filter::ObjectFilter;
@@ -41,6 +47,9 @@ pub use land_type::LandType;
 
 mod mana_pool;
 pub use mana_pool::ManaPool;
+
+mod owner;
+pub use owner::Owner;
 
 mod on_battlefield;
 pub use on_battlefield::OnBattlefield;

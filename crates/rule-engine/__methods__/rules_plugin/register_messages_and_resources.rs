@@ -46,6 +46,9 @@ pub fn register_messages_and_resources(app: &mut App) {
         registry.register_predicate_component::<cards::Defender>(world);
         registry.register_predicate_component::<cards::SummoningSick>(world);
         registry.register_predicate_component::<cards::OnBattlefield>(world);
+        registry.register_entity_component::<cards::Owner>(world);
+        registry.register_entity_component::<cards::Blocking>(world);
+        registry.register_entity_component::<cards::Enchanting>(world);
     }
     app.world_mut().spawn((registry,));
 }

@@ -26,6 +26,7 @@ impl Rules<'_, '_> {
         predicate: &rules::Predicate,
         subject: Entity,
         other: Option<Entity>,
+        player: Option<Entity>,
     ) -> bool {
     }
 

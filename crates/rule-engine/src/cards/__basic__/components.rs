@@ -1,17 +1,8 @@
-use bevy::prelude::{Component, Entity};
+use bevy::prelude::Component;
 use derive_more::Deref;
 
 use crate::abilities;
 use crate::cards;
-
-#[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Deref)]
-pub struct Owner(pub Entity);
-
-#[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Deref)]
-pub struct Blocking(pub Entity);
-
-#[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Deref)]
-pub struct Enchanting(pub Entity);
 
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Blocked;

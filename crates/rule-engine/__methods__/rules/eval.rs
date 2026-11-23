@@ -8,6 +8,7 @@ pub fn eval(
     predicate: &rules::Predicate,
     subject: Entity,
     other: Option<Entity>,
+    player: Option<Entity>,
 ) -> bool {
     match predicate {
         rules::Predicate::Has(key) => answers
@@ -18,6 +19,27 @@ pub fn eval(
             .is_some_and(|component| {
                 answers.entities.get(subject).is_ok_and(|entity| entity.contains_id(component))
             }),
+        rules::Predicate::PointsTo(key, role) => {
+            let wanted = match role {
+                rules::Role::Subject => Some(subject),
+                rules::Role::Other => other,
+                rules::Role::Player => player,
+            };
+            wanted.is_some_and(|wanted| {
+                answers
+                    .registry
+                    .single()
+                    .ok()
+                    .and_then(|registry| {
+                        answers
+                            .entities
+                            .get(subject)
+                            .ok()
+                            .and_then(|entity| registry.target_of(*key, entity))
+                    })
+                    .is_some_and(|found| found == wanted)
+            })
+        }
         rules::Predicate::Characteristic(characteristic, comparison, threshold) => answers
             .entities
             .get(subject)
@@ -35,18 +57,20 @@ pub fn eval(
                 }
             }),
         rules::Predicate::Of(role, inner) => match role {
-            rules::Role::Subject => eval(answers, inner, subject, other),
-            rules::Role::Other => {
-                other.is_some_and(|candidate| eval(answers, inner, candidate, Some(subject)))
+            rules::Role::Subject => eval(answers, inner, subject, other, player),
+            rules::Role::Other => other
+                .is_some_and(|candidate| eval(answers, inner, candidate, Some(subject), player)),
+            rules::Role::Player => {
+                player.is_some_and(|candidate| eval(answers, inner, candidate, other, player))
             }
         },
         rules::Predicate::All(predicates) => {
-            predicates.iter().all(|inner| eval(answers, inner, subject, other))
+            predicates.iter().all(|inner| eval(answers, inner, subject, other, player))
         }
         rules::Predicate::Any(predicates) => {
-            predicates.iter().any(|inner| eval(answers, inner, subject, other))
+            predicates.iter().any(|inner| eval(answers, inner, subject, other, player))
         }
-        rules::Predicate::Not(inner) => !eval(answers, inner, subject, other),
+        rules::Predicate::Not(inner) => !eval(answers, inner, subject, other, player),
         rules::Predicate::True => true,
     }
 }
@@ -69,7 +93,13 @@ mod tests {
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
-                assert!(eval(&answers, &rules::has::<cards::Tapped>(), *bears, None));
+                assert!(eval(
+                    &answers,
+                    &rules::has::<cards::Tapped>(),
+                    *bears,
+                    None,
+                    None
+                ));
             })
             .unwrap();
         Ok(())
@@ -86,6 +116,7 @@ mod tests {
                     &answers,
                     &rules::has::<cards::Tapped>(),
                     *bears,
+                    None,
                     None
                 ));
             })
@@ -103,7 +134,7 @@ mod tests {
             .run_system_once(move |answers: rules::Rules| {
                 let awake_and_airborne =
                     !rules::has::<cards::Tapped>() & rules::has::<cards::Flying>();
-                assert!(eval(&answers, &awake_and_airborne, *drake, None));
+                assert!(eval(&answers, &awake_and_airborne, *drake, None, None));
             })
             .unwrap();
         Ok(())
@@ -119,7 +150,7 @@ mod tests {
             .run_system_once(move |answers: rules::Rules| {
                 let awake_and_airborne =
                     !rules::has::<cards::Tapped>() & rules::has::<cards::Flying>();
-                assert!(!eval(&answers, &awake_and_airborne, *drake, None));
+                assert!(!eval(&answers, &awake_and_airborne, *drake, None, None));
             })
             .unwrap();
         Ok(())
@@ -138,8 +169,8 @@ mod tests {
             .run_system_once(move |answers: rules::Rules| {
                 let tapped_or_flying =
                     rules::has::<cards::Tapped>() | rules::has::<cards::Flying>();
-                assert!(!eval(&answers, &tapped_or_flying, *resting, None));
-                assert!(eval(&answers, &tapped_or_flying, *tapped, None));
+                assert!(!eval(&answers, &tapped_or_flying, *resting, None, None));
+                assert!(eval(&answers, &tapped_or_flying, *tapped, None, None));
             })
             .unwrap();
         Ok(())
@@ -156,8 +187,8 @@ mod tests {
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
                 let big = rules::at_least(rules::Characteristic::Power, 3);
-                assert!(!eval(&answers, &big, *bears, None));
-                assert!(eval(&answers, &big, *wolf, None));
+                assert!(!eval(&answers, &big, *bears, None, None));
+                assert!(eval(&answers, &big, *wolf, None, None));
             })
             .unwrap();
         Ok(())
@@ -176,9 +207,9 @@ mod tests {
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
                 let other_flies = rules::other(rules::has::<cards::Flying>());
-                assert!(!eval(&answers, &other_flies, *bears, None));
-                assert!(eval(&answers, &other_flies, *bears, Some(*drake)));
-                assert!(!eval(&answers, &other_flies, *drake, Some(*bears)));
+                assert!(!eval(&answers, &other_flies, *bears, None, None));
+                assert!(eval(&answers, &other_flies, *bears, Some(*drake), None));
+                assert!(!eval(&answers, &other_flies, *drake, Some(*bears), None));
             })
             .unwrap();
         Ok(())
@@ -193,7 +224,83 @@ mod tests {
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
                 let other_flies = rules::other(rules::has::<cards::Flying>());
-                assert!(!eval(&answers, &other_flies, *drake, None));
+                assert!(!eval(&answers, &other_flies, *drake, None, None));
+            })
+            .unwrap();
+        Ok(())
+    }
+
+    #[test]
+    fn points_to_owner_matches_the_ctx_player() -> TestResult {
+        let (mut game, [p1, _p2]) = MockGame::new([P1.battlefield([GRIZZLY_BEARS]), P2]);
+        let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                let owned_by_player = rules::points_to::<cards::Owner>(rules::Role::Player);
+                assert!(eval(
+                    &answers,
+                    &owned_by_player,
+                    *bears,
+                    None,
+                    Some(p1.into())
+                ));
+            })
+            .unwrap();
+        Ok(())
+    }
+
+    #[test]
+    fn points_to_owner_is_false_for_another_player() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([P1.battlefield([GRIZZLY_BEARS]), P2]);
+        let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                let owned_by_player = rules::points_to::<cards::Owner>(rules::Role::Player);
+                assert!(!eval(
+                    &answers,
+                    &owned_by_player,
+                    *bears,
+                    None,
+                    Some(p2.into())
+                ));
+            })
+            .unwrap();
+        Ok(())
+    }
+
+    #[test]
+    fn points_to_without_the_component_is_false() -> TestResult {
+        let (mut game, [p1, _p2]) = MockGame::new([P1.battlefield([GRIZZLY_BEARS]), P2]);
+        let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                let blocking_player = rules::points_to::<cards::Blocking>(rules::Role::Player);
+                assert!(!eval(
+                    &answers,
+                    &blocking_player,
+                    *bears,
+                    None,
+                    Some(p1.into())
+                ));
+            })
+            .unwrap();
+        Ok(())
+    }
+
+    #[test]
+    fn of_player_evaluates_on_the_player() -> TestResult {
+        let (mut game, [p1, _p2]) = MockGame::new([P1.battlefield([GRIZZLY_BEARS]), P2]);
+        let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                let on_player =
+                    rules::Predicate::Of(rules::Role::Player, Box::new(rules::Predicate::True));
+                assert!(eval(&answers, &on_player, *bears, None, Some(p1.into())));
+                assert!(!eval(&answers, &on_player, *bears, None, None));
             })
             .unwrap();
         Ok(())

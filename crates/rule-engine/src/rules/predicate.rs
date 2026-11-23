@@ -3,6 +3,7 @@ use crate::rules;
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Predicate {
     Has(rules::ComponentKey),
+    PointsTo(rules::ComponentKey, rules::Role),
     Characteristic(rules::Characteristic, rules::Comparison, i32),
     Of(rules::Role, Box<Self>),
     All(Vec<Self>),

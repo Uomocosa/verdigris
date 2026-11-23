@@ -3,8 +3,9 @@ mod basic;
 
 pub use basic::enums::{Characteristic, Comparison, Role};
 pub use basic::newtypes::{ClauseKey, ComponentKey, RuleId, StepId};
-pub use basic::predicate_builders::{at_least, at_most, equal_to, has, other};
+pub use basic::predicate_builders::{at_least, at_most, equal_to, has, other, points_to};
 pub use basic::structs::Clause;
+pub use basic::type_aliases::TargetOf;
 
 #[path = "__traits__/mod.rs"]
 pub mod traits;

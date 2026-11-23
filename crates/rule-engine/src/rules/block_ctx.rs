@@ -6,12 +6,14 @@ use crate::rules;
 pub struct BlockCtx {
     pub blocker: Entity,
     pub attacker: Entity,
+    pub player: Entity,
 }
 
 #[rustfmt::skip]
 impl rules::traits::pair_ctx::PairCtx for BlockCtx {
     fn subject(&self) -> Entity { self.blocker }
     fn other(&self) -> Option<Entity> { Some(self.attacker) }
+    fn player(&self) -> Entity { self.player }
 }
 
 #[cfg(test)]
@@ -26,8 +28,14 @@ mod tests {
     fn test_usage() {
         let blocker = Entity::PLACEHOLDER;
         let attacker = Entity::from_raw_u32(1).unwrap();
-        let context = BlockCtx { blocker, attacker };
+        let player = Entity::from_raw_u32(2).unwrap();
+        let context = BlockCtx {
+            blocker,
+            attacker,
+            player,
+        };
         assert_eq!(context.subject(), blocker);
         assert_eq!(context.other(), Some(attacker));
+        assert_eq!(context.player(), player);
     }
 }

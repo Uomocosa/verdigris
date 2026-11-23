@@ -6,10 +6,12 @@ use crate::rules::traits::pair_ctx::PairCtx;
 pub fn legal<R: LegalityRule>(answers: &rules::Rules, context: &R::Ctx) -> bool {
     let subject = context.subject();
     let other = context.other();
+    let player = context.player();
     let waived = |clause: &rules::Clause| {
         let entity = match clause.role {
             rules::Role::Subject => Some(subject),
             rules::Role::Other => other,
+            rules::Role::Player => Some(player),
         };
         entity.is_some_and(|entity| {
             answers
@@ -21,9 +23,9 @@ pub fn legal<R: LegalityRule>(answers: &rules::Rules, context: &R::Ctx) -> bool 
     let base = R::clauses()
         .iter()
         .filter(|clause| !waived(clause))
-        .all(|clause| answers.eval(&clause.requires, subject, other));
+        .all(|clause| answers.eval(&clause.requires, subject, other, Some(player)));
     let restricted = answers.mods(subject).iter().any(|change| {
-        matches!(change, effects::Change::Restrict(id, requirement) if *id == R::ID && !answers.eval(requirement, subject, other))
+        matches!(change, effects::Change::Restrict(id, requirement) if *id == R::ID && !answers.eval(requirement, subject, other, Some(player)))
     });
     base && !restricted
 }
@@ -46,7 +48,13 @@ mod tests {
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
-                assert!(legal::<TestRule>(&answers, &rules::AttackCtx(*bears)));
+                assert!(legal::<TestRule>(
+                    &answers,
+                    &rules::AttackCtx {
+                        attacker: *bears,
+                        player: p1.into()
+                    }
+                ));
             })
             .unwrap();
         Ok(())
@@ -60,7 +68,13 @@ mod tests {
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
-                assert!(!legal::<TestRule>(&answers, &rules::AttackCtx(*bears)));
+                assert!(!legal::<TestRule>(
+                    &answers,
+                    &rules::AttackCtx {
+                        attacker: *bears,
+                        player: p2.into()
+                    }
+                ));
             })
             .unwrap();
         Ok(())
@@ -74,7 +88,13 @@ mod tests {
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
-                assert!(legal::<TestRule>(&answers, &rules::AttackCtx(*waiver)));
+                assert!(legal::<TestRule>(
+                    &answers,
+                    &rules::AttackCtx {
+                        attacker: *waiver,
+                        player: p1.into()
+                    }
+                ));
             })
             .unwrap();
         Ok(())
@@ -91,7 +111,10 @@ mod tests {
             .run_system_once(move |answers: rules::Rules| {
                 assert!(!legal::<RestrictedRule>(
                     &answers,
-                    &rules::AttackCtx(*restriction)
+                    &rules::AttackCtx {
+                        attacker: *restriction,
+                        player: p1.into()
+                    }
                 ));
             })
             .unwrap();

@@ -17,6 +17,11 @@ mod tests {
         assert_eq!(cards::Tapped::KEY, rules::ComponentKey("tapped"));
         assert_eq!(cards::Attacking::KEY, rules::ComponentKey("attacking"));
         assert_eq!(cards::Flying::KEY, rules::ComponentKey("flying"));
+        assert_eq!(cards::Creature::KEY, rules::ComponentKey("creature"));
+        assert_eq!(
+            cards::OnBattlefield::KEY,
+            rules::ComponentKey("on-battlefield")
+        );
         assert_eq!(cards::Reach::KEY, rules::ComponentKey("reach"));
         assert_eq!(cards::Vigilance::KEY, rules::ComponentKey("vigilance"));
         assert_eq!(cards::Defender::KEY, rules::ComponentKey("defender"));

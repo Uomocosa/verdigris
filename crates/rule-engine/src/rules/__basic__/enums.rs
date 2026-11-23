@@ -15,4 +15,5 @@ pub enum Comparison {
 pub enum Role {
     Subject,
     Other,
+    Player,
 }

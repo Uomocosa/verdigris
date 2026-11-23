@@ -24,3 +24,10 @@ pub const fn equal_to(characteristic: rules::Characteristic, threshold: i32) -> 
 pub fn other(predicate: rules::Predicate) -> rules::Predicate {
     rules::Predicate::Of(rules::Role::Other, Box::new(predicate))
 }
+
+#[must_use]
+pub const fn points_to<C: rules::traits::entity_component::EntityComponent>(
+    role: rules::Role,
+) -> rules::Predicate {
+    rules::Predicate::PointsTo(C::KEY, role)
+}
