@@ -20,11 +20,11 @@ pub const TEST_WEIGHT_OF_COMMAND: testing::Card = testing::Card {
 mod tests {
     use crate::CREATURE;
     use crate::OPPONENT;
+    use crate::TAP_ATTACKERS;
     use crate::abilities;
     use crate::cards;
     use crate::cost;
     use crate::effects;
-    use crate::rules;
 
     use super::TEST_WEIGHT_OF_COMMAND;
 
@@ -39,10 +39,7 @@ mod tests {
             weight.continuous_abilities().cloned().collect::<Vec<_>>(),
             [abilities::Continuous {
                 filter: CREATURE.controlled_by(OPPONENT),
-                change: effects::Change::Rule {
-                    question: rules::Question::TapsWhenAttacking,
-                    answer: rules::Answer::TapsWhenAttacking(true),
-                },
+                change: effects::Change::Perform(TAP_ATTACKERS),
             }]
         );
     }

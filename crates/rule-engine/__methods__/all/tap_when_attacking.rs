@@ -1,23 +1,20 @@
+use crate::TAP_ATTACKERS;
 use crate::abilities;
 use crate::effects;
-use crate::rules;
 use crate::statics;
 
 pub fn tap_when_attacking(all: statics::All) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
-        change: effects::Change::Rule {
-            question: rules::Question::TapsWhenAttacking,
-            answer: rules::Answer::TapsWhenAttacking(true),
-        },
+        change: effects::Change::Perform(TAP_ATTACKERS),
     }
 }
 
 #[cfg(test)]
 mod tests {
     use crate::CREATURE;
+    use crate::TAP_ATTACKERS;
     use crate::effects;
-    use crate::rules;
     use crate::statics;
 
     use super::tap_when_attacking;
@@ -26,12 +23,6 @@ mod tests {
     fn test_usage() {
         let ability = tap_when_attacking(statics::all(CREATURE));
         assert_eq!(ability.filter, CREATURE);
-        assert_eq!(
-            ability.change,
-            effects::Change::Rule {
-                question: rules::Question::TapsWhenAttacking,
-                answer: rules::Answer::TapsWhenAttacking(true),
-            }
-        );
+        assert_eq!(ability.change, effects::Change::Perform(TAP_ATTACKERS),);
     }
 }

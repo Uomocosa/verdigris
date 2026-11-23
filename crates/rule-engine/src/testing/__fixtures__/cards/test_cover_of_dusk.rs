@@ -19,12 +19,12 @@ pub const TEST_COVER_OF_DUSK: testing::Card = testing::Card {
 #[cfg(test)]
 mod tests {
     use crate::CREATURE;
+    use crate::TAP_ATTACKERS;
     use crate::YOU;
     use crate::abilities;
     use crate::cards;
     use crate::cost;
     use crate::effects;
-    use crate::rules;
 
     use super::TEST_COVER_OF_DUSK;
 
@@ -39,10 +39,7 @@ mod tests {
             cover.continuous_abilities().cloned().collect::<Vec<_>>(),
             [abilities::Continuous {
                 filter: CREATURE.controlled_by(YOU).attacking(),
-                change: effects::Change::Rule {
-                    question: rules::Question::TapsWhenAttacking,
-                    answer: rules::Answer::TapsWhenAttacking(false),
-                },
+                change: effects::Change::Skip(TAP_ATTACKERS),
             }]
         );
     }

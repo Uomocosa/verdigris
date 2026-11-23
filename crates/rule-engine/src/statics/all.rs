@@ -54,6 +54,9 @@ impl All {
 
     #[must_use]
     pub fn skip(self, step: rules::StepId) -> abilities::Continuous {}
+
+    #[must_use]
+    pub fn perform(self, step: rules::StepId) -> abilities::Continuous {}
 }
 
 #[cfg(test)]

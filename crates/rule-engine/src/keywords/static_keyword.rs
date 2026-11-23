@@ -1,3 +1,4 @@
+use crate::TAP_ATTACKERS;
 use crate::effects;
 use crate::rules;
 
@@ -25,6 +26,7 @@ impl StaticKeyword {
         match self {
             Self::Reach => vec![effects::Change::Waive(rules::FLYING.key)],
             Self::Haste => vec![effects::Change::Waive(rules::SUMMONING_SICK.key)],
+            Self::Vigilance => vec![effects::Change::Skip(TAP_ATTACKERS)],
             _ => Vec::new(),
         }
     }
@@ -32,6 +34,7 @@ impl StaticKeyword {
 
 #[cfg(test)]
 mod tests {
+    use crate::TAP_ATTACKERS;
     use crate::effects;
     use crate::keywords;
     use crate::rules;
@@ -50,7 +53,7 @@ mod tests {
         );
         assert_eq!(
             keywords::StaticKeyword::Vigilance.keyword_changes(),
-            Vec::new()
+            vec![effects::Change::Skip(TAP_ATTACKERS)]
         );
     }
 }

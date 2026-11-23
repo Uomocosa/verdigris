@@ -1,5 +1,6 @@
 use bevy::prelude::{Added, Commands, Entity, Query};
 
+use crate::TAP_ATTACKERS;
 use crate::cards;
 use crate::rules;
 
@@ -11,7 +12,7 @@ pub fn r508_1f_tap_attackers(
     answers: rules::Rules,
 ) {
     for attacker in attackers.iter() {
-        if answers.ask::<rules::TapsWhenAttacking>(attacker) {
+        if answers.performs(attacker, TAP_ATTACKERS) {
             commands.entity(attacker).insert(cards::Tapped);
         }
     }

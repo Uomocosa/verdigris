@@ -1,5 +1,6 @@
 use crate::cards;
 use crate::effects;
+use crate::rules;
 use crate::turns;
 use crate::zones;
 
@@ -34,6 +35,12 @@ pub const END_OF_COMBAT: turns::Step = turns::Step::EndOfCombat;
 pub const MAIN_2: turns::Step = turns::Step::PostcombatMain;
 pub const END: turns::Step = turns::Step::End;
 pub const CLEANUP: turns::Step = turns::Step::Cleanup;
+
+/// 508.1f The active player taps the chosen creatures.
+pub const TAP_ATTACKERS: rules::StepId = rules::StepId("508.1f/tap");
+
+/// 502.3 The active player untaps permanents simultaneously.
+pub const UNTAP_STEP: rules::StepId = rules::StepId("502.3/untap");
 
 pub const CREATURE: effects::Filter = effects::Filter {
     kind: effects::FilterKind::Creature,

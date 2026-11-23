@@ -62,6 +62,7 @@ pub enum Change {
     Restrict(rules::RuleId, rules::Predicate),
     Demand(rules::RuleId),
     Skip(rules::StepId),
+    Perform(rules::StepId),
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

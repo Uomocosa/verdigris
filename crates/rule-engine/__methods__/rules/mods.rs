@@ -6,18 +6,15 @@ use crate::rules;
 
 pub fn mods(answers: &rules::Rules, entity: Entity) -> Vec<effects::Change> {
     let mut changes: Vec<effects::Change> = answers
-        .effects
-        .iter()
-        .filter(|effect| effect.affected == entity)
-        .map(|effect| effect.change.clone())
+        .characteristics(entity)
+        .keywords
+        .into_iter()
+        .flat_map(keywords::StaticKeyword::keyword_changes)
         .collect();
-    changes.extend(
-        answers
-            .characteristics(entity)
-            .keywords
-            .into_iter()
-            .flat_map(keywords::StaticKeyword::keyword_changes),
-    );
+    let mut ordered: Vec<effects::ContinuousEffect> =
+        answers.effects.iter().filter(|effect| effect.affected == entity).cloned().collect();
+    ordered.sort_by_key(|effect| effect.timestamp);
+    changes.extend(ordered.into_iter().map(|effect| effect.change));
     changes
 }
 

@@ -4,10 +4,20 @@ use crate::effects;
 use crate::rules;
 
 pub fn performs(answers: &rules::Rules, entity: Entity, step: rules::StepId) -> bool {
-    !answers
-        .mods(entity)
-        .iter()
-        .any(|change| matches!(change, effects::Change::Skip(skipped) if *skipped == step))
+    let mut performs = true;
+    for change in answers.mods(entity) {
+        if let effects::Change::Skip(skipped) = change
+            && skipped == step
+        {
+            performs = false;
+        }
+        if let effects::Change::Perform(performed) = change
+            && performed == step
+        {
+            performs = true;
+        }
+    }
+    performs
 }
 
 #[cfg(test)]
