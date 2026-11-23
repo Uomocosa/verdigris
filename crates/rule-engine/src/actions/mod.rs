@@ -5,8 +5,8 @@ pub use basic::enums::{Action, Choice};
 pub use basic::messages::{PlayerAction, Rejected};
 pub use basic::resources::PendingChoice;
 pub use basic::structs::{
-    BlockAssignment, DamageAssignment, DiscardChoice, LegendaryChoice, OrderTriggersChoice,
-    RequiredCombatDamage, TargetChoice,
+    ArrangeGraveyardChoice, BlockAssignment, DamageAssignment, DiscardChoice, LegendaryChoice,
+    OrderTriggersChoice, RequiredCombatDamage, TargetChoice,
 };
 
 mod combat_damage_choice;

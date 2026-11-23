@@ -93,6 +93,7 @@ mod tests {
         game.play([p1.cast(mind_rot).targeting(p2).end_turn(), p2.end_turn()])?;
 
         game.play([p2.discard([bears, bolt])])?;
+        game.play([p2.arrange_graveyard([bolt, bears])])?;
 
         assert!(game.player(p2).cards_in(GRAVEYARD).has(bears));
         assert!(game.player(p2).cards_in(GRAVEYARD).has(bolt));

@@ -10,6 +10,7 @@ pub fn add_step_end_systems(app: &mut App) {
             comprehensive_rules::r500_1_r500_2_step_ends::r500_1_r500_2_step_ends,
             comprehensive_rules::r508_8_skip_combat_steps::r508_8_skip_combat_steps,
             comprehensive_rules::r404_1_graveyard_top::r404_1_graveyard_top,
+            comprehensive_rules::r404_3_graveyard_order::r404_3_graveyard_order,
         )
             .chain()
             .in_set(RuleSet::StepEnd),
@@ -27,6 +28,6 @@ mod tests {
         let mut app = App::new();
         add_step_end_systems(&mut app);
 
-        assert_eq!(app.get_schedule(Update).map(Schedule::systems_len), Some(3));
+        assert_eq!(app.get_schedule(Update).map(Schedule::systems_len), Some(4));
     }
 }

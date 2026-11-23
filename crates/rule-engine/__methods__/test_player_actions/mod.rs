@@ -1,3 +1,4 @@
+mod arrange_graveyard;
 mod declare_attackers;
 mod declare_blockers;
 mod discard;
@@ -5,6 +6,7 @@ mod from_cast;
 mod of;
 mod order_triggers;
 mod targeting;
+pub use arrange_graveyard::arrange_graveyard;
 pub use declare_attackers::declare_attackers;
 pub use declare_blockers::declare_blockers;
 pub use discard::discard;

@@ -56,6 +56,7 @@ mod tests {
             p1.cast(cancel).targeting(bolt).pass_priority(),
             p2.pass_priority(),
         ])?;
+        game.play([p1.arrange_graveyard([cancel, bolt])])?;
 
         let graveyard = game.zone_entity(p1, GRAVEYARD).expect("p1 graveyard");
         let top_first = game.with_query::<&zones::ZoneContents, Vec<Entity>>(|contents| {

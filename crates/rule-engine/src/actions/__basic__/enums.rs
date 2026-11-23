@@ -16,6 +16,7 @@ pub enum Action {
     ChooseLegendary(Entity),
     ChooseDefendingPlayer(Entity),
     OrderTriggers(Vec<Entity>),
+    ArrangeGraveyard(Vec<Entity>),
     AssignCombatDamage(Vec<actions::DamageAssignment>),
     DeclareAttackers(Vec<Entity>),
     DeclareBlockers(Vec<actions::BlockAssignment>),
@@ -29,5 +30,6 @@ pub enum Choice {
     Discard(actions::DiscardChoice),
     CombatDamage(actions::CombatDamageChoice),
     OrderTriggers(actions::OrderTriggersChoice),
+    ArrangeGraveyard(actions::ArrangeGraveyardChoice),
     Legendary(actions::LegendaryChoice),
 }

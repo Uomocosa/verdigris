@@ -37,6 +37,9 @@ pub enum Rejected {
     InvalidCombatDamage {
         player: Entity,
     },
+    InvalidGraveyardOrder {
+        player: Entity,
+    },
     CannotChooseDefendingPlayer {
         player: Entity,
     },

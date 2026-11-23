@@ -392,6 +392,7 @@ mod tests {
         );
         game.play([p1.pass_priority(), p2.pass_priority()])?;
 
+        game.play([p2.arrange_graveyard([rats_1, rats_2])])?;
         assert_eq!(game.player(p2).life(), 19);
         assert!(game.player(p2).cards_in(GRAVEYARD).has(rats_1));
         assert!(game.player(p2).cards_in(GRAVEYARD).has(rats_2));

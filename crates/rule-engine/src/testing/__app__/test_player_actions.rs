@@ -40,6 +40,9 @@ impl TestPlayerActions {
 
     #[must_use]
     pub fn order_triggers<const N: usize>(self, triggers: [testing::TestCard; N]) -> Self {}
+
+    #[must_use]
+    pub fn arrange_graveyard<const N: usize>(self, cards: [testing::TestCard; N]) -> Self {}
 }
 
 #[rustfmt::skip]

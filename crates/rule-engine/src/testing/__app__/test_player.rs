@@ -55,6 +55,9 @@ impl TestPlayer {
     pub fn order_triggers<const N: usize>(self, triggers: [testing::TestCard; N]) -> testing::TestPlayerActions { testing::TestPlayerActions::of(self).order_triggers(triggers) }
 
     #[must_use]
+    pub fn arrange_graveyard<const N: usize>(self, cards: [testing::TestCard; N]) -> testing::TestPlayerActions { testing::TestPlayerActions::of(self).arrange_graveyard(cards) }
+
+    #[must_use]
     pub fn pass_to(self, step: turns::Step) -> testing::TestPlayerActions { testing::TestPlayerActions::of(self).pass_to(step) }
 
     #[must_use]

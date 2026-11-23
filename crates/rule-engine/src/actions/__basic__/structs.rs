@@ -48,3 +48,10 @@ pub struct LegendaryChoice {
     pub player: Entity,
     pub legal: BTreeSet<Entity>,
 }
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ArrangeGraveyardChoice {
+    pub player: Entity,
+    pub graveyard: Entity,
+    pub cards: Vec<Entity>,
+}

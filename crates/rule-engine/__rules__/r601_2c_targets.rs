@@ -129,6 +129,7 @@ pub fn r601_2c_targets(
             | actions::Action::PlayLand(_)
             | actions::Action::ActivateManaAbility { .. }
             | actions::Action::ChooseLegendary(_)
+            | actions::Action::ArrangeGraveyard(_)
             | actions::Action::PassPriority
             | actions::Action::Concede => {}
         }
@@ -424,6 +425,7 @@ mod tests {
             p1.cast(blade).targeting(scout).pass_priority(),
             p2.pass_priority(),
         ])?;
+        game.play([p1.arrange_graveyard([scout, blade])])?;
         assert!(game.player(p1).cards_in(GRAVEYARD).has(scout));
         assert!(game.player(p1).cards_in(GRAVEYARD).has(blade));
         Ok(())
