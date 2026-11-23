@@ -370,4 +370,37 @@ mod tests {
             .unwrap();
         Ok(())
     }
+
+    #[test]
+    fn a_cant_aimed_at_gain_life_leaves_lose_life_legal() -> TestResult {
+        let (mut game, [p1, _]) = MockGame::new([P1.battlefield([TEST_CANT_DISCARD]), P2]);
+        game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TEST_CANT_DISCARD)?;
+        game.pass_priority();
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                assert_eq!(
+                    legality::<rules::GainLife>(
+                        &answers,
+                        &rules::GainLife {
+                            player: p1.into(),
+                            amount: 3
+                        }
+                    ),
+                    rules::Legality::Illegal
+                );
+                assert_eq!(
+                    legality::<rules::LoseLife>(
+                        &answers,
+                        &rules::LoseLife {
+                            player: p1.into(),
+                            amount: 3
+                        }
+                    ),
+                    rules::Legality::Legal
+                );
+            })
+            .unwrap();
+        Ok(())
+    }
 }
