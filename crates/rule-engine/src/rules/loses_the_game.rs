@@ -6,7 +6,7 @@ pub struct LosesTheGame;
 #[rustfmt::skip]
 impl LegalityRule for LosesTheGame {
     type Ctx = rules::PlayerCtx;
-    const ID: rules::RuleId = rules::RuleId("104.3");
+    const ID: rules::EventId = rules::EventId("104.3");
     fn clauses() -> Vec<rules::Clause> { Vec::new() }
 }
 
@@ -19,7 +19,7 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        assert_eq!(LosesTheGame::ID, rules::RuleId("104.3"));
+        assert_eq!(LosesTheGame::ID, rules::EventId("104.3"));
         assert_eq!(LosesTheGame::clauses(), Vec::new());
     }
 }

@@ -46,10 +46,10 @@ mod tests {
             crucible.continuous_abilities().cloned().collect::<Vec<_>>(),
             [abilities::Continuous {
                 filter: PLAYER.controlled_by(YOU),
-                modification: effects::Modification::Rule(rules::RuleChange::Allow(
-                    rules::play_land::FROM_HAND.key,
-                    rules::in_zone(GRAVEYARD, rules::Role::Player),
-                )),
+                modification: effects::Modification::Rule(rules::RuleChange {
+                    target: rules::Target::Clause(rules::play_land::FROM_HAND.key),
+                    change: rules::Change::Allow(rules::in_zone(GRAVEYARD, rules::Role::Player)),
+                }),
             }]
         );
     }

@@ -10,7 +10,7 @@ pub struct TestRule;
 
 impl LegalityRule for TestRule {
     type Ctx = rules::AttackCtx;
-    const ID: rules::RuleId = rules::RuleId("test/legality");
+    const ID: rules::EventId = rules::EventId("test/legality");
 
     #[atomic_delegate(TestRule, LegalityRule)]
     fn clauses() -> Vec<rules::Clause> {}
@@ -27,7 +27,7 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        assert_eq!(TestRule::ID, rules::RuleId("test/legality"));
+        assert_eq!(TestRule::ID, rules::EventId("test/legality"));
         assert_eq!(*TEST_STEP, "test/step");
         let clauses = TestRule::clauses();
         assert_eq!(clauses.len(), 1);

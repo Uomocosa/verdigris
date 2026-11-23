@@ -6,9 +6,10 @@ use crate::statics;
 pub fn cast_spells_as_though_they_had_flash(all: statics::All) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
-        modification: effects::Modification::Rule(rules::RuleChange::AsThough(
-            rules::cast_spell::TIMING.key,
-        )),
+        modification: effects::Modification::Rule(rules::RuleChange {
+            target: rules::Target::Clause(rules::cast_spell::TIMING.key),
+            change: rules::Change::AsThough,
+        }),
     }
 }
 
@@ -28,7 +29,10 @@ mod tests {
         assert_eq!(ability.filter, PLAYER.controlled_by(YOU));
         assert_eq!(
             ability.modification,
-            effects::Modification::Rule(rules::RuleChange::AsThough(rules::cast_spell::TIMING.key))
+            effects::Modification::Rule(rules::RuleChange {
+                target: rules::Target::Clause(rules::cast_spell::TIMING.key),
+                change: rules::Change::AsThough,
+            })
         );
     }
 }

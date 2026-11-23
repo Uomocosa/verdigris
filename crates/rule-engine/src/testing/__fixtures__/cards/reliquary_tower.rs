@@ -42,9 +42,9 @@ mod tests {
             tower.continuous_abilities().cloned().collect::<Vec<_>>(),
             [abilities::Continuous {
                 filter: PLAYER.controlled_by(YOU),
-                modification: effects::Modification::Rule(rules::RuleChange::Value {
-                    rule: rules::MaximumHandSize::ID,
-                    change: rules::ValueChange::NoMaximum,
+                modification: effects::Modification::Rule(rules::RuleChange {
+                    target: rules::Target::Value(rules::MaximumHandSize::ID),
+                    change: rules::Change::NoMaximum,
                 }),
             }]
         );

@@ -6,7 +6,7 @@ pub struct DrawsFromEmptyLibrary;
 #[rustfmt::skip]
 impl LegalityRule for DrawsFromEmptyLibrary {
     type Ctx = rules::PlayerCtx;
-    const ID: rules::RuleId = rules::RuleId("121.4");
+    const ID: rules::EventId = rules::EventId("121.4");
     fn clauses() -> Vec<rules::Clause> { Vec::new() }
 }
 
@@ -19,7 +19,7 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        assert_eq!(DrawsFromEmptyLibrary::ID, rules::RuleId("121.4"));
+        assert_eq!(DrawsFromEmptyLibrary::ID, rules::EventId("121.4"));
         assert_eq!(DrawsFromEmptyLibrary::clauses(), Vec::new());
     }
 }

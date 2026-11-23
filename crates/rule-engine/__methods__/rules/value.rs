@@ -1,6 +1,5 @@
 use bevy::prelude::Entity;
 
-use crate::effects;
 use crate::rules;
 
 pub fn value<V: rules::traits::value_rule::ValueRule>(
@@ -8,25 +7,19 @@ pub fn value<V: rules::traits::value_rule::ValueRule>(
     player: Entity,
 ) -> rules::Limit {
     let mut limit = V::default();
-    for modification in answers.mods(player) {
-        let effects::Modification::Rule(rules::RuleChange::Value { rule, change }) = modification
-        else {
-            continue;
-        };
-        if rule != V::ID {
-            continue;
-        }
+    for change in answers.changes(player, rules::Target::Value(V::ID)) {
         limit = match change {
-            rules::ValueChange::Set(count) => rules::Limit::At(count),
-            rules::ValueChange::Increase(count) => match limit {
+            rules::Change::Set(count) => rules::Limit::At(count),
+            rules::Change::Increase(count) => match limit {
                 rules::Limit::At(maximum) => rules::Limit::At(maximum.saturating_add(count)),
                 rules::Limit::NoMaximum => rules::Limit::NoMaximum,
             },
-            rules::ValueChange::Decrease(count) => match limit {
+            rules::Change::Decrease(count) => match limit {
                 rules::Limit::At(maximum) => rules::Limit::At(maximum.saturating_sub(count)),
                 rules::Limit::NoMaximum => rules::Limit::NoMaximum,
             },
-            rules::ValueChange::NoMaximum => rules::Limit::NoMaximum,
+            rules::Change::NoMaximum => rules::Limit::NoMaximum,
+            _ => limit,
         };
     }
     limit

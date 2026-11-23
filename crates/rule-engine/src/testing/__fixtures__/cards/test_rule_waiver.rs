@@ -46,18 +46,20 @@ mod tests {
                         object: Some(effects::ObjectRelation::ThisObject),
                         ..CREATURE
                     },
-                    modification: effects::Modification::Rule(rules::RuleChange::AsThough(
-                        testing::UNTAPPED.key,
-                    )),
+                    modification: effects::Modification::Rule(rules::RuleChange {
+                        target: rules::Target::Clause(testing::UNTAPPED.key),
+                        change: rules::Change::AsThough,
+                    }),
                 },
                 abilities::Continuous {
                     filter: effects::Filter {
                         object: Some(effects::ObjectRelation::ThisObject),
                         ..CREATURE
                     },
-                    modification: effects::Modification::Rule(rules::RuleChange::Requirement(
-                        testing::TestRule::ID
-                    ),),
+                    modification: effects::Modification::Rule(rules::RuleChange {
+                        target: rules::Target::Event(testing::TestRule::ID),
+                        change: rules::Change::Must,
+                    },),
                 },
                 abilities::Continuous {
                     filter: effects::Filter {

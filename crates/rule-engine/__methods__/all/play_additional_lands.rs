@@ -7,9 +7,9 @@ use crate::statics;
 pub fn play_additional_lands(all: statics::All, count: u32) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
-        modification: effects::Modification::Rule(rules::RuleChange::Value {
-            rule: rules::LandPlays::ID,
-            change: rules::ValueChange::Increase(count),
+        modification: effects::Modification::Rule(rules::RuleChange {
+            target: rules::Target::Value(rules::LandPlays::ID),
+            change: rules::Change::Increase(count),
         }),
     }
 }
@@ -30,9 +30,9 @@ mod tests {
         assert_eq!(ability.filter, PLAYER);
         assert_eq!(
             ability.modification,
-            effects::Modification::Rule(rules::RuleChange::Value {
-                rule: rules::LandPlays::ID,
-                change: rules::ValueChange::Increase(2),
+            effects::Modification::Rule(rules::RuleChange {
+                target: rules::Target::Value(rules::LandPlays::ID),
+                change: rules::Change::Increase(2),
             })
         );
     }

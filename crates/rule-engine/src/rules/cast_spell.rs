@@ -15,7 +15,7 @@ pub struct CastSpell;
 
 impl LegalityRule for CastSpell {
     type Ctx = rules::CastSpellCtx;
-    const ID: rules::RuleId = rules::RuleId("601.2a");
+    const ID: rules::EventId = rules::EventId("601.2a");
 
     #[atomic_delegate(CastSpell, LegalityRule)]
     fn clauses() -> Vec<rules::Clause> {}
@@ -37,7 +37,7 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        assert_eq!(CastSpell::ID, rules::RuleId("601.2a"));
+        assert_eq!(CastSpell::ID, rules::EventId("601.2a"));
         let clauses = CastSpell::clauses();
         assert_eq!(clauses.len(), 5);
         assert_eq!(clauses[0].key, PRIORITY.key);

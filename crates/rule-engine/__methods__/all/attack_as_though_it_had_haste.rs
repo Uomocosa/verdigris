@@ -6,9 +6,10 @@ use crate::statics;
 pub fn attack_as_though_it_had_haste(all: statics::All) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
-        modification: effects::Modification::Rule(rules::RuleChange::AsThough(
-            rules::declare_attacker::SUMMONING_SICK.key,
-        )),
+        modification: effects::Modification::Rule(rules::RuleChange {
+            target: rules::Target::Clause(rules::declare_attacker::SUMMONING_SICK.key),
+            change: rules::Change::AsThough,
+        }),
     }
 }
 
@@ -27,9 +28,10 @@ mod tests {
         assert_eq!(ability.filter, CREATURE);
         assert_eq!(
             ability.modification,
-            effects::Modification::Rule(rules::RuleChange::AsThough(
-                rules::declare_attacker::SUMMONING_SICK.key,
-            ))
+            effects::Modification::Rule(rules::RuleChange {
+                target: rules::Target::Clause(rules::declare_attacker::SUMMONING_SICK.key),
+                change: rules::Change::AsThough,
+            })
         );
     }
 }

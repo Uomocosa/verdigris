@@ -1,4 +1,3 @@
-use crate::effects;
 use crate::rules;
 use crate::rules::traits::context::Context;
 use crate::rules::traits::legality_rule::LegalityRule;
@@ -17,12 +16,14 @@ pub fn legality<R: LegalityRule>(answers: &rules::Rules, context: &R::Ctx) -> ru
             rules::Role::Player => Some(player),
         };
         entity.is_some_and(|entity| {
-            answers.mods(entity).iter().any(|modification| match modification {
-                effects::Modification::Rule(rules::RuleChange::AsThough(key)) => *key == clause.key,
-                effects::Modification::Rule(rules::RuleChange::Allow(key, alternative)) => {
-                    *key == clause.key && answers.eval(alternative, subject, other, Some(player))
+            answers.changes(entity, rules::Target::Clause(clause.key)).iter().any(|change| {
+                match change {
+                    rules::Change::AsThough => true,
+                    rules::Change::Allow(alternative) => {
+                        answers.eval(alternative, subject, other, Some(player))
+                    }
+                    _ => false,
                 }
-                _ => false,
             })
         })
     };
@@ -30,10 +31,24 @@ pub fn legality<R: LegalityRule>(answers: &rules::Rules, context: &R::Ctx) -> ru
         .iter()
         .filter(|clause| !waived(clause))
         .all(|clause| answers.eval(&clause.condition, subject, other, Some(player)));
-    let restricted = answers.mods(subject).iter().any(|modification| {
-        matches!(modification, effects::Modification::Rule(rules::RuleChange::Restriction { rule, condition }) if *rule == R::ID && !answers.eval(condition, subject, other, Some(player)))
+    let vetoed = [
+        (rules::Role::Subject, Some(subject)),
+        (rules::Role::Other, other),
+        (rules::Role::Player, Some(player)),
+    ]
+    .into_iter()
+    .filter_map(|(role, entity)| entity.map(|entity| (role, entity)))
+    .any(|(role, entity)| {
+        answers.changes(entity, rules::Target::Event(R::ID)).iter().any(|change| match change {
+            rules::Change::Cant => true,
+            rules::Change::OnlyIf {
+                role: required,
+                condition,
+            } if *required == role => !answers.eval(condition, subject, other, Some(player)),
+            _ => false,
+        })
     });
-    if base && !restricted {
+    if base && !vetoed {
         rules::Legality::Legal
     } else {
         rules::Legality::Illegal
@@ -221,6 +236,30 @@ mod tests {
                         &answers,
                         &rules::AttackCtx {
                             attacker: *waiver,
+                            player: p1.into()
+                        }
+                    ),
+                    rules::Legality::Illegal
+                );
+            })
+            .unwrap();
+        Ok(())
+    }
+
+    #[test]
+    fn an_only_if_for_the_player_that_does_not_hold_is_illegal() -> TestResult {
+        let (mut game, [p1, _]) =
+            MockGame::new([P1.battlefield([TEST_PLAYER_RESTRICTION, GRIZZLY_BEARS]), P2]);
+        let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        game.pass_priority();
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                assert_eq!(
+                    legality::<TestRule>(
+                        &answers,
+                        &rules::AttackCtx {
+                            attacker: *bears,
                             player: p1.into()
                         }
                     ),

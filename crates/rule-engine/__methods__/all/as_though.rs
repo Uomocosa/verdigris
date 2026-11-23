@@ -6,7 +6,10 @@ use crate::statics;
 pub fn as_though<Ctx>(all: statics::All, clause: rules::ClauseId<Ctx>) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
-        modification: effects::Modification::Rule(rules::RuleChange::AsThough(clause.key)),
+        modification: effects::Modification::Rule(rules::RuleChange {
+            target: rules::Target::Clause(clause.key),
+            change: rules::Change::AsThough,
+        }),
     }
 }
 
@@ -28,9 +31,10 @@ mod tests {
         assert_eq!(ability.filter, CREATURE);
         assert_eq!(
             ability.modification,
-            effects::Modification::Rule(rules::RuleChange::AsThough(rules::ClauseKey(
-                "test/untapped",
-            )))
+            effects::Modification::Rule(rules::RuleChange {
+                target: rules::Target::Clause(rules::ClauseKey("test/untapped")),
+                change: rules::Change::AsThough,
+            })
         );
     }
 }

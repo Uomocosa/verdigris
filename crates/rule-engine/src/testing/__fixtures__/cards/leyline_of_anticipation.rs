@@ -43,9 +43,10 @@ mod tests {
             leyline.continuous_abilities().cloned().collect::<Vec<_>>(),
             [abilities::Continuous {
                 filter: PLAYER.controlled_by(YOU),
-                modification: effects::Modification::Rule(rules::RuleChange::AsThough(
-                    rules::cast_spell::TIMING.key
-                )),
+                modification: effects::Modification::Rule(rules::RuleChange {
+                    target: rules::Target::Clause(rules::cast_spell::TIMING.key),
+                    change: rules::Change::AsThough,
+                }),
             }]
         );
     }

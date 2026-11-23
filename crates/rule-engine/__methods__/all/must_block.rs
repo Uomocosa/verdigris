@@ -7,9 +7,10 @@ use crate::statics;
 pub fn must_block(all: statics::All) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
-        modification: effects::Modification::Rule(rules::RuleChange::Requirement(
-            rules::DeclareBlocker::ID,
-        )),
+        modification: effects::Modification::Rule(rules::RuleChange {
+            target: rules::Target::Event(rules::DeclareBlocker::ID),
+            change: rules::Change::Must,
+        }),
     }
 }
 
@@ -29,8 +30,11 @@ mod tests {
         assert_eq!(ability.filter, CREATURE);
         assert_eq!(
             ability.modification,
-            effects::Modification::Rule(rules::RuleChange::Requirement(rules::DeclareBlocker::ID,))
+            effects::Modification::Rule(rules::RuleChange {
+                target: rules::Target::Event(rules::DeclareBlocker::ID),
+                change: rules::Change::Must,
+            })
         );
-        assert_eq!(rules::DeclareBlocker::ID, rules::RuleId("509.1a"));
+        assert_eq!(rules::DeclareBlocker::ID, rules::EventId("509.1a"));
     }
 }

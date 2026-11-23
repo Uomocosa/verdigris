@@ -62,16 +62,16 @@ mod tests {
             [
                 abilities::Continuous {
                     filter: PLAYER.controlled_by(YOU),
-                    modification: effects::Modification::Rule(rules::RuleChange::Restriction {
-                        rule: rules::LosesTheGame::ID,
-                        condition: !rules::Predicate::True,
+                    modification: effects::Modification::Rule(rules::RuleChange {
+                        target: rules::Target::Event(rules::LosesTheGame::ID),
+                        change: rules::Change::Cant,
                     }),
                 },
                 abilities::Continuous {
                     filter: PLAYER.controlled_by(OPPONENT),
-                    modification: effects::Modification::Rule(rules::RuleChange::Restriction {
-                        rule: rules::WinsTheGame::ID,
-                        condition: !rules::Predicate::True,
+                    modification: effects::Modification::Rule(rules::RuleChange {
+                        target: rules::Target::Event(rules::WinsTheGame::ID),
+                        change: rules::Change::Cant,
                     }),
                 },
             ]

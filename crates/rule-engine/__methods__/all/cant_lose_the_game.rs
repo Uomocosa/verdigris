@@ -7,9 +7,9 @@ use crate::statics;
 pub fn cant_lose_the_game(all: statics::All) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
-        modification: effects::Modification::Rule(rules::RuleChange::Restriction {
-            rule: rules::LosesTheGame::ID,
-            condition: !rules::Predicate::True,
+        modification: effects::Modification::Rule(rules::RuleChange {
+            target: rules::Target::Event(rules::LosesTheGame::ID),
+            change: rules::Change::Cant,
         }),
     }
 }
@@ -29,9 +29,9 @@ mod tests {
         assert_eq!(ability.filter, PLAYER);
         assert_eq!(
             ability.modification,
-            effects::Modification::Rule(rules::RuleChange::Restriction {
-                rule: rules::RuleId("104.3"),
-                condition: !rules::Predicate::True,
+            effects::Modification::Rule(rules::RuleChange {
+                target: rules::Target::Event(rules::EventId("104.3")),
+                change: rules::Change::Cant,
             })
         );
     }

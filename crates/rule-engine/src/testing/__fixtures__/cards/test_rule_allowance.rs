@@ -42,10 +42,10 @@ mod tests {
             allowance.continuous_abilities().cloned().collect::<Vec<_>>(),
             [abilities::Continuous {
                 filter: CREATURE,
-                modification: effects::Modification::Rule(rules::RuleChange::Allow(
-                    testing::UNTAPPED.key,
-                    rules::has::<cards::Flying>(),
-                )),
+                modification: effects::Modification::Rule(rules::RuleChange {
+                    target: rules::Target::Clause(testing::UNTAPPED.key),
+                    change: rules::Change::Allow(rules::has::<cards::Flying>()),
+                }),
             }]
         );
     }

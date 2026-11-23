@@ -20,27 +20,28 @@ pub enum Role {
     Player,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum RuleChange {
-    AsThough(rules::ClauseKey),
-    Allow(rules::ClauseKey, rules::Predicate),
-    Restriction {
-        rule: rules::RuleId,
-        condition: rules::Predicate,
-    },
-    Requirement(rules::RuleId),
-    Value {
-        rule: rules::RuleId,
-        change: rules::ValueChange,
-    },
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum Target {
+    Event(rules::EventId),
+    Clause(rules::ClauseKey),
+    Value(rules::RuleId),
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum ValueChange {
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum Change {
+    AsThough,
+    Allow(rules::Predicate),
+    OnlyIf {
+        role: rules::Role,
+        condition: rules::Predicate,
+    },
+    Cant,
+    Must,
     Set(u32),
     Increase(u32),
     Decrease(u32),
     NoMaximum,
+    Instead(rules::Outcome),
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -52,12 +53,4 @@ pub enum Legality {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Outcome {
     WinTheGame,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum Replacement {
-    Instead {
-        event: rules::EventId,
-        outcome: rules::Outcome,
-    },
 }

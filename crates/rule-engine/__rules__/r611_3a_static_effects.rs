@@ -570,12 +570,18 @@ mod tests {
             .run_system_once(move |answers: rules::Rules| {
                 assert!(
                     answers.mods(controller).contains(&effects::Modification::Rule(
-                        rules::RuleChange::AsThough(testing::UNTAPPED.key),
+                        rules::RuleChange {
+                            target: rules::Target::Clause(testing::UNTAPPED.key),
+                            change: rules::Change::AsThough,
+                        },
                     ))
                 );
                 assert!(
                     !answers.mods(opponent).contains(&effects::Modification::Rule(
-                        rules::RuleChange::AsThough(testing::UNTAPPED.key),
+                        rules::RuleChange {
+                            target: rules::Target::Clause(testing::UNTAPPED.key),
+                            change: rules::Change::AsThough,
+                        },
                     ))
                 );
             })
@@ -587,7 +593,10 @@ mod tests {
             .run_system_once(move |answers: rules::Rules| {
                 assert!(
                     !answers.mods(controller).contains(&effects::Modification::Rule(
-                        rules::RuleChange::AsThough(testing::UNTAPPED.key),
+                        rules::RuleChange {
+                            target: rules::Target::Clause(testing::UNTAPPED.key),
+                            change: rules::Change::AsThough,
+                        },
                     ))
                 );
             })

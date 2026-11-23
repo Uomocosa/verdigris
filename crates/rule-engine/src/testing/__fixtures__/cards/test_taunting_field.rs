@@ -40,9 +40,10 @@ mod tests {
             field.continuous_abilities().cloned().collect::<Vec<_>>(),
             [abilities::Continuous {
                 filter: CREATURE.controlled_by(OPPONENT),
-                modification: effects::Modification::Rule(rules::RuleChange::Requirement(
-                    rules::DeclareBlocker::ID,
-                )),
+                modification: effects::Modification::Rule(rules::RuleChange {
+                    target: rules::Target::Event(rules::DeclareBlocker::ID),
+                    change: rules::Change::Must,
+                }),
             }]
         );
     }

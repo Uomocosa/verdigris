@@ -54,9 +54,9 @@ mod tests {
             maniac.continuous_abilities().cloned().collect::<Vec<_>>(),
             [abilities::Continuous {
                 filter: PLAYER.controlled_by(YOU),
-                modification: effects::Modification::Replacement(rules::Replacement::Instead {
-                    event: rules::DRAW_FROM_EMPTY_LIBRARY,
-                    outcome: rules::Outcome::WinTheGame,
+                modification: effects::Modification::Rule(rules::RuleChange {
+                    target: rules::Target::Event(rules::DRAW_FROM_EMPTY_LIBRARY),
+                    change: rules::Change::Instead(rules::Outcome::WinTheGame),
                 }),
             }]
         );

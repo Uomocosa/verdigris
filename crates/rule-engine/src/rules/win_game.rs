@@ -33,7 +33,7 @@ mod tests {
             rules::traits::context::Context::player(&event.context()),
             player
         );
-        assert_eq!(rules::WinsTheGame::ID, rules::RuleId("104.2"));
+        assert_eq!(rules::WinsTheGame::ID, rules::EventId("104.2"));
         assert_eq!(WinGame::ID, rules::EventId("104.2"));
     }
 }

@@ -55,7 +55,6 @@ pub enum Layered {
 pub enum Modification {
     Characteristic(Layered),
     Rule(rules::RuleChange),
-    Replacement(rules::Replacement),
     Skip(rules::ActionId),
     Perform(rules::ActionId),
 }

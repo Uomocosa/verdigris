@@ -42,8 +42,14 @@ mod tests {
                 assert_eq!(
                     modifications,
                     [
-                        effects::Modification::Rule(rules::RuleChange::AsThough(UNTAPPED.key)),
-                        effects::Modification::Rule(rules::RuleChange::Requirement(TestRule::ID)),
+                        effects::Modification::Rule(rules::RuleChange {
+                            target: rules::Target::Clause(UNTAPPED.key),
+                            change: rules::Change::AsThough,
+                        }),
+                        effects::Modification::Rule(rules::RuleChange {
+                            target: rules::Target::Event(TestRule::ID),
+                            change: rules::Change::Must,
+                        }),
                         effects::Modification::Skip(TEST_STEP),
                     ]
                 );
@@ -62,7 +68,10 @@ mod tests {
             .run_system_once(move |answers: rules::Rules| {
                 assert!(
                     !mods(&answers, *spider).contains(&effects::Modification::Rule(
-                        rules::RuleChange::AsThough(rules::declare_blocker::FLYING.key)
+                        rules::RuleChange {
+                            target: rules::Target::Clause(rules::declare_blocker::FLYING.key),
+                            change: rules::Change::AsThough,
+                        }
                     ))
                 );
             })

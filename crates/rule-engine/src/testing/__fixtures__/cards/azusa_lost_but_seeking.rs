@@ -56,9 +56,9 @@ mod tests {
             azusa.continuous_abilities().cloned().collect::<Vec<_>>(),
             [abilities::Continuous {
                 filter: PLAYER.controlled_by(YOU),
-                modification: effects::Modification::Rule(rules::RuleChange::Value {
-                    rule: rules::LandPlays::ID,
-                    change: rules::ValueChange::Increase(2),
+                modification: effects::Modification::Rule(rules::RuleChange {
+                    target: rules::Target::Value(rules::LandPlays::ID),
+                    change: rules::Change::Increase(2),
                 }),
             }]
         );

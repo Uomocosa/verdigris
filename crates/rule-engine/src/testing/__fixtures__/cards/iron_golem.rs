@@ -54,18 +54,20 @@ mod tests {
                         object: Some(effects::ObjectRelation::ThisObject),
                         ..CREATURE
                     },
-                    modification: effects::Modification::Rule(rules::RuleChange::Requirement(
-                        rules::DeclareAttacker::ID,
-                    )),
+                    modification: effects::Modification::Rule(rules::RuleChange {
+                        target: rules::Target::Event(rules::DeclareAttacker::ID),
+                        change: rules::Change::Must,
+                    }),
                 },
                 abilities::Continuous {
                     filter: effects::Filter {
                         object: Some(effects::ObjectRelation::ThisObject),
                         ..CREATURE
                     },
-                    modification: effects::Modification::Rule(rules::RuleChange::Requirement(
-                        rules::DeclareBlocker::ID,
-                    )),
+                    modification: effects::Modification::Rule(rules::RuleChange {
+                        target: rules::Target::Event(rules::DeclareBlocker::ID),
+                        change: rules::Change::Must,
+                    }),
                 },
             ]
         );

@@ -1,6 +1,5 @@
 use bevy::prelude::Entity;
 
-use crate::effects;
 use crate::rules;
 
 pub fn replacement(
@@ -8,12 +7,11 @@ pub fn replacement(
     affected: Entity,
     event: rules::EventId,
 ) -> Option<rules::Outcome> {
-    answers.mods(affected).into_iter().find_map(|modification| match modification {
-        effects::Modification::Replacement(rules::Replacement::Instead {
-            event: candidate,
-            outcome,
-        }) if candidate == event => Some(outcome),
-        _ => None,
+    answers.changes(affected, rules::Target::Event(event)).into_iter().find_map(|change| {
+        match change {
+            rules::Change::Instead(outcome) => Some(outcome),
+            _ => None,
+        }
     })
 }
 

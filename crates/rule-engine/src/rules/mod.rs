@@ -1,15 +1,14 @@
 #[path = "__basic__/mod.rs"]
 mod basic;
 
-pub use basic::enums::{
-    Characteristic, Comparison, Legality, Outcome, Replacement, Role, RuleChange, ValueChange,
-};
+pub use basic::enums::{Change, Characteristic, Comparison, Legality, Outcome, Role, Target};
 pub use basic::messages::Would;
 pub use basic::newtypes::{ActionId, ClauseKey, ComponentKey, EventId, RuleId};
 pub use basic::predicate_builders::{
     active_player, at_least, at_most, card_type, equal_to, has, has_priority, in_zone, main_phase,
     other, points_to, stack_empty, step_is,
 };
+pub use basic::structs::RuleChange;
 pub use basic::type_aliases::TargetOf;
 
 #[path = "__traits__/mod.rs"]

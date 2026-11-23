@@ -7,10 +7,10 @@ use crate::zones;
 pub fn play_lands_from(all: statics::All, zone: zones::Zone) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
-        modification: effects::Modification::Rule(rules::RuleChange::Allow(
-            rules::play_land::FROM_HAND.key,
-            rules::in_zone(zone, rules::Role::Player),
-        )),
+        modification: effects::Modification::Rule(rules::RuleChange {
+            target: rules::Target::Clause(rules::play_land::FROM_HAND.key),
+            change: rules::Change::Allow(rules::in_zone(zone, rules::Role::Player)),
+        }),
     }
 }
 
@@ -30,10 +30,10 @@ mod tests {
         assert_eq!(ability.filter, PLAYER);
         assert_eq!(
             ability.modification,
-            effects::Modification::Rule(rules::RuleChange::Allow(
-                rules::ClauseKey("305.1/from-hand"),
-                rules::in_zone(GRAVEYARD, rules::Role::Player),
-            ))
+            effects::Modification::Rule(rules::RuleChange {
+                target: rules::Target::Clause(rules::ClauseKey("305.1/from-hand")),
+                change: rules::Change::Allow(rules::in_zone(GRAVEYARD, rules::Role::Player)),
+            })
         );
     }
 }

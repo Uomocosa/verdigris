@@ -10,10 +10,10 @@ pub fn allow<Ctx>(
 ) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
-        modification: effects::Modification::Rule(rules::RuleChange::Allow(
-            clause.key,
-            alternative,
-        )),
+        modification: effects::Modification::Rule(rules::RuleChange {
+            target: rules::Target::Clause(clause.key),
+            change: rules::Change::Allow(alternative),
+        }),
     }
 }
 
@@ -37,10 +37,10 @@ mod tests {
         assert_eq!(ability.filter, CREATURE);
         assert_eq!(
             ability.modification,
-            effects::Modification::Rule(rules::RuleChange::Allow(
-                rules::ClauseKey("test/untapped"),
-                rules::has::<cards::Flying>(),
-            ))
+            effects::Modification::Rule(rules::RuleChange {
+                target: rules::Target::Clause(rules::ClauseKey("test/untapped")),
+                change: rules::Change::Allow(rules::has::<cards::Flying>()),
+            })
         );
     }
 }

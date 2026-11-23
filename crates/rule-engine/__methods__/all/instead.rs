@@ -10,9 +10,9 @@ pub fn instead(
 ) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
-        modification: effects::Modification::Replacement(rules::Replacement::Instead {
-            event,
-            outcome,
+        modification: effects::Modification::Rule(rules::RuleChange {
+            target: rules::Target::Event(event),
+            change: rules::Change::Instead(outcome),
         }),
     }
 }
@@ -37,9 +37,9 @@ mod tests {
         assert_eq!(ability.filter, PLAYER.controlled_by(YOU));
         assert_eq!(
             ability.modification,
-            effects::Modification::Replacement(rules::Replacement::Instead {
-                event: rules::DRAW_FROM_EMPTY_LIBRARY,
-                outcome: rules::Outcome::WinTheGame,
+            effects::Modification::Rule(rules::RuleChange {
+                target: rules::Target::Event(rules::DRAW_FROM_EMPTY_LIBRARY),
+                change: rules::Change::Instead(rules::Outcome::WinTheGame),
             })
         );
     }

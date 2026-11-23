@@ -49,9 +49,10 @@ mod tests {
                     object: Some(effects::ObjectRelation::ThisObject),
                     ..CREATURE
                 },
-                modification: effects::Modification::Rule(rules::RuleChange::AsThough(
-                    rules::declare_attacker::DEFENDER.key
-                )),
+                modification: effects::Modification::Rule(rules::RuleChange {
+                    target: rules::Target::Clause(rules::declare_attacker::DEFENDER.key),
+                    change: rules::Change::AsThough,
+                }),
             }]
         );
     }

@@ -47,10 +47,10 @@ impl Rules<'_, '_> {
     pub fn performs(&self, entity: Entity, step: rules::ActionId) -> bool {}
 
     #[must_use]
-    pub fn required<R: rules::traits::legality_rule::LegalityRule>(&self, entity: Entity) -> bool {}
+    pub fn replacement(&self, affected: Entity, event: rules::EventId) -> Option<rules::Outcome> {}
 
     #[must_use]
-    pub fn replacement(&self, affected: Entity, event: rules::EventId) -> Option<rules::Outcome> {}
+    pub fn changes(&self, entity: Entity, target: rules::Target) -> Vec<rules::Change> {}
 
     #[must_use]
     pub fn value<V: rules::traits::value_rule::ValueRule>(&self, player: Entity) -> rules::Limit {}
@@ -61,6 +61,14 @@ impl Rules<'_, '_> {
     pub fn legal<R: rules::traits::legality_rule::LegalityRule>(&self, context: &R::Ctx) -> bool {
         let outcome = self.legality::<R>(context);
         outcome == rules::Legality::Legal
+    }
+}
+
+#[rustfmt::skip]
+impl Rules<'_, '_> {
+    #[must_use]
+    pub fn required<R: rules::traits::legality_rule::LegalityRule>(&self, entity: Entity) -> bool {
+        self.changes(entity, rules::Target::Event(R::ID)).contains(&rules::Change::Must)
     }
 }
 
@@ -91,6 +99,23 @@ mod tests {
             .run_system_once(move |answers: rules::Rules| {
                 assert!(answers.performs(*bears, TAP_ATTACKERS));
                 assert!(!answers.performs(*sovereign, TAP_ATTACKERS));
+            })
+            .unwrap();
+        Ok(())
+    }
+
+    #[test]
+    fn required_holds_for_must_and_fails_otherwise() -> TestResult {
+        let (mut game, [p1, _]) =
+            MockGame::new([P1.battlefield([TEST_RULE_WAIVER, GRIZZLY_BEARS]), P2]);
+        let [waiver] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TEST_RULE_WAIVER)?;
+        let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        game.pass_priority();
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                assert!(answers.required::<TestRule>(*waiver));
+                assert!(!answers.required::<TestRule>(*bears));
             })
             .unwrap();
         Ok(())

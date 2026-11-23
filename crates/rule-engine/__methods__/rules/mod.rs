@@ -1,16 +1,16 @@
+mod changes;
 mod characteristics;
 mod eval;
 mod legality;
 mod mods;
 mod performs;
 mod replacement;
-mod required;
 mod value;
+pub use changes::changes;
 pub use characteristics::characteristics;
 pub use eval::eval;
 pub use legality::legality;
 pub use mods::mods;
 pub use performs::performs;
 pub use replacement::replacement;
-pub use required::required;
 pub use value::value;

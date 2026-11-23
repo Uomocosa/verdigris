@@ -14,7 +14,7 @@ pub struct DeclareAttacker;
 
 impl LegalityRule for DeclareAttacker {
     type Ctx = rules::AttackCtx;
-    const ID: rules::RuleId = rules::RuleId("508.1a");
+    const ID: rules::EventId = rules::EventId("508.1a");
 
     #[atomic_delegate(DeclareAttacker, LegalityRule)]
     fn clauses() -> Vec<rules::Clause> {}
@@ -35,7 +35,7 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        assert_eq!(DeclareAttacker::ID, rules::RuleId("508.1a"));
+        assert_eq!(DeclareAttacker::ID, rules::EventId("508.1a"));
         let clauses = DeclareAttacker::clauses();
         assert_eq!(clauses.len(), 5);
         assert_eq!(clauses[0].key, CREATURE.key);

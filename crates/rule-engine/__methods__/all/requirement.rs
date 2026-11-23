@@ -7,7 +7,10 @@ use crate::statics;
 pub fn requirement<R: LegalityRule>(all: statics::All) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
-        modification: effects::Modification::Rule(rules::RuleChange::Requirement(R::ID)),
+        modification: effects::Modification::Rule(rules::RuleChange {
+            target: rules::Target::Event(R::ID),
+            change: rules::Change::Must,
+        }),
     }
 }
 
@@ -27,9 +30,10 @@ mod tests {
         assert_eq!(ability.filter, CREATURE);
         assert_eq!(
             ability.modification,
-            effects::Modification::Rule(rules::RuleChange::Requirement(rules::RuleId(
-                "test/restriction",
-            )))
+            effects::Modification::Rule(rules::RuleChange {
+                target: rules::Target::Event(rules::EventId("test/restriction")),
+                change: rules::Change::Must,
+            })
         );
     }
 }

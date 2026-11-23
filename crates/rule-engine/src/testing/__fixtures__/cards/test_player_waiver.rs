@@ -40,9 +40,10 @@ mod tests {
             waiver.continuous_abilities().cloned().collect::<Vec<_>>(),
             [abilities::Continuous {
                 filter: PLAYER.controlled_by(YOU),
-                modification: effects::Modification::Rule(rules::RuleChange::AsThough(
-                    testing::UNTAPPED.key,
-                )),
+                modification: effects::Modification::Rule(rules::RuleChange {
+                    target: rules::Target::Clause(testing::UNTAPPED.key),
+                    change: rules::Change::AsThough,
+                }),
             }]
         );
     }

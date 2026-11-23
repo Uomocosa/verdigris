@@ -17,7 +17,7 @@ pub struct PlayLand;
 
 impl LegalityRule for PlayLand {
     type Ctx = rules::PlayLandCtx;
-    const ID: rules::RuleId = rules::RuleId("305.1");
+    const ID: rules::EventId = rules::EventId("305.1");
 
     #[atomic_delegate(PlayLand, LegalityRule)]
     fn clauses() -> Vec<rules::Clause> {}
@@ -41,7 +41,7 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        assert_eq!(PlayLand::ID, rules::RuleId("305.1"));
+        assert_eq!(PlayLand::ID, rules::EventId("305.1"));
         let clauses = PlayLand::clauses();
         assert_eq!(clauses.len(), 7);
         assert_eq!(clauses[0].key, PRIORITY.key);

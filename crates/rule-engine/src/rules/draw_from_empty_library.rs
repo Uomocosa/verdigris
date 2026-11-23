@@ -35,7 +35,7 @@ mod tests {
             rules::traits::context::Context::player(&event.context()),
             player
         );
-        assert_eq!(rules::DrawsFromEmptyLibrary::ID, rules::RuleId("121.4"));
+        assert_eq!(rules::DrawsFromEmptyLibrary::ID, rules::EventId("121.4"));
         assert_eq!(DrawFromEmptyLibrary::ID, rules::DRAW_FROM_EMPTY_LIBRARY);
     }
 }

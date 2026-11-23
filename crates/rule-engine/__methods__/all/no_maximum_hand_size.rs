@@ -7,9 +7,9 @@ use crate::statics;
 pub fn no_maximum_hand_size(all: statics::All) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
-        modification: effects::Modification::Rule(rules::RuleChange::Value {
-            rule: rules::MaximumHandSize::ID,
-            change: rules::ValueChange::NoMaximum,
+        modification: effects::Modification::Rule(rules::RuleChange {
+            target: rules::Target::Value(rules::MaximumHandSize::ID),
+            change: rules::Change::NoMaximum,
         }),
     }
 }
@@ -30,9 +30,9 @@ mod tests {
         assert_eq!(ability.filter, PLAYER);
         assert_eq!(
             ability.modification,
-            effects::Modification::Rule(rules::RuleChange::Value {
-                rule: rules::MaximumHandSize::ID,
-                change: rules::ValueChange::NoMaximum,
+            effects::Modification::Rule(rules::RuleChange {
+                target: rules::Target::Value(rules::MaximumHandSize::ID),
+                change: rules::Change::NoMaximum,
             })
         );
     }

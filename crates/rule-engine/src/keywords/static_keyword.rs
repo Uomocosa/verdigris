@@ -24,9 +24,10 @@ impl StaticKeyword {
     #[must_use]
     pub fn keyword_modifications(self) -> Vec<effects::Modification> {
         match self {
-            Self::Haste => vec![effects::Modification::Rule(rules::RuleChange::AsThough(
-                rules::declare_attacker::SUMMONING_SICK.key,
-            ))],
+            Self::Haste => vec![effects::Modification::Rule(rules::RuleChange {
+                target: rules::Target::Clause(rules::declare_attacker::SUMMONING_SICK.key),
+                change: rules::Change::AsThough,
+            })],
             Self::Vigilance => vec![effects::Modification::Skip(TAP_ATTACKERS)],
             _ => Vec::new(),
         }
@@ -47,9 +48,10 @@ mod tests {
         assert_eq!(StaticKeyword::Reach.keyword_modifications(), vec![]);
         assert_eq!(
             StaticKeyword::Haste.keyword_modifications(),
-            vec![effects::Modification::Rule(rules::RuleChange::AsThough(
-                rules::declare_attacker::SUMMONING_SICK.key
-            ))]
+            vec![effects::Modification::Rule(rules::RuleChange {
+                target: rules::Target::Clause(rules::declare_attacker::SUMMONING_SICK.key),
+                change: rules::Change::AsThough,
+            })]
         );
         assert_eq!(
             keywords::StaticKeyword::Vigilance.keyword_modifications(),
