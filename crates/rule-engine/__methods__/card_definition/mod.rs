@@ -1,6 +1,7 @@
 mod abilities;
 mod activated_abilities;
 mod assigned_blocked_damage;
+mod begins_the_game_on_the_battlefield;
 mod colors;
 mod continuous_abilities;
 mod enchant;
@@ -13,6 +14,7 @@ mod triggered_abilities;
 pub use abilities::abilities;
 pub use activated_abilities::activated_abilities;
 pub use assigned_blocked_damage::assigned_blocked_damage;
+pub use begins_the_game_on_the_battlefield::begins_the_game_on_the_battlefield;
 pub use colors::colors;
 pub use continuous_abilities::continuous_abilities;
 pub use enchant::enchant;

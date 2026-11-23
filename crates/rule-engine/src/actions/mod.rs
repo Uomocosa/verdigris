@@ -3,10 +3,10 @@ mod basic;
 
 pub use basic::enums::{Action, Choice};
 pub use basic::messages::{PlayerAction, Rejected};
-pub use basic::resources::PendingChoice;
+pub use basic::resources::{OpeningHandWindow, PendingChoice};
 pub use basic::structs::{
     ArrangeGraveyardChoice, BlockAssignment, DamageAssignment, DiscardChoice, LegendaryChoice,
-    OrderTriggersChoice, RequiredCombatDamage, TargetChoice,
+    OpeningHandActionsChoice, OrderTriggersChoice, RequiredCombatDamage, TargetChoice,
 };
 
 mod combat_damage_choice;

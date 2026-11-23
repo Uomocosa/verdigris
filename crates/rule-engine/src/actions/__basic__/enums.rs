@@ -20,6 +20,7 @@ pub enum Action {
     AssignCombatDamage(Vec<actions::DamageAssignment>),
     DeclareAttackers(Vec<Entity>),
     DeclareBlockers(Vec<actions::BlockAssignment>),
+    BeginGameWithOnBattlefield(Vec<Entity>),
     PassPriority,
     Concede,
 }
@@ -30,6 +31,7 @@ pub enum Choice {
     Discard(actions::DiscardChoice),
     CombatDamage(actions::CombatDamageChoice),
     OrderTriggers(actions::OrderTriggersChoice),
+    OpeningHandActions(actions::OpeningHandActionsChoice),
     ArrangeGraveyard(actions::ArrangeGraveyardChoice),
     Legendary(actions::LegendaryChoice),
 }

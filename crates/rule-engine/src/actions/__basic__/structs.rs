@@ -44,6 +44,12 @@ pub struct OrderTriggersChoice {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
+pub struct OpeningHandActionsChoice {
+    pub player: Entity,
+    pub cards: Vec<Entity>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct LegendaryChoice {
     pub player: Entity,
     pub legal: BTreeSet<Entity>,

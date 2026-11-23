@@ -43,3 +43,8 @@ pub const fn tap_add(produces: cards::ManaType) -> abilities::ActivatedAbility {
         produces,
     }
 }
+
+#[must_use]
+pub const fn begin_the_game_with_it_on_the_battlefield() -> abilities::StaticAbility {
+    abilities::StaticAbility::OpeningHand
+}

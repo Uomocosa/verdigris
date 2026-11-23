@@ -1,7 +1,9 @@
 #[path = "__basic__/mod.rs"]
 mod basic;
 
-pub use basic::card_text::{at, tap_add, when, when_this_dies, whenever};
+pub use basic::card_text::{
+    at, begin_the_game_with_it_on_the_battlefield, tap_add, when, when_this_dies, whenever,
+};
 pub use basic::enums::{ActivationCost, Replacement};
 pub use basic::structs::{ActivatedAbility, Continuous, TriggeredAbility};
 
