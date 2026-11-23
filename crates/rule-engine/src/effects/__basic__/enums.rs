@@ -29,6 +29,7 @@ pub enum EffectKind {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum FilterKind {
     Creature,
+    Enchantment,
     Player,
     AnyTarget,
     Spell,

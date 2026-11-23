@@ -360,18 +360,23 @@ mod tests {
     }
 
     #[test]
-    #[ignore = "needs a removal action for enchantments: no fixture destroys a noncreature permanent"]
     fn static_effect_ends_when_its_source_leaves_the_battlefield() -> TestResult {
-        let (mut game, [p1, _]) = MockGame::new([
-            P1.battlefield([ALWAYS_WATCHING, GRIZZLY_BEARS]),
-            P2.battlefield([GRIZZLY_BEARS]),
+        use crate::{BATTLEFIELD, GRAVEYARD, HAND};
+
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.battlefield([ALWAYS_WATCHING, GRIZZLY_BEARS]).hand([DEMYSTIFY]).mana_pool(mana![W]),
+            P2,
         ]);
         let [watching] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(ALWAYS_WATCHING)?;
         let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
-        game.pass_priority();
-        assert!(game.player(p1).cards_in(BATTLEFIELD).has(watching));
+        let [demystify] = game.player(p1).cards_in(HAND).exactly::<1>(DEMYSTIFY)?;
+        game.play([p1.cast(demystify).targeting(watching)])?;
         assert_eq!(game.pt(bears), Some(crate::pt!(3, 3)));
         assert!(game.has::<cards::Vigilance>(bears));
+
+        game.play([p1.pass_priority(), p2.pass_priority()])?;
+
+        assert!(game.player(p1).cards_in(GRAVEYARD).has(watching));
         assert_eq!(game.pt(bears), Some(crate::pt!(2, 2)));
         assert!(!game.has::<cards::Vigilance>(bears));
         Ok(())

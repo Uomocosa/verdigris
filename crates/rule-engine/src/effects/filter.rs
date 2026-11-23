@@ -35,6 +35,14 @@ impl Filter {
     }
 
     #[must_use]
+    pub fn does_enchantment_match(self, definition: &cards::CardDefinition) -> bool {
+        let is_enchantment = definition.type_line.types.contains(&cards::CardType::Enchantment);
+        let has_excluded_color =
+            self.excluded_color.is_some_and(|excluded| definition.colors().contains(&excluded));
+        is_enchantment && !has_excluded_color
+    }
+
+    #[must_use]
     pub fn does_spell_match(self, definition: &cards::CardDefinition) -> bool {
         let is_creature = definition.type_line.types.contains(&cards::CardType::Creature);
         let is_instant = definition.type_line.types.contains(&cards::CardType::Instant);
@@ -44,6 +52,7 @@ impl Filter {
             effects::FilterKind::NoncreatureSpell => !is_creature,
             effects::FilterKind::InstantSpell => is_instant,
             effects::FilterKind::Creature
+            | effects::FilterKind::Enchantment
             | effects::FilterKind::Player
             | effects::FilterKind::AnyTarget => false,
         }

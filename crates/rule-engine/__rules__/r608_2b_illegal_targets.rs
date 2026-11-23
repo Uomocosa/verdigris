@@ -78,10 +78,15 @@ fn target_is_legal(
         .get(target)
         .is_ok_and(|(definition, _, _, _)| requirement.filter.does_creature_match(definition))
         && battlefield.contains(target);
+    let enchantment_matches_filter = cards
+        .get(target)
+        .is_ok_and(|(definition, _, _, _)| requirement.filter.does_enchantment_match(definition))
+        && battlefield.contains(target);
     match requirement.filter.kind {
         effects::FilterKind::AnyTarget => is_player || creature_matches_filter,
         effects::FilterKind::Player => is_player,
         effects::FilterKind::Creature => creature_matches_filter,
+        effects::FilterKind::Enchantment => enchantment_matches_filter,
         effects::FilterKind::Spell
         | effects::FilterKind::CreatureSpell
         | effects::FilterKind::NoncreatureSpell

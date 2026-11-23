@@ -43,6 +43,14 @@ pub const CREATURE: effects::Filter = effects::Filter {
     nontoken: false,
     object: None,
 };
+pub const ENCHANTMENT: effects::Filter = effects::Filter {
+    kind: effects::FilterKind::Enchantment,
+    controlled_by: None,
+    excluded_color: None,
+    attacking: false,
+    nontoken: false,
+    object: None,
+};
 pub const ANY_TARGET: effects::Filter = effects::Filter {
     kind: effects::FilterKind::AnyTarget,
     controlled_by: None,

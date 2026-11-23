@@ -182,6 +182,12 @@ fn legal_targets(
                     && (**owner == controller
                         || !definition.has_keyword(keywords::StaticKeyword::Hexproof))
             }
+            effects::FilterKind::Enchantment => {
+                filter.does_enchantment_match(definition)
+                    && battlefield.contains(entity)
+                    && (**owner == controller
+                        || !definition.has_keyword(keywords::StaticKeyword::Hexproof))
+            }
             effects::FilterKind::Player => false,
         };
         if is_legal {
