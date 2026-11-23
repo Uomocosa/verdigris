@@ -1,6 +1,7 @@
 use atomic_delegate_macros::atomic_delegates;
+use bevy::ecs::resource::IsResource;
 use bevy::ecs::system::SystemParam;
-use bevy::prelude::{Entity, Query};
+use bevy::prelude::{Entity, EntityRef, Query, Without};
 
 use crate::cards;
 use crate::effects;
@@ -10,6 +11,8 @@ use crate::rules;
 pub struct Rules<'w, 's> {
     pub definitions: Query<'w, 's, &'static cards::CardDefinition>,
     pub effects: Query<'w, 's, &'static effects::ContinuousEffect>,
+    pub entities: Query<'w, 's, EntityRef<'static>, Without<IsResource>>,
+    pub registry: Query<'w, 's, &'static rules::PredicateRegistry>,
 }
 
 #[atomic_delegates]
@@ -18,6 +21,15 @@ impl Rules<'_, '_> {
 
     #[must_use]
     pub fn characteristics(&self, entity: Entity) -> cards::Characteristics {}
+
+    #[must_use]
+    pub fn eval(
+        &self,
+        predicate: &rules::Predicate,
+        subject: Entity,
+        other: Option<Entity>,
+    ) -> bool {
+    }
 }
 
 #[cfg(test)]

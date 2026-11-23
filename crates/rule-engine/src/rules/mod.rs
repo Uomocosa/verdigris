@@ -1,13 +1,21 @@
 #[path = "__basic__/mod.rs"]
 mod basic;
 
-pub use basic::enums::{Combine, Question};
+pub use basic::enums::{Characteristic, Combine, Comparison, Question, Role};
+pub use basic::newtypes::ComponentKey;
+pub use basic::predicate_builders::{at_least, at_most, equal_to, has, other};
 
 #[path = "__traits__/mod.rs"]
 pub mod traits;
 
 mod answer;
 pub use answer::Answer;
+
+mod predicate;
+pub use predicate::Predicate;
+
+mod predicate_registry;
+pub use predicate_registry::PredicateRegistry;
 
 mod rules;
 pub use rules::Rules;

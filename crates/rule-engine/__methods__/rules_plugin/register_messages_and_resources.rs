@@ -6,6 +6,7 @@ use crate::cards;
 use crate::damage;
 use crate::effects;
 use crate::players;
+use crate::rules;
 use crate::stack;
 use crate::turns;
 
@@ -33,6 +34,18 @@ pub fn register_messages_and_resources(app: &mut App) {
     app.init_resource::<StateBasedActionsPerformed>();
     app.init_resource::<effects::Timestamp>();
     app.init_resource::<stack::TriggerQueue>();
+    let mut registry = rules::PredicateRegistry::default();
+    {
+        let world = app.world_mut();
+        registry.register_predicate_component::<cards::Tapped>(world);
+        registry.register_predicate_component::<cards::Attacking>(world);
+        registry.register_predicate_component::<cards::Flying>(world);
+        registry.register_predicate_component::<cards::Reach>(world);
+        registry.register_predicate_component::<cards::Vigilance>(world);
+        registry.register_predicate_component::<cards::Defender>(world);
+        registry.register_predicate_component::<cards::SummoningSick>(world);
+    }
+    app.world_mut().spawn((registry,));
 }
 
 #[cfg(test)]
