@@ -1,15 +1,13 @@
 use crate::abilities;
 use crate::effects;
 use crate::rules;
+use crate::rules::traits::legality_rule::LegalityRule;
 use crate::statics;
 
 pub fn must_attack(all: statics::All) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
-        change: effects::Change::Rule {
-            question: rules::Question::MustAttack,
-            answer: rules::Answer::MustAttack(true),
-        },
+        change: effects::Change::Demand(rules::DeclareAttacker::ID),
     }
 }
 
@@ -18,6 +16,7 @@ mod tests {
     use crate::CREATURE;
     use crate::effects;
     use crate::rules;
+    use crate::rules::traits::legality_rule::LegalityRule;
     use crate::statics;
 
     use super::must_attack;
@@ -28,10 +27,8 @@ mod tests {
         assert_eq!(ability.filter, CREATURE);
         assert_eq!(
             ability.change,
-            effects::Change::Rule {
-                question: rules::Question::MustAttack,
-                answer: rules::Answer::MustAttack(true),
-            }
+            effects::Change::Demand(rules::DeclareAttacker::ID)
         );
+        assert_eq!(rules::DeclareAttacker::ID, rules::RuleId("508.1a"));
     }
 }

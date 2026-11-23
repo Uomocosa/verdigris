@@ -40,6 +40,7 @@ mod tests {
     use crate::keywords;
     use crate::pt;
     use crate::rules;
+    use crate::rules::traits::legality_rule::LegalityRule;
 
     use super::MASTER_OF_THE_FEAST;
 
@@ -61,10 +62,7 @@ mod tests {
                     object: Some(effects::ObjectRelation::ThisObject),
                     ..CREATURE
                 },
-                change: effects::Change::Rule {
-                    question: rules::Question::MustAttack,
-                    answer: rules::Answer::MustAttack(true),
-                },
+                change: effects::Change::Demand(rules::DeclareAttacker::ID),
             }]
         );
         assert_eq!(

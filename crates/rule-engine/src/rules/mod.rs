@@ -24,6 +24,9 @@ pub use clause_id::ClauseId;
 mod declare_blocker;
 pub use declare_blocker::{DeclareBlocker, FLYING, UNTAPPED};
 
+pub mod declare_attacker;
+pub use declare_attacker::{DEFENDER, DeclareAttacker, SUMMONING_SICK};
+
 mod predicate;
 pub use predicate::Predicate;
 

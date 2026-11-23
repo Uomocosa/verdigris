@@ -54,10 +54,7 @@ mod tests {
                         object: Some(effects::ObjectRelation::ThisObject),
                         ..CREATURE
                     },
-                    change: effects::Change::Rule {
-                        question: rules::Question::MustAttack,
-                        answer: rules::Answer::MustAttack(true),
-                    },
+                    change: effects::Change::Demand(rules::DeclareAttacker::ID),
                 },
                 abilities::Continuous {
                     filter: effects::Filter {

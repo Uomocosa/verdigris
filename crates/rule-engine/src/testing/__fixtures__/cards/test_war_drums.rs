@@ -25,6 +25,7 @@ mod tests {
     use crate::cost;
     use crate::effects;
     use crate::rules;
+    use crate::rules::traits::legality_rule::LegalityRule;
 
     use super::TEST_WAR_DRUMS;
 
@@ -39,10 +40,7 @@ mod tests {
             drums.continuous_abilities().cloned().collect::<Vec<_>>(),
             [abilities::Continuous {
                 filter: CREATURE.controlled_by(YOU),
-                change: effects::Change::Rule {
-                    question: rules::Question::MustAttack,
-                    answer: rules::Answer::MustAttack(true),
-                },
+                change: effects::Change::Demand(rules::DeclareAttacker::ID),
             }]
         );
     }

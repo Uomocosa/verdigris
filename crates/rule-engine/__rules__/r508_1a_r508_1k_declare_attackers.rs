@@ -1,4 +1,4 @@
-use bevy::prelude::{Commands, Entity, Has, MessageReader, MessageWriter, Query, Res};
+use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query, Res};
 
 use crate::BATTLEFIELD;
 use crate::actions;
@@ -51,9 +51,7 @@ pub fn r508_1a_r508_1k_declare_attackers(
         &cards::CardDefinition,
         &cards::Owner,
         &zones::InZone,
-        Option<&cards::Tapped>,
     )>,
-    markers: Query<(Has<cards::SummoningSick>, Has<cards::Defender>)>,
     answers: rules::Rules,
     zones: zones::ZoneLookup,
 ) {
@@ -79,28 +77,20 @@ pub fn r508_1a_r508_1k_declare_attackers(
             continue;
         };
         let all_legal = attackers.iter().all(|attacker| {
-            cards.get(*attacker).is_ok_and(|(_, definition, owner, in_zone, tapped)| {
-                markers.get(*attacker).is_ok_and(|(sick, defender)| {
-                    definition.type_line.types.contains(&cards::CardType::Creature)
-                        && **owner == action.player
-                        && **in_zone == battlefield
-                        && tapped.is_none()
-                        && !defender
-                        && (!sick || answers.ask::<rules::IgnoresSummoningSickness>(*attacker))
-                })
+            cards.get(*attacker).is_ok_and(|(_, definition, owner, in_zone)| {
+                definition.type_line.types.contains(&cards::CardType::Creature)
+                    && **owner == action.player
+                    && **in_zone == battlefield
+                    && answers.legal::<rules::DeclareAttacker>(&rules::AttackCtx(*attacker))
             })
         });
-        let requirement_unmet = cards.iter().any(|(entity, definition, owner, in_zone, tapped)| {
-            markers.get(entity).is_ok_and(|(sick, defender)| {
-                **owner == action.player
-                    && **in_zone == battlefield
-                    && definition.type_line.types.contains(&cards::CardType::Creature)
-                    && answers.ask::<rules::MustAttack>(entity)
-                    && tapped.is_none()
-                    && !defender
-                    && (!sick || answers.ask::<rules::IgnoresSummoningSickness>(entity))
-                    && !attackers.contains(&entity)
-            })
+        let requirement_unmet = cards.iter().any(|(entity, definition, owner, in_zone)| {
+            **owner == action.player
+                && **in_zone == battlefield
+                && definition.type_line.types.contains(&cards::CardType::Creature)
+                && answers.demanded::<rules::DeclareAttacker>(entity)
+                && answers.legal::<rules::DeclareAttacker>(&rules::AttackCtx(entity))
+                && !attackers.contains(&entity)
         });
         if !all_legal || requirement_unmet {
             rejected.write(actions::Rejected::CannotAttack {
@@ -420,9 +410,39 @@ mod tests {
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
-                assert!(answers.ask::<rules::MustAttack>(bears.into()));
+                assert!(answers.demanded::<rules::DeclareAttacker>(bears.into()));
             })
             .unwrap();
+        Ok(())
+    }
+
+    #[test]
+    fn a_creature_that_waives_untapped_can_attack_while_tapped() -> TestResult {
+        let (mut game, [p1, p2]) =
+            MockGame::new([P1.battlefield_tapped([TEST_RESTLESS_WATCHER]), P2]);
+        let [watcher] =
+            game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TEST_RESTLESS_WATCHER)?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareAttackers),
+            p2.pass_to(turns::Step::DeclareAttackers),
+            p1.declare_attackers([watcher]),
+        ])?;
+
+        assert!(game.is_attacking(watcher));
+        Ok(())
+    }
+
+    #[test]
+    fn a_creature_that_waives_defender_can_attack() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([P1.battlefield([TEST_EAGER_WALL]), P2]);
+        let [wall] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TEST_EAGER_WALL)?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareAttackers),
+            p2.pass_to(turns::Step::DeclareAttackers),
+            p1.declare_attackers([wall]),
+        ])?;
+
+        assert!(game.is_attacking(wall));
         Ok(())
     }
 }
