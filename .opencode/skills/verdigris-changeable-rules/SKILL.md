@@ -49,6 +49,8 @@ pub enum Change {
     OnlyIf { role: rules::Role, condition: rules::Predicate }, // Event: veto unless it holds
     Cant { role: rules::Role },                   // Event: absolute veto for that role
     Must,                                       // Event: requirement (508.1d / 509.1c)
+    Skip,                                       // Event: do not perform (untap, tap-attacker)
+    Perform,                                    // Event: do perform (overrides Skip)
     // quantity
     Set(u32), Increase(u32), Decrease(u32), NoMaximum,
     // replacement (614)
@@ -98,7 +100,8 @@ pending choice like the opening-hand choices, never as an implicit default.
   `Modification` variants in each evaluator.
 - Do look a change up on the entity its `Role` names (subject, other, player), for clauses and
   for `OnlyIf` alike. `Cant` names the role it protects and vetoes only when the carrying
-  entity is the event's entity of that role (exactly like `OnlyIf`).
+  entity is the event's entity of that role (exactly like `OnlyIf`). `Skip` / `Perform` fold
+  in timestamp order over the subject's changes for the event (latest wins, unlike `Cant`).
 - Don't create an empty "rule" type only to hang a veto on: the event is the target.
 - Don't special-case a card in a `__rules__` system; express it as a `RuleChange`.
 - Keep the CR numbers as IDs and the verbatim-text tests.

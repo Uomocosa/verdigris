@@ -43,6 +43,10 @@ mod tests {
                     vec![rules::Change::AsThough]
                 );
                 assert_eq!(
+                    changes(&answers, *waiver, rules::Target::Event(TestStep::ID)),
+                    vec![rules::Change::Skip]
+                );
+                assert_eq!(
                     changes(&answers, *waiver, rules::Target::Event(TestRule::ID)),
                     vec![rules::Change::Must]
                 );

@@ -1,8 +1,8 @@
-use crate::UNTAP_STEP;
 use crate::card;
 use crate::cards;
 use crate::cost;
 use crate::pt;
+use crate::rules;
 use crate::statics;
 use crate::testing;
 
@@ -11,7 +11,7 @@ pub const TEST_FROZEN_RELIC: testing::Card = testing::Card {
     definition: || {
         card! {
             cards::creature("Test Frozen Relic", cost![2], pt!(1, 1));
-            statics::this().skip(UNTAP_STEP),
+            statics::this().skip::<rules::Untap>(),
         }
     },
 };
@@ -19,12 +19,13 @@ pub const TEST_FROZEN_RELIC: testing::Card = testing::Card {
 #[cfg(test)]
 mod tests {
     use crate::CREATURE;
-    use crate::UNTAP_STEP;
     use crate::abilities;
     use crate::cards;
     use crate::cost;
     use crate::effects;
     use crate::pt;
+    use crate::rules;
+    use crate::rules::traits::event::Event;
 
     use super::TEST_FROZEN_RELIC;
 
@@ -42,7 +43,10 @@ mod tests {
                     object: Some(effects::ObjectRelation::ThisObject),
                     ..CREATURE
                 },
-                modification: effects::Modification::Skip(UNTAP_STEP),
+                modification: effects::Modification::Rule(rules::RuleChange {
+                    target: rules::Target::Event(rules::Untap::ID),
+                    change: rules::Change::Skip,
+                }),
             }]
         );
     }

@@ -55,8 +55,6 @@ pub enum Layered {
 pub enum Modification {
     Characteristic(Layered),
     Rule(rules::RuleChange),
-    Skip(rules::ActionId),
-    Perform(rules::ActionId),
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

@@ -5,7 +5,6 @@ use crate::rules;
 use crate::rules::traits::event::Event;
 
 pub const UNTAPPED: rules::ClauseId<TestRule> = rules::ClauseId::new("test/untapped");
-pub const TEST_STEP: rules::ActionId = rules::ActionId("test/step");
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct TestRule {
@@ -32,14 +31,12 @@ mod tests {
     use crate::rules;
     use crate::rules::traits::event::Event;
 
-    use super::TEST_STEP;
     use super::TestRule;
     use super::UNTAPPED;
 
     #[test]
     fn test_usage() {
         assert_eq!(TestRule::ID, rules::EventId("test/legality"));
-        assert_eq!(*TEST_STEP, "test/step");
         let clauses = TestRule::clauses();
         assert_eq!(clauses.len(), 1);
         assert_eq!(clauses[0].key, UNTAPPED.key);

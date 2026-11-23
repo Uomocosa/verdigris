@@ -47,7 +47,7 @@ pub fn legality<E: Event>(answers: &rules::Rules, event: &E) -> rules::Legality 
             _ => false,
         })
     });
-    if base && !vetoed {
+    if base && !vetoed && answers.performs(event) {
         rules::Legality::Legal
     } else {
         rules::Legality::Illegal

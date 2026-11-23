@@ -36,6 +36,8 @@ pub fn engine() -> rules::RuleRegistry {
     register(rules::LoseLife::ID, rules::LoseLife::clauses());
     register(rules::Mill::ID, rules::Mill::clauses());
     register(rules::PlayLand::ID, rules::PlayLand::clauses());
+    register(rules::TapAttacker::ID, rules::TapAttacker::clauses());
+    register(rules::Untap::ID, rules::Untap::clauses());
     register(rules::WinGame::ID, rules::WinGame::clauses());
     #[cfg(any(test, feature = "testing"))]
     {
@@ -45,6 +47,7 @@ pub fn engine() -> rules::RuleRegistry {
             testing::RestrictedRule::ID,
             testing::RestrictedRule::clauses(),
         );
+        register(testing::TestStep::ID, testing::TestStep::clauses());
     }
     let values = HashSet::from([rules::LandPlays::ID, rules::MaximumHandSize::ID]);
     rules::RuleRegistry {

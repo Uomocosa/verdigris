@@ -1,20 +1,13 @@
-use bevy::prelude::Entity;
-
-use crate::effects;
 use crate::rules;
+use crate::rules::traits::event::Event;
 
-pub fn performs(answers: &rules::Rules, entity: Entity, step: rules::ActionId) -> bool {
+pub fn performs<E: Event>(answers: &rules::Rules, event: &E) -> bool {
     let mut performs = true;
-    for modification in answers.mods(entity) {
-        if let effects::Modification::Skip(skipped) = modification
-            && skipped == step
-        {
-            performs = false;
-        }
-        if let effects::Modification::Perform(performed) = modification
-            && performed == step
-        {
-            performs = true;
+    for change in answers.changes(event.subject(), rules::Target::Event(E::ID)) {
+        match change {
+            rules::Change::Skip => performs = false,
+            rules::Change::Perform => performs = true,
+            _ => {}
         }
     }
     performs
@@ -40,8 +33,20 @@ mod tests {
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
-                assert!(!performs(&answers, *waiver, TEST_STEP));
-                assert!(performs(&answers, *bears, TEST_STEP));
+                assert!(!performs(
+                    &answers,
+                    &TestStep {
+                        permanent: *waiver,
+                        controller: p1.into(),
+                    }
+                ));
+                assert!(performs(
+                    &answers,
+                    &TestStep {
+                        permanent: *bears,
+                        controller: p1.into(),
+                    }
+                ));
             })
             .unwrap();
         Ok(())

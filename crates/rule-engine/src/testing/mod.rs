@@ -14,7 +14,7 @@ pub use app::{
     TriggerQuery, ZoneObject, ZoneOwner,
 };
 pub use basic::newtypes::TestCardName;
-pub use fakes::{AbsoluteRule, RestrictedRule, TEST_STEP, TestRule, UNTAPPED};
+pub use fakes::{AbsoluteRule, RestrictedRule, TestRule, TestStep, UNTAPPED};
 pub use fixtures::{
     ALL_CARDS, ALWAYS_WATCHING, AZUSA_LOST_BUT_SEEKING, BLADEBRAND, BORDERLAND_MARAUDER, CANCEL,
     CARESS_OF_PHYREXIA, CHILD_OF_NIGHT, CHUB_TOAD, CRUCIBLE_OF_WORLDS, DARKSTEEL_MYR, DEMYSTIFY,

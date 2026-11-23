@@ -1,12 +1,16 @@
 use crate::abilities;
 use crate::effects;
 use crate::rules;
+use crate::rules::traits::event::Event;
 use crate::statics;
 
-pub fn skip(all: statics::All, step: rules::ActionId) -> abilities::Continuous {
+pub fn skip<E: Event>(all: statics::All) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
-        modification: effects::Modification::Skip(step),
+        modification: effects::Modification::Rule(rules::RuleChange {
+            target: rules::Target::Event(E::ID),
+            change: rules::Change::Skip,
+        }),
     }
 }
 
@@ -15,18 +19,21 @@ mod tests {
     use crate::CREATURE;
     use crate::effects;
     use crate::rules;
+    use crate::rules::traits::event::Event;
     use crate::statics;
-    use crate::testing;
 
     use super::skip;
 
     #[test]
     fn test_usage() {
-        let ability = skip(statics::all(CREATURE), testing::TEST_STEP);
+        let ability = skip::<rules::Draw>(statics::all(CREATURE));
         assert_eq!(ability.filter, CREATURE);
         assert_eq!(
             ability.modification,
-            effects::Modification::Skip(rules::ActionId("test/step"))
+            effects::Modification::Rule(rules::RuleChange {
+                target: rules::Target::Event(rules::Draw::ID),
+                change: rules::Change::Skip,
+            })
         );
     }
 }

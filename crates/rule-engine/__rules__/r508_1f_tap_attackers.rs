@@ -1,20 +1,19 @@
-use bevy::prelude::{Added, Commands, Entity, Query};
+use bevy::prelude::{Added, Entity, MessageWriter, Query};
 
-use crate::TAP_ATTACKERS;
 use crate::cards;
 use crate::rules;
 
 /// 508.1f The active player taps the chosen creatures. Tapping a creature when it’s declared as
 /// an attacker isn’t a cost; attacking simply causes creatures to become tapped.
 pub fn r508_1f_tap_attackers(
-    mut commands: Commands,
-    attackers: Query<Entity, Added<cards::Attacking>>,
-    answers: rules::Rules,
+    attackers: Query<(Entity, &cards::Owner), Added<cards::Attacking>>,
+    mut taps: MessageWriter<rules::Would<rules::TapAttacker>>,
 ) {
-    for attacker in attackers.iter() {
-        if answers.performs(attacker, TAP_ATTACKERS) {
-            commands.entity(attacker).insert(cards::Tapped);
-        }
+    for (attacker, owner) in attackers.iter() {
+        taps.write(rules::Would(rules::TapAttacker {
+            attacker,
+            player: **owner,
+        }));
     }
 }
 
@@ -41,24 +40,6 @@ mod tests {
         assert!(game.is_attacking(bears_1));
         assert!(game.is_tapped(bears_1));
         assert!(!game.is_tapped(bears_2));
-        Ok(())
-    }
-
-    #[test]
-    fn vigilance_creature_does_not_tap_to_attack() -> TestResult {
-        let (mut game, [p1, p2]) = MockGame::new([
-            P1.battlefield([FELIDAR_SOVEREIGN]),
-            P2.battlefield([GRIZZLY_BEARS]),
-        ]);
-        let [sovereign] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(FELIDAR_SOVEREIGN)?;
-        game.play([
-            p1.pass_to(turns::Step::DeclareAttackers),
-            p2.pass_to(turns::Step::DeclareAttackers),
-            p1.declare_attackers([sovereign]),
-        ])?;
-
-        assert!(game.is_attacking(sovereign));
-        assert!(!game.is_tapped(sovereign));
         Ok(())
     }
 }

@@ -1,6 +1,6 @@
-use crate::TAP_ATTACKERS;
 use crate::effects;
 use crate::rules;
+use crate::rules::traits::event::Event;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum StaticKeyword {
@@ -28,7 +28,10 @@ impl StaticKeyword {
                 target: rules::Target::Clause(rules::declare_attacker::SUMMONING_SICK.key),
                 change: rules::Change::AsThough,
             })],
-            Self::Vigilance => vec![effects::Modification::Skip(TAP_ATTACKERS)],
+            Self::Vigilance => vec![effects::Modification::Rule(rules::RuleChange {
+                target: rules::Target::Event(rules::TapAttacker::ID),
+                change: rules::Change::Skip,
+            })],
             _ => Vec::new(),
         }
     }
@@ -36,10 +39,10 @@ impl StaticKeyword {
 
 #[cfg(test)]
 mod tests {
-    use crate::TAP_ATTACKERS;
     use crate::effects;
     use crate::keywords;
     use crate::rules;
+    use crate::rules::traits::event::Event;
 
     use super::StaticKeyword;
 
@@ -55,7 +58,10 @@ mod tests {
         );
         assert_eq!(
             keywords::StaticKeyword::Vigilance.keyword_modifications(),
-            vec![effects::Modification::Skip(TAP_ATTACKERS)]
+            vec![effects::Modification::Rule(rules::RuleChange {
+                target: rules::Target::Event(rules::TapAttacker::ID),
+                change: rules::Change::Skip,
+            })]
         );
     }
 }

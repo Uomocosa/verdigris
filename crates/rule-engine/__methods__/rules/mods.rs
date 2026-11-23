@@ -50,7 +50,10 @@ mod tests {
                             target: rules::Target::Event(TestRule::ID),
                             change: rules::Change::Must,
                         }),
-                        effects::Modification::Skip(TEST_STEP),
+                        effects::Modification::Rule(rules::RuleChange {
+                            target: rules::Target::Event(TestStep::ID),
+                            change: rules::Change::Skip,
+                        }),
                     ]
                 );
             })

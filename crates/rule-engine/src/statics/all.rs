@@ -79,10 +79,10 @@ impl All {
     pub fn requirement<E: rules::traits::event::Event>(self) -> abilities::Continuous {}
 
     #[must_use]
-    pub fn skip(self, step: rules::ActionId) -> abilities::Continuous {}
+    pub fn skip<E: rules::traits::event::Event>(self) -> abilities::Continuous {}
 
     #[must_use]
-    pub fn perform(self, step: rules::ActionId) -> abilities::Continuous {}
+    pub fn perform<E: rules::traits::event::Event>(self) -> abilities::Continuous {}
 
     #[must_use]
     pub fn play_lands_from(self, zone: zones::Zone) -> abilities::Continuous {}

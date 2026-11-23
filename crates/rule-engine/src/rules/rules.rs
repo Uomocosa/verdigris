@@ -40,7 +40,7 @@ impl Rules<'_, '_> {
     pub fn legality<E: rules::traits::event::Event>(&self, event: &E) -> rules::Legality {}
 
     #[must_use]
-    pub fn performs(&self, entity: Entity, step: rules::ActionId) -> bool {}
+    pub fn performs<E: rules::traits::event::Event>(&self, event: &E) -> bool {}
 
     #[must_use]
     pub fn replacement<E: rules::traits::event::Event>(
@@ -82,7 +82,6 @@ mod tests {
     use bevy::ecs::system::RunSystemOnce;
 
     use crate::BATTLEFIELD;
-    use crate::TAP_ATTACKERS;
     use crate::rules;
     use crate::testing::*;
 
@@ -97,8 +96,14 @@ mod tests {
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
-                assert!(answers.performs(*bears, TAP_ATTACKERS));
-                assert!(!answers.performs(*sovereign, TAP_ATTACKERS));
+                assert!(answers.performs(&rules::TapAttacker {
+                    attacker: *bears,
+                    player: p1.into(),
+                }));
+                assert!(!answers.performs(&rules::TapAttacker {
+                    attacker: *sovereign,
+                    player: p2.into(),
+                }));
             })
             .unwrap();
         Ok(())

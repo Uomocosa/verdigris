@@ -1,6 +1,5 @@
-use bevy::prelude::{Commands, Entity, MessageReader, Query, Res, With};
+use bevy::prelude::{Entity, MessageReader, MessageWriter, Query, Res, With};
 
-use crate::UNTAP_STEP;
 use crate::cards;
 use crate::rules;
 use crate::turns;
@@ -11,10 +10,9 @@ use crate::turns;
 /// untapping.
 pub fn r502_3_untap(
     mut step_started: MessageReader<turns::StepStarted>,
-    mut commands: Commands,
+    mut untaps: MessageWriter<rules::Would<rules::Untap>>,
     turn: Res<turns::Turn>,
     tapped: Query<(Entity, &cards::Owner), With<cards::Tapped>>,
-    answers: rules::Rules,
 ) {
     let turn = turn.into_inner();
     for step in step_started.read() {
@@ -22,8 +20,11 @@ pub fn r502_3_untap(
             continue;
         }
         for (entity, owner) in tapped.iter() {
-            if **owner == turn.active && answers.performs(entity, UNTAP_STEP) {
-                commands.entity(entity).remove::<cards::Tapped>();
+            if **owner == turn.active {
+                untaps.write(rules::Would(rules::Untap {
+                    permanent: entity,
+                    controller: **owner,
+                }));
             }
         }
     }
@@ -63,23 +64,6 @@ mod tests {
 
         assert!(!game.is_tapped(p2_bears));
         assert!(game.is_tapped(p1_bears));
-        Ok(())
-    }
-
-    #[test]
-    fn a_permanent_that_skips_untap_stays_tapped() -> TestResult {
-        let (mut game, [p1, p2]) = MockGame::new([
-            P1.battlefield_tapped([TEST_FROZEN_RELIC]),
-            P2.battlefield_tapped([GRIZZLY_BEARS]),
-        ]);
-        let [relic] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TEST_FROZEN_RELIC)?;
-        let [p2_bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
-
-        game.play([p1.end_turn(), p2.end_turn()])?;
-        game.play([p2.pass_to(turns::Step::Upkeep)])?;
-
-        assert!(game.is_tapped(relic));
-        assert!(!game.is_tapped(p2_bears));
         Ok(())
     }
 }

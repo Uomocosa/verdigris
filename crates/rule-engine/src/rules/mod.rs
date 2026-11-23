@@ -3,7 +3,7 @@ mod basic;
 
 pub use basic::enums::{Amount, Change, Characteristic, Comparison, Field, Legality, Role, Target};
 pub use basic::messages::{Proceeds, Would};
-pub use basic::newtypes::{ActionId, ClauseKey, ComponentKey, EventId, RuleId};
+pub use basic::newtypes::{ClauseKey, ComponentKey, EventId, RuleId};
 pub use basic::predicate_builders::{
     active_player, at_least, at_most, card_type, equal_to, event_field, has, has_priority, in_zone,
     main_phase, other, points_to, stack_empty, step_is,
@@ -53,6 +53,9 @@ pub use lose_life::LoseLife;
 mod mill;
 pub use mill::Mill;
 
+mod untap;
+pub use untap::Untap;
+
 mod clause;
 pub use clause::Clause;
 
@@ -94,3 +97,6 @@ pub use rules::Rules;
 
 mod rule_registry;
 pub use rule_registry::RuleRegistry;
+
+mod tap_attacker;
+pub use tap_attacker::TapAttacker;

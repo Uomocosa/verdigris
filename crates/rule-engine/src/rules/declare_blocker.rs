@@ -37,8 +37,6 @@ impl Event for DeclareBlocker {
 mod tests {
     use std::collections::HashSet;
 
-    use crate::TAP_ATTACKERS;
-    use crate::UNTAP_STEP;
     use crate::cards;
     use crate::rules;
     use crate::rules::traits::event::Event;
@@ -84,7 +82,7 @@ mod tests {
     }
 
     #[test]
-    fn clause_keys_are_unique_across_declare_rules_and_step_ids_differ() {
+    fn clause_keys_are_unique_across_declare_rules() {
         let mut seen = HashSet::new();
         for clause in DeclareBlocker::clauses().into_iter().chain(rules::DeclareAttacker::clauses())
         {
@@ -94,6 +92,5 @@ mod tests {
                 clause.key
             );
         }
-        assert_ne!(TAP_ATTACKERS, UNTAP_STEP);
     }
 }

@@ -50,6 +50,8 @@ pub enum Change {
         role: rules::Role,
     },
     Must,
+    Skip,
+    Perform,
     Set(u32),
     Increase(u32),
     Decrease(u32),
