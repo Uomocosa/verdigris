@@ -20,9 +20,19 @@ pub fn r117_3a_r117_3c_r117_3d_priority(
     mut rejected: MessageWriter<actions::Rejected>,
     mut priority: ResMut<turns::Priority>,
     turn_order: Res<turns::TurnOrder>,
+    window: Res<actions::OpeningHandWindow>,
 ) {
     let turn_order = turn_order.into_inner();
+    let window = window.into_inner();
     for action in actions.read() {
+        if matches!(&action.action, actions::Action::PassPriority)
+            && !window.is_complete(turn_order.len())
+        {
+            rejected.write(actions::Rejected::NoPriority {
+                player: action.player,
+            });
+            continue;
+        }
         if action.player != priority.player {
             if matches!(&action.action, actions::Action::PassPriority) {
                 rejected.write(actions::Rejected::NoPriority {

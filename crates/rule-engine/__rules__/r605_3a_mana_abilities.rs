@@ -13,6 +13,8 @@ pub fn r605_3a_mana_abilities(
     mut rejected: MessageWriter<actions::Rejected>,
     mut commands: Commands,
     priority: Res<turns::Priority>,
+    window: Res<actions::OpeningHandWindow>,
+    turn_order: Res<turns::TurnOrder>,
     permanents: Query<
         (
             &cards::CardDefinition,
@@ -24,12 +26,18 @@ pub fn r605_3a_mana_abilities(
     mut pools: Query<&mut cards::ManaPool>,
 ) {
     let priority = priority.into_inner();
+    let window = window.into_inner();
+    let turn_order = turn_order.into_inner();
     for action in actions.read() {
         let actions::Action::ActivateManaAbility { source, produces } = &action.action else {
             continue;
         };
         let produces = *produces;
         let permanent = *source;
+        if !window.is_complete(turn_order.len()) {
+            rejected.write(actions::Rejected::CannotActivateManaAbility { permanent });
+            continue;
+        }
         let Ok((definition, owner, tapped)) = permanents.get(permanent) else {
             continue;
         };

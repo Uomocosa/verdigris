@@ -1,8 +1,9 @@
 use crate::STACK;
-use bevy::prelude::{Commands, MessageReader, MessageWriter};
+use bevy::prelude::{Commands, MessageReader, MessageWriter, Res};
 
 use crate::actions;
 use crate::rules;
+use crate::turns;
 use crate::zones;
 
 /// 601.2a To propose the casting of a spell, a player first moves that card (or that copy of a
@@ -34,13 +35,21 @@ pub fn r601_2a_cast(
     mut actions: MessageReader<actions::PlayerAction>,
     mut rejected: MessageWriter<actions::Rejected>,
     mut commands: Commands,
+    window: Res<actions::OpeningHandWindow>,
+    turn_order: Res<turns::TurnOrder>,
     answers: rules::Rules,
 ) {
+    let window = window.into_inner();
+    let turn_order = turn_order.into_inner();
     for action in actions.read() {
         let actions::Action::Cast(spell) = &action.action else {
             continue;
         };
         let spell = *spell;
+        if !window.is_complete(turn_order.len()) {
+            rejected.write(actions::Rejected::CannotCast { spell });
+            continue;
+        }
         if !answers.legal::<rules::CastSpell>(&rules::CastSpellCtx {
             spell,
             player: action.player,

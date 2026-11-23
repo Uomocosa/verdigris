@@ -121,9 +121,105 @@ fn opening_hand_cards(
 mod tests {
     use crate::actions;
     use crate::cards;
+    use crate::mana;
     use crate::testing::*;
     use crate::turns;
     use crate::{BATTLEFIELD, HAND};
+
+    #[test]
+    fn casting_while_the_opening_hand_window_is_open_is_rejected() -> TestResult {
+        let (mut game, [p1, ..]) = MockGame::new([
+            P1.hand([LEYLINE_OF_ANTICIPATION, LIGHTNING_BOLT]).mana_pool(mana![R]),
+            P2,
+        ]);
+        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
+
+        game.act(p1, actions::Action::Cast(bolt.into()));
+
+        assert_eq!(
+            game.last_rejection(),
+            Some(&actions::Rejected::CannotCast { spell: bolt.into() })
+        );
+        assert!(game.player(p1).cards_in(HAND).has(bolt));
+        assert!(!game.stack().has(bolt));
+        Ok(())
+    }
+
+    #[test]
+    fn playing_a_land_while_the_opening_hand_window_is_open_is_rejected() -> TestResult {
+        let (mut game, [p1, ..]) = MockGame::new([P1.hand([LEYLINE_OF_ANTICIPATION, FOREST]), P2]);
+        let [forest] = game.player(p1).cards_in(HAND).exactly::<1>(FOREST)?;
+
+        game.act(p1, actions::Action::PlayLand(forest.into()));
+
+        assert_eq!(
+            game.last_rejection(),
+            Some(&actions::Rejected::CannotPlayLand {
+                land: forest.into()
+            })
+        );
+        assert!(game.player(p1).cards_in(HAND).has(forest));
+        Ok(())
+    }
+
+    #[test]
+    fn activating_a_mana_ability_while_the_opening_hand_window_is_open_is_rejected() -> TestResult {
+        let (mut game, [p1, ..]) =
+            MockGame::new([P1.hand([LEYLINE_OF_ANTICIPATION]).battlefield([FOREST]), P2]);
+        let [forest] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(FOREST)?;
+
+        game.act(
+            p1,
+            actions::Action::ActivateManaAbility {
+                source: forest.into(),
+                produces: cards::ManaType::from(cards::Color::Green),
+            },
+        );
+
+        assert_eq!(
+            game.last_rejection(),
+            Some(&actions::Rejected::CannotActivateManaAbility {
+                permanent: forest.into()
+            })
+        );
+        assert_eq!(game.mana_pool(p1), mana![]);
+        assert!(!game.is_tapped(forest));
+        Ok(())
+    }
+
+    #[test]
+    fn passing_priority_while_the_opening_hand_window_is_open_is_rejected() {
+        let (mut game, [p1, ..]) = MockGame::new([P1.hand([LEYLINE_OF_ANTICIPATION]), P2]);
+
+        game.act(p1, actions::Action::PassPriority);
+
+        assert_eq!(
+            game.last_rejection(),
+            Some(&actions::Rejected::NoPriority { player: *p1 })
+        );
+        assert_eq!(game.priority_player(), p1);
+    }
+
+    #[test]
+    fn declaring_attackers_while_the_opening_hand_window_is_open_is_rejected() -> TestResult {
+        let (mut game, [p1, ..]) =
+            MockGame::builder().turn(1, turns::Step::DeclareAttackers).players([
+                P1.hand([LEYLINE_OF_ANTICIPATION]).battlefield([GRIZZLY_BEARS]),
+                P2,
+            ]);
+        let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+
+        game.act(p1, actions::Action::DeclareAttackers(vec![bears.into()]));
+
+        assert_eq!(
+            game.last_rejection(),
+            Some(&actions::Rejected::CannotAttack {
+                attackers: vec![bears.into()]
+            })
+        );
+        assert!(!game.is_attacking(bears));
+        Ok(())
+    }
 
     #[test]
     fn leyline_in_the_opening_hand_begins_the_game_on_the_battlefield() -> TestResult {
@@ -193,6 +289,49 @@ mod tests {
         assert!(game.last_rejection().is_none());
         game.play([p1.pass_priority(), p2.pass_priority()])?;
         assert_eq!(game.turn().step, turns::Step::BeginningOfCombat);
+        Ok(())
+    }
+
+    #[test]
+    fn opening_hand_choices_follow_turn_order_with_three_players() -> TestResult {
+        let (mut game, [p1, p2, p3]) = MockGame::new([
+            P1.hand([LEYLINE_OF_ANTICIPATION]),
+            P2.hand([LEYLINE_OF_ANTICIPATION]),
+            P3.hand([LEYLINE_OF_ANTICIPATION]),
+        ]);
+        let [p1_leyline] = game.player(p1).cards_in(HAND).exactly::<1>(LEYLINE_OF_ANTICIPATION)?;
+        let [p2_leyline] = game.player(p2).cards_in(HAND).exactly::<1>(LEYLINE_OF_ANTICIPATION)?;
+        let [p3_leyline] = game.player(p3).cards_in(HAND).exactly::<1>(LEYLINE_OF_ANTICIPATION)?;
+
+        game.act(
+            p3,
+            actions::Action::BeginGameWithOnBattlefield(vec![p3_leyline.into()]),
+        );
+
+        assert_eq!(
+            game.last_rejection(),
+            Some(&actions::Rejected::InvalidOpeningHandActions { player: *p3 })
+        );
+        assert!(game.player(p3).cards_in(HAND).has(p3_leyline));
+
+        game.act(
+            p1,
+            actions::Action::BeginGameWithOnBattlefield(vec![p1_leyline.into()]),
+        );
+        game.act(
+            p2,
+            actions::Action::BeginGameWithOnBattlefield(vec![p2_leyline.into()]),
+        );
+        game.act(
+            p3,
+            actions::Action::BeginGameWithOnBattlefield(vec![p3_leyline.into()]),
+        );
+
+        assert!(game.player(p1).cards_in(BATTLEFIELD).has(p1_leyline));
+        assert!(game.player(p2).cards_in(BATTLEFIELD).has(p2_leyline));
+        assert!(game.player(p3).cards_in(BATTLEFIELD).has(p3_leyline));
+        let window = game.app.world().resource::<actions::OpeningHandWindow>();
+        assert_eq!(window.len(), 3);
         Ok(())
     }
 

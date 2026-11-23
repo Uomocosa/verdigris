@@ -9,7 +9,6 @@ pub fn add_priority_action_systems(app: &mut App) {
         (
             comprehensive_rules::r601_2a_cast::r601_2a_cast,
             comprehensive_rules::r601_2c_targets::r601_2c_targets,
-            comprehensive_rules::r103_6_r103_6a_opening_hand_actions::r103_6_r103_6a_opening_hand_actions,
             comprehensive_rules::r119_4_pay_life::r119_4_pay_life,
             comprehensive_rules::r601_2h_pay::r601_2h_pay,
             comprehensive_rules::r508_1a_r508_1k_declare_attackers::r508_1a_r508_1k_declare_attackers,
@@ -50,7 +49,7 @@ mod tests {
 
         assert_eq!(
             app.get_schedule(Update).map(Schedule::systems_len),
-            Some(16)
+            Some(15)
         );
     }
 }

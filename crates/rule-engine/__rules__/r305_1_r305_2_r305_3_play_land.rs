@@ -32,14 +32,22 @@ pub fn r305_1_r305_2_r305_3_play_land(
     mut entered: MessageWriter<cards::Entered>,
     mut commands: Commands,
     turn: Res<turns::Turn>,
+    turn_order: Res<turns::TurnOrder>,
+    window: Res<actions::OpeningHandWindow>,
     answers: rules::Rules,
 ) {
     let turn = turn.into_inner();
+    let window = window.into_inner();
+    let turn_order = turn_order.into_inner();
     for action in actions.read() {
         let actions::Action::PlayLand(land) = &action.action else {
             continue;
         };
         let land = *land;
+        if !window.is_complete(turn_order.len()) {
+            rejected.write(actions::Rejected::CannotPlayLand { land });
+            continue;
+        }
         let is_legal = answers.legal::<rules::PlayLand>(&rules::PlayLandCtx {
             land,
             player: action.player,
