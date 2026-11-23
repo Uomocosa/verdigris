@@ -1,11 +1,12 @@
 use std::collections::BTreeSet;
 
-use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query, Res, ResMut};
+use bevy::prelude::{Entity, MessageReader, MessageWriter, Query, Res, ResMut};
 
 use crate::BATTLEFIELD;
 use crate::HAND;
 use crate::actions;
 use crate::cards;
+use crate::rules;
 use crate::turns;
 use crate::zones;
 
@@ -20,8 +21,7 @@ pub fn r103_6_r103_6a_opening_hand_actions(
     mut rejected: MessageWriter<actions::Rejected>,
     mut pending: ResMut<actions::PendingChoice>,
     mut window: ResMut<actions::OpeningHandWindow>,
-    mut entered: MessageWriter<cards::Entered>,
-    mut commands: Commands,
+    mut entering: MessageWriter<rules::Would<rules::EnterBattlefield>>,
     turn: Res<turns::Turn>,
     turn_order: Res<turns::TurnOrder>,
     opening_hands: Query<(
@@ -79,15 +79,18 @@ pub fn r103_6_r103_6a_opening_hand_actions(
             });
             continue;
         }
-        let Some(battlefield) = zones.find(BATTLEFIELD, Some(action.player)) else {
+        if zones.find(BATTLEFIELD, Some(action.player)).is_none() {
             rejected.write(actions::Rejected::InvalidOpeningHandActions {
                 player: action.player,
             });
             continue;
-        };
+        }
         for card in answered {
-            commands.entity(*card).insert(zones::InZone(battlefield));
-            entered.write(cards::Entered(*card));
+            entering.write(rules::Would(rules::EnterBattlefield {
+                permanent: *card,
+                controller: action.player,
+                summoning_sick: false,
+            }));
         }
         *pending = actions::PendingChoice(None);
     }

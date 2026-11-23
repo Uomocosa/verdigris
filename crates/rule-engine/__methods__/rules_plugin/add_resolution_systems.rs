@@ -55,6 +55,10 @@ pub fn add_resolution_systems(app: &mut App) {
                 comprehensive_rules::r608_2n_graveyard::r608_2n_graveyard,
                 comprehensive_rules::r608_3a_permanent_enters::r608_3a_permanent_enters,
                 comprehensive_rules::r701_7a_create_tokens::r701_7a_create_tokens,
+                comprehensive_rules::r614_1a_r616_1_replacement_effects::r614_1a_r616_1_replacement_effects::<
+                    rules::EnterBattlefield,
+                >,
+                comprehensive_rules::r110_1_enter_battlefield::r110_1_enter_battlefield,
                 comprehensive_rules::r110_5b_enters_untapped::r110_5b_enters_untapped,
             )
                 .chain(),
@@ -77,7 +81,7 @@ mod tests {
 
         assert_eq!(
             app.get_schedule(Update).map(Schedule::systems_len),
-            Some(25)
+            Some(27)
         );
     }
 }

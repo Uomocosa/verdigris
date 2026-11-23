@@ -2,11 +2,9 @@ use bevy::prelude::{Commands, MessageReader, MessageWriter, Res};
 
 use crate::BATTLEFIELD;
 use crate::actions;
-use crate::cards;
 use crate::players;
 use crate::rules;
 use crate::turns;
-use crate::zones;
 
 /// 305.1. A player who has priority may play a land card from their hand during a main phase of
 /// their turn when the stack is empty. Playing a land is a special action; it doesn’t use the stack
@@ -29,7 +27,7 @@ use crate::zones;
 pub fn r305_1_r305_2_r305_3_play_land(
     mut actions: MessageReader<actions::PlayerAction>,
     mut rejected: MessageWriter<actions::Rejected>,
-    mut entered: MessageWriter<cards::Entered>,
+    mut entering: MessageWriter<rules::Would<rules::EnterBattlefield>>,
     mut commands: Commands,
     turn: Res<turns::Turn>,
     turn_order: Res<turns::TurnOrder>,
@@ -77,9 +75,12 @@ pub fn r305_1_r305_2_r305_3_play_land(
         }
         record.record_play(turn.number);
         commands.entity(action.player).insert(record);
-        if let Some(battlefield) = answers.zones.find(BATTLEFIELD, Some(action.player)) {
-            commands.entity(land).insert(zones::InZone(battlefield));
-            entered.write(cards::Entered(land));
+        if answers.zones.find(BATTLEFIELD, Some(action.player)).is_some() {
+            entering.write(rules::Would(rules::EnterBattlefield {
+                permanent: land,
+                controller: action.player,
+                summoning_sick: false,
+            }));
         }
     }
 }

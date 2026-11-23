@@ -38,6 +38,9 @@ pub use discard::Discard;
 mod draw;
 pub use draw::Draw;
 
+mod enter_battlefield;
+pub use enter_battlefield::EnterBattlefield;
+
 mod event_template;
 pub use event_template::EventTemplate;
 

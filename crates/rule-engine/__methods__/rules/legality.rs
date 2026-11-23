@@ -478,6 +478,44 @@ mod tests {
     }
 
     #[test]
+    fn a_cant_aimed_at_enter_battlefield_is_illegal_for_the_protected_controller() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.battlefield([TEST_NO_TOKENS, GRIZZLY_BEARS]),
+            P2.battlefield([GRIZZLY_BEARS]),
+        ]);
+        let [protected] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        game.pass_priority();
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                assert_eq!(
+                    legality::<rules::EnterBattlefield>(
+                        &answers,
+                        &rules::EnterBattlefield {
+                            permanent: *protected,
+                            controller: p1.into(),
+                            summoning_sick: true,
+                        }
+                    ),
+                    rules::Legality::Illegal
+                );
+                assert_eq!(
+                    legality::<rules::EnterBattlefield>(
+                        &answers,
+                        &rules::EnterBattlefield {
+                            permanent: *protected,
+                            controller: p2.into(),
+                            summoning_sick: true,
+                        }
+                    ),
+                    rules::Legality::Legal
+                );
+            })
+            .unwrap();
+        Ok(())
+    }
+
+    #[test]
     fn a_cant_aimed_at_deal_damage_is_illegal_for_the_protected_recipient() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield([TEST_SAFE_HAVEN, GRIZZLY_BEARS]),

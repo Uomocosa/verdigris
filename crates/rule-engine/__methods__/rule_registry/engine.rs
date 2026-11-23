@@ -31,6 +31,10 @@ pub fn engine() -> rules::RuleRegistry {
         rules::DrawFromEmptyLibrary::ID,
         rules::DrawFromEmptyLibrary::clauses(),
     );
+    register(
+        rules::EnterBattlefield::ID,
+        rules::EnterBattlefield::clauses(),
+    );
     register(rules::GainLife::ID, rules::GainLife::clauses());
     register(rules::LoseGame::ID, rules::LoseGame::clauses());
     register(rules::LoseLife::ID, rules::LoseLife::clauses());

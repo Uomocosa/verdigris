@@ -1,6 +1,6 @@
 use bevy::prelude::{Commands, MessageReader, MessageWriter};
 
-use crate::BATTLEFIELD;
+use crate::GRAVEYARD;
 use crate::cards;
 use crate::damage;
 use crate::rules;
@@ -16,26 +16,29 @@ use crate::zones;
 /// the characteristics its creation effect defines.
 pub fn r701_7a_create_tokens(
     mut requested: MessageReader<rules::Proceeds<rules::CreateTokens>>,
-    mut entered: MessageWriter<cards::Entered>,
+    mut entering: MessageWriter<rules::Would<rules::EnterBattlefield>>,
     mut commands: Commands,
     zones: zones::ZoneLookup,
 ) {
     for request in requested.read() {
-        let Some(battlefield) = zones.find(BATTLEFIELD, Some(request.controller)) else {
+        let Some(staging) = zones.find(GRAVEYARD, Some(request.controller)) else {
             continue;
         };
         for _ in 0..request.amount {
             let token = commands
                 .spawn((
                     request.token.definition(),
-                    zones::InZone(battlefield),
+                    zones::InZone(staging),
                     cards::Owner(request.controller),
                     damage::Damage(0),
-                    cards::SummoningSick,
                     cards::Token,
                 ))
                 .id();
-            entered.write(cards::Entered(token));
+            entering.write(rules::Would(rules::EnterBattlefield {
+                permanent: token,
+                controller: request.controller,
+                summoning_sick: true,
+            }));
         }
     }
 }
