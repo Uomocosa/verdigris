@@ -62,3 +62,4 @@ pub mod r704_5f_zero_toughness;
 pub mod r704_5g_lethal_damage;
 pub mod r704_5h_deathtouch_damage;
 pub mod r704_5j_legend_rule;
+pub mod r704_5m_aura_illegal;
