@@ -91,7 +91,7 @@ pub fn write_markers(
                         desired_at_step = Some(cards::TriggeredAtStep(*ability));
                     }
                 }
-                abilities::TriggerEvent::Dies => {}
+                abilities::TriggerEvent::Dies | abilities::TriggerEvent::Attacks => {}
             }
         }
     }

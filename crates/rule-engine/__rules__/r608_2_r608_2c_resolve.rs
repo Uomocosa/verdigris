@@ -60,10 +60,10 @@ pub fn r608_2_r608_2c_resolve(
                 |p| vec![p],
             );
         let target_zone = chosen_target.and_then(|target| lookups.in_zone.get(target).ok());
-        let target_on_battlefield =
-            target_zone.is_some_and(|zone| zones.contains(BATTLEFIELD, **zone));
         let target_on_stack = target_zone.is_some_and(|zone| zones.contains(STACK, **zone));
-        let battlefield_target = chosen_target.filter(|_| target_on_battlefield);
+        let battlefield_target = chosen_target
+            .filter(|_| target_zone.is_some_and(|zone| zones.contains(BATTLEFIELD, **zone)))
+            .or_else(|| self_target_on_battlefield(&lookups, spell, effect, &zones));
         for kind in std::iter::once(effect.kind).chain(effect.follow_ups.into_iter().flatten()) {
             match kind {
                 effects::EffectKind::Damage(amount) => {
@@ -140,6 +140,27 @@ pub fn r608_2_r608_2c_resolve(
                 }
             }
         }
+    }
+}
+
+fn self_target_on_battlefield(
+    lookups: &stack::ResolutionLookups<'_, '_>,
+    spell: Entity,
+    effect: effects::Effect,
+    zones: &zones::ZoneLookup,
+) -> Option<Entity> {
+    if !effect
+        .target
+        .is_some_and(|target| target.filter.object == Some(effects::ObjectRelation::ThisObject))
+    {
+        return None;
+    }
+    let source = lookups.abilities.get(spell).ok().map(|ability| ability.source)?;
+    let zone = lookups.in_zone.get(source).ok().copied()?;
+    if zones.contains(BATTLEFIELD, *zone) {
+        Some(source)
+    } else {
+        None
     }
 }
 

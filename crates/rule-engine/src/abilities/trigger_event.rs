@@ -10,6 +10,7 @@ pub enum TriggerEvent {
     Enters(cards::ObjectFilter),
     BeginningOfStep(turns::Step, effects::PlayerRef),
     BeginningOfNextCleanup,
+    Attacks,
     Dies,
 }
 
@@ -17,6 +18,11 @@ impl TriggerEvent {
     #[must_use]
     pub const fn beginning_of_next_cleanup() -> Self {
         Self::BeginningOfNextCleanup
+    }
+
+    #[must_use]
+    pub const fn attacks() -> Self {
+        Self::Attacks
     }
 }
 
@@ -46,6 +52,10 @@ mod tests {
         assert_eq!(
             abilities::TriggerEvent::beginning_of_next_cleanup(),
             abilities::TriggerEvent::BeginningOfNextCleanup
+        );
+        assert_eq!(
+            abilities::TriggerEvent::attacks(),
+            abilities::TriggerEvent::Attacks
         );
     }
 }

@@ -1,5 +1,6 @@
 mod always_watching;
 mod bladebrand;
+mod borderland_marauder;
 mod cancel;
 mod caress_of_phyrexia;
 mod child_of_night;
@@ -58,6 +59,7 @@ mod wind_drake;
 
 pub use always_watching::ALWAYS_WATCHING;
 pub use bladebrand::BLADEBRAND;
+pub use borderland_marauder::BORDERLAND_MARAUDER;
 pub use cancel::CANCEL;
 pub use caress_of_phyrexia::CARESS_OF_PHYREXIA;
 pub use child_of_night::CHILD_OF_NIGHT;

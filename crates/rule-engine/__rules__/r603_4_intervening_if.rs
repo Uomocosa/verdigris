@@ -45,7 +45,9 @@ pub fn r603_4_intervening_if(
                 abilities::TriggerEvent::BeginningOfNextCleanup => {
                     **step == turns::Step::Cleanup && turn.active == controller
                 }
-                abilities::TriggerEvent::Enters(_) | abilities::TriggerEvent::Dies => false,
+                abilities::TriggerEvent::Enters(_)
+                | abilities::TriggerEvent::Dies
+                | abilities::TriggerEvent::Attacks => false,
             };
             if !triggered {
                 continue;
