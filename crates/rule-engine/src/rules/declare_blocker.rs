@@ -18,6 +18,10 @@ impl LegalityRule for DeclareBlocker {
 
 #[cfg(test)]
 mod tests {
+    use std::collections::HashSet;
+
+    use crate::TAP_ATTACKERS;
+    use crate::UNTAP_STEP;
     use crate::cards;
     use crate::rules;
     use crate::rules::traits::legality_rule::LegalityRule;
@@ -41,5 +45,19 @@ mod tests {
             clauses[1].requires,
             !rules::other(rules::has::<cards::Flying>()) | rules::has::<cards::Flying>()
         );
+    }
+
+    #[test]
+    fn clause_keys_are_unique_across_declare_rules_and_step_ids_differ() {
+        let mut seen = HashSet::new();
+        for clause in DeclareBlocker::clauses().into_iter().chain(rules::DeclareAttacker::clauses())
+        {
+            assert!(
+                seen.insert(clause.key),
+                "duplicate clause key: {:?}",
+                clause.key
+            );
+        }
+        assert_ne!(TAP_ATTACKERS, UNTAP_STEP);
     }
 }

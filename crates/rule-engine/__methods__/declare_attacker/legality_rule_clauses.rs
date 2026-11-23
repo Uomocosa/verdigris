@@ -14,7 +14,7 @@ pub fn legality_rule_clauses() -> Vec<rules::Clause> {
             !rules::has::<cards::SummoningSick>(),
         ),
         rules::declare_attacker::DEFENDER.clause(
-            "A creature with defender can't attack.",
+            "A creature with defender can’t attack.",
             rules::Role::Subject,
             !rules::has::<cards::Defender>(),
         ),

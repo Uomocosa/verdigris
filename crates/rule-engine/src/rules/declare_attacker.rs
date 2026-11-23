@@ -42,7 +42,22 @@ mod tests {
         assert_eq!(clauses[1].role, rules::Role::Subject);
         assert_eq!(clauses[1].requires, !rules::has::<cards::SummoningSick>());
         assert_eq!(clauses[2].key, DEFENDER.key);
+        assert_eq!(clauses[2].text, "A creature with defender can’t attack.");
         assert_eq!(clauses[2].role, rules::Role::Subject);
         assert_eq!(clauses[2].requires, !rules::has::<cards::Defender>());
+    }
+
+    #[test]
+    fn clause_texts_occur_verbatim_in_comprehensive_rules() {
+        const RULES_TEXT: &str = include_str!("../../../../docs/MagicCompRules-20250919.txt");
+        for clause in rules::DeclareBlocker::clauses().into_iter().chain(DeclareAttacker::clauses())
+        {
+            assert!(
+                RULES_TEXT.contains(clause.text),
+                "clause {:?} text not found verbatim in Comprehensive Rules: {:?}",
+                clause.key,
+                clause.text
+            );
+        }
     }
 }
