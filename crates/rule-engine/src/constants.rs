@@ -10,9 +10,6 @@ pub const ANY: effects::PlayerRef = effects::PlayerRef::Any;
 
 pub const ANOTHER_CREATURE: cards::ObjectFilter = cards::ObjectFilter::AnotherCreature;
 
-/// 514.1 Maximum hand size (normally seven).
-pub const MAX_HAND_SIZE: usize = 7;
-
 /// Guards the 117.5 loop against an endless chain of state-based actions.
 pub const MAX_STATE_BASED_PASSES: u32 = 64;
 

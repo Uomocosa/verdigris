@@ -29,6 +29,18 @@ pub enum RuleChange {
         condition: rules::Predicate,
     },
     Requirement(rules::RuleId),
+    Value {
+        rule: rules::RuleId,
+        change: rules::ValueChange,
+    },
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum ValueChange {
+    Set(u32),
+    Increase(u32),
+    Decrease(u32),
+    NoMaximum,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

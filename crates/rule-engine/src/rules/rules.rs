@@ -48,6 +48,9 @@ impl Rules<'_, '_> {
 
     #[must_use]
     pub fn required<R: rules::traits::legality_rule::LegalityRule>(&self, entity: Entity) -> bool {}
+
+    #[must_use]
+    pub fn value<V: rules::traits::value_rule::ValueRule>(&self, player: Entity) -> rules::Limit {}
 }
 
 impl Rules<'_, '_> {

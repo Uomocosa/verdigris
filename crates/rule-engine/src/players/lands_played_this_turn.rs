@@ -6,14 +6,22 @@ pub struct LandsPlayedThisTurn {
     pub turn_number: u32,
 }
 
-const LANDS_PER_TURN: u8 = 1;
-
-#[rustfmt::skip]
 impl LandsPlayedThisTurn {
-    pub const NONE: Self = Self { count: 0, turn_number: 0 };
+    pub const NONE: Self = Self {
+        count: 0,
+        turn_number: 0,
+    };
+}
 
+impl LandsPlayedThisTurn {
     #[must_use]
-    pub const fn has_played_all_this_turn(&self, turn_number: u32) -> bool { self.turn_number == turn_number && self.count >= LANDS_PER_TURN }
+    pub const fn count_for(&self, turn_number: u32) -> u8 {
+        if self.turn_number == turn_number {
+            self.count
+        } else {
+            0
+        }
+    }
 }
 
 impl LandsPlayedThisTurn {
@@ -34,9 +42,9 @@ mod tests {
     #[test]
     fn test_usage() {
         let mut played = LandsPlayedThisTurn::NONE;
-        assert!(!played.has_played_all_this_turn(1));
+        assert_eq!(played.count_for(1), 0);
         played.record_play(1);
-        assert!(played.has_played_all_this_turn(1));
-        assert!(!played.has_played_all_this_turn(2));
+        assert_eq!(played.count_for(1), 1);
+        assert_eq!(played.count_for(2), 0);
     }
 }

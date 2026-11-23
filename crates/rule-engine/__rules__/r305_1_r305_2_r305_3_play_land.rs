@@ -60,7 +60,10 @@ pub fn r305_1_r305_2_r305_3_play_land(
             rejected.write(actions::Rejected::CannotPlayLand { land });
             continue;
         };
-        if record.has_played_all_this_turn(turn.number) {
+        if !answers
+            .value::<rules::LandPlays>(action.player)
+            .allows(u32::from(record.count_for(turn.number)))
+        {
             rejected.write(actions::Rejected::CannotPlayLand { land });
             continue;
         }
@@ -109,6 +112,33 @@ mod tests {
             })
         );
         assert!(game.player(p1).cards_in(HAND).has(forest_2));
+        Ok(())
+    }
+
+    #[test]
+    fn azusa_lost_but_seeking_allows_two_additional_lands() -> TestResult {
+        let (mut game, [p1, ..]) = MockGame::new([
+            P1.battlefield([AZUSA_LOST_BUT_SEEKING]).hand([FOREST, FOREST, FOREST, FOREST]),
+            P2,
+        ]);
+        let [forest_1, forest_2, forest_3, forest_4] =
+            game.player(p1).cards_in(HAND).exactly::<4>(FOREST)?;
+
+        game.play([p1.play_land(forest_1)])?;
+        game.play([p1.play_land(forest_2)])?;
+        game.play([p1.play_land(forest_3)])?;
+        game.act(p1, actions::Action::PlayLand(forest_4.into()));
+
+        assert!(game.player(p1).cards_in(BATTLEFIELD).has(forest_1));
+        assert!(game.player(p1).cards_in(BATTLEFIELD).has(forest_2));
+        assert!(game.player(p1).cards_in(BATTLEFIELD).has(forest_3));
+        assert_eq!(
+            game.last_rejection(),
+            Some(&actions::Rejected::CannotPlayLand {
+                land: forest_4.into()
+            })
+        );
+        assert!(game.player(p1).cards_in(HAND).has(forest_4));
         Ok(())
     }
 

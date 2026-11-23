@@ -1,7 +1,8 @@
-use crate::{HAND, MAX_HAND_SIZE};
 use bevy::prelude::{MessageReader, MessageWriter, Query, Res};
 
+use crate::HAND;
 use crate::players;
+use crate::rules;
 use crate::turns;
 use crate::zones;
 
@@ -12,6 +13,7 @@ pub fn r514_1_cleanup_discard(
     mut step_started: MessageReader<turns::StepStarted>,
     mut discards: MessageWriter<players::DiscardRequested>,
     turn: Res<turns::Turn>,
+    answers: rules::Rules,
     zones: zones::ZoneLookup,
     zone_contents: Query<&zones::ZoneContents>,
 ) {
@@ -26,7 +28,7 @@ pub fn r514_1_cleanup_discard(
         let Ok(contents) = zone_contents.get(hand) else {
             continue;
         };
-        let excess = contents.len().saturating_sub(MAX_HAND_SIZE);
+        let excess = answers.value::<rules::MaximumHandSize>(turn.active).excess(contents.len());
         if excess == 0 {
             continue;
         }
@@ -71,6 +73,27 @@ mod tests {
         game.play([p1.discard([bears])])?;
         assert!(game.player(p1).cards_in(GRAVEYARD).has(bears));
         assert_eq!(game.player(p1).cards_in(HAND).count(), 7);
+        Ok(())
+    }
+
+    #[test]
+    fn reliquary_tower_removes_the_cleanup_discard() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.battlefield([RELIQUARY_TOWER]).hand([
+                GRIZZLY_BEARS,
+                LIGHTNING_BOLT,
+                MURDER,
+                DIVINATION,
+                CANCEL,
+                DISPEL,
+                MIND_ROT,
+                DOOM_BLADE,
+            ]),
+            P2,
+        ]);
+        game.play([p1.end_turn(), p2.end_turn()])?;
+
+        assert_eq!(game.player(p1).cards_in(HAND).count(), 8);
         Ok(())
     }
 }

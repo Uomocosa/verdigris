@@ -1,7 +1,7 @@
 #[path = "__basic__/mod.rs"]
 mod basic;
 
-pub use basic::enums::{Characteristic, Comparison, Legality, Role, RuleChange};
+pub use basic::enums::{Characteristic, Comparison, Legality, Role, RuleChange, ValueChange};
 pub use basic::newtypes::{ActionId, ClauseKey, ComponentKey, RuleId};
 pub use basic::predicate_builders::{
     active_player, at_least, at_most, card_type, equal_to, has, has_priority, in_zone, main_phase,
@@ -26,6 +26,15 @@ pub use clause_id::ClauseId;
 
 pub mod declare_blocker;
 pub use declare_blocker::DeclareBlocker;
+
+pub mod land_plays;
+pub use land_plays::LandPlays;
+
+pub mod limit;
+pub use limit::Limit;
+
+pub mod maximum_hand_size;
+pub use maximum_hand_size::MaximumHandSize;
 
 pub mod declare_attacker;
 pub use declare_attacker::DeclareAttacker;

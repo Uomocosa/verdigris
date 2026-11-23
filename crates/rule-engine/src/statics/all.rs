@@ -68,6 +68,12 @@ impl All {
 
     #[must_use]
     pub fn play_lands_from(self, zone: zones::Zone) -> abilities::Continuous {}
+
+    #[must_use]
+    pub fn no_maximum_hand_size(self) -> abilities::Continuous {}
+
+    #[must_use]
+    pub fn play_additional_lands(self, count: u32) -> abilities::Continuous {}
 }
 
 #[cfg(test)]
