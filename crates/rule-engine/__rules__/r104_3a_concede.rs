@@ -31,4 +31,13 @@ mod tests {
         assert!(game.has_lost(p1));
         assert!(game.has_won(p2));
     }
+
+    #[test]
+    fn platinum_angel_controller_can_still_concede() {
+        let (mut game, [p1, _p2]) = MockGame::new([P1.battlefield([PLATINUM_ANGEL]), P2]);
+
+        game.act(p1, actions::Action::Concede);
+
+        assert!(game.has_lost(p1));
+    }
 }

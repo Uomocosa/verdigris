@@ -1,13 +1,12 @@
-use bevy::prelude::{Commands, Entity, Query, ResMut, With};
+use bevy::prelude::{Entity, MessageWriter, Query, With};
 
-use crate::StateBasedActionsPerformed;
 use crate::players;
+use crate::rules;
 
 /// 104.2a A player still in the game wins the game if that player’s opponents have all left the game. This
 /// happens immediately and overrides all effects that would preclude that player from winning the game.
 pub fn r104_2a_wins_when_opponents_left(
-    mut commands: Commands,
-    mut state_based_actions_performed: ResMut<StateBasedActionsPerformed>,
+    mut wins: MessageWriter<rules::Would<rules::WinGame>>,
     players: Query<(Entity, Option<&players::Lost>), With<players::Player>>,
     won: Query<Entity, With<players::Won>>,
 ) {
@@ -21,8 +20,7 @@ pub fn r104_2a_wins_when_opponents_left(
         return;
     };
     if won.get(*winner).is_err() {
-        commands.entity(*winner).insert(players::Won);
-        **state_based_actions_performed = true;
+        wins.write(rules::Would(rules::WinGame(*winner)));
     }
 }
 

@@ -8,6 +8,7 @@ pub fn add_state_based_systems(app: &mut App) {
     app.add_systems(
         StateBasedActions,
         (
+            comprehensive_rules::r611_3a_static_effects::r611_3a_static_effects,
             comprehensive_rules::r613_1_layers::r613_1_layers,
             comprehensive_rules::r704_5f_zero_toughness::r704_5f_zero_toughness,
             comprehensive_rules::r704_5g_lethal_damage::r704_5g_lethal_damage,
@@ -21,6 +22,7 @@ pub fn add_state_based_systems(app: &mut App) {
             comprehensive_rules::r704_5c_poison::r704_5c_poison,
             comprehensive_rules::r104_2a_wins_when_opponents_left::r104_2a_wins_when_opponents_left,
             comprehensive_rules::r104_4a_draw::r104_4a_draw,
+            comprehensive_rules::r616_1_replacement_effects::r616_1_replacement_effects,
         )
             .chain(),
     );
@@ -55,7 +57,7 @@ mod tests {
         assert_eq!(app.get_schedule(Update).map(Schedule::systems_len), Some(6));
         assert_eq!(
             app.get_schedule(StateBasedActions).map(Schedule::systems_len),
-            Some(13)
+            Some(15)
         );
     }
 }

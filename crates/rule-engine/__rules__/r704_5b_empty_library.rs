@@ -1,13 +1,12 @@
-use bevy::prelude::{Commands, Entity, Query, ResMut, With, Without};
+use bevy::prelude::{Entity, MessageWriter, Query, With, Without};
 
-use crate::StateBasedActionsPerformed;
 use crate::players;
+use crate::rules;
 
 /// 704.5b If a player attempted to draw a card from a library with no cards in it since the last
 /// time state-based actions were checked, that player loses the game.
 pub fn r704_5b_empty_library(
-    mut commands: Commands,
-    mut state_based_actions_performed: ResMut<StateBasedActionsPerformed>,
+    mut losses: MessageWriter<rules::Would<rules::LoseGame>>,
     players: Query<
         Entity,
         (
@@ -17,8 +16,7 @@ pub fn r704_5b_empty_library(
     >,
 ) {
     for player in players.iter() {
-        commands.entity(player).insert(players::Lost);
-        **state_based_actions_performed = true;
+        losses.write(rules::Would(rules::LoseGame(player)));
     }
 }
 

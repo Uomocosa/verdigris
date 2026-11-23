@@ -4,6 +4,7 @@ use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, ParamSet};
 use crate::damage;
 use crate::effects;
 use crate::players;
+use crate::rules;
 use crate::stack;
 use crate::zones;
 
@@ -12,6 +13,13 @@ type EffectMessageWriters<'a, 'b, 'c, 'd> = (
     MessageWriter<'b, effects::KeywordGranted>,
     MessageWriter<'c, effects::MillRequested>,
     MessageWriter<'d, effects::TokensRequested>,
+);
+
+type PlayerEffectWriters<'a, 'b, 'c, 'd> = (
+    MessageWriter<'a, players::LifeLost>,
+    MessageWriter<'b, players::DiscardRequested>,
+    MessageWriter<'c, players::LifeGained>,
+    MessageWriter<'d, rules::Would<rules::WinGame>>,
 );
 
 /// 608.2. If the object that’s resolving is an instant spell, a sorcery spell, or an ability, its
@@ -32,11 +40,7 @@ pub fn r608_2_r608_2c_resolve(
     mut destructions: MessageWriter<damage::Destruction>,
     mut countered: MessageWriter<stack::Countered>,
     mut draws: MessageWriter<players::DrawRequested>,
-    mut player_effects: ParamSet<(
-        MessageWriter<players::LifeLost>,
-        MessageWriter<players::DiscardRequested>,
-        MessageWriter<players::LifeGained>,
-    )>,
+    mut player_effects: ParamSet<PlayerEffectWriters<'_, '_, '_, '_>>,
     mut effect_messages: ParamSet<EffectMessageWriters<'_, '_, '_, '_>>,
     lookups: stack::ResolutionLookups<'_, '_>,
     zones: zones::ZoneLookup,
@@ -136,7 +140,7 @@ pub fn r608_2_r608_2c_resolve(
                     }
                 }
                 effects::EffectKind::WinTheGame => {
-                    commands.entity(controller).insert(players::Won);
+                    player_effects.p3().write(rules::Would(rules::WinGame(controller)));
                 }
             }
         }

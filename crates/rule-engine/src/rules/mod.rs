@@ -2,6 +2,7 @@
 mod basic;
 
 pub use basic::enums::{Characteristic, Comparison, Legality, Role, RuleChange, ValueChange};
+pub use basic::messages::Would;
 pub use basic::newtypes::{ActionId, ClauseKey, ComponentKey, RuleId};
 pub use basic::predicate_builders::{
     active_player, at_least, at_most, card_type, equal_to, has, has_priority, in_zone, main_phase,
@@ -14,9 +15,14 @@ pub mod traits;
 
 mod attack_ctx;
 pub use attack_ctx::AttackCtx;
-
 mod block_ctx;
 pub use block_ctx::BlockCtx;
+
+mod lose_game;
+pub use lose_game::LoseGame;
+
+mod loses_the_game;
+pub use loses_the_game::LosesTheGame;
 
 mod clause;
 pub use clause::Clause;
@@ -26,6 +32,12 @@ pub use clause_id::ClauseId;
 
 pub mod declare_blocker;
 pub use declare_blocker::DeclareBlocker;
+
+mod win_game;
+pub use win_game::WinGame;
+
+mod wins_the_game;
+pub use wins_the_game::WinsTheGame;
 
 pub mod land_plays;
 pub use land_plays::LandPlays;
@@ -50,6 +62,9 @@ pub use predicate::Predicate;
 
 mod predicate_registry;
 pub use predicate_registry::PredicateRegistry;
+
+mod player_ctx;
+pub use player_ctx::PlayerCtx;
 
 mod rules;
 pub use rules::Rules;

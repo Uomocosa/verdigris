@@ -1,6 +1,7 @@
 use bevy::prelude::{Commands, Entity, Query, Res, ResMut};
 
 use crate::BATTLEFIELD;
+use crate::StateBasedActionsPerformed;
 use crate::abilities;
 use crate::cards;
 use crate::effects;
@@ -48,6 +49,7 @@ pub fn r611_3a_static_effects(
     players: Res<turns::TurnOrder>,
     zones: zones::ZoneLookup,
     mut timestamp: ResMut<effects::Timestamp>,
+    mut state_based_actions_performed: ResMut<StateBasedActionsPerformed>,
 ) {
     let players = players.into_inner();
     for (entity, effect) in applied.iter() {
@@ -60,11 +62,13 @@ pub fn r611_3a_static_effects(
         let Ok((_, source_definition, source_owner, source_zone, enchanting)) = sources.get(source)
         else {
             commands.entity(entity).despawn();
+            **state_based_actions_performed = true;
             continue;
         };
         let enchanted = enchanting.map(|entity| **entity);
         if !zones.contains(BATTLEFIELD, **source_zone) {
             commands.entity(entity).despawn();
+            **state_based_actions_performed = true;
             continue;
         }
         let still_applies = source_definition.continuous_abilities().any(|ability| {
@@ -81,6 +85,7 @@ pub fn r611_3a_static_effects(
         });
         if !still_applies {
             commands.entity(entity).despawn();
+            **state_based_actions_performed = true;
         }
     }
     for (source, definition, owner, in_zone, enchanting) in sources.iter() {
