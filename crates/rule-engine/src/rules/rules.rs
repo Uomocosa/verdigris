@@ -43,7 +43,7 @@ impl Rules<'_, '_> {
 
 #[atomic_delegates]
 impl Rules<'_, '_> {
-    pub(crate) fn mods<'a>(&'a self, entity: Entity) -> impl Iterator<Item = &'a effects::Change> {}
+    pub(crate) fn mods(&self, entity: Entity) -> Vec<effects::Change> {}
 }
 
 #[cfg(test)]

@@ -280,9 +280,9 @@ mod tests {
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
                 assert!(answers.ask::<rules::MustAttack>(golem.into()));
-                assert!(answers.ask::<rules::MustBlock>(golem.into()));
+                assert!(answers.demanded::<rules::DeclareBlocker>(golem.into()));
                 assert!(!answers.ask::<rules::MustAttack>(bears.into()));
-                assert!(!answers.ask::<rules::MustBlock>(bears.into()));
+                assert!(!answers.demanded::<rules::DeclareBlocker>(bears.into()));
             })
             .unwrap();
         Ok(())

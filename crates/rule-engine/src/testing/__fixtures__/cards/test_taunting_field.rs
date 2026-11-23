@@ -25,6 +25,7 @@ mod tests {
     use crate::cost;
     use crate::effects;
     use crate::rules;
+    use crate::rules::traits::legality_rule::LegalityRule;
 
     use super::TEST_TAUNTING_FIELD;
 
@@ -39,10 +40,7 @@ mod tests {
             field.continuous_abilities().cloned().collect::<Vec<_>>(),
             [abilities::Continuous {
                 filter: CREATURE.controlled_by(OPPONENT),
-                change: effects::Change::Rule {
-                    question: rules::Question::MustBlock,
-                    answer: rules::Answer::MustBlock(true),
-                },
+                change: effects::Change::Demand(rules::DeclareBlocker::ID),
             }]
         );
     }

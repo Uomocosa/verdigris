@@ -14,6 +14,7 @@ pub fn legal<R: LegalityRule>(answers: &rules::Rules, context: &R::Ctx) -> bool 
         entity.is_some_and(|entity| {
             answers
                 .mods(entity)
+                .iter()
                 .any(|change| matches!(change, effects::Change::Waive(key) if *key == clause.key))
         })
     };
@@ -21,7 +22,7 @@ pub fn legal<R: LegalityRule>(answers: &rules::Rules, context: &R::Ctx) -> bool 
         .iter()
         .filter(|clause| !waived(clause))
         .all(|clause| answers.eval(&clause.requires, subject, other));
-    let restricted = answers.mods(subject).any(|change| {
+    let restricted = answers.mods(subject).iter().any(|change| {
         matches!(change, effects::Change::Restrict(id, requirement) if *id == R::ID && !answers.eval(requirement, subject, other))
     });
     base && !restricted

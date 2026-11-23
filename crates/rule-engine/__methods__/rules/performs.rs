@@ -6,6 +6,7 @@ use crate::rules;
 pub fn performs(answers: &rules::Rules, entity: Entity, step: rules::StepId) -> bool {
     !answers
         .mods(entity)
+        .iter()
         .any(|change| matches!(change, effects::Change::Skip(skipped) if *skipped == step))
 }
 

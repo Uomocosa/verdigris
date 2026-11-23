@@ -7,6 +7,7 @@ pub mod cards_in_zone;
 pub mod characteristics;
 pub mod clause_id;
 pub mod combat_damage_choice;
+pub mod declare_blocker;
 pub mod effect;
 #[cfg(feature = "testing")]
 pub mod expected_targets;

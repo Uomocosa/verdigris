@@ -21,6 +21,9 @@ pub use block_ctx::BlockCtx;
 mod clause_id;
 pub use clause_id::ClauseId;
 
+mod declare_blocker;
+pub use declare_blocker::{DeclareBlocker, FLYING, UNTAPPED};
+
 mod predicate;
 pub use predicate::Predicate;
 

@@ -1,4 +1,4 @@
-use bevy::prelude::{Commands, Entity, Has, MessageReader, MessageWriter, Query, Res};
+use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query, Res};
 
 use crate::BATTLEFIELD;
 use crate::actions;
@@ -52,10 +52,8 @@ pub fn r509_1a_r509_1g_r509_1h_r702_9b_r702_17b_declare_blockers(
         &cards::CardDefinition,
         &cards::Owner,
         &zones::InZone,
-        Option<&cards::Tapped>,
     )>,
-    attacking: Query<(&cards::Attacking, Has<cards::Flying>)>,
-    flight: Query<(Has<cards::Flying>, Has<cards::Reach>)>,
+    attacking: Query<(Entity, &cards::Attacking)>,
     answers: rules::Rules,
     zones: zones::ZoneLookup,
 ) {
@@ -81,37 +79,31 @@ pub fn r509_1a_r509_1g_r509_1h_r702_9b_r702_17b_declare_blockers(
             continue;
         };
         let all_legal = assignments.iter().all(|assignment| {
-            let blocker_legal = cards.get(assignment.blocker).is_ok_and(
-                |(_, definition, owner, in_zone, tapped)| {
+            let blocker_ok =
+                cards.get(assignment.blocker).is_ok_and(|(_, definition, owner, in_zone)| {
                     definition.type_line.types.contains(&cards::CardType::Creature)
                         && **owner == action.player
                         && **in_zone == battlefield
-                        && tapped.is_none()
-                },
-            );
-            let attacker_legal =
-                attacking.get(assignment.attacker).is_ok_and(|(_, attacker_flies)| {
-                    if !attacker_flies {
-                        return true;
-                    }
-                    flight
-                        .get(assignment.blocker)
-                        .is_ok_and(|(blocker_flies, blocker_reach)| blocker_flies || blocker_reach)
                 });
-            blocker_legal && attacker_legal
+            let attacker_ok = attacking.get(assignment.attacker).is_ok();
+            blocker_ok
+                && attacker_ok
+                && answers.legal::<rules::DeclareBlocker>(&rules::BlockCtx {
+                    blocker: assignment.blocker,
+                    attacker: assignment.attacker,
+                })
         });
-        let requirement_unmet = cards.iter().any(|(entity, definition, owner, in_zone, tapped)| {
+        let requirement_unmet = cards.iter().any(|(entity, definition, owner, in_zone)| {
             **owner == action.player
                 && **in_zone == battlefield
                 && definition.type_line.types.contains(&cards::CardType::Creature)
-                && answers.ask::<rules::MustBlock>(entity)
-                && tapped.is_none()
+                && answers.demanded::<rules::DeclareBlocker>(entity)
                 && !assignments.iter().any(|assignment| assignment.blocker == entity)
-                && attacking.iter().any(|(_, attacker_flies)| {
-                    !attacker_flies
-                        || flight.get(entity).is_ok_and(|(blocker_flies, blocker_reach)| {
-                            blocker_flies || blocker_reach
-                        })
+                && attacking.iter().any(|(attacker, _)| {
+                    answers.legal::<rules::DeclareBlocker>(&rules::BlockCtx {
+                        blocker: entity,
+                        attacker,
+                    })
                 })
         });
         if !all_legal || requirement_unmet {
@@ -195,6 +187,30 @@ mod tests {
             Some(&actions::Rejected::CannotBlock { assignments })
         );
         assert!(!game.is_blocking(bears));
+        Ok(())
+    }
+
+    #[test]
+    fn a_creature_that_waives_untapped_can_block_while_tapped() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.battlefield([TYPHOID_RATS]),
+            P2.battlefield_tapped([TEST_TAPPED_SENTRY]),
+        ]);
+        let [rats] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TYPHOID_RATS)?;
+        let [sentry] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(TEST_TAPPED_SENTRY)?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareAttackers),
+            p2.pass_to(turns::Step::DeclareAttackers),
+            p1.declare_attackers([rats]),
+        ])?;
+
+        game.play([
+            p1.pass_to(turns::Step::DeclareBlockers),
+            p2.pass_to(turns::Step::DeclareBlockers),
+        ])?;
+        game.play([p1.pass_priority(), p2.declare_blockers([(sentry, rats)])])?;
+
+        assert!(game.is_blocking(sentry));
         Ok(())
     }
 
@@ -436,7 +452,7 @@ mod tests {
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
-                assert!(answers.ask::<rules::MustBlock>(bears_2.into()));
+                assert!(answers.demanded::<rules::DeclareBlocker>(bears_2.into()));
             })
             .unwrap();
         Ok(())

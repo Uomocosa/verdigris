@@ -5,4 +5,6 @@ pub use basic::card_text::{
     deathtouch, defender, double_strike, enchant, first_strike, flying, haste, hexproof,
     indestructible, infect, lifelink, reach, trample, vigilance,
 };
-pub use basic::enums::StaticKeyword;
+
+mod static_keyword;
+pub use static_keyword::StaticKeyword;

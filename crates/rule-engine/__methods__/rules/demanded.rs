@@ -5,7 +5,10 @@ use crate::rules;
 use crate::rules::traits::legality_rule::LegalityRule;
 
 pub fn demanded<R: LegalityRule>(answers: &rules::Rules, entity: Entity) -> bool {
-    answers.mods(entity).any(|change| matches!(change, effects::Change::Demand(id) if *id == R::ID))
+    answers
+        .mods(entity)
+        .iter()
+        .any(|change| matches!(change, effects::Change::Demand(id) if *id == R::ID))
 }
 
 #[cfg(test)]

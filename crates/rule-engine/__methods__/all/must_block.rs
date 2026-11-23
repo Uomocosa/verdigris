@@ -1,15 +1,13 @@
 use crate::abilities;
 use crate::effects;
 use crate::rules;
+use crate::rules::traits::legality_rule::LegalityRule;
 use crate::statics;
 
 pub fn must_block(all: statics::All) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
-        change: effects::Change::Rule {
-            question: rules::Question::MustBlock,
-            answer: rules::Answer::MustBlock(true),
-        },
+        change: effects::Change::Demand(rules::DeclareBlocker::ID),
     }
 }
 
@@ -18,6 +16,7 @@ mod tests {
     use crate::CREATURE;
     use crate::effects;
     use crate::rules;
+    use crate::rules::traits::legality_rule::LegalityRule;
     use crate::statics;
 
     use super::must_block;
@@ -28,10 +27,8 @@ mod tests {
         assert_eq!(ability.filter, CREATURE);
         assert_eq!(
             ability.change,
-            effects::Change::Rule {
-                question: rules::Question::MustBlock,
-                answer: rules::Answer::MustBlock(true),
-            }
+            effects::Change::Demand(rules::DeclareBlocker::ID)
         );
+        assert_eq!(rules::DeclareBlocker::ID, rules::RuleId("509.1a"));
     }
 }

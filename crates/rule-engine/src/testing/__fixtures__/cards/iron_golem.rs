@@ -28,6 +28,7 @@ mod tests {
     use crate::keywords;
     use crate::pt;
     use crate::rules;
+    use crate::rules::traits::legality_rule::LegalityRule;
 
     use super::IRON_GOLEM;
 
@@ -63,10 +64,7 @@ mod tests {
                         object: Some(effects::ObjectRelation::ThisObject),
                         ..CREATURE
                     },
-                    change: effects::Change::Rule {
-                        question: rules::Question::MustBlock,
-                        answer: rules::Answer::MustBlock(true),
-                    },
+                    change: effects::Change::Demand(rules::DeclareBlocker::ID),
                 },
             ]
         );
