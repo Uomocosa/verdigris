@@ -10,6 +10,7 @@ pub struct WinGame(pub Entity);
 #[rustfmt::skip]
 impl Event for WinGame {
     type Legality = rules::WinsTheGame;
+    const ID: rules::EventId = rules::EventId("104.2");
     fn context(self) -> rules::PlayerCtx { rules::PlayerCtx::from(*self) }
 }
 
@@ -33,5 +34,6 @@ mod tests {
             player
         );
         assert_eq!(rules::WinsTheGame::ID, rules::RuleId("104.2"));
+        assert_eq!(WinGame::ID, rules::EventId("104.2"));
     }
 }

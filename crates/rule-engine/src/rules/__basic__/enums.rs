@@ -48,3 +48,16 @@ pub enum Legality {
     Legal,
     Illegal,
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum Outcome {
+    WinTheGame,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum Replacement {
+    Instead {
+        event: rules::EventId,
+        outcome: rules::Outcome,
+    },
+}

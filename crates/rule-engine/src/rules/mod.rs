@@ -1,9 +1,11 @@
 #[path = "__basic__/mod.rs"]
 mod basic;
 
-pub use basic::enums::{Characteristic, Comparison, Legality, Role, RuleChange, ValueChange};
+pub use basic::enums::{
+    Characteristic, Comparison, Legality, Outcome, Replacement, Role, RuleChange, ValueChange,
+};
 pub use basic::messages::Would;
-pub use basic::newtypes::{ActionId, ClauseKey, ComponentKey, RuleId};
+pub use basic::newtypes::{ActionId, ClauseKey, ComponentKey, EventId, RuleId};
 pub use basic::predicate_builders::{
     active_player, at_least, at_most, card_type, equal_to, has, has_priority, in_zone, main_phase,
     other, points_to, stack_empty, step_is,
@@ -38,6 +40,12 @@ pub use clause_id::ClauseId;
 
 pub mod declare_blocker;
 pub use declare_blocker::DeclareBlocker;
+
+mod draw_from_empty_library;
+pub use draw_from_empty_library::{DRAW_FROM_EMPTY_LIBRARY, DrawFromEmptyLibrary};
+
+mod draws_from_empty_library;
+pub use draws_from_empty_library::DrawsFromEmptyLibrary;
 
 mod win_game;
 pub use win_game::WinGame;

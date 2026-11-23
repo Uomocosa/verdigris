@@ -50,6 +50,9 @@ impl Rules<'_, '_> {
     pub fn required<R: rules::traits::legality_rule::LegalityRule>(&self, entity: Entity) -> bool {}
 
     #[must_use]
+    pub fn replacement(&self, affected: Entity, event: rules::EventId) -> Option<rules::Outcome> {}
+
+    #[must_use]
     pub fn value<V: rules::traits::value_rule::ValueRule>(&self, player: Entity) -> rules::Limit {}
 }
 

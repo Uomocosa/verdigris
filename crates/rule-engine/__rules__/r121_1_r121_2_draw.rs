@@ -1,7 +1,8 @@
 use crate::{HAND, LIBRARY};
-use bevy::prelude::{Commands, Entity, MessageReader, Query};
+use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query};
 
 use crate::players;
+use crate::rules;
 use crate::zones;
 
 /// 121.1. A player draws a card by putting the top card of their library into their hand. This is
@@ -17,6 +18,7 @@ use crate::zones;
 /// library top first.
 pub fn r121_1_r121_2_draw(
     mut draws: MessageReader<players::DrawRequested>,
+    mut attempted: MessageWriter<rules::Would<rules::DrawFromEmptyLibrary>>,
     mut commands: Commands,
     zones: zones::ZoneLookup,
     zone_contents: Query<&zones::ZoneContents>,
@@ -38,7 +40,7 @@ pub fn r121_1_r121_2_draw(
             }
         }
         if u32::try_from(drawn_from_top.len()).unwrap_or(u32::MAX) < draw.count {
-            commands.entity(draw.player).insert(players::AttemptedDrawFromEmptyLibrary);
+            attempted.write(rules::Would(rules::DrawFromEmptyLibrary(draw.player)));
         }
     }
 }

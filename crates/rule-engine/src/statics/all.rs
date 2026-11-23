@@ -19,6 +19,9 @@ impl All {
     pub fn get_pt(self, power: i32, toughness: i32) -> abilities::Continuous {}
 
     #[must_use]
+    pub fn instead(self, event: rules::EventId, outcome: rules::Outcome) -> abilities::Continuous {}
+
+    #[must_use]
     pub fn lose(self, keyword: keywords::StaticKeyword) -> abilities::Continuous {}
 
     #[must_use]

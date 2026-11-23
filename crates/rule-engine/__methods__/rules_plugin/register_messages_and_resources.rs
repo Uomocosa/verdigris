@@ -23,6 +23,7 @@ pub fn register_messages_and_resources(app: &mut App) {
         .add_message::<players::DiscardRequested>()
         .add_message::<rules::Would<rules::LoseGame>>()
         .add_message::<rules::Would<rules::WinGame>>()
+        .add_message::<rules::Would<rules::DrawFromEmptyLibrary>>()
         .add_message::<effects::MillRequested>()
         .add_message::<effects::TokensRequested>()
         .add_message::<effects::PowerToughnessModified>()

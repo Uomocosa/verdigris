@@ -1,7 +1,9 @@
+use crate::rules;
 use crate::rules::traits::legality_rule::LegalityRule;
 
 pub trait Event: Clone + Send + Sync + 'static {
     type Legality: LegalityRule;
+    const ID: rules::EventId;
     fn context(self) -> <Self::Legality as LegalityRule>::Ctx;
 }
 
