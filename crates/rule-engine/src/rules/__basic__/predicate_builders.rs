@@ -1,4 +1,6 @@
 use crate::rules;
+use crate::turns;
+use crate::zones;
 
 #[must_use]
 pub const fn has<C: rules::traits::keyed_component::KeyedComponent>() -> rules::Predicate {
@@ -30,4 +32,37 @@ pub const fn points_to<C: rules::traits::entity_component::EntityComponent>(
     role: rules::Role,
 ) -> rules::Predicate {
     rules::Predicate::PointsTo(C::KEY, role)
+}
+
+#[must_use]
+pub const fn in_zone(zone: zones::Zone, role: rules::Role) -> rules::Predicate {
+    rules::Predicate::InZone(zone, role)
+}
+
+#[must_use]
+pub const fn step_is(step: turns::Step) -> rules::Predicate {
+    rules::Predicate::StepIs(step)
+}
+
+#[must_use]
+pub fn main_phase() -> rules::Predicate {
+    rules::Predicate::Any(vec![
+        rules::Predicate::StepIs(turns::Step::PrecombatMain),
+        rules::Predicate::StepIs(turns::Step::PostcombatMain),
+    ])
+}
+
+#[must_use]
+pub const fn stack_empty() -> rules::Predicate {
+    rules::Predicate::StackEmpty
+}
+
+#[must_use]
+pub const fn active_player(role: rules::Role) -> rules::Predicate {
+    rules::Predicate::ActivePlayer(role)
+}
+
+#[must_use]
+pub const fn has_priority(role: rules::Role) -> rules::Predicate {
+    rules::Predicate::HasPriority(role)
 }

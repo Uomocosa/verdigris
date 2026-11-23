@@ -1,4 +1,6 @@
 use crate::rules;
+use crate::turns;
+use crate::zones;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Predicate {
@@ -10,6 +12,11 @@ pub enum Predicate {
     Any(Vec<Self>),
     Not(Box<Self>),
     True,
+    InZone(zones::Zone, rules::Role),
+    StepIs(turns::Step),
+    StackEmpty,
+    ActivePlayer(rules::Role),
+    HasPriority(rules::Role),
 }
 
 #[rustfmt::skip]

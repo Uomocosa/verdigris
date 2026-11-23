@@ -6,6 +6,8 @@ use bevy::prelude::{Entity, EntityRef, Query, Without};
 use crate::cards;
 use crate::effects;
 use crate::rules;
+use crate::turns;
+use crate::zones;
 
 #[derive(SystemParam, Clone, Copy)]
 pub struct Rules<'w, 's> {
@@ -13,6 +15,10 @@ pub struct Rules<'w, 's> {
     pub effects: Query<'w, 's, &'static effects::ContinuousEffect>,
     pub entities: Query<'w, 's, EntityRef<'static>, Without<IsResource>>,
     pub registry: Query<'w, 's, &'static rules::PredicateRegistry>,
+    pub turn: Query<'w, 's, &'static turns::Turn>,
+    pub priority: Query<'w, 's, &'static turns::Priority>,
+    pub zones: zones::ZoneLookup<'w, 's>,
+    pub in_zone: Query<'w, 's, &'static zones::InZone>,
 }
 
 #[atomic_delegates]

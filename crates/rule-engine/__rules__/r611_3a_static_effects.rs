@@ -1,6 +1,7 @@
 use bevy::prelude::{Commands, Entity, Query, Res, ResMut};
 
 use crate::BATTLEFIELD;
+use crate::abilities;
 use crate::cards;
 use crate::effects;
 use crate::turns;
@@ -67,25 +68,16 @@ pub fn r611_3a_static_effects(
             continue;
         }
         let still_applies = source_definition.continuous_abilities().any(|ability| {
-            ability.modification == effect.modification
-                && ability.filter.kind == effects::FilterKind::Creature
-                && candidates.get(effect.affected).is_ok_and(
-                    |(_, definition, owner, zone, attacking, token)| {
-                        zones.contains(BATTLEFIELD, **zone)
-                            && candidate_matches(
-                                ability.filter,
-                                source,
-                                effect.affected,
-                                enchanted,
-                                **source_owner,
-                                **owner,
-                                attacking.is_some(),
-                                token.is_some(),
-                                definition,
-                                players,
-                            )
-                    },
-                )
+            ability_still_applies(
+                ability,
+                effect,
+                source,
+                enchanted,
+                **source_owner,
+                &candidates,
+                &zones,
+                players,
+            )
         });
         if !still_applies {
             commands.entity(entity).despawn();
@@ -101,47 +93,152 @@ pub fn r611_3a_static_effects(
         }
         let stamp = stamp_for(source, &mut commands, &stamped, &mut timestamp);
         for ability in definition.continuous_abilities() {
-            if ability.filter.kind != effects::FilterKind::Creature {
-                continue;
-            }
-            for (
-                candidate,
-                candidate_definition,
-                candidate_owner,
-                candidate_zone,
-                attacking,
-                token,
-            ) in candidates.iter()
-            {
-                if !zones.contains(BATTLEFIELD, **candidate_zone) {
-                    continue;
-                }
-                if !candidate_matches(
-                    ability.filter,
+            match ability.filter.kind {
+                effects::FilterKind::Creature => spawn_creature_effects(
+                    &mut commands,
                     source,
-                    candidate,
+                    ability,
                     enchanted,
                     **owner,
-                    **candidate_owner,
-                    attacking.is_some(),
-                    token.is_some(),
-                    candidate_definition,
+                    &candidates,
+                    &zones,
                     players,
-                ) {
-                    continue;
-                }
-                if already_applied(&applied, source, candidate, &ability.modification) {
-                    continue;
-                }
-                commands.spawn(effects::ContinuousEffect {
-                    affected: candidate,
-                    source: Some(source),
-                    modification: ability.modification.clone(),
-                    until: effects::Duration::WhileSourceOnBattlefield,
-                    timestamp: stamp,
-                });
+                    &applied,
+                    stamp,
+                ),
+                effects::FilterKind::Player => spawn_player_effects(
+                    &mut commands,
+                    source,
+                    ability,
+                    enchanted,
+                    **owner,
+                    players,
+                    &applied,
+                    stamp,
+                ),
+                _ => {}
             }
         }
+    }
+}
+
+fn ability_still_applies(
+    ability: &abilities::Continuous,
+    effect: &effects::ContinuousEffect,
+    source: Entity,
+    enchanted: Option<Entity>,
+    controller: Entity,
+    candidates: &StaticCandidates<'_, '_, '_, '_, '_, '_, '_>,
+    zones: &zones::ZoneLookup,
+    players: &[Entity],
+) -> bool {
+    if ability.modification != effect.modification {
+        return false;
+    }
+    match ability.filter.kind {
+        effects::FilterKind::Creature => candidates.get(effect.affected).is_ok_and(
+            |(_, definition, owner, zone, attacking, token)| {
+                zones.contains(BATTLEFIELD, **zone)
+                    && candidate_matches(
+                        ability.filter,
+                        source,
+                        effect.affected,
+                        enchanted,
+                        controller,
+                        **owner,
+                        attacking.is_some(),
+                        token.is_some(),
+                        definition,
+                        players,
+                    )
+            },
+        ),
+        effects::FilterKind::Player => player_matches(
+            ability.filter,
+            source,
+            effect.affected,
+            enchanted,
+            controller,
+            players,
+        ),
+        _ => false,
+    }
+}
+
+fn spawn_creature_effects(
+    commands: &mut Commands,
+    source: Entity,
+    ability: &abilities::Continuous,
+    enchanted: Option<Entity>,
+    controller: Entity,
+    candidates: &StaticCandidates<'_, '_, '_, '_, '_, '_, '_>,
+    zones: &zones::ZoneLookup,
+    players: &[Entity],
+    applied: &Query<(Entity, &effects::ContinuousEffect)>,
+    stamp: u64,
+) {
+    for (candidate, definition, owner, zone, attacking, token) in candidates.iter() {
+        if !zones.contains(BATTLEFIELD, **zone) {
+            continue;
+        }
+        if !candidate_matches(
+            ability.filter,
+            source,
+            candidate,
+            enchanted,
+            controller,
+            **owner,
+            attacking.is_some(),
+            token.is_some(),
+            definition,
+            players,
+        ) {
+            continue;
+        }
+        if already_applied(applied, source, candidate, &ability.modification) {
+            continue;
+        }
+        commands.spawn(effects::ContinuousEffect {
+            affected: candidate,
+            source: Some(source),
+            modification: ability.modification.clone(),
+            until: effects::Duration::WhileSourceOnBattlefield,
+            timestamp: stamp,
+        });
+    }
+}
+
+fn spawn_player_effects(
+    commands: &mut Commands,
+    source: Entity,
+    ability: &abilities::Continuous,
+    enchanted: Option<Entity>,
+    controller: Entity,
+    players: &[Entity],
+    applied: &Query<(Entity, &effects::ContinuousEffect)>,
+    stamp: u64,
+) {
+    for candidate in players {
+        if !player_matches(
+            ability.filter,
+            source,
+            *candidate,
+            enchanted,
+            controller,
+            players,
+        ) {
+            continue;
+        }
+        if already_applied(applied, source, *candidate, &ability.modification) {
+            continue;
+        }
+        commands.spawn(effects::ContinuousEffect {
+            affected: *candidate,
+            source: Some(source),
+            modification: ability.modification.clone(),
+            until: effects::Duration::WhileSourceOnBattlefield,
+            timestamp: stamp,
+        });
     }
 }
 
@@ -192,6 +289,27 @@ fn candidate_matches(
         return false;
     }
     filter.does_creature_match(definition)
+}
+
+fn player_matches(
+    filter: effects::Filter,
+    source: Entity,
+    candidate: Entity,
+    enchanted: Option<Entity>,
+    controller: Entity,
+    players: &[Entity],
+) -> bool {
+    match filter.object {
+        Some(effects::ObjectRelation::ThisObject) if candidate != source => return false,
+        Some(effects::ObjectRelation::EnchantedObject) if enchanted != Some(candidate) => {
+            return false;
+        }
+        _ => {}
+    }
+    filter.controlled_by.map_or_else(
+        || players.contains(&candidate),
+        |controller_ref| controller_ref.resolve(controller, players).contains(&candidate),
+    )
 }
 
 fn already_applied(
@@ -426,6 +544,54 @@ mod tests {
         ])?;
         assert!(game.is_attacking(bears));
         assert!(game.is_tapped(bears));
+        Ok(())
+    }
+
+    #[test]
+    fn r611_3a_player_static_modifies_only_its_controller() -> TestResult {
+        use bevy::ecs::system::RunSystemOnce;
+        use bevy::prelude::Entity;
+
+        use crate::GRAVEYARD;
+        use crate::rules;
+        use crate::testing;
+
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.battlefield([TEST_PLAYER_WAIVER]).hand([DEMYSTIFY]).mana_pool(mana![W]),
+            P2,
+        ]);
+        let [waiver] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TEST_PLAYER_WAIVER)?;
+        let [demystify] = game.player(p1).cards_in(HAND).exactly::<1>(DEMYSTIFY)?;
+        game.play([p1.cast(demystify).targeting(waiver)])?;
+        let controller = Entity::from(p1);
+        let opponent = Entity::from(p2);
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                assert!(
+                    answers.mods(controller).contains(&effects::Modification::Rule(
+                        rules::RuleChange::AsThough(testing::UNTAPPED.key),
+                    ))
+                );
+                assert!(
+                    !answers.mods(opponent).contains(&effects::Modification::Rule(
+                        rules::RuleChange::AsThough(testing::UNTAPPED.key),
+                    ))
+                );
+            })
+            .unwrap();
+        game.play([p1.pass_priority(), p2.pass_priority()])?;
+        assert!(game.player(p1).cards_in(GRAVEYARD).has(waiver));
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                assert!(
+                    !answers.mods(controller).contains(&effects::Modification::Rule(
+                        rules::RuleChange::AsThough(testing::UNTAPPED.key),
+                    ))
+                );
+            })
+            .unwrap();
         Ok(())
     }
 }

@@ -2,6 +2,7 @@ use bevy::prelude::Entity;
 
 use crate::cards;
 use crate::rules;
+use crate::zones;
 
 pub fn eval(
     answers: &rules::Rules,
@@ -10,6 +11,11 @@ pub fn eval(
     other: Option<Entity>,
     player: Option<Entity>,
 ) -> bool {
+    let target = |role: &rules::Role| match role {
+        rules::Role::Subject => Some(subject),
+        rules::Role::Other => other,
+        rules::Role::Player => player,
+    };
     match predicate {
         rules::Predicate::Has(key) => answers
             .registry
@@ -19,27 +25,20 @@ pub fn eval(
             .is_some_and(|component| {
                 answers.entities.get(subject).is_ok_and(|entity| entity.contains_id(component))
             }),
-        rules::Predicate::PointsTo(key, role) => {
-            let wanted = match role {
-                rules::Role::Subject => Some(subject),
-                rules::Role::Other => other,
-                rules::Role::Player => player,
-            };
-            wanted.is_some_and(|wanted| {
-                answers
-                    .registry
-                    .single()
-                    .ok()
-                    .and_then(|registry| {
-                        answers
-                            .entities
-                            .get(subject)
-                            .ok()
-                            .and_then(|entity| registry.target_of(*key, entity))
-                    })
-                    .is_some_and(|found| found == wanted)
-            })
-        }
+        rules::Predicate::PointsTo(key, role) => target(role).is_some_and(|wanted| {
+            answers
+                .registry
+                .single()
+                .ok()
+                .and_then(|registry| {
+                    answers
+                        .entities
+                        .get(subject)
+                        .ok()
+                        .and_then(|entity| registry.target_of(*key, entity))
+                })
+                .is_some_and(|found| found == wanted)
+        }),
         rules::Predicate::Characteristic(characteristic, comparison, threshold) => answers
             .entities
             .get(subject)
@@ -72,6 +71,30 @@ pub fn eval(
         }
         rules::Predicate::Not(inner) => !eval(answers, inner, subject, other, player),
         rules::Predicate::True => true,
+        rules::Predicate::InZone(zone, role) => target(role).is_some_and(|holder| {
+            answers
+                .entities
+                .get(subject)
+                .ok()
+                .and_then(|entity| entity.get::<zones::InZone>())
+                .is_some_and(|in_zone| {
+                    answers.zones.get(**in_zone).is_ok_and(|(_, found, owner)| {
+                        *found == *zone && owner.is_some_and(|owner| **owner == holder)
+                    })
+                })
+        }),
+        rules::Predicate::StepIs(step) => {
+            answers.turn.single().is_ok_and(|turn| turn.step == *step)
+        }
+        rules::Predicate::StackEmpty => answers
+            .zones
+            .find(zones::SharedZone::Stack, None)
+            .is_none_or(|stack| !answers.in_zone.iter().any(|in_zone| **in_zone == stack)),
+        rules::Predicate::ActivePlayer(role) => target(role)
+            .is_some_and(|holder| answers.turn.single().is_ok_and(|turn| turn.active == holder)),
+        rules::Predicate::HasPriority(role) => target(role).is_some_and(|holder| {
+            answers.priority.single().is_ok_and(|priority| priority.player == holder)
+        }),
     }
 }
 
@@ -80,9 +103,12 @@ mod tests {
     use bevy::ecs::system::RunSystemOnce;
 
     use crate::BATTLEFIELD;
+    use crate::HAND;
     use crate::cards;
+    use crate::mana;
     use crate::rules;
     use crate::testing::*;
+    use crate::turns;
 
     use super::eval;
 
@@ -301,6 +327,149 @@ mod tests {
                     rules::Predicate::Of(rules::Role::Player, Box::new(rules::Predicate::True));
                 assert!(eval(&answers, &on_player, *bears, None, Some(p1.into())));
                 assert!(!eval(&answers, &on_player, *bears, None, None));
+            })
+            .unwrap();
+        Ok(())
+    }
+
+    #[test]
+    fn in_zone_matches_zone_and_owner() -> TestResult {
+        let (mut game, [p1, p2]) =
+            MockGame::new([P1.battlefield([GRIZZLY_BEARS]), P2.hand([GRIZZLY_BEARS])]);
+        let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                let on_own_battlefield = rules::in_zone(BATTLEFIELD, rules::Role::Player);
+                assert!(eval(
+                    &answers,
+                    &on_own_battlefield,
+                    *bears,
+                    None,
+                    Some(p1.into())
+                ));
+                assert!(!eval(
+                    &answers,
+                    &on_own_battlefield,
+                    *bears,
+                    None,
+                    Some(p2.into())
+                ));
+                let in_own_hand = rules::in_zone(HAND, rules::Role::Player);
+                assert!(!eval(&answers, &in_own_hand, *bears, None, Some(p1.into())));
+            })
+            .unwrap();
+        Ok(())
+    }
+
+    #[test]
+    fn step_is_matches_the_current_step() -> TestResult {
+        let (mut game, [p1, _p2]) = MockGame::builder()
+            .turn(2, turns::Step::Upkeep)
+            .players([P1.battlefield([GRIZZLY_BEARS]), P2]);
+        let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                assert!(eval(
+                    &answers,
+                    &rules::step_is(turns::Step::Upkeep),
+                    *bears,
+                    None,
+                    None
+                ));
+                assert!(!eval(
+                    &answers,
+                    &rules::step_is(turns::Step::PrecombatMain),
+                    *bears,
+                    None,
+                    None
+                ));
+            })
+            .unwrap();
+        Ok(())
+    }
+
+    #[test]
+    fn main_phase_holds_during_either_main_phase() -> TestResult {
+        let (mut game, [p1, _p2]) = MockGame::new([P1.battlefield([GRIZZLY_BEARS]), P2]);
+        let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                assert!(eval(&answers, &rules::main_phase(), *bears, None, None));
+            })
+            .unwrap();
+        let (mut upkeep, [q1, _q2]) = MockGame::builder()
+            .turn(2, turns::Step::Upkeep)
+            .players([P1.battlefield([GRIZZLY_BEARS]), P2]);
+        let [resting] = upkeep.player(q1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        upkeep
+            .app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                assert!(!eval(&answers, &rules::main_phase(), *resting, None, None));
+            })
+            .unwrap();
+        Ok(())
+    }
+
+    #[test]
+    fn stack_empty_holds_when_nothing_is_on_the_stack() -> TestResult {
+        let (mut game, [p1, _p2]) = MockGame::new([P1.battlefield([GRIZZLY_BEARS]), P2]);
+        let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                assert!(eval(&answers, &rules::stack_empty(), *bears, None, None));
+            })
+            .unwrap();
+        Ok(())
+    }
+
+    #[test]
+    fn stack_empty_fails_while_a_spell_is_on_the_stack() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
+            P2.battlefield([GRIZZLY_BEARS]),
+        ]);
+        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
+        game.play([p1.cast(bolt).targeting(p2)])?;
+        let [stacked] = game.stack().exactly::<1>(LIGHTNING_BOLT)?;
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                assert!(!eval(&answers, &rules::stack_empty(), *stacked, None, None));
+            })
+            .unwrap();
+        Ok(())
+    }
+
+    #[test]
+    fn active_player_matches_the_turns_active_player() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([P1.battlefield([GRIZZLY_BEARS]), P2]);
+        let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                let active = rules::active_player(rules::Role::Player);
+                assert!(eval(&answers, &active, *bears, None, Some(p1.into())));
+                assert!(!eval(&answers, &active, *bears, None, Some(p2.into())));
+            })
+            .unwrap();
+        Ok(())
+    }
+
+    #[test]
+    fn has_priority_matches_the_priority_player() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([P1.battlefield([GRIZZLY_BEARS]), P2]);
+        let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                let priority = rules::has_priority(rules::Role::Player);
+                assert!(eval(&answers, &priority, *bears, None, Some(p1.into())));
+                assert!(!eval(&answers, &priority, *bears, None, Some(p2.into())));
             })
             .unwrap();
         Ok(())

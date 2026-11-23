@@ -3,7 +3,10 @@ mod basic;
 
 pub use basic::enums::{Characteristic, Comparison, Legality, Role, RuleChange};
 pub use basic::newtypes::{ActionId, ClauseKey, ComponentKey, RuleId};
-pub use basic::predicate_builders::{at_least, at_most, equal_to, has, other, points_to};
+pub use basic::predicate_builders::{
+    active_player, at_least, at_most, equal_to, has, has_priority, in_zone, main_phase, other,
+    points_to, stack_empty, step_is,
+};
 pub use basic::type_aliases::TargetOf;
 
 #[path = "__traits__/mod.rs"]
