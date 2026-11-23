@@ -2,14 +2,21 @@
 mod basic;
 
 pub use basic::enums::{Characteristic, Combine, Comparison, Question, Role};
-pub use basic::newtypes::ComponentKey;
+pub use basic::newtypes::{ClauseKey, ComponentKey, RuleId, StepId};
 pub use basic::predicate_builders::{at_least, at_most, equal_to, has, other};
+pub use basic::structs::Clause;
 
 #[path = "__traits__/mod.rs"]
 pub mod traits;
 
 mod answer;
 pub use answer::Answer;
+
+mod attack_ctx;
+pub use attack_ctx::AttackCtx;
+
+mod block_ctx;
+pub use block_ctx::BlockCtx;
 
 mod predicate;
 pub use predicate::Predicate;

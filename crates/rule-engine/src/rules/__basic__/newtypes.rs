@@ -1,4 +1,13 @@
 use derive_more::Deref;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deref)]
+pub struct ClauseKey(pub &'static str);
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Deref)]
 pub struct ComponentKey(pub &'static str);
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deref)]
+pub struct RuleId(pub &'static str);
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deref)]
+pub struct StepId(pub &'static str);
