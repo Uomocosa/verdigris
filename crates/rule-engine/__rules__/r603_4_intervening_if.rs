@@ -47,7 +47,9 @@ pub fn r603_4_intervening_if(
                 }
                 abilities::TriggerEvent::Enters(_)
                 | abilities::TriggerEvent::Dies
-                | abilities::TriggerEvent::Attacks => false,
+                | abilities::TriggerEvent::Attacks
+                | abilities::TriggerEvent::Blocks
+                | abilities::TriggerEvent::BecomesBlocked => false,
             };
             if !triggered {
                 continue;

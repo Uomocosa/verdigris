@@ -11,6 +11,8 @@ pub enum TriggerEvent {
     BeginningOfStep(turns::Step, effects::PlayerRef),
     BeginningOfNextCleanup,
     Attacks,
+    Blocks,
+    BecomesBlocked,
     Dies,
 }
 
@@ -23,6 +25,16 @@ impl TriggerEvent {
     #[must_use]
     pub const fn attacks() -> Self {
         Self::Attacks
+    }
+
+    #[must_use]
+    pub const fn blocks() -> Self {
+        Self::Blocks
+    }
+
+    #[must_use]
+    pub const fn becomes_blocked() -> Self {
+        Self::BecomesBlocked
     }
 }
 
@@ -56,6 +68,14 @@ mod tests {
         assert_eq!(
             abilities::TriggerEvent::attacks(),
             abilities::TriggerEvent::Attacks
+        );
+        assert_eq!(
+            abilities::TriggerEvent::blocks(),
+            abilities::TriggerEvent::Blocks
+        );
+        assert_eq!(
+            abilities::TriggerEvent::becomes_blocked(),
+            abilities::TriggerEvent::BecomesBlocked
         );
     }
 }
