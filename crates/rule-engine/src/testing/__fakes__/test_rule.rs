@@ -4,7 +4,7 @@ use crate::rules;
 use crate::rules::traits::legality_rule::LegalityRule;
 
 pub const UNTAPPED: rules::ClauseId<rules::AttackCtx> = rules::ClauseId::new("test/untapped");
-pub const TEST_STEP: rules::StepId = rules::StepId("test/step");
+pub const TEST_STEP: rules::ActionId = rules::ActionId("test/step");
 
 pub struct TestRule;
 

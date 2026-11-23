@@ -39,6 +39,14 @@ impl All {
     pub fn as_though<Ctx>(self, clause: rules::ClauseId<Ctx>) -> abilities::Continuous {}
 
     #[must_use]
+    pub fn allow<Ctx>(
+        self,
+        clause: rules::ClauseId<Ctx>,
+        alternative: rules::Predicate,
+    ) -> abilities::Continuous {
+    }
+
+    #[must_use]
     pub fn restriction<R: rules::traits::legality_rule::LegalityRule>(
         self,
         requirement: rules::Predicate,
@@ -52,10 +60,10 @@ impl All {
     }
 
     #[must_use]
-    pub fn skip(self, step: rules::StepId) -> abilities::Continuous {}
+    pub fn skip(self, step: rules::ActionId) -> abilities::Continuous {}
 
     #[must_use]
-    pub fn perform(self, step: rules::StepId) -> abilities::Continuous {}
+    pub fn perform(self, step: rules::ActionId) -> abilities::Continuous {}
 }
 
 #[cfg(test)]

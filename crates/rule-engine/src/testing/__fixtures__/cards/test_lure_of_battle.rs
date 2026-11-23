@@ -40,7 +40,9 @@ mod tests {
             lure.continuous_abilities().cloned().collect::<Vec<_>>(),
             [abilities::Continuous {
                 filter: CREATURE.controlled_by(OPPONENT),
-                modification: effects::Modification::Requirement(rules::DeclareBlocker::ID),
+                modification: effects::Modification::Rule(rules::RuleChange::Requirement(
+                    rules::DeclareBlocker::ID,
+                )),
             }]
         );
     }

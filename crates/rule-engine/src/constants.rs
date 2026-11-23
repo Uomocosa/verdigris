@@ -37,10 +37,10 @@ pub const END: turns::Step = turns::Step::End;
 pub const CLEANUP: turns::Step = turns::Step::Cleanup;
 
 /// 508.1f The active player taps the chosen creatures.
-pub const TAP_ATTACKERS: rules::StepId = rules::StepId("508.1f/tap");
+pub const TAP_ATTACKERS: rules::ActionId = rules::ActionId("508.1f/tap");
 
 /// 502.3 The active player untaps permanents simultaneously.
-pub const UNTAP_STEP: rules::StepId = rules::StepId("502.3/untap");
+pub const UNTAP_STEP: rules::ActionId = rules::ActionId("502.3/untap");
 
 pub const CREATURE: effects::Filter = effects::Filter {
     kind: effects::FilterKind::Creature,

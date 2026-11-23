@@ -25,6 +25,7 @@ mod tests {
     use crate::cost;
     use crate::effects;
     use crate::pt;
+    use crate::rules;
     use crate::rules::traits::legality_rule::LegalityRule;
     use crate::testing;
 
@@ -45,14 +46,18 @@ mod tests {
                         object: Some(effects::ObjectRelation::ThisObject),
                         ..CREATURE
                     },
-                    modification: effects::Modification::AsThough(testing::UNTAPPED.key),
+                    modification: effects::Modification::Rule(rules::RuleChange::AsThough(
+                        testing::UNTAPPED.key,
+                    )),
                 },
                 abilities::Continuous {
                     filter: effects::Filter {
                         object: Some(effects::ObjectRelation::ThisObject),
                         ..CREATURE
                     },
-                    modification: effects::Modification::Requirement(testing::TestRule::ID),
+                    modification: effects::Modification::Rule(rules::RuleChange::Requirement(
+                        testing::TestRule::ID
+                    ),),
                 },
                 abilities::Continuous {
                     filter: effects::Filter {

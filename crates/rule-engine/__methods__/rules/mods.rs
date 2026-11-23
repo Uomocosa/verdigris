@@ -42,8 +42,8 @@ mod tests {
                 assert_eq!(
                     modifications,
                     [
-                        effects::Modification::AsThough(UNTAPPED.key),
-                        effects::Modification::Requirement(TestRule::ID),
+                        effects::Modification::Rule(rules::RuleChange::AsThough(UNTAPPED.key)),
+                        effects::Modification::Rule(rules::RuleChange::Requirement(TestRule::ID)),
                         effects::Modification::Skip(TEST_STEP),
                     ]
                 );
@@ -61,8 +61,8 @@ mod tests {
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
                 assert!(
-                    !mods(&answers, *spider).contains(&effects::Modification::AsThough(
-                        rules::declare_blocker::FLYING.key
+                    !mods(&answers, *spider).contains(&effects::Modification::Rule(
+                        rules::RuleChange::AsThough(rules::declare_blocker::FLYING.key)
                     ))
                 );
             })

@@ -44,10 +44,10 @@ mod tests {
                     object: Some(effects::ObjectRelation::ThisObject),
                     ..CREATURE
                 },
-                modification: effects::Modification::Restriction(
-                    testing::RestrictedRule::ID,
-                    rules::at_least(rules::Characteristic::Power, 3),
-                ),
+                modification: effects::Modification::Rule(rules::RuleChange::Restriction {
+                    rule: testing::RestrictedRule::ID,
+                    condition: rules::at_least(rules::Characteristic::Power, 3),
+                }),
             }]
         );
     }

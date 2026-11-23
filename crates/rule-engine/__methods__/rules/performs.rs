@@ -3,7 +3,7 @@ use bevy::prelude::Entity;
 use crate::effects;
 use crate::rules;
 
-pub fn performs(answers: &rules::Rules, entity: Entity, step: rules::StepId) -> bool {
+pub fn performs(answers: &rules::Rules, entity: Entity, step: rules::ActionId) -> bool {
     let mut performs = true;
     for modification in answers.mods(entity) {
         if let effects::Modification::Skip(skipped) = modification

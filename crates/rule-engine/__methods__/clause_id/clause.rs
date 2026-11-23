@@ -11,6 +11,7 @@ pub const fn clause<Ctx>(
         text,
         role,
         condition,
+        absolute: false,
     }
 }
 

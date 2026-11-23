@@ -42,7 +42,9 @@ mod tests {
                     object: Some(effects::ObjectRelation::ThisObject),
                     ..CREATURE
                 },
-                modification: effects::Modification::AsThough(rules::declare_blocker::UNTAPPED.key),
+                modification: effects::Modification::Rule(rules::RuleChange::AsThough(
+                    rules::declare_blocker::UNTAPPED.key,
+                )),
             }]
         );
     }

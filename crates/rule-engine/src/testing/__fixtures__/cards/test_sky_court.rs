@@ -41,10 +41,11 @@ mod tests {
             court.continuous_abilities().cloned().collect::<Vec<_>>(),
             [abilities::Continuous {
                 filter: CREATURE,
-                modification: effects::Modification::Restriction(
-                    rules::DeclareBlocker::ID,
-                    !rules::has::<cards::Flying>() | rules::other(rules::has::<cards::Flying>()),
-                ),
+                modification: effects::Modification::Rule(rules::RuleChange::Restriction {
+                    rule: rules::DeclareBlocker::ID,
+                    condition: !rules::has::<cards::Flying>()
+                        | rules::other(rules::has::<cards::Flying>()),
+                }),
             }]
         );
     }

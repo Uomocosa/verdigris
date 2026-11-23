@@ -1,0 +1,233 @@
+use crate::effects;
+use crate::rules;
+use crate::rules::traits::context::Context;
+use crate::rules::traits::legality_rule::LegalityRule;
+
+pub fn legality<R: LegalityRule>(answers: &rules::Rules, context: &R::Ctx) -> rules::Legality {
+    let subject = context.subject();
+    let other = context.other();
+    let player = context.player();
+    let waived = |clause: &rules::Clause| {
+        if clause.absolute {
+            return false;
+        }
+        let entity = match clause.role {
+            rules::Role::Subject => Some(subject),
+            rules::Role::Other => other,
+            rules::Role::Player => Some(player),
+        };
+        entity.is_some_and(|entity| {
+            answers.mods(entity).iter().any(|modification| match modification {
+                effects::Modification::Rule(rules::RuleChange::AsThough(key)) => *key == clause.key,
+                effects::Modification::Rule(rules::RuleChange::Allow(key, alternative)) => {
+                    *key == clause.key && answers.eval(alternative, subject, other, Some(player))
+                }
+                _ => false,
+            })
+        })
+    };
+    let base = R::clauses()
+        .iter()
+        .filter(|clause| !waived(clause))
+        .all(|clause| answers.eval(&clause.condition, subject, other, Some(player)));
+    let restricted = answers.mods(subject).iter().any(|modification| {
+        matches!(modification, effects::Modification::Rule(rules::RuleChange::Restriction { rule, condition }) if *rule == R::ID && !answers.eval(condition, subject, other, Some(player)))
+    });
+    if base && !restricted {
+        rules::Legality::Legal
+    } else {
+        rules::Legality::Illegal
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use bevy::ecs::system::RunSystemOnce;
+
+    use crate::BATTLEFIELD;
+    use crate::cards;
+    use crate::rules;
+    use crate::testing::*;
+
+    use super::legality;
+
+    #[test]
+    fn test_usage() -> TestResult {
+        let (mut game, [p1, _]) = MockGame::new([P1.battlefield([GRIZZLY_BEARS]), P2]);
+        let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        game.pass_priority();
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                assert_eq!(
+                    legality::<TestRule>(
+                        &answers,
+                        &rules::AttackCtx {
+                            attacker: *bears,
+                            player: p1.into()
+                        }
+                    ),
+                    rules::Legality::Legal
+                );
+            })
+            .unwrap();
+        Ok(())
+    }
+
+    #[test]
+    fn a_tapped_creature_fails_an_untapped_clause() -> TestResult {
+        let (mut game, [_, p2]) = MockGame::new([P1, P2.battlefield_tapped([GRIZZLY_BEARS])]);
+        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        game.pass_priority();
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                assert_eq!(
+                    legality::<TestRule>(
+                        &answers,
+                        &rules::AttackCtx {
+                            attacker: *bears,
+                            player: p2.into()
+                        }
+                    ),
+                    rules::Legality::Illegal
+                );
+            })
+            .unwrap();
+        Ok(())
+    }
+
+    #[test]
+    fn a_waived_clause_is_skipped_for_the_waiving_creature() -> TestResult {
+        let (mut game, [p1, _]) = MockGame::new([P1.battlefield_tapped([TEST_RULE_WAIVER]), P2]);
+        let [waiver] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TEST_RULE_WAIVER)?;
+        game.pass_priority();
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                assert_eq!(
+                    legality::<TestRule>(
+                        &answers,
+                        &rules::AttackCtx {
+                            attacker: *waiver,
+                            player: p1.into()
+                        }
+                    ),
+                    rules::Legality::Legal
+                );
+            })
+            .unwrap();
+        Ok(())
+    }
+
+    #[test]
+    fn a_restriction_that_does_not_hold_is_illegal() -> TestResult {
+        let (mut game, [p1, _]) = MockGame::new([P1.battlefield([TEST_RULE_RESTRICTION]), P2]);
+        let [restriction] =
+            game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TEST_RULE_RESTRICTION)?;
+        game.pass_priority();
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                assert_eq!(
+                    legality::<RestrictedRule>(
+                        &answers,
+                        &rules::AttackCtx {
+                            attacker: *restriction,
+                            player: p1.into()
+                        }
+                    ),
+                    rules::Legality::Illegal
+                );
+            })
+            .unwrap();
+        Ok(())
+    }
+
+    #[test]
+    fn an_allowance_satisfies_a_failing_clause_when_its_alternative_holds() -> TestResult {
+        let (mut game, [_, p2]) = MockGame::new([
+            P1.battlefield([TEST_RULE_ALLOWANCE]),
+            P2.battlefield_tapped([WIND_DRAKE]),
+        ]);
+        let [drake] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(WIND_DRAKE)?;
+        game.pass_priority();
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                assert!(answers.eval(
+                    &rules::has::<cards::Flying>(),
+                    *drake,
+                    None,
+                    Some(p2.into())
+                ));
+                assert_eq!(
+                    legality::<TestRule>(
+                        &answers,
+                        &rules::AttackCtx {
+                            attacker: *drake,
+                            player: p2.into()
+                        }
+                    ),
+                    rules::Legality::Legal
+                );
+            })
+            .unwrap();
+        Ok(())
+    }
+
+    #[test]
+    fn an_allowance_leaves_a_failing_clause_when_its_alternative_fails() -> TestResult {
+        let (mut game, [_, p2]) = MockGame::new([
+            P1.battlefield([TEST_RULE_ALLOWANCE]),
+            P2.battlefield_tapped([GRIZZLY_BEARS]),
+        ]);
+        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        game.pass_priority();
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                assert!(!answers.eval(
+                    &rules::has::<cards::Flying>(),
+                    *bears,
+                    None,
+                    Some(p2.into())
+                ));
+                assert_eq!(
+                    legality::<TestRule>(
+                        &answers,
+                        &rules::AttackCtx {
+                            attacker: *bears,
+                            player: p2.into()
+                        }
+                    ),
+                    rules::Legality::Illegal
+                );
+            })
+            .unwrap();
+        Ok(())
+    }
+
+    #[test]
+    fn an_absolute_clause_is_not_satisfied_by_as_though() -> TestResult {
+        let (mut game, [p1, _]) = MockGame::new([P1.battlefield_tapped([TEST_RULE_WAIVER]), P2]);
+        let [waiver] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TEST_RULE_WAIVER)?;
+        game.pass_priority();
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                assert_eq!(
+                    legality::<AbsoluteRule>(
+                        &answers,
+                        &rules::AttackCtx {
+                            attacker: *waiver,
+                            player: p1.into()
+                        }
+                    ),
+                    rules::Legality::Illegal
+                );
+            })
+            .unwrap();
+        Ok(())
+    }
+}

@@ -1,12 +1,12 @@
 mod characteristics;
 mod eval;
-mod legal;
+mod legality;
 mod mods;
 mod performs;
 mod required;
 pub use characteristics::characteristics;
 pub use eval::eval;
-pub use legal::legal;
+pub use legality::legality;
 pub use mods::mods;
 pub use performs::performs;
 pub use required::required;

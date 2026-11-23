@@ -1,3 +1,4 @@
+mod allow;
 mod as_though;
 mod attack_as_though_it_had_haste;
 mod attack_without_tapping;
@@ -11,6 +12,7 @@ mod requirement;
 mod restriction;
 mod skip;
 mod tap_when_attacking;
+pub use allow::allow;
 pub use as_though::as_though;
 pub use attack_as_though_it_had_haste::attack_as_though_it_had_haste;
 pub use attack_without_tapping::attack_without_tapping;

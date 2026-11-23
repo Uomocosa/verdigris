@@ -43,10 +43,10 @@ mod tests {
             field.continuous_abilities().cloned().collect::<Vec<_>>(),
             [abilities::Continuous {
                 filter: CREATURE,
-                modification: effects::Modification::Restriction(
-                    rules::DeclareBlocker::ID,
-                    rules::at_least(rules::Characteristic::Power, 3),
-                ),
+                modification: effects::Modification::Rule(rules::RuleChange::Restriction {
+                    rule: rules::DeclareBlocker::ID,
+                    condition: rules::at_least(rules::Characteristic::Power, 3),
+                }),
             }]
         );
     }

@@ -31,13 +31,25 @@ impl Rules<'_, '_> {
     }
 
     #[must_use]
-    pub fn legal<R: rules::traits::legality_rule::LegalityRule>(&self, context: &R::Ctx) -> bool {}
+    pub fn legality<R: rules::traits::legality_rule::LegalityRule>(
+        &self,
+        context: &R::Ctx,
+    ) -> rules::Legality {
+    }
 
     #[must_use]
-    pub fn performs(&self, entity: Entity, step: rules::StepId) -> bool {}
+    pub fn performs(&self, entity: Entity, step: rules::ActionId) -> bool {}
 
     #[must_use]
     pub fn required<R: rules::traits::legality_rule::LegalityRule>(&self, entity: Entity) -> bool {}
+}
+
+impl Rules<'_, '_> {
+    #[must_use]
+    pub fn legal<R: rules::traits::legality_rule::LegalityRule>(&self, context: &R::Ctx) -> bool {
+        let outcome = self.legality::<R>(context);
+        outcome == rules::Legality::Legal
+    }
 }
 
 #[atomic_delegates]

@@ -1,3 +1,5 @@
+#[cfg(feature = "testing")]
+pub mod absolute_rule;
 pub mod all;
 pub mod card_definition;
 #[cfg(feature = "testing")]
@@ -5,6 +7,7 @@ pub mod cards;
 #[cfg(feature = "testing")]
 pub mod cards_in_zone;
 pub mod characteristics;
+pub mod clause;
 pub mod clause_id;
 pub mod combat_damage_choice;
 pub mod declare_attacker;

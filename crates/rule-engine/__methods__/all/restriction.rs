@@ -10,7 +10,10 @@ pub fn restriction<R: LegalityRule>(
 ) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
-        modification: effects::Modification::Restriction(R::ID, requirement),
+        modification: effects::Modification::Rule(rules::RuleChange::Restriction {
+            rule: R::ID,
+            condition: requirement,
+        }),
     }
 }
 
@@ -31,10 +34,10 @@ mod tests {
         assert_eq!(ability.filter, CREATURE);
         assert_eq!(
             ability.modification,
-            effects::Modification::Restriction(
-                rules::RuleId("test/restriction"),
-                rules::Predicate::True
-            )
+            effects::Modification::Rule(rules::RuleChange::Restriction {
+                rule: rules::RuleId("test/restriction"),
+                condition: rules::Predicate::True,
+            })
         );
     }
 }

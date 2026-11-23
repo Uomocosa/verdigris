@@ -54,11 +54,9 @@ pub enum Layered {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Modification {
     Characteristic(Layered),
-    AsThough(rules::ClauseKey),
-    Restriction(rules::RuleId, rules::Predicate),
-    Requirement(rules::RuleId),
-    Skip(rules::StepId),
-    Perform(rules::StepId),
+    Rule(rules::RuleChange),
+    Skip(rules::ActionId),
+    Perform(rules::ActionId),
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

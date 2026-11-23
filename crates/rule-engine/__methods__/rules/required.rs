@@ -8,7 +8,7 @@ pub fn required<R: LegalityRule>(answers: &rules::Rules, entity: Entity) -> bool
     answers
         .mods(entity)
         .iter()
-        .any(|modification| matches!(modification, effects::Modification::Requirement(id) if *id == R::ID))
+        .any(|modification| matches!(modification, effects::Modification::Rule(rules::RuleChange::Requirement(id)) if *id == R::ID))
 }
 
 #[cfg(test)]
