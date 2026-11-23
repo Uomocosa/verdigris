@@ -58,6 +58,10 @@ pub enum Change {
         question: rules::Question,
         answer: rules::Answer,
     },
+    Waive(rules::ClauseKey),
+    Restrict(rules::RuleId, rules::Predicate),
+    Demand(rules::RuleId),
+    Skip(rules::StepId),
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

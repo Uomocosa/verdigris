@@ -4,6 +4,7 @@ use derive_more::Deref;
 use crate::abilities;
 use crate::effects;
 use crate::keywords;
+use crate::rules;
 use crate::rules::traits::rule_question::RuleQuestion;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deref)]
@@ -37,6 +38,22 @@ impl All {
 
     #[must_use]
     pub fn rule<Q: RuleQuestion>(self, answer: Q::Answer) -> abilities::Continuous {}
+
+    #[must_use]
+    pub fn waive<Ctx>(self, clause: rules::ClauseId<Ctx>) -> abilities::Continuous {}
+
+    #[must_use]
+    pub fn restrict<R: rules::traits::legality_rule::LegalityRule>(
+        self,
+        requirement: rules::Predicate,
+    ) -> abilities::Continuous {
+    }
+
+    #[must_use]
+    pub fn demand<R: rules::traits::legality_rule::LegalityRule>(self) -> abilities::Continuous {}
+
+    #[must_use]
+    pub fn skip(self, step: rules::StepId) -> abilities::Continuous {}
 }
 
 #[cfg(test)]

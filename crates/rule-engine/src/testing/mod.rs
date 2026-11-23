@@ -2,6 +2,8 @@
 mod app;
 #[path = "__basic__/mod.rs"]
 mod basic;
+#[path = "__fakes__/mod.rs"]
+mod fakes;
 #[path = "__fixtures__/mod.rs"]
 mod fixtures;
 
@@ -12,6 +14,7 @@ pub use app::{
     TriggerQuery, ZoneObject, ZoneOwner,
 };
 pub use basic::newtypes::TestCardName;
+pub use fakes::{RestrictedRule, TEST_STEP, TestRule, UNTAPPED};
 pub use fixtures::{
     ALWAYS_WATCHING, BLADEBRAND, BORDERLAND_MARAUDER, CANCEL, CARESS_OF_PHYREXIA, CHILD_OF_NIGHT,
     DARKSTEEL_MYR, DEMYSTIFY, DISFIGURE, DISPEL, DIVINATION, DOOM_BLADE, ENDLESS_ONE,
