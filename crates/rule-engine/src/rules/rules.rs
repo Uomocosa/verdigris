@@ -30,6 +30,20 @@ impl Rules<'_, '_> {
         other: Option<Entity>,
     ) -> bool {
     }
+
+    #[must_use]
+    pub fn legal<R: rules::traits::legality_rule::LegalityRule>(&self, context: &R::Ctx) -> bool {}
+
+    #[must_use]
+    pub fn performs(&self, entity: Entity, step: rules::StepId) -> bool {}
+
+    #[must_use]
+    pub fn demanded<R: rules::traits::legality_rule::LegalityRule>(&self, entity: Entity) -> bool {}
+}
+
+#[atomic_delegates]
+impl Rules<'_, '_> {
+    pub(crate) fn mods<'a>(&'a self, entity: Entity) -> impl Iterator<Item = &'a effects::Change> {}
 }
 
 #[cfg(test)]
