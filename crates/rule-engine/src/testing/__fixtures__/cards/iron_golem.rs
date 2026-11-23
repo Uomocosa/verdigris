@@ -46,7 +46,7 @@ mod tests {
             vec![keywords::StaticKeyword::Vigilance]
         );
         assert_eq!(
-            golem.continuous_abilities().copied().collect::<Vec<_>>(),
+            golem.continuous_abilities().cloned().collect::<Vec<_>>(),
             [
                 abilities::Continuous {
                     filter: effects::Filter {

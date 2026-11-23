@@ -36,7 +36,7 @@ mod tests {
         assert_eq!(cover.cost, cost![2, W]);
         assert_eq!(cover.colors(), vec![cards::Color::White]);
         assert_eq!(
-            cover.continuous_abilities().copied().collect::<Vec<_>>(),
+            cover.continuous_abilities().cloned().collect::<Vec<_>>(),
             [abilities::Continuous {
                 filter: CREATURE.controlled_by(YOU).attacking(),
                 change: effects::Change::Rule {

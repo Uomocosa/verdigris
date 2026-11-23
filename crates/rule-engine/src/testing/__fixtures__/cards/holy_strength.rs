@@ -46,7 +46,7 @@ mod tests {
             vec![keywords::StaticKeyword::Enchant(CREATURE)]
         );
         assert_eq!(
-            strength.continuous_abilities().copied().collect::<Vec<_>>(),
+            strength.continuous_abilities().cloned().collect::<Vec<_>>(),
             [abilities::Continuous {
                 filter: effects::Filter {
                     object: Some(effects::ObjectRelation::EnchantedObject),

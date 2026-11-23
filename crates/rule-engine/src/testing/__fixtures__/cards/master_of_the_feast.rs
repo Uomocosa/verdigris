@@ -55,7 +55,7 @@ mod tests {
             vec![keywords::StaticKeyword::Flying]
         );
         assert_eq!(
-            feast.continuous_abilities().copied().collect::<Vec<_>>(),
+            feast.continuous_abilities().cloned().collect::<Vec<_>>(),
             [abilities::Continuous {
                 filter: effects::Filter {
                     object: Some(effects::ObjectRelation::ThisObject),

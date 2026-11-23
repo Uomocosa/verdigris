@@ -6,14 +6,14 @@ pub fn with_effects(
     effects: &[effects::ContinuousEffect],
 ) -> cards::Characteristics {
     for effect in effects {
-        if let effects::Change::Characteristic(change) = effect.change {
+        if let effects::Change::Characteristic(change) = &effect.change {
             if let effects::Layered::GainKeyword(keyword) = change
-                && !characteristics.keywords.contains(&keyword)
+                && !characteristics.keywords.contains(keyword)
             {
-                characteristics.keywords.push(keyword);
+                characteristics.keywords.push(*keyword);
             }
             if let effects::Layered::LoseKeyword(keyword) = change {
-                characteristics.keywords.retain(|kept| *kept != keyword);
+                characteristics.keywords.retain(|kept| kept != keyword);
             }
         }
     }
@@ -26,10 +26,10 @@ pub fn with_effects(
         if let effects::Change::Characteristic(effects::Layered::ModifyPT {
             power: delta_power,
             toughness: delta_toughness,
-        }) = effect.change
+        }) = &effect.change
         {
-            power = power.saturating_add(delta_power);
-            toughness = toughness.saturating_add(delta_toughness);
+            power = power.saturating_add(*delta_power);
+            toughness = toughness.saturating_add(*delta_toughness);
         }
     }
     characteristics.power_toughness = Some(cards::PowerToughness { power, toughness });
@@ -69,7 +69,7 @@ mod tests {
             timestamp: 0,
         };
         assert_eq!(
-            with_effects(from_printed_value.clone(), &[effect]).power_toughness,
+            with_effects(from_printed_value.clone(), std::slice::from_ref(&effect)).power_toughness,
             Some(cards::PowerToughness {
                 power: 3,
                 toughness: 5
@@ -79,7 +79,7 @@ mod tests {
         assert_eq!(
             with_effects(
                 cards::Characteristics::from_printed(&spell, true),
-                &[effect]
+                std::slice::from_ref(&effect)
             )
             .power_toughness,
             None

@@ -8,7 +8,7 @@ pub struct TriggeredAbility {
     pub effect: effects::Effect,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Continuous {
     pub filter: effects::Filter,
     pub change: effects::Change,

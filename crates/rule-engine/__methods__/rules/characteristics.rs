@@ -6,7 +6,7 @@ use crate::rules;
 
 pub fn characteristics(answers: &rules::Rules, entity: Entity) -> cards::Characteristics {
     let mut applicable: Vec<effects::ContinuousEffect> =
-        answers.effects.iter().filter(|effect| effect.affected == entity).copied().collect();
+        answers.effects.iter().filter(|effect| effect.affected == entity).cloned().collect();
     applicable.sort_by_key(|effect| effect.timestamp);
     answers
         .definitions

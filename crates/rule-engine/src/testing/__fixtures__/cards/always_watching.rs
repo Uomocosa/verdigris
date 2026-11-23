@@ -38,7 +38,7 @@ mod tests {
         assert_eq!(watching.cost, cost![1, W, W]);
         assert_eq!(watching.colors(), vec![cards::Color::White]);
         assert_eq!(
-            watching.continuous_abilities().copied().collect::<Vec<_>>(),
+            watching.continuous_abilities().cloned().collect::<Vec<_>>(),
             [
                 abilities::Continuous {
                     filter: CREATURE.controlled_by(YOU).nontoken(),

@@ -35,7 +35,7 @@ mod tests {
             [
                 abilities::Ability::from(keywords::vigilance()),
                 abilities::Ability::from(triggered),
-                abilities::Ability::from(static_ability),
+                abilities::Ability::from(static_ability.clone()),
             ],
         );
         assert_eq!(
@@ -47,7 +47,7 @@ mod tests {
             [triggered]
         );
         assert_eq!(
-            definition.continuous_abilities().copied().collect::<Vec<_>>(),
+            definition.continuous_abilities().cloned().collect::<Vec<_>>(),
             [static_ability]
         );
     }

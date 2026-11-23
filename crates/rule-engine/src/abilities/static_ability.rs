@@ -1,7 +1,7 @@
 use crate::abilities;
 use crate::keywords;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum StaticAbility {
     Keyword(keywords::StaticKeyword),
     Continuous(abilities::Continuous),

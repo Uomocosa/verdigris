@@ -4,7 +4,7 @@ use crate::abilities;
 use crate::effects;
 use crate::keywords;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, From)]
+#[derive(Debug, Clone, PartialEq, Eq, From)]
 pub enum Ability {
     Spell(effects::Effect),
     Triggered(abilities::TriggeredAbility),

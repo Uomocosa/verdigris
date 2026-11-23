@@ -6,16 +6,16 @@ use crate::rules::traits::rule_question::RuleQuestion;
 
 pub fn ask<Q: RuleQuestion>(answers: &rules::Rules, entity: Entity) -> Q::Answer {
     let mut applicable: Vec<effects::ContinuousEffect> =
-        answers.effects.iter().filter(|effect| effect.affected == entity).copied().collect();
+        answers.effects.iter().filter(|effect| effect.affected == entity).cloned().collect();
     applicable.sort_by_key(|effect| effect.timestamp);
     let characteristics = answers.characteristics(entity);
     applicable
         .iter()
         .filter_map(|effect| {
-            if let effects::Change::Rule { question, answer } = effect.change
-                && question == Q::QUESTION
+            if let effects::Change::Rule { question, answer } = &effect.change
+                && *question == Q::QUESTION
             {
-                Q::from_answer(answer)
+                Q::from_answer(*answer)
             } else {
                 None
             }

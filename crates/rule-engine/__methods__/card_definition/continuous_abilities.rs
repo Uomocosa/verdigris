@@ -28,9 +28,9 @@ mod tests {
     fn test_usage() {
         let continuous = statics::all(CREATURE).gain(keywords::vigilance());
         let definition = cards::creature("Grizzly Bears", cost![1, G], pt!(2, 2))
-            .abilities([abilities::Ability::from(continuous)]);
+            .abilities([abilities::Ability::from(continuous.clone())]);
         assert_eq!(
-            continuous_abilities(&definition).copied().collect::<Vec<_>>(),
+            continuous_abilities(&definition).cloned().collect::<Vec<_>>(),
             [continuous]
         );
     }

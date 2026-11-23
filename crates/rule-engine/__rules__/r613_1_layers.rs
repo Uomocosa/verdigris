@@ -40,7 +40,7 @@ pub fn r613_1_layers(
     for (card, definition, in_zone, current) in cards.iter() {
         let on_battlefield = zones.contains(BATTLEFIELD, **in_zone);
         let mut applicable: Vec<effects::ContinuousEffect> =
-            locked.iter().filter(|effect| effect.affected == card).copied().collect();
+            locked.iter().filter(|effect| effect.affected == card).cloned().collect();
         applicable.sort_by_key(|effect| effect.timestamp);
         let characteristics = cards::Characteristics::from_printed(definition, on_battlefield)
             .with_effects(&applicable);

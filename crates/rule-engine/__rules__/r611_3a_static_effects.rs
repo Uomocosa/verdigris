@@ -130,13 +130,13 @@ pub fn r611_3a_static_effects(
                 ) {
                     continue;
                 }
-                if already_applied(&applied, source, candidate, ability.change) {
+                if already_applied(&applied, source, candidate, &ability.change) {
                     continue;
                 }
                 commands.spawn(effects::ContinuousEffect {
                     affected: candidate,
                     source: Some(source),
-                    change: ability.change,
+                    change: ability.change.clone(),
                     until: effects::Duration::WhileSourceOnBattlefield,
                     timestamp: stamp,
                 });
@@ -198,12 +198,12 @@ fn already_applied(
     applied: &Query<(Entity, &effects::ContinuousEffect)>,
     source: Entity,
     affected: Entity,
-    change: effects::Change,
+    change: &effects::Change,
 ) -> bool {
     applied.iter().any(|(_, effect)| {
         effect.source == Some(source)
             && effect.affected == affected
-            && effect.change == change
+            && &effect.change == change
             && effect.until == effects::Duration::WhileSourceOnBattlefield
     })
 }

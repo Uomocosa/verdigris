@@ -36,7 +36,7 @@ mod tests {
         assert_eq!(weight.cost, cost![2, U]);
         assert_eq!(weight.colors(), vec![cards::Color::Blue]);
         assert_eq!(
-            weight.continuous_abilities().copied().collect::<Vec<_>>(),
+            weight.continuous_abilities().cloned().collect::<Vec<_>>(),
             [abilities::Continuous {
                 filter: CREATURE.controlled_by(OPPONENT),
                 change: effects::Change::Rule {

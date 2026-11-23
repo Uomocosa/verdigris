@@ -37,7 +37,7 @@ mod tests {
         assert_eq!(mist.cost, cost![1, G]);
         assert_eq!(mist.colors(), vec![cards::Color::Green]);
         assert_eq!(
-            mist.continuous_abilities().copied().collect::<Vec<_>>(),
+            mist.continuous_abilities().cloned().collect::<Vec<_>>(),
             [abilities::Continuous {
                 filter: CREATURE.controlled_by(OPPONENT),
                 change: effects::Change::Characteristic(effects::Layered::LoseKeyword(

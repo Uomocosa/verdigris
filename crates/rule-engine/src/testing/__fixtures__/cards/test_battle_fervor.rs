@@ -36,7 +36,7 @@ mod tests {
         assert_eq!(fervor.cost, cost![1, R]);
         assert_eq!(fervor.colors(), vec![cards::Color::Red]);
         assert_eq!(
-            fervor.continuous_abilities().copied().collect::<Vec<_>>(),
+            fervor.continuous_abilities().cloned().collect::<Vec<_>>(),
             [abilities::Continuous {
                 filter: CREATURE.controlled_by(YOU),
                 change: effects::Change::Rule {

@@ -3,7 +3,7 @@ use derive_more::Deref;
 
 use crate::effects;
 
-#[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Component, Debug, Clone, PartialEq, Eq)]
 pub struct ContinuousEffect {
     pub affected: Entity,
     pub source: Option<Entity>,
