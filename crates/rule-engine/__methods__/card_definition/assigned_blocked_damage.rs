@@ -28,15 +28,16 @@ pub fn assigned_blocked_damage(
         if **blocking != source {
             continue;
         }
+        let lethal = effective
+            .map(|power_toughness| **power_toughness)
+            .map_or(0, |power_toughness| {
+                u32::try_from(power_toughness.toughness).unwrap_or_default()
+            })
+            .saturating_sub(marked.map_or(0, |damage| **damage));
         let lethal = if source_has_deathtouch {
-            1
+            lethal.min(1)
         } else {
-            effective
-                .map(|power_toughness| **power_toughness)
-                .map_or(0, |power_toughness| {
-                    u32::try_from(power_toughness.toughness).unwrap_or_default()
-                })
-                .saturating_sub(marked.map_or(0, |damage| **damage))
+            lethal
         };
         blockers_of.push((blocker, lethal));
         if !participants.contains(&blocker) {
