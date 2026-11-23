@@ -1,12 +1,13 @@
-use bevy::prelude::{Entity, MessageWriter, Query, With};
+use bevy::prelude::{Commands, Entity, Query, ResMut, With};
 
+use crate::StateBasedActionsPerformed;
 use crate::players;
-use crate::rules;
 
 /// 104.2a A player still in the game wins the game if that player’s opponents have all left the game. This
 /// happens immediately and overrides all effects that would preclude that player from winning the game.
 pub fn r104_2a_wins_when_opponents_left(
-    mut wins: MessageWriter<rules::Would<rules::WinGame>>,
+    mut commands: Commands,
+    mut state_based_actions_performed: ResMut<StateBasedActionsPerformed>,
     players: Query<(Entity, Option<&players::Lost>), With<players::Player>>,
     won: Query<Entity, With<players::Won>>,
 ) {
@@ -20,13 +21,25 @@ pub fn r104_2a_wins_when_opponents_left(
         return;
     };
     if won.get(*winner).is_err() {
-        wins.write(rules::Would(rules::WinGame(*winner)));
+        commands.entity(*winner).insert(players::Won);
+        **state_based_actions_performed = true;
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use crate::actions;
     use crate::testing::*;
+
+    #[test]
+    fn r104_2a_sole_survivor_wins_despite_cant_win_effect() {
+        let (mut game, [p1, p2]) = MockGame::new([P1.battlefield([PLATINUM_ANGEL]), P2]);
+
+        game.act(p1, actions::Action::Concede);
+
+        assert!(game.has_lost(p1));
+        assert!(game.has_won(p2));
+    }
 
     #[test]
     fn last_player_wins_when_their_opponent_has_left() -> TestResult {
