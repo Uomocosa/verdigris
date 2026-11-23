@@ -14,6 +14,7 @@ pub mod combat_damage_choice;
 pub mod declare_attacker;
 pub mod declare_blocker;
 pub mod effect;
+pub mod event_template;
 #[cfg(feature = "testing")]
 pub mod expected_targets;
 pub mod filter;

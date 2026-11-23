@@ -4,6 +4,7 @@ use bevy::prelude::{App, IntoScheduleConfigs, Update};
 use crate::RuleSet;
 use crate::StateBasedActions;
 use crate::comprehensive_rules;
+use crate::rules;
 
 pub fn add_state_based_systems(app: &mut App) {
     app.add_systems(
@@ -28,7 +29,18 @@ pub fn add_state_based_systems(app: &mut App) {
                 comprehensive_rules::r704_5c_poison::r704_5c_poison,
                 comprehensive_rules::r104_2a_wins_when_opponents_left::r104_2a_wins_when_opponents_left,
                 comprehensive_rules::r104_4a_draw::r104_4a_draw,
-                comprehensive_rules::r614_1a_r616_1_replacement_effects::r614_1a_r616_1_replacement_effects,
+                comprehensive_rules::r614_1a_r616_1_replacement_effects::r614_1a_r616_1_replacement_effects::<
+                    rules::DrawFromEmptyLibrary,
+                >,
+                comprehensive_rules::r614_1a_r616_1_replacement_effects::r614_1a_r616_1_replacement_effects::<
+                    rules::LoseGame,
+                >,
+                comprehensive_rules::r614_1a_r616_1_replacement_effects::r614_1a_r616_1_replacement_effects::<
+                    rules::WinGame,
+                >,
+                comprehensive_rules::r121_4_draw_from_empty_library::r121_4_draw_from_empty_library,
+                comprehensive_rules::r104_3_lose_the_game::r104_3_lose_the_game,
+                comprehensive_rules::r104_2_win_the_game::r104_2_win_the_game,
             )
                 .chain(),
         )
@@ -65,7 +77,7 @@ mod tests {
         assert_eq!(app.get_schedule(Update).map(Schedule::systems_len), Some(6));
         assert_eq!(
             app.get_schedule(StateBasedActions).map(Schedule::systems_len),
-            Some(16)
+            Some(21)
         );
     }
 }

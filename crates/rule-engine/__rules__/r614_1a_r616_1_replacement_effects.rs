@@ -1,14 +1,8 @@
-use bevy::prelude::{Commands, MessageReader, MessageWriter, ParamSet, ResMut};
+use bevy::prelude::{Commands, MessageReader, MessageWriter, ResMut};
 
 use crate::StateBasedActionsPerformed;
-use crate::players;
 use crate::rules;
 use crate::rules::traits::event::Event;
-
-type WinMessages<'reader_w, 'reader_s, 'writer> = (
-    MessageReader<'reader_w, 'reader_s, rules::Would<rules::WinGame>>,
-    MessageWriter<'writer, rules::Would<rules::WinGame>>,
-);
 
 /// 614.1a Effects that use the word “instead” are replacement effects. Most replacement effects use the word “instead” to indicate what events will be replaced with other events.
 ///
@@ -23,39 +17,28 @@ type WinMessages<'reader_w, 'reader_s, 'writer> = (
 /// When several replacements could apply to the same event, CR 616.1 lets the affected player
 /// choose one. This system applies the earliest-timestamped `Instead` instead; player choice
 /// between several replacements is out of scope.
-pub fn r614_1a_r616_1_replacement_effects(
-    mut attempted: MessageReader<rules::Would<rules::DrawFromEmptyLibrary>>,
-    mut losses: MessageReader<rules::Would<rules::LoseGame>>,
-    mut wins: ParamSet<WinMessages<'_, '_, '_>>,
+pub fn r614_1a_r616_1_replacement_effects<E: Event>(
+    mut incoming: MessageReader<rules::Would<E>>,
+    mut proceeds: MessageWriter<rules::Proceeds<E>>,
     mut commands: Commands,
     mut state_based_actions_performed: ResMut<StateBasedActionsPerformed>,
     answers: rules::Rules,
 ) {
-    for would in attempted.read() {
-        let rules::Would(event) = would;
-        match answers.replacement(**event, rules::DrawFromEmptyLibrary::ID) {
-            Some(rules::Outcome::WinTheGame) => {
-                wins.p1().write(rules::Would(rules::WinGame(**event)));
+    for would in incoming.read() {
+        let event = &**would;
+        if !answers.legal(event) {
+            continue;
+        }
+        match answers.replacement(event) {
+            Some(then) => {
+                for template in then {
+                    template.instantiate(event).announce(&mut commands);
+                }
                 **state_based_actions_performed = true;
             }
             None => {
-                commands.entity(**event).insert(players::AttemptedDrawFromEmptyLibrary);
-                **state_based_actions_performed = true;
+                proceeds.write(rules::Proceeds(event.clone()));
             }
-        }
-    }
-    for would in losses.read() {
-        let rules::Would(event) = would;
-        if answers.legal(event) {
-            commands.entity(**event).insert(players::Lost);
-            **state_based_actions_performed = true;
-        }
-    }
-    for would in wins.p0().read() {
-        let rules::Would(event) = would;
-        if answers.legal(event) {
-            commands.entity(**event).insert(players::Won);
-            **state_based_actions_performed = true;
         }
     }
 }

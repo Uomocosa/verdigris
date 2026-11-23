@@ -1,8 +1,8 @@
 #[path = "__basic__/mod.rs"]
 mod basic;
 
-pub use basic::enums::{Change, Characteristic, Comparison, Legality, Outcome, Role, Target};
-pub use basic::messages::Would;
+pub use basic::enums::{Change, Characteristic, Comparison, Legality, Role, Target};
+pub use basic::messages::{Proceeds, Would};
 pub use basic::newtypes::{ActionId, ClauseKey, ComponentKey, EventId, RuleId};
 pub use basic::predicate_builders::{
     active_player, at_least, at_most, card_type, equal_to, has, has_priority, in_zone, main_phase,
@@ -16,6 +16,12 @@ pub mod traits;
 
 pub mod cast_spell;
 pub use cast_spell::CastSpell;
+
+mod any_event;
+pub use any_event::AnyEvent;
+
+mod event_template;
+pub use event_template::EventTemplate;
 
 mod lose_game;
 pub use lose_game::LoseGame;

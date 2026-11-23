@@ -1,15 +1,18 @@
-use bevy::prelude::Entity;
-
 use crate::rules;
+use crate::rules::traits::event::Event;
 
-pub fn replacement(
+pub fn replacement<E: Event>(
     answers: &rules::Rules,
-    affected: Entity,
-    event: rules::EventId,
-) -> Option<rules::Outcome> {
-    answers.changes(affected, rules::Target::Event(event)).into_iter().find_map(|change| {
+    event: &E,
+) -> Option<Vec<rules::EventTemplate>> {
+    let affected = event.player();
+    let subject = event.subject();
+    let other = event.other();
+    answers.changes(affected, rules::Target::Event(E::ID)).into_iter().find_map(|change| {
         match change {
-            rules::Change::Instead(outcome) => Some(outcome),
+            rules::Change::Instead { when, then } => {
+                answers.eval(&when, subject, other, Some(affected)).then_some(then)
+            }
             _ => None,
         }
     })
@@ -22,7 +25,6 @@ mod tests {
 
     use crate::BATTLEFIELD;
     use crate::rules;
-    use crate::rules::traits::event::Event;
     use crate::testing::*;
 
     use super::replacement;
@@ -38,10 +40,12 @@ mod tests {
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
                 assert_eq!(
-                    replacement(&answers, player, rules::DrawFromEmptyLibrary::ID),
-                    Some(rules::Outcome::WinTheGame)
+                    replacement(&answers, &rules::DrawFromEmptyLibrary(player)),
+                    Some(vec![rules::EventTemplate::WinGame {
+                        who: rules::Role::Player,
+                    }])
                 );
-                assert_eq!(replacement(&answers, player, rules::LoseGame::ID), None);
+                assert_eq!(replacement(&answers, &rules::LoseGame(player)), None);
             })
             .unwrap();
         Ok(())

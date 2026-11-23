@@ -1,6 +1,8 @@
 pub mod r103_6_r103_6a_opening_hand_actions;
 pub mod r103_8a_r504_1_draw_step;
+pub mod r104_2_win_the_game;
 pub mod r104_2a_wins_when_opponents_left;
+pub mod r104_3_lose_the_game;
 pub mod r104_3a_concede;
 pub mod r104_4a_draw;
 pub mod r106_4_mana_empties;
@@ -12,6 +14,7 @@ pub mod r119_3_life_loss;
 pub mod r119_4_pay_life;
 pub mod r120_3_r120_3a_r120_3b_r120_3e_damage_results;
 pub mod r121_1_r121_2_draw;
+pub mod r121_4_draw_from_empty_library;
 pub mod r302_6_summoning_sickness;
 pub mod r305_1_r305_2_r305_3_play_land;
 pub mod r305_6_basic_land_mana_ability;

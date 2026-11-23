@@ -18,7 +18,10 @@ pub const LABORATORY_MANIAC: testing::Card = testing::Card {
                 .subtype(cards::CreatureType::Wizard.into());
             statics::all(PLAYER.controlled_by(YOU)).instead(
                 rules::DrawFromEmptyLibrary::ID,
-                rules::Outcome::WinTheGame,
+                rules::Predicate::True,
+                vec![rules::EventTemplate::WinGame {
+                    who: rules::Role::Player,
+                }],
             ),
         }
     },
@@ -58,7 +61,12 @@ mod tests {
                 filter: PLAYER.controlled_by(YOU),
                 modification: effects::Modification::Rule(rules::RuleChange {
                     target: rules::Target::Event(rules::DrawFromEmptyLibrary::ID),
-                    change: rules::Change::Instead(rules::Outcome::WinTheGame),
+                    change: rules::Change::Instead {
+                        when: rules::Predicate::True,
+                        then: vec![rules::EventTemplate::WinGame {
+                            who: rules::Role::Player,
+                        }],
+                    },
                 }),
             }]
         );

@@ -43,7 +43,11 @@ impl Rules<'_, '_> {
     pub fn performs(&self, entity: Entity, step: rules::ActionId) -> bool {}
 
     #[must_use]
-    pub fn replacement(&self, affected: Entity, event: rules::EventId) -> Option<rules::Outcome> {}
+    pub fn replacement<E: rules::traits::event::Event>(
+        &self,
+        event: &E,
+    ) -> Option<Vec<rules::EventTemplate>> {
+    }
 
     #[must_use]
     pub fn changes(&self, entity: Entity, target: rules::Target) -> Vec<rules::Change> {}

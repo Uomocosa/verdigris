@@ -41,16 +41,14 @@ pub enum Change {
     Increase(u32),
     Decrease(u32),
     NoMaximum,
-    Instead(rules::Outcome),
+    Instead {
+        when: rules::Predicate,
+        then: Vec<rules::EventTemplate>,
+    },
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Legality {
     Legal,
     Illegal,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum Outcome {
-    WinTheGame,
 }
