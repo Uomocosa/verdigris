@@ -1,0 +1,114 @@
+use atomic_delegate_macros::atomic_delegate;
+
+use crate::rules;
+use crate::rules::traits::legality_rule::LegalityRule;
+
+pub const PRIORITY: rules::ClauseId<rules::PlayLandCtx> = rules::ClauseId::new("305.1/priority");
+pub const FROM_HAND: rules::ClauseId<rules::PlayLandCtx> = rules::ClauseId::new("305.1/from-hand");
+pub const LAND_CARD: rules::ClauseId<rules::PlayLandCtx> = rules::ClauseId::new("305.1/land-card");
+pub const MAIN_PHASE: rules::ClauseId<rules::PlayLandCtx> =
+    rules::ClauseId::new("305.1/main-phase");
+pub const EMPTY_STACK: rules::ClauseId<rules::PlayLandCtx> =
+    rules::ClauseId::new("305.1/empty-stack");
+pub const OWNS: rules::ClauseId<rules::PlayLandCtx> = rules::ClauseId::new("305.1/owns");
+pub const OWN_TURN: rules::ClauseId<rules::PlayLandCtx> = rules::ClauseId::new("305.3/own-turn");
+
+pub struct PlayLand;
+
+impl LegalityRule for PlayLand {
+    type Ctx = rules::PlayLandCtx;
+    const ID: rules::RuleId = rules::RuleId("305.1");
+
+    #[atomic_delegate(PlayLand, LegalityRule)]
+    fn clauses() -> Vec<rules::Clause> {}
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::HAND;
+    use crate::cards;
+    use crate::rules;
+    use crate::rules::traits::legality_rule::LegalityRule;
+
+    use super::EMPTY_STACK;
+    use super::FROM_HAND;
+    use super::LAND_CARD;
+    use super::MAIN_PHASE;
+    use super::OWN_TURN;
+    use super::OWNS;
+    use super::PRIORITY;
+    use super::PlayLand;
+
+    #[test]
+    fn test_usage() {
+        assert_eq!(PlayLand::ID, rules::RuleId("305.1"));
+        let clauses = PlayLand::clauses();
+        assert_eq!(clauses.len(), 7);
+        assert_eq!(clauses[0].key, PRIORITY.key);
+        assert_eq!(clauses[0].text, "A player who has priority");
+        assert_eq!(clauses[0].role, rules::Role::Player);
+        assert_eq!(
+            clauses[0].condition,
+            rules::has_priority(rules::Role::Player)
+        );
+        assert_eq!(clauses[1].key, LAND_CARD.key);
+        assert_eq!(clauses[1].text, "a land card");
+        assert_eq!(clauses[1].role, rules::Role::Subject);
+        assert_eq!(
+            clauses[1].condition,
+            rules::card_type(cards::CardType::Land)
+        );
+        assert_eq!(clauses[2].key, FROM_HAND.key);
+        assert_eq!(clauses[2].text, "from their hand");
+        assert_eq!(clauses[2].role, rules::Role::Player);
+        assert_eq!(
+            clauses[2].condition,
+            rules::in_zone(HAND, rules::Role::Player)
+        );
+        assert_eq!(clauses[3].key, MAIN_PHASE.key);
+        assert_eq!(clauses[3].text, "during a main phase of their turn");
+        assert_eq!(clauses[3].role, rules::Role::Player);
+        assert_eq!(clauses[3].condition, rules::main_phase());
+        assert_eq!(clauses[4].key, EMPTY_STACK.key);
+        assert_eq!(clauses[4].text, "when the stack is empty");
+        assert_eq!(clauses[4].role, rules::Role::Player);
+        assert_eq!(clauses[4].condition, rules::stack_empty());
+        assert_eq!(clauses[5].key, OWNS.key);
+        assert_eq!(clauses[5].text, "their hand");
+        assert_eq!(clauses[5].role, rules::Role::Subject);
+        assert_eq!(
+            clauses[5].condition,
+            rules::points_to::<cards::Owner>(rules::Role::Player)
+        );
+        assert_eq!(clauses[6].key, OWN_TURN.key);
+        assert_eq!(
+            clauses[6].text,
+            "A player can’t play a land, for any reason, if it isn’t their turn."
+        );
+        assert_eq!(clauses[6].role, rules::Role::Player);
+        assert_eq!(
+            clauses[6].condition,
+            rules::active_player(rules::Role::Player)
+        );
+        assert!(clauses[6].absolute);
+        assert!(
+            PlayLand::clauses()
+                .iter()
+                .filter(|clause| clause.key != OWN_TURN.key)
+                .all(|clause| !clause.absolute)
+        );
+    }
+
+    #[test]
+    fn clause_texts_occur_verbatim_in_comprehensive_rules() {
+        const RULES_TEXT: &str = include_str!("../../../../docs/MagicCompRules-20250919.txt");
+        for clause in PlayLand::clauses() {
+            assert!(
+                RULES_TEXT.contains(clause.text),
+                "clause {:?} text not found verbatim in Comprehensive Rules: {:?}",
+                clause.key,
+                clause.text
+            );
+        }
+    }
+}

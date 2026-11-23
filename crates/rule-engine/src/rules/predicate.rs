@@ -1,3 +1,4 @@
+use crate::cards;
 use crate::rules;
 use crate::turns;
 use crate::zones;
@@ -6,6 +7,7 @@ use crate::zones;
 pub enum Predicate {
     Has(rules::ComponentKey),
     PointsTo(rules::ComponentKey, rules::Role),
+    CardType(cards::CardType),
     Characteristic(rules::Characteristic, rules::Comparison, i32),
     Of(rules::Role, Box<Self>),
     All(Vec<Self>),

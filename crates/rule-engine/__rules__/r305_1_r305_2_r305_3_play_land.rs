@@ -1,11 +1,10 @@
-use bevy::prelude::{Commands, MessageReader, MessageWriter, Query, Res};
+use bevy::prelude::{Commands, MessageReader, MessageWriter, Res};
 
 use crate::BATTLEFIELD;
-use crate::HAND;
-use crate::STACK;
 use crate::actions;
 use crate::cards;
 use crate::players;
+use crate::rules;
 use crate::turns;
 use crate::zones;
 
@@ -32,48 +31,32 @@ pub fn r305_1_r305_2_r305_3_play_land(
     mut rejected: MessageWriter<actions::Rejected>,
     mut entered: MessageWriter<cards::Entered>,
     mut commands: Commands,
-    priority: Res<turns::Priority>,
     turn: Res<turns::Turn>,
-    lands: Query<(&cards::CardDefinition, &cards::Owner, &zones::InZone)>,
-    zones: zones::ZoneLookup,
-    mut played: Query<&mut players::LandsPlayedThisTurn>,
+    answers: rules::Rules,
 ) {
-    let priority = priority.into_inner();
     let turn = turn.into_inner();
     for action in actions.read() {
         let actions::Action::PlayLand(land) = &action.action else {
             continue;
         };
         let land = *land;
-        let Ok((definition, owner, in_zone)) = lands.get(land) else {
-            rejected.write(actions::Rejected::CannotPlayLand { land });
-            continue;
-        };
-        let Some(hand) = zones.find(HAND, Some(action.player)) else {
-            rejected.write(actions::Rejected::CannotPlayLand { land });
-            continue;
-        };
-        let Some(stack) = zones.find(STACK, None) else {
-            rejected.write(actions::Rejected::CannotPlayLand { land });
-            continue;
-        };
-        let is_stack_empty = !lands.iter().any(|(_, _, zone)| **zone == stack);
-        let is_main_phase = matches!(
-            turn.step,
-            turns::Step::PrecombatMain | turns::Step::PostcombatMain
-        );
-        let do_special_action_conditions_hold = action.player == priority.player
-            && **owner == action.player
-            && **in_zone == hand
-            && definition.type_line.types.contains(&cards::CardType::Land)
-            && is_stack_empty
-            && is_main_phase
-            && turn.active == action.player;
-        if !do_special_action_conditions_hold {
+        let is_legal = answers.legal::<rules::PlayLand>(&rules::PlayLandCtx {
+            land,
+            player: action.player,
+        });
+        if !is_legal {
             rejected.write(actions::Rejected::CannotPlayLand { land });
             continue;
         }
-        let Ok(mut record) = played.get_mut(action.player) else {
+        let Ok(record) = answers
+            .entities
+            .get(action.player)
+            .map(|entity| entity.get::<players::LandsPlayedThisTurn>().copied())
+        else {
+            rejected.write(actions::Rejected::CannotPlayLand { land });
+            continue;
+        };
+        let Some(mut record) = record else {
             rejected.write(actions::Rejected::CannotPlayLand { land });
             continue;
         };
@@ -82,7 +65,8 @@ pub fn r305_1_r305_2_r305_3_play_land(
             continue;
         }
         record.record_play(turn.number);
-        if let Some(battlefield) = zones.find(BATTLEFIELD, Some(action.player)) {
+        commands.entity(action.player).insert(record);
+        if let Some(battlefield) = answers.zones.find(BATTLEFIELD, Some(action.player)) {
             commands.entity(land).insert(zones::InZone(battlefield));
             entered.write(cards::Entered(land));
         }
@@ -92,9 +76,10 @@ pub fn r305_1_r305_2_r305_3_play_land(
 #[cfg(test)]
 mod tests {
     use crate::actions;
+    use crate::mana;
     use crate::testing::*;
     use crate::turns;
-    use crate::{BATTLEFIELD, HAND};
+    use crate::{BATTLEFIELD, GRAVEYARD, HAND};
 
     #[test]
     fn a_player_plays_a_land_from_their_hand_as_a_special_action() -> TestResult {
@@ -144,6 +129,103 @@ mod tests {
             })
         );
         assert!(game.player(p1).cards_in(HAND).has(forest));
+        Ok(())
+    }
+
+    #[test]
+    fn crucible_of_worlds_lets_a_player_play_a_land_from_their_graveyard() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.battlefield([CRUCIBLE_OF_WORLDS]).hand([MIND_ROT, FOREST]).mana_pool(mana![2, B]),
+            P2,
+        ]);
+        let [mind_rot] = game.player(p1).cards_in(HAND).exactly::<1>(MIND_ROT)?;
+        let [forest] = game.player(p1).cards_in(HAND).exactly::<1>(FOREST)?;
+
+        game.play([
+            p1.cast(mind_rot).targeting(p1).pass_priority(),
+            p2.pass_priority(),
+            p1.play_land(forest),
+        ])?;
+
+        assert!(game.player(p1).cards_in(BATTLEFIELD).has(forest));
+        assert!(game.last_rejection().is_none());
+        Ok(())
+    }
+
+    #[test]
+    fn a_land_in_the_graveyard_cannot_be_played_without_crucible_of_worlds() -> TestResult {
+        let (mut game, [p1, p2]) =
+            MockGame::new([P1.hand([MIND_ROT, FOREST]).mana_pool(mana![2, B]), P2]);
+        let [mind_rot] = game.player(p1).cards_in(HAND).exactly::<1>(MIND_ROT)?;
+        let [forest] = game.player(p1).cards_in(HAND).exactly::<1>(FOREST)?;
+
+        game.play([
+            p1.cast(mind_rot).targeting(p1).pass_priority(),
+            p2.pass_priority(),
+        ])?;
+        assert!(game.player(p1).cards_in(GRAVEYARD).has(forest));
+
+        game.act(p1, actions::Action::PlayLand(forest.into()));
+
+        assert_eq!(
+            game.last_rejection(),
+            Some(&actions::Rejected::CannotPlayLand {
+                land: forest.into()
+            })
+        );
+        assert!(game.player(p1).cards_in(GRAVEYARD).has(forest));
+        Ok(())
+    }
+
+    #[test]
+    fn crucible_of_worlds_does_not_let_a_player_play_a_land_from_an_opponents_graveyard()
+    -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.battlefield([CRUCIBLE_OF_WORLDS]).hand([MIND_ROT]).mana_pool(mana![2, B]),
+            P2.hand([FOREST]),
+        ]);
+        let [mind_rot] = game.player(p1).cards_in(HAND).exactly::<1>(MIND_ROT)?;
+        let [forest] = game.player(p2).cards_in(HAND).exactly::<1>(FOREST)?;
+
+        game.play([
+            p1.cast(mind_rot).targeting(p2).pass_priority(),
+            p2.pass_priority(),
+        ])?;
+        assert!(game.player(p2).cards_in(GRAVEYARD).has(forest));
+
+        game.act(p1, actions::Action::PlayLand(forest.into()));
+
+        assert_eq!(
+            game.last_rejection(),
+            Some(&actions::Rejected::CannotPlayLand {
+                land: forest.into()
+            })
+        );
+        assert!(game.player(p2).cards_in(GRAVEYARD).has(forest));
+        Ok(())
+    }
+
+    #[test]
+    fn crucible_of_worlds_does_not_let_a_player_play_a_land_on_an_opponents_turn() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.battlefield([CRUCIBLE_OF_WORLDS]).hand([MIND_ROT, FOREST]).mana_pool(mana![2, B]),
+            P2,
+        ]);
+        let [mind_rot] = game.player(p1).cards_in(HAND).exactly::<1>(MIND_ROT)?;
+        let [forest] = game.player(p1).cards_in(HAND).exactly::<1>(FOREST)?;
+
+        game.play([p1.cast(mind_rot).targeting(p1).end_turn(), p2.end_turn()])?;
+        assert!(game.player(p1).cards_in(GRAVEYARD).has(forest));
+
+        game.act(p1, actions::Action::PlayLand(forest.into()));
+
+        assert_eq!(
+            game.last_rejection(),
+            Some(&actions::Rejected::CannotPlayLand {
+                land: forest.into()
+            })
+        );
+        assert!(game.player(p1).cards_in(GRAVEYARD).has(forest));
         Ok(())
     }
 }

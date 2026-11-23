@@ -39,6 +39,10 @@ pub fn eval(
                 })
                 .is_some_and(|found| found == wanted)
         }),
+        rules::Predicate::CardType(card) => answers
+            .definitions
+            .get(subject)
+            .is_ok_and(|definition| definition.type_line.types.contains(card)),
         rules::Predicate::Characteristic(characteristic, comparison, threshold) => answers
             .entities
             .get(subject)
@@ -311,6 +315,25 @@ mod tests {
                     None,
                     Some(p1.into())
                 ));
+            })
+            .unwrap();
+        Ok(())
+    }
+
+    #[test]
+    fn card_type_matches_a_land_and_rejects_a_creature() -> TestResult {
+        let (mut game, [p1, _p2]) = MockGame::new([P1.hand([FOREST, GRIZZLY_BEARS]), P2]);
+        let [forest] = game.player(p1).cards_in(HAND).exactly::<1>(FOREST)?;
+        let [bears] = game.player(p1).cards_in(HAND).exactly::<1>(GRIZZLY_BEARS)?;
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                let is_land = rules::card_type(cards::CardType::Land);
+                assert!(eval(&answers, &is_land, *forest, None, None));
+                assert!(!eval(&answers, &is_land, *bears, None, None));
+                let is_creature = rules::card_type(cards::CardType::Creature);
+                assert!(!eval(&answers, &is_creature, *forest, None, None));
+                assert!(eval(&answers, &is_creature, *bears, None, None));
             })
             .unwrap();
         Ok(())

@@ -5,6 +5,7 @@ use crate::abilities;
 use crate::effects;
 use crate::keywords;
 use crate::rules;
+use crate::zones;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deref)]
 pub struct All(pub effects::Filter);
@@ -64,6 +65,9 @@ impl All {
 
     #[must_use]
     pub fn perform(self, step: rules::ActionId) -> abilities::Continuous {}
+
+    #[must_use]
+    pub fn play_lands_from(self, zone: zones::Zone) -> abilities::Continuous {}
 }
 
 #[cfg(test)]

@@ -23,6 +23,7 @@ pub mod mock_game;
 pub mod mock_game_builder;
 #[cfg(feature = "testing")]
 pub mod pass_budget;
+pub mod play_land;
 #[cfg(feature = "testing")]
 pub mod restricted_rule;
 pub mod rules;

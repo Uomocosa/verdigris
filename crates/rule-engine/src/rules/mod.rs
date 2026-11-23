@@ -4,8 +4,8 @@ mod basic;
 pub use basic::enums::{Characteristic, Comparison, Legality, Role, RuleChange};
 pub use basic::newtypes::{ActionId, ClauseKey, ComponentKey, RuleId};
 pub use basic::predicate_builders::{
-    active_player, at_least, at_most, equal_to, has, has_priority, in_zone, main_phase, other,
-    points_to, stack_empty, step_is,
+    active_player, at_least, at_most, card_type, equal_to, has, has_priority, in_zone, main_phase,
+    other, points_to, stack_empty, step_is,
 };
 pub use basic::type_aliases::TargetOf;
 
@@ -29,6 +29,12 @@ pub use declare_blocker::DeclareBlocker;
 
 pub mod declare_attacker;
 pub use declare_attacker::DeclareAttacker;
+
+pub mod play_land;
+pub use play_land::PlayLand;
+
+mod play_land_ctx;
+pub use play_land_ctx::PlayLandCtx;
 
 mod predicate;
 pub use predicate::Predicate;

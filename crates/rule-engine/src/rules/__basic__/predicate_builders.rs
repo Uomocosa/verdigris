@@ -1,3 +1,4 @@
+use crate::cards;
 use crate::rules;
 use crate::turns;
 use crate::zones;
@@ -5,6 +6,11 @@ use crate::zones;
 #[must_use]
 pub const fn has<C: rules::traits::keyed_component::KeyedComponent>() -> rules::Predicate {
     rules::Predicate::Has(C::KEY)
+}
+
+#[must_use]
+pub const fn card_type(card: cards::CardType) -> rules::Predicate {
+    rules::Predicate::CardType(card)
 }
 
 #[must_use]
