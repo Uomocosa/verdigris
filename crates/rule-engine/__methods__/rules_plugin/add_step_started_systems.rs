@@ -15,7 +15,11 @@ pub fn add_step_started_systems(app: &mut App) {
     );
     app.add_systems(
         Update,
-        comprehensive_rules::r502_3_untap::r502_3_untap.in_set(RuleSet::StepStarted),
+        (
+            comprehensive_rules::r502_3_untap::r502_3_untap,
+            comprehensive_rules::r302_6_summoning_sickness::r302_6_summoning_sickness,
+        )
+            .in_set(RuleSet::StepStarted),
     );
     app.add_systems(
         Update,
@@ -47,6 +51,6 @@ mod tests {
         let mut app = App::new();
         add_step_started_systems(&mut app);
 
-        assert_eq!(app.get_schedule(Update).map(Schedule::systems_len), Some(7));
+        assert_eq!(app.get_schedule(Update).map(Schedule::systems_len), Some(8));
     }
 }

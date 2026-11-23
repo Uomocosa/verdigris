@@ -15,6 +15,7 @@ pub struct CurrentMarkers<'a> {
     pub flying: Has<cards::Flying>,
     pub reach: Has<cards::Reach>,
     pub vigilance: Has<cards::Vigilance>,
+    pub defender: Has<cards::Defender>,
     pub enters: Option<&'a cards::TriggeredEnters>,
     pub at_step: Option<&'a cards::TriggeredAtStep>,
 }

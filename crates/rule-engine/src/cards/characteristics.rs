@@ -33,6 +33,16 @@ impl Characteristics {
     }
 }
 
+#[atomic_delegates]
+impl Characteristics {
+    pub(crate) fn write_triggered_markers(
+        &self,
+        entity: &mut EntityCommands,
+        current: cards::CurrentMarkersItem<'_, '_, '_>,
+    ) {
+    }
+}
+
 impl Characteristics {
     pub(crate) fn sync_marker<M>(
         entity: &mut EntityCommands,

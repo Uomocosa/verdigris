@@ -1,9 +1,8 @@
-use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query, Res};
+use bevy::prelude::{Commands, Entity, Has, MessageReader, MessageWriter, Query, Res};
 
 use crate::BATTLEFIELD;
 use crate::actions;
 use crate::cards;
-use crate::keywords;
 use crate::rules;
 use crate::turns;
 use crate::zones;
@@ -54,7 +53,7 @@ pub fn r508_1a_r508_1k_declare_attackers(
         &zones::InZone,
         Option<&cards::Tapped>,
     )>,
-    entered_on: Query<Option<&cards::EnteredOnTurn>>,
+    markers: Query<(Has<cards::SummoningSick>, Has<cards::Defender>)>,
     answers: rules::Rules,
     zones: zones::ZoneLookup,
 ) {
@@ -81,35 +80,27 @@ pub fn r508_1a_r508_1k_declare_attackers(
         };
         let all_legal = attackers.iter().all(|attacker| {
             cards.get(*attacker).is_ok_and(|(_, definition, owner, in_zone, tapped)| {
-                definition.type_line.types.contains(&cards::CardType::Creature)
-                    && **owner == action.player
-                    && **in_zone == battlefield
-                    && tapped.is_none()
-                    && !answers
-                        .characteristics(*attacker)
-                        .keywords
-                        .contains(&keywords::StaticKeyword::Defender)
-                    && (answers.ask::<rules::IgnoresSummoningSickness>(*attacker)
-                        || entered_on.get(*attacker).is_ok_and(|on_turn| {
-                            on_turn.is_none_or(|turn_number| **turn_number != turn.number)
-                        }))
+                markers.get(*attacker).is_ok_and(|(sick, defender)| {
+                    definition.type_line.types.contains(&cards::CardType::Creature)
+                        && **owner == action.player
+                        && **in_zone == battlefield
+                        && tapped.is_none()
+                        && !defender
+                        && (!sick || answers.ask::<rules::IgnoresSummoningSickness>(*attacker))
+                })
             })
         });
         let requirement_unmet = cards.iter().any(|(entity, definition, owner, in_zone, tapped)| {
-            **owner == action.player
-                && **in_zone == battlefield
-                && definition.type_line.types.contains(&cards::CardType::Creature)
-                && answers.ask::<rules::MustAttack>(entity)
-                && tapped.is_none()
-                && !answers
-                    .characteristics(entity)
-                    .keywords
-                    .contains(&keywords::StaticKeyword::Defender)
-                && (answers.ask::<rules::IgnoresSummoningSickness>(entity)
-                    || entered_on.get(entity).is_ok_and(|on_turn| {
-                        on_turn.is_none_or(|turn_number| **turn_number != turn.number)
-                    }))
-                && !attackers.contains(&entity)
+            markers.get(entity).is_ok_and(|(sick, defender)| {
+                **owner == action.player
+                    && **in_zone == battlefield
+                    && definition.type_line.types.contains(&cards::CardType::Creature)
+                    && answers.ask::<rules::MustAttack>(entity)
+                    && tapped.is_none()
+                    && !defender
+                    && (!sick || answers.ask::<rules::IgnoresSummoningSickness>(entity))
+                    && !attackers.contains(&entity)
+            })
         });
         if !all_legal || requirement_unmet {
             rejected.write(actions::Rejected::CannotAttack {

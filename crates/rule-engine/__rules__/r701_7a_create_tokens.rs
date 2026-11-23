@@ -1,10 +1,9 @@
-use bevy::prelude::{Commands, MessageReader, MessageWriter, Res};
+use bevy::prelude::{Commands, MessageReader, MessageWriter};
 
 use crate::BATTLEFIELD;
 use crate::cards;
 use crate::damage;
 use crate::effects;
-use crate::turns;
 use crate::zones;
 
 /// 701.7a To create one or more tokens with certain characteristics, put the specified number of
@@ -20,9 +19,7 @@ pub fn r701_7a_create_tokens(
     mut entered: MessageWriter<cards::Entered>,
     mut commands: Commands,
     zones: zones::ZoneLookup,
-    turn: Res<turns::Turn>,
 ) {
-    let turn = turn.into_inner();
     for request in requested.read() {
         let Some(battlefield) = zones.find(BATTLEFIELD, Some(request.controller)) else {
             continue;
@@ -34,7 +31,7 @@ pub fn r701_7a_create_tokens(
                     zones::InZone(battlefield),
                     cards::Owner(request.controller),
                     damage::Damage(0),
-                    cards::EnteredOnTurn(turn.number),
+                    cards::SummoningSick,
                     cards::Token,
                 ))
                 .id();

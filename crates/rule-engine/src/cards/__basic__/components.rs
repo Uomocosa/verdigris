@@ -19,8 +19,8 @@ pub struct Enchanting(pub Entity);
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Blocked;
 
-#[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Deref)]
-pub struct EnteredOnTurn(pub u32);
+#[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
+pub struct SummoningSick;
 
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Tapped;
@@ -57,6 +57,9 @@ pub struct Reach;
 
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Vigilance;
+
+#[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Defender;
 
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Deref)]
 pub struct TriggeredEnters(pub abilities::TriggeredAbility);

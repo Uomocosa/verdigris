@@ -1,6 +1,5 @@
 use bevy::prelude::EntityCommands;
 
-use crate::abilities;
 use crate::cards;
 use crate::keywords;
 
@@ -75,40 +74,13 @@ pub fn write_markers(
         current.vigilance,
         cards::Vigilance,
     );
-    let mut desired_enters = None;
-    let mut desired_at_step = None;
-    if characteristics.on_battlefield {
-        for ability in &characteristics.triggered_abilities {
-            match ability.event {
-                abilities::TriggerEvent::Enters(_) => {
-                    if desired_enters.is_none() {
-                        desired_enters = Some(cards::TriggeredEnters(*ability));
-                    }
-                }
-                abilities::TriggerEvent::BeginningOfStep(_, _)
-                | abilities::TriggerEvent::BeginningOfNextCleanup => {
-                    if desired_at_step.is_none() {
-                        desired_at_step = Some(cards::TriggeredAtStep(*ability));
-                    }
-                }
-                abilities::TriggerEvent::Dies | abilities::TriggerEvent::Attacks => {}
-            }
-        }
-    }
-    if current.enters != desired_enters.as_ref() {
-        if let Some(enters) = desired_enters {
-            entity.insert(enters);
-        } else {
-            entity.remove::<cards::TriggeredEnters>();
-        }
-    }
-    if current.at_step != desired_at_step.as_ref() {
-        if let Some(at_step) = desired_at_step {
-            entity.insert(at_step);
-        } else {
-            entity.remove::<cards::TriggeredAtStep>();
-        }
-    }
+    cards::Characteristics::sync_marker(
+        entity,
+        desired(keywords::StaticKeyword::Defender),
+        current.defender,
+        cards::Defender,
+    );
+    characteristics.write_triggered_markers(entity, current);
 }
 
 #[cfg(test)]
@@ -149,6 +121,25 @@ mod tests {
     }
 
     #[test]
+    fn defender_keyword_writes_the_defender_marker() {
+        let mut app = App::new();
+        let wall = (testing::WALL_OF_STONE.definition)();
+        let characteristics = cards::Characteristics::from_printed(&wall, true).with_effects(&[]);
+        let entity = app.world_mut().spawn(wall).id();
+        app.add_systems(
+            Update,
+            move |mut commands: Commands, markers: Query<cards::CurrentMarkers<'_>>| {
+                let current = markers.get(entity).expect("test spawns the card");
+                characteristics.write_markers(&mut commands.entity(entity), current);
+            },
+        );
+        app.update();
+
+        let world = app.world();
+        assert!(world.get::<cards::Defender>(entity).is_some());
+    }
+
+    #[test]
     fn removing_derived_components_and_rerunning_layers_is_identity() {
         let mut app = App::new();
         app.add_plugins(RulesPlugin);
@@ -179,23 +170,28 @@ mod tests {
         let snapshot = |app: &App| {
             let world = app.world();
             (
-                world.get::<cards::OnBattlefield>(bears).is_some(),
-                world.get::<cards::EffectivePT>(bears).copied().map(|effective| *effective),
-                world.get::<cards::Indestructible>(bears).is_some(),
-                world.get::<cards::Deathtouch>(bears).is_some(),
-                world.get::<cards::Infect>(bears).is_some(),
-                world.get::<cards::Lifelink>(bears).is_some(),
-                world.get::<cards::Trample>(bears).is_some(),
-                world.get::<cards::Flying>(bears).is_some(),
-                world.get::<cards::Reach>(bears).is_some(),
-                world.get::<cards::Vigilance>(bears).is_some(),
-                world.get::<cards::TriggeredEnters>(bears).is_some(),
-                world.get::<cards::TriggeredAtStep>(bears).is_some(),
+                (
+                    world.get::<cards::OnBattlefield>(bears).is_some(),
+                    world.get::<cards::EffectivePT>(bears).copied().map(|effective| *effective),
+                    world.get::<cards::Indestructible>(bears).is_some(),
+                    world.get::<cards::Deathtouch>(bears).is_some(),
+                    world.get::<cards::Infect>(bears).is_some(),
+                    world.get::<cards::Lifelink>(bears).is_some(),
+                    world.get::<cards::Trample>(bears).is_some(),
+                ),
+                (
+                    world.get::<cards::Flying>(bears).is_some(),
+                    world.get::<cards::Reach>(bears).is_some(),
+                    world.get::<cards::Vigilance>(bears).is_some(),
+                    world.get::<cards::Defender>(bears).is_some(),
+                    world.get::<cards::TriggeredEnters>(bears).is_some(),
+                    world.get::<cards::TriggeredAtStep>(bears).is_some(),
+                ),
             )
         };
         let before = snapshot(&app);
         assert_eq!(
-            before.1,
+            before.0.1,
             Some(cards::PowerToughness {
                 power: 2,
                 toughness: 2
@@ -212,6 +208,7 @@ mod tests {
             cards::Flying,
             cards::Reach,
             cards::Vigilance,
+            cards::Defender,
             cards::TriggeredEnters,
             cards::TriggeredAtStep,
         )>();
