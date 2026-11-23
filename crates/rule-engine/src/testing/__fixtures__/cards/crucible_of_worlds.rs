@@ -11,16 +11,7 @@ pub const CRUCIBLE_OF_WORLDS: testing::Card = testing::Card {
     name: testing::TestCardName("Crucible of Worlds"),
     definition: || {
         card! {
-            cards::CardDefinition {
-                name: "Crucible of Worlds".into(),
-                cost: cost![3],
-                type_line: cards::TypeLine {
-                    types: vec![cards::CardType::Artifact],
-                    ..Default::default()
-                },
-                power_toughness: None,
-                text: Vec::new(),
-            };
+            cards::CardDefinition::from_artifact("Crucible of Worlds", cost![3]);
             statics::all(PLAYER.controlled_by(YOU)).play_lands_from(GRAVEYARD),
         }
     },
@@ -44,6 +35,11 @@ mod tests {
         let crucible = (CRUCIBLE_OF_WORLDS.definition)();
         assert_eq!(*crucible.name, "Crucible of Worlds");
         assert_eq!(crucible.type_line.types, vec![cards::CardType::Artifact]);
+        assert_eq!(
+            crucible.type_line.supertypes,
+            Vec::<cards::Supertype>::new()
+        );
+        assert_eq!(crucible.type_line.subtypes, Vec::<cards::Subtype>::new());
         assert_eq!(crucible.cost, cost![3]);
         assert_eq!(crucible.colors(), vec![]);
         assert_eq!(

@@ -7,7 +7,7 @@ pub use basic::components::{
     TriggeredAtStep, TriggeredEnters,
 };
 pub use basic::current_markers::{CurrentMarkers, CurrentMarkersItem};
-pub use basic::enums::{CardType, Color, EnchantmentType, ManaSymbol, Supertype};
+pub use basic::enums::{CardType, Color, CreatureType, EnchantmentType, ManaSymbol, Supertype};
 pub use basic::messages::Entered;
 pub use basic::newtypes::CardName;
 pub use basic::structs::PowerToughness;

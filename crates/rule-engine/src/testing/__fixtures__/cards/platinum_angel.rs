@@ -13,7 +13,8 @@ pub const PLATINUM_ANGEL: testing::Card = testing::Card {
     name: testing::TestCardName("Platinum Angel"),
     definition: || {
         card! {
-            cards::artifact_creature("Platinum Angel", cost![7], pt!(4, 4));
+            cards::artifact_creature("Platinum Angel", cost![7], pt!(4, 4))
+                .subtype(cards::CreatureType::Angel.into());
             keywords::flying(),
             statics::all(PLAYER.controlled_by(YOU)).cant_lose_the_game(),
             statics::all(PLAYER.controlled_by(OPPONENT)).cant_win_the_game(),
@@ -44,6 +45,11 @@ mod tests {
         assert_eq!(
             angel.type_line.types,
             vec![cards::CardType::Artifact, cards::CardType::Creature]
+        );
+        assert_eq!(angel.type_line.supertypes, Vec::<cards::Supertype>::new());
+        assert_eq!(
+            angel.type_line.subtypes,
+            vec![cards::Subtype::from(cards::CreatureType::Angel)]
         );
         assert_eq!(angel.cost, cost![7]);
         assert_eq!(angel.power_toughness, Some(pt!(4, 4)));

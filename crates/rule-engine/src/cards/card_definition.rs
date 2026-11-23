@@ -23,6 +23,21 @@ pub struct CardDefinition {
 
 impl CardDefinition {
     #[must_use]
+    pub fn from_artifact(name: impl Into<cards::CardName>, cost: cards::Cost) -> Self {
+        Self {
+            name: name.into(),
+            cost,
+            type_line: cards::TypeLine {
+                supertypes: Vec::new(),
+                types: vec![cards::CardType::Artifact],
+                subtypes: Vec::new(),
+            },
+            power_toughness: None,
+            text: Vec::new(),
+        }
+    }
+
+    #[must_use]
     pub fn from_enchantment(name: impl Into<cards::CardName>, cost: cards::Cost) -> Self {
         Self {
             name: name.into(),

@@ -4,6 +4,14 @@ pub enum EnchantmentType {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum CreatureType {
+    Angel,
+    Human,
+    Monk,
+    Wizard,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum CardType {
     Creature,
     Instant,

@@ -12,7 +12,9 @@ pub const AZUSA_LOST_BUT_SEEKING: testing::Card = testing::Card {
     definition: || {
         card! {
             cards::creature("Azusa, Lost but Seeking", cost![2, G], pt!(1, 2))
-                .supertype(cards::Supertype::Legendary);
+                .supertype(cards::Supertype::Legendary)
+                .subtype(cards::CreatureType::Human.into())
+                .subtype(cards::CreatureType::Monk.into());
             statics::all(PLAYER.controlled_by(YOU)).play_additional_lands(2),
         }
     },
@@ -41,6 +43,13 @@ mod tests {
             vec![cards::Supertype::Legendary]
         );
         assert_eq!(azusa.type_line.types, vec![cards::CardType::Creature]);
+        assert_eq!(
+            azusa.type_line.subtypes,
+            vec![
+                cards::Subtype::from(cards::CreatureType::Human),
+                cards::Subtype::from(cards::CreatureType::Monk),
+            ]
+        );
         assert_eq!(azusa.cost, cost![2, G]);
         assert_eq!(azusa.power_toughness, Some(pt!(1, 2)));
         assert_eq!(
