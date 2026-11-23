@@ -13,6 +13,7 @@ pub enum TriggerEvent {
     Attacks,
     Blocks,
     BecomesBlocked,
+    DealtCombatDamageToPlayer,
     Dies,
 }
 
@@ -35,6 +36,11 @@ impl TriggerEvent {
     #[must_use]
     pub const fn becomes_blocked() -> Self {
         Self::BecomesBlocked
+    }
+
+    #[must_use]
+    pub const fn dealt_combat_damage_to_player() -> Self {
+        Self::DealtCombatDamageToPlayer
     }
 }
 
@@ -76,6 +82,10 @@ mod tests {
         assert_eq!(
             abilities::TriggerEvent::becomes_blocked(),
             abilities::TriggerEvent::BecomesBlocked
+        );
+        assert_eq!(
+            abilities::TriggerEvent::dealt_combat_damage_to_player(),
+            abilities::TriggerEvent::DealtCombatDamageToPlayer
         );
     }
 }

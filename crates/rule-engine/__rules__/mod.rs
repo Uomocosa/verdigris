@@ -29,6 +29,7 @@ pub mod r508_8_skip_combat_steps;
 pub mod r509_1a_r509_1g_r509_1h_r702_9b_r702_17b_declare_blockers;
 pub mod r509_1i_r509_2a_r509_3a_r509_3c_blocker_triggers;
 pub mod r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_r702_2c_r702_19b_r702_19d_combat_damage;
+pub mod r510_3a_combat_damage_triggers;
 pub mod r514_1_cleanup_discard;
 pub mod r514_2_cleanup_step;
 pub mod r514_3a_cleanup_reentry;

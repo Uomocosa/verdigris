@@ -18,6 +18,7 @@ pub fn add_resolution_systems(app: &mut App) {
             comprehensive_rules::r701_9a_r701_9b_discard::r701_9a_r701_9b_discard,
             comprehensive_rules::r701_6a_counter::r701_6a_counter,
             comprehensive_rules::r120_3_r120_3a_r120_3b_r120_3e_damage_results::r120_3_r120_3a_r120_3b_r120_3e_damage_results,
+            comprehensive_rules::r510_3a_combat_damage_triggers::r510_3a_combat_damage_triggers,
             comprehensive_rules::r702_15b_lifelink::r702_15b_lifelink,
             comprehensive_rules::r608_2n_graveyard::r608_2n_graveyard,
             comprehensive_rules::r608_3a_permanent_enters::r608_3a_permanent_enters,
@@ -42,7 +43,7 @@ mod tests {
 
         assert_eq!(
             app.get_schedule(Update).map(Schedule::systems_len),
-            Some(16)
+            Some(17)
         );
     }
 }
