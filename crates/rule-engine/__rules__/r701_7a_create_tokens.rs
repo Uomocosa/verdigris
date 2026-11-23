@@ -3,7 +3,7 @@ use bevy::prelude::{Commands, MessageReader, MessageWriter};
 use crate::BATTLEFIELD;
 use crate::cards;
 use crate::damage;
-use crate::effects;
+use crate::rules;
 use crate::zones;
 
 /// 701.7a To create one or more tokens with certain characteristics, put the specified number of
@@ -15,7 +15,7 @@ use crate::zones;
 /// characteristics. No replacement effect exists yet, so a token is put onto the battlefield with
 /// the characteristics its creation effect defines.
 pub fn r701_7a_create_tokens(
-    mut requested: MessageReader<effects::TokensRequested>,
+    mut requested: MessageReader<rules::Proceeds<rules::CreateTokens>>,
     mut entered: MessageWriter<cards::Entered>,
     mut commands: Commands,
     zones: zones::ZoneLookup,
@@ -24,7 +24,7 @@ pub fn r701_7a_create_tokens(
         let Some(battlefield) = zones.find(BATTLEFIELD, Some(request.controller)) else {
             continue;
         };
-        for _ in 0..request.count {
+        for _ in 0..request.amount {
             let token = commands
                 .spawn((
                     request.token.definition(),

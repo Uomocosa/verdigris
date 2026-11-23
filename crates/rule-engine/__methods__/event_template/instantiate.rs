@@ -32,6 +32,27 @@ pub fn instantiate<E: Event>(template: &rules::EventTemplate, event: &E) -> rule
             player: holder(who),
             amount: amount(template_amount),
         }),
+        rules::EventTemplate::Discard {
+            who,
+            amount: template_amount,
+        } => rules::AnyEvent::Discard(rules::Discard {
+            player: holder(who),
+            amount: amount(template_amount),
+        }),
+        rules::EventTemplate::GainLife {
+            who,
+            amount: template_amount,
+        } => rules::AnyEvent::GainLife(rules::GainLife {
+            player: holder(who),
+            amount: amount(template_amount),
+        }),
+        rules::EventTemplate::Mill {
+            who,
+            amount: template_amount,
+        } => rules::AnyEvent::Mill(rules::Mill {
+            player: holder(who),
+            amount: amount(template_amount),
+        }),
     }
 }
 

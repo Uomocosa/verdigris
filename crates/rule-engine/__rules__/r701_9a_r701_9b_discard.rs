@@ -4,7 +4,7 @@ use std::collections::BTreeSet;
 use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query, ResMut};
 
 use crate::actions;
-use crate::players;
+use crate::rules;
 use crate::zones;
 
 /// 701.9a To discard a card, move it from its owner’s hand to that player’s graveyard.
@@ -13,7 +13,7 @@ use crate::zones;
 /// choose which card to discard. Some effects, however, require a random discard or allow another
 /// player to choose which card is discarded.
 pub fn r701_9a_r701_9b_discard(
-    mut discards: MessageReader<players::DiscardRequested>,
+    mut discards: MessageReader<rules::Proceeds<rules::Discard>>,
     mut actions: MessageReader<actions::PlayerAction>,
     mut rejected: MessageWriter<actions::Rejected>,
     mut pending: ResMut<actions::PendingChoice>,
@@ -32,7 +32,7 @@ pub fn r701_9a_r701_9b_discard(
             .get(hand)
             .map(|contents| contents.iter().copied().collect())
             .unwrap_or_default();
-        if held.len() <= usize::try_from(discard.count).unwrap_or(usize::MAX) {
+        if held.len() <= usize::try_from(discard.amount).unwrap_or(usize::MAX) {
             for card in held {
                 commands.entity(card).insert(zones::InZone(graveyard));
             }
@@ -40,7 +40,7 @@ pub fn r701_9a_r701_9b_discard(
         }
         *pending = actions::PendingChoice(Some(actions::Choice::Discard(actions::DiscardChoice {
             player: discard.player,
-            count: discard.count,
+            count: discard.amount,
             legal: held.into_iter().collect(),
         })));
     }
@@ -112,6 +112,23 @@ mod tests {
 
         game.player(p2).cards_in(GRAVEYARD).exactly::<1>(GRIZZLY_BEARS)?;
         assert!(game.player(p2).cards_in(HAND).has_no(GRIZZLY_BEARS));
+        Ok(())
+    }
+
+    #[test]
+    fn mind_rot_discards_nothing_when_the_target_cant_discard() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.hand([MIND_ROT]).mana_pool(mana![2, B]),
+            P2.battlefield([TEST_CANT_DISCARD]).hand([GRIZZLY_BEARS, LIGHTNING_BOLT, MURDER]),
+        ]);
+        let [mind_rot] = game.player(p1).cards_in(HAND).exactly::<1>(MIND_ROT)?;
+        game.play([p1.cast(mind_rot).targeting(p2).end_turn(), p2.end_turn()])?;
+
+        assert_eq!(game.player(p2).cards_in(HAND).count(), 3);
+        assert!(game.player(p2).cards_in(HAND).has(GRIZZLY_BEARS));
+        assert!(game.player(p2).cards_in(HAND).has(LIGHTNING_BOLT));
+        assert!(game.player(p2).cards_in(HAND).has(MURDER));
+        assert_eq!(game.player(p2).cards_in(GRAVEYARD).count(), 0);
         Ok(())
     }
 }

@@ -8,7 +8,7 @@ use crate::rules;
 /// adjusted accordingly.
 pub fn r119_3_life_loss(
     mut life_lost: MessageReader<rules::Proceeds<rules::LoseLife>>,
-    mut life_gained: MessageReader<players::LifeGained>,
+    mut life_gained: MessageReader<rules::Proceeds<rules::GainLife>>,
     mut lives: Query<&mut players::Life>,
 ) {
     for event in life_lost.read() {

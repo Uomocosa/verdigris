@@ -20,17 +20,29 @@ pub use cast_spell::CastSpell;
 mod any_event;
 pub use any_event::AnyEvent;
 
+mod create_tokens;
+pub use create_tokens::CreateTokens;
+
+mod discard;
+pub use discard::Discard;
+
 mod draw;
 pub use draw::Draw;
 
 mod event_template;
 pub use event_template::EventTemplate;
 
+mod gain_life;
+pub use gain_life::GainLife;
+
 mod lose_game;
 pub use lose_game::LoseGame;
 
 mod lose_life;
 pub use lose_life::LoseLife;
+
+mod mill;
+pub use mill::Mill;
 
 mod clause;
 pub use clause::Clause;

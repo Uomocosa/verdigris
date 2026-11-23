@@ -1,6 +1,6 @@
 use bevy::prelude::{Commands, Entity, MessageReader, Query};
 
-use crate::effects;
+use crate::rules;
 use crate::zones;
 use crate::{GRAVEYARD, LIBRARY};
 
@@ -12,7 +12,7 @@ use crate::{GRAVEYARD, LIBRARY};
 /// they mill as many as possible. Similarly, the player can’t pay a cost that includes milling a
 /// number of cards greater than the number of cards in their library.
 pub fn r701_17a_r701_17b_mill(
-    mut mills: MessageReader<effects::MillRequested>,
+    mut mills: MessageReader<rules::Proceeds<rules::Mill>>,
     mut commands: Commands,
     zones: zones::ZoneLookup,
     zone_contents: Query<&zones::ZoneContents>,
@@ -27,7 +27,7 @@ pub fn r701_17a_r701_17b_mill(
         let milled_from_top: Vec<Entity> = zone_contents
             .get(library)
             .map(|contents| {
-                let requested = usize::try_from(mill.count).unwrap_or(usize::MAX);
+                let requested = usize::try_from(mill.amount).unwrap_or(usize::MAX);
                 contents.iter().take(requested).copied().collect()
             })
             .unwrap_or_default();

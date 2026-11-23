@@ -19,6 +19,18 @@ pub enum EventTemplate {
         who: rules::Role,
         amount: rules::Amount,
     },
+    Discard {
+        who: rules::Role,
+        amount: rules::Amount,
+    },
+    GainLife {
+        who: rules::Role,
+        amount: rules::Amount,
+    },
+    Mill {
+        who: rules::Role,
+        amount: rules::Amount,
+    },
 }
 
 #[atomic_delegates]

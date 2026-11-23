@@ -60,6 +60,7 @@ mod tests {
 
     use crate::BATTLEFIELD;
     use crate::cards;
+    use crate::effects;
     use crate::rules;
     use crate::testing::*;
 
@@ -263,6 +264,107 @@ mod tests {
                         }
                     ),
                     rules::Legality::Illegal
+                );
+            })
+            .unwrap();
+        Ok(())
+    }
+
+    #[test]
+    fn a_cant_aimed_at_gain_life_is_illegal_for_its_controller() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([P1.battlefield([TEST_CANT_DISCARD]), P2]);
+        game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TEST_CANT_DISCARD)?;
+        game.pass_priority();
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                assert_eq!(
+                    legality::<rules::GainLife>(
+                        &answers,
+                        &rules::GainLife {
+                            player: p1.into(),
+                            amount: 3
+                        }
+                    ),
+                    rules::Legality::Illegal
+                );
+                assert_eq!(
+                    legality::<rules::GainLife>(
+                        &answers,
+                        &rules::GainLife {
+                            player: p2.into(),
+                            amount: 3
+                        }
+                    ),
+                    rules::Legality::Legal
+                );
+            })
+            .unwrap();
+        Ok(())
+    }
+
+    #[test]
+    fn a_cant_aimed_at_mill_is_illegal_for_its_controller() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([P1.battlefield([TEST_CANT_DISCARD]), P2]);
+        game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TEST_CANT_DISCARD)?;
+        game.pass_priority();
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                assert_eq!(
+                    legality::<rules::Mill>(
+                        &answers,
+                        &rules::Mill {
+                            player: p1.into(),
+                            amount: 5
+                        }
+                    ),
+                    rules::Legality::Illegal
+                );
+                assert_eq!(
+                    legality::<rules::Mill>(
+                        &answers,
+                        &rules::Mill {
+                            player: p2.into(),
+                            amount: 5
+                        }
+                    ),
+                    rules::Legality::Legal
+                );
+            })
+            .unwrap();
+        Ok(())
+    }
+
+    #[test]
+    fn a_cant_aimed_at_create_tokens_is_illegal_for_its_controller() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([P1.battlefield([TEST_CANT_DISCARD]), P2]);
+        game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TEST_CANT_DISCARD)?;
+        game.pass_priority();
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                assert_eq!(
+                    legality::<rules::CreateTokens>(
+                        &answers,
+                        &rules::CreateTokens {
+                            controller: p1.into(),
+                            amount: 2,
+                            token: effects::TokenDefinition::from(SOLDIER_TOKEN.definition),
+                        }
+                    ),
+                    rules::Legality::Illegal
+                );
+                assert_eq!(
+                    legality::<rules::CreateTokens>(
+                        &answers,
+                        &rules::CreateTokens {
+                            controller: p2.into(),
+                            amount: 2,
+                            token: effects::TokenDefinition::from(SOLDIER_TOKEN.definition),
+                        }
+                    ),
+                    rules::Legality::Legal
                 );
             })
             .unwrap();

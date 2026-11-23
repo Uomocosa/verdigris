@@ -11,14 +11,14 @@ use crate::zones;
 type EffectMessageWriters<'a, 'b, 'c, 'd> = (
     MessageWriter<'a, effects::PowerToughnessModified>,
     MessageWriter<'b, effects::KeywordGranted>,
-    MessageWriter<'c, effects::MillRequested>,
-    MessageWriter<'d, effects::TokensRequested>,
+    MessageWriter<'c, rules::Would<rules::Mill>>,
+    MessageWriter<'d, rules::Would<rules::CreateTokens>>,
 );
 
 type PlayerEffectWriters<'a, 'b, 'c, 'd, 'e> = (
     MessageWriter<'a, rules::Would<rules::LoseLife>>,
-    MessageWriter<'b, players::DiscardRequested>,
-    MessageWriter<'c, players::LifeGained>,
+    MessageWriter<'b, rules::Would<rules::Discard>>,
+    MessageWriter<'c, rules::Would<rules::GainLife>>,
     MessageWriter<'d, rules::Would<rules::Draw>>,
     MessageWriter<'e, rules::Would<rules::WinGame>>,
 );
@@ -93,19 +93,18 @@ pub fn r608_2_r608_2c_resolve(
                     }
                 }
                 effects::EffectKind::CreateTokens { count, definition } => {
-                    effect_messages.p3().write(effects::TokensRequested {
-                        count,
-                        token: definition,
-                        controller,
-                    });
+                    request_tokens(&mut effect_messages.p3(), controller, count, definition);
                 }
                 effects::EffectKind::Draw(count) => {
                     request_draws(&mut player_effects.p3(), &player_targets, **owner, count);
                 }
                 effects::EffectKind::Mill(count) => {
-                    for player in players_or_fallback(&player_targets, controller) {
-                        effect_messages.p2().write(effects::MillRequested { player, count });
-                    }
+                    request_mills(
+                        &mut effect_messages.p2(),
+                        &player_targets,
+                        controller,
+                        count,
+                    );
                 }
                 effects::EffectKind::LoseLife(amount) => {
                     request_life_loss(&mut player_effects.p0(), &player_targets, amount);
@@ -116,9 +115,12 @@ pub fn r608_2_r608_2c_resolve(
                     }
                 }
                 effects::EffectKind::GainLife(amount) => {
-                    for player in players_or_fallback(&player_targets, controller) {
-                        player_effects.p2().write(players::LifeGained { player, amount });
-                    }
+                    request_life_gain(
+                        &mut player_effects.p2(),
+                        &player_targets,
+                        controller,
+                        amount,
+                    );
                 }
                 effects::EffectKind::Discard(count) => {
                     request_discard(&mut player_effects.p1(), &player_targets, count);
@@ -226,16 +228,54 @@ fn request_life_loss(
 }
 
 fn request_discard(
-    discarded: &mut MessageWriter<players::DiscardRequested>,
+    discarded: &mut MessageWriter<rules::Would<rules::Discard>>,
     players: &[Entity],
     count: u32,
 ) {
     for player in players {
-        discarded.write(players::DiscardRequested {
+        discarded.write(rules::Would(rules::Discard {
             player: *player,
-            count,
-        });
+            amount: count,
+        }));
     }
+}
+
+fn request_mills(
+    mills: &mut MessageWriter<rules::Would<rules::Mill>>,
+    players: &[Entity],
+    fallback: Entity,
+    count: u32,
+) {
+    for player in players_or_fallback(players, fallback) {
+        mills.write(rules::Would(rules::Mill {
+            player,
+            amount: count,
+        }));
+    }
+}
+
+fn request_life_gain(
+    gained: &mut MessageWriter<rules::Would<rules::GainLife>>,
+    players: &[Entity],
+    fallback: Entity,
+    amount: u32,
+) {
+    for player in players_or_fallback(players, fallback) {
+        gained.write(rules::Would(rules::GainLife { player, amount }));
+    }
+}
+
+fn request_tokens(
+    tokens: &mut MessageWriter<rules::Would<rules::CreateTokens>>,
+    controller: Entity,
+    count: u32,
+    definition: effects::TokenDefinition,
+) {
+    tokens.write(rules::Would(rules::CreateTokens {
+        controller,
+        amount: count,
+        token: definition,
+    }));
 }
 
 fn players_or_fallback(players: &[Entity], fallback: Entity) -> Vec<Entity> {

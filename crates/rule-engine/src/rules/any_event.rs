@@ -9,6 +9,10 @@ pub enum AnyEvent {
     DrawFromEmptyLibrary(rules::DrawFromEmptyLibrary),
     Draw(rules::Draw),
     LoseLife(rules::LoseLife),
+    Discard(rules::Discard),
+    GainLife(rules::GainLife),
+    Mill(rules::Mill),
+    CreateTokens(rules::CreateTokens),
 }
 
 impl AnyEvent {
@@ -27,6 +31,18 @@ impl AnyEvent {
                 commands.write_message(rules::Would(happened));
             }
             Self::LoseLife(happened) => {
+                commands.write_message(rules::Would(happened));
+            }
+            Self::Discard(happened) => {
+                commands.write_message(rules::Would(happened));
+            }
+            Self::GainLife(happened) => {
+                commands.write_message(rules::Would(happened));
+            }
+            Self::Mill(happened) => {
+                commands.write_message(rules::Would(happened));
+            }
+            Self::CreateTokens(happened) => {
                 commands.write_message(rules::Would(happened));
             }
         }

@@ -5,7 +5,6 @@ use crate::actions;
 use crate::cards;
 use crate::damage;
 use crate::effects;
-use crate::players;
 use crate::rules;
 use crate::stack;
 use crate::turns;
@@ -17,20 +16,24 @@ pub fn register_messages_and_resources(app: &mut App) {
         .add_message::<stack::Countered>()
         .add_message::<damage::DamageDealt>()
         .add_message::<damage::Destruction>()
-        .add_message::<players::LifeGained>()
-        .add_message::<players::DiscardRequested>()
         .add_message::<rules::Would<rules::LoseGame>>()
         .add_message::<rules::Would<rules::WinGame>>()
         .add_message::<rules::Would<rules::DrawFromEmptyLibrary>>()
         .add_message::<rules::Would<rules::Draw>>()
         .add_message::<rules::Would<rules::LoseLife>>()
+        .add_message::<rules::Would<rules::Discard>>()
+        .add_message::<rules::Would<rules::GainLife>>()
+        .add_message::<rules::Would<rules::Mill>>()
+        .add_message::<rules::Would<rules::CreateTokens>>()
         .add_message::<rules::Proceeds<rules::LoseGame>>()
         .add_message::<rules::Proceeds<rules::WinGame>>()
         .add_message::<rules::Proceeds<rules::DrawFromEmptyLibrary>>()
         .add_message::<rules::Proceeds<rules::Draw>>()
         .add_message::<rules::Proceeds<rules::LoseLife>>()
-        .add_message::<effects::MillRequested>()
-        .add_message::<effects::TokensRequested>()
+        .add_message::<rules::Proceeds<rules::Discard>>()
+        .add_message::<rules::Proceeds<rules::GainLife>>()
+        .add_message::<rules::Proceeds<rules::Mill>>()
+        .add_message::<rules::Proceeds<rules::CreateTokens>>()
         .add_message::<effects::PowerToughnessModified>()
         .add_message::<effects::KeywordGranted>()
         .add_message::<cards::Entered>()
