@@ -14,7 +14,8 @@ Would<E> -> 1. Permission  (may E happen?  clauses + AsThough / Allow / OnlyIf /
 Proceeds<E>                (nothing can stop E any more; only the pipeline writes it, plus the
                            unstoppable rules listed in ../SKILL.md §5)
          -> 3. Perform     (the CR's default result, in the __rules__ system that owns E,
-                           which reads Proceeds<E>)
+                           which reads Proceeds<E>; an event whose CR default is
+                           "nothing" has no such system)
          -> Did<E>         (triggers: "whenever a player draws ...")    [when needed]
 ```
 
@@ -54,7 +55,7 @@ pub enum Change {
     // quantity
     Set(u32), Increase(u32), Decrease(u32), NoMaximum,
     // replacement (614)
-    Instead { when: rules::Predicate, then: Vec<rules::EventTemplate> },
+    Instead { when: rules::Predicate, then: Vec<rules::EventTemplate> }, // `then: may(..)` is planned, §3
 }
 
 pub struct RuleChange { pub target: Target, pub change: Change }
@@ -81,18 +82,48 @@ add an event, clause or value rule, register it.
    fields (`Draw { player, amount }`). `impl Event` with `ID` = CR number, `Context` for roles.
 2. If the CR lists conditions, write them as `clauses()` with `ClauseId` consts, text quoted
    VERBATIM from `docs/MagicCompRules-*.txt` (keep the verbatim test).
-3. The `__rules__` system that owns the action writes `Would<E>` instead of acting directly; the
+3. Whoever starts the action writes `Would<E>` instead of acting directly: the shared action system for
+   a player's action (`../SKILL.md` §12), the `__rules__` system for everything else. The
    pipeline decides; the owning system reads `Proceeds<E>` and performs only what comes out.
 4. Register the event (section 2).
 
 **A card that changes a rule**: pick the target (whole event, one clause, or a value) and the
-change; add one `statics::all(...)` builder in `src/statics/all.rs` + `__methods__/all/` if no
+change; if the target event is missing, add it (above). Add one `statics::all(...)` builder in `src/statics/all.rs` + `__methods__/all/` if no
 existing builder fits. Prefer reusing `as_though`, `allow`, `restriction`, `instead`.
 
 **Replacement order** (616): earliest timestamp first; a replacement applies at most once to an
 event (track applied effects on the event while it is re-announced). Player choice among
-replacements (616.1) and optional "you may ... instead" are NOT implemented yet: add them as a
-pending choice like the opening-hand choices, never as an implicit default.
+replacements (616.1) and optional "you may ... instead" are NOT implemented yet. When needed, the OPTION belongs to
+the change: `then: may(event)`. The pipeline asks through the shared ask / answer (`../SKILL.md` §12)
+and announces the event only on a yes. Never an implicit default, never a question in the rule.
+
+```rust
+// "If you would draw a card, you may mill a card instead." The rule that announces Draw is untouched.
+Change::Instead { when: ALWAYS, then: may(EventTemplate::Mill { .. }) }
+// the same without a choice: "If you would draw a card, mill a card instead."
+Change::Instead { when: ALWAYS, then: vec![EventTemplate::Mill { .. }] }
+```
+
+```
+Would<Draw> -> pipeline finds the change on the event's subject / player
+   then: vec![..]  -> announces Would<Mill>
+   then: may(..)   -> Ask(the event's player); yes -> Would<Mill>, no -> Proceeds<Draw>
+   no change       -> Proceeds<Draw> (nothing reads it if the default is nothing)
+```
+
+The pipeline does the asking. A rule that reads `Proceeds<E>` to build an ask is wrong: `may` already
+asked, and the chosen event reaches the rule that owns it as its own `Proceeds`.
+
+Several optional changes of one player may be grouped into one ask. `then` may name any event: a new
+template is one variant plus its `instantiate`, and the event's own rule performs it.
+
+**Text that points at cards** ("some cards / effects allow a player to ...") is announced as an event
+whose subject is the object that may carry the change; its default is nothing. The card then writes a
+change to that event, for its own object. Nothing is asked for an object without a change.
+
+**A card that works outside the battlefield** (611.3b "or the object generating it is in the
+appropriate zone"): the change applies from the zone its text names. If the engine reads changes only
+from the battlefield, that is a gap to close there, not a reason for a rule to look into the zone.
 
 ## 4. Do / don't
 
