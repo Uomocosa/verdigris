@@ -48,6 +48,7 @@ pub fn engine() -> rules::RuleRegistry {
         events::PutIntoGraveyard::ID,
         events::PutIntoGraveyard::clauses(),
     );
+    register(events::Tap::ID, events::Tap::clauses());
     register(events::TapAttacker::ID, events::TapAttacker::clauses());
     register(events::Untap::ID, events::Untap::clauses());
     register(events::WinGame::ID, events::WinGame::clauses());

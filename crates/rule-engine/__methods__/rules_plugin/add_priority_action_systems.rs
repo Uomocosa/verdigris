@@ -15,10 +15,11 @@ pub fn add_priority_action_systems(app: &mut App) {
             comprehensive_rules::r601_2h_pay::r601_2h_pay,
             comprehensive_rules::r508_1a_r508_1k_declare_attackers::r508_1a_r508_1k_declare_attackers,
             comprehensive_rules::r508_1m_r508_2a_r508_3a_attack_triggers::r508_1m_r508_2a_r508_3a_attack_triggers,
+            comprehensive_rules::r611_3a_static_effects::r611_3a_static_effects,
             (
-                comprehensive_rules::r508_1f_tap_attackers::r508_1f_tap_attackers,
-                Attempt::<events::TapAttacker>::resolved_by(
-                    comprehensive_rules::r508_1f_tap_attackers_perform::r508_1f_tap_attackers_perform,
+                comprehensive_rules::r508_1f_tap_attackers::r508_1f_tap_attackers(),
+                Attempt::<events::Tap>::resolved_by(
+                    comprehensive_rules::r701_26a_tap::r701_26a_tap,
                 ),
             )
                 .chain(),
@@ -36,15 +37,6 @@ pub fn add_priority_action_systems(app: &mut App) {
             .chain()
             .in_set(RuleSet::PriorityAction),
     );
-    app.add_systems(
-        Update,
-        comprehensive_rules::r611_3a_static_effects::r611_3a_static_effects
-            .in_set(RuleSet::PriorityAction)
-            .after(
-                comprehensive_rules::r508_1a_r508_1k_declare_attackers::r508_1a_r508_1k_declare_attackers,
-            )
-            .before(comprehensive_rules::r508_1f_tap_attackers::r508_1f_tap_attackers),
-    );
 }
 
 #[cfg(test)]
@@ -60,7 +52,7 @@ mod tests {
 
         assert_eq!(
             app.get_schedule(Update).map(Schedule::systems_len),
-            Some(20)
+            Some(22)
         );
     }
 }
