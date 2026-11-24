@@ -107,11 +107,11 @@ mod tests {
         let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
         game.play([p1.cast(bolt).targeting(p2).pass_priority()])?;
 
-        assert_ne!(game.priority_player(), p1);
+        assert_ne!(game.priority_player(), p1.id);
         game.play([p2.pass_priority()])?;
 
         let priority = game.priority();
-        assert_eq!(priority.player, p1);
+        assert_eq!(priority.player, p1.id);
         assert_eq!(priority.consecutive_passes, 0);
         Ok(())
     }

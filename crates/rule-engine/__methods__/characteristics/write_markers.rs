@@ -98,6 +98,7 @@ mod tests {
     use crate::RulesPlugin;
     use crate::cards;
     use crate::damage;
+    use crate::players;
     use crate::pt;
     use crate::testing;
     use crate::turns;
@@ -193,14 +194,16 @@ mod tests {
             .id();
         app.insert_resource(turns::Turn {
             number: 1,
-            active: players[0],
+            active: players::PlayerId(players[0]),
             step: turns::Step::PrecombatMain,
         });
         app.insert_resource(turns::Priority {
-            player: players[0],
+            player: players::PlayerId(players[0]),
             consecutive_passes: 0,
         });
-        app.insert_resource(turns::TurnOrder::from(players));
+        app.insert_resource(turns::TurnOrder::from(
+            players.iter().copied().map(players::PlayerId).collect::<Vec<_>>(),
+        ));
         app.update();
 
         let snapshot = |app: &App| {

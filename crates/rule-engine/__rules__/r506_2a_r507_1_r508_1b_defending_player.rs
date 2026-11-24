@@ -41,7 +41,7 @@ pub fn r506_2a_r507_1_r508_1b_defending_player(
         for player in defending.iter() {
             commands.entity(player).remove::<players::DefendingPlayer>();
         }
-        let mut opponents = players.iter().filter(|player| *player != turn.active);
+        let mut opponents = players.iter().filter(|player| *player != *turn.active);
         if let (Some(solo_opponent), None) = (opponents.next(), opponents.next()) {
             commands.entity(solo_opponent).insert(players::DefendingPlayer);
         }
@@ -51,10 +51,10 @@ pub fn r506_2a_r507_1_r508_1b_defending_player(
             continue;
         };
         let is_legal = turn.step == turns::Step::BeginningOfCombat
-            && action.player == turn.active
-            && action.player == priority.player
+            && players::PlayerId(action.player) == turn.active
+            && players::PlayerId(action.player) == priority.player
             && players.get(*chosen).is_ok()
-            && *chosen != turn.active
+            && players::PlayerId(*chosen) != turn.active
             && lost.get(*chosen).is_err();
         if !is_legal {
             rejected.write(actions::Rejected::CannotChooseDefendingPlayer {

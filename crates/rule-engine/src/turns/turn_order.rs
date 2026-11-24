@@ -1,12 +1,14 @@
-use bevy::prelude::{Entity, Resource};
+use bevy::prelude::Resource;
 use derive_more::{Deref, From};
 
+use crate::players;
+
 #[derive(Resource, Debug, Clone, PartialEq, Eq, Deref, From)]
-pub struct TurnOrder(Vec<Entity>);
+pub struct TurnOrder(Vec<players::PlayerId>);
 
 impl TurnOrder {
     #[must_use]
-    pub fn next_after(&self, player: Entity) -> Option<Entity> {
+    pub fn next_after(&self, player: players::PlayerId) -> Option<players::PlayerId> {
         let position = self.iter().position(|candidate| *candidate == player)?;
         self.iter().cycle().nth(position.saturating_add(1)).copied()
     }
@@ -14,8 +16,6 @@ impl TurnOrder {
 
 #[cfg(test)]
 mod tests {
-    use bevy::prelude::Entity;
-
     use crate::testing::*;
 
     use super::TurnOrder;
@@ -23,13 +23,7 @@ mod tests {
     #[test]
     fn test_usage() {
         let (_, [p1, p2, p3, p4, p5]) = MockGame::new([P1, P2, P3, P4, P5]);
-        let (first, second, third, fourth, outsider) = (
-            Entity::from(p1),
-            Entity::from(p2),
-            Entity::from(p3),
-            Entity::from(p4),
-            Entity::from(p5),
-        );
+        let (first, second, third, fourth, outsider) = (p1.id, p2.id, p3.id, p4.id, p5.id);
         let order = TurnOrder::from(vec![first, second, third, fourth]);
 
         assert_eq!(order.next_after(first), Some(second));

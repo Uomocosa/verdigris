@@ -21,18 +21,18 @@ pub fn r514_1_cleanup_discard(
         if **step != turns::Step::Cleanup {
             continue;
         }
-        let Some(hand) = zones.find(HAND, Some(turn.active)) else {
+        let Some(hand) = zones.find(HAND, Some(*turn.active)) else {
             continue;
         };
         let Ok(contents) = zone_contents.get(hand) else {
             continue;
         };
-        let excess = answers.value::<rules::MaximumHandSize>(turn.active).excess(contents.len());
+        let excess = answers.value::<rules::MaximumHandSize>(*turn.active).excess(contents.len());
         if excess == 0 {
             continue;
         }
         discards.write(rules::Would(rules::Discard {
-            player: turn.active,
+            player: *turn.active,
             amount: u32::try_from(excess).unwrap_or(u32::MAX),
         }));
     }

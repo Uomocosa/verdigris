@@ -78,10 +78,10 @@ mod tests {
         let turn = *game.turn();
         let priority = game.priority();
         assert_eq!(turn.number, 2);
-        assert_eq!(turn.active, p2);
-        assert_ne!(turn.active, p1);
+        assert_eq!(turn.active, p2.id);
+        assert_ne!(turn.active, p1.id);
         assert_eq!(turn.step, turns::Step::Untap);
-        assert_eq!(priority.player, p2);
+        assert_eq!(priority.player, p2.id);
         assert_eq!(priority.consecutive_passes, 0);
 
         game.app.update();
@@ -89,7 +89,7 @@ mod tests {
         let turn = *game.turn();
         let priority = game.priority();
         assert_eq!(turn.step, turns::Step::Upkeep);
-        assert_eq!(priority.player, p2);
+        assert_eq!(priority.player, p2.id);
         Ok(())
     }
 }

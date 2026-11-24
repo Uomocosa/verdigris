@@ -60,7 +60,7 @@ mod tests {
         let priority = game.priority();
         let turn = *game.turn();
         assert_eq!(turn.step, turns::Step::BeginningOfCombat);
-        assert_eq!(priority.player, p1);
+        assert_eq!(priority.player, p1.id);
         assert_eq!(priority.consecutive_passes, 0);
         Ok(())
     }

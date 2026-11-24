@@ -83,7 +83,7 @@ pub fn play(
         }
         loop {
             let holder = game.app.world().resource::<turns::Priority>().player;
-            let Some(position) = auto_passes.iter().position(|pass| pass.player == holder) else {
+            let Some(position) = auto_passes.iter().position(|pass| pass.player == *holder) else {
                 break;
             };
             let now = *game.app.world().resource::<turns::Turn>();
@@ -95,7 +95,7 @@ pub fn play(
                 break;
             }
             let before = game.rejection_count();
-            game.act(holder, actions::Action::PassPriority);
+            game.act(*holder, actions::Action::PassPriority);
             if game.rejection_count() > before
                 && let Some(rejection) = game.last_rejection().cloned()
             {
@@ -178,7 +178,7 @@ mod tests {
         assert!(game.player(p2).cards_in(GRAVEYARD).exactly::<1>(NEGATE).is_ok());
         let turn = *game.turn();
         assert_eq!(turn.number, 2);
-        assert_eq!(turn.active, p2);
+        assert_eq!(turn.active, p2.id);
         Ok(())
     }
 
@@ -214,7 +214,7 @@ mod tests {
 
         let turn = *game.turn();
         assert_eq!(turn.number, 1);
-        assert_eq!(turn.active, p1);
+        assert_eq!(turn.active, p1.id);
         assert_eq!(turn.step, turns::Step::PostcombatMain);
         Ok(())
     }

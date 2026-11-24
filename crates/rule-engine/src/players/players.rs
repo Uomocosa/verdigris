@@ -22,13 +22,13 @@ impl Players<'_, '_> {
 
     #[must_use]
     pub fn has_anyone_won(&self) -> bool { !self.winners.is_empty() }
+
+    #[must_use]
+    pub fn in_turn_order(&self) -> Vec<players::PlayerId> { self.turn_order.iter().flat_map(|order| order.iter().copied()).collect() }
 }
 
 #[atomic_delegates]
 impl Players<'_, '_> {
-    #[must_use]
-    pub fn in_turn_order(&self) -> Vec<players::PlayerId> {}
-
     #[must_use]
     pub fn still_in_the_game(&self) -> Vec<players::PlayerId> {}
 }

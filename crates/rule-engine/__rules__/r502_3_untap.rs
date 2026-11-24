@@ -20,7 +20,7 @@ pub fn r502_3_untap(
             continue;
         }
         for (entity, owner) in tapped.iter() {
-            if **owner == turn.active {
+            if **owner == *turn.active {
                 untaps.write(rules::Would(rules::Untap {
                     permanent: entity,
                     controller: **owner,

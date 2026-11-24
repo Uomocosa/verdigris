@@ -50,6 +50,7 @@ pub fn r611_3a_static_effects(
     mut timestamp: ResMut<effects::Timestamp>,
 ) {
     let players = players.into_inner();
+    let players: Vec<Entity> = players.iter().map(|player| **player).collect();
     for (entity, effect) in applied.iter() {
         if effect.until != effects::Duration::WhileSourceOnBattlefield {
             continue;
@@ -76,7 +77,7 @@ pub fn r611_3a_static_effects(
                 **source_owner,
                 &candidates,
                 &zones,
-                players,
+                &players,
             )
         });
         if !still_applies {
@@ -102,7 +103,7 @@ pub fn r611_3a_static_effects(
                     **owner,
                     &candidates,
                     &zones,
-                    players,
+                    &players,
                     &applied,
                     stamp,
                 ),
@@ -112,7 +113,7 @@ pub fn r611_3a_static_effects(
                     ability,
                     enchanted,
                     **owner,
-                    players,
+                    &players,
                     &applied,
                     stamp,
                 ),

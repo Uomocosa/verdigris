@@ -1,6 +1,7 @@
 use bevy::prelude::{MessageReader, MessageWriter, Res, ResMut};
 
 use crate::actions;
+use crate::players;
 use crate::turns;
 
 /// 117.3a The active player receives priority at the beginning of most steps and phases, after any
@@ -33,7 +34,7 @@ pub fn r117_3a_r117_3c_r117_3d_priority(
             });
             continue;
         }
-        if action.player != priority.player {
+        if players::PlayerId(action.player) != priority.player {
             if matches!(&action.action, actions::Action::PassPriority) {
                 rejected.write(actions::Rejected::NoPriority {
                     player: action.player,
@@ -66,9 +67,9 @@ mod tests {
         game.play([p1.pass_priority()])?;
 
         let priority = game.priority();
-        assert_eq!(priority.player, p2);
+        assert_eq!(priority.player, p2.id);
         assert_eq!(priority.consecutive_passes, 1);
-        assert_ne!(priority.player, p1);
+        assert_ne!(priority.player, p1.id);
         Ok(())
     }
 
@@ -80,7 +81,7 @@ mod tests {
 
         for (holder, next) in holders.into_iter().zip(expected) {
             game.play([holder.pass_priority()])?;
-            assert_eq!(game.priority_player(), next);
+            assert_eq!(game.priority_player(), next.id);
         }
         Ok(())
     }
@@ -94,7 +95,7 @@ mod tests {
         game.play([p1.pass_priority(), p2.cast(bolt)])?;
 
         let priority = game.priority();
-        assert_eq!(priority.player, p2);
+        assert_eq!(priority.player, p2.id);
         assert_eq!(priority.consecutive_passes, 0);
         Ok(())
     }
@@ -109,6 +110,6 @@ mod tests {
             err.rejection(),
             Some(&actions::Rejected::NoPriority { player: *p2 })
         );
-        assert_eq!(game.priority_player(), p1);
+        assert_eq!(game.priority_player(), p1.id);
     }
 }

@@ -3,18 +3,19 @@ use std::collections::BTreeSet;
 use bevy::prelude::{Entity, Resource};
 use derive_more::{Deref, DerefMut};
 
+use crate::players;
 use crate::turns;
 
 #[derive(Resource, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Turn {
     pub number: u32,
-    pub active: Entity,
+    pub active: players::PlayerId,
     pub step: turns::Step,
 }
 
 #[derive(Resource, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Priority {
-    pub player: Entity,
+    pub player: players::PlayerId,
     pub consecutive_passes: u32,
 }
 

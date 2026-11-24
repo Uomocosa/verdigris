@@ -24,7 +24,7 @@ impl ActiveAutoPass {
                 now.number != self.start.number || now.step.phase() != self.start.step.phase()
             }
             testing::AutoPassUntil::OwnNextTurn => {
-                now.active == self.player && now.number > self.start.number
+                *now.active == self.player && now.number > self.start.number
             }
         }
     }
@@ -34,6 +34,7 @@ impl ActiveAutoPass {
 mod tests {
     use bevy::prelude::Entity;
 
+    use crate::players;
     use crate::testing;
     use crate::turns;
 
@@ -43,7 +44,7 @@ mod tests {
     fn test_usage() {
         let start = turns::Turn {
             number: 1,
-            active: Entity::PLACEHOLDER,
+            active: players::PlayerId(Entity::PLACEHOLDER),
             step: turns::Step::PrecombatMain,
         };
         let auto_pass = ActiveAutoPass {
@@ -55,7 +56,7 @@ mod tests {
         assert!(!auto_pass.is_stop_reached(start));
         assert!(auto_pass.is_stop_reached(turns::Turn {
             number: 1,
-            active: Entity::PLACEHOLDER,
+            active: players::PlayerId(Entity::PLACEHOLDER),
             step: turns::Step::BeginningOfCombat,
         }));
     }

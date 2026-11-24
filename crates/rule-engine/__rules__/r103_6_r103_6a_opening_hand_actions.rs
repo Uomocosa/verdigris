@@ -39,14 +39,14 @@ pub fn r103_6_r103_6a_opening_hand_actions(
         if window.len() < player_count {
             let mut current = turn.active;
             for _ in 0..player_count {
-                if !window.contains(&current) {
-                    window.push(current);
-                    let eligible = opening_hand_cards(current, &opening_hands, &zones);
+                if !window.contains(&*current) {
+                    window.push(*current);
+                    let eligible = opening_hand_cards(*current, &opening_hands, &zones);
                     if !eligible.is_empty() {
                         *pending =
                             actions::PendingChoice(Some(actions::Choice::OpeningHandActions(
                                 actions::OpeningHandActionsChoice {
-                                    player: current,
+                                    player: *current,
                                     cards: eligible,
                                 },
                             )));
@@ -200,7 +200,7 @@ mod tests {
             game.last_rejection(),
             Some(&actions::Rejected::NoPriority { player: *p1 })
         );
-        assert_eq!(game.priority_player(), p1);
+        assert_eq!(game.priority_player(), p1.id);
     }
 
     #[test]
@@ -240,7 +240,7 @@ mod tests {
         assert!(game.player(p1).cards_in(BATTLEFIELD).has(leyline));
         assert!(game.player(p1).cards_in(HAND).has_no(LEYLINE_OF_ANTICIPATION));
         assert_eq!(game.turn().number, 1);
-        assert_eq!(game.priority_player(), p1);
+        assert_eq!(game.priority_player(), p1.id);
         assert!(game.last_rejection().is_none());
         Ok(())
     }

@@ -5,6 +5,7 @@ use bevy::prelude::{App, Entity};
 use crate::RulesPlugin;
 use crate::cards;
 use crate::damage;
+use crate::players;
 use crate::testing;
 use crate::turns;
 use crate::zones;
@@ -84,6 +85,7 @@ pub fn spawn_game(
         .get(players.iter().position(|setup| setup.active).unwrap_or(0))
         .copied()
         .unwrap_or(Entity::PLACEHOLDER);
+    let active = players::PlayerId(active);
     app.insert_resource(turns::Turn {
         number: builder.turn_number,
         active,
@@ -93,7 +95,9 @@ pub fn spawn_game(
         player: active,
         consecutive_passes: 0,
     });
-    app.insert_resource(turns::TurnOrder::from(entities.clone()));
+    app.insert_resource(turns::TurnOrder::from(
+        entities.iter().copied().map(players::PlayerId).collect::<Vec<_>>(),
+    ));
 
     let game = testing::MockGame {
         players: entities.clone(),
@@ -106,6 +110,7 @@ pub fn spawn_game(
 
 #[cfg(test)]
 mod tests {
+    use crate::players;
     use crate::testing::*;
     use crate::turns;
     use crate::zones;
@@ -120,8 +125,8 @@ mod tests {
         assert_eq!(entities.len(), 2);
         assert_eq!(game.life(entities[0]), 20);
         let turn = game.turn();
-        assert_eq!(turn.active, entities[1]);
-        assert_eq!(game.priority_player(), entities[1]);
+        assert_eq!(turn.active, players::PlayerId(entities[1]));
+        assert_eq!(game.priority_player(), players::PlayerId(entities[1]));
         assert_eq!(game.app.world().resource::<turns::TurnOrder>().len(), 2);
         assert_eq!(
             game.get::<zones::Zone>(game.stack),

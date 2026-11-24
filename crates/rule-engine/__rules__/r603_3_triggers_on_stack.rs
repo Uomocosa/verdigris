@@ -2,6 +2,7 @@ use bevy::prelude::{Entity, World};
 
 use crate::actions;
 use crate::cards;
+use crate::players;
 use crate::stack;
 use crate::turns;
 use crate::zones;
@@ -38,7 +39,7 @@ pub fn r603_3_triggers_on_stack(world: &mut World) {
     let active = world.resource::<turns::Turn>().active;
     let turn_order = world.resource::<turns::TurnOrder>().clone();
     let apnap = players_in_apnap_order(active, &turn_order);
-    pending.sort_by_key(|trigger| apnap_position(&apnap, trigger.controller));
+    pending.sort_by_key(|trigger| apnap_position(&apnap, players::PlayerId(trigger.controller)));
     let mut groups: Vec<Vec<stack::PendingTrigger>> = Vec::new();
     for trigger in pending {
         let continues_run = groups.last().is_some_and(|group| {
@@ -83,7 +84,10 @@ pub fn r603_3_triggers_on_stack(world: &mut World) {
     }
 }
 
-fn players_in_apnap_order(active: Entity, turn_order: &turns::TurnOrder) -> Vec<Entity> {
+fn players_in_apnap_order(
+    active: players::PlayerId,
+    turn_order: &turns::TurnOrder,
+) -> Vec<players::PlayerId> {
     let mut order = vec![active];
     let mut current = active;
     while let Some(next) = turn_order.next_after(current) {
@@ -96,7 +100,7 @@ fn players_in_apnap_order(active: Entity, turn_order: &turns::TurnOrder) -> Vec<
     order
 }
 
-fn apnap_position(order: &[Entity], player: Entity) -> usize {
+fn apnap_position(order: &[players::PlayerId], player: players::PlayerId) -> usize {
     order.iter().position(|candidate| *candidate == player).unwrap_or(usize::MAX)
 }
 
