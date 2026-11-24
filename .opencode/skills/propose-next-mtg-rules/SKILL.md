@@ -17,7 +17,7 @@ stage, commit or run anything that changes files outside `.local-run/`.
 
 1. Load `lele-rs` (it binds `lele-syntax-rs`) and `bevy-rs`.
 2. Read `.opencode/skills/verdigris-rules-style/SKILL.md` and its `references/CHANGEABLE_RULES.md`
-   in full: every system you propose is written that way (named questions, `Would` / `Proceeds`).
+   in full: every system you propose is written that way (named questions, `Attempt` / `Resolve`).
 3. Read `AGENTS.md`, especially "Verdigris rules" 1–10. Every proposal must obey them.
 4. Run `scripts/rule-coverage.sh`. It lists every system with the CR rules it quotes and its
    `RuleSet`, the ignored tests, the fixture cards and coverage per CR section. Treat it as the

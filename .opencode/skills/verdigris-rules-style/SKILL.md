@@ -1,6 +1,6 @@
 ---
 name: verdigris-rules-style
-description: Use before adding, changing or reviewing ANY rule system, game action, card effect, static ability, replacement effect or rule-changing card in verdigris. Says how a __rules__ body reads (like the Comprehensive Rules sentence it quotes) and how it acts (Would / Proceeds, one writer per outcome). Its references/CHANGEABLE_RULES.md defines the event pipeline and MUST be read. Read together with verdigris-style.
+description: Use before adding, changing or reviewing ANY rule system, game action, card effect, static ability, replacement effect or rule-changing card in verdigris. Says how a __rules__ body reads (like the Comprehensive Rules sentence it quotes) and how it acts (Attempt / Resolve, one writer per outcome). Its references/CHANGEABLE_RULES.md defines the event pipeline and MUST be read. Read together with verdigris-style.
 ---
 
 # verdigris-rules-style
@@ -17,12 +17,12 @@ The example all sections refer to is `crates/rule-engine/__rules__/r104_2a_wins_
 /// game. This happens immediately and overrides all effects that would preclude that player from
 /// winning the game.
 pub fn r104_2a_wins_when_opponents_left(
-    mut wins: MessageWriter<rules::Proceeds<rules::WinGame>>,
+    mut wins: MessageWriter<Resolve<events::WinGame>>,
     players: players::Players,
 ) {
     for player in players.still_in_the_game() {
         if player.have_all_opponents_left() {
-            wins.write(rules::Proceeds(rules::WinGame(player.id)));
+            wins.write(Resolve(events::WinGame(player.id)));
         }
     }
 }
@@ -96,23 +96,25 @@ player.have_all_opponents_left()
 ```
 
 A missing zone or component is not the announcing rule's problem: the system that performs the event
-looks it up (`r110_1_enter_battlefield` finds the battlefield), the rule just writes `Would(..)`.
+looks it up (`r110_1_enter_battlefield` finds the battlefield), the rule just writes `Attempt(..)`.
 
 No rule checks "is the game over": 104.1 (`r104_1_game_ends`) stops every `RuleSet`. A guard with a
 CR rule behind it stays (800.4a: `if holder.is_still_in_the_game() { return; }`).
 
-## 5. `Would` asks, `Proceeds` doesn't
+## 5. `Attempt` asks, `Resolve` doesn't
+
+`Resolve<E>` is about events; 608 (resolving) is about the stack.
 
 | Write | When |
 |---|---|
-| `Would(event)` | the default: cards may forbid or replace the event |
-| `Proceeds(event)` | only when the CR says no effect can stop it |
+| `Attempt(event)` | the default: cards may forbid or replace the event |
+| `Resolve(event)` | only when the CR says no effect can stop it |
 
-Besides the pipeline itself, the rules that write `Proceeds` are 104.2a ("overrides all effects
+Besides the pipeline itself, the rules that write `Resolve` are 104.2a ("overrides all effects
 that would preclude that player from winning") and 104.3a (conceding, the exception named in
 101.1). A new one needs a CR quote as clear as those.
 
-Write `Proceeds(..)` out in the rule body. Never wrap it in a helper (`declare_as_winner`): a card
+Write `Resolve(..)` out in the rule body. Never wrap it in a helper (`declare_as_winner`): a card
 effect would reuse the helper and bypass cards like Platinum Angel.
 
 ## 6. One writer per outcome
@@ -164,8 +166,8 @@ wrap an `Entity` in `PlayerId(..)` just to make it compile.
 ## 10. A rule is an anchor
 
 A rule says WHEN something would happen and to whom; cards decide WHAT is different. So the rule
-announces `Would(event)` and stops there. If no card reacts, the performing system does the CR's
-default, and **the default may be nothing at all** (then nothing reads `Proceeds`).
+announces `Attempt(event)` and stops there. If no card reacts, the performing system does the CR's
+default, and **the default may be nothing at all** (then nothing reads `Resolve`).
 
 A rule never looks for cards that react: no query over abilities, no "does this card have ...", no
 list of candidates, no early return when the list is empty. Announce the event for every object or
@@ -179,7 +181,7 @@ for card in permanents.iter().filter(|card| card.has_upkeep_effect()) { perform(
 
 // Good: announce it; with no reacting card, nothing happens
 if let Some(active_player) = game.active_player() {
-    upkeeps.write(rules::Would(rules::BeginUpkeep(active_player.id)));
+    upkeeps.write(Attempt(events::BeginUpkeep(active_player.id)));
 }
 ```
 
@@ -200,7 +202,7 @@ Asking, checking an answer, and performing are different jobs, so they are diffe
 general rule has lettered sub-rules (120.3: "damage may have one or more of the following results";
 120.3a damage to a player, 120.3e damage to a creature), the general system names none of them, and
 each sub-rule has its own file that picks out its own case. Adding a sub-rule adds a file and edits
-no other rule. A sub-rule reads only its own event, never the general event's `Proceeds` to build a list.
+no other rule. A sub-rule reads only its own event, never the general event's `Resolve` to build a list.
 
 A sub-rule that is only a condition ("a player can't ... unless") is a clause of the event and has no
 file; its text is quoted on the rule that owns the event.
@@ -208,14 +210,15 @@ file; its text is quoted on the rule that owns the event.
 **How to check:** delete one sub-rule in your head. If the general system no longer makes sense or
 compiles, it named a case.
 
-File per CR rule (AGENTS rule 1). When one sentence needs two systems (ask / perform), each has its own
-file quoting the same sentence, like `r502_3_untap` and `r502_3_untap_perform`. An old combined `rA_rB_..` file is split when it is refactored.
+One file per CR rule. The `pub fn` named after the file is the rule's system or, if the sentence needs
+several, it returns them `.chain()`ed; those systems are private in the same file. A different CR rule
+is a different file: 502.3 announces the untap, 701.26b says what untapping does.
 
 ## 12. Who gives the choice
 
 | The choice comes from | Who asks |
 |---|---|
-| a card or effect: "you may ..." on the card, or a CR sentence that only points at it ("some cards allow ...", "if an effect lets a player ...") | the card's change (`may` in `CHANGEABLE_RULES.md` §3); the rule is an anchor (§10) and has no `Ask` |
+| a card or effect: "you may ..." on the card, or a CR sentence that only points at it ("some cards allow ...", "if an effect lets a player ...") | the card's change (`may` in `CHANGEABLE_RULES.md` §3); the rule is an anchor (§10) and has no `May` |
 | the CR sentence itself, with no card involved ("the player chooses one of them") | the rule writes `Ask(choice)` and reads `Answered<Choice>` |
 
 Test: remove every card from the game. Does the CR sentence still make the player choose? If not, the
@@ -324,7 +327,7 @@ bookkeeping becomes one on what players see. Commit only on the full suite
 | `.filter(..).map(..).collect()` spelling out a CR concept in a rule body | §2 |
 | `Without<players::Lost>` in a rule | `players::StillInTheGame`, §3 |
 | an early return no CR text explains | §4 |
-| `Proceeds` in a rule whose CR text doesn't say it can't be stopped, or `Proceeds` inside a helper | §5 |
+| `Resolve` in a rule whose CR text doesn't say it can't be stopped, or `Resolve` inside a helper | §5 |
 | a `Won` / `Lost` / `GameIsADraw` / `LeftTheGame` insert or a `Life` write outside its writer | send the event, §6 |
 | `ResMut<turns::Turn>` or `ResMut<turns::Priority>` in a rule | `GameMut`, §8 |
 | an id passed to ask about a player (`players.x(turn.active)`) | a handle, §2 |

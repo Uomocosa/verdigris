@@ -6,17 +6,17 @@ What cards can change and how. How a rule body is written: `../SKILL.md`.
 
 In Magic every rule can be changed by a card: drawing, casting, paying, attacking, losing the
 game. So the engine has ONE shape for all of them. Every game action is an **Event**. Before it
-happens it is announced as `Would<E>` and passes through a fixed **pipeline**:
+happens it is announced as `Attempt<E>` and passes through a fixed **pipeline**:
 
 ```
-Would<E> -> 1. Permission  (may E happen?  clauses + AsThough / Allow / OnlyIf / Cant)
-         -> 2. Replacement (614: does E become other events? Instead / Modify)
-Proceeds<E>                (nothing can stop E any more; only the pipeline writes it, plus the
+Attempt<E> -> 1. Permission (may E happen?  clauses + AsThough / Allow / OnlyIf / Cant)
+          -> 2. Replacement (614: does E become other events? Instead / Modify)
+Resolve<E>                  (nothing can stop E any more; only the pipeline writes it, plus the
                            unstoppable rules listed in ../SKILL.md §5)
-         -> 3. Perform     (the CR's default result, in the __rules__ system that owns E,
-                           which reads Proceeds<E>; an event whose CR default is
+          -> 3. Perform     (the CR's default result, in the __rules__ system that owns E,
+                           which reads Resolve<E>; an event whose CR default is
                            "nothing" has no such system)
-         -> Did<E>         (triggers: "whenever a player draws ...")    [when needed]
+          -> Did<E>         (triggers: "whenever a player draws ...")    [when needed]
 ```
 
 A card never adds engine code to change a rule. It adds a `RuleChange { target, change }`
@@ -78,11 +78,11 @@ add an event, clause or value rule, register it.
 ## 3. How to add things
 
 **A new game action** (draw, cast, pay mana, attack, mill ...):
-1. A struct in `src/rules/<cr_name>.rs` with the CR's words as its name and its parameters as
+1. A struct in `src/events/<cr_name>.rs` with the CR's words as its name and its parameters as
    fields (`Draw { player, amount }`). `impl Event` with `ID` = CR number, `Context` for roles.
 2. If the CR lists conditions, write them as `clauses()` with `ClauseId` consts, text quoted
    VERBATIM from `docs/MagicCompRules-*.txt` (keep the verbatim test).
-3. The `__rules__` system that owns the action writes `Would<E>` instead of acting directly; the pipeline decides; the owning system reads `Proceeds<E>` and performs only what comes out.
+3. The `__rules__` system that owns the action writes `Attempt<E>` instead of acting directly; the pipeline decides; the owning system reads `Resolve<E>` and performs only what comes out.
 4. Register the event (section 2).
 
 **A card that changes a rule**: pick the target (whole event, one clause, or a value) and the
@@ -103,14 +103,14 @@ Change::Instead { when: ALWAYS, then: Then::Events(vec![EventTemplate::Mill { ..
 ```
 
 ```
-Would<Draw> -> pipeline finds the change on the event's subject / player
-   Then::Events(vec![..])  -> announces Would<Mill>
-   then: may(..)   -> Ask(the event's player); yes -> Would<Mill>, no -> Proceeds<Draw>
-   no change       -> Proceeds<Draw> (nothing reads it if the default is nothing)
+Attempt<Draw> -> pipeline finds the change on the event's subject / player
+   Then::Events(vec![..])  -> announces Attempt<Mill>
+   then: may(..)   -> May(the event's player); yes -> Attempt<Mill>, no -> Resolve<Draw>
+   no change       -> Resolve<Draw> (nothing reads it if the default is nothing)
 ```
 
-The pipeline does the asking. A rule that reads `Proceeds<E>` to build an ask is wrong: `may` already
-asked, and the chosen event reaches the rule that owns it as its own `Proceeds`.
+The pipeline does the asking. A rule that reads `Resolve<E>` to build an ask is wrong: `may` already
+asked, and the chosen event reaches the rule that owns it as its own `Resolve`.
 
 Several optional changes of one player may be grouped into one ask. `then` may name any event: a new
 template is one variant plus its `instantiate`, and the event's own rule performs it.

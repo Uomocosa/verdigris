@@ -42,7 +42,7 @@ If a git hook fails, stop and report the root cause; never use `--no-verify`.
 
 ## Verdigris rules
 
-1. Each MTG Comprehensive Rule gets one file `crates/rule-engine/src/__rules__/r<num>[_<letter>]_<slug>.rs` with exactly one system; its doc comment quotes the CR text (docs/MagicCompRules-20250919.txt).
+1. One file per CR rule. The `pub fn` named after the file is the rule's system or, if the sentence needs several, it returns them `.chain()`ed; those systems are private in the same file. A different CR rule is a different file: 502.3 announces the untap, 701.26b says what untapping does.
 2. Card text is the syntax. A `CardDefinition` reads like the printed Oracle text: use the card's own words (`YOU`, `OPPONENT`, `ANY`, `target`, `HAND.of(YOU)`, `damage(3)`, `destroy()`). Never rewrite card text into engine terms in a card definition; if a card can't be written that way, the syntax grows to fit it.
 3. Card definitions describe; the engine (`__rules__` systems) orchestrates. Relative words (YOU, OPPONENT, ANY) are resolved against the controller at rule time and must work for any number of players (2+).
 4. Game state is absolute: a real card is in a real zone entity (`InZone(zone)` + `Owner(player)`), never a relative zone.
