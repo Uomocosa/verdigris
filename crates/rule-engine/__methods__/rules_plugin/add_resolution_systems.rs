@@ -68,6 +68,10 @@ pub fn add_resolution_systems(app: &mut App) {
                 comprehensive_rules::r608_3a_permanent_enters::r608_3a_permanent_enters,
                 comprehensive_rules::r701_7a_create_tokens::r701_7a_create_tokens,
                 comprehensive_rules::r614_1a_r616_1_replacement_effects::r614_1a_r616_1_replacement_effects::<
+                    rules::BeginTheGameOnTheBattlefield,
+                >,
+                comprehensive_rules::r103_6a_begin_the_game_on_the_battlefield::r103_6a_begin_the_game_on_the_battlefield,
+                comprehensive_rules::r614_1a_r616_1_replacement_effects::r614_1a_r616_1_replacement_effects::<
                     rules::EnterBattlefield,
                 >,
                 comprehensive_rules::r110_1_enter_battlefield::r110_1_enter_battlefield,
@@ -93,7 +97,7 @@ mod tests {
 
         assert_eq!(
             app.get_schedule(Update).map(Schedule::systems_len),
-            Some(27)
+            Some(29)
         );
     }
 }

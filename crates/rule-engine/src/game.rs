@@ -53,10 +53,7 @@ mod tests {
             .world_mut()
             .run_system_once(move |answers: Game| {
                 assert_eq!(answers.active_player().map(|player| player.id), Some(p1.id));
-                assert_eq!(
-                    answers.priority_holder().map(|player| player.id),
-                    Some(p1.id)
-                );
+                assert_eq!(answers.priority_holder().map(|player| player.id), None);
             })
             .unwrap();
     }

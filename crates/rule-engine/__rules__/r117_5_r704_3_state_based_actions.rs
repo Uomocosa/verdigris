@@ -25,7 +25,7 @@ pub fn r117_5_r704_3_state_based_actions(world: &mut World) {
             }
             if matches!(
                 (*world.resource::<actions::PendingChoice>()).as_ref(),
-                Some(actions::Choice::OrderTriggers(_) | actions::Choice::OpeningHandActions(_))
+                Some(actions::Choice::OrderTriggers(_) | actions::Choice::May(_))
             ) {
                 return;
             }

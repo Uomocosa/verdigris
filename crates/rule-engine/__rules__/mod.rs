@@ -1,4 +1,6 @@
-pub mod r103_6_r103_6a_opening_hand_actions;
+pub mod r103_6_opening_hand_actions;
+pub mod r103_6a_begin_the_game_on_the_battlefield;
+pub mod r103_8_first_turn;
 pub mod r103_8a_r504_1_draw_step;
 pub mod r104_1_game_ends;
 pub mod r104_2_win_the_game;

@@ -19,6 +19,11 @@ impl Priority {
 
 #[rustfmt::skip]
 impl Priority {
+    pub const NO_HOLDER: Self = Self { holder: None, passed: BTreeSet::new() };
+}
+
+#[rustfmt::skip]
+impl Priority {
     #[must_use]
     pub fn has_passed(&self, player: players::PlayerId) -> bool { self.passed.contains(&player) }
 }

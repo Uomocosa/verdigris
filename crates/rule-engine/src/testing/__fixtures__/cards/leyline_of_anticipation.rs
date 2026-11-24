@@ -37,7 +37,9 @@ mod tests {
         assert_eq!(leyline.type_line.types, vec![cards::CardType::Enchantment]);
         assert_eq!(leyline.cost, cost![2, U, U]);
         assert_eq!(leyline.colors(), vec![cards::Color::Blue]);
-        assert!(leyline.begins_the_game_on_the_battlefield());
+        assert!(leyline.text.contains(&abilities::Ability::from(
+            abilities::begin_the_game_with_it_on_the_battlefield()
+        )));
         assert_eq!(leyline.text.len(), 2);
         assert_eq!(
             leyline.continuous_abilities().cloned().collect::<Vec<_>>(),

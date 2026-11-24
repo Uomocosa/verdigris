@@ -88,9 +88,6 @@ impl CardDefinition {
     pub fn enters_tapped(&self) -> bool {}
 
     #[must_use]
-    pub fn begins_the_game_on_the_battlefield(&self) -> bool {}
-
-    #[must_use]
     pub fn enchant(&self) -> Option<effects::Filter> {}
 }
 

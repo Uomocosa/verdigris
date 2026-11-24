@@ -130,7 +130,6 @@ pub fn r601_2c_targets(
             | actions::Action::ActivateManaAbility { .. }
             | actions::Action::ChooseLegendary(_)
             | actions::Action::ArrangeGraveyard(_)
-            | actions::Action::BeginGameWithOnBattlefield(_)
             | actions::Action::ChooseMay(_)
             | actions::Action::PassPriority
             | actions::Action::Concede => {}

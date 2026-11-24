@@ -6,7 +6,7 @@ pub use basic::messages::{Answered, Ask, PlayerAction, Rejected};
 pub use basic::resources::{AskQueue, PendingChoice, PendingMayAsks};
 pub use basic::structs::{
     ArrangeGraveyardChoice, BlockAssignment, DamageAssignment, DiscardChoice, LegendaryChoice,
-    MayChoice, OpeningHandActionsChoice, OrderTriggersChoice, RequiredCombatDamage, TargetChoice,
+    MayChoice, OrderTriggersChoice, RequiredCombatDamage, TargetChoice,
 };
 
 #[path = "__bevy_systems__/mod.rs"]
@@ -14,6 +14,3 @@ pub mod bevy_systems;
 
 mod combat_damage_choice;
 pub use combat_damage_choice::CombatDamageChoice;
-
-mod opening_hand_window;
-pub use opening_hand_window::OpeningHandWindow;

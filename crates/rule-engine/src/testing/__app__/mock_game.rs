@@ -104,9 +104,7 @@ impl MockGame {
     }
 
     pub fn pass_priority(&mut self) {
-        let Some(player) = self.priority().holder else {
-            return;
-        };
+        let player = self.priority().holder.unwrap_or_else(|| self.turn().active);
         let _ = self.app.world_mut().write_message(actions::PlayerAction {
             player,
             action: actions::Action::PassPriority,
@@ -205,8 +203,8 @@ mod tests {
         assert!(!game.has_lost(p1));
         assert_eq!(game.damage(p1), 0);
         assert_eq!(game.turn().number, 1);
-        assert_eq!(game.priority_player(), Some(p1.id));
-        assert_eq!(game.priority().holder, Some(p1.id));
+        assert_eq!(game.priority_player(), None);
+        assert_eq!(game.priority().holder, None);
         assert!(game.priority().passed.is_empty());
         assert_eq!(game.player(p2).cards_in(BATTLEFIELD).count(), 1);
         assert_eq!(game.stack().count(), 0);
@@ -239,7 +237,7 @@ mod tests {
         assert_eq!(turn.number, 1);
         assert_eq!(turn.active, p1.id);
         assert_eq!(turn.step, turns::Step::PrecombatMain);
-        assert_eq!(game.priority_player(), Some(p1.id));
+        assert_eq!(game.priority_player(), None);
         Ok(())
     }
 
@@ -266,7 +264,7 @@ mod tests {
         assert_eq!(turn.number, 3);
         assert_eq!(turn.active, game.p(2).id);
         assert_eq!(turn.step, turns::Step::PostcombatMain);
-        assert_eq!(game.priority_player(), Some(game.p(2).id));
+        assert_eq!(game.priority_player(), None);
     }
 
     #[test]
@@ -284,7 +282,7 @@ mod tests {
         assert_eq!(turn.number, 1);
         assert_eq!(turn.step, turns::Step::PrecombatMain);
         assert_eq!(turn.active, p1.id);
-        assert_eq!(game.priority_player(), Some(p1.id));
+        assert_eq!(game.priority_player(), None);
     }
 
     #[test]
@@ -299,7 +297,7 @@ mod tests {
         assert_eq!(turn.number, 3);
         assert_eq!(turn.step, turns::Step::PostcombatMain);
         assert_eq!(turn.active, p2.id);
-        assert_eq!(game.priority_player(), Some(p2.id));
+        assert_eq!(game.priority_player(), None);
     }
 
     #[test]

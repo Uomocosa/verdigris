@@ -45,6 +45,8 @@ pub fn register_messages_and_resources(app: &mut App) {
         .add_message::<rules::Proceeds<rules::Counter>>()
         .add_message::<rules::Proceeds<rules::DealDamage>>()
         .add_message::<rules::Proceeds<rules::EnterBattlefield>>()
+        .add_message::<rules::Proceeds<rules::BeginTheGameOnTheBattlefield>>()
+        .add_message::<rules::Proceeds<rules::OpeningHandAction>>()
         .add_message::<rules::Proceeds<rules::Untap>>()
         .add_message::<rules::Proceeds<rules::TapAttacker>>()
         .add_message::<rules::Proceeds<rules::PutIntoGraveyard>>()
@@ -64,14 +66,20 @@ pub fn register_messages_and_resources(app: &mut App) {
         .add_message::<rules::Ask<rules::LoseGame>>()
         .add_message::<rules::Ask<rules::WinGame>>()
         .add_message::<rules::Ask<rules::Untap>>()
+        .add_message::<rules::Ask<rules::OpeningHandAction>>()
+        .add_message::<rules::Ask<rules::BeginTheGameOnTheBattlefield>>()
         .add_message::<effects::PowerToughnessModified>()
         .add_message::<effects::KeywordGranted>()
         .add_message::<cards::Entered>()
         .add_message::<turns::StepStarted>()
-        .add_message::<turns::AllPlayersPassed>();
+        .add_message::<turns::AllPlayersPassed>()
+        .add_message::<turns::MulligansComplete>()
+        .add_message::<turns::OpeningHandActionsComplete>();
     app.init_resource::<actions::PendingChoice>();
     app.init_resource::<actions::AskQueue>();
-    app.init_resource::<actions::OpeningHandWindow>();
+    app.insert_resource(actions::PendingMayAsks::<rules::OpeningHandAction>(
+        Vec::new(),
+    ));
     app.init_resource::<turns::CombatDamageSteps>();
     app.init_resource::<turns::CombatDamageParticipants>();
     app.init_resource::<StateBasedActionsPerformed>();

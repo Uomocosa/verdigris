@@ -1,8 +1,7 @@
-use bevy::prelude::{MessageReader, MessageWriter, Res};
+use bevy::prelude::{MessageReader, MessageWriter};
 
 use crate::GameMut;
 use crate::actions;
-use crate::turns;
 
 /// 117.3a The active player receives priority at the beginning of most steps and phases, after any
 /// turn-based actions (such as drawing a card during the draw step; see rule 703) have been dealt
@@ -20,20 +19,8 @@ pub fn r117_3a_r117_3c_r117_3d_priority(
     mut actions: MessageReader<actions::PlayerAction>,
     mut rejected: MessageWriter<actions::Rejected>,
     mut game: GameMut,
-    turn_order: Res<turns::TurnOrder>,
-    window: Res<actions::OpeningHandWindow>,
 ) {
-    let turn_order = turn_order.into_inner();
-    let window = window.into_inner();
     for action in actions.read() {
-        if matches!(&action.action, actions::Action::PassPriority)
-            && !window.is_complete(turn_order.len())
-        {
-            rejected.write(actions::Rejected::NoPriority {
-                player: action.player,
-            });
-            continue;
-        }
         let holder = game.priority_holder().map(|holder| holder.id);
         if holder.is_none_or(|holder| action.player != holder) {
             if matches!(&action.action, actions::Action::PassPriority) {

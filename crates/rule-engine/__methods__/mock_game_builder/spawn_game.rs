@@ -90,8 +90,9 @@ pub fn spawn_game(
         active,
         step: builder.step,
     });
-    app.insert_resource(turns::Priority::held_by(active));
+    app.insert_resource(turns::Priority::NO_HOLDER);
     app.insert_resource(turns::TurnOrder::from(entities.clone()));
+    app.world_mut().write_message(turns::MulligansComplete);
 
     let game = testing::MockGame {
         players: entities.clone(),
@@ -119,7 +120,7 @@ mod tests {
         assert_eq!(game.life(*entities[0]), 20);
         let turn = game.turn();
         assert_eq!(turn.active, entities[1]);
-        assert_eq!(game.priority_player(), Some(entities[1]));
+        assert_eq!(game.priority_player(), None);
         assert_eq!(game.app.world().resource::<turns::TurnOrder>().len(), 2);
         assert_eq!(
             game.get::<zones::Zone>(game.stack),

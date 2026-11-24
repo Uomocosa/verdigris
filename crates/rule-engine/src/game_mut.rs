@@ -68,10 +68,7 @@ mod tests {
             .world_mut()
             .run_system_once(move |mut answers: GameMut| {
                 assert_eq!(answers.step(), turns::Step::PrecombatMain);
-                assert_eq!(
-                    answers.priority_holder().map(|player| player.id),
-                    Some(p1.id)
-                );
+                assert_eq!(answers.priority_holder().map(|player| player.id), None);
                 answers.pass_priority_to(p2.id);
                 assert_eq!(
                     answers.priority_holder().map(|player| player.id),

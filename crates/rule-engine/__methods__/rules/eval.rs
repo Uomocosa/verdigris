@@ -491,6 +491,7 @@ mod tests {
     fn has_priority_matches_the_priority_player() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([P1.battlefield([GRIZZLY_BEARS]), P2]);
         let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        game.app.update();
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {

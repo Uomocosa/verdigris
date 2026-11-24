@@ -44,25 +44,15 @@ pub fn r508_1a_r508_1k_declare_attackers(
     mut commands: Commands,
     priority: Res<turns::Priority>,
     turn: Res<turns::Turn>,
-    turn_order: Res<turns::TurnOrder>,
-    window: Res<actions::OpeningHandWindow>,
     candidates: Query<(Entity, &cards::Owner), With<cards::Creature>>,
     answers: rules::Rules,
 ) {
     let priority = priority.into_inner();
     let turn = turn.into_inner();
-    let window = window.into_inner();
-    let turn_order = turn_order.into_inner();
     for action in actions.read() {
         let actions::Action::DeclareAttackers(attackers) = &action.action else {
             continue;
         };
-        if !window.is_complete(turn_order.len()) {
-            rejected.write(actions::Rejected::CannotAttack {
-                attackers: attackers.clone(),
-            });
-            continue;
-        }
         if turn.step != turns::Step::DeclareAttackers
             || priority.holder != Some(action.player)
             || action.player != turn.active

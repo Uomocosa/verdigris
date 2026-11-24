@@ -54,9 +54,6 @@ pub enum Rejected {
     InvalidMay {
         player: players::PlayerId,
     },
-    InvalidOpeningHandActions {
-        player: players::PlayerId,
-    },
     InvalidCombatDamage {
         player: players::PlayerId,
     },

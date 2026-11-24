@@ -54,12 +54,6 @@ pub struct MayChoice {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct OpeningHandActionsChoice {
-    pub player: players::PlayerId,
-    pub cards: Vec<Entity>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct LegendaryChoice {
     pub player: players::PlayerId,
     pub legal: BTreeSet<Entity>,
