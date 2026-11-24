@@ -77,8 +77,8 @@ mod tests {
         ]);
         let [sign_in_blood] = game.player(p1).cards_in(HAND).exactly::<1>(SIGN_IN_BLOOD)?;
         game.play([
-            p1.cast(sign_in_blood).targeting(p2).end_turn(),
-            p2.end_turn(),
+            p1.cast(sign_in_blood).targeting(p2).pass_priority(),
+            p2.pass_priority(),
         ])?;
         assert!(game.has_lost(p2));
         Ok(())

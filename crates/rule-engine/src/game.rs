@@ -9,13 +9,13 @@ pub struct Game<'w, 's> {
     players: players::Players<'w, 's>,
     turn: Query<'w, 's, &'static turns::Turn>,
     priority: Query<'w, 's, &'static turns::Priority>,
-    drawn: Query<'w, 's, Entity, With<players::GameIsADraw>>,
+    whose_game_is_a_draw: Query<'w, 's, Entity, With<players::GameIsADraw>>,
 }
 
 #[rustfmt::skip]
 impl Game<'_, '_> {
     #[must_use]
-    pub fn is_a_draw(&self) -> bool { !self.drawn.is_empty() && self.players.still_in_the_game().is_empty() }
+    pub fn is_a_draw(&self) -> bool { !self.whose_game_is_a_draw.is_empty() && self.players.still_in_the_game().is_empty() }
 
     #[must_use]
     pub fn is_over(&self) -> bool { self.players.has_anyone_won() || self.is_a_draw() }
