@@ -122,7 +122,7 @@ mod tests {
     }
 
     #[test]
-    fn opening_hand_choices_follow_turn_order_with_three_players() -> TestResult {
+    fn opening_hand_choices_follow_turn_order() -> TestResult {
         let (mut game, [p1, p2, p3]) = MockGame::new([
             P1.hand([LEYLINE_OF_ANTICIPATION]),
             P2.hand([LEYLINE_OF_ANTICIPATION]),
@@ -139,26 +139,6 @@ mod tests {
             Some(&actions::Rejected::InvalidMay { player: p3.id })
         );
         assert!(game.player(p3).cards_in(HAND).has(p3_leyline));
-
-        game.act(p1, actions::Action::ChooseMay(vec![p1_leyline.into()]));
-        game.act(p2, actions::Action::ChooseMay(vec![p2_leyline.into()]));
-        game.act(p3, actions::Action::ChooseMay(vec![p3_leyline.into()]));
-
-        assert!(game.player(p1).cards_in(BATTLEFIELD).has(p1_leyline));
-        assert!(game.player(p2).cards_in(BATTLEFIELD).has(p2_leyline));
-        assert!(game.player(p3).cards_in(BATTLEFIELD).has(p3_leyline));
-        assert_eq!(game.priority_player(), Some(p1.id));
-        Ok(())
-    }
-
-    #[test]
-    fn opening_hand_choices_follow_turn_order() -> TestResult {
-        let (mut game, [p1, p2]) = MockGame::new([
-            P1.hand([LEYLINE_OF_ANTICIPATION]),
-            P2.hand([LEYLINE_OF_ANTICIPATION]),
-        ]);
-        let [p1_leyline] = game.player(p1).cards_in(HAND).exactly::<1>(LEYLINE_OF_ANTICIPATION)?;
-        let [p2_leyline] = game.player(p2).cards_in(HAND).exactly::<1>(LEYLINE_OF_ANTICIPATION)?;
 
         game.act(p2, actions::Action::ChooseMay(vec![p2_leyline.into()]));
 
@@ -184,6 +164,13 @@ mod tests {
         game.act(p2, actions::Action::ChooseMay(vec![p2_leyline.into()]));
 
         assert!(game.player(p2).cards_in(BATTLEFIELD).has(p2_leyline));
+        assert_eq!(game.priority().holder, None);
+
+        game.act(p3, actions::Action::ChooseMay(vec![p3_leyline.into()]));
+
+        assert!(game.player(p1).cards_in(BATTLEFIELD).has(p1_leyline));
+        assert!(game.player(p2).cards_in(BATTLEFIELD).has(p2_leyline));
+        assert!(game.player(p3).cards_in(BATTLEFIELD).has(p3_leyline));
         assert_eq!(game.priority_player(), Some(p1.id));
         Ok(())
     }
