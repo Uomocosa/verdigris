@@ -20,7 +20,7 @@ pub fn r104_2a_wins_when_opponents_left(
     mut wins: MessageWriter<rules::Proceeds<rules::WinGame>>,
     players: players::Players,
 ) {
-    if players.is_game_over() {
+    if players.has_anyone_won() {
         return;
     }
     for player in players.still_in_the_game() {
@@ -83,7 +83,8 @@ if players.iter().count() < 2 { return; }
 players.have_all_opponents_left(player)
 ```
 
-A guard that has a CR rule behind it stays: `is_game_over()` is 104.1.
+A guard that has a CR rule behind it stays: `has_anyone_won()` is 104.1 ("a game ends immediately
+when a player wins").
 
 ## 5. `Would` asks, `Proceeds` doesn't
 

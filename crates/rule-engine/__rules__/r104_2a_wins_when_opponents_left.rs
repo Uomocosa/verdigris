@@ -9,7 +9,7 @@ pub fn r104_2a_wins_when_opponents_left(
     mut wins: MessageWriter<rules::Proceeds<rules::WinGame>>,
     players: players::Players,
 ) {
-    if players.is_game_over() {
+    if players.has_anyone_won() {
         return;
     }
     for player in players.still_in_the_game() {

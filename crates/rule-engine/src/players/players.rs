@@ -10,7 +10,6 @@ pub struct Players<'w, 's> {
     turn_order: Query<'w, 's, &'static turns::TurnOrder>,
     still_in_the_game: Query<'w, 's, Entity, players::StillInTheGame>,
     winners: Query<'w, 's, Entity, With<players::Won>>,
-    drawn: Query<'w, 's, Entity, With<players::Drawn>>,
 }
 
 #[rustfmt::skip]
@@ -25,7 +24,7 @@ impl Players<'_, '_> {
     pub fn is_still_in_the_game(&self, player: Entity) -> bool { self.still_in_the_game.contains(player) }
 
     #[must_use]
-    pub fn is_game_over(&self) -> bool { !self.winners.is_empty() || !self.drawn.is_empty() }
+    pub fn has_anyone_won(&self) -> bool { !self.winners.is_empty() }
 }
 
 #[atomic_delegates]
@@ -65,7 +64,7 @@ mod tests {
                 );
                 assert!(!players.is_still_in_the_game(Entity::from(p2)));
                 assert!(!players.have_all_opponents_left(Entity::from(p1)));
-                assert!(!players.is_game_over());
+                assert!(!players.has_anyone_won());
             })
             .unwrap();
         Ok(())
