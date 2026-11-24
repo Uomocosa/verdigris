@@ -37,14 +37,14 @@ mod tests {
                     &answers,
                     &TestStep {
                         permanent: *waiver,
-                        controller: p1.into(),
+                        controller: p1.id,
                     }
                 ));
                 assert!(performs(
                     &answers,
                     &TestStep {
                         permanent: *bears,
-                        controller: p1.into(),
+                        controller: p1.id,
                     }
                 ));
             })

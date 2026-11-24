@@ -186,7 +186,7 @@ fn request_destroy(
     if let Some(target) = target {
         destructions.write(rules::Would(rules::Destroy {
             permanent: target,
-            controller: permanent_controller(lookups, target, controller),
+            controller: players::PlayerId(permanent_controller(lookups, target, controller)),
         }));
     }
 }
@@ -203,7 +203,7 @@ fn request_counter(
     {
         countered.write(rules::Would(rules::Counter {
             spell: target,
-            controller: permanent_controller(lookups, target, controller),
+            controller: players::PlayerId(permanent_controller(lookups, target, controller)),
         }));
     }
 }
@@ -283,7 +283,7 @@ fn request_damage(
         source: spell,
         recipient: target,
         amount,
-        controller: permanent_controller(lookups, target, controller),
+        controller: players::PlayerId(permanent_controller(lookups, target, controller)),
     }));
 }
 
@@ -373,7 +373,7 @@ fn request_tokens(
     definition: effects::TokenDefinition,
 ) {
     tokens.write(rules::Would(rules::CreateTokens {
-        controller,
+        controller: players::PlayerId(controller),
         amount: count,
         token: definition,
     }));

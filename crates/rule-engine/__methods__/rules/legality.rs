@@ -12,14 +12,14 @@ pub fn legality<E: Event>(answers: &rules::Rules, event: &E) -> rules::Legality 
         let entity = match clause.role {
             rules::Role::Subject => Some(subject),
             rules::Role::Other => other,
-            rules::Role::Player => Some(player),
+            rules::Role::Player => Some(*player),
         };
         entity.is_some_and(|entity| {
             answers.changes(entity, rules::Target::Clause(clause.key)).iter().any(|change| {
                 match change {
                     rules::Change::AsThough => true,
                     rules::Change::Allow(alternative) => {
-                        answers.eval(alternative, subject, other, Some(player))
+                        answers.eval(alternative, subject, other, Some(*player))
                     }
                     _ => false,
                 }
@@ -29,11 +29,11 @@ pub fn legality<E: Event>(answers: &rules::Rules, event: &E) -> rules::Legality 
     let base = E::clauses()
         .iter()
         .filter(|clause| !waived(clause))
-        .all(|clause| answers.eval(&clause.condition, subject, other, Some(player)));
+        .all(|clause| answers.eval(&clause.condition, subject, other, Some(*player)));
     let vetoed = [
         (rules::Role::Subject, Some(subject)),
         (rules::Role::Other, other),
-        (rules::Role::Player, Some(player)),
+        (rules::Role::Player, Some(*player)),
     ]
     .into_iter()
     .filter_map(|(role, entity)| entity.map(|entity| (role, entity)))
@@ -43,7 +43,7 @@ pub fn legality<E: Event>(answers: &rules::Rules, event: &E) -> rules::Legality 
             rules::Change::OnlyIf {
                 role: required,
                 condition,
-            } if *required == role => !answers.eval(condition, subject, other, Some(player)),
+            } if *required == role => !answers.eval(condition, subject, other, Some(*player)),
             _ => false,
         })
     });
@@ -79,7 +79,7 @@ mod tests {
                         &answers,
                         &TestRule {
                             attacker: *bears,
-                            player: p1.into()
+                            player: p1.id
                         }
                     ),
                     rules::Legality::Legal
@@ -102,7 +102,7 @@ mod tests {
                         &answers,
                         &TestRule {
                             attacker: *bears,
-                            player: p2.into()
+                            player: p2.id
                         }
                     ),
                     rules::Legality::Illegal
@@ -125,7 +125,7 @@ mod tests {
                         &answers,
                         &TestRule {
                             attacker: *waiver,
-                            player: p1.into()
+                            player: p1.id
                         }
                     ),
                     rules::Legality::Legal
@@ -149,7 +149,7 @@ mod tests {
                         &answers,
                         &RestrictedRule {
                             attacker: *restriction,
-                            player: p1.into()
+                            player: p1.id
                         }
                     ),
                     rules::Legality::Illegal
@@ -181,7 +181,7 @@ mod tests {
                         &answers,
                         &TestRule {
                             attacker: *drake,
-                            player: p2.into()
+                            player: p2.id
                         }
                     ),
                     rules::Legality::Legal
@@ -213,7 +213,7 @@ mod tests {
                         &answers,
                         &TestRule {
                             attacker: *bears,
-                            player: p2.into()
+                            player: p2.id
                         }
                     ),
                     rules::Legality::Illegal
@@ -236,7 +236,7 @@ mod tests {
                         &answers,
                         &AbsoluteRule {
                             attacker: *waiver,
-                            player: p1.into()
+                            player: p1.id
                         }
                     ),
                     rules::Legality::Illegal
@@ -260,7 +260,7 @@ mod tests {
                         &answers,
                         &TestRule {
                             attacker: *bears,
-                            player: p1.into()
+                            player: p1.id
                         }
                     ),
                     rules::Legality::Illegal
@@ -348,7 +348,7 @@ mod tests {
                     legality::<rules::CreateTokens>(
                         &answers,
                         &rules::CreateTokens {
-                            controller: p1.into(),
+                            controller: p1.id,
                             amount: 2,
                             token: effects::TokenDefinition::from(SOLDIER_TOKEN.definition),
                         }
@@ -359,7 +359,7 @@ mod tests {
                     legality::<rules::CreateTokens>(
                         &answers,
                         &rules::CreateTokens {
-                            controller: p2.into(),
+                            controller: p2.id,
                             amount: 2,
                             token: effects::TokenDefinition::from(SOLDIER_TOKEN.definition),
                         }
@@ -421,7 +421,7 @@ mod tests {
                         &answers,
                         &rules::Destroy {
                             permanent: *protected,
-                            controller: p1.into(),
+                            controller: p1.id,
                         }
                     ),
                     rules::Legality::Illegal
@@ -431,7 +431,7 @@ mod tests {
                         &answers,
                         &rules::Destroy {
                             permanent: *exposed,
-                            controller: p2.into(),
+                            controller: p2.id,
                         }
                     ),
                     rules::Legality::Legal
@@ -457,7 +457,7 @@ mod tests {
                         &answers,
                         &rules::Counter {
                             spell: *protected,
-                            controller: p1.into(),
+                            controller: p1.id,
                         }
                     ),
                     rules::Legality::Illegal
@@ -467,7 +467,7 @@ mod tests {
                         &answers,
                         &rules::Counter {
                             spell: *protected,
-                            controller: p2.into(),
+                            controller: p2.id,
                         }
                     ),
                     rules::Legality::Legal
@@ -493,7 +493,7 @@ mod tests {
                         &answers,
                         &rules::EnterBattlefield {
                             permanent: *protected,
-                            controller: p1.into(),
+                            controller: p1.id,
                             summoning_sick: true,
                         }
                     ),
@@ -504,7 +504,7 @@ mod tests {
                         &answers,
                         &rules::EnterBattlefield {
                             permanent: *protected,
-                            controller: p2.into(),
+                            controller: p2.id,
                             summoning_sick: true,
                         }
                     ),
@@ -534,7 +534,7 @@ mod tests {
                             source: *exposed,
                             recipient: *protected,
                             amount: 3,
-                            controller: p1.into(),
+                            controller: p1.id,
                         }
                     ),
                     rules::Legality::Illegal
@@ -546,7 +546,7 @@ mod tests {
                             source: *exposed,
                             recipient: *exposed,
                             amount: 3,
-                            controller: p2.into(),
+                            controller: p2.id,
                         }
                     ),
                     rules::Legality::Legal
@@ -558,7 +558,7 @@ mod tests {
                             source: *protected,
                             recipient: *exposed,
                             amount: 3,
-                            controller: p2.into(),
+                            controller: p2.id,
                         }
                     ),
                     rules::Legality::Legal

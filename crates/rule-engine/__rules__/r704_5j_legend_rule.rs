@@ -32,7 +32,7 @@ pub fn r704_5j_legend_rule(
         for other in choice.legal.iter().copied().filter(|other| other != chosen) {
             destructions.write(rules::Would(rules::Destroy {
                 permanent: other,
-                controller: *choice.player,
+                controller: choice.player,
             }));
         }
         **performed = true;

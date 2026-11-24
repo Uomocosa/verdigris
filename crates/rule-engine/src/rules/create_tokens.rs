@@ -1,21 +1,23 @@
 use bevy::prelude::Entity;
 
+use crate::players;
+
 use crate::effects;
 use crate::rules;
 use crate::rules::traits::event::Event;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct CreateTokens {
-    pub controller: Entity,
+    pub controller: players::PlayerId,
     pub amount: u32,
     pub token: effects::TokenDefinition,
 }
 
 #[rustfmt::skip]
 impl rules::traits::context::Context for CreateTokens {
-    fn subject(&self) -> Entity { self.controller }
+    fn subject(&self) -> Entity { *self.controller }
     fn other(&self) -> Option<Entity> { None }
-    fn player(&self) -> Entity { self.controller }
+    fn player(&self) -> players::PlayerId { self.controller }
 }
 
 impl Event for CreateTokens {
@@ -39,16 +41,17 @@ mod tests {
     use crate::testing;
 
     use super::CreateTokens;
+    use crate::players;
 
     #[test]
     fn test_usage() {
-        let controller = Entity::PLACEHOLDER;
+        let controller = players::PlayerId(Entity::PLACEHOLDER);
         let event = CreateTokens {
             controller,
             amount: 2,
             token: effects::TokenDefinition::from(testing::SOLDIER_TOKEN.definition),
         };
-        assert_eq!(event.subject(), controller);
+        assert_eq!(event.subject(), *controller);
         assert_eq!(event.other(), None);
         assert_eq!(event.player(), controller);
         assert_eq!(CreateTokens::ID, rules::EventId("701.7a"));

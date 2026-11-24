@@ -1,5 +1,7 @@
 use bevy::prelude::Entity;
 
+use crate::players;
+
 use crate::rules;
 use crate::rules::traits::event::Event;
 
@@ -8,14 +10,14 @@ pub struct DealDamage {
     pub source: Entity,
     pub recipient: Entity,
     pub amount: u32,
-    pub controller: Entity,
+    pub controller: players::PlayerId,
 }
 
 #[rustfmt::skip]
 impl rules::traits::context::Context for DealDamage {
     fn subject(&self) -> Entity { self.recipient }
     fn other(&self) -> Option<Entity> { Some(self.source) }
-    fn player(&self) -> Entity { self.controller }
+    fn player(&self) -> players::PlayerId { self.controller }
 }
 
 impl Event for DealDamage {
@@ -37,12 +39,13 @@ mod tests {
     use crate::rules::traits::event::Event;
 
     use super::DealDamage;
+    use crate::players;
 
     #[test]
     fn test_usage() {
         let source = Entity::PLACEHOLDER;
         let recipient = Entity::from_raw_u32(1).unwrap();
-        let controller = Entity::from_raw_u32(2).unwrap();
+        let controller = players::PlayerId(Entity::from_raw_u32(2).unwrap());
         let event = DealDamage {
             source,
             recipient,

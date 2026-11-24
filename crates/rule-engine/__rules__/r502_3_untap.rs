@@ -1,6 +1,7 @@
 use bevy::prelude::{Entity, MessageReader, MessageWriter, Query, Res, With};
 
 use crate::cards;
+use crate::players;
 use crate::rules;
 use crate::turns;
 
@@ -23,7 +24,7 @@ pub fn r502_3_untap(
             if **owner == *turn.active {
                 untaps.write(rules::Would(rules::Untap {
                     permanent: entity,
-                    controller: **owner,
+                    controller: players::PlayerId(**owner),
                 }));
             }
         }

@@ -98,11 +98,11 @@ mod tests {
             .run_system_once(move |answers: rules::Rules| {
                 assert!(answers.performs(&rules::TapAttacker {
                     attacker: *bears,
-                    player: p1.into(),
+                    player: p1.id,
                 }));
                 assert!(!answers.performs(&rules::TapAttacker {
                     attacker: *sovereign,
-                    player: p2.into(),
+                    player: p2.id,
                 }));
             })
             .unwrap();

@@ -52,7 +52,7 @@ pub fn r601_2a_cast(
         }
         if !answers.legal::<rules::CastSpell>(&rules::CastSpell {
             spell,
-            player: *action.player,
+            player: action.player,
         }) {
             rejected.write(actions::Rejected::CannotCast { spell });
             continue;

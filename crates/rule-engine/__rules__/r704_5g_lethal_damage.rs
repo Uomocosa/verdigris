@@ -2,6 +2,7 @@ use bevy::prelude::{Entity, MessageWriter, Query, With};
 
 use crate::cards;
 use crate::damage;
+use crate::players;
 use crate::rules;
 
 /// 704.5g If a creature has toughness greater than 0, it has damage marked on it, and the total
@@ -22,7 +23,7 @@ pub fn r704_5g_lethal_damage(
         }
         destructions.write(rules::Would(rules::Destroy {
             permanent: creature,
-            controller: **owner,
+            controller: players::PlayerId(**owner),
         }));
     }
 }

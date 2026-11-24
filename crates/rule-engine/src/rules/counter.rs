@@ -1,19 +1,21 @@
 use bevy::prelude::Entity;
 
+use crate::players;
+
 use crate::rules;
 use crate::rules::traits::event::Event;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Counter {
     pub spell: Entity,
-    pub controller: Entity,
+    pub controller: players::PlayerId,
 }
 
 #[rustfmt::skip]
 impl rules::traits::context::Context for Counter {
     fn subject(&self) -> Entity { self.spell }
     fn other(&self) -> Option<Entity> { None }
-    fn player(&self) -> Entity { self.controller }
+    fn player(&self) -> players::PlayerId { self.controller }
 }
 
 impl Event for Counter {
@@ -29,11 +31,12 @@ mod tests {
     use crate::rules::traits::event::Event;
 
     use super::Counter;
+    use crate::players;
 
     #[test]
     fn test_usage() {
         let spell = Entity::PLACEHOLDER;
-        let controller = Entity::from_raw_u32(1).unwrap();
+        let controller = players::PlayerId(Entity::from_raw_u32(1).unwrap());
         let event = Counter { spell, controller };
         assert_eq!(event.subject(), spell);
         assert_eq!(event.other(), None);

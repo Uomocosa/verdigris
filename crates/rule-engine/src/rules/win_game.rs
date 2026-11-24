@@ -12,7 +12,7 @@ pub struct WinGame(pub players::PlayerId);
 impl rules::traits::context::Context for WinGame {
     fn subject(&self) -> Entity { ***self }
     fn other(&self) -> Option<Entity> { None }
-    fn player(&self) -> Entity { ***self }
+    fn player(&self) -> players::PlayerId { **self }
 }
 
 #[rustfmt::skip]
@@ -37,7 +37,7 @@ mod tests {
         let event = WinGame(player);
         assert_eq!(event.subject(), *player);
         assert_eq!(event.other(), None);
-        assert_eq!(event.player(), *player);
+        assert_eq!(event.player(), player);
         assert_eq!(WinGame::ID, rules::EventId("104.2"));
         assert_eq!(WinGame::clauses(), Vec::new());
     }

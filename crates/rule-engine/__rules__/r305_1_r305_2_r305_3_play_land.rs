@@ -48,7 +48,7 @@ pub fn r305_1_r305_2_r305_3_play_land(
         }
         let is_legal = answers.legal::<rules::PlayLand>(&rules::PlayLand {
             land,
-            player: *action.player,
+            player: action.player,
         });
         if !is_legal {
             rejected.write(actions::Rejected::CannotPlayLand { land });
@@ -78,7 +78,7 @@ pub fn r305_1_r305_2_r305_3_play_land(
         if answers.zones.find(BATTLEFIELD, Some(*action.player)).is_some() {
             entering.write(rules::Would(rules::EnterBattlefield {
                 permanent: land,
-                controller: *action.player,
+                controller: action.player,
                 summoning_sick: false,
             }));
         }

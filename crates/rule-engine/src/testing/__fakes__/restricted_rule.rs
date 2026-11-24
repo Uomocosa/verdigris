@@ -1,20 +1,22 @@
 use atomic_delegate_macros::atomic_delegate;
 use bevy::prelude::Entity;
 
+use crate::players;
+
 use crate::rules;
 use crate::rules::traits::event::Event;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct RestrictedRule {
     pub attacker: Entity,
-    pub player: Entity,
+    pub player: players::PlayerId,
 }
 
 #[rustfmt::skip]
 impl rules::traits::context::Context for RestrictedRule {
     fn subject(&self) -> Entity { self.attacker }
     fn other(&self) -> Option<Entity> { None }
-    fn player(&self) -> Entity { self.player }
+    fn player(&self) -> players::PlayerId { self.player }
 }
 
 impl Event for RestrictedRule {

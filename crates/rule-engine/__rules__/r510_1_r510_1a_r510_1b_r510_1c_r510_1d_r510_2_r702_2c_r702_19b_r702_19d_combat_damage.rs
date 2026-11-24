@@ -123,7 +123,7 @@ pub fn r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_r702_2c_r702_19b_r702_19d_c
                     source: attacker,
                     recipient: defending,
                     amount,
-                    controller: recipient_controller(&lookups.p1(), defending),
+                    controller: players::PlayerId(recipient_controller(&lookups.p1(), defending)),
                 }));
             } else {
                 for write in definition.assigned_blocked_damage(
@@ -179,7 +179,7 @@ fn announce_damage(
         source: assigned.source,
         recipient: assigned.target,
         amount: assigned.amount,
-        controller: recipient_controller(owners, assigned.target),
+        controller: players::PlayerId(recipient_controller(owners, assigned.target)),
     })
 }
 

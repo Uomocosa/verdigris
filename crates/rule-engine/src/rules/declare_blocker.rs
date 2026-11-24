@@ -1,6 +1,8 @@
 use atomic_delegate_macros::atomic_delegate;
 use bevy::prelude::Entity;
 
+use crate::players;
+
 use crate::rules;
 use crate::rules::traits::event::Event;
 
@@ -16,14 +18,14 @@ pub const FLYING: rules::ClauseId<rules::DeclareBlocker> = rules::ClauseId::new(
 pub struct DeclareBlocker {
     pub blocker: Entity,
     pub attacker: Entity,
-    pub player: Entity,
+    pub player: players::PlayerId,
 }
 
 #[rustfmt::skip]
 impl rules::traits::context::Context for DeclareBlocker {
     fn subject(&self) -> Entity { self.blocker }
     fn other(&self) -> Option<Entity> { Some(self.attacker) }
-    fn player(&self) -> Entity { self.player }
+    fn player(&self) -> players::PlayerId { self.player }
 }
 
 impl Event for DeclareBlocker {

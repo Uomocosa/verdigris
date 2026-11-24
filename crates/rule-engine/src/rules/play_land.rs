@@ -1,6 +1,8 @@
 use atomic_delegate_macros::atomic_delegate;
 use bevy::prelude::Entity;
 
+use crate::players;
+
 use crate::rules;
 use crate::rules::traits::event::Event;
 
@@ -15,14 +17,14 @@ pub const OWN_TURN: rules::ClauseId<rules::PlayLand> = rules::ClauseId::new("305
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct PlayLand {
     pub land: Entity,
-    pub player: Entity,
+    pub player: players::PlayerId,
 }
 
 #[rustfmt::skip]
 impl rules::traits::context::Context for PlayLand {
     fn subject(&self) -> Entity { self.land }
     fn other(&self) -> Option<Entity> { None }
-    fn player(&self) -> Entity { self.player }
+    fn player(&self) -> players::PlayerId { self.player }
 }
 
 impl Event for PlayLand {

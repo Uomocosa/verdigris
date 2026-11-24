@@ -12,7 +12,7 @@ pub struct DrawFromEmptyLibrary(pub players::PlayerId);
 impl rules::traits::context::Context for DrawFromEmptyLibrary {
     fn subject(&self) -> Entity { ***self }
     fn other(&self) -> Option<Entity> { None }
-    fn player(&self) -> Entity { ***self }
+    fn player(&self) -> players::PlayerId { **self }
 }
 
 #[rustfmt::skip]
@@ -37,7 +37,7 @@ mod tests {
         let event = DrawFromEmptyLibrary(player);
         assert_eq!(event.subject(), *player);
         assert_eq!(event.other(), None);
-        assert_eq!(event.player(), *player);
+        assert_eq!(event.player(), player);
         assert_eq!(DrawFromEmptyLibrary::ID, rules::EventId("121.4"));
         assert_eq!(DrawFromEmptyLibrary::clauses(), Vec::new());
     }

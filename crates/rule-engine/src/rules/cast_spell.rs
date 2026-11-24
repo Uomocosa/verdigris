@@ -1,6 +1,8 @@
 use atomic_delegate_macros::atomic_delegate;
 use bevy::prelude::Entity;
 
+use crate::players;
+
 use crate::rules;
 use crate::rules::traits::event::Event;
 
@@ -13,14 +15,14 @@ pub const TIMING: rules::ClauseId<rules::CastSpell> = rules::ClauseId::new("601.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct CastSpell {
     pub spell: Entity,
-    pub player: Entity,
+    pub player: players::PlayerId,
 }
 
 #[rustfmt::skip]
 impl rules::traits::context::Context for CastSpell {
     fn subject(&self) -> Entity { self.spell }
     fn other(&self) -> Option<Entity> { None }
-    fn player(&self) -> Entity { self.player }
+    fn player(&self) -> players::PlayerId { self.player }
 }
 
 impl Event for CastSpell {

@@ -26,7 +26,7 @@ mod tests {
     fn test_usage() {
         let player = players::PlayerId(Entity::PLACEHOLDER);
         let event = rules::LoseGame(player);
-        assert_eq!(event.player(), *player);
+        assert_eq!(event.player(), player);
         assert_eq!(rules::LoseGame::ID, rules::EventId("104.3"));
     }
 }

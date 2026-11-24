@@ -88,7 +88,7 @@ pub fn r103_6_r103_6a_opening_hand_actions(
         for card in answered {
             entering.write(rules::Would(rules::EnterBattlefield {
                 permanent: *card,
-                controller: *action.player,
+                controller: action.player,
                 summoning_sick: false,
             }));
         }

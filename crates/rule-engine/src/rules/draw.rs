@@ -14,7 +14,7 @@ pub struct Draw {
 impl rules::traits::context::Context for Draw {
     fn subject(&self) -> Entity { *self.player }
     fn other(&self) -> Option<Entity> { None }
-    fn player(&self) -> Entity { *self.player }
+    fn player(&self) -> players::PlayerId { self.player }
 }
 
 impl Event for Draw {
@@ -44,7 +44,7 @@ mod tests {
         let event = Draw { player, amount: 2 };
         assert_eq!(event.subject(), *player);
         assert_eq!(event.other(), None);
-        assert_eq!(event.player(), *player);
+        assert_eq!(event.player(), player);
         assert_eq!(Draw::ID, rules::EventId("121.1"));
         assert_eq!(Draw::clauses(), Vec::new());
         assert_eq!(event.field(rules::Field::Amount), Some(2));

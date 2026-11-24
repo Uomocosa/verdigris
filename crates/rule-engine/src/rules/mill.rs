@@ -14,7 +14,7 @@ pub struct Mill {
 impl rules::traits::context::Context for Mill {
     fn subject(&self) -> Entity { *self.player }
     fn other(&self) -> Option<Entity> { None }
-    fn player(&self) -> Entity { *self.player }
+    fn player(&self) -> players::PlayerId { self.player }
 }
 
 impl Event for Mill {
@@ -44,7 +44,7 @@ mod tests {
         let event = Mill { player, amount: 2 };
         assert_eq!(event.subject(), *player);
         assert_eq!(event.other(), None);
-        assert_eq!(event.player(), *player);
+        assert_eq!(event.player(), player);
         assert_eq!(Mill::ID, rules::EventId("701.17a"));
         assert_eq!(Mill::clauses(), Vec::new());
         assert_eq!(event.field(rules::Field::Amount), Some(2));

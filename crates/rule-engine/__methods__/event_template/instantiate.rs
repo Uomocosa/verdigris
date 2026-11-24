@@ -4,8 +4,8 @@ use crate::rules::traits::event::Event;
 
 pub fn instantiate<E: Event>(template: &rules::EventTemplate, event: &E) -> rules::AnyEvent {
     let holder = |who: &rules::Role| match who {
-        rules::Role::Subject => event.subject(),
-        rules::Role::Other => event.other().unwrap_or_else(|| event.player()),
+        rules::Role::Subject => players::PlayerId(event.subject()),
+        rules::Role::Other => players::PlayerId(event.other().unwrap_or_else(|| *event.player())),
         rules::Role::Player => event.player(),
     };
     let amount = |amount: &rules::Amount| match amount {
@@ -14,44 +14,44 @@ pub fn instantiate<E: Event>(template: &rules::EventTemplate, event: &E) -> rule
     };
     match template {
         rules::EventTemplate::WinGame { who } => {
-            rules::AnyEvent::WinGame(rules::WinGame(players::PlayerId(holder(who))))
+            rules::AnyEvent::WinGame(rules::WinGame(holder(who)))
         }
         rules::EventTemplate::LoseGame { who } => {
-            rules::AnyEvent::LoseGame(rules::LoseGame(players::PlayerId(holder(who))))
+            rules::AnyEvent::LoseGame(rules::LoseGame(holder(who)))
         }
         rules::EventTemplate::Draw {
             who,
             amount: template_amount,
         } => rules::AnyEvent::Draw(rules::Draw {
-            player: players::PlayerId(holder(who)),
+            player: holder(who),
             amount: amount(template_amount),
         }),
         rules::EventTemplate::LoseLife {
             who,
             amount: template_amount,
         } => rules::AnyEvent::LoseLife(rules::LoseLife {
-            player: players::PlayerId(holder(who)),
+            player: holder(who),
             amount: amount(template_amount),
         }),
         rules::EventTemplate::Discard {
             who,
             amount: template_amount,
         } => rules::AnyEvent::Discard(rules::Discard {
-            player: players::PlayerId(holder(who)),
+            player: holder(who),
             amount: amount(template_amount),
         }),
         rules::EventTemplate::GainLife {
             who,
             amount: template_amount,
         } => rules::AnyEvent::GainLife(rules::GainLife {
-            player: players::PlayerId(holder(who)),
+            player: holder(who),
             amount: amount(template_amount),
         }),
         rules::EventTemplate::Mill {
             who,
             amount: template_amount,
         } => rules::AnyEvent::Mill(rules::Mill {
-            player: players::PlayerId(holder(who)),
+            player: holder(who),
             amount: amount(template_amount),
         }),
     }

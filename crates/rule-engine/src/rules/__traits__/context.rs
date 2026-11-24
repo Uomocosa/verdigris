@@ -1,14 +1,18 @@
 use bevy::prelude::Entity;
 
+use crate::players;
+
 pub trait Context {
     fn subject(&self) -> Entity;
     fn other(&self) -> Option<Entity>;
-    fn player(&self) -> Entity;
+    fn player(&self) -> players::PlayerId;
 }
 
 #[cfg(test)]
 mod tests {
     use bevy::prelude::Entity;
+
+    use crate::players;
 
     use crate::rules;
     use crate::rules::traits::context::Context;
@@ -16,7 +20,7 @@ mod tests {
     #[test]
     fn test_usage() {
         let attacker = Entity::PLACEHOLDER;
-        let player = Entity::from_raw_u32(1).unwrap();
+        let player = players::PlayerId(Entity::from_raw_u32(1).unwrap());
         let attack = rules::DeclareAttacker { attacker, player };
         assert_eq!(attack.subject(), attacker);
         assert_eq!(attack.other(), None);

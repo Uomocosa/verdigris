@@ -12,7 +12,7 @@ pub struct LoseGame(pub players::PlayerId);
 impl rules::traits::context::Context for LoseGame {
     fn subject(&self) -> Entity { ***self }
     fn other(&self) -> Option<Entity> { None }
-    fn player(&self) -> Entity { ***self }
+    fn player(&self) -> players::PlayerId { **self }
 }
 
 #[rustfmt::skip]
@@ -37,7 +37,7 @@ mod tests {
         let event = LoseGame(player);
         assert_eq!(event.subject(), *player);
         assert_eq!(event.other(), None);
-        assert_eq!(event.player(), *player);
+        assert_eq!(event.player(), player);
         assert_eq!(LoseGame::ID, rules::EventId("104.3"));
         assert_eq!(LoseGame::clauses(), Vec::new());
     }

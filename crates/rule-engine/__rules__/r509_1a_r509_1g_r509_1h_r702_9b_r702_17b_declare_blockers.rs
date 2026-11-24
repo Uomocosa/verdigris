@@ -69,7 +69,7 @@ pub fn r509_1a_r509_1g_r509_1h_r702_9b_r702_17b_declare_blockers(
                 && answers.legal::<rules::DeclareBlocker>(&rules::DeclareBlocker {
                     blocker: assignment.blocker,
                     attacker: assignment.attacker,
-                    player: *action.player,
+                    player: action.player,
                 })
         });
         let requirement_unmet = blockers.iter().any(|(entity, owner)| {
@@ -80,7 +80,7 @@ pub fn r509_1a_r509_1g_r509_1h_r702_9b_r702_17b_declare_blockers(
                     answers.legal::<rules::DeclareBlocker>(&rules::DeclareBlocker {
                         blocker: entity,
                         attacker,
-                        player: *action.player,
+                        player: action.player,
                     })
                 })
         });
