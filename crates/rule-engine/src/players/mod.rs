@@ -12,3 +12,5 @@ pub use lands_played_this_turn::LandsPlayedThisTurn;
 
 mod players;
 pub use players::Players;
+mod player_view;
+pub use player_view::PlayerView;

@@ -26,6 +26,7 @@ pub mod mock_game_builder;
 #[cfg(feature = "testing")]
 pub mod pass_budget;
 pub mod play_land;
+pub mod player_view;
 pub mod players;
 pub mod predicate;
 #[cfg(feature = "testing")]

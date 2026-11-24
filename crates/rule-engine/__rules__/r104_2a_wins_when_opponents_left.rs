@@ -13,8 +13,8 @@ pub fn r104_2a_wins_when_opponents_left(
         return;
     }
     for player in players.still_in_the_game() {
-        if players.have_all_opponents_left(player) {
-            wins.write(rules::Proceeds(rules::WinGame(player)));
+        if player.have_all_opponents_left() {
+            wins.write(rules::Proceeds(rules::WinGame(player.id)));
         }
     }
 }

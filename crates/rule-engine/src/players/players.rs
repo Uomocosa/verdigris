@@ -15,9 +15,6 @@ pub struct Players<'w, 's> {
 #[rustfmt::skip]
 impl Players<'_, '_> {
     #[must_use]
-    pub fn opponents_of(&self, player: players::PlayerId) -> Vec<players::PlayerId> { self.in_turn_order().into_iter().filter(|other| *other != player).collect() }
-
-    #[must_use]
     pub fn is_still_in_the_game(&self, player: players::PlayerId) -> bool { self.still_in_the_game.contains(*player) }
 
     #[must_use]
@@ -30,16 +27,13 @@ impl Players<'_, '_> {
 #[atomic_delegates]
 impl Players<'_, '_> {
     #[must_use]
-    pub fn still_in_the_game(&self) -> Vec<players::PlayerId> {}
+    pub fn still_in_the_game(&self) -> Vec<players::PlayerView<'_, '_>> {}
 }
 
-impl Players<'_, '_> {
+#[rustfmt::skip]
+impl<'w, 's> Players<'w, 's> {
     #[must_use]
-    pub fn have_all_opponents_left(&self, player: players::PlayerId) -> bool {
-        let opponents = self.opponents_of(player);
-        let is_any_still_here = opponents.iter().any(|other| self.is_still_in_the_game(*other));
-        !opponents.is_empty() && !is_any_still_here
-    }
+    pub(crate) const fn view(self, id: players::PlayerId) -> players::PlayerView<'w, 's> { players::PlayerView { id, players: self } }
 }
 
 #[cfg(test)]
@@ -57,9 +51,15 @@ mod tests {
         game.app
             .world_mut()
             .run_system_once(move |players: Players| {
-                assert_eq!(players.opponents_of(p1.id), [p2.id, p3.id]);
+                assert_eq!(
+                    players
+                        .still_in_the_game()
+                        .into_iter()
+                        .map(|player| player.id)
+                        .collect::<Vec<_>>(),
+                    [p1.id, p3.id]
+                );
                 assert!(!players.is_still_in_the_game(p2.id));
-                assert!(!players.have_all_opponents_left(p1.id));
                 assert!(!players.has_anyone_won());
             })
             .unwrap();

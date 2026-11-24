@@ -1,10 +1,13 @@
 use crate::players;
 
-pub fn still_in_the_game(players: &players::Players) -> Vec<players::PlayerId> {
+pub fn still_in_the_game<'w, 's>(
+    players: &players::Players<'w, 's>,
+) -> Vec<players::PlayerView<'w, 's>> {
     players
         .in_turn_order()
         .into_iter()
         .filter(|player| players.is_still_in_the_game(*player))
+        .map(|id| (*players).view(id))
         .collect()
 }
 
@@ -24,7 +27,10 @@ mod tests {
         game.app
             .world_mut()
             .run_system_once(move |all: players::Players| {
-                assert_eq!(still_in_the_game(&all), [p1.id, p3.id]);
+                assert_eq!(
+                    still_in_the_game(&all).into_iter().map(|player| player.id).collect::<Vec<_>>(),
+                    [p1.id, p3.id]
+                );
             })
             .unwrap();
         Ok(())
