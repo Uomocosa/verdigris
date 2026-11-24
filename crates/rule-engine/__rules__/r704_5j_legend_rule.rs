@@ -12,7 +12,7 @@ use crate::rules;
 /// player, that player chooses one of them, and the rest are put into their owners’ graveyards.
 /// This is called the “legend rule.”
 pub fn r704_5j_legend_rule(
-    mut destructions: MessageWriter<rules::Would<rules::Destroy>>,
+    mut burials: MessageWriter<rules::Would<rules::PutIntoGraveyard>>,
     mut pending: ResMut<actions::PendingChoice>,
     mut performed: ResMut<StateBasedActionsPerformed>,
     mut actions: MessageReader<actions::PlayerAction>,
@@ -30,9 +30,12 @@ pub fn r704_5j_legend_rule(
         }
         *pending = actions::PendingChoice(None);
         for other in choice.legal.iter().copied().filter(|other| other != chosen) {
-            destructions.write(rules::Would(rules::Destroy {
-                permanent: other,
-                controller: choice.player,
+            let Ok((_, _, owner)) = permanents.get(other) else {
+                continue;
+            };
+            burials.write(rules::Would(rules::PutIntoGraveyard {
+                object: other,
+                owner: **owner,
             }));
         }
         **performed = true;
@@ -80,6 +83,27 @@ mod tests {
     fn legend_rule_keeps_the_chosen_permanent_and_buries_the_other() -> TestResult {
         let (mut game, [p1, ..]) = MockGame::new([
             P1.battlefield([ISAMARU_HOUND_OF_KONDA, ISAMARU_HOUND_OF_KONDA]),
+            P2,
+        ]);
+        let [isamaru_1, isamaru_2] =
+            game.player(p1).cards_in(BATTLEFIELD).exactly::<2>(ISAMARU_HOUND_OF_KONDA)?;
+
+        game.play([p1.pass_priority()])?;
+        game.act(p1, actions::Action::ChooseLegendary(isamaru_1.into()));
+
+        assert!(game.player(p1).cards_in(BATTLEFIELD).has(isamaru_1));
+        assert!(game.player(p1).cards_in(GRAVEYARD).has(isamaru_2));
+        Ok(())
+    }
+
+    #[test]
+    fn a_cant_be_destroyed_effect_does_not_save_the_other_legend() -> TestResult {
+        let (mut game, [p1, ..]) = MockGame::new([
+            P1.battlefield([
+                ISAMARU_HOUND_OF_KONDA,
+                ISAMARU_HOUND_OF_KONDA,
+                TEST_SAFE_HAVEN,
+            ]),
             P2,
         ]);
         let [isamaru_1, isamaru_2] =

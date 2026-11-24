@@ -30,14 +30,16 @@ mod tests {
     use crate::{BATTLEFIELD, GRAVEYARD, HAND};
 
     #[test]
-    fn aura_goes_to_its_own_owners_graveyard_when_its_creature_dies() -> TestResult {
+    fn an_effect_about_creatures_does_not_keep_an_aura() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
-            P1.hand([HOLY_STRENGTH]).mana_pool(mana![W]).battlefield([GRIZZLY_BEARS]),
-            P2.hand([MURDER]).mana_pool(mana![1, B, B]),
+            P1.hand([HOLY_STRENGTH]).mana_pool(mana![W]),
+            P2.hand([MURDER])
+                .mana_pool(mana![1, B, B])
+                .battlefield([GRIZZLY_BEARS, TEST_NO_BURIALS]),
         ]);
         let [strength] = game.player(p1).cards_in(HAND).exactly::<1>(HOLY_STRENGTH)?;
         let [murder] = game.player(p2).cards_in(HAND).exactly::<1>(MURDER)?;
-        let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
 
         game.play([
             p1.cast(strength).targeting(bears).pass_priority(),
@@ -47,7 +49,6 @@ mod tests {
             p1.pass_priority(),
         ])?;
 
-        assert!(game.player(p1).cards_in(GRAVEYARD).has(bears));
         assert!(game.player(p1).cards_in(GRAVEYARD).has(strength));
         Ok(())
     }
