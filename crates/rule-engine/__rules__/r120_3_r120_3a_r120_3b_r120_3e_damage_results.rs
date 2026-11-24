@@ -2,6 +2,7 @@ use crate::events;
 use bevy::prelude::{Commands, Has, MessageReader, MessageWriter, Query};
 
 use crate::Attempt;
+use crate::Did;
 use crate::Resolve;
 use crate::cards;
 use crate::damage;
@@ -21,6 +22,7 @@ use crate::players;
 /// damage to be marked on that creature.
 pub fn r120_3_r120_3a_r120_3b_r120_3e_damage_results(
     mut damage_dealt: MessageReader<Resolve<events::DealDamage>>,
+    mut did_damage: MessageWriter<Did<events::DealDamage>>,
     mut life_lost: MessageWriter<Attempt<events::LoseLife>>,
     mut commands: Commands,
     lives: Query<&players::Life>,
@@ -40,22 +42,23 @@ pub fn r120_3_r120_3a_r120_3b_r120_3e_damage_results(
                 } else {
                     commands.entity(event.recipient).insert(players::PoisonCounters(event.amount));
                 }
-                continue;
+            } else {
+                life_lost.write(Attempt(events::LoseLife {
+                    player: players::PlayerId(event.recipient),
+                    amount: event.amount,
+                }));
             }
-            life_lost.write(Attempt(events::LoseLife {
-                player: players::PlayerId(event.recipient),
-                amount: event.amount,
-            }));
-            continue;
+        } else {
+            let marked = targets.get(event.recipient).ok().flatten().map_or(0, |damage| **damage);
+            commands
+                .entity(event.recipient)
+                .insert(damage::Damage(marked.saturating_add(event.amount)));
+            let has_deathtouch = sources.get(event.source).is_ok_and(|has| has);
+            if has_deathtouch {
+                commands.entity(event.recipient).insert(damage::DealtByDeathtouch);
+            }
         }
-        let marked = targets.get(event.recipient).ok().flatten().map_or(0, |damage| **damage);
-        commands
-            .entity(event.recipient)
-            .insert(damage::Damage(marked.saturating_add(event.amount)));
-        let has_deathtouch = sources.get(event.source).is_ok_and(|has| has);
-        if has_deathtouch {
-            commands.entity(event.recipient).insert(damage::DealtByDeathtouch);
-        }
+        did_damage.write(Did(**event));
     }
 }
 

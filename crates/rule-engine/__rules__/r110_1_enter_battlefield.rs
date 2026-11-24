@@ -2,6 +2,7 @@ use crate::events;
 use bevy::prelude::{Commands, MessageReader, MessageWriter};
 
 use crate::BATTLEFIELD;
+use crate::Did;
 use crate::Resolve;
 use crate::cards;
 use crate::zones;
@@ -11,7 +12,7 @@ use crate::zones;
 /// being a permanent as it’s moved to another zone by an effect or rule.
 pub fn r110_1_enter_battlefield(
     mut entering: MessageReader<Resolve<events::EnterBattlefield>>,
-    mut entered: MessageWriter<cards::Entered>,
+    mut entered: MessageWriter<Did<events::EnterBattlefield>>,
     mut commands: Commands,
     zones: zones::ZoneLookup,
 ) {
@@ -26,7 +27,7 @@ pub fn r110_1_enter_battlefield(
         } else {
             commands.entity(event.permanent).insert(zones::InZone(battlefield));
         }
-        entered.write(cards::Entered(event.permanent));
+        entered.write(Did(**event));
     }
 }
 

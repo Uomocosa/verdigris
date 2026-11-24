@@ -16,7 +16,7 @@ Resolve<E>                  (nothing can stop E any more; only the pipeline writ
           -> 3. Perform     (the CR's default result, in the __rules__ system that owns E,
                            which reads Resolve<E>; an event whose CR default is
                            "nothing" has no such system)
-          -> Did<E>         (triggers: "whenever a player draws ...")    [when needed]
+          -> Did<E>         (triggers: "whenever a player draws ...")    (written by the rule that performs E)
 ```
 
 A card never adds engine code to change a rule. It adds a `RuleChange { target, change }`

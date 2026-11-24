@@ -1,7 +1,9 @@
 use bevy::prelude::{Entity, MessageReader, Query, ResMut, With};
 
+use crate::Did;
 use crate::abilities;
 use crate::cards;
+use crate::events;
 use crate::stack;
 
 /// 603.2. Whenever a game event or game state matches a triggered ability’s trigger event, that
@@ -22,13 +24,13 @@ use crate::stack;
 /// determine if those abilities trigger, using the existence of those abilities and the appearance
 /// of objects immediately prior to the event. The list of exceptions is as follows:
 pub fn r603_2_r603_6a_triggered_abilities(
-    mut entered: MessageReader<cards::Entered>,
+    mut entered: MessageReader<Did<events::EnterBattlefield>>,
     mut queue: ResMut<stack::TriggerQueue>,
     entered_cards: Query<&cards::CardDefinition>,
     sources: Query<(Entity, &cards::Owner, &cards::TriggeredEnters), With<cards::OnBattlefield>>,
 ) {
     for event in entered.read() {
-        let permanent = **event;
+        let permanent = event.permanent;
         let Ok(definition) = entered_cards.get(permanent) else {
             continue;
         };

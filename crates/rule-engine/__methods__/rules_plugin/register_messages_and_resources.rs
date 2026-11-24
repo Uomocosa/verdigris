@@ -37,7 +37,6 @@ pub fn register_messages_and_resources(app: &mut App) {
     events::PutIntoGraveyard::register(app);
     app.add_message::<effects::PowerToughnessModified>()
         .add_message::<effects::KeywordGranted>()
-        .add_message::<cards::Entered>()
         .add_message::<turns::StepStarted>()
         .add_message::<turns::AllPlayersPassed>()
         .add_message::<turns::MulligansComplete>()

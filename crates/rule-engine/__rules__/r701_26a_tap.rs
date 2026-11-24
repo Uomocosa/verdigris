@@ -1,13 +1,22 @@
 use crate::events;
-use bevy::prelude::{Commands, MessageReader};
+use bevy::prelude::{Commands, MessageReader, MessageWriter, Query, Without};
 
+use crate::Did;
 use crate::Resolve;
 use crate::cards;
 
 /// 701.26a To tap a permanent, turn it sideways from an upright position. Only untapped permanents can be tapped.
-pub fn r701_26a_tap(mut taps: MessageReader<Resolve<events::Tap>>, mut commands: Commands) {
+pub fn r701_26a_tap(
+    mut taps: MessageReader<Resolve<events::Tap>>,
+    mut did_taps: MessageWriter<Did<events::Tap>>,
+    mut commands: Commands,
+    untapped: Query<(), Without<cards::Tapped>>,
+) {
     for tap in taps.read() {
-        commands.entity(tap.permanent).insert(cards::Tapped);
+        if untapped.get(tap.permanent).is_ok() {
+            commands.entity(tap.permanent).insert(cards::Tapped);
+            did_taps.write(Did(**tap));
+        }
     }
 }
 

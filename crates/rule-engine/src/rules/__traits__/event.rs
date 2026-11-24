@@ -1,6 +1,7 @@
 use bevy::prelude::App;
 
 use crate::Attempt;
+use crate::Did;
 use crate::May;
 use crate::Resolve;
 use crate::rules;
@@ -19,7 +20,8 @@ pub trait Event: Context + Clone + Send + Sync + 'static {
     fn register(app: &mut App) {
         app.add_message::<Attempt<Self>>()
             .add_message::<Resolve<Self>>()
-            .add_message::<May<Self>>();
+            .add_message::<May<Self>>()
+            .add_message::<Did<Self>>();
     }
 }
 

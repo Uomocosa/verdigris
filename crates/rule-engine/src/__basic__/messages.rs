@@ -7,6 +7,9 @@ use crate::rules::traits::event::Event;
 #[derive(Message, Clone, Debug, Deref)]
 pub struct Resolve<E>(pub E);
 
+#[derive(Message, Clone, Debug, Deref)]
+pub struct Did<E>(pub E);
+
 #[derive(Message, Clone, Debug)]
 pub struct May<E: Event> {
     pub event: E,

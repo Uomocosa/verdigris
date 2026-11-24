@@ -1,14 +1,23 @@
 use crate::events;
-use bevy::prelude::{Commands, MessageReader};
+use bevy::prelude::{Commands, MessageReader, MessageWriter, Query, With};
 
+use crate::Did;
 use crate::Resolve;
 use crate::cards;
 
 /// 701.26b To untap a permanent, rotate it back to the upright position from a sideways position.
 /// Only tapped permanents can be untapped.
-pub fn r701_26b_untap(mut untaps: MessageReader<Resolve<events::Untap>>, mut commands: Commands) {
+pub fn r701_26b_untap(
+    mut untaps: MessageReader<Resolve<events::Untap>>,
+    mut did_untaps: MessageWriter<Did<events::Untap>>,
+    mut commands: Commands,
+    tapped: Query<(), With<cards::Tapped>>,
+) {
     for untap in untaps.read() {
-        commands.entity(untap.permanent).remove::<cards::Tapped>();
+        if tapped.get(untap.permanent).is_ok() {
+            commands.entity(untap.permanent).remove::<cards::Tapped>();
+            did_untaps.write(Did(**untap));
+        }
     }
 }
 

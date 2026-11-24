@@ -1,7 +1,7 @@
 use crate::events;
 use bevy::prelude::{MessageReader, Query, ResMut, With};
 
-use crate::Resolve;
+use crate::Did;
 use crate::abilities;
 use crate::cards;
 use crate::players;
@@ -11,15 +11,12 @@ use crate::stack;
 /// performed afterward are put onto the stack before the active player gets priority; the order in
 /// which they triggered doesn’t matter. (See rule 603, “Handling Triggered Abilities.”)
 pub fn r510_3a_combat_damage_triggers(
-    mut dealt: MessageReader<Resolve<events::DealDamage>>,
+    mut dealt: MessageReader<Did<events::DealDamage>>,
     mut queue: ResMut<stack::TriggerQueue>,
     sources: Query<(&cards::CardDefinition, &cards::Owner), With<cards::Attacking>>,
     targets: Query<&players::Life>,
 ) {
     for event in dealt.read() {
-        if event.amount == 0 {
-            continue;
-        }
         if targets.get(event.recipient).is_err() {
             continue;
         }

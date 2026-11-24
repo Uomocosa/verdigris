@@ -1,22 +1,24 @@
 use bevy::prelude::{Commands, MessageReader, Query};
 
+use crate::Did;
 use crate::cards;
+use crate::events;
 
 /// 110.5b Permanents enter the battlefield untapped, unflipped, face up, and phased in unless a
 /// spell or ability says otherwise.
 pub fn r110_5b_enters_untapped(
-    mut entered: MessageReader<cards::Entered>,
+    mut entered: MessageReader<Did<events::EnterBattlefield>>,
     mut commands: Commands,
     definitions: Query<&cards::CardDefinition>,
 ) {
     for entry in entered.read() {
-        let Ok(definition) = definitions.get(**entry) else {
+        let Ok(definition) = definitions.get(entry.permanent) else {
             continue;
         };
         if definition.enters_tapped() {
-            commands.entity(**entry).insert(cards::Tapped);
+            commands.entity(entry.permanent).insert(cards::Tapped);
         } else {
-            commands.entity(**entry).remove::<cards::Tapped>();
+            commands.entity(entry.permanent).remove::<cards::Tapped>();
         }
     }
 }
