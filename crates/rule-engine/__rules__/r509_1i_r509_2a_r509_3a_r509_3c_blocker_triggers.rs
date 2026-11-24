@@ -144,6 +144,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "needs a card that lets a creature block an additional creature: 509.1a"]
     fn a_blocker_blocking_two_creatures_triggers_only_once() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield([GRIZZLY_BEARS, GRIZZLY_BEARS]),

@@ -72,6 +72,9 @@ pub fn r509_1a_r509_1g_r509_1h_r702_9b_r702_17b_declare_blockers(
                     player: action.player,
                 })
         });
+        let blocks_one_creature = assignments.iter().all(|assignment| {
+            assignments.iter().filter(|other| other.blocker == assignment.blocker).count() == 1
+        });
         let requirement_unmet = blockers.iter().any(|(entity, owner)| {
             **owner == action.player
                 && answers.required::<rules::DeclareBlocker>(entity)
@@ -84,7 +87,7 @@ pub fn r509_1a_r509_1g_r509_1h_r702_9b_r702_17b_declare_blockers(
                     })
                 })
         });
-        if !all_legal || requirement_unmet {
+        if !all_legal || !blocks_one_creature || requirement_unmet {
             rejected.write(actions::Rejected::CannotBlock {
                 assignments: assignments.clone(),
             });
@@ -109,22 +112,42 @@ mod tests {
     #[test]
     fn declared_blockers_become_blocking_and_attacker_blocked() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
-            P1.battlefield([TYPHOID_RATS]),
+            P1.battlefield([TYPHOID_RATS, GRIZZLY_BEARS]),
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
         let [rats] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TYPHOID_RATS)?;
+        let [bears_1] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
         let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
         game.play([
             p1.pass_to(turns::Step::DeclareAttackers),
             p2.pass_to(turns::Step::DeclareAttackers),
-            p1.declare_attackers([rats]),
+            p1.declare_attackers([rats, bears_1]),
         ])?;
 
         game.play([
             p1.pass_to(turns::Step::DeclareBlockers),
             p2.pass_to(turns::Step::DeclareBlockers),
         ])?;
-        game.play([p1.pass_priority(), p2.declare_blockers([(bears, rats)])])?;
+        game.play([p1.pass_priority()])?;
+        let assignments = vec![
+            actions::BlockAssignment {
+                blocker: bears.into(),
+                attacker: rats.into(),
+            },
+            actions::BlockAssignment {
+                blocker: bears.into(),
+                attacker: bears_1.into(),
+            },
+        ];
+
+        game.act(p2, actions::Action::DeclareBlockers(assignments.clone()));
+
+        assert_eq!(
+            game.last_rejection(),
+            Some(&actions::Rejected::CannotBlock { assignments })
+        );
+        assert!(!game.is_blocking(bears));
+        game.play([p2.declare_blockers([(bears, rats)])])?;
 
         assert_eq!(
             game.get::<crate::cards::Blocking>(bears),
