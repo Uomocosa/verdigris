@@ -1,4 +1,4 @@
-use bevy::prelude::{Entity, MessageWriter, Query, With, Without};
+use bevy::prelude::{Entity, MessageWriter, Query, With};
 
 use crate::players;
 use crate::rules;
@@ -11,7 +11,7 @@ pub fn r704_5b_empty_library(
         Entity,
         (
             With<players::AttemptedDrawFromEmptyLibrary>,
-            Without<players::Lost>,
+            players::StillInTheGame,
         ),
     >,
 ) {

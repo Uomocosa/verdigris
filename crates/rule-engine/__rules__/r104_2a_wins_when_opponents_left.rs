@@ -1,28 +1,21 @@
-use bevy::prelude::{Commands, Entity, Query, ResMut, With};
+use bevy::prelude::MessageWriter;
 
-use crate::StateBasedActionsPerformed;
 use crate::players;
+use crate::rules;
 
 /// 104.2a A player still in the game wins the game if that player’s opponents have all left the game. This
 /// happens immediately and overrides all effects that would preclude that player from winning the game.
 pub fn r104_2a_wins_when_opponents_left(
-    mut commands: Commands,
-    mut state_based_actions_performed: ResMut<StateBasedActionsPerformed>,
-    players: Query<(Entity, Option<&players::Lost>), With<players::Player>>,
-    won: Query<Entity, With<players::Won>>,
+    mut wins: MessageWriter<rules::Proceeds<rules::WinGame>>,
+    players: players::Players,
 ) {
-    let total = players.iter().count();
-    if total < 2 {
+    if players.is_game_over() {
         return;
     }
-    let still_in_the_game: Vec<Entity> =
-        players.iter().filter(|(_, lost)| lost.is_none()).map(|(player, _)| player).collect();
-    let [winner] = still_in_the_game.as_slice() else {
-        return;
-    };
-    if won.get(*winner).is_err() {
-        commands.entity(*winner).insert(players::Won);
-        **state_based_actions_performed = true;
+    for player in players.still_in_the_game() {
+        if players.have_all_opponents_left(player) {
+            wins.write(rules::Proceeds(rules::WinGame(player)));
+        }
     }
 }
 
@@ -30,6 +23,7 @@ pub fn r104_2a_wins_when_opponents_left(
 mod tests {
     use crate::actions;
     use crate::testing::*;
+    use crate::turns;
 
     #[test]
     fn r104_2a_sole_survivor_wins_despite_cant_win_effect() {
@@ -72,6 +66,18 @@ mod tests {
         assert!(game.has_lost(p2));
         assert!(!game.has_won(p1));
         assert!(!game.has_won(p3));
+        Ok(())
+    }
+
+    #[test]
+    fn conceding_after_winning_does_not_make_the_opponent_win() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::builder()
+            .turn(2, turns::Step::Upkeep)
+            .players([P1.battlefield([LABORATORY_MANIAC]).empty_library(), P2]);
+        game.play([p1.pass_priority(), p2.pass_priority(), p1.pass_priority()])?;
+        game.act(p1, actions::Action::Concede);
+        assert!(game.has_won(p1));
+        assert!(!game.has_won(p2));
         Ok(())
     }
 }

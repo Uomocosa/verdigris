@@ -1,4 +1,4 @@
-use bevy::prelude::{Entity, MessageWriter, Query, Without};
+use bevy::prelude::{Entity, MessageWriter, Query};
 
 use crate::players;
 use crate::rules;
@@ -6,7 +6,7 @@ use crate::rules;
 /// 704.5a If a player has 0 or less life, that player loses the game.
 pub fn r704_5a_zero_life(
     mut losses: MessageWriter<rules::Would<rules::LoseGame>>,
-    players: Query<(Entity, &players::Life), Without<players::Lost>>,
+    players: Query<(Entity, &players::Life), players::StillInTheGame>,
 ) {
     for (player, life) in players.iter() {
         if **life <= 0 {
