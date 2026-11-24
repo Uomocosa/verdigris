@@ -221,7 +221,8 @@ mod tests {
 
     #[test]
     fn default_game_has_two_players_twenty_life_and_full_libraries() -> TestResult {
-        let (game, [p1, p2]) = MockGame::new([P1, P2]);
+        let (mut game, [p1, p2]) = MockGame::new([P1, P2]);
+        game.app.update();
         assert_eq!(game.life(p1), 20);
         assert_eq!(game.life(p2), 20);
 
@@ -237,19 +238,20 @@ mod tests {
         assert_eq!(turn.number, 1);
         assert_eq!(turn.active, p1.id);
         assert_eq!(turn.step, turns::Step::PrecombatMain);
-        assert_eq!(game.priority_player(), None);
+        assert_eq!(game.priority_player(), Some(p1.id));
         Ok(())
     }
 
     #[test]
     fn overrides_place_cards_and_support_four_players() {
-        let (game, [p1, p2, ..]) =
+        let (mut game, [p1, p2, ..]) =
             MockGame::builder().turn(3, turns::Step::PostcombatMain).players([
                 P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
                 P2.active().battlefield([GRIZZLY_BEARS]).library([MURDER]),
                 P3,
                 P4,
             ]);
+        game.app.update();
 
         assert_ne!(game.p(3), game.p(4));
         assert!(game.app.world().get_entity(Entity::from(game.p(3))).is_ok());
@@ -264,12 +266,14 @@ mod tests {
         assert_eq!(turn.number, 3);
         assert_eq!(turn.active, game.p(2).id);
         assert_eq!(turn.step, turns::Step::PostcombatMain);
-        assert_eq!(game.priority_player(), None);
+        assert_eq!(game.priority_player(), Some(game.p(2).id));
     }
 
     #[test]
     fn new_builds_the_described_players() {
-        let (game, [p1, p2]) = MockGame::new([P1.hand([DIVINATION]).mana_pool(mana![2, U]), P2]);
+        let (mut game, [p1, p2]) =
+            MockGame::new([P1.hand([DIVINATION]).mana_pool(mana![2, U]), P2]);
+        game.app.update();
 
         assert!(game.player(p1).cards_in(HAND).has(DIVINATION));
         assert!(game.player(p1).cards_in(HAND).has_no(GRIZZLY_BEARS));
@@ -282,14 +286,15 @@ mod tests {
         assert_eq!(turn.number, 1);
         assert_eq!(turn.step, turns::Step::PrecombatMain);
         assert_eq!(turn.active, p1.id);
-        assert_eq!(game.priority_player(), None);
+        assert_eq!(game.priority_player(), Some(p1.id));
     }
 
     #[test]
     fn builder_players_marks_the_active_setup_and_its_turn() {
-        let (game, [_, p2, ..]) = MockGame::builder()
+        let (mut game, [_, p2, ..]) = MockGame::builder()
             .turn(3, turns::Step::PostcombatMain)
             .players([P1, P2.active().battlefield([GRIZZLY_BEARS]), P3, P4]);
+        game.app.update();
 
         assert!(game.player(p2).cards_in(BATTLEFIELD).has(GRIZZLY_BEARS));
 
@@ -297,7 +302,7 @@ mod tests {
         assert_eq!(turn.number, 3);
         assert_eq!(turn.step, turns::Step::PostcombatMain);
         assert_eq!(turn.active, p2.id);
-        assert_eq!(game.priority_player(), None);
+        assert_eq!(game.priority_player(), Some(p2.id));
     }
 
     #[test]

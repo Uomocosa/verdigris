@@ -49,11 +49,15 @@ mod tests {
     #[test]
     fn test_usage() {
         let (mut game, [p1, _p2]) = MockGame::new([P1, P2]);
+        game.app.update();
         game.app
             .world_mut()
             .run_system_once(move |answers: Game| {
                 assert_eq!(answers.active_player().map(|player| player.id), Some(p1.id));
-                assert_eq!(answers.priority_holder().map(|player| player.id), None);
+                assert_eq!(
+                    answers.priority_holder().map(|player| player.id),
+                    Some(p1.id)
+                );
             })
             .unwrap();
     }
