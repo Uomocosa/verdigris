@@ -1,14 +1,12 @@
 use bevy::prelude::App;
 
-use crate::Attempt;
-use crate::May;
-use crate::Resolve;
 use crate::StateBasedActionsPerformed;
 use crate::actions;
 use crate::cards;
 use crate::effects;
 use crate::events;
 use crate::rules;
+use crate::rules::traits::event::Event;
 use crate::stack;
 use crate::turns;
 
@@ -17,62 +15,26 @@ pub fn register_messages_and_resources(app: &mut App) {
         .add_message::<actions::Rejected>()
         .add_message::<actions::Ask>()
         .add_message::<actions::Answered>()
-        .add_message::<stack::Resolution>()
-        .add_message::<Attempt<events::LoseGame>>()
-        .add_message::<Attempt<events::WinGame>>()
-        .add_message::<Attempt<events::DrawFromEmptyLibrary>>()
-        .add_message::<Attempt<events::Draw>>()
-        .add_message::<Attempt<events::LoseLife>>()
-        .add_message::<Attempt<events::Discard>>()
-        .add_message::<Attempt<events::GainLife>>()
-        .add_message::<Attempt<events::Mill>>()
-        .add_message::<Attempt<events::CreateTokens>>()
-        .add_message::<Attempt<events::Destroy>>()
-        .add_message::<Attempt<events::Counter>>()
-        .add_message::<Attempt<events::DealDamage>>()
-        .add_message::<Attempt<events::EnterBattlefield>>()
-        .add_message::<Attempt<events::BeginTheGameOnTheBattlefield>>()
-        .add_message::<Attempt<events::OpeningHandAction>>()
-        .add_message::<Attempt<events::Untap>>()
-        .add_message::<Attempt<events::TapAttacker>>()
-        .add_message::<Attempt<events::PutIntoGraveyard>>()
-        .add_message::<Resolve<events::LoseGame>>()
-        .add_message::<Resolve<events::WinGame>>()
-        .add_message::<Resolve<events::DrawFromEmptyLibrary>>()
-        .add_message::<Resolve<events::Draw>>()
-        .add_message::<Resolve<events::LoseLife>>()
-        .add_message::<Resolve<events::Discard>>()
-        .add_message::<Resolve<events::GainLife>>()
-        .add_message::<Resolve<events::Mill>>()
-        .add_message::<Resolve<events::CreateTokens>>()
-        .add_message::<Resolve<events::Destroy>>()
-        .add_message::<Resolve<events::Counter>>()
-        .add_message::<Resolve<events::DealDamage>>()
-        .add_message::<Resolve<events::EnterBattlefield>>()
-        .add_message::<Resolve<events::BeginTheGameOnTheBattlefield>>()
-        .add_message::<Resolve<events::OpeningHandAction>>()
-        .add_message::<Resolve<events::Untap>>()
-        .add_message::<Resolve<events::TapAttacker>>()
-        .add_message::<Resolve<events::PutIntoGraveyard>>()
-        .add_message::<May<events::Draw>>()
-        .add_message::<May<events::Discard>>()
-        .add_message::<May<events::Mill>>()
-        .add_message::<May<events::CreateTokens>>()
-        .add_message::<May<events::Counter>>()
-        .add_message::<May<events::DealDamage>>()
-        .add_message::<May<events::LoseLife>>()
-        .add_message::<May<events::GainLife>>()
-        .add_message::<May<events::EnterBattlefield>>()
-        .add_message::<May<events::TapAttacker>>()
-        .add_message::<May<events::Destroy>>()
-        .add_message::<May<events::PutIntoGraveyard>>()
-        .add_message::<May<events::DrawFromEmptyLibrary>>()
-        .add_message::<May<events::LoseGame>>()
-        .add_message::<May<events::WinGame>>()
-        .add_message::<May<events::Untap>>()
-        .add_message::<May<events::OpeningHandAction>>()
-        .add_message::<May<events::BeginTheGameOnTheBattlefield>>()
-        .add_message::<effects::PowerToughnessModified>()
+        .add_message::<stack::Resolution>();
+    events::LoseGame::register(app);
+    events::WinGame::register(app);
+    events::DrawFromEmptyLibrary::register(app);
+    events::Draw::register(app);
+    events::LoseLife::register(app);
+    events::Discard::register(app);
+    events::GainLife::register(app);
+    events::Mill::register(app);
+    events::CreateTokens::register(app);
+    events::Destroy::register(app);
+    events::Counter::register(app);
+    events::DealDamage::register(app);
+    events::EnterBattlefield::register(app);
+    events::BeginTheGameOnTheBattlefield::register(app);
+    events::OpeningHandAction::register(app);
+    events::Untap::register(app);
+    events::TapAttacker::register(app);
+    events::PutIntoGraveyard::register(app);
+    app.add_message::<effects::PowerToughnessModified>()
         .add_message::<effects::KeywordGranted>()
         .add_message::<cards::Entered>()
         .add_message::<turns::StepStarted>()

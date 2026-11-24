@@ -1,3 +1,8 @@
+use bevy::prelude::App;
+
+use crate::Attempt;
+use crate::May;
+use crate::Resolve;
 use crate::rules;
 use crate::rules::traits::context::Context;
 
@@ -10,6 +15,11 @@ pub trait Event: Context + Clone + Send + Sync + 'static {
     #[must_use]
     fn field(&self, _field: rules::Field) -> Option<u32> {
         None
+    }
+    fn register(app: &mut App) {
+        app.add_message::<Attempt<Self>>()
+            .add_message::<Resolve<Self>>()
+            .add_message::<May<Self>>();
     }
 }
 
