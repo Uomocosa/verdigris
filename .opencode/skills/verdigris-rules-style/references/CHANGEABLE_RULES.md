@@ -1,9 +1,6 @@
----
-name: verdigris-changeable-rules
-description: Use before adding or changing ANY game action, rule, card effect, static ability, replacement effect or rule-changing card in verdigris. Defines the "changeable rules" pattern - every game action is an Event that passes through Would<E> (permission, replacement, perform), and every card that changes a rule is one RuleChange { target, change } aimed at an event, a clause, or a value. Read together with verdigris-style.
----
+# Changeable rules
 
-# verdigris-changeable-rules
+What cards can change and how. How a rule body is written: `../SKILL.md`.
 
 ## 0. The idea in one paragraph
 
@@ -14,7 +11,10 @@ happens it is announced as `Would<E>` and passes through a fixed **pipeline**:
 ```
 Would<E> -> 1. Permission  (may E happen?  clauses + AsThough / Allow / OnlyIf / Cant)
          -> 2. Replacement (614: does E become other events? Instead / Modify)
-         -> 3. Perform     (the CR's default result, in the __rules__ system that owns E)
+Proceeds<E>                (nothing can stop E any more; only the pipeline writes it, plus the
+                           unstoppable rules listed in ../SKILL.md §5)
+         -> 3. Perform     (the CR's default result, in the __rules__ system that owns E,
+                           which reads Proceeds<E>)
          -> Did<E>         (triggers: "whenever a player draws ...")    [when needed]
 ```
 
@@ -82,7 +82,7 @@ add an event, clause or value rule, register it.
 2. If the CR lists conditions, write them as `clauses()` with `ClauseId` consts, text quoted
    VERBATIM from `docs/MagicCompRules-*.txt` (keep the verbatim test).
 3. The `__rules__` system that owns the action writes `Would<E>` instead of acting directly; the
-   pipeline decides; the owning system performs only what comes out.
+   pipeline decides; the owning system reads `Proceeds<E>` and performs only what comes out.
 4. Register the event (section 2).
 
 **A card that changes a rule**: pick the target (whole event, one clause, or a value) and the

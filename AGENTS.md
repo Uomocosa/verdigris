@@ -31,6 +31,7 @@ If a git hook fails, stop and report the root cause; never use `--no-verify`.
 - Never add `#[allow(clippy::…)]` for pedantic/nursery without explicit user approval.
 - Every claim about existing code cites a `file:line` you actually read.
 - Load the `verdigris-style` skill before writing or reviewing Rust here; repo-specific style decisions live there.
+- Before touching `__rules__/`, game actions, card effects or rule-changing cards, read `.opencode/skills/verdigris-rules-style/SKILL.md` and its `references/CHANGEABLE_RULES.md` in full (open the files even if you can't load skills).
 
 ## Working with AI assistants
 

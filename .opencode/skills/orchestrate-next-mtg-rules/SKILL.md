@@ -37,7 +37,8 @@ always on the current branch (orchestrator-core: never create, switch or merge b
    rank: the card exists and is real (drop proposals with made-up cards), the proposed test is
    really red, no rule file or system already covers it. Write the table to `report.md`.
 4. **Implement.** Write one brief per IMPLEMENT item (`brief-<X>.md`), one worker, one commit
-   each, fast gate per item. Log hash, tier + model, minutes in `plan.md`. Re-rank between items
+   each, fast gate per item. Every brief tells the worker to read
+   `.opencode/skills/verdigris-rules-style/SKILL.md` and its `references/CHANGEABLE_RULES.md` first. Log hash, tier + model, minutes in `plan.md`. Re-rank between items
    if an implementation changes what is possible (a DEFERRED item may become doable).
 5. **Gate.** Run the full suite yourself, then push.
 6. **Report.** In `report.md` and your final message: the ranked table, the steps with commit

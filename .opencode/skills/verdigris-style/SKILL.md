@@ -11,6 +11,7 @@ description: Use before writing, editing or reviewing any Rust code or test in v
 2. Read `lele-syntax-rs/references/RATIONALE.md` and `references/SMELLS.md` **in full** —
    actually open the files, do not rely on the skill summary.
 3. Read `AGENTS.md` "Verdigris rules" 1–10.
+4. For rule systems, game actions, card effects and rule-changing cards: `verdigris-rules-style`.
 
 This file only adds what is specific to verdigris. When it conflicts with the linter, the
 linter wins; when it conflicts with an AGENTS rule, stop and ask.

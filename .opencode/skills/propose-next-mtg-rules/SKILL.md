@@ -16,11 +16,13 @@ stage, commit or run anything that changes files outside `.local-run/`.
 ## 0. Load and read first
 
 1. Load `lele-rs` (it binds `lele-syntax-rs`) and `bevy-rs`.
-2. Read `AGENTS.md`, especially "Verdigris rules" 1–10. Every proposal must obey them.
-3. Run `scripts/rule-coverage.sh`. It lists every system with the CR rules it quotes and its
+2. Read `.opencode/skills/verdigris-rules-style/SKILL.md` and its `references/CHANGEABLE_RULES.md`
+   in full: every system you propose is written that way (named questions, `Would` / `Proceeds`).
+3. Read `AGENTS.md`, especially "Verdigris rules" 1–10. Every proposal must obey them.
+4. Run `scripts/rule-coverage.sh`. It lists every system with the CR rules it quotes and its
    `RuleSet`, the ignored tests, the fixture cards and coverage per CR section. Treat it as the
    truth about what exists; do not rebuild that list by hand.
-4. Read `crates/rule-engine/__methods__/rules_plugin/plugin_build.rs` (messages, `RuleSet`
+5. Read `crates/rule-engine/__methods__/rules_plugin/plugin_build.rs` (messages, `RuleSet`
    chain, registration) and two existing rule files close to your lane, with their tests.
 
 ## 1. Lane
