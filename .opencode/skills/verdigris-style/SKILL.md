@@ -75,8 +75,8 @@ action that must happen IN a step goes after all of them as its own entry, never
 actions with no `pass_to` (`activate_ability(..).cast(..).targeting(..)`) are fine.
 
 Raw `game.act(..)` stays only in tests that check the engine rejects an action
-(`game.last_rejection()`). A card that only exists after an action (drawn, created) is looked
-up right after that step, with a comment.
+(`game.last_rejection()`). Only a card that did not exist at setup (a token) is looked up
+later, right after the step that creates it; an end-state check uses `.has(card)`.
 
 **Why:** the reader learns what is on the table before reading what happens to it, and a
 lookup placed after `play` silently depends on the card not having moved.

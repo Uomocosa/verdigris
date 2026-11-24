@@ -478,8 +478,6 @@ mod tests {
         let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
         game.play([p1.cast(bolt).targeting(bears).end_turn(), p2.end_turn()])?;
         assert!(game.player(p2).cards_in(GRAVEYARD).has(bears));
-        assert!(game.player(p2).cards_in(GRAVEYARD).has(GRIZZLY_BEARS));
-        let [bolt] = game.player(p1).cards_in(GRAVEYARD).exactly::<1>(LIGHTNING_BOLT)?;
         assert!(game.player(p1).cards_in(GRAVEYARD).has(bolt));
         Ok(())
     }
@@ -510,9 +508,7 @@ mod tests {
             p2.end_turn(),
         ])?;
         assert!(game.player(p2).cards_in(GRAVEYARD).has(bears));
-        assert!(game.player(p2).cards_in(GRAVEYARD).has(GRIZZLY_BEARS));
-        let [blade] = game.player(p1).cards_in(GRAVEYARD).exactly::<1>(DOOM_BLADE)?;
-        assert!(game.player(p1).cards_in(GRAVEYARD).has(blade));
+        assert!(game.player(p1).cards_in(GRAVEYARD).has(doom_blade));
         Ok(())
     }
 }

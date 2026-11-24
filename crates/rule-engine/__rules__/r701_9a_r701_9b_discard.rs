@@ -109,10 +109,12 @@ mod tests {
             P2.hand([GRIZZLY_BEARS]),
         ]);
         let [mind_rot] = game.player(p1).cards_in(HAND).exactly::<1>(MIND_ROT)?;
+        let [bears] = game.player(p2).cards_in(HAND).exactly::<1>(GRIZZLY_BEARS)?;
+
         game.play([p1.cast(mind_rot).targeting(p2).end_turn(), p2.end_turn()])?;
 
-        game.player(p2).cards_in(GRAVEYARD).exactly::<1>(GRIZZLY_BEARS)?;
-        assert!(game.player(p2).cards_in(HAND).has_no(GRIZZLY_BEARS));
+        assert!(game.player(p2).cards_in(GRAVEYARD).has(bears));
+        assert!(game.player(p2).cards_in(HAND).has_no(bears));
         Ok(())
     }
 

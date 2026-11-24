@@ -64,11 +64,15 @@ mod tests {
             P2,
         ]);
         let [divination] = game.player(p1).cards_in(HAND).exactly::<1>(DIVINATION)?;
+        let [bears] = game.player(p1).cards_in(LIBRARY).exactly::<1>(GRIZZLY_BEARS)?;
+        let [bolt] = game.player(p1).cards_in(LIBRARY).exactly::<1>(LIGHTNING_BOLT)?;
+        let [murder] = game.player(p1).cards_in(LIBRARY).exactly::<1>(MURDER)?;
+
         game.play([p1.cast(divination).pass_priority(), p2.pass_priority()])?;
-        assert!(game.player(p1).cards_in(HAND).has(GRIZZLY_BEARS));
-        assert!(game.player(p1).cards_in(HAND).has(LIGHTNING_BOLT));
+        assert!(game.player(p1).cards_in(HAND).has(bears));
+        assert!(game.player(p1).cards_in(HAND).has(bolt));
         assert!(game.player(p1).cards_in(GRAVEYARD).has(divination));
-        game.player(p1).cards_in(LIBRARY).exactly::<1>(MURDER)?;
+        assert!(game.player(p1).cards_in(LIBRARY).has(murder));
         Ok(())
     }
 

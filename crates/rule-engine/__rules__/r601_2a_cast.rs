@@ -80,8 +80,9 @@ mod tests {
         let (mut game, [p1, p2]) = MockGame::builder()
             .turn(2, turns::Step::PrecombatMain)
             .players([P1.hand([DIVINATION]).mana_pool(mana![2, U]), P2.active()]);
-        game.play([p2.pass_priority()])?;
         let [divination] = game.player(p1).cards_in(HAND).exactly::<1>(DIVINATION)?;
+
+        game.play([p2.pass_priority()])?;
         let err = game.play([p1.cast(divination)]).unwrap_err();
         assert_eq!(
             err.rejection(),
@@ -100,8 +101,9 @@ mod tests {
             P2,
         ]);
         let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
-        game.play([p1.cast(bolt).targeting(p2)])?;
         let [divination] = game.player(p1).cards_in(HAND).exactly::<1>(DIVINATION)?;
+
+        game.play([p1.cast(bolt).targeting(p2)])?;
         let err = game.play([p1.cast(divination)]).unwrap_err();
         assert_eq!(
             err.rejection(),
@@ -158,9 +160,9 @@ mod tests {
                 P1.battlefield([LEYLINE_OF_ANTICIPATION]).hand([DIVINATION]).mana_pool(mana![2, U]),
                 P2.active(),
             ]);
-        game.play([p2.pass_priority()])?;
         let [divination] = game.player(p1).cards_in(HAND).exactly::<1>(DIVINATION)?;
 
+        game.play([p2.pass_priority()])?;
         game.play([p1.cast(divination)])?;
 
         assert!(game.stack().has(divination));
@@ -193,12 +195,12 @@ mod tests {
         ]);
         let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
         let [dispel] = game.player(p2).cards_in(HAND).exactly::<1>(DISPEL)?;
+        let [divination] = game.player(p1).cards_in(HAND).exactly::<1>(DIVINATION)?;
+
         game.play([
             p1.cast(bolt).targeting(p2).pass_priority(),
             p2.cast(dispel).targeting(bolt),
         ])?;
-        let [divination] = game.player(p1).cards_in(HAND).exactly::<1>(DIVINATION)?;
-
         game.play([p2.pass_priority(), p1.cast(divination)])?;
 
         assert!(game.stack().has(divination));
@@ -212,9 +214,9 @@ mod tests {
             P1.battlefield([LEYLINE_OF_ANTICIPATION]),
             P2.hand([DIVINATION]).mana_pool(mana![2, U]),
         ]);
-        game.play([p1.pass_priority()])?;
         let [divination] = game.player(p2).cards_in(HAND).exactly::<1>(DIVINATION)?;
 
+        game.play([p1.pass_priority()])?;
         game.act(p2, actions::Action::Cast(divination.into()));
 
         assert_eq!(

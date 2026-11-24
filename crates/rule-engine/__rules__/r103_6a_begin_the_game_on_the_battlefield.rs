@@ -56,12 +56,13 @@ mod tests {
                 P2.active(),
             ]);
         let [leyline] = game.player(p1).cards_in(HAND).exactly::<1>(LEYLINE_OF_ANTICIPATION)?;
-        game.act(p1, actions::Action::ChooseMay(vec![leyline.into()]));
-        assert!(game.player(p1).cards_in(BATTLEFIELD).has(leyline));
         let [tower_1, tower_2] =
             game.player(p1).cards_in(BATTLEFIELD).exactly::<2>(RELIQUARY_TOWER)?;
         let [tundra] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TUNDRA)?;
         let [divination] = game.player(p1).cards_in(HAND).exactly::<1>(DIVINATION)?;
+
+        game.act(p1, actions::Action::ChooseMay(vec![leyline.into()]));
+        assert!(game.player(p1).cards_in(BATTLEFIELD).has(leyline));
 
         game.play([
             p2.pass_priority(),
