@@ -2,11 +2,11 @@
 mod basic;
 
 pub use basic::components::{
-    AttemptedDrawFromEmptyLibrary, DefendingPlayer, GameIsADraw, Life, Lost, Player,
+    AttemptedDrawFromEmptyLibrary, DefendingPlayer, GameIsADraw, LeftTheGame, Life, Lost, Player,
     PoisonCounters, Won,
 };
 pub use basic::newtypes::PlayerId;
-pub use basic::type_aliases::StillInTheGame;
+pub use basic::type_aliases::{LostOrDrawn, StillInTheGame};
 
 mod lands_played_this_turn;
 pub use lands_played_this_turn::LandsPlayedThisTurn;

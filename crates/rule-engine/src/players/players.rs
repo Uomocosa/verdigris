@@ -10,12 +10,16 @@ pub struct Players<'w, 's> {
     pub(crate) turn_order: Query<'w, 's, &'static turns::TurnOrder>,
     still_in_the_game: Query<'w, 's, Entity, players::StillInTheGame>,
     winners: Query<'w, 's, Entity, With<players::Won>>,
+    lost: Query<'w, 's, Entity, With<players::Lost>>,
 }
 
 #[rustfmt::skip]
 impl Players<'_, '_> {
     #[must_use]
     pub fn is_still_in_the_game(&self, player: players::PlayerId) -> bool { self.still_in_the_game.contains(*player) }
+
+    #[must_use]
+    pub fn has_lost(&self, player: players::PlayerId) -> bool { self.lost.contains(*player) }
 
     #[must_use]
     pub fn has_anyone_won(&self) -> bool { !self.winners.is_empty() }

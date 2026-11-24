@@ -1,4 +1,4 @@
-use bevy::prelude::{Commands, Entity, Query, ResMut, With};
+use bevy::prelude::{Commands, ResMut};
 
 use crate::StateBasedActionsPerformed;
 use crate::players;
@@ -7,23 +7,14 @@ use crate::players;
 pub fn r104_4a_draw(
     mut commands: Commands,
     mut state_based_actions_performed: ResMut<StateBasedActionsPerformed>,
-    players: Query<(Entity, Option<&players::Lost>), With<players::Player>>,
-    won: Query<Entity, With<players::Won>>,
-    drawn: Query<Entity, With<players::GameIsADraw>>,
+    players: players::Players,
 ) {
-    if !won.is_empty() || !drawn.is_empty() {
-        return;
-    }
-    let remaining: Vec<Entity> = players.iter().map(|(player, _)| player).collect();
-    if remaining.len() < 2 {
-        return;
-    }
-    let do_all_remaining_players_lose = players.iter().all(|(_, lost)| lost.is_some());
-    if !do_all_remaining_players_lose {
+    let remaining = players.still_in_the_game();
+    if remaining.is_empty() || !remaining.iter().all(players::PlayerView::has_lost) {
         return;
     }
     for player in remaining {
-        commands.entity(player).insert(players::GameIsADraw);
+        commands.entity(*player.id).insert(players::GameIsADraw);
     }
     **state_based_actions_performed = true;
 }
@@ -58,5 +49,18 @@ mod tests {
         assert!(!game.has::<players::GameIsADraw>(p1));
         assert!(!game.has::<players::GameIsADraw>(p2));
         Ok(())
+    }
+
+    #[test]
+    fn a_player_who_already_left_is_not_part_of_the_draw() {
+        use crate::actions;
+        let (mut game, [p1, p2, p3]) = MockGame::new([P1.life(0), P2.life(0), P3]);
+
+        game.act(p3, actions::Action::Concede);
+
+        assert!(game.has_lost(p3));
+        assert!(!game.has::<players::GameIsADraw>(p3));
+        assert!(game.has::<players::GameIsADraw>(p1));
+        assert!(game.has::<players::GameIsADraw>(p2));
     }
 }

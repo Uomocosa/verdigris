@@ -6,6 +6,7 @@ pub mod r104_2a_wins_when_opponents_left;
 pub mod r104_3_lose_the_game;
 pub mod r104_3a_concede;
 pub mod r104_4a_draw;
+pub mod r104_5_leaves_the_game;
 pub mod r106_4_mana_empties;
 pub mod r110_1_enter_battlefield;
 pub mod r110_5b_enters_untapped;

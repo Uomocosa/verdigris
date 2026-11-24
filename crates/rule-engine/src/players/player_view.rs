@@ -17,6 +17,9 @@ impl PlayerView<'_, '_> {
     pub fn is_still_in_the_game(&self) -> bool { self.players.is_still_in_the_game(self.id) }
 
     #[must_use]
+    pub fn has_lost(&self) -> bool { self.players.has_lost(self.id) }
+
+    #[must_use]
     pub fn have_all_opponents_left(&self) -> bool { !self.opponents().is_empty() && self.opponents_still_in_the_game().is_empty() }
 }
 

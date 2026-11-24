@@ -29,6 +29,8 @@ pub fn add_priority_action_systems(app: &mut App) {
             comprehensive_rules::r605_3a_mana_abilities::r605_3a_mana_abilities,
             comprehensive_rules::r601_2g_mana_abilities::r601_2g_mana_abilities,
             comprehensive_rules::r104_3a_concede::r104_3a_concede,
+            comprehensive_rules::r104_3_lose_the_game::r104_3_lose_the_game,
+            comprehensive_rules::r104_5_leaves_the_game::r104_5_leaves_the_game,
         )
             .chain()
             .in_set(RuleSet::PriorityAction),
@@ -57,7 +59,7 @@ mod tests {
 
         assert_eq!(
             app.get_schedule(Update).map(Schedule::systems_len),
-            Some(17)
+            Some(19)
         );
     }
 }

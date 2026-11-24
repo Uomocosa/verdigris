@@ -17,6 +17,9 @@ pub struct PoisonCounters(pub u32);
 pub struct Lost;
 
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
+pub struct LeftTheGame;
+
+#[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Won;
 
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]

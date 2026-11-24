@@ -17,34 +17,41 @@ pub fn add_state_based_systems(app: &mut App) {
                 .chain(),
             ApplyDeferred,
             (
-                comprehensive_rules::r704_5f_zero_toughness::r704_5f_zero_toughness,
-                comprehensive_rules::r704_5g_lethal_damage::r704_5g_lethal_damage,
-                comprehensive_rules::r704_5h_deathtouch_damage::r704_5h_deathtouch_damage,
-                comprehensive_rules::r704_5j_legend_rule::r704_5j_legend_rule,
-                comprehensive_rules::r614_1a_r616_1_replacement_effects::r614_1a_r616_1_replacement_effects::<
-                    rules::Destroy,
-                >,
-                comprehensive_rules::r702_12b_indestructible::r702_12b_indestructible,
-                comprehensive_rules::r704_5m_aura_illegal::r704_5m_aura_illegal,
-                comprehensive_rules::r704_5d_token_outside_battlefield::r704_5d_token_outside_battlefield,
-                comprehensive_rules::r704_5a_zero_life::r704_5a_zero_life,
-                comprehensive_rules::r704_5b_empty_library::r704_5b_empty_library,
-                comprehensive_rules::r704_5c_poison::r704_5c_poison,
-                comprehensive_rules::r104_2a_wins_when_opponents_left::r104_2a_wins_when_opponents_left,
-                comprehensive_rules::r104_4a_draw::r104_4a_draw,
-                comprehensive_rules::r614_1a_r616_1_replacement_effects::r614_1a_r616_1_replacement_effects::<
-                    rules::DrawFromEmptyLibrary,
-                >,
-                comprehensive_rules::r614_1a_r616_1_replacement_effects::r614_1a_r616_1_replacement_effects::<
-                    rules::LoseGame,
-                >,
-                comprehensive_rules::r614_1a_r616_1_replacement_effects::r614_1a_r616_1_replacement_effects::<
-                    rules::WinGame,
-                >,
-                comprehensive_rules::r121_4_draw_from_empty_library::r121_4_draw_from_empty_library,
-                comprehensive_rules::r104_3_lose_the_game::r104_3_lose_the_game,
-                comprehensive_rules::r104_2_win_the_game::r104_2_win_the_game,
-                comprehensive_rules::r104_1_game_ends::r104_1_game_ends,
+                (
+                    comprehensive_rules::r704_5f_zero_toughness::r704_5f_zero_toughness,
+                    comprehensive_rules::r704_5g_lethal_damage::r704_5g_lethal_damage,
+                    comprehensive_rules::r704_5h_deathtouch_damage::r704_5h_deathtouch_damage,
+                    comprehensive_rules::r704_5j_legend_rule::r704_5j_legend_rule,
+                    comprehensive_rules::r614_1a_r616_1_replacement_effects::r614_1a_r616_1_replacement_effects::<
+                        rules::Destroy,
+                    >,
+                    comprehensive_rules::r702_12b_indestructible::r702_12b_indestructible,
+                    comprehensive_rules::r704_5m_aura_illegal::r704_5m_aura_illegal,
+                    comprehensive_rules::r704_5d_token_outside_battlefield::r704_5d_token_outside_battlefield,
+                    comprehensive_rules::r704_5a_zero_life::r704_5a_zero_life,
+                    comprehensive_rules::r704_5b_empty_library::r704_5b_empty_library,
+                    comprehensive_rules::r704_5c_poison::r704_5c_poison,
+                    comprehensive_rules::r104_2a_wins_when_opponents_left::r104_2a_wins_when_opponents_left,
+                    comprehensive_rules::r614_1a_r616_1_replacement_effects::r614_1a_r616_1_replacement_effects::<
+                        rules::DrawFromEmptyLibrary,
+                    >,
+                    comprehensive_rules::r614_1a_r616_1_replacement_effects::r614_1a_r616_1_replacement_effects::<
+                        rules::LoseGame,
+                    >,
+                    comprehensive_rules::r614_1a_r616_1_replacement_effects::r614_1a_r616_1_replacement_effects::<
+                        rules::WinGame,
+                    >,
+                    comprehensive_rules::r121_4_draw_from_empty_library::r121_4_draw_from_empty_library,
+                )
+                    .chain(),
+                (
+                    comprehensive_rules::r104_3_lose_the_game::r104_3_lose_the_game,
+                    comprehensive_rules::r104_2_win_the_game::r104_2_win_the_game,
+                    comprehensive_rules::r104_4a_draw::r104_4a_draw,
+                    comprehensive_rules::r104_5_leaves_the_game::r104_5_leaves_the_game,
+                    comprehensive_rules::r104_1_game_ends::r104_1_game_ends,
+                )
+                    .chain(),
             )
                 .chain(),
         )
@@ -81,7 +88,7 @@ mod tests {
         assert_eq!(app.get_schedule(Update).map(Schedule::systems_len), Some(6));
         assert_eq!(
             app.get_schedule(StateBasedActions).map(Schedule::systems_len),
-            Some(23)
+            Some(24)
         );
     }
 }

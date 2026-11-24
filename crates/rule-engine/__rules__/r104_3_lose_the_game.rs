@@ -10,8 +10,12 @@ pub fn r104_3_lose_the_game(
     mut proceeds: MessageReader<rules::Proceeds<rules::LoseGame>>,
     mut commands: Commands,
     mut state_based_actions_performed: ResMut<StateBasedActionsPerformed>,
+    players: players::Players,
 ) {
     for happened in proceeds.read() {
+        if !players.is_still_in_the_game(happened.player()) {
+            continue;
+        }
         commands.entity(*happened.player()).insert(players::Lost);
         **state_based_actions_performed = true;
     }
