@@ -76,6 +76,10 @@ pub fn add_resolution_systems(app: &mut App) {
                 >,
                 comprehensive_rules::r110_1_enter_battlefield::r110_1_enter_battlefield,
                 comprehensive_rules::r110_5b_enters_untapped::r110_5b_enters_untapped,
+                (
+                    comprehensive_rules::r608_3e_cannot_enter::r608_3e_cannot_enter,
+                )
+                    .chain(),
             )
                 .chain(),
         )
@@ -97,7 +101,7 @@ mod tests {
 
         assert_eq!(
             app.get_schedule(Update).map(Schedule::systems_len),
-            Some(29)
+            Some(30)
         );
     }
 }

@@ -60,6 +60,7 @@ pub mod r608_2a_intervening_if;
 pub mod r608_2b_illegal_targets;
 pub mod r608_2n_graveyard;
 pub mod r608_3a_permanent_enters;
+pub mod r608_3e_cannot_enter;
 pub mod r611_2a_continuous_effects;
 pub mod r611_3a_static_effects;
 pub mod r613_1_layers;
