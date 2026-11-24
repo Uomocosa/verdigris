@@ -1,7 +1,7 @@
 use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query, Res, With};
 
+use crate::Game;
 use crate::actions;
-use crate::game;
 use crate::players;
 use crate::turns;
 
@@ -28,7 +28,7 @@ pub fn r506_2a_r507_1_r508_1b_defending_player(
     mut rejected: MessageWriter<actions::Rejected>,
     mut commands: Commands,
     turn: Res<turns::Turn>,
-    game: game::Game,
+    game: Game,
     defending: Query<Entity, With<players::DefendingPlayer>>,
 ) {
     let turn = turn.into_inner();

@@ -113,8 +113,14 @@ impl MockGame {
     }
 
     pub fn pass_priority_all(&mut self) {
-        let remaining =
-            self.players.iter().filter(|player| !self.priority().has_passed(**player)).count();
+        let remaining = self
+            .players
+            .iter()
+            .filter(|player| {
+                let id: players::PlayerId = **player;
+                !self.priority().has_passed(id) && !self.has_lost(*id)
+            })
+            .count();
         for _ in 0..remaining {
             self.pass_priority();
         }

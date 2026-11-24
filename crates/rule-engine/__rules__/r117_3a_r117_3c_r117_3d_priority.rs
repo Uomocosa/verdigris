@@ -1,5 +1,6 @@
-use bevy::prelude::{MessageReader, MessageWriter, Res, ResMut};
+use bevy::prelude::{MessageReader, MessageWriter, Res};
 
+use crate::GameMut;
 use crate::actions;
 use crate::turns;
 
@@ -18,7 +19,7 @@ use crate::turns;
 pub fn r117_3a_r117_3c_r117_3d_priority(
     mut actions: MessageReader<actions::PlayerAction>,
     mut rejected: MessageWriter<actions::Rejected>,
-    mut priority: ResMut<turns::Priority>,
+    mut game: GameMut,
     turn_order: Res<turns::TurnOrder>,
     window: Res<actions::OpeningHandWindow>,
 ) {
@@ -33,7 +34,7 @@ pub fn r117_3a_r117_3c_r117_3d_priority(
             });
             continue;
         }
-        if action.player != priority.holder {
+        if action.player != game.priority_holder().id {
             if matches!(&action.action, actions::Action::PassPriority) {
                 rejected.write(actions::Rejected::NoPriority {
                     player: action.player,
@@ -42,12 +43,12 @@ pub fn r117_3a_r117_3c_r117_3d_priority(
             continue;
         }
         if matches!(&action.action, actions::Action::PassPriority) {
-            if let Some(next) = turn_order.next_after(priority.holder) {
-                priority.pass_to(next);
+            if let Some(next) = game.priority_holder().next_in_turn_order() {
+                game.pass_priority_to(next.id);
             }
             continue;
         }
-        priority.give_to(action.player);
+        game.give_priority_to(action.player);
     }
 }
 
@@ -109,5 +110,16 @@ mod tests {
             Some(&actions::Rejected::NoPriority { player: p2.id })
         );
         assert_eq!(game.priority_player(), p1.id);
+    }
+
+    #[test]
+    fn a_player_who_left_does_not_receive_priority() -> TestResult {
+        let (mut game, [p1, p2, p3]) = MockGame::new([P1, P2, P3]);
+
+        game.act(p2, actions::Action::Concede);
+        game.play([p1.pass_priority()])?;
+
+        assert_eq!(game.priority_player(), p3.id);
+        Ok(())
     }
 }

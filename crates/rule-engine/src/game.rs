@@ -33,7 +33,7 @@ impl<'w, 's> Game<'w, 's> {
 mod tests {
     use bevy::ecs::system::RunSystemOnce;
 
-    use crate::game;
+    use crate::Game;
     use crate::testing::*;
 
     #[test]
@@ -41,7 +41,7 @@ mod tests {
         let (mut game, [p1, _p2]) = MockGame::new([P1, P2]);
         game.app
             .world_mut()
-            .run_system_once(move |answers: game::Game| {
+            .run_system_once(move |answers: Game| {
                 assert_eq!(answers.active_player().map(|player| player.id), Some(p1.id));
                 assert_eq!(
                     answers.priority_holder().map(|player| player.id),
@@ -57,7 +57,7 @@ mod tests {
         game.play([p1.pass_priority()])?;
         game.app
             .world_mut()
-            .run_system_once(move |answers: game::Game| {
+            .run_system_once(move |answers: Game| {
                 assert!(answers.active_player().is_none());
             })
             .unwrap();

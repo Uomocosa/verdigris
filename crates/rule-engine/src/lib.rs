@@ -8,7 +8,8 @@ pub mod cards;
 mod comprehensive_rules;
 pub mod damage;
 pub mod effects;
-pub mod game;
+mod game;
+mod game_mut;
 pub mod keywords;
 pub mod players;
 pub mod rules;
@@ -23,6 +24,8 @@ pub mod zones;
 pub use basic::enums::RuleSet;
 pub use basic::resources::StateBasedActionsPerformed;
 pub use basic::schedules::StateBasedActions;
+pub use game::Game;
+pub use game_mut::GameMut;
 pub use rules_plugin::RulesPlugin;
 
 mod constants;

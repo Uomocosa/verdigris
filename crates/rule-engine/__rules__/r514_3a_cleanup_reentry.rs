@@ -1,5 +1,6 @@
 use bevy::prelude::{MessageReader, Res, ResMut};
 
+use crate::GameMut;
 use crate::StateBasedActionsPerformed;
 use crate::stack;
 use crate::turns;
@@ -14,12 +15,10 @@ pub fn r514_3a_cleanup_reentry(
     mut steps: MessageReader<turns::StepStarted>,
     mut passed: MessageReader<turns::AllPlayersPassed>,
     reentry: ResMut<turns::CleanupReentry>,
-    mut priority: ResMut<turns::Priority>,
-    turn: Res<turns::Turn>,
+    mut game: GameMut,
     triggers: Res<stack::TriggerQueue>,
     performed: Res<StateBasedActionsPerformed>,
 ) {
-    let turn = turn.into_inner();
     let reentry = reentry.into_inner();
     let triggers = triggers.into_inner();
     let performed = performed.into_inner();
@@ -29,14 +28,14 @@ pub fn r514_3a_cleanup_reentry(
         }
         if **performed || !triggers.is_empty() {
             reentry.is_priority_window = true;
-            priority.give_to(turn.active);
+            game.give_priority_to_active_player();
         }
     }
     for _ in passed.read() {
         if !reentry.is_priority_window {
             continue;
         }
-        priority.give_to(turn.active);
+        game.give_priority_to_active_player();
         reentry.should_repeat = true;
     }
 }

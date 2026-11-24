@@ -1,5 +1,6 @@
-use bevy::prelude::{MessageReader, MessageWriter, Res, ResMut};
+use bevy::prelude::{MessageReader, MessageWriter, Res};
 
+use crate::GameMut;
 use crate::turns;
 
 /// 500.1. A turn consists of five phases, in this order: beginning, precombat main, combat,
@@ -14,13 +15,12 @@ use crate::turns;
 pub fn r500_1_r500_2_step_ends(
     mut all_players_passed: MessageReader<turns::AllPlayersPassed>,
     mut step_started: MessageWriter<turns::StepStarted>,
-    mut turn: ResMut<turns::Turn>,
-    mut priority: ResMut<turns::Priority>,
+    mut game: GameMut,
     combat_damage_steps: Res<turns::CombatDamageSteps>,
 ) {
     let combat_damage_steps = *combat_damage_steps.into_inner();
     for _ in all_players_passed.read() {
-        let next = match turn.step {
+        let next = match game.step() {
             turns::Step::Untap => turns::Step::Upkeep,
             turns::Step::Upkeep => turns::Step::Draw,
             turns::Step::Draw => turns::Step::PrecombatMain,
@@ -39,14 +39,15 @@ pub fn r500_1_r500_2_step_ends(
             turns::Step::PostcombatMain => turns::Step::End,
             turns::Step::End => turns::Step::Cleanup,
         };
-        turn.step = next;
-        priority.give_to(turn.active);
+        game.begin_step(next);
+        game.give_priority_to_active_player();
         step_started.write(turns::StepStarted(next));
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use crate::actions;
     use crate::testing::*;
     use crate::turns;
 
@@ -61,6 +62,19 @@ mod tests {
         assert_eq!(turn.step, turns::Step::BeginningOfCombat);
         assert_eq!(priority.holder, p1.id);
         assert!(priority.passed.is_empty());
+        Ok(())
+    }
+
+    #[test]
+    fn priority_goes_to_the_next_player_when_the_active_player_left() -> TestResult {
+        let (mut game, [p1, p2, p3]) = MockGame::new([P1, P2, P3]);
+
+        game.play([p1.pass_priority()])?;
+        game.act(p1, actions::Action::Concede);
+        game.play([p2.pass_priority(), p3.pass_priority()])?;
+
+        assert_eq!(game.turn().step, turns::Step::BeginningOfCombat);
+        assert_eq!(game.priority_player(), p2.id);
         Ok(())
     }
 }

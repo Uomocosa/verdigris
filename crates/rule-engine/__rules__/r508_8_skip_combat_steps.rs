@@ -1,5 +1,6 @@
-use bevy::prelude::{MessageMutator, MessageReader, Query, ResMut, With};
+use bevy::prelude::{MessageMutator, MessageReader, Query, With};
 
+use crate::GameMut;
 use crate::cards;
 use crate::turns;
 
@@ -8,15 +9,14 @@ use crate::turns;
 pub fn r508_8_skip_combat_steps(
     mut all_players_passed: MessageReader<turns::AllPlayersPassed>,
     mut step_started: MessageMutator<turns::StepStarted>,
-    mut turn: ResMut<turns::Turn>,
-    mut priority: ResMut<turns::Priority>,
+    mut game: GameMut,
     attackers: Query<(), With<cards::Attacking>>,
 ) {
     if all_players_passed.is_empty() {
         return;
     }
     all_players_passed.clear();
-    if turn.step != turns::Step::DeclareAttackers {
+    if game.step() != turns::Step::DeclareAttackers {
         return;
     }
     for step in step_started.read() {
@@ -29,8 +29,8 @@ pub fn r508_8_skip_combat_steps(
     } else {
         turns::Step::DeclareBlockers
     };
-    turn.step = next;
-    priority.give_to(turn.active);
+    game.begin_step(next);
+    game.give_priority_to_active_player();
     step_started.write(turns::StepStarted(next));
 }
 

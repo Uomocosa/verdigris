@@ -1,5 +1,6 @@
-use bevy::prelude::{MessageWriter, Res, ResMut};
+use bevy::prelude::{MessageWriter, ResMut};
 
+use crate::GameMut;
 use crate::turns;
 
 /// 500.3. A step in which no players receive priority ends when all specified actions that take
@@ -22,13 +23,10 @@ use crate::turns;
 /// and no abilities can be activated. However, this rule is subject to the following exception:
 pub fn r500_3_r503_1_step_without_priority_ends(
     mut step_started: MessageWriter<turns::StepStarted>,
-    mut turn: ResMut<turns::Turn>,
-    mut priority: ResMut<turns::Priority>,
-    turn_order: Res<turns::TurnOrder>,
+    mut game: GameMut,
     mut reentry: ResMut<turns::CleanupReentry>,
 ) {
-    let turn_order = turn_order.into_inner();
-    match turn.step {
+    match game.step() {
         turns::Step::Cleanup => {
             if reentry.should_repeat {
                 reentry.should_repeat = false;
@@ -44,18 +42,13 @@ pub fn r500_3_r503_1_step_without_priority_ends(
             if reentry.is_priority_window {
                 return;
             }
-            let Some(next) = turn_order.next_after(turn.active) else {
-                return;
-            };
-            turn.number = turn.number.saturating_add(1);
-            turn.active = next;
-            turn.step = turns::Step::Untap;
-            priority.give_to(next);
-            step_started.write(turns::StepStarted(turns::Step::Untap));
+            if game.begin_next_turn().is_some() {
+                step_started.write(turns::StepStarted(turns::Step::Untap));
+            }
         }
         turns::Step::Untap => {
-            turn.step = turns::Step::Upkeep;
-            priority.give_to(turn.active);
+            game.begin_step(turns::Step::Upkeep);
+            game.give_priority_to_active_player();
             step_started.write(turns::StepStarted(turns::Step::Upkeep));
         }
         _ => {}
@@ -64,6 +57,7 @@ pub fn r500_3_r503_1_step_without_priority_ends(
 
 #[cfg(test)]
 mod tests {
+    use crate::actions;
     use crate::testing::*;
     use crate::turns;
 
@@ -88,6 +82,17 @@ mod tests {
         let priority = game.priority();
         assert_eq!(turn.step, turns::Step::Upkeep);
         assert_eq!(priority.holder, p2.id);
+        Ok(())
+    }
+
+    #[test]
+    fn a_player_who_left_does_not_begin_a_turn() -> TestResult {
+        let (mut game, [p1, p2, p3]) = MockGame::new([P1, P2, P3]);
+
+        game.act(p2, actions::Action::Concede);
+        game.play([p1.end_turn(), p3.end_turn()])?;
+
+        assert_eq!(game.turn().active, p3.id);
         Ok(())
     }
 }

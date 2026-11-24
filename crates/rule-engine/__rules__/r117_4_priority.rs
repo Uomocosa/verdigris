@@ -1,6 +1,7 @@
 use crate::STACK;
-use bevy::prelude::{MessageWriter, Query, Res, ResMut};
+use bevy::prelude::{MessageWriter, Query};
 
+use crate::GameMut;
 use crate::stack;
 use crate::turns;
 use crate::zones;
@@ -11,20 +12,16 @@ use crate::zones;
 pub fn r117_4_priority(
     mut resolutions: MessageWriter<stack::Resolution>,
     mut all_players_passed: MessageWriter<turns::AllPlayersPassed>,
-    mut priority: ResMut<turns::Priority>,
-    turn: Res<turns::Turn>,
-    turn_order: Res<turns::TurnOrder>,
+    mut game: GameMut,
     cards: Query<(&zones::InZone, Option<&stack::CastingStage>)>,
     zones: zones::ZoneLookup,
     stack_contents: Query<&zones::ZoneContents>,
 ) {
-    let turn = turn.into_inner();
-    let turn_order = turn_order.into_inner();
-    if !turn_order.iter().all(|player| priority.has_passed(*player)) {
+    if !game.have_all_players_passed_in_succession() {
         return;
     }
-    let holder = priority.holder;
-    priority.give_to(holder);
+    let holder = game.priority_holder();
+    game.give_priority_to(holder.id);
     let top = zones
         .find(STACK, None)
         .and_then(|stack| stack_contents.get(stack).ok())
@@ -37,14 +34,16 @@ pub fn r117_4_priority(
     if is_still_casting {
         return;
     }
-    priority.give_to(turn.active);
+    game.give_priority_to_active_player();
     resolutions.write(stack::Resolution(top));
 }
 
 #[cfg(test)]
 mod tests {
+    use crate::actions;
     use crate::mana;
     use crate::testing::*;
+    use crate::turns;
     use crate::{GRAVEYARD, HAND};
 
     #[test]
@@ -113,6 +112,30 @@ mod tests {
         let priority = game.priority();
         assert_eq!(priority.holder, p1.id);
         assert!(priority.passed.is_empty());
+        Ok(())
+    }
+
+    #[test]
+    fn the_step_ends_when_every_player_still_in_the_game_has_passed() -> TestResult {
+        let (mut game, [p1, p2, p3]) = MockGame::new([P1, P2, P3]);
+
+        game.act(p3, actions::Action::Concede);
+        game.play([p1.pass_priority(), p2.pass_priority()])?;
+
+        assert_eq!(game.turn().step, turns::Step::BeginningOfCombat);
+        Ok(())
+    }
+
+    #[test]
+    fn a_player_who_passed_and_then_left_does_not_count_for_the_others() -> TestResult {
+        let (mut game, [p1, p2, p3]) = MockGame::new([P1, P2, P3]);
+
+        game.play([p1.pass_priority()])?;
+        game.act(p1, actions::Action::Concede);
+        game.play([p2.pass_priority()])?;
+
+        assert_eq!(game.turn().step, turns::Step::PrecombatMain);
+        assert_eq!(game.priority_player(), p3.id);
         Ok(())
     }
 }
