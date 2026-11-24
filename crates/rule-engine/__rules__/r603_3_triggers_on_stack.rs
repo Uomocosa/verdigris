@@ -67,7 +67,7 @@ pub fn r603_3_triggers_on_stack(world: &mut World) {
         };
         *world.resource_mut::<actions::PendingChoice>() = actions::PendingChoice(Some(
             actions::Choice::OrderTriggers(actions::OrderTriggersChoice {
-                player: first.controller,
+                player: players::PlayerId(first.controller),
                 triggers: group.iter().map(|trigger| trigger.source).collect(),
             }),
         ));

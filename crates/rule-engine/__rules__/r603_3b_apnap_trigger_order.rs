@@ -59,7 +59,7 @@ pub fn r603_3b_apnap_trigger_order(
         };
         let mut held: Vec<stack::PendingTrigger> = Vec::new();
         for trigger in queue.take_pending() {
-            if trigger.controller == choice.player && expected.contains(&trigger.source) {
+            if trigger.controller == *choice.player && expected.contains(&trigger.source) {
                 held.push(trigger);
             } else {
                 queue.push(trigger);
@@ -129,7 +129,7 @@ mod tests {
         let Some(actions::Choice::OrderTriggers(choice)) = pending else {
             panic!("expected P1 to be asked to order their triggers");
         };
-        assert_eq!(choice.player, *p1);
+        assert_eq!(choice.player, p1.id);
         let mut triggers = choice.triggers;
         triggers.sort();
         let mut expected = [Entity::from(warden_1), Entity::from(warden_2)];

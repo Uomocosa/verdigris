@@ -3,7 +3,6 @@ use bevy::prelude::{Commands, MessageReader, MessageWriter, Query, Res, With};
 use crate::abilities;
 use crate::actions;
 use crate::cards;
-use crate::players;
 use crate::turns;
 /// 605.3a A player may activate an activated mana ability whenever they have priority, whenever
 /// they are casting a spell or activating an ability that requires a mana payment, or whenever a
@@ -50,14 +49,11 @@ pub fn r605_3a_mana_abilities(
         if ability.cost != abilities::ActivationCost::Tap {
             continue;
         }
-        if players::PlayerId(action.player) != priority.player
-            || **owner != action.player
-            || tapped.is_some()
-        {
+        if action.player != priority.player || **owner != *action.player || tapped.is_some() {
             rejected.write(actions::Rejected::CannotActivateManaAbility { permanent });
             continue;
         }
-        let Ok(mut pool) = pools.get_mut(action.player) else {
+        let Ok(mut pool) = pools.get_mut(*action.player) else {
             rejected.write(actions::Rejected::CannotActivateManaAbility { permanent });
             continue;
         };

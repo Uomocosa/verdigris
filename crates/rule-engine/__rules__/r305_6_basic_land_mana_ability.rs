@@ -2,7 +2,6 @@ use bevy::prelude::{Commands, MessageReader, MessageWriter, Query, Res, With};
 
 use crate::actions;
 use crate::cards;
-use crate::players;
 use crate::turns;
 
 /// 305.6. The basic land types are Plains, Island, Swamp, Mountain, and Forest. If an object uses
@@ -84,14 +83,11 @@ pub fn r305_6_basic_land_mana_ability(
             rejected.write(actions::Rejected::CannotActivateManaAbility { permanent });
             continue;
         };
-        if players::PlayerId(action.player) != priority.player
-            || **owner != action.player
-            || tapped.is_some()
-        {
+        if action.player != priority.player || **owner != *action.player || tapped.is_some() {
             rejected.write(actions::Rejected::CannotActivateManaAbility { permanent });
             continue;
         }
-        let Ok(mut pool) = pools.get_mut(action.player) else {
+        let Ok(mut pool) = pools.get_mut(*action.player) else {
             rejected.write(actions::Rejected::CannotActivateManaAbility { permanent });
             continue;
         };

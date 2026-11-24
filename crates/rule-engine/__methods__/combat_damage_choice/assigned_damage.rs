@@ -4,10 +4,11 @@ use bevy::prelude::Entity;
 
 use crate::actions;
 use crate::damage;
+use crate::players;
 
 pub fn assigned_damage(
     choice: &actions::CombatDamageChoice,
-    player: Entity,
+    player: players::PlayerId,
     assignments: &[actions::DamageAssignment],
 ) -> Option<Vec<damage::AssignedDamage>> {
     if player != choice.player || assignments.is_empty() {
@@ -86,11 +87,11 @@ mod tests {
         let [companion] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GARRUKS_COMPANION)?;
         let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
         let [spider] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GIANT_SPIDER)?;
-        let player = Entity::from(p1);
+        let player = p1.id;
         let source = Entity::from(companion);
         let bears_blocking = Entity::from(bears);
         let spider_blocking = Entity::from(spider);
-        let outsider = Entity::from(p2);
+        let outsider = p2.id;
 
         let choice = actions::CombatDamageChoice {
             player,
@@ -127,11 +128,11 @@ mod tests {
         let [companion] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GARRUKS_COMPANION)?;
         let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
         let [spider] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GIANT_SPIDER)?;
-        let player = Entity::from(p1);
+        let player = p1.id;
         let source = Entity::from(companion);
         let bears_blocking = Entity::from(bears);
         let spider_blocking = Entity::from(spider);
-        let outsider = Entity::from(p2);
+        let outsider = p2.id;
 
         let choice = actions::CombatDamageChoice {
             player,
@@ -156,7 +157,7 @@ mod tests {
                 amount: 1,
             },
             actions::DamageAssignment {
-                target: outsider,
+                target: *outsider,
                 amount: 1,
             },
         ];

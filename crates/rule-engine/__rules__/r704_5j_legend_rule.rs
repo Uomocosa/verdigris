@@ -5,6 +5,7 @@ use bevy::prelude::{Entity, MessageReader, MessageWriter, Query, ResMut, With};
 use crate::StateBasedActionsPerformed;
 use crate::actions;
 use crate::cards;
+use crate::players;
 use crate::rules;
 
 /// 704.5j If two or more legendary permanents with the same name are controlled by the same
@@ -31,7 +32,7 @@ pub fn r704_5j_legend_rule(
         for other in choice.legal.iter().copied().filter(|other| other != chosen) {
             destructions.write(rules::Would(rules::Destroy {
                 permanent: other,
-                controller: choice.player,
+                controller: *choice.player,
             }));
         }
         **performed = true;
@@ -53,14 +54,14 @@ pub fn r704_5j_legend_rule(
         }
         if matches!(
             (*pending).as_ref(),
-            Some(actions::Choice::Legendary(choice)) if choice.player == owner
+            Some(actions::Choice::Legendary(choice)) if *choice.player == owner
         ) {
             return;
         }
         let legal = entities.into_iter().collect();
         *pending =
             actions::PendingChoice(Some(actions::Choice::Legendary(actions::LegendaryChoice {
-                player: owner,
+                player: players::PlayerId(owner),
                 legal,
             })));
         return;

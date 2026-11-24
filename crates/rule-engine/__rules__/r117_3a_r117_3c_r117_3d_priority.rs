@@ -1,7 +1,6 @@
 use bevy::prelude::{MessageReader, MessageWriter, Res, ResMut};
 
 use crate::actions;
-use crate::players;
 use crate::turns;
 
 /// 117.3a The active player receives priority at the beginning of most steps and phases, after any
@@ -34,7 +33,7 @@ pub fn r117_3a_r117_3c_r117_3d_priority(
             });
             continue;
         }
-        if players::PlayerId(action.player) != priority.player {
+        if action.player != priority.player {
             if matches!(&action.action, actions::Action::PassPriority) {
                 rejected.write(actions::Rejected::NoPriority {
                     player: action.player,
@@ -108,7 +107,7 @@ mod tests {
 
         assert_eq!(
             err.rejection(),
-            Some(&actions::Rejected::NoPriority { player: *p2 })
+            Some(&actions::Rejected::NoPriority { player: p2.id })
         );
         assert_eq!(game.priority_player(), p1.id);
     }

@@ -2,7 +2,6 @@ use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query, Res, 
 
 use crate::actions;
 use crate::cards;
-use crate::players;
 use crate::rules;
 use crate::turns;
 
@@ -65,8 +64,8 @@ pub fn r508_1a_r508_1k_declare_attackers(
             continue;
         }
         if turn.step != turns::Step::DeclareAttackers
-            || players::PlayerId(action.player) != priority.player
-            || players::PlayerId(action.player) != turn.active
+            || action.player != priority.player
+            || action.player != turn.active
         {
             rejected.write(actions::Rejected::CannotAttack {
                 attackers: attackers.clone(),
@@ -76,15 +75,15 @@ pub fn r508_1a_r508_1k_declare_attackers(
         let all_legal = attackers.iter().all(|attacker| {
             answers.legal::<rules::DeclareAttacker>(&rules::DeclareAttacker {
                 attacker: *attacker,
-                player: action.player,
+                player: *action.player,
             })
         });
         let requirement_unmet = candidates.iter().any(|(entity, owner)| {
-            **owner == action.player
+            **owner == *action.player
                 && answers.required::<rules::DeclareAttacker>(entity)
                 && answers.legal::<rules::DeclareAttacker>(&rules::DeclareAttacker {
                     attacker: entity,
-                    player: action.player,
+                    player: *action.player,
                 })
                 && !attackers.contains(&entity)
         });

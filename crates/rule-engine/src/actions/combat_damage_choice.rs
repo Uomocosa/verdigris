@@ -1,12 +1,12 @@
 use atomic_delegate_macros::atomic_delegates;
-use bevy::prelude::Entity;
 
 use crate::actions;
 use crate::damage;
+use crate::players;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CombatDamageChoice {
-    pub player: Entity,
+    pub player: players::PlayerId,
     pub needed: Vec<actions::RequiredCombatDamage>,
 }
 
@@ -15,7 +15,7 @@ impl CombatDamageChoice {
     #[must_use]
     pub(crate) fn assigned_damage(
         &self,
-        player: Entity,
+        player: players::PlayerId,
         assignments: &[actions::DamageAssignment],
     ) -> Option<Vec<damage::AssignedDamage>> {
     }
@@ -35,7 +35,7 @@ mod tests {
     #[test]
     fn test_usage() {
         let (game, [p1, p2]) = MockGame::new([P1, P2]);
-        let player = Entity::from(p1);
+        let player = p1.id;
         let source = Entity::from(p2);
         let first = game.zone_entity(p1, BATTLEFIELD).unwrap();
         let second = game.zone_entity(p2, HAND).unwrap();

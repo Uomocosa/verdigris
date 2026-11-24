@@ -51,11 +51,11 @@ pub fn r506_2a_r507_1_r508_1b_defending_player(
             continue;
         };
         let is_legal = turn.step == turns::Step::BeginningOfCombat
-            && players::PlayerId(action.player) == turn.active
-            && players::PlayerId(action.player) == priority.player
-            && players.get(*chosen).is_ok()
-            && players::PlayerId(*chosen) != turn.active
-            && lost.get(*chosen).is_err();
+            && action.player == turn.active
+            && action.player == priority.player
+            && players.get(**chosen).is_ok()
+            && *chosen != turn.active
+            && lost.get(**chosen).is_err();
         if !is_legal {
             rejected.write(actions::Rejected::CannotChooseDefendingPlayer {
                 player: action.player,
@@ -65,7 +65,7 @@ pub fn r506_2a_r507_1_r508_1b_defending_player(
         for player in defending.iter() {
             commands.entity(player).remove::<players::DefendingPlayer>();
         }
-        commands.entity(*chosen).insert(players::DefendingPlayer);
+        commands.entity(**chosen).insert(players::DefendingPlayer);
     }
 }
 
@@ -89,7 +89,7 @@ mod tests {
             ]);
         let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
 
-        game.act(p2, actions::Action::ChooseDefendingPlayer(p3.into()));
+        game.act(p2, actions::Action::ChooseDefendingPlayer(p3.id));
         game.play([
             p2.pass_to(turns::Step::DeclareAttackers),
             p1.pass_to(turns::Step::DeclareAttackers),
@@ -117,7 +117,7 @@ mod tests {
             p3.pass_to(turns::Step::BeginningOfCombat),
         ])?;
 
-        game.act(p1, actions::Action::ChooseDefendingPlayer(p3.into()));
+        game.act(p1, actions::Action::ChooseDefendingPlayer(p3.id));
         let marker: Option<Entity> = game.get::<players::DefendingPlayer>(p3).map(|_| p3.into());
         assert_eq!(marker, Some(p3.into()));
 
@@ -143,11 +143,11 @@ mod tests {
         ])?;
         assert!(game.has_lost(p3));
 
-        game.act(p1, actions::Action::ChooseDefendingPlayer(p3.into()));
+        game.act(p1, actions::Action::ChooseDefendingPlayer(p3.id));
 
         assert_eq!(
             game.last_rejection(),
-            Some(&actions::Rejected::CannotChooseDefendingPlayer { player: *p1 })
+            Some(&actions::Rejected::CannotChooseDefendingPlayer { player: p1.id })
         );
         assert!(!game.has::<players::DefendingPlayer>(p3));
         Ok(())

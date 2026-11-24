@@ -1,10 +1,11 @@
 use bevy::prelude::{Entity, Message};
 
 use crate::actions;
+use crate::players;
 
 #[derive(Message, Debug, Clone, PartialEq, Eq)]
 pub struct PlayerAction {
-    pub player: Entity,
+    pub player: players::PlayerId,
     pub action: actions::Action,
 }
 
@@ -29,22 +30,22 @@ pub enum Rejected {
         spell: Entity,
     },
     InvalidDiscard {
-        player: Entity,
+        player: players::PlayerId,
     },
     InvalidTriggerOrder {
-        player: Entity,
+        player: players::PlayerId,
     },
     InvalidOpeningHandActions {
-        player: Entity,
+        player: players::PlayerId,
     },
     InvalidCombatDamage {
-        player: Entity,
+        player: players::PlayerId,
     },
     InvalidGraveyardOrder {
-        player: Entity,
+        player: players::PlayerId,
     },
     CannotChooseDefendingPlayer {
-        player: Entity,
+        player: players::PlayerId,
     },
     CannotAttack {
         attackers: Vec<Entity>,
@@ -53,6 +54,6 @@ pub enum Rejected {
         assignments: Vec<actions::BlockAssignment>,
     },
     NoPriority {
-        player: Entity,
+        player: players::PlayerId,
     },
 }

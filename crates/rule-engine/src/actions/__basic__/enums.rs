@@ -2,6 +2,7 @@ use bevy::prelude::Entity;
 
 use crate::actions;
 use crate::cards;
+use crate::players;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Action {
@@ -14,7 +15,7 @@ pub enum Action {
     ChooseTargets(Vec<Entity>),
     ChooseDiscard(Vec<Entity>),
     ChooseLegendary(Entity),
-    ChooseDefendingPlayer(Entity),
+    ChooseDefendingPlayer(players::PlayerId),
     OrderTriggers(Vec<Entity>),
     ArrangeGraveyard(Vec<Entity>),
     AssignCombatDamage(Vec<actions::DamageAssignment>),

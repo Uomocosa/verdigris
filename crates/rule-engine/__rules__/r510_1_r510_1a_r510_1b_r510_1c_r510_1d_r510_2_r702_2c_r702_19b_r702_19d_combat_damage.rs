@@ -142,7 +142,7 @@ pub fn r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_r702_2c_r702_19b_r702_19d_c
         if !needed.is_empty() {
             *pending = actions::PendingChoice(Some(actions::Choice::CombatDamage(
                 actions::CombatDamageChoice {
-                    player: *turn.active,
+                    player: turn.active,
                     needed,
                 },
             )));

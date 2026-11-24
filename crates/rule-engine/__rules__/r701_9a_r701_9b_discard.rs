@@ -4,6 +4,7 @@ use std::collections::BTreeSet;
 use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query, ResMut};
 
 use crate::actions;
+use crate::players;
 use crate::rules;
 use crate::zones;
 
@@ -39,7 +40,7 @@ pub fn r701_9a_r701_9b_discard(
             continue;
         }
         *pending = actions::PendingChoice(Some(actions::Choice::Discard(actions::DiscardChoice {
-            player: discard.player,
+            player: players::PlayerId(discard.player),
             count: discard.amount,
             legal: held.into_iter().collect(),
         })));
@@ -65,7 +66,7 @@ pub fn r701_9a_r701_9b_discard(
             });
             continue;
         }
-        let Some(graveyard) = zones.find(GRAVEYARD, Some(choice.player)) else {
+        let Some(graveyard) = zones.find(GRAVEYARD, Some(*choice.player)) else {
             continue;
         };
         for card in cards {

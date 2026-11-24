@@ -96,13 +96,13 @@ impl MockGame {
     }
 
     pub fn act(&mut self, player: impl Into<Entity>, action: actions::Action) {
-        let player = player.into();
+        let player = players::PlayerId(player.into());
         let _ = self.app.world_mut().write_message(actions::PlayerAction { player, action });
         self.app.update();
     }
 
     pub fn pass_priority(&mut self) {
-        let player = *self.priority().player;
+        let player = self.priority().player;
         let _ = self.app.world_mut().write_message(actions::PlayerAction {
             player,
             action: actions::Action::PassPriority,

@@ -2,7 +2,6 @@ use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query, Res, 
 
 use crate::actions;
 use crate::cards;
-use crate::players;
 use crate::rules;
 use crate::turns;
 
@@ -57,8 +56,8 @@ pub fn r509_1a_r509_1g_r509_1h_r702_9b_r702_17b_declare_blockers(
             continue;
         };
         if turn.step != turns::Step::DeclareBlockers
-            || players::PlayerId(action.player) != priority.player
-            || players::PlayerId(action.player) == turn.active
+            || action.player != priority.player
+            || action.player == turn.active
         {
             rejected.write(actions::Rejected::CannotBlock {
                 assignments: assignments.clone(),
@@ -70,18 +69,18 @@ pub fn r509_1a_r509_1g_r509_1h_r702_9b_r702_17b_declare_blockers(
                 && answers.legal::<rules::DeclareBlocker>(&rules::DeclareBlocker {
                     blocker: assignment.blocker,
                     attacker: assignment.attacker,
-                    player: action.player,
+                    player: *action.player,
                 })
         });
         let requirement_unmet = blockers.iter().any(|(entity, owner)| {
-            **owner == action.player
+            **owner == *action.player
                 && answers.required::<rules::DeclareBlocker>(entity)
                 && !assignments.iter().any(|assignment| assignment.blocker == entity)
                 && attacking.iter().any(|(attacker, _)| {
                     answers.legal::<rules::DeclareBlocker>(&rules::DeclareBlocker {
                         blocker: entity,
                         attacker,
-                        player: action.player,
+                        player: *action.player,
                     })
                 })
         });

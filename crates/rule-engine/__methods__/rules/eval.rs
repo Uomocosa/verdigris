@@ -1,7 +1,6 @@
 use bevy::prelude::Entity;
 
 use crate::cards;
-use crate::players;
 use crate::rules;
 use crate::zones;
 
@@ -95,14 +94,10 @@ pub fn eval(
             .zones
             .find(zones::SharedZone::Stack, None)
             .is_none_or(|stack| !answers.in_zone.iter().any(|in_zone| **in_zone == stack)),
-        rules::Predicate::ActivePlayer(role) => target(role).is_some_and(|holder| {
-            answers.turn.single().is_ok_and(|turn| turn.active == players::PlayerId(holder))
-        }),
+        rules::Predicate::ActivePlayer(role) => target(role)
+            .is_some_and(|holder| answers.turn.single().is_ok_and(|turn| *turn.active == holder)),
         rules::Predicate::HasPriority(role) => target(role).is_some_and(|holder| {
-            answers
-                .priority
-                .single()
-                .is_ok_and(|priority| priority.player == players::PlayerId(holder))
+            answers.priority.single().is_ok_and(|priority| *priority.player == holder)
         }),
         rules::Predicate::EventField(..) => false,
     }

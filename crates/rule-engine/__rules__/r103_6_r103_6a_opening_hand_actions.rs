@@ -39,14 +39,14 @@ pub fn r103_6_r103_6a_opening_hand_actions(
         if window.len() < player_count {
             let mut current = turn.active;
             for _ in 0..player_count {
-                if !window.contains(&*current) {
-                    window.push(*current);
+                if !window.contains(&current) {
+                    window.push(current);
                     let eligible = opening_hand_cards(*current, &opening_hands, &zones);
                     if !eligible.is_empty() {
                         *pending =
                             actions::PendingChoice(Some(actions::Choice::OpeningHandActions(
                                 actions::OpeningHandActionsChoice {
-                                    player: *current,
+                                    player: current,
                                     cards: eligible,
                                 },
                             )));
@@ -79,7 +79,7 @@ pub fn r103_6_r103_6a_opening_hand_actions(
             });
             continue;
         }
-        if zones.find(BATTLEFIELD, Some(action.player)).is_none() {
+        if zones.find(BATTLEFIELD, Some(*action.player)).is_none() {
             rejected.write(actions::Rejected::InvalidOpeningHandActions {
                 player: action.player,
             });
@@ -88,7 +88,7 @@ pub fn r103_6_r103_6a_opening_hand_actions(
         for card in answered {
             entering.write(rules::Would(rules::EnterBattlefield {
                 permanent: *card,
-                controller: action.player,
+                controller: *action.player,
                 summoning_sick: false,
             }));
         }
@@ -198,7 +198,7 @@ mod tests {
 
         assert_eq!(
             game.last_rejection(),
-            Some(&actions::Rejected::NoPriority { player: *p1 })
+            Some(&actions::Rejected::NoPriority { player: p1.id })
         );
         assert_eq!(game.priority_player(), p1.id);
     }
@@ -313,7 +313,7 @@ mod tests {
 
         assert_eq!(
             game.last_rejection(),
-            Some(&actions::Rejected::InvalidOpeningHandActions { player: *p3 })
+            Some(&actions::Rejected::InvalidOpeningHandActions { player: p3.id })
         );
         assert!(game.player(p3).cards_in(HAND).has(p3_leyline));
 
@@ -354,7 +354,7 @@ mod tests {
 
         assert_eq!(
             game.last_rejection(),
-            Some(&actions::Rejected::InvalidOpeningHandActions { player: *p2 })
+            Some(&actions::Rejected::InvalidOpeningHandActions { player: p2.id })
         );
         assert!(game.player(p2).cards_in(HAND).has(p2_leyline));
 
@@ -366,7 +366,7 @@ mod tests {
         assert!(game.player(p1).cards_in(BATTLEFIELD).has(p1_leyline));
         let window = game.app.world().resource::<actions::OpeningHandWindow>();
         assert_eq!(window.len(), 1);
-        assert_eq!(window[0], *p1);
+        assert_eq!(window[0], p1.id);
 
         game.act(
             p2,

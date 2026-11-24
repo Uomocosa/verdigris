@@ -2,6 +2,8 @@ use bevy::prelude::Entity;
 
 use std::collections::{BTreeMap, BTreeSet};
 
+use crate::players;
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TargetChoice {
     pub spell: Entity,
@@ -11,7 +13,7 @@ pub struct TargetChoice {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct DiscardChoice {
-    pub player: Entity,
+    pub player: players::PlayerId,
     pub count: u32,
     pub legal: BTreeSet<Entity>,
 }
@@ -39,25 +41,25 @@ pub struct RequiredCombatDamage {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct OrderTriggersChoice {
-    pub player: Entity,
+    pub player: players::PlayerId,
     pub triggers: Vec<Entity>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct OpeningHandActionsChoice {
-    pub player: Entity,
+    pub player: players::PlayerId,
     pub cards: Vec<Entity>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct LegendaryChoice {
-    pub player: Entity,
+    pub player: players::PlayerId,
     pub legal: BTreeSet<Entity>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ArrangeGraveyardChoice {
-    pub player: Entity,
+    pub player: players::PlayerId,
     pub graveyard: Entity,
     pub cards: Vec<Entity>,
 }

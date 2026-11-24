@@ -5,6 +5,7 @@ use bevy::prelude::{Changed, Entity, MessageReader, MessageWriter, Query, ResMut
 use crate::GRAVEYARD;
 use crate::actions;
 use crate::cards;
+use crate::players;
 use crate::zones;
 
 /// 404.3. If an effect or rule puts two or more cards into the same graveyard at the same time,
@@ -79,7 +80,7 @@ pub fn r404_3_graveyard_order(
         batch.sort_by_key(|card| positions.get(card).copied().unwrap_or(usize::MAX));
         *pending = actions::PendingChoice(Some(actions::Choice::ArrangeGraveyard(
             actions::ArrangeGraveyardChoice {
-                player: owner_entity,
+                player: players::PlayerId(owner_entity),
                 graveyard,
                 cards: batch,
             },
