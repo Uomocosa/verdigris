@@ -27,9 +27,8 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let configs = resolved_by::<events::Untap, _>(
-            comprehensive_rules::r502_3_untap_perform::r502_3_untap_perform,
-        );
+        let configs =
+            resolved_by::<events::Untap, _>(comprehensive_rules::r701_26b_untap::r701_26b_untap);
         let ScheduleConfigs::Configs {
             configs, metadata, ..
         } = configs

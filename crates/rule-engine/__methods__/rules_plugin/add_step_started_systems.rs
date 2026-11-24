@@ -21,7 +21,7 @@ pub fn add_step_started_systems(app: &mut App) {
             (
                 comprehensive_rules::r502_3_untap::r502_3_untap,
                 Attempt::<events::Untap>::resolved_by(
-                    comprehensive_rules::r502_3_untap_perform::r502_3_untap_perform,
+                    comprehensive_rules::r701_26b_untap::r701_26b_untap,
                 ),
             )
                 .chain(),
