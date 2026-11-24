@@ -94,7 +94,8 @@ targeting rule in `r601_2c_targets`) rather than a new system, say so, name the 
 extends, and say whether a dedicated system was considered and why not — the goal is one
 system per rule (or rule group), so extending is the exception.
 
-**Test** — the full red `MockGame` test (rust fence), named for the behaviour it checks
+**Test** — how it goes red. First choice: an existing test plus the added step or assert, as a diff with its
+`file:line`. Only if no test can be extended: the full red `MockGame` test (rust fence), named for the behaviour it checks
 (no `r<num>_` prefix: the file name already carries the rule ids), driven only through builder setup and player actions (`act`,
 `pass_priority`, `pass_priority_all`, `end_turn`), asserting each state. Never writes messages
 or components with `app.world_mut()`. If no action can reach the state yet:

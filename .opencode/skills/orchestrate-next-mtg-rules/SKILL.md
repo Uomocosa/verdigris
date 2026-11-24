@@ -38,7 +38,7 @@ always on the current branch (orchestrator-core: never create, switch or merge b
    really red, no rule file or system already covers it. Write the table to `report.md`.
 4. **Implement.** Write one brief per IMPLEMENT item (`brief-<X>.md`), one worker, one commit
    each, fast gate per item. Every brief tells the worker to read
-   `.opencode/skills/verdigris-rules-style/SKILL.md` and its `references/CHANGEABLE_RULES.md` first. Log hash, tier + model, minutes in `plan.md`. Re-rank between items
+   `.opencode/skills/verdigris-rules-style/SKILL.md` and its `references/CHANGEABLE_RULES.md` first. Every `worker-env.md` says: "Tests: red first, by adding a step or assert to an existing test. A new test needs a reason in the report." Log hash, tier + model, minutes in `plan.md`. Re-rank between items
    if an implementation changes what is possible (a DEFERRED item may become doable).
 5. **Gate.** Run the full suite yourself, then push.
 6. **Report.** In `report.md` and your final message: the ranked table, the steps with commit

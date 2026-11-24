@@ -290,15 +290,27 @@ is in scope of refactoring that rule. A plan applies them; "keep it smaller for 
 not a reason to skip one. Awaiting the user's approval, so ask: turning every `PlayerAction` into an
 event (§12, last paragraph) and `Did<E>` in 603.2 (§10).
 
-## 15. Tests: extend before you add
+## 15. Tests: make an existing one red
 
-A refactor preserves behaviour: what players see and what `MockGame` tests show. Types, messages and
-systems are free to change; an assert on internal bookkeeping is replaced by one on behaviour. A behaviour change needs a test that
-was RUN red on the old system, preferably by adding one step to an existing test; add a new test only
-if no test covers the scenario. A plan adds at most one new test per behaviour change, none for
-behaviour that stays, and none for what an existing test already shows; a rejection that became visible
-is an extra step in an existing test. Commit only on the full suite (`cargo nextest run ... --no-fail-fast`):
-`just test` stops at the first failure.
+Red first, then green, but reuse. In this order:
+1. an existing test of the rule, with one more assert or step;
+2. an existing test of a neighbouring rule that already reaches the situation;
+3. a new test, only if 1 and 2 can't show it. Say in the report which tests you checked.
+
+```rust
+// Good: the situation is already there, one step makes the test red
+    game.play([p1.declare_attackers([bears])])?;
+    assert!(game.is_attacking(bears));
+    assert!(game.is_tapped(bears));              // new: 508.1f
+
+// Bad: a second test that repeats the whole setup to check one more thing
+    #[test]
+    fn attacking_taps_the_creature() -> TestResult { /* same 10 lines */ }
+```
+
+RUN it red on the old code. A refactor adds no test: players see the same, and an assert on internal
+bookkeeping becomes one on what players see. Commit only on the full suite
+(`cargo nextest run ... --no-fail-fast`): `just test` stops at the first failure.
 
 ## Checklist for a rule (or a plan for one)
 
