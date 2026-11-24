@@ -5,5 +5,5 @@ use crate::players;
 pub type StillInTheGame = (
     With<players::Player>,
     Without<players::Lost>,
-    Without<players::Drawn>,
+    Without<players::GameIsADraw>,
 );

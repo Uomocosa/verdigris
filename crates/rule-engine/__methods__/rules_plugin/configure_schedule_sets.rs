@@ -1,19 +1,20 @@
-use bevy::prelude::{App, IntoScheduleConfigs, Update};
+use bevy::prelude::{App, IntoScheduleConfigs, Update, not, resource_exists};
 
+use crate::GameEnded;
 use crate::RuleSet;
 
 pub fn configure_schedule_sets(app: &mut App) {
     app.configure_sets(
         Update,
         (
-            RuleSet::Turn,
-            RuleSet::PriorityAction,
-            RuleSet::Resolution,
-            RuleSet::StateBased,
-            RuleSet::StepEnd,
-            RuleSet::StepStarted,
-            RuleSet::Cleanup,
-            RuleSet::TurnEnd,
+            RuleSet::Turn.run_if(not(resource_exists::<GameEnded>)),
+            RuleSet::PriorityAction.run_if(not(resource_exists::<GameEnded>)),
+            RuleSet::Resolution.run_if(not(resource_exists::<GameEnded>)),
+            RuleSet::StateBased.run_if(not(resource_exists::<GameEnded>)),
+            RuleSet::StepEnd.run_if(not(resource_exists::<GameEnded>)),
+            RuleSet::StepStarted.run_if(not(resource_exists::<GameEnded>)),
+            RuleSet::Cleanup.run_if(not(resource_exists::<GameEnded>)),
+            RuleSet::TurnEnd.run_if(not(resource_exists::<GameEnded>)),
         )
             .chain(),
     );

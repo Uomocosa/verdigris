@@ -9,7 +9,7 @@ pub fn r104_4a_draw(
     mut state_based_actions_performed: ResMut<StateBasedActionsPerformed>,
     players: Query<(Entity, Option<&players::Lost>), With<players::Player>>,
     won: Query<Entity, With<players::Won>>,
-    drawn: Query<Entity, With<players::Drawn>>,
+    drawn: Query<Entity, With<players::GameIsADraw>>,
 ) {
     if !won.is_empty() || !drawn.is_empty() {
         return;
@@ -23,7 +23,7 @@ pub fn r104_4a_draw(
         return;
     }
     for player in remaining {
-        commands.entity(player).insert(players::Drawn);
+        commands.entity(player).insert(players::GameIsADraw);
     }
     **state_based_actions_performed = true;
 }
@@ -43,8 +43,8 @@ mod tests {
         assert!(game.has_lost(p2));
         assert!(!game.has_won(p1));
         assert!(!game.has_won(p2));
-        assert!(game.has::<players::Drawn>(p1));
-        assert!(game.has::<players::Drawn>(p2));
+        assert!(game.has::<players::GameIsADraw>(p1));
+        assert!(game.has::<players::GameIsADraw>(p2));
         Ok(())
     }
 
@@ -55,8 +55,8 @@ mod tests {
         game.play([p1.pass_priority()])?;
 
         assert!(game.has_lost(p1));
-        assert!(!game.has::<players::Drawn>(p1));
-        assert!(!game.has::<players::Drawn>(p2));
+        assert!(!game.has::<players::GameIsADraw>(p1));
+        assert!(!game.has::<players::GameIsADraw>(p2));
         Ok(())
     }
 }

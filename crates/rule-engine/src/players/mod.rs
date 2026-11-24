@@ -2,7 +2,8 @@
 mod basic;
 
 pub use basic::components::{
-    AttemptedDrawFromEmptyLibrary, DefendingPlayer, Drawn, Life, Lost, Player, PoisonCounters, Won,
+    AttemptedDrawFromEmptyLibrary, DefendingPlayer, GameIsADraw, Life, Lost, Player,
+    PoisonCounters, Won,
 };
 pub use basic::newtypes::PlayerId;
 pub use basic::type_aliases::StillInTheGame;

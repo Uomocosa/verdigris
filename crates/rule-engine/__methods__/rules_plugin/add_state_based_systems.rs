@@ -44,6 +44,7 @@ pub fn add_state_based_systems(app: &mut App) {
                 comprehensive_rules::r121_4_draw_from_empty_library::r121_4_draw_from_empty_library,
                 comprehensive_rules::r104_3_lose_the_game::r104_3_lose_the_game,
                 comprehensive_rules::r104_2_win_the_game::r104_2_win_the_game,
+                comprehensive_rules::r104_1_game_ends::r104_1_game_ends,
             )
                 .chain(),
         )
@@ -80,7 +81,7 @@ mod tests {
         assert_eq!(app.get_schedule(Update).map(Schedule::systems_len), Some(6));
         assert_eq!(
             app.get_schedule(StateBasedActions).map(Schedule::systems_len),
-            Some(22)
+            Some(23)
         );
     }
 }

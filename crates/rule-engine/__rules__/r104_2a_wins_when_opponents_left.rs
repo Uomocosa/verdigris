@@ -9,9 +9,6 @@ pub fn r104_2a_wins_when_opponents_left(
     mut wins: MessageWriter<rules::Proceeds<rules::WinGame>>,
     players: players::Players,
 ) {
-    if players.has_anyone_won() {
-        return;
-    }
     for player in players.still_in_the_game() {
         if player.have_all_opponents_left() {
             wins.write(rules::Proceeds(rules::WinGame(player.id)));

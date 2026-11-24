@@ -1,5 +1,6 @@
 use bevy::prelude::World;
 
+use crate::GameEnded;
 use crate::MAX_STATE_BASED_PASSES;
 use crate::StateBasedActions;
 use crate::StateBasedActionsPerformed;
@@ -15,6 +16,9 @@ pub fn r117_5_r704_3_state_based_actions(world: &mut World) {
     for _ in 0..MAX_STATE_BASED_PASSES {
         **world.resource_mut::<StateBasedActionsPerformed>() = false;
         world.run_schedule(StateBasedActions);
+        if world.contains_resource::<GameEnded>() {
+            return;
+        }
         if !**world.resource::<StateBasedActionsPerformed>() {
             if world.resource::<stack::TriggerQueue>().is_empty() {
                 return;
