@@ -7,7 +7,7 @@ use crate::turns;
 
 #[derive(SystemParam, Clone, Copy)]
 pub struct Players<'w, 's> {
-    turn_order: Query<'w, 's, &'static turns::TurnOrder>,
+    pub(crate) turn_order: Query<'w, 's, &'static turns::TurnOrder>,
     still_in_the_game: Query<'w, 's, Entity, players::StillInTheGame>,
     winners: Query<'w, 's, Entity, With<players::Won>>,
 }
@@ -15,13 +15,10 @@ pub struct Players<'w, 's> {
 #[rustfmt::skip]
 impl Players<'_, '_> {
     #[must_use]
-    pub fn in_turn_order(&self) -> Vec<Entity> { self.turn_order.iter().flat_map(|order| order.iter().copied()).collect() }
+    pub fn opponents_of(&self, player: players::PlayerId) -> Vec<players::PlayerId> { self.in_turn_order().into_iter().filter(|other| *other != player).collect() }
 
     #[must_use]
-    pub fn opponents_of(&self, player: Entity) -> Vec<Entity> { self.in_turn_order().into_iter().filter(|other| *other != player).collect() }
-
-    #[must_use]
-    pub fn is_still_in_the_game(&self, player: Entity) -> bool { self.still_in_the_game.contains(player) }
+    pub fn is_still_in_the_game(&self, player: players::PlayerId) -> bool { self.still_in_the_game.contains(*player) }
 
     #[must_use]
     pub fn has_anyone_won(&self) -> bool { !self.winners.is_empty() }
@@ -30,12 +27,15 @@ impl Players<'_, '_> {
 #[atomic_delegates]
 impl Players<'_, '_> {
     #[must_use]
-    pub fn still_in_the_game(&self) -> Vec<Entity> {}
+    pub fn in_turn_order(&self) -> Vec<players::PlayerId> {}
+
+    #[must_use]
+    pub fn still_in_the_game(&self) -> Vec<players::PlayerId> {}
 }
 
 impl Players<'_, '_> {
     #[must_use]
-    pub fn have_all_opponents_left(&self, player: Entity) -> bool {
+    pub fn have_all_opponents_left(&self, player: players::PlayerId) -> bool {
         let opponents = self.opponents_of(player);
         let is_any_still_here = opponents.iter().any(|other| self.is_still_in_the_game(*other));
         !opponents.is_empty() && !is_any_still_here
@@ -45,7 +45,6 @@ impl Players<'_, '_> {
 #[cfg(test)]
 mod tests {
     use bevy::ecs::system::RunSystemOnce;
-    use bevy::prelude::Entity;
 
     use crate::testing::*;
 
@@ -58,12 +57,9 @@ mod tests {
         game.app
             .world_mut()
             .run_system_once(move |players: Players| {
-                assert_eq!(
-                    players.opponents_of(Entity::from(p1)),
-                    [Entity::from(p2), Entity::from(p3)]
-                );
-                assert!(!players.is_still_in_the_game(Entity::from(p2)));
-                assert!(!players.have_all_opponents_left(Entity::from(p1)));
+                assert_eq!(players.opponents_of(p1.id), [p2.id, p3.id]);
+                assert!(!players.is_still_in_the_game(p2.id));
+                assert!(!players.have_all_opponents_left(p1.id));
                 assert!(!players.has_anyone_won());
             })
             .unwrap();

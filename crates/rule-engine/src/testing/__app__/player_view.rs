@@ -1,6 +1,5 @@
-use bevy::prelude::Entity;
-
 use crate::cards;
+use crate::players;
 use crate::testing;
 use crate::zones;
 
@@ -21,7 +20,7 @@ impl<'g> PlayerView<'g> {
 #[rustfmt::skip]
 impl PlayerView<'_> {
     #[must_use]
-    pub const fn id(&self) -> Entity { self.player.entity }
+    pub const fn id(&self) -> players::PlayerId { self.player.id }
 
     #[must_use]
     pub fn life(&self) -> i32 { self.game.life(self.player) }
@@ -48,7 +47,7 @@ mod tests {
     fn test_usage() {
         let (game, [p1, ..]) = MockGame::new([P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]), P2]);
         let view = game.player(p1);
-        assert_eq!(view.id(), p1);
+        assert_eq!(view.id(), p1.id);
         assert_eq!(view.life(), 20);
         assert_eq!(view.mana_pool(), mana![R]);
         assert_eq!(view.cards_in(HAND).count(), 1);

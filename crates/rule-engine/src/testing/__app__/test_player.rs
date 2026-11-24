@@ -1,26 +1,30 @@
 use bevy::prelude::Entity;
 use derive_more::Deref;
 
+use crate::players;
 use crate::testing;
 use crate::turns;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Deref)]
 pub struct TestPlayer {
-    #[deref]
-    pub(crate) entity: Entity,
+    #[deref(forward)]
+    pub(crate) id: players::PlayerId,
     pub(crate) seat: testing::PlayerSeat,
 }
 
 impl TestPlayer {
     #[must_use]
     pub(crate) const fn from_entity_and_seat(entity: Entity, seat: testing::PlayerSeat) -> Self {
-        Self { entity, seat }
+        Self {
+            id: players::PlayerId(entity),
+            seat,
+        }
     }
 }
 
 #[rustfmt::skip]
 impl From<TestPlayer> for Entity {
-    fn from(player: TestPlayer) -> Self { player.entity }
+    fn from(player: TestPlayer) -> Self { *player.id }
 }
 
 #[rustfmt::skip]
@@ -74,6 +78,7 @@ impl TestPlayer {
 mod tests {
     use bevy::prelude::{Entity, World};
 
+    use crate::players;
     use crate::testing;
     use crate::turns;
 
@@ -84,6 +89,7 @@ mod tests {
         let player = testing::TestPlayer::from_entity_and_seat(entity, testing::PlayerSeat(1));
 
         assert_eq!(Entity::from(player), entity);
+        assert_eq!(player.id, players::PlayerId(entity));
         assert_eq!(*player, entity);
         assert_eq!(*player.seat, 1);
         assert_eq!(

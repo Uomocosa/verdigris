@@ -1,8 +1,6 @@
-use bevy::prelude::Entity;
-
 use crate::players;
 
-pub fn still_in_the_game(players: &players::Players) -> Vec<Entity> {
+pub fn still_in_the_game(players: &players::Players) -> Vec<players::PlayerId> {
     players
         .in_turn_order()
         .into_iter()
@@ -13,7 +11,6 @@ pub fn still_in_the_game(players: &players::Players) -> Vec<Entity> {
 #[cfg(test)]
 mod tests {
     use bevy::ecs::system::RunSystemOnce;
-    use bevy::prelude::Entity;
 
     use crate::testing::*;
 
@@ -27,10 +24,7 @@ mod tests {
         game.app
             .world_mut()
             .run_system_once(move |all: players::Players| {
-                assert_eq!(
-                    still_in_the_game(&all),
-                    [Entity::from(p1), Entity::from(p3)]
-                );
+                assert_eq!(still_in_the_game(&all), [p1.id, p3.id]);
             })
             .unwrap();
         Ok(())
