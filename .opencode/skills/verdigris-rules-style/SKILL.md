@@ -190,11 +190,7 @@ turn", "receives priority") is another sentence, so another rule.
 The event is about the object that can change it: one event per object when each object may change
 its own (the pipeline applies only the first matching `Instead` to an event).
 
-"Whenever ..." abilities are the only ones that are looked up, and in ONE place: a rule performs the
-event and that fact (`Did<E>`; an existing fact message such as `cards::Entered` counts) is matched by
-the triggered-ability rule 603.2, once for all events. Its lettered cases (603.6a, 508.3a, 509.3a) only
-say which fact and which trigger event match. A rule that searches
-for "cards that trigger on my event" is the search above; plan it as `Did<E>` (missing engine part, §14).
+Rules that queue triggered abilities (603.2, 508.3a, 509.3a) look them up themselves today; this section doesn't cover them.
 
 **Why:** a new card then needs no change in any rule.
 
@@ -229,7 +225,7 @@ moment, and the same anchor must serve both.
 Asking, waiting and validating is ONE shared mechanism for the whole engine, not code in a rule: it
 shows one ask at a time, in turn order, drops an ask with no options or whose player left, checks
 player / legality / count / duplicates, and writes `Answered` or `Rejected`. The choice type alone
-says what a legal answer is. A rule body has no `PendingChoice`, no `PlayerAction`, no `Rejected`.
+says what a legal answer is. A rule body that needs a choice has no `PendingChoice` and no answer check.
 
 ```rust
 // 701.22a "look at the top N cards ..., then put any number of them on the bottom": the CR asks
@@ -239,15 +235,16 @@ for scry in scries.read() { asks.write(actions::Ask(actions::ScryChoice::new(scr
 for answered in answers.read() { .. }
 ```
 
-`Ask` / `Answered` do not exist yet: the rules of today write `PendingChoice` themselves. Don't copy
-them; a refactor of such a rule plans the shared part once and uses it.
+For a card's `may` the mechanism exists: `actions::Ask` / `actions::Answered`, shown and checked
+by `answer_asks`; an event that can carry a `may` registers `show_may::<E>`, `answer_may::<E>`
+and its `PendingMayAsks<E>` (see `OpeningHandAction`). For a choice the CR itself gives, rules
+still write `PendingChoice`: don't copy them; a refactor of such a rule extends this mechanism
+and uses it.
 
 Other choice rules may keep their own `PendingChoice` until they are refactored; the old and new way
 can live side by side.
 
-The same holds for a player's action (play, cast, attack). One shared system turns the `PlayerAction`
-into the event and rejects it if it isn't legal; legality is the event's `clauses()` plus its
-`ValueRule`s, both folded by `Rules::legal`. The rule reads `Proceeds<E>` and contains no legality test.
+Rules that read a `PlayerAction` (play, cast, attack) keep doing so for now.
 
 ## 13. State another rule needs is a CR concept
 
@@ -287,8 +284,7 @@ that stands for "everyone did it".
 A missing engine part is not a reason to keep a rule complicated. Name the part, say what else it
 would serve, and plan the rule as if it existed. Moving an old rule to the shapes of §5, §6, §10-§13
 is in scope of refactoring that rule. A plan applies them; "keep it smaller for now" is
-not a reason to skip one. Awaiting the user's approval, so ask: turning every `PlayerAction` into an
-event (§12, last paragraph) and `Did<E>` in 603.2 (§10).
+not a reason to skip one.
 
 ## 15. Tests: make an existing one red
 

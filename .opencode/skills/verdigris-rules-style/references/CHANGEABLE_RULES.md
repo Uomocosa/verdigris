@@ -55,7 +55,7 @@ pub enum Change {
     // quantity
     Set(u32), Increase(u32), Decrease(u32), NoMaximum,
     // replacement (614)
-    Instead { when: rules::Predicate, then: Vec<rules::EventTemplate> }, // `then: may(..)` is planned, §3
+    Instead { when: rules::Predicate, then: rules::Then }, // Then::{Events(Vec<EventTemplate>), May(EventTemplate)}
 }
 
 pub struct RuleChange { pub target: Target, pub change: Change }
@@ -82,9 +82,7 @@ add an event, clause or value rule, register it.
    fields (`Draw { player, amount }`). `impl Event` with `ID` = CR number, `Context` for roles.
 2. If the CR lists conditions, write them as `clauses()` with `ClauseId` consts, text quoted
    VERBATIM from `docs/MagicCompRules-*.txt` (keep the verbatim test).
-3. Whoever starts the action writes `Would<E>` instead of acting directly: the shared action system for
-   a player's action (`../SKILL.md` §12), the `__rules__` system for everything else. The
-   pipeline decides; the owning system reads `Proceeds<E>` and performs only what comes out.
+3. The `__rules__` system that owns the action writes `Would<E>` instead of acting directly; the pipeline decides; the owning system reads `Proceeds<E>` and performs only what comes out.
 4. Register the event (section 2).
 
 **A card that changes a rule**: pick the target (whole event, one clause, or a value) and the
@@ -93,7 +91,7 @@ existing builder fits. Prefer reusing `as_though`, `allow`, `restriction`, `inst
 
 **Replacement order** (616): earliest timestamp first; a replacement applies at most once to an
 event (track applied effects on the event while it is re-announced). Player choice among
-replacements (616.1) and optional "you may ... instead" are NOT implemented yet. When needed, the OPTION belongs to
+replacements (616.1) is NOT implemented yet. An optional "you may ... instead" belongs to
 the change: `then: may(event)`. The pipeline asks through the shared ask / answer (`../SKILL.md` §12)
 and announces the event only on a yes. Never an implicit default, never a question in the rule.
 
@@ -101,12 +99,12 @@ and announces the event only on a yes. Never an implicit default, never a questi
 // "If you would draw a card, you may mill a card instead." The rule that announces Draw is untouched.
 Change::Instead { when: ALWAYS, then: may(EventTemplate::Mill { .. }) }
 // the same without a choice: "If you would draw a card, mill a card instead."
-Change::Instead { when: ALWAYS, then: vec![EventTemplate::Mill { .. }] }
+Change::Instead { when: ALWAYS, then: Then::Events(vec![EventTemplate::Mill { .. }]) }
 ```
 
 ```
 Would<Draw> -> pipeline finds the change on the event's subject / player
-   then: vec![..]  -> announces Would<Mill>
+   Then::Events(vec![..])  -> announces Would<Mill>
    then: may(..)   -> Ask(the event's player); yes -> Would<Mill>, no -> Proceeds<Draw>
    no change       -> Proceeds<Draw> (nothing reads it if the default is nothing)
 ```
