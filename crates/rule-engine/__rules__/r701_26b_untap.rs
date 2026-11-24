@@ -21,10 +21,10 @@ mod tests {
     #[test]
     fn a_permanent_that_skips_untap_stays_tapped() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
-            P1.battlefield_tapped([TEST_FROZEN_RELIC]),
-            P2.battlefield_tapped([GRIZZLY_BEARS]),
+            P1,
+            P2.battlefield_tapped([GRIZZLY_BEARS, TEST_FROZEN_RELIC]),
         ]);
-        let [relic] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TEST_FROZEN_RELIC)?;
+        let [relic] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(TEST_FROZEN_RELIC)?;
         let [p2_bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
 
         game.play([p1.end_turn(), p2.end_turn()])?;
