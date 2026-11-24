@@ -184,7 +184,7 @@ fn announce_damage(
 }
 
 fn recipient_controller(owners: &Query<&cards::Owner>, recipient: Entity) -> Entity {
-    owners.get(recipient).map_or(recipient, |owner| **owner)
+    owners.get(recipient).map_or(recipient, |owner| ***owner)
 }
 
 #[cfg(test)]

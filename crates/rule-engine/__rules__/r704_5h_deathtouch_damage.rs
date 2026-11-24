@@ -2,7 +2,6 @@ use bevy::prelude::{Commands, Entity, MessageWriter, Query, With};
 
 use crate::cards;
 use crate::damage;
-use crate::players;
 use crate::rules;
 
 /// 704.5h If a creature has toughness greater than 0, and it’s been dealt damage by a source with
@@ -29,7 +28,7 @@ pub fn r704_5h_deathtouch_damage(
         if effective.toughness > 0 {
             destructions.write(rules::Would(rules::Destroy {
                 permanent: creature,
-                controller: players::PlayerId(**owner),
+                controller: **owner,
             }));
         }
     }

@@ -39,7 +39,7 @@ pub fn r603_3_triggers_on_stack(world: &mut World) {
     let active = world.resource::<turns::Turn>().active;
     let turn_order = world.resource::<turns::TurnOrder>().clone();
     let apnap = players_in_apnap_order(active, &turn_order);
-    pending.sort_by_key(|trigger| apnap_position(&apnap, players::PlayerId(trigger.controller)));
+    pending.sort_by_key(|trigger| apnap_position(&apnap, trigger.controller));
     let mut groups: Vec<Vec<stack::PendingTrigger>> = Vec::new();
     for trigger in pending {
         let continues_run = groups.last().is_some_and(|group| {
@@ -67,7 +67,7 @@ pub fn r603_3_triggers_on_stack(world: &mut World) {
         };
         *world.resource_mut::<actions::PendingChoice>() = actions::PendingChoice(Some(
             actions::Choice::OrderTriggers(actions::OrderTriggersChoice {
-                player: players::PlayerId(first.controller),
+                player: first.controller,
                 triggers: group.iter().map(|trigger| trigger.source).collect(),
             }),
         ));
@@ -143,7 +143,7 @@ mod tests {
         assert!(game.stack().has_no(SOUL_WARDEN));
         let [trigger] = game.stack().exactly_trigger::<1>(SOUL_WARDEN.trigger())?;
         let ability = game.get::<stack::TriggeredAbilityOnStack>(trigger).unwrap();
-        assert_eq!(ability.controller, *p1);
+        assert_eq!(ability.controller, p1.id);
         assert!(!game.has::<crate::cards::CardDefinition>(trigger));
         Ok(())
     }

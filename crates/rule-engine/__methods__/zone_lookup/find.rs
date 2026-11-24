@@ -1,11 +1,12 @@
 use bevy::prelude::Entity;
 
+use crate::players;
 use crate::zones;
 
 pub fn find(
     lookup: &zones::ZoneLookup,
     zone: impl Into<zones::Zone>,
-    owner: Option<Entity>,
+    owner: Option<players::PlayerId>,
 ) -> Option<Entity> {
     let zone = zone.into();
     lookup.iter().find_map(|(entity, found_zone, found_owner)| {
@@ -24,8 +25,8 @@ pub fn find(
 #[cfg(test)]
 mod tests {
     use bevy::ecs::system::RunSystemOnce;
-    use bevy::prelude::Entity;
 
+    use crate::players;
     use crate::testing::*;
     use crate::{HAND, STACK};
 
@@ -35,17 +36,16 @@ mod tests {
     #[test]
     fn test_usage() {
         let (mut game, [p1, ..]) = MockGame::new([P1, P2]);
-        let (stack, hand, owner) = (
-            game.stack,
-            game.zone_entity(p1, HAND).unwrap(),
-            Entity::from(p1),
-        );
+        let (stack, hand) = (game.stack, game.zone_entity(p1, HAND).unwrap());
         game.app
             .world_mut()
             .run_system_once(move |lookup: zones::ZoneLookup| {
                 assert_eq!(find(&lookup, zones::Zone::Stack, None), Some(stack));
-                assert_eq!(find(&lookup, zones::Zone::Hand, Some(owner)), Some(hand));
-                assert_eq!(find(&lookup, zones::Zone::Stack, Some(stack)), None);
+                assert_eq!(find(&lookup, zones::Zone::Hand, Some(p1.id)), Some(hand));
+                assert_eq!(
+                    find(&lookup, zones::Zone::Stack, Some(players::PlayerId(stack))),
+                    None
+                );
                 assert_eq!(
                     find(&lookup, STACK, None),
                     find(&lookup, zones::Zone::Stack, None)

@@ -18,10 +18,10 @@ pub fn r701_17a_r701_17b_mill(
     zone_contents: Query<&zones::ZoneContents>,
 ) {
     for mill in mills.read() {
-        let Some(library) = zones.find(LIBRARY, Some(*mill.player)) else {
+        let Some(library) = zones.find(LIBRARY, Some(mill.player)) else {
             continue;
         };
-        let Some(graveyard) = zones.find(GRAVEYARD, Some(*mill.player)) else {
+        let Some(graveyard) = zones.find(GRAVEYARD, Some(mill.player)) else {
             continue;
         };
         let milled_from_top: Vec<Entity> = zone_contents

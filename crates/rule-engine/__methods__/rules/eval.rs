@@ -83,7 +83,7 @@ pub fn eval(
                 .and_then(|entity| entity.get::<zones::InZone>())
                 .is_some_and(|in_zone| {
                     answers.zones.get(**in_zone).is_ok_and(|(_, found, owner)| {
-                        *found == *zone && owner.is_some_and(|owner| **owner == holder)
+                        *found == *zone && owner.is_some_and(|owner| ***owner == holder)
                     })
                 })
         }),

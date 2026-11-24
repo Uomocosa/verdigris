@@ -32,6 +32,7 @@ mod tests {
     use crate::YOU;
     use crate::abilities;
     use crate::effects;
+    use crate::players;
     use crate::stack;
 
     use super::TriggerQueue;
@@ -40,7 +41,7 @@ mod tests {
     fn test_usage() {
         let trigger = stack::PendingTrigger {
             source: Entity::PLACEHOLDER,
-            controller: Entity::PLACEHOLDER,
+            controller: players::PlayerId(Entity::PLACEHOLDER),
             ability: abilities::TriggeredAbility {
                 event: ANOTHER_CREATURE.enters(),
                 intervening_if: None,

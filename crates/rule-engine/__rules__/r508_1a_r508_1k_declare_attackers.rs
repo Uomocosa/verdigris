@@ -79,7 +79,7 @@ pub fn r508_1a_r508_1k_declare_attackers(
             })
         });
         let requirement_unmet = candidates.iter().any(|(entity, owner)| {
-            **owner == *action.player
+            **owner == action.player
                 && answers.required::<rules::DeclareAttacker>(entity)
                 && answers.legal::<rules::DeclareAttacker>(&rules::DeclareAttacker {
                     attacker: entity,

@@ -73,7 +73,7 @@ pub fn r509_1a_r509_1g_r509_1h_r702_9b_r702_17b_declare_blockers(
                 })
         });
         let requirement_unmet = blockers.iter().any(|(entity, owner)| {
-            **owner == *action.player
+            **owner == action.player
                 && answers.required::<rules::DeclareBlocker>(entity)
                 && !assignments.iter().any(|assignment| assignment.blocker == entity)
                 && attacking.iter().any(|(attacker, _)| {

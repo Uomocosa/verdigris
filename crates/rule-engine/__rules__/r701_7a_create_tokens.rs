@@ -21,7 +21,7 @@ pub fn r701_7a_create_tokens(
     zones: zones::ZoneLookup,
 ) {
     for request in requested.read() {
-        let Some(staging) = zones.find(GRAVEYARD, Some(*request.controller)) else {
+        let Some(staging) = zones.find(GRAVEYARD, Some(request.controller)) else {
             continue;
         };
         for _ in 0..request.amount {
@@ -29,7 +29,7 @@ pub fn r701_7a_create_tokens(
                 .spawn((
                     request.token.definition(),
                     zones::InZone(staging),
-                    cards::Owner(*request.controller),
+                    cards::Owner(request.controller),
                     damage::Damage(0),
                     cards::Token,
                 ))

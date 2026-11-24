@@ -4,6 +4,7 @@ use bevy::prelude::{Entity, Query};
 use derive_more::Deref;
 
 use crate::cards;
+use crate::players;
 use crate::zones;
 
 #[derive(Clone, Copy, SystemParam, Deref)]
@@ -20,7 +21,12 @@ impl ZoneLookup<'_, '_> {
 #[atomic_delegates]
 impl ZoneLookup<'_, '_> {
     #[must_use]
-    pub fn find(&self, zone: impl Into<zones::Zone>, owner: Option<Entity>) -> Option<Entity> {}
+    pub fn find(
+        &self,
+        zone: impl Into<zones::Zone>,
+        owner: Option<players::PlayerId>,
+    ) -> Option<Entity> {
+    }
 }
 
 #[cfg(test)]
@@ -43,9 +49,9 @@ mod tests {
             .run_system_once(move |zones: ZoneLookup| {
                 assert!(zones.contains(zones::Zone::Battlefield, battlefield));
                 assert!(!zones.contains(zones::Zone::Hand, battlefield));
-                assert_eq!(zones.find(zones::Zone::Hand, Some(p1.into())), Some(hand));
+                assert_eq!(zones.find(zones::Zone::Hand, Some(p1.id)), Some(hand));
                 assert_eq!(
-                    zones.find(zones::Zone::Battlefield, Some(p1.into())),
+                    zones.find(zones::Zone::Battlefield, Some(p1.id)),
                     Some(battlefield)
                 );
             })

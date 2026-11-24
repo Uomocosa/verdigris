@@ -182,13 +182,14 @@ mod tests {
         app.add_plugins(RulesPlugin);
         let players =
             testing::MockGameBuilder::spawn_players(&mut app, &[testing::P1, testing::P2]);
-        let battlefield = app.world_mut().spawn((BATTLEFIELD, cards::Owner(players[0]))).id();
+        let battlefield =
+            app.world_mut().spawn((BATTLEFIELD, cards::Owner(players::PlayerId(players[0])))).id();
         let bears = app
             .world_mut()
             .spawn((
                 (testing::GRIZZLY_BEARS.definition)(),
                 zones::InZone(battlefield),
-                cards::Owner(players[0]),
+                cards::Owner(players::PlayerId(players[0])),
                 damage::Damage(0),
             ))
             .id();

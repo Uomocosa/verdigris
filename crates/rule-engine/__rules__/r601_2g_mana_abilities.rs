@@ -30,7 +30,7 @@ pub fn r601_2g_mana_abilities(
             continue;
         }
         for (spell, stage, owner, definition) in casting.iter() {
-            if *stage != stack::CastingStage::AwaitingPayment || **owner != *action.player {
+            if *stage != stack::CastingStage::AwaitingPayment || **owner != action.player {
                 continue;
             }
             if is_mana_activation {

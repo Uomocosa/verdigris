@@ -21,7 +21,7 @@ pub fn r514_1_cleanup_discard(
         if **step != turns::Step::Cleanup {
             continue;
         }
-        let Some(hand) = zones.find(HAND, Some(*turn.active)) else {
+        let Some(hand) = zones.find(HAND, Some(turn.active)) else {
             continue;
         };
         let Ok(contents) = zone_contents.get(hand) else {

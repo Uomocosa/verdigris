@@ -16,7 +16,7 @@ pub fn r302_6_summoning_sickness(
             continue;
         }
         for (entity, owner) in sick.iter() {
-            if **owner == *turn.active {
+            if **owner == turn.active {
                 commands.entity(entity).remove::<cards::SummoningSick>();
             }
         }

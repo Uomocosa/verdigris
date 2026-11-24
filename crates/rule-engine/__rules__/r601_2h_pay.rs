@@ -33,7 +33,7 @@ pub fn r601_2h_pay(
         if *stage != stack::CastingStage::AwaitingPayment {
             continue;
         }
-        let Ok(mut pool) = pools.get_mut(**owner) else {
+        let Ok(mut pool) = pools.get_mut(***owner) else {
             continue;
         };
         if pool.pay(definition.cost) {

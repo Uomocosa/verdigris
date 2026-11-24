@@ -63,8 +63,8 @@ pub fn r404_3_graveyard_order(
             continue;
         }
         let (owner_entity, batch) =
-            moved_cards_by_graveyard.entry(graveyard).or_insert_with(|| (**owner, Vec::new()));
-        *owner_entity = **owner;
+            moved_cards_by_graveyard.entry(graveyard).or_insert_with(|| (***owner, Vec::new()));
+        *owner_entity = ***owner;
         batch.push(card);
     }
     for (graveyard, (owner_entity, moved_cards)) in moved_cards_by_graveyard {

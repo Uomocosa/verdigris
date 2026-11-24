@@ -15,7 +15,7 @@ pub fn r110_1_enter_battlefield(
     zones: zones::ZoneLookup,
 ) {
     for event in entering.read() {
-        let Some(battlefield) = zones.find(BATTLEFIELD, Some(*event.controller)) else {
+        let Some(battlefield) = zones.find(BATTLEFIELD, Some(event.controller)) else {
             continue;
         };
         if event.summoning_sick {

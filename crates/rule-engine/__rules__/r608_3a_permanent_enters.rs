@@ -2,7 +2,6 @@ use crate::{BATTLEFIELD, GRAVEYARD, STACK};
 use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query, With};
 
 use crate::cards;
-use crate::players;
 use crate::rules;
 use crate::stack;
 use crate::zones;
@@ -72,7 +71,7 @@ pub fn r608_3a_permanent_enters(
         if zones.find(BATTLEFIELD, Some(**owner)).is_some() {
             entering.write(rules::Would(rules::EnterBattlefield {
                 permanent: spell,
-                controller: players::PlayerId(**owner),
+                controller: **owner,
                 summoning_sick: true,
             }));
         }

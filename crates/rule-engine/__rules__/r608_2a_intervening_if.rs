@@ -26,7 +26,7 @@ pub fn r608_2a_intervening_if(
         let Some(condition) = ability.intervening_if else {
             continue;
         };
-        if !condition.holds(ability.controller, &lives) {
+        if !condition.holds(*ability.controller, &lives) {
             commands.entity(spell).despawn();
         }
     }

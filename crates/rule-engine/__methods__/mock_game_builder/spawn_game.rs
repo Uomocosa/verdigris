@@ -42,7 +42,10 @@ pub fn spawn_game(
             [LIBRARY, HAND, BATTLEFIELD, GRAVEYARD, EXILE]
                 .into_iter()
                 .map(|zone| {
-                    let zone_entity = app.world_mut().spawn((zone, cards::Owner(*player))).id();
+                    let zone_entity = app
+                        .world_mut()
+                        .spawn((zone, cards::Owner(players::PlayerId(*player))))
+                        .id();
                     (zone, zone_entity)
                 })
                 .collect()
@@ -56,7 +59,11 @@ pub fn spawn_game(
         };
         let hand = player_zones.get(&HAND).copied().unwrap_or(Entity::PLACEHOLDER);
         for definition in setup.hand.iter().cloned() {
-            let _ = app.world_mut().spawn((definition, zones::InZone(hand), cards::Owner(*player)));
+            let _ = app.world_mut().spawn((
+                definition,
+                zones::InZone(hand),
+                cards::Owner(players::PlayerId(*player)),
+            ));
         }
 
         let battlefield = player_zones.get(&BATTLEFIELD).copied().unwrap_or(Entity::PLACEHOLDER);
@@ -64,7 +71,7 @@ pub fn spawn_game(
             let _ = app.world_mut().spawn((
                 definition,
                 zones::InZone(battlefield),
-                cards::Owner(*player),
+                cards::Owner(players::PlayerId(*player)),
                 damage::Damage(0),
             ));
         }
@@ -76,8 +83,11 @@ pub fn spawn_game(
             .clone()
             .unwrap_or_else(|| vec![cards::CardDefinition::from(testing::GRIZZLY_BEARS); 12]);
         for definition in library_cards {
-            let _ =
-                app.world_mut().spawn((definition, zones::InZone(library), cards::Owner(*player)));
+            let _ = app.world_mut().spawn((
+                definition,
+                zones::InZone(library),
+                cards::Owner(players::PlayerId(*player)),
+            ));
         }
     }
 

@@ -14,7 +14,7 @@ pub fn cards_in_zone(
         .iter_entities()
         .find(|entity| {
             entity.get::<zones::Zone>().is_some_and(|found| *found == zone)
-                && entity.get::<cards::Owner>().is_some_and(|owner| **owner == player)
+                && entity.get::<cards::Owner>().is_some_and(|owner| ***owner == player)
         })
         .map(|entity| entity.id())
     else {

@@ -41,14 +41,14 @@ pub fn r119_4_pay_life(
         if definition.cost.phyrexian.is_none() {
             continue;
         }
-        let Ok(pool) = pools.get(**owner) else {
+        let Ok(pool) = pools.get(***owner) else {
             continue;
         };
         let mut affordable = *pool;
         if affordable.pay(definition.cost) {
             continue;
         }
-        let Ok(mut life) = lives.get_mut(**owner) else {
+        let Ok(mut life) = lives.get_mut(***owner) else {
             continue;
         };
         if **life < 2 {

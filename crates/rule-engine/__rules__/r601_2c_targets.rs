@@ -71,7 +71,7 @@ pub fn r601_2c_targets(
                 let legal = legal_targets(
                     spell,
                     target.filter,
-                    controller,
+                    *controller,
                     &players,
                     &cards,
                     &battlefield,
@@ -181,13 +181,13 @@ fn legal_targets(
             effects::FilterKind::Creature | effects::FilterKind::AnyTarget => {
                 filter.does_creature_match(definition)
                     && battlefield.contains(entity)
-                    && (**owner == controller
+                    && (***owner == controller
                         || !definition.has_keyword(keywords::StaticKeyword::Hexproof))
             }
             effects::FilterKind::Enchantment => {
                 filter.does_enchantment_match(definition)
                     && battlefield.contains(entity)
-                    && (**owner == controller
+                    && (***owner == controller
                         || !definition.has_keyword(keywords::StaticKeyword::Hexproof))
             }
             effects::FilterKind::Player => false,

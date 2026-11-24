@@ -39,11 +39,11 @@ pub fn r603_4_intervening_if(
                 abilities::TriggerEvent::BeginningOfStep(expected, who) => {
                     **step == expected && {
                         let players: Vec<Entity> = lives.iter().map(|(player, _)| player).collect();
-                        who.resolve(controller, &players).contains(&*turn.active)
+                        who.resolve(*controller, &players).contains(&*turn.active)
                     }
                 }
                 abilities::TriggerEvent::BeginningOfNextCleanup => {
-                    **step == turns::Step::Cleanup && turn.active == players::PlayerId(controller)
+                    **step == turns::Step::Cleanup && turn.active == controller
                 }
                 abilities::TriggerEvent::Enters(_)
                 | abilities::TriggerEvent::Dies
@@ -57,7 +57,7 @@ pub fn r603_4_intervening_if(
             }
             let ability = **at_step;
             if let Some(condition) = ability.intervening_if
-                && !condition.holds(controller, &lives)
+                && !condition.holds(*controller, &lives)
             {
                 continue;
             }

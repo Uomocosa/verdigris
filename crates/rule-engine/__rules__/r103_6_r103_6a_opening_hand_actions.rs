@@ -6,6 +6,7 @@ use crate::BATTLEFIELD;
 use crate::HAND;
 use crate::actions;
 use crate::cards;
+use crate::players;
 use crate::rules;
 use crate::turns;
 use crate::zones;
@@ -79,7 +80,7 @@ pub fn r103_6_r103_6a_opening_hand_actions(
             });
             continue;
         }
-        if zones.find(BATTLEFIELD, Some(*action.player)).is_none() {
+        if zones.find(BATTLEFIELD, Some(action.player)).is_none() {
             rejected.write(actions::Rejected::InvalidOpeningHandActions {
                 player: action.player,
             });
@@ -106,13 +107,13 @@ fn opening_hand_cards(
     )>,
     zones: &zones::ZoneLookup,
 ) -> Vec<Entity> {
-    let Some(hand) = zones.find(HAND, Some(player)) else {
+    let Some(hand) = zones.find(HAND, Some(players::PlayerId(player))) else {
         return Vec::new();
     };
     opening_hands
         .iter()
         .filter(|(_, definition, owner, in_zone)| {
-            ***owner == player
+            ****owner == player
                 && ***in_zone == hand
                 && definition.begins_the_game_on_the_battlefield()
         })

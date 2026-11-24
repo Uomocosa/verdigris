@@ -60,7 +60,7 @@ pub fn r608_2_r608_2c_resolve(
         let chosen_target = lookups.chosen_targets.get(spell).ok().map(|chosen| **chosen);
         let player_targets =
             chosen_target.filter(|target| lookups.lives.get(*target).is_ok()).map_or_else(
-                || resolve_player_targets(&lookups, effect, controller),
+                || resolve_player_targets(&lookups, effect, *controller),
                 |p| vec![p],
             );
         let target_zone = chosen_target.and_then(|target| lookups.in_zone.get(target).ok());
@@ -76,12 +76,12 @@ pub fn r608_2_r608_2c_resolve(
                         &lookups,
                         spell,
                         chosen_target,
-                        controller,
+                        *controller,
                         amount,
                     );
                 }
                 effects::EffectKind::Destroy => {
-                    request_destroy(&mut destructions, &lookups, battlefield_target, controller);
+                    request_destroy(&mut destructions, &lookups, battlefield_target, *controller);
                 }
                 #[rustfmt::skip]
                 effects::EffectKind::Exile => {
@@ -93,20 +93,20 @@ pub fn r608_2_r608_2c_resolve(
                         &lookups,
                         chosen_target,
                         target_on_stack,
-                        controller,
+                        *controller,
                     );
                 }
                 effects::EffectKind::CreateTokens { count, definition } => {
-                    request_tokens(&mut effect_messages.p3(), controller, count, definition);
+                    request_tokens(&mut effect_messages.p3(), *controller, count, definition);
                 }
                 effects::EffectKind::Draw(count) => {
-                    request_draws(&mut player_effects.p3(), &player_targets, **owner, count);
+                    request_draws(&mut player_effects.p3(), &player_targets, ***owner, count);
                 }
                 effects::EffectKind::Mill(count) => {
                     request_mills(
                         &mut effect_messages.p2(),
                         &player_targets,
-                        controller,
+                        *controller,
                         count,
                     );
                 }
@@ -120,7 +120,7 @@ pub fn r608_2_r608_2c_resolve(
                     request_life_gain(
                         &mut player_effects.p2(),
                         &player_targets,
-                        controller,
+                        *controller,
                         amount,
                     );
                 }
@@ -139,7 +139,7 @@ pub fn r608_2_r608_2c_resolve(
                     request_gain_keyword(&mut effect_messages, battlefield_target, keyword);
                 }
                 effects::EffectKind::WinTheGame => {
-                    let winner = players::PlayerId(controller);
+                    let winner = controller;
                     player_effects.p4().write(rules::Would(rules::WinGame(winner)));
                 }
             }
@@ -295,7 +295,7 @@ fn permanent_controller(
     if lookups.lives.get(target).is_ok() {
         return target;
     }
-    lookups.owners.get(target).map_or(fallback, |owner| **owner)
+    lookups.owners.get(target).map_or(fallback, |owner| ***owner)
 }
 
 fn request_draws(

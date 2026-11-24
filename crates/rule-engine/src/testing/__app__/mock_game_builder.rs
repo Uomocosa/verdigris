@@ -3,6 +3,7 @@ use bevy::prelude::{App, Entity};
 
 use crate::cards;
 use crate::damage;
+use crate::players;
 use crate::testing;
 use crate::turns;
 use crate::zones;
@@ -67,7 +68,7 @@ impl MockGameBuilder {
             let _ = app.world_mut().spawn((
                 definition,
                 zones::InZone(battlefield),
-                cards::Owner(player),
+                cards::Owner(players::PlayerId(player)),
                 damage::Damage(0),
                 cards::Tapped,
             ));
@@ -111,7 +112,7 @@ mod tests {
             .query_filtered::<(Entity, &cards::Owner, &zones::InZone), With<cards::Tapped>>();
         let found: Vec<(Entity, Entity, Entity)> = found
             .iter(app.world())
-            .map(|(entity, owner, in_zone)| (entity, **owner, **in_zone))
+            .map(|(entity, owner, in_zone)| (entity, ***owner, **in_zone))
             .collect();
         assert_eq!(found.len(), 1);
         assert_eq!(found[0].1, player);

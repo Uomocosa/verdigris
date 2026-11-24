@@ -59,7 +59,7 @@ pub fn r603_3b_apnap_trigger_order(
         };
         let mut held: Vec<stack::PendingTrigger> = Vec::new();
         for trigger in queue.take_pending() {
-            if trigger.controller == *choice.player && expected.contains(&trigger.source) {
+            if trigger.controller == choice.player && expected.contains(&trigger.source) {
                 held.push(trigger);
             } else {
                 queue.push(trigger);

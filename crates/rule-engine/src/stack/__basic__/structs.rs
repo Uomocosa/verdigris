@@ -10,7 +10,7 @@ use crate::zones;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct PendingTrigger {
     pub source: Entity,
-    pub controller: Entity,
+    pub controller: players::PlayerId,
     pub ability: abilities::TriggeredAbility,
 }
 

@@ -20,7 +20,7 @@ pub fn r702_15b_lifelink(
         let Ok(owner) = sources.get(event.source) else {
             continue;
         };
-        if let Ok(mut life) = lives.get_mut(**owner) {
+        if let Ok(mut life) = lives.get_mut(***owner) {
             *life =
                 players::Life((**life).saturating_add(damage::Damage::signed_amount(event.amount)));
         }

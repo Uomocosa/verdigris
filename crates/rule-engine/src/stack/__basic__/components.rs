@@ -3,6 +3,7 @@ use derive_more::Deref;
 
 use crate::abilities;
 use crate::effects;
+use crate::players;
 
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Deref)]
 pub struct ChosenTarget(pub Entity);
@@ -16,7 +17,7 @@ pub enum CastingStage {
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct TriggeredAbilityOnStack {
     pub source: Entity,
-    pub controller: Entity,
+    pub controller: players::PlayerId,
     pub intervening_if: Option<abilities::Condition>,
     pub effect: effects::Effect,
 }

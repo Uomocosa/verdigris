@@ -25,7 +25,7 @@ pub fn r121_1_r121_2_draw(
     for draw in draws.read() {
         let player = draw.player;
         let count = draw.amount;
-        let Some(library) = zones.find(LIBRARY, Some(*player)) else {
+        let Some(library) = zones.find(LIBRARY, Some(player)) else {
             continue;
         };
         let drawn_from_top: Vec<Entity> = zone_contents
@@ -35,7 +35,7 @@ pub fn r121_1_r121_2_draw(
                 contents.iter().take(requested).copied().collect()
             })
             .unwrap_or_default();
-        if let Some(hand) = zones.find(HAND, Some(*player)) {
+        if let Some(hand) = zones.find(HAND, Some(player)) {
             for card in &drawn_from_top {
                 commands.entity(*card).insert(zones::InZone(hand));
             }

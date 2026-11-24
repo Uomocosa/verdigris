@@ -22,10 +22,10 @@ pub fn r701_9a_r701_9b_discard(
     zone_contents: Query<&zones::ZoneContents>,
 ) {
     for discard in discards.read() {
-        let Some(hand) = zones.find(HAND, Some(*discard.player)) else {
+        let Some(hand) = zones.find(HAND, Some(discard.player)) else {
             continue;
         };
-        let Some(graveyard) = zones.find(GRAVEYARD, Some(*discard.player)) else {
+        let Some(graveyard) = zones.find(GRAVEYARD, Some(discard.player)) else {
             continue;
         };
         let held: Vec<Entity> = zone_contents
@@ -65,7 +65,7 @@ pub fn r701_9a_r701_9b_discard(
             });
             continue;
         }
-        let Some(graveyard) = zones.find(GRAVEYARD, Some(*choice.player)) else {
+        let Some(graveyard) = zones.find(GRAVEYARD, Some(choice.player)) else {
             continue;
         };
         for card in cards {

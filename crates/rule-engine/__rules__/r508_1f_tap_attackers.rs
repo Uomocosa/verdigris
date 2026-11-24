@@ -1,7 +1,6 @@
 use bevy::prelude::{Added, Entity, MessageWriter, Query};
 
 use crate::cards;
-use crate::players;
 use crate::rules;
 
 /// 508.1f The active player taps the chosen creatures. Tapping a creature when it’s declared as
@@ -13,7 +12,7 @@ pub fn r508_1f_tap_attackers(
     for (attacker, owner) in attackers.iter() {
         taps.write(rules::Would(rules::TapAttacker {
             attacker,
-            player: players::PlayerId(**owner),
+            player: **owner,
         }));
     }
 }

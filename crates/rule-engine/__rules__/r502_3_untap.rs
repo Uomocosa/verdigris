@@ -1,7 +1,6 @@
 use bevy::prelude::{Entity, MessageReader, MessageWriter, Query, Res, With};
 
 use crate::cards;
-use crate::players;
 use crate::rules;
 use crate::turns;
 
@@ -21,10 +20,10 @@ pub fn r502_3_untap(
             continue;
         }
         for (entity, owner) in tapped.iter() {
-            if **owner == *turn.active {
+            if **owner == turn.active {
                 untaps.write(rules::Would(rules::Untap {
                     permanent: entity,
-                    controller: players::PlayerId(**owner),
+                    controller: **owner,
                 }));
             }
         }
