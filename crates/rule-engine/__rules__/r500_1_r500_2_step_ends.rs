@@ -60,7 +60,7 @@ mod tests {
         let priority = game.priority();
         let turn = *game.turn();
         assert_eq!(turn.step, turns::Step::BeginningOfCombat);
-        assert_eq!(priority.holder, p1.id);
+        assert_eq!(priority.holder, Some(p1.id));
         assert!(priority.passed.is_empty());
         Ok(())
     }
@@ -74,7 +74,7 @@ mod tests {
         game.play([p2.pass_priority(), p3.pass_priority()])?;
 
         assert_eq!(game.turn().step, turns::Step::BeginningOfCombat);
-        assert_eq!(game.priority_player(), p2.id);
+        assert_eq!(game.priority_player(), Some(p2.id));
         Ok(())
     }
 }

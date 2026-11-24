@@ -25,7 +25,7 @@ mod tests {
         assert!(game.has_won(p1));
         let priority = game.priority();
         let turn = *game.turn();
-        let holder: Entity = *game.priority().holder;
+        let holder: Entity = *game.priority().holder.unwrap_or(p1.id);
         game.act(holder, actions::Action::PassPriority);
         assert_eq!(game.priority(), priority);
         assert_eq!(*game.turn(), turn);
@@ -38,7 +38,7 @@ mod tests {
         assert!(game.has::<players::GameIsADraw>(p1));
         let priority = game.priority();
         let turn = *game.turn();
-        let holder: Entity = *game.priority().holder;
+        let holder: Entity = *game.priority().holder.unwrap_or(p1.id);
         game.act(holder, actions::Action::PassPriority);
         assert_eq!(game.priority(), priority);
         assert_eq!(*game.turn(), turn);

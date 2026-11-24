@@ -119,7 +119,7 @@ mod tests {
         assert_eq!(game.life(*entities[0]), 20);
         let turn = game.turn();
         assert_eq!(turn.active, entities[1]);
-        assert_eq!(game.priority_player(), entities[1]);
+        assert_eq!(game.priority_player(), Some(entities[1]));
         assert_eq!(game.app.world().resource::<turns::TurnOrder>().len(), 2);
         assert_eq!(
             game.get::<zones::Zone>(game.stack),

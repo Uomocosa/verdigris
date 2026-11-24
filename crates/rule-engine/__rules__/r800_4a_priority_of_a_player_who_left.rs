@@ -13,7 +13,9 @@ use crate::GameMut;
 /// Only the last sentence is implemented; objects and effects of a player who left are not handled
 /// yet.
 pub fn r800_4a_priority_of_a_player_who_left(mut game: GameMut) {
-    let holder = game.priority_holder();
+    let Some(holder) = game.priority_holder() else {
+        return;
+    };
     if holder.is_still_in_the_game() {
         return;
     }
@@ -33,7 +35,7 @@ mod tests {
 
         game.act(p1, actions::Action::Concede);
 
-        assert_eq!(game.priority_player(), p2.id);
+        assert_eq!(game.priority_player(), Some(p2.id));
     }
 
     #[test]
@@ -42,7 +44,7 @@ mod tests {
 
         game.play([p1.pass_priority()])?;
 
-        assert_eq!(game.priority_player(), p3.id);
+        assert_eq!(game.priority_player(), Some(p3.id));
         Ok(())
     }
 }

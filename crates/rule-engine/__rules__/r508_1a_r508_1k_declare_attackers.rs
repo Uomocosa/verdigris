@@ -64,7 +64,7 @@ pub fn r508_1a_r508_1k_declare_attackers(
             continue;
         }
         if turn.step != turns::Step::DeclareAttackers
-            || action.player != priority.holder
+            || priority.holder != Some(action.player)
             || action.player != turn.active
         {
             rejected.write(actions::Rejected::CannotAttack {

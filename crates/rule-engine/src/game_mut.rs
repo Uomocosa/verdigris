@@ -18,7 +18,9 @@ impl<'w, 's> GameMut<'w, 's> {
     pub fn step(&self) -> turns::Step { self.turn.step }
 
     #[must_use]
-    pub fn priority_holder(&self) -> players::PlayerView<'w, 's> { self.players.view(self.priority.holder) }
+    pub fn priority_holder(&self) -> Option<players::PlayerView<'w, 's>> {
+        self.priority.holder.map(|holder| self.players.view(holder))
+    }
 
     pub fn give_priority_to(&mut self, player: players::PlayerId) { self.priority.give_to(player); }
 
@@ -66,16 +68,28 @@ mod tests {
             .world_mut()
             .run_system_once(move |mut answers: GameMut| {
                 assert_eq!(answers.step(), turns::Step::PrecombatMain);
-                assert_eq!(answers.priority_holder().id, p1.id);
+                assert_eq!(
+                    answers.priority_holder().map(|player| player.id),
+                    Some(p1.id)
+                );
                 answers.pass_priority_to(p2.id);
-                assert_eq!(answers.priority_holder().id, p2.id);
+                assert_eq!(
+                    answers.priority_holder().map(|player| player.id),
+                    Some(p2.id)
+                );
                 assert!(!answers.have_all_players_passed_in_succession());
                 answers.begin_step(turns::Step::Draw);
                 assert_eq!(answers.step(), turns::Step::Draw);
                 answers.give_priority_to_active_player();
-                assert_eq!(answers.priority_holder().id, p1.id);
+                assert_eq!(
+                    answers.priority_holder().map(|player| player.id),
+                    Some(p1.id)
+                );
                 answers.give_priority_to(p2.id);
-                assert_eq!(answers.priority_holder().id, p2.id);
+                assert_eq!(
+                    answers.priority_holder().map(|player| player.id),
+                    Some(p2.id)
+                );
             })
             .unwrap();
     }

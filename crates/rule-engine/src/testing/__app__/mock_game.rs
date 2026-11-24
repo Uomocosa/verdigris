@@ -79,7 +79,7 @@ impl MockGame {
     }
 
     #[must_use]
-    pub fn priority_player(&self) -> players::PlayerId { self.priority().holder }
+    pub fn priority_player(&self) -> Option<players::PlayerId> { self.priority().holder }
 }
 
 impl MockGame {
@@ -104,7 +104,9 @@ impl MockGame {
     }
 
     pub fn pass_priority(&mut self) {
-        let player = self.priority().holder;
+        let Some(player) = self.priority().holder else {
+            return;
+        };
         let _ = self.app.world_mut().write_message(actions::PlayerAction {
             player,
             action: actions::Action::PassPriority,
@@ -203,8 +205,8 @@ mod tests {
         assert!(!game.has_lost(p1));
         assert_eq!(game.damage(p1), 0);
         assert_eq!(game.turn().number, 1);
-        assert_eq!(game.priority_player(), p1.id);
-        assert_eq!(game.priority().holder, p1.id);
+        assert_eq!(game.priority_player(), Some(p1.id));
+        assert_eq!(game.priority().holder, Some(p1.id));
         assert!(game.priority().passed.is_empty());
         assert_eq!(game.player(p2).cards_in(BATTLEFIELD).count(), 1);
         assert_eq!(game.stack().count(), 0);
@@ -237,7 +239,7 @@ mod tests {
         assert_eq!(turn.number, 1);
         assert_eq!(turn.active, p1.id);
         assert_eq!(turn.step, turns::Step::PrecombatMain);
-        assert_eq!(game.priority_player(), p1.id);
+        assert_eq!(game.priority_player(), Some(p1.id));
         Ok(())
     }
 
@@ -264,7 +266,7 @@ mod tests {
         assert_eq!(turn.number, 3);
         assert_eq!(turn.active, game.p(2).id);
         assert_eq!(turn.step, turns::Step::PostcombatMain);
-        assert_eq!(game.priority_player(), game.p(2).id);
+        assert_eq!(game.priority_player(), Some(game.p(2).id));
     }
 
     #[test]
@@ -282,7 +284,7 @@ mod tests {
         assert_eq!(turn.number, 1);
         assert_eq!(turn.step, turns::Step::PrecombatMain);
         assert_eq!(turn.active, p1.id);
-        assert_eq!(game.priority_player(), p1.id);
+        assert_eq!(game.priority_player(), Some(p1.id));
     }
 
     #[test]
@@ -297,7 +299,7 @@ mod tests {
         assert_eq!(turn.number, 3);
         assert_eq!(turn.step, turns::Step::PostcombatMain);
         assert_eq!(turn.active, p2.id);
-        assert_eq!(game.priority_player(), p2.id);
+        assert_eq!(game.priority_player(), Some(p2.id));
     }
 
     #[test]

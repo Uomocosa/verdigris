@@ -30,7 +30,10 @@ mod tests {
                 let next = begin_next_turn(&mut answers);
                 assert_eq!(next.map(|player| player.id), Some(p2.id));
                 assert_eq!(answers.step(), turns::Step::Untap);
-                assert_eq!(answers.priority_holder().id, p2.id);
+                assert_eq!(
+                    answers.priority_holder().map(|player| player.id),
+                    Some(p2.id)
+                );
             })
             .unwrap();
     }

@@ -201,7 +201,7 @@ mod tests {
             game.last_rejection(),
             Some(&actions::Rejected::NoPriority { player: p1.id })
         );
-        assert_eq!(game.priority_player(), p1.id);
+        assert_eq!(game.priority_player(), Some(p1.id));
     }
 
     #[test]
@@ -241,7 +241,7 @@ mod tests {
         assert!(game.player(p1).cards_in(BATTLEFIELD).has(leyline));
         assert!(game.player(p1).cards_in(HAND).has_no(LEYLINE_OF_ANTICIPATION));
         assert_eq!(game.turn().number, 1);
-        assert_eq!(game.priority_player(), p1.id);
+        assert_eq!(game.priority_player(), Some(p1.id));
         assert!(game.last_rejection().is_none());
         Ok(())
     }

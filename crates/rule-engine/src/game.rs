@@ -24,7 +24,7 @@ impl Game<'_, '_> {
 impl<'w, 's> Game<'w, 's> {
     #[must_use]
     pub fn priority_holder(&self) -> Option<players::PlayerView<'w, 's>> {
-        let holder = self.priority.single().ok()?.holder;
+        let holder = self.priority.single().ok()?.holder?;
         Some(self.players.view(holder))
     }
 

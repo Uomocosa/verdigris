@@ -59,7 +59,7 @@ mod tests {
 
         game.play([p1.pass_to(CLEANUP), p2.pass_to(CLEANUP)])?;
         assert_eq!(game.turn().step, turns::Step::Cleanup);
-        assert_eq!(game.priority().holder, p1.id);
+        assert_eq!(game.priority().holder, Some(p1.id));
 
         game.play([p1.order_triggers([knight_1, knight_2, knight_3])])?;
         assert_eq!(game.trigger_sources().len(), 3);

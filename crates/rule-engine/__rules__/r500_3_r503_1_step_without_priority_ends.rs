@@ -73,7 +73,7 @@ mod tests {
         assert_eq!(turn.active, p2.id);
         assert_ne!(turn.active, p1.id);
         assert_eq!(turn.step, turns::Step::Untap);
-        assert_eq!(priority.holder, p2.id);
+        assert_eq!(priority.holder, Some(p2.id));
         assert!(priority.passed.is_empty());
 
         game.app.update();
@@ -81,7 +81,7 @@ mod tests {
         let turn = *game.turn();
         let priority = game.priority();
         assert_eq!(turn.step, turns::Step::Upkeep);
-        assert_eq!(priority.holder, p2.id);
+        assert_eq!(priority.holder, Some(p2.id));
         Ok(())
     }
 

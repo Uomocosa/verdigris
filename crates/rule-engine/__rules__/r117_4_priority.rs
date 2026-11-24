@@ -20,7 +20,9 @@ pub fn r117_4_priority(
     if !game.have_all_players_passed_in_succession() {
         return;
     }
-    let holder = game.priority_holder();
+    let Some(holder) = game.priority_holder() else {
+        return;
+    };
     game.give_priority_to(holder.id);
     let top = zones
         .find(STACK, None)
@@ -106,11 +108,11 @@ mod tests {
         let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
         game.play([p1.cast(bolt).targeting(p2).pass_priority()])?;
 
-        assert_ne!(game.priority_player(), p1.id);
+        assert_ne!(game.priority_player(), Some(p1.id));
         game.play([p2.pass_priority()])?;
 
         let priority = game.priority();
-        assert_eq!(priority.holder, p1.id);
+        assert_eq!(priority.holder, Some(p1.id));
         assert!(priority.passed.is_empty());
         Ok(())
     }
@@ -135,7 +137,7 @@ mod tests {
         game.play([p2.pass_priority()])?;
 
         assert_eq!(game.turn().step, turns::Step::PrecombatMain);
-        assert_eq!(game.priority_player(), p3.id);
+        assert_eq!(game.priority_player(), Some(p3.id));
         Ok(())
     }
 }

@@ -82,7 +82,7 @@ pub fn play(
             }
         }
         loop {
-            let holder = game.app.world().resource::<turns::Priority>().holder;
+            let holder = game.priority().holder.unwrap_or_else(|| game.turn().active);
             let Some(position) = auto_passes.iter().position(|pass| pass.player == *holder) else {
                 break;
             };

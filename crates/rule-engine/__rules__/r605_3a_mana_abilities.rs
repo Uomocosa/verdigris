@@ -49,7 +49,7 @@ pub fn r605_3a_mana_abilities(
         if ability.cost != abilities::ActivationCost::Tap {
             continue;
         }
-        if action.player != priority.holder || **owner != action.player || tapped.is_some() {
+        if priority.holder != Some(action.player) || **owner != action.player || tapped.is_some() {
             rejected.write(actions::Rejected::CannotActivateManaAbility { permanent });
             continue;
         }

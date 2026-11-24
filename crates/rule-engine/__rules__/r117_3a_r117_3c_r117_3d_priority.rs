@@ -34,7 +34,8 @@ pub fn r117_3a_r117_3c_r117_3d_priority(
             });
             continue;
         }
-        if action.player != game.priority_holder().id {
+        let holder = game.priority_holder().map(|holder| holder.id);
+        if holder.is_none_or(|holder| action.player != holder) {
             if matches!(&action.action, actions::Action::PassPriority) {
                 rejected.write(actions::Rejected::NoPriority {
                     player: action.player,
@@ -43,7 +44,9 @@ pub fn r117_3a_r117_3c_r117_3d_priority(
             continue;
         }
         if matches!(&action.action, actions::Action::PassPriority) {
-            if let Some(next) = game.priority_holder().next_in_turn_order() {
+            if let Some(next) =
+                game.priority_holder().and_then(|holder| holder.next_in_turn_order())
+            {
                 game.pass_priority_to(next.id);
             }
             continue;
@@ -66,9 +69,9 @@ mod tests {
         game.play([p1.pass_priority()])?;
 
         let priority = game.priority();
-        assert_eq!(priority.holder, p2.id);
+        assert_eq!(priority.holder, Some(p2.id));
         assert!(priority.has_passed(p1.id));
-        assert_ne!(priority.holder, p1.id);
+        assert_ne!(priority.holder, Some(p1.id));
         Ok(())
     }
 
@@ -80,7 +83,7 @@ mod tests {
 
         for (holder, next) in holders.into_iter().zip(expected) {
             game.play([holder.pass_priority()])?;
-            assert_eq!(game.priority_player(), next.id);
+            assert_eq!(game.priority_player(), Some(next.id));
         }
         Ok(())
     }
@@ -94,7 +97,7 @@ mod tests {
         game.play([p1.pass_priority(), p2.cast(bolt)])?;
 
         let priority = game.priority();
-        assert_eq!(priority.holder, p2.id);
+        assert_eq!(priority.holder, Some(p2.id));
         assert!(priority.passed.is_empty());
         Ok(())
     }
@@ -109,7 +112,7 @@ mod tests {
             err.rejection(),
             Some(&actions::Rejected::NoPriority { player: p2.id })
         );
-        assert_eq!(game.priority_player(), p1.id);
+        assert_eq!(game.priority_player(), Some(p1.id));
     }
 
     #[test]
@@ -119,7 +122,7 @@ mod tests {
         game.act(p2, actions::Action::Concede);
         game.play([p1.pass_priority()])?;
 
-        assert_eq!(game.priority_player(), p3.id);
+        assert_eq!(game.priority_player(), Some(p3.id));
         Ok(())
     }
 }

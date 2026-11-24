@@ -5,7 +5,7 @@ use crate::turns;
 
 pub const fn held_by(holder: players::PlayerId) -> turns::Priority {
     turns::Priority {
-        holder,
+        holder: Some(holder),
         passed: BTreeSet::new(),
     }
 }
@@ -20,7 +20,7 @@ mod tests {
     fn test_usage() {
         let (_game, [p1, ..]) = MockGame::new([P1, P2]);
         let priority = held_by(p1.id);
-        assert_eq!(priority.holder, p1.id);
+        assert_eq!(priority.holder, Some(p1.id));
         assert!(priority.passed.is_empty());
     }
 }
