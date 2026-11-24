@@ -8,6 +8,7 @@ pub mod cards;
 mod comprehensive_rules;
 pub mod damage;
 pub mod effects;
+pub mod game;
 pub mod keywords;
 pub mod players;
 pub mod rules;

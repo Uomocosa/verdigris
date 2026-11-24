@@ -1,6 +1,7 @@
 use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query, Res, With};
 
 use crate::actions;
+use crate::game;
 use crate::players;
 use crate::turns;
 
@@ -27,13 +28,10 @@ pub fn r506_2a_r507_1_r508_1b_defending_player(
     mut rejected: MessageWriter<actions::Rejected>,
     mut commands: Commands,
     turn: Res<turns::Turn>,
-    priority: Res<turns::Priority>,
-    players: Query<Entity, With<players::Player>>,
+    game: game::Game,
     defending: Query<Entity, With<players::DefendingPlayer>>,
-    lost: Query<Entity, With<players::Lost>>,
 ) {
     let turn = turn.into_inner();
-    let priority = priority.into_inner();
     for step in step_started.read() {
         if **step != turns::Step::BeginningOfCombat {
             continue;
@@ -41,9 +39,10 @@ pub fn r506_2a_r507_1_r508_1b_defending_player(
         for player in defending.iter() {
             commands.entity(player).remove::<players::DefendingPlayer>();
         }
-        let mut opponents = players.iter().filter(|player| *player != *turn.active);
-        if let (Some(solo_opponent), None) = (opponents.next(), opponents.next()) {
-            commands.entity(solo_opponent).insert(players::DefendingPlayer);
+        if let Some(attacking_player) = game.active_player()
+            && let [only_opponent] = attacking_player.opponents_still_in_the_game().as_slice()
+        {
+            commands.entity(*only_opponent.id).insert(players::DefendingPlayer);
         }
     }
     for action in actions.read() {
@@ -51,11 +50,14 @@ pub fn r506_2a_r507_1_r508_1b_defending_player(
             continue;
         };
         let is_legal = turn.step == turns::Step::BeginningOfCombat
-            && action.player == turn.active
-            && action.player == priority.holder
-            && players.get(**chosen).is_ok()
-            && *chosen != turn.active
-            && lost.get(**chosen).is_err();
+            && game.active_player().is_some_and(|attacking_player| {
+                action.player == attacking_player.id
+                    && game.priority_holder().is_some_and(|holder| action.player == holder.id)
+                    && attacking_player
+                        .opponents_still_in_the_game()
+                        .iter()
+                        .any(|opponent| opponent.id == *chosen)
+            });
         if !is_legal {
             rejected.write(actions::Rejected::CannotChooseDefendingPlayer {
                 player: action.player,
@@ -163,6 +165,21 @@ mod tests {
 
         assert!(game.has::<players::DefendingPlayer>(p2));
         assert!(!game.has::<players::DefendingPlayer>(p1));
+        Ok(())
+    }
+
+    #[test]
+    fn the_only_opponent_still_in_the_game_becomes_the_defending_player() -> TestResult {
+        let (mut game, [p1, p2, p3]) = MockGame::new([P1, P2, P3.life(0)]);
+        game.play([
+            p1.pass_to(turns::Step::BeginningOfCombat),
+            p2.pass_to(turns::Step::BeginningOfCombat),
+            p3.pass_to(turns::Step::BeginningOfCombat),
+        ])?;
+        assert!(game.has_lost(p3));
+        assert!(game.has::<players::DefendingPlayer>(p2));
+        assert!(!game.has::<players::DefendingPlayer>(p1));
+        assert!(!game.has::<players::DefendingPlayer>(p3));
         Ok(())
     }
 }
