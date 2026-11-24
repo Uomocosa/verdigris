@@ -1,25 +1,20 @@
-use crate::GRAVEYARD;
-use bevy::prelude::{Commands, Entity, Query, ResMut, With};
+use bevy::prelude::{Entity, MessageWriter, Query, With};
 
-use crate::StateBasedActionsPerformed;
 use crate::cards;
-use crate::zones;
+use crate::rules;
 
 /// 704.5f If a creature has toughness 0 or less, it’s put into its owner’s graveyard. Regeneration
 /// can’t replace this event.
 pub fn r704_5f_zero_toughness(
-    mut commands: Commands,
-    mut state_based_actions_performed: ResMut<StateBasedActionsPerformed>,
+    mut burials: MessageWriter<rules::Would<rules::PutIntoGraveyard>>,
     cards: Query<(Entity, &cards::EffectivePT, &cards::Owner), With<cards::OnBattlefield>>,
-    zones: zones::ZoneLookup,
 ) {
     for (creature, effective, owner) in cards.iter() {
-        if effective.toughness > 0 {
-            continue;
-        }
-        if let Some(graveyard) = zones.find(GRAVEYARD, Some(**owner)) {
-            commands.entity(creature).insert(zones::InZone(graveyard));
-            **state_based_actions_performed = true;
+        if effective.toughness <= 0 {
+            burials.write(rules::Would(rules::PutIntoGraveyard {
+                object: creature,
+                owner: **owner,
+            }));
         }
     }
 }
@@ -44,6 +39,23 @@ mod tests {
         ])?;
         assert!(!game.player(p2).cards_in(BATTLEFIELD).has(GRIZZLY_BEARS));
         assert!(game.player(p2).cards_in(GRAVEYARD).has(GRIZZLY_BEARS));
+        assert!(game.player(p1).cards_in(GRAVEYARD).has(disfigure));
+        Ok(())
+    }
+
+    #[test]
+    fn a_cant_be_put_into_a_graveyard_effect_keeps_the_zero_toughness_creature() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.hand([DISFIGURE]).mana_pool(mana![B]),
+            P2.battlefield([GRIZZLY_BEARS, TEST_NO_BURIALS]),
+        ]);
+        let [disfigure] = game.player(p1).cards_in(HAND).exactly::<1>(DISFIGURE)?;
+        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        game.play([
+            p1.cast(disfigure).targeting(bears).pass_priority(),
+            p2.pass_priority(),
+        ])?;
+        assert!(game.player(p2).cards_in(BATTLEFIELD).has(bears));
         assert!(game.player(p1).cards_in(GRAVEYARD).has(disfigure));
         Ok(())
     }

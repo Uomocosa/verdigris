@@ -22,6 +22,7 @@ pub mod r302_6_summoning_sickness;
 pub mod r305_1_r305_2_r305_3_play_land;
 pub mod r305_6_basic_land_mana_ability;
 pub mod r404_1_graveyard_top;
+pub mod r404_1_put_into_graveyard;
 pub mod r404_3_graveyard_order;
 pub mod r500_1_r500_2_step_ends;
 pub mod r500_3_r503_1_step_without_priority_ends;

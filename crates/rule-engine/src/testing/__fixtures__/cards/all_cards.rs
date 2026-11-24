@@ -60,6 +60,7 @@ pub const ALL_CARDS: &[testing::Card] = &[
     testing::TEST_LOW_SKIMMER,
     testing::TEST_LURE_OF_BATTLE,
     testing::TEST_NIGHT_OF_THE_HUNT,
+    testing::TEST_NO_BURIALS,
     testing::TEST_NO_TOKENS,
     testing::TEST_PAINFUL_LESSONS,
     testing::TEST_PLAYER_RESTRICTION,

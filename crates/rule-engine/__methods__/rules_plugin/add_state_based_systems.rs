@@ -27,6 +27,10 @@ pub fn add_state_based_systems(app: &mut App) {
                     >,
                     comprehensive_rules::r702_12b_indestructible::r702_12b_indestructible,
                     comprehensive_rules::r704_5m_aura_illegal::r704_5m_aura_illegal,
+                    comprehensive_rules::r614_1a_r616_1_replacement_effects::r614_1a_r616_1_replacement_effects::<
+                        rules::PutIntoGraveyard,
+                    >,
+                    comprehensive_rules::r404_1_put_into_graveyard::r404_1_put_into_graveyard,
                     comprehensive_rules::r704_5d_token_outside_battlefield::r704_5d_token_outside_battlefield,
                     comprehensive_rules::r704_5a_zero_life::r704_5a_zero_life,
                     comprehensive_rules::r704_5b_empty_library::r704_5b_empty_library,
@@ -89,7 +93,7 @@ mod tests {
         assert_eq!(app.get_schedule(Update).map(Schedule::systems_len), Some(7));
         assert_eq!(
             app.get_schedule(StateBasedActions).map(Schedule::systems_len),
-            Some(24)
+            Some(26)
         );
     }
 }

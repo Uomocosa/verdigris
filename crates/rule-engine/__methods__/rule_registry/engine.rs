@@ -40,6 +40,10 @@ pub fn engine() -> rules::RuleRegistry {
     register(rules::LoseLife::ID, rules::LoseLife::clauses());
     register(rules::Mill::ID, rules::Mill::clauses());
     register(rules::PlayLand::ID, rules::PlayLand::clauses());
+    register(
+        rules::PutIntoGraveyard::ID,
+        rules::PutIntoGraveyard::clauses(),
+    );
     register(rules::TapAttacker::ID, rules::TapAttacker::clauses());
     register(rules::Untap::ID, rules::Untap::clauses());
     register(rules::WinGame::ID, rules::WinGame::clauses());

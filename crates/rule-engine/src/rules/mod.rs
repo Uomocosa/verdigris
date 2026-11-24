@@ -95,6 +95,9 @@ pub use predicate::Predicate;
 mod predicate_registry;
 pub use predicate_registry::PredicateRegistry;
 
+mod put_into_graveyard;
+pub use put_into_graveyard::PutIntoGraveyard;
+
 mod rules;
 pub use rules::Rules;
 
