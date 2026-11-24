@@ -21,16 +21,18 @@ mod tests {
     use crate::players;
 
     #[test]
-    fn test_usage() {
-        let (mut game, [p1, p2]) = MockGame::new([P1, P2]);
+    fn test_usage() -> TestResult {
+        let (mut game, [p1, _p2, p3]) = MockGame::new([P1, P2.life(0), P3]);
+        game.play([p1.pass_priority()])?;
         game.app
             .world_mut()
             .run_system_once(move |all: players::Players| {
                 assert_eq!(
                     still_in_the_game(&all),
-                    [Entity::from(p1), Entity::from(p2)]
+                    [Entity::from(p1), Entity::from(p3)]
                 );
             })
             .unwrap();
+        Ok(())
     }
 }
