@@ -23,7 +23,7 @@ impl All {
         self,
         event: rules::EventId,
         when: rules::Predicate,
-        then: Vec<rules::EventTemplate>,
+        then: impl Into<rules::Then>,
     ) -> abilities::Continuous {
     }
 

@@ -11,6 +11,8 @@ use crate::turns;
 pub fn register_messages_and_resources(app: &mut App) {
     app.add_message::<actions::PlayerAction>()
         .add_message::<actions::Rejected>()
+        .add_message::<actions::Ask>()
+        .add_message::<actions::Answered>()
         .add_message::<stack::Resolution>()
         .add_message::<rules::Would<rules::LoseGame>>()
         .add_message::<rules::Would<rules::WinGame>>()
@@ -44,12 +46,29 @@ pub fn register_messages_and_resources(app: &mut App) {
         .add_message::<rules::Proceeds<rules::Untap>>()
         .add_message::<rules::Proceeds<rules::TapAttacker>>()
         .add_message::<rules::Proceeds<rules::PutIntoGraveyard>>()
+        .add_message::<rules::Ask<rules::Draw>>()
+        .add_message::<rules::Ask<rules::Discard>>()
+        .add_message::<rules::Ask<rules::Mill>>()
+        .add_message::<rules::Ask<rules::CreateTokens>>()
+        .add_message::<rules::Ask<rules::Counter>>()
+        .add_message::<rules::Ask<rules::DealDamage>>()
+        .add_message::<rules::Ask<rules::LoseLife>>()
+        .add_message::<rules::Ask<rules::GainLife>>()
+        .add_message::<rules::Ask<rules::EnterBattlefield>>()
+        .add_message::<rules::Ask<rules::TapAttacker>>()
+        .add_message::<rules::Ask<rules::Destroy>>()
+        .add_message::<rules::Ask<rules::PutIntoGraveyard>>()
+        .add_message::<rules::Ask<rules::DrawFromEmptyLibrary>>()
+        .add_message::<rules::Ask<rules::LoseGame>>()
+        .add_message::<rules::Ask<rules::WinGame>>()
+        .add_message::<rules::Ask<rules::Untap>>()
         .add_message::<effects::PowerToughnessModified>()
         .add_message::<effects::KeywordGranted>()
         .add_message::<cards::Entered>()
         .add_message::<turns::StepStarted>()
         .add_message::<turns::AllPlayersPassed>();
     app.init_resource::<actions::PendingChoice>();
+    app.init_resource::<actions::AskQueue>();
     app.init_resource::<actions::OpeningHandWindow>();
     app.init_resource::<turns::CombatDamageSteps>();
     app.init_resource::<turns::CombatDamageParticipants>();

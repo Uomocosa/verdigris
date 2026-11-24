@@ -13,6 +13,7 @@ pub enum Action {
     Cast(Entity),
     PlayLand(Entity),
     ChooseTargets(Vec<Entity>),
+    ChooseMay(Vec<Entity>),
     ChooseDiscard(Vec<Entity>),
     ChooseLegendary(Entity),
     ChooseDefendingPlayer(players::PlayerId),
@@ -29,6 +30,7 @@ pub enum Action {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Choice {
     Target(actions::TargetChoice),
+    May(actions::MayChoice),
     Discard(actions::DiscardChoice),
     CombatDamage(actions::CombatDamageChoice),
     OrderTriggers(actions::OrderTriggersChoice),

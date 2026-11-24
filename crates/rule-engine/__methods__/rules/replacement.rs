@@ -1,10 +1,7 @@
 use crate::rules;
 use crate::rules::traits::event::Event;
 
-pub fn replacement<E: Event>(
-    answers: &rules::Rules,
-    event: &E,
-) -> Option<Vec<rules::EventTemplate>> {
+pub fn replacement<E: Event>(answers: &rules::Rules, event: &E) -> Option<rules::Then> {
     let affected = event.player();
     let subject = event.subject();
     let other = event.other();
@@ -47,9 +44,9 @@ mod tests {
             .run_system_once(move |answers: rules::Rules| {
                 assert_eq!(
                     replacement(&answers, &rules::DrawFromEmptyLibrary(player)),
-                    Some(vec![rules::EventTemplate::WinGame {
+                    Some(rules::Then::Events(vec![rules::EventTemplate::WinGame {
                         who: rules::Role::Player,
-                    }])
+                    }]))
                 );
                 assert_eq!(replacement(&answers, &rules::LoseGame(player)), None);
             })

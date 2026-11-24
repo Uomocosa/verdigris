@@ -9,6 +9,7 @@ pub fn target_choice(game: &testing::MockGame) -> Option<testing::ExpectedTarget
             legal: choice.legal.clone(),
         }),
         actions::Choice::Discard(_)
+        | actions::Choice::May(_)
         | actions::Choice::CombatDamage(_)
         | actions::Choice::OrderTriggers(_)
         | actions::Choice::OpeningHandActions(_)

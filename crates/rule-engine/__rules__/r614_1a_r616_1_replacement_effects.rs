@@ -20,6 +20,7 @@ use crate::rules::traits::event::Event;
 pub fn r614_1a_r616_1_replacement_effects<E: Event>(
     mut incoming: MessageReader<rules::Would<E>>,
     mut proceeds: MessageWriter<rules::Proceeds<E>>,
+    mut asks: MessageWriter<rules::Ask<E>>,
     mut commands: Commands,
     mut state_based_actions_performed: ResMut<StateBasedActionsPerformed>,
     answers: rules::Rules,
@@ -30,11 +31,17 @@ pub fn r614_1a_r616_1_replacement_effects<E: Event>(
             continue;
         }
         match answers.replacement(event) {
-            Some(then) => {
+            Some(rules::Then::Events(then)) => {
                 for template in then {
                     template.instantiate(event).announce(&mut commands);
                 }
                 **state_based_actions_performed = true;
+            }
+            Some(rules::Then::May(then)) => {
+                asks.write(rules::Ask {
+                    event: event.clone(),
+                    then,
+                });
             }
             None => {
                 proceeds.write(rules::Proceeds(event.clone()));

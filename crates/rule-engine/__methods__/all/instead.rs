@@ -7,13 +7,16 @@ pub fn instead(
     all: statics::All,
     event: rules::EventId,
     when: rules::Predicate,
-    then: Vec<rules::EventTemplate>,
+    then: impl Into<rules::Then>,
 ) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
         modification: effects::Modification::Rule(rules::RuleChange {
             target: rules::Target::Event(event),
-            change: rules::Change::Instead { when, then },
+            change: rules::Change::Instead {
+                when,
+                then: then.into(),
+            },
         }),
     }
 }
@@ -46,9 +49,9 @@ mod tests {
                 target: rules::Target::Event(rules::DrawFromEmptyLibrary::ID),
                 change: rules::Change::Instead {
                     when: rules::Predicate::True,
-                    then: vec![rules::EventTemplate::WinGame {
+                    then: rules::Then::Events(vec![rules::EventTemplate::WinGame {
                         who: rules::Role::Player,
-                    }],
+                    }]),
                 },
             })
         );

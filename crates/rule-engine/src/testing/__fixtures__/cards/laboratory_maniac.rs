@@ -63,9 +63,9 @@ mod tests {
                     target: rules::Target::Event(rules::DrawFromEmptyLibrary::ID),
                     change: rules::Change::Instead {
                         when: rules::Predicate::True,
-                        then: vec![rules::EventTemplate::WinGame {
+                        then: rules::Then::Events(vec![rules::EventTemplate::WinGame {
                             who: rules::Role::Player,
-                        }],
+                        }]),
                     },
                 }),
             }]

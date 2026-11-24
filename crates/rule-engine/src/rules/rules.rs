@@ -44,11 +44,7 @@ impl Rules<'_, '_> {
     pub fn performs<E: rules::traits::event::Event>(&self, event: &E) -> bool {}
 
     #[must_use]
-    pub fn replacement<E: rules::traits::event::Event>(
-        &self,
-        event: &E,
-    ) -> Option<Vec<rules::EventTemplate>> {
-    }
+    pub fn replacement<E: rules::traits::event::Event>(&self, event: &E) -> Option<rules::Then> {}
 
     #[must_use]
     pub fn changes(&self, entity: Entity, target: rules::Target) -> Vec<rules::Change> {}

@@ -54,10 +54,10 @@ mod tests {
                             rules::Comparison::AtLeast,
                             2
                         ),
-                        then: vec![rules::EventTemplate::LoseLife {
+                        then: rules::Then::Events(vec![rules::EventTemplate::LoseLife {
                             who: rules::Role::Player,
                             amount: rules::Amount::FromEvent(rules::Field::Amount),
-                        }],
+                        }]),
                     },
                 }),
             }]

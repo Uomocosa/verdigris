@@ -2,6 +2,22 @@ use bevy::prelude::{Entity, Message};
 
 use crate::actions;
 use crate::players;
+use crate::rules;
+
+#[derive(Message, Debug, Clone, PartialEq, Eq)]
+pub struct Ask {
+    pub player: players::PlayerId,
+    pub event: rules::EventId,
+    pub option: Entity,
+}
+
+#[derive(Message, Debug, Clone, PartialEq, Eq)]
+pub struct Answered {
+    pub player: players::PlayerId,
+    pub event: rules::EventId,
+    pub option: Entity,
+    pub is_accepted: bool,
+}
 
 #[derive(Message, Debug, Clone, PartialEq, Eq)]
 pub struct PlayerAction {
@@ -33,6 +49,9 @@ pub enum Rejected {
         player: players::PlayerId,
     },
     InvalidTriggerOrder {
+        player: players::PlayerId,
+    },
+    InvalidMay {
         player: players::PlayerId,
     },
     InvalidOpeningHandActions {
