@@ -1,11 +1,15 @@
 use crate::abilities;
 use crate::cards;
+use crate::rules;
+use crate::rules::traits::event::Event;
 
 pub fn begins_the_game_on_the_battlefield(definition: &cards::CardDefinition) -> bool {
     definition.text.iter().any(|ability| {
         matches!(
             ability,
-            abilities::Ability::Static(abilities::StaticAbility::OpeningHand)
+            abilities::Ability::Static(abilities::StaticAbility::Replacement(
+                abilities::Replacement::Rule(change)
+            )) if change.target == rules::Target::Event(rules::OpeningHandAction::ID)
         )
     })
 }

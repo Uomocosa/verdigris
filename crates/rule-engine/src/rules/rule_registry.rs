@@ -62,8 +62,11 @@ mod tests {
                         abilities::StaticAbility::Keyword(keyword) => {
                             modifications.extend(keyword.keyword_modifications());
                         }
-                        abilities::StaticAbility::Replacement(_)
-                        | abilities::StaticAbility::OpeningHand => {}
+                        abilities::StaticAbility::Replacement(replacement) => {
+                            if let abilities::Replacement::Rule(change) = replacement {
+                                modifications.push(effects::Modification::Rule(change.clone()));
+                            }
+                        }
                     }
                 }
                 for modification in modifications {

@@ -17,6 +17,7 @@ pub enum AnyEvent {
     Counter(rules::Counter),
     DealDamage(rules::DealDamage),
     EnterBattlefield(rules::EnterBattlefield),
+    BeginTheGameOnTheBattlefield(rules::BeginTheGameOnTheBattlefield),
 }
 
 impl AnyEvent {
@@ -59,6 +60,9 @@ impl AnyEvent {
                 commands.write_message(rules::Would(happened));
             }
             Self::EnterBattlefield(happened) => {
+                commands.write_message(rules::Would(happened));
+            }
+            Self::BeginTheGameOnTheBattlefield(happened) => {
                 commands.write_message(rules::Would(happened));
             }
         }

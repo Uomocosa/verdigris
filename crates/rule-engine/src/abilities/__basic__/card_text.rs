@@ -1,6 +1,8 @@
 use crate::abilities;
 use crate::cards;
 use crate::effects;
+use crate::rules;
+use crate::rules::traits::event::Event;
 
 #[must_use]
 pub fn whenever(
@@ -46,5 +48,11 @@ pub const fn tap_add(produces: cards::ManaType) -> abilities::ActivatedAbility {
 
 #[must_use]
 pub const fn begin_the_game_with_it_on_the_battlefield() -> abilities::StaticAbility {
-    abilities::StaticAbility::OpeningHand
+    abilities::StaticAbility::Replacement(abilities::Replacement::Rule(rules::RuleChange {
+        target: rules::Target::Event(rules::OpeningHandAction::ID),
+        change: rules::Change::Instead {
+            when: rules::Predicate::True,
+            then: rules::may(rules::EventTemplate::BeginTheGameOnTheBattlefield),
+        },
+    }))
 }

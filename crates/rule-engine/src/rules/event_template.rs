@@ -31,6 +31,7 @@ pub enum EventTemplate {
         who: rules::Role,
         amount: rules::Amount,
     },
+    BeginTheGameOnTheBattlefield,
 }
 
 #[atomic_delegates]

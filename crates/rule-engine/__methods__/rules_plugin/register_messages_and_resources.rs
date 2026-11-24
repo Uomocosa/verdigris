@@ -27,6 +27,8 @@ pub fn register_messages_and_resources(app: &mut App) {
         .add_message::<rules::Would<rules::Counter>>()
         .add_message::<rules::Would<rules::DealDamage>>()
         .add_message::<rules::Would<rules::EnterBattlefield>>()
+        .add_message::<rules::Would<rules::BeginTheGameOnTheBattlefield>>()
+        .add_message::<rules::Would<rules::OpeningHandAction>>()
         .add_message::<rules::Would<rules::Untap>>()
         .add_message::<rules::Would<rules::TapAttacker>>()
         .add_message::<rules::Would<rules::PutIntoGraveyard>>()

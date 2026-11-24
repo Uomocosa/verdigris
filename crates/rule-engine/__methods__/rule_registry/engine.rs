@@ -47,6 +47,14 @@ pub fn engine() -> rules::RuleRegistry {
     register(rules::TapAttacker::ID, rules::TapAttacker::clauses());
     register(rules::Untap::ID, rules::Untap::clauses());
     register(rules::WinGame::ID, rules::WinGame::clauses());
+    register(
+        rules::OpeningHandAction::ID,
+        rules::OpeningHandAction::clauses(),
+    );
+    register(
+        rules::BeginTheGameOnTheBattlefield::ID,
+        rules::BeginTheGameOnTheBattlefield::clauses(),
+    );
     #[cfg(any(test, feature = "testing"))]
     {
         register(testing::TestRule::ID, testing::TestRule::clauses());

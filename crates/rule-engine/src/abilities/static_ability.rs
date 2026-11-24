@@ -6,7 +6,6 @@ pub enum StaticAbility {
     Keyword(keywords::StaticKeyword),
     Continuous(abilities::Continuous),
     Replacement(abilities::Replacement),
-    OpeningHand,
 }
 
 impl From<keywords::StaticKeyword> for StaticAbility {

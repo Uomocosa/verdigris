@@ -1,5 +1,6 @@
 use bevy::prelude::Entity;
 
+use crate::abilities;
 use crate::effects;
 use crate::keywords;
 use crate::rules;
@@ -11,6 +12,19 @@ pub fn mods(answers: &rules::Rules, entity: Entity) -> Vec<effects::Modification
         .into_iter()
         .flat_map(keywords::StaticKeyword::keyword_modifications)
         .collect();
+    modifications.extend(
+        answers
+            .definitions
+            .get(entity)
+            .into_iter()
+            .flat_map(|definition| &definition.text)
+            .filter_map(|ability| match ability {
+                abilities::Ability::Static(abilities::StaticAbility::Replacement(
+                    abilities::Replacement::Rule(change),
+                )) => Some(effects::Modification::Rule(change.clone())),
+                _ => None,
+            }),
+    );
     let mut ordered: Vec<effects::ContinuousEffect> =
         answers.effects.iter().filter(|effect| effect.affected == entity).cloned().collect();
     ordered.sort_by_key(|effect| effect.timestamp);

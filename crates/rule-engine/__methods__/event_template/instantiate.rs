@@ -54,6 +54,12 @@ pub fn instantiate<E: Event>(template: &rules::EventTemplate, event: &E) -> rule
             player: holder(who),
             amount: amount(template_amount),
         }),
+        rules::EventTemplate::BeginTheGameOnTheBattlefield => {
+            rules::AnyEvent::BeginTheGameOnTheBattlefield(rules::BeginTheGameOnTheBattlefield {
+                card: event.subject(),
+                player: event.player(),
+            })
+        }
     }
 }
 
