@@ -1,18 +1,18 @@
+use crate::events;
 use bevy::prelude::{Entity, MessageWriter, Query, With};
 
 use crate::Attempt;
 use crate::cards;
-use crate::rules;
 
 /// 704.5f If a creature has toughness 0 or less, it’s put into its owner’s graveyard. Regeneration
 /// can’t replace this event.
 pub fn r704_5f_zero_toughness(
-    mut burials: MessageWriter<Attempt<rules::PutIntoGraveyard>>,
+    mut burials: MessageWriter<Attempt<events::PutIntoGraveyard>>,
     cards: Query<(Entity, &cards::EffectivePT, &cards::Owner), With<cards::OnBattlefield>>,
 ) {
     for (creature, effective, owner) in cards.iter() {
         if effective.toughness <= 0 {
-            burials.write(Attempt(rules::PutIntoGraveyard {
+            burials.write(Attempt(events::PutIntoGraveyard {
                 object: creature,
                 owner: **owner,
             }));

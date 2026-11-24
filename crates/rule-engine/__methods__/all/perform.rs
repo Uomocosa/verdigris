@@ -18,6 +18,7 @@ pub fn perform<E: Event>(all: statics::All) -> abilities::Continuous {
 mod tests {
     use crate::CREATURE;
     use crate::effects;
+    use crate::events;
     use crate::rules;
     use crate::rules::traits::event::Event;
     use crate::statics;
@@ -26,12 +27,12 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let ability = perform::<rules::Draw>(statics::all(CREATURE));
+        let ability = perform::<events::Draw>(statics::all(CREATURE));
         assert_eq!(ability.filter, CREATURE);
         assert_eq!(
             ability.modification,
             effects::Modification::Rule(rules::RuleChange {
-                target: rules::Target::Event(rules::Draw::ID),
+                target: rules::Target::Event(events::Draw::ID),
                 change: rules::Change::Perform,
             })
         );

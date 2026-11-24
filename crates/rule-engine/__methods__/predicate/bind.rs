@@ -33,6 +33,7 @@ pub fn bind<E: Event>(predicate: &rules::Predicate, event: &E) -> rules::Predica
 mod tests {
     use bevy::prelude::Entity;
 
+    use crate::events;
     use crate::players;
     use crate::rules;
 
@@ -40,7 +41,7 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let draw_two = rules::Draw {
+        let draw_two = events::Draw {
             player: players::PlayerId(Entity::PLACEHOLDER),
             amount: 2,
         };
@@ -50,7 +51,7 @@ mod tests {
 
     #[test]
     fn bind_rewrites_event_field_against_the_event_amount() {
-        let draw_two = rules::Draw {
+        let draw_two = events::Draw {
             player: players::PlayerId(Entity::PLACEHOLDER),
             amount: 2,
         };
@@ -69,7 +70,7 @@ mod tests {
         assert_eq!(
             bind(
                 &missing,
-                &rules::WinGame(players::PlayerId(Entity::PLACEHOLDER))
+                &events::WinGame(players::PlayerId(Entity::PLACEHOLDER))
             ),
             !rules::Predicate::True
         );

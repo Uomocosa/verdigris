@@ -17,6 +17,7 @@ pub fn as_though<Ctx>(all: statics::All, clause: rules::ClauseId<Ctx>) -> abilit
 mod tests {
     use crate::CREATURE;
     use crate::effects;
+    use crate::events;
     use crate::rules;
     use crate::statics;
 
@@ -26,7 +27,7 @@ mod tests {
     fn test_usage() {
         let ability = as_though(
             statics::all(CREATURE),
-            rules::ClauseId::<rules::DeclareAttacker>::new("test/untapped"),
+            rules::ClauseId::<events::DeclareAttacker>::new("test/untapped"),
         );
         assert_eq!(ability.filter, CREATURE);
         assert_eq!(

@@ -1,15 +1,15 @@
+use crate::events;
 use bevy::prelude::{Commands, MessageReader};
 
 use crate::Resolve;
 use crate::cards;
-use crate::rules;
 
 /// 502.3. Third, the active player determines which permanents they control will untap. Then they
 /// untap them all simultaneously. This turn-based action doesn’t use the stack. Normally, all of
 /// a player’s permanents untap, but effects can keep one or more of a player’s permanents from
 /// untapping.
 pub fn r502_3_untap_perform(
-    mut untaps: MessageReader<Resolve<rules::Untap>>,
+    mut untaps: MessageReader<Resolve<events::Untap>>,
     mut commands: Commands,
 ) {
     for untap in untaps.read() {

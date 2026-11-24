@@ -3,18 +3,19 @@ use bevy::prelude::Entity;
 
 use crate::players;
 
+use crate::events;
 use crate::rules;
 use crate::rules::traits::event::Event;
 
-pub const CREATURE: rules::ClauseId<rules::DeclareAttacker> =
+pub const CREATURE: rules::ClauseId<events::DeclareAttacker> =
     rules::ClauseId::new("508.1a/creature");
-pub const CONTROLS: rules::ClauseId<rules::DeclareAttacker> =
+pub const CONTROLS: rules::ClauseId<events::DeclareAttacker> =
     rules::ClauseId::new("508.1a/controls");
-pub const UNTAPPED: rules::ClauseId<rules::DeclareAttacker> =
+pub const UNTAPPED: rules::ClauseId<events::DeclareAttacker> =
     rules::ClauseId::new("508.1a/untapped");
-pub const SUMMONING_SICK: rules::ClauseId<rules::DeclareAttacker> =
+pub const SUMMONING_SICK: rules::ClauseId<events::DeclareAttacker> =
     rules::ClauseId::new("508.1a/controlled-since-turn-began");
-pub const DEFENDER: rules::ClauseId<rules::DeclareAttacker> =
+pub const DEFENDER: rules::ClauseId<events::DeclareAttacker> =
     rules::ClauseId::new("702.3b/defender");
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -40,6 +41,7 @@ impl Event for DeclareAttacker {
 #[cfg(test)]
 mod tests {
     use crate::cards;
+    use crate::events;
     use crate::rules;
     use crate::rules::traits::event::Event;
 
@@ -86,7 +88,8 @@ mod tests {
     #[test]
     fn clause_texts_occur_verbatim_in_comprehensive_rules() {
         const RULES_TEXT: &str = include_str!("../../../../docs/MagicCompRules-20250919.txt");
-        for clause in rules::DeclareBlocker::clauses().into_iter().chain(DeclareAttacker::clauses())
+        for clause in
+            events::DeclareBlocker::clauses().into_iter().chain(DeclareAttacker::clauses())
         {
             assert!(
                 RULES_TEXT.contains(clause.text),

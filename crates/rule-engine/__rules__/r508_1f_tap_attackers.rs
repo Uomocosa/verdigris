@@ -1,17 +1,17 @@
+use crate::events;
 use bevy::prelude::{Added, Entity, MessageWriter, Query};
 
 use crate::Attempt;
 use crate::cards;
-use crate::rules;
 
 /// 508.1f The active player taps the chosen creatures. Tapping a creature when it’s declared as
 /// an attacker isn’t a cost; attacking simply causes creatures to become tapped.
 pub fn r508_1f_tap_attackers(
     attackers: Query<(Entity, &cards::Owner), Added<cards::Attacking>>,
-    mut taps: MessageWriter<Attempt<rules::TapAttacker>>,
+    mut taps: MessageWriter<Attempt<events::TapAttacker>>,
 ) {
     for (attacker, owner) in attackers.iter() {
-        taps.write(Attempt(rules::TapAttacker {
+        taps.write(Attempt(events::TapAttacker {
             attacker,
             player: **owner,
         }));

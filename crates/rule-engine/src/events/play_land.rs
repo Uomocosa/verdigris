@@ -3,16 +3,18 @@ use bevy::prelude::Entity;
 
 use crate::players;
 
+use crate::events;
 use crate::rules;
 use crate::rules::traits::event::Event;
 
-pub const PRIORITY: rules::ClauseId<rules::PlayLand> = rules::ClauseId::new("305.1/priority");
-pub const FROM_HAND: rules::ClauseId<rules::PlayLand> = rules::ClauseId::new("305.1/from-hand");
-pub const LAND_CARD: rules::ClauseId<rules::PlayLand> = rules::ClauseId::new("305.1/land-card");
-pub const MAIN_PHASE: rules::ClauseId<rules::PlayLand> = rules::ClauseId::new("305.1/main-phase");
-pub const EMPTY_STACK: rules::ClauseId<rules::PlayLand> = rules::ClauseId::new("305.1/empty-stack");
-pub const OWNS: rules::ClauseId<rules::PlayLand> = rules::ClauseId::new("305.1/owns");
-pub const OWN_TURN: rules::ClauseId<rules::PlayLand> = rules::ClauseId::new("305.3/own-turn");
+pub const PRIORITY: rules::ClauseId<events::PlayLand> = rules::ClauseId::new("305.1/priority");
+pub const FROM_HAND: rules::ClauseId<events::PlayLand> = rules::ClauseId::new("305.1/from-hand");
+pub const LAND_CARD: rules::ClauseId<events::PlayLand> = rules::ClauseId::new("305.1/land-card");
+pub const MAIN_PHASE: rules::ClauseId<events::PlayLand> = rules::ClauseId::new("305.1/main-phase");
+pub const EMPTY_STACK: rules::ClauseId<events::PlayLand> =
+    rules::ClauseId::new("305.1/empty-stack");
+pub const OWNS: rules::ClauseId<events::PlayLand> = rules::ClauseId::new("305.1/owns");
+pub const OWN_TURN: rules::ClauseId<events::PlayLand> = rules::ClauseId::new("305.3/own-turn");
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct PlayLand {

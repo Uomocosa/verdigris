@@ -42,13 +42,14 @@ impl<Ctx> ClauseId<Ctx> {
 #[cfg(test)]
 mod tests {
     use crate::cards;
+    use crate::events;
     use crate::rules;
 
     use super::ClauseId;
 
     #[test]
     fn test_usage() {
-        let id = ClauseId::<rules::DeclareBlocker>::new("509.1a/untapped");
+        let id = ClauseId::<events::DeclareBlocker>::new("509.1a/untapped");
         let built = id.clause(
             "The chosen creatures must be untapped",
             rules::Role::Subject,

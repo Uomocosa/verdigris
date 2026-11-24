@@ -2,6 +2,7 @@ use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query, Res, 
 
 use crate::actions;
 use crate::cards;
+use crate::events;
 use crate::rules;
 use crate::turns;
 
@@ -63,15 +64,15 @@ pub fn r508_1a_r508_1k_declare_attackers(
             continue;
         }
         let all_legal = attackers.iter().all(|attacker| {
-            answers.legal::<rules::DeclareAttacker>(&rules::DeclareAttacker {
+            answers.legal::<events::DeclareAttacker>(&events::DeclareAttacker {
                 attacker: *attacker,
                 player: action.player,
             })
         });
         let requirement_unmet = candidates.iter().any(|(entity, owner)| {
             **owner == action.player
-                && answers.required::<rules::DeclareAttacker>(entity)
-                && answers.legal::<rules::DeclareAttacker>(&rules::DeclareAttacker {
+                && answers.required::<events::DeclareAttacker>(entity)
+                && answers.legal::<events::DeclareAttacker>(&events::DeclareAttacker {
                     attacker: entity,
                     player: action.player,
                 })
@@ -93,6 +94,7 @@ pub fn r508_1a_r508_1k_declare_attackers(
 mod tests {
     use crate::BATTLEFIELD;
     use crate::actions;
+    use crate::events;
     use crate::testing::*;
     use crate::turns;
 
@@ -416,7 +418,7 @@ mod tests {
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
-                assert!(answers.required::<rules::DeclareAttacker>(bears.into()));
+                assert!(answers.required::<events::DeclareAttacker>(bears.into()));
             })
             .unwrap();
         Ok(())

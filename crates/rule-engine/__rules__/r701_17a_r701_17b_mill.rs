@@ -1,7 +1,7 @@
+use crate::events;
 use bevy::prelude::{Commands, Entity, MessageReader, Query};
 
 use crate::Resolve;
-use crate::rules;
 use crate::zones;
 use crate::{GRAVEYARD, LIBRARY};
 
@@ -13,7 +13,7 @@ use crate::{GRAVEYARD, LIBRARY};
 /// they mill as many as possible. Similarly, the player can’t pay a cost that includes milling a
 /// number of cards greater than the number of cards in their library.
 pub fn r701_17a_r701_17b_mill(
-    mut mills: MessageReader<Resolve<rules::Mill>>,
+    mut mills: MessageReader<Resolve<events::Mill>>,
     mut commands: Commands,
     zones: zones::ZoneLookup,
     zone_contents: Query<&zones::ZoneContents>,

@@ -1,5 +1,6 @@
 use crate::abilities;
 use crate::effects;
+use crate::events;
 use crate::rules;
 use crate::statics;
 
@@ -7,7 +8,7 @@ pub fn attack_as_though_it_had_haste(all: statics::All) -> abilities::Continuous
     abilities::Continuous {
         filter: *all,
         modification: effects::Modification::Rule(rules::RuleChange {
-            target: rules::Target::Clause(rules::declare_attacker::SUMMONING_SICK.key),
+            target: rules::Target::Clause(events::declare_attacker::SUMMONING_SICK.key),
             change: rules::Change::AsThough,
         }),
     }
@@ -17,6 +18,7 @@ pub fn attack_as_though_it_had_haste(all: statics::All) -> abilities::Continuous
 mod tests {
     use crate::CREATURE;
     use crate::effects;
+    use crate::events;
     use crate::rules;
     use crate::statics;
 
@@ -29,7 +31,7 @@ mod tests {
         assert_eq!(
             ability.modification,
             effects::Modification::Rule(rules::RuleChange {
-                target: rules::Target::Clause(rules::declare_attacker::SUMMONING_SICK.key),
+                target: rules::Target::Clause(events::declare_attacker::SUMMONING_SICK.key),
                 change: rules::Change::AsThough,
             })
         );

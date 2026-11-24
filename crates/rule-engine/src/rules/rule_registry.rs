@@ -31,6 +31,7 @@ impl RuleRegistry {
 mod tests {
     use crate::abilities;
     use crate::effects;
+    use crate::events;
     use crate::rules;
     use crate::rules::traits::event::Event;
     use crate::rules::traits::value_rule::ValueRule;
@@ -39,9 +40,9 @@ mod tests {
     #[test]
     fn test_usage() {
         let registry = rules::RuleRegistry::engine();
-        assert!(registry.resolves(&rules::Target::Event(rules::Draw::ID)));
+        assert!(registry.resolves(&rules::Target::Event(events::Draw::ID)));
         assert!(registry.resolves(&rules::Target::Clause(
-            rules::declare_attacker::SUMMONING_SICK.key
+            events::declare_attacker::SUMMONING_SICK.key
         )));
         assert!(registry.resolves(&rules::Target::Value(rules::MaximumHandSize::ID)));
         assert!(!registry.resolves(&rules::Target::Event(rules::EventId("999.9"))));

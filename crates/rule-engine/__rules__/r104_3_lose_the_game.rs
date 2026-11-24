@@ -1,14 +1,14 @@
+use crate::events;
 use bevy::prelude::{Commands, MessageReader, ResMut};
 
 use crate::Resolve;
 use crate::StateBasedActionsPerformed;
 use crate::players;
-use crate::rules;
 use crate::rules::traits::context::Context;
 
 /// 104.3. There are several ways to lose the game.
 pub fn r104_3_lose_the_game(
-    mut proceeds: MessageReader<Resolve<rules::LoseGame>>,
+    mut proceeds: MessageReader<Resolve<events::LoseGame>>,
     mut commands: Commands,
     mut state_based_actions_performed: ResMut<StateBasedActionsPerformed>,
     players: players::Players,

@@ -18,13 +18,14 @@ pub const fn clause<Ctx>(
 #[cfg(test)]
 mod tests {
     use crate::cards;
+    use crate::events;
     use crate::rules;
 
     use super::clause;
 
     #[test]
     fn test_usage() {
-        let id = rules::ClauseId::<rules::DeclareBlocker>::new("509.1a/untapped");
+        let id = rules::ClauseId::<events::DeclareBlocker>::new("509.1a/untapped");
         let built = clause(
             id,
             "The chosen creatures must be untapped",

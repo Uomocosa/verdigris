@@ -1,17 +1,17 @@
+use crate::events;
 use bevy::prelude::{MessageReader, Query, ResMut, With};
 
 use crate::Resolve;
 use crate::abilities;
 use crate::cards;
 use crate::players;
-use crate::rules;
 use crate::stack;
 
 /// 510.3a Any abilities that triggered on damage being dealt or while state-based actions are
 /// performed afterward are put onto the stack before the active player gets priority; the order in
 /// which they triggered doesn’t matter. (See rule 603, “Handling Triggered Abilities.”)
 pub fn r510_3a_combat_damage_triggers(
-    mut dealt: MessageReader<Resolve<rules::DealDamage>>,
+    mut dealt: MessageReader<Resolve<events::DealDamage>>,
     mut queue: ResMut<stack::TriggerQueue>,
     sources: Query<(&cards::CardDefinition, &cards::Owner), With<cards::Attacking>>,
     targets: Query<&players::Life>,

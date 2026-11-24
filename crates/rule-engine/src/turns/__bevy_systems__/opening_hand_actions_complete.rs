@@ -1,7 +1,7 @@
+use crate::events;
 use bevy::prelude::{Local, MessageReader, MessageWriter, Res};
 
 use crate::actions;
-use crate::rules;
 use crate::rules::traits::event::Event;
 use crate::turns;
 
@@ -19,7 +19,7 @@ pub fn opening_hand_actions_complete(
         return;
     }
     let queue = queue.into_inner();
-    if queue.iter().any(|ask| ask.event == rules::OpeningHandAction::ID) {
+    if queue.iter().any(|ask| ask.event == events::OpeningHandAction::ID) {
         return;
     }
     complete.write(turns::OpeningHandActionsComplete);

@@ -334,6 +334,7 @@ mod tests {
     use crate::HAND;
     use crate::cards;
     use crate::effects;
+    use crate::events;
     use crate::mana;
     use crate::testing::*;
     use crate::turns;
@@ -399,10 +400,10 @@ mod tests {
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
-                assert!(answers.required::<rules::DeclareAttacker>(golem.into()));
-                assert!(answers.required::<rules::DeclareBlocker>(golem.into()));
-                assert!(!answers.required::<rules::DeclareAttacker>(bears.into()));
-                assert!(!answers.required::<rules::DeclareBlocker>(bears.into()));
+                assert!(answers.required::<events::DeclareAttacker>(golem.into()));
+                assert!(answers.required::<events::DeclareBlocker>(golem.into()));
+                assert!(!answers.required::<events::DeclareAttacker>(bears.into()));
+                assert!(!answers.required::<events::DeclareBlocker>(bears.into()));
             })
             .unwrap();
         Ok(())

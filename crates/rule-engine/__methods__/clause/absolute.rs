@@ -10,13 +10,14 @@ pub fn absolute(clause: rules::Clause) -> rules::Clause {
 #[cfg(test)]
 mod tests {
     use crate::cards;
+    use crate::events;
     use crate::rules;
 
     use super::absolute;
 
     #[test]
     fn test_usage() {
-        let clause = rules::ClauseId::<rules::DeclareBlocker>::new("509.1a/untapped").clause(
+        let clause = rules::ClauseId::<events::DeclareBlocker>::new("509.1a/untapped").clause(
             "The chosen creatures must be untapped",
             rules::Role::Subject,
             !rules::has::<cards::Tapped>(),

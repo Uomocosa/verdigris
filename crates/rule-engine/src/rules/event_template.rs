@@ -44,6 +44,7 @@ impl EventTemplate {
 mod tests {
     use bevy::prelude::Entity;
 
+    use crate::events;
     use crate::players;
     use crate::rules;
 
@@ -52,20 +53,20 @@ mod tests {
     #[test]
     fn test_usage() {
         let player = Entity::PLACEHOLDER;
-        let happened = rules::DrawFromEmptyLibrary(players::PlayerId(player));
+        let happened = events::DrawFromEmptyLibrary(players::PlayerId(player));
         let template = EventTemplate::WinGame {
             who: rules::Role::Player,
         };
         assert_eq!(
             template.instantiate(&happened),
-            rules::AnyEvent::WinGame(rules::WinGame(players::PlayerId(player)))
+            rules::AnyEvent::WinGame(events::WinGame(players::PlayerId(player)))
         );
         assert_eq!(
             EventTemplate::LoseGame {
                 who: rules::Role::Subject,
             }
             .instantiate(&happened),
-            rules::AnyEvent::LoseGame(rules::LoseGame(players::PlayerId(player)))
+            rules::AnyEvent::LoseGame(events::LoseGame(players::PlayerId(player)))
         );
     }
 }

@@ -1,9 +1,9 @@
+use crate::events;
 use crate::{BATTLEFIELD, GRAVEYARD, STACK};
 use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query, With};
 
 use crate::Attempt;
 use crate::cards;
-use crate::rules;
 use crate::stack;
 use crate::zones;
 
@@ -23,7 +23,7 @@ use crate::zones;
 /// stack and put into its owner’s graveyard.
 pub fn r608_3a_permanent_enters(
     mut resolutions: MessageReader<stack::Resolution>,
-    mut entering: MessageWriter<Attempt<rules::EnterBattlefield>>,
+    mut entering: MessageWriter<Attempt<events::EnterBattlefield>>,
     mut commands: Commands,
     cards: Query<(
         &cards::CardDefinition,
@@ -70,7 +70,7 @@ pub fn r608_3a_permanent_enters(
             }
         }
         if zones.find(BATTLEFIELD, Some(**owner)).is_some() {
-            entering.write(Attempt(rules::EnterBattlefield {
+            entering.write(Attempt(events::EnterBattlefield {
                 permanent: spell,
                 controller: **owner,
                 summoning_sick: true,

@@ -1,10 +1,10 @@
+use crate::events;
 use bevy::prelude::Entity;
 
 use crate::players;
-use crate::rules;
 
-pub const fn from_controller(player: players::PlayerId, card: Entity) -> rules::EnterBattlefield {
-    rules::EnterBattlefield {
+pub const fn from_controller(player: players::PlayerId, card: Entity) -> events::EnterBattlefield {
+    events::EnterBattlefield {
         permanent: card,
         controller: player,
         summoning_sick: false,

@@ -18,71 +18,17 @@ pub mod traits;
 #[path = "__bevy_systems__/mod.rs"]
 pub mod bevy_systems;
 
-pub mod cast_spell;
-pub use cast_spell::CastSpell;
-
-mod begin_the_game_on_the_battlefield;
-pub use begin_the_game_on_the_battlefield::BeginTheGameOnTheBattlefield;
-
-mod opening_hand_action;
-pub use opening_hand_action::OpeningHandAction;
-
 mod any_event;
 pub use any_event::AnyEvent;
 
-mod create_tokens;
-pub use create_tokens::CreateTokens;
-
-mod counter;
-pub use counter::Counter;
-
-mod deal_damage;
-pub use deal_damage::DealDamage;
-
-mod destroy;
-pub use destroy::Destroy;
-
-mod discard;
-pub use discard::Discard;
-
-mod draw;
-pub use draw::Draw;
-
-mod enter_battlefield;
-pub use enter_battlefield::EnterBattlefield;
-
 mod event_template;
 pub use event_template::EventTemplate;
-
-mod gain_life;
-pub use gain_life::GainLife;
-
-mod lose_game;
-pub use lose_game::LoseGame;
-
-mod lose_life;
-pub use lose_life::LoseLife;
-
-mod mill;
-pub use mill::Mill;
-
-mod untap;
-pub use untap::Untap;
 
 mod clause;
 pub use clause::Clause;
 
 mod clause_id;
 pub use clause_id::ClauseId;
-
-pub mod declare_blocker;
-pub use declare_blocker::DeclareBlocker;
-
-mod draw_from_empty_library;
-pub use draw_from_empty_library::DrawFromEmptyLibrary;
-
-mod win_game;
-pub use win_game::WinGame;
 
 pub mod land_plays;
 pub use land_plays::LandPlays;
@@ -93,26 +39,14 @@ pub use limit::Limit;
 pub mod maximum_hand_size;
 pub use maximum_hand_size::MaximumHandSize;
 
-pub mod declare_attacker;
-pub use declare_attacker::DeclareAttacker;
-
-pub mod play_land;
-pub use play_land::PlayLand;
-
 mod predicate;
 pub use predicate::Predicate;
 
 mod predicate_registry;
 pub use predicate_registry::PredicateRegistry;
 
-mod put_into_graveyard;
-pub use put_into_graveyard::PutIntoGraveyard;
-
 mod rules;
 pub use rules::Rules;
 
 mod rule_registry;
 pub use rule_registry::RuleRegistry;
-
-mod tap_attacker;
-pub use tap_attacker::TapAttacker;

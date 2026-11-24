@@ -1,5 +1,6 @@
 use crate::abilities;
 use crate::effects;
+use crate::events;
 use crate::rules;
 use crate::rules::traits::event::Event;
 use crate::statics;
@@ -8,7 +9,7 @@ pub fn cant_win_the_game(all: statics::All) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
         modification: effects::Modification::Rule(rules::RuleChange {
-            target: rules::Target::Event(rules::WinGame::ID),
+            target: rules::Target::Event(events::WinGame::ID),
             change: rules::Change::Cant {
                 role: rules::Role::Player,
             },

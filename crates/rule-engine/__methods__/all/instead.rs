@@ -26,6 +26,7 @@ mod tests {
     use crate::PLAYER;
     use crate::YOU;
     use crate::effects;
+    use crate::events;
     use crate::rules;
     use crate::rules::traits::event::Event;
     use crate::statics;
@@ -36,7 +37,7 @@ mod tests {
     fn test_usage() {
         let ability = instead(
             statics::all(PLAYER.controlled_by(YOU)),
-            rules::DrawFromEmptyLibrary::ID,
+            events::DrawFromEmptyLibrary::ID,
             rules::Predicate::True,
             vec![rules::EventTemplate::WinGame {
                 who: rules::Role::Player,
@@ -46,7 +47,7 @@ mod tests {
         assert_eq!(
             ability.modification,
             effects::Modification::Rule(rules::RuleChange {
-                target: rules::Target::Event(rules::DrawFromEmptyLibrary::ID),
+                target: rules::Target::Event(events::DrawFromEmptyLibrary::ID),
                 change: rules::Change::Instead {
                     when: rules::Predicate::True,
                     then: rules::Then::Events(vec![rules::EventTemplate::WinGame {

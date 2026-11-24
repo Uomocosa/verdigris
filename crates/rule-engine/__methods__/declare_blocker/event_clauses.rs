@@ -1,25 +1,26 @@
 use crate::cards;
+use crate::events;
 use crate::rules;
 
 pub fn event_clauses() -> Vec<rules::Clause> {
     vec![
-        rules::declare_blocker::CREATURE.clause(
+        events::declare_blocker::CREATURE.clause(
             "The defending player chooses which creatures they control",
             rules::Role::Subject,
             rules::has::<cards::Creature>(),
         ),
-        rules::declare_blocker::CONTROLS.clause(
+        events::declare_blocker::CONTROLS.clause(
             "creatures they control",
             rules::Role::Subject,
             rules::points_to::<cards::Owner>(rules::Role::Player)
                 & rules::has::<cards::OnBattlefield>(),
         ),
-        rules::declare_blocker::UNTAPPED.clause(
+        events::declare_blocker::UNTAPPED.clause(
             "The chosen creatures must be untapped",
             rules::Role::Subject,
             !rules::has::<cards::Tapped>(),
         ),
-        rules::declare_blocker::FLYING.clause(
+        events::declare_blocker::FLYING.clause(
             "can’t be blocked except by creatures with flying and/or reach",
             rules::Role::Other,
             !rules::other(rules::has::<cards::Flying>())

@@ -1,8 +1,8 @@
+use crate::events;
 use bevy::prelude::{App, IntoScheduleConfigs, Update};
 
 use crate::RuleSet;
 use crate::comprehensive_rules;
-use crate::rules;
 
 pub fn add_resolution_systems(app: &mut App) {
     app.add_systems(
@@ -19,22 +19,22 @@ pub fn add_resolution_systems(app: &mut App) {
             (
                 (
                     comprehensive_rules::r614_1a_r616_1_replacement_effects::r614_1a_r616_1_replacement_effects::<
-                        rules::Draw,
+                        events::Draw,
                     >,
                     comprehensive_rules::r614_1a_r616_1_replacement_effects::r614_1a_r616_1_replacement_effects::<
-                        rules::Discard,
+                        events::Discard,
                     >,
                     comprehensive_rules::r614_1a_r616_1_replacement_effects::r614_1a_r616_1_replacement_effects::<
-                        rules::Mill,
+                        events::Mill,
                     >,
                     comprehensive_rules::r614_1a_r616_1_replacement_effects::r614_1a_r616_1_replacement_effects::<
-                        rules::CreateTokens,
+                        events::CreateTokens,
                     >,
                     comprehensive_rules::r614_1a_r616_1_replacement_effects::r614_1a_r616_1_replacement_effects::<
-                        rules::Counter,
+                        events::Counter,
                     >,
                     comprehensive_rules::r614_1a_r616_1_replacement_effects::r614_1a_r616_1_replacement_effects::<
-                        rules::DealDamage,
+                        events::DealDamage,
                     >,
                 )
                     .chain(),
@@ -46,10 +46,10 @@ pub fn add_resolution_systems(app: &mut App) {
                         .chain(),
                     (
                         comprehensive_rules::r614_1a_r616_1_replacement_effects::r614_1a_r616_1_replacement_effects::<
-                            rules::LoseLife,
+                            events::LoseLife,
                         >,
                         comprehensive_rules::r614_1a_r616_1_replacement_effects::r614_1a_r616_1_replacement_effects::<
-                            rules::GainLife,
+                            events::GainLife,
                         >,
                     )
                         .chain(),
@@ -68,11 +68,11 @@ pub fn add_resolution_systems(app: &mut App) {
                 comprehensive_rules::r608_3a_permanent_enters::r608_3a_permanent_enters,
                 comprehensive_rules::r701_7a_create_tokens::r701_7a_create_tokens,
                 comprehensive_rules::r614_1a_r616_1_replacement_effects::r614_1a_r616_1_replacement_effects::<
-                    rules::BeginTheGameOnTheBattlefield,
+                    events::BeginTheGameOnTheBattlefield,
                 >,
                 comprehensive_rules::r103_6a_begin_the_game_on_the_battlefield::r103_6a_begin_the_game_on_the_battlefield,
                 comprehensive_rules::r614_1a_r616_1_replacement_effects::r614_1a_r616_1_replacement_effects::<
-                    rules::EnterBattlefield,
+                    events::EnterBattlefield,
                 >,
                 comprehensive_rules::r110_1_enter_battlefield::r110_1_enter_battlefield,
                 comprehensive_rules::r110_5b_enters_untapped::r110_5b_enters_untapped,

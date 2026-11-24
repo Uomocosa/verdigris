@@ -3,14 +3,16 @@ use bevy::prelude::Entity;
 
 use crate::players;
 
+use crate::events;
 use crate::rules;
 use crate::rules::traits::event::Event;
 
-pub const PRIORITY: rules::ClauseId<rules::CastSpell> = rules::ClauseId::new("601.2a/priority");
-pub const FROM_HAND: rules::ClauseId<rules::CastSpell> = rules::ClauseId::new("601.2a/from-hand");
-pub const OWNS: rules::ClauseId<rules::CastSpell> = rules::ClauseId::new("601.2a/owns");
-pub const NOT_A_LAND: rules::ClauseId<rules::CastSpell> = rules::ClauseId::new("601.2a/not-a-land");
-pub const TIMING: rules::ClauseId<rules::CastSpell> = rules::ClauseId::new("601.2a/timing");
+pub const PRIORITY: rules::ClauseId<events::CastSpell> = rules::ClauseId::new("601.2a/priority");
+pub const FROM_HAND: rules::ClauseId<events::CastSpell> = rules::ClauseId::new("601.2a/from-hand");
+pub const OWNS: rules::ClauseId<events::CastSpell> = rules::ClauseId::new("601.2a/owns");
+pub const NOT_A_LAND: rules::ClauseId<events::CastSpell> =
+    rules::ClauseId::new("601.2a/not-a-land");
+pub const TIMING: rules::ClauseId<events::CastSpell> = rules::ClauseId::new("601.2a/timing");
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct CastSpell {

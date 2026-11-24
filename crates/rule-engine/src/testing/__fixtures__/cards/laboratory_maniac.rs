@@ -3,6 +3,7 @@ use crate::YOU;
 use crate::card;
 use crate::cards;
 use crate::cost;
+use crate::events;
 use crate::pt;
 use crate::rules;
 use crate::rules::traits::event::Event;
@@ -17,7 +18,7 @@ pub const LABORATORY_MANIAC: testing::Card = testing::Card {
                 .subtype(cards::CreatureType::Human.into())
                 .subtype(cards::CreatureType::Wizard.into());
             statics::all(PLAYER.controlled_by(YOU)).instead(
-                rules::DrawFromEmptyLibrary::ID,
+                events::DrawFromEmptyLibrary::ID,
                 rules::Predicate::True,
                 vec![rules::EventTemplate::WinGame {
                     who: rules::Role::Player,

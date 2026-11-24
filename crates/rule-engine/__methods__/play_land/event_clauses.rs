@@ -1,40 +1,41 @@
 use crate::HAND;
 use crate::cards;
+use crate::events;
 use crate::rules;
 
 pub fn event_clauses() -> Vec<rules::Clause> {
     vec![
-        rules::play_land::PRIORITY.clause(
+        events::play_land::PRIORITY.clause(
             "A player who has priority",
             rules::Role::Player,
             rules::has_priority(rules::Role::Player),
         ),
-        rules::play_land::LAND_CARD.clause(
+        events::play_land::LAND_CARD.clause(
             "a land card",
             rules::Role::Subject,
             rules::card_type(cards::CardType::Land),
         ),
-        rules::play_land::FROM_HAND.clause(
+        events::play_land::FROM_HAND.clause(
             "from their hand",
             rules::Role::Player,
             rules::in_zone(HAND, rules::Role::Player),
         ),
-        rules::play_land::MAIN_PHASE.clause(
+        events::play_land::MAIN_PHASE.clause(
             "during a main phase of their turn",
             rules::Role::Player,
             rules::main_phase(),
         ),
-        rules::play_land::EMPTY_STACK.clause(
+        events::play_land::EMPTY_STACK.clause(
             "when the stack is empty",
             rules::Role::Player,
             rules::stack_empty(),
         ),
-        rules::play_land::OWNS.clause(
+        events::play_land::OWNS.clause(
             "their hand",
             rules::Role::Subject,
             rules::points_to::<cards::Owner>(rules::Role::Player),
         ),
-        rules::play_land::OWN_TURN
+        events::play_land::OWN_TURN
             .clause(
                 "A player can’t play a land, for any reason, if it isn’t their turn.",
                 rules::Role::Player,

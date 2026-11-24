@@ -1,3 +1,4 @@
+use crate::events;
 use bevy::prelude::{Commands, Has, MessageReader, MessageWriter, Query};
 
 use crate::Attempt;
@@ -5,7 +6,6 @@ use crate::Resolve;
 use crate::cards;
 use crate::damage;
 use crate::players;
-use crate::rules;
 
 /// 120.3. Damage may have one or more of the following results, depending on whether the recipient
 /// of the damage is a player or permanent, the characteristics of the damage’s source, and the
@@ -20,8 +20,8 @@ use crate::rules;
 /// 120.3e Damage dealt to a creature by a source with neither wither nor infect causes that much
 /// damage to be marked on that creature.
 pub fn r120_3_r120_3a_r120_3b_r120_3e_damage_results(
-    mut damage_dealt: MessageReader<Resolve<rules::DealDamage>>,
-    mut life_lost: MessageWriter<Attempt<rules::LoseLife>>,
+    mut damage_dealt: MessageReader<Resolve<events::DealDamage>>,
+    mut life_lost: MessageWriter<Attempt<events::LoseLife>>,
     mut commands: Commands,
     lives: Query<&players::Life>,
     mut poisoned: Query<&mut players::PoisonCounters>,
@@ -42,7 +42,7 @@ pub fn r120_3_r120_3a_r120_3b_r120_3e_damage_results(
                 }
                 continue;
             }
-            life_lost.write(Attempt(rules::LoseLife {
+            life_lost.write(Attempt(events::LoseLife {
                 player: players::PlayerId(event.recipient),
                 amount: event.amount,
             }));

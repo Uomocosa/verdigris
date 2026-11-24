@@ -1,24 +1,24 @@
+use crate::events;
 use bevy::prelude::Commands;
 
 use crate::Attempt;
-use crate::rules;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum AnyEvent {
-    WinGame(rules::WinGame),
-    LoseGame(rules::LoseGame),
-    DrawFromEmptyLibrary(rules::DrawFromEmptyLibrary),
-    Draw(rules::Draw),
-    LoseLife(rules::LoseLife),
-    Discard(rules::Discard),
-    GainLife(rules::GainLife),
-    Mill(rules::Mill),
-    CreateTokens(rules::CreateTokens),
-    Destroy(rules::Destroy),
-    Counter(rules::Counter),
-    DealDamage(rules::DealDamage),
-    EnterBattlefield(rules::EnterBattlefield),
-    BeginTheGameOnTheBattlefield(rules::BeginTheGameOnTheBattlefield),
+    WinGame(events::WinGame),
+    LoseGame(events::LoseGame),
+    DrawFromEmptyLibrary(events::DrawFromEmptyLibrary),
+    Draw(events::Draw),
+    LoseLife(events::LoseLife),
+    Discard(events::Discard),
+    GainLife(events::GainLife),
+    Mill(events::Mill),
+    CreateTokens(events::CreateTokens),
+    Destroy(events::Destroy),
+    Counter(events::Counter),
+    DealDamage(events::DealDamage),
+    EnterBattlefield(events::EnterBattlefield),
+    BeginTheGameOnTheBattlefield(events::BeginTheGameOnTheBattlefield),
 }
 
 impl AnyEvent {
@@ -72,11 +72,11 @@ impl AnyEvent {
 
 #[cfg(test)]
 mod tests {
+    use crate::events;
     use bevy::ecs::system::RunSystemOnce;
     use bevy::prelude::{Commands, MessageReader};
 
     use crate::Attempt;
-    use crate::rules;
     use crate::testing::*;
 
     use super::AnyEvent;
@@ -88,13 +88,13 @@ mod tests {
         game.app
             .world_mut()
             .run_system_once(move |mut commands: Commands| {
-                AnyEvent::WinGame(rules::WinGame(player)).announce(&mut commands);
+                AnyEvent::WinGame(events::WinGame(player)).announce(&mut commands);
             })
             .unwrap();
         game.app
             .world_mut()
-            .run_system_once(move |mut reader: MessageReader<Attempt<rules::WinGame>>| {
-                assert!(reader.read().any(|attempt| **attempt == rules::WinGame(player)));
+            .run_system_once(move |mut reader: MessageReader<Attempt<events::WinGame>>| {
+                assert!(reader.read().any(|attempt| **attempt == events::WinGame(player)));
             })
             .unwrap();
     }

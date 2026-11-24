@@ -1,8 +1,8 @@
+use crate::events;
 use bevy::prelude::{MessageReader, MessageWriter};
 
 use crate::Attempt;
 use crate::players;
-use crate::rules;
 use crate::turns;
 
 /// 103.6. Some cards allow a player to take actions with them from their opening hand. Once the
@@ -15,13 +15,13 @@ use crate::turns;
 /// an earlier player answers.
 pub fn r103_6_opening_hand_actions(
     mut mulligans_complete: MessageReader<turns::MulligansComplete>,
-    mut opening_hand_actions: MessageWriter<Attempt<rules::OpeningHandAction>>,
+    mut opening_hand_actions: MessageWriter<Attempt<events::OpeningHandAction>>,
     players: players::Players,
 ) {
     for _ in mulligans_complete.read() {
         for player in players.still_in_the_game() {
             for card in player.opening_hand() {
-                opening_hand_actions.write(Attempt(rules::OpeningHandAction {
+                opening_hand_actions.write(Attempt(events::OpeningHandAction {
                     card,
                     player: player.id,
                 }));

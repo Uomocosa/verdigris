@@ -1,30 +1,31 @@
 use crate::cards;
+use crate::events;
 use crate::rules;
 
 pub fn event_clauses() -> Vec<rules::Clause> {
     vec![
-        rules::declare_attacker::CREATURE.clause(
+        events::declare_attacker::CREATURE.clause(
             "The active player chooses which creatures that they control",
             rules::Role::Subject,
             rules::has::<cards::Creature>(),
         ),
-        rules::declare_attacker::CONTROLS.clause(
+        events::declare_attacker::CONTROLS.clause(
             "creatures that they control",
             rules::Role::Subject,
             rules::points_to::<cards::Owner>(rules::Role::Player)
                 & rules::has::<cards::OnBattlefield>(),
         ),
-        rules::declare_attacker::UNTAPPED.clause(
+        events::declare_attacker::UNTAPPED.clause(
             "The chosen creatures must be untapped",
             rules::Role::Subject,
             !rules::has::<cards::Tapped>(),
         ),
-        rules::declare_attacker::SUMMONING_SICK.clause(
+        events::declare_attacker::SUMMONING_SICK.clause(
             "have been controlled by the active player continuously since the turn began",
             rules::Role::Subject,
             !rules::has::<cards::SummoningSick>(),
         ),
-        rules::declare_attacker::DEFENDER.clause(
+        events::declare_attacker::DEFENDER.clause(
             "A creature with defender can’t attack.",
             rules::Role::Subject,
             !rules::has::<cards::Defender>(),

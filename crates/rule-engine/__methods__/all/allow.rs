@@ -22,6 +22,7 @@ mod tests {
     use crate::CREATURE;
     use crate::cards;
     use crate::effects;
+    use crate::events;
     use crate::rules;
     use crate::statics;
 
@@ -31,7 +32,7 @@ mod tests {
     fn test_usage() {
         let ability = allow(
             statics::all(CREATURE),
-            rules::ClauseId::<rules::DeclareAttacker>::new("test/untapped"),
+            rules::ClauseId::<events::DeclareAttacker>::new("test/untapped"),
             rules::has::<cards::Flying>(),
         );
         assert_eq!(ability.filter, CREATURE);

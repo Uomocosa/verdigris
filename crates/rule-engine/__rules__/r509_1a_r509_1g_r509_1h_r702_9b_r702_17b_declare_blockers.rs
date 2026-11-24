@@ -2,6 +2,7 @@ use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query, Res, 
 
 use crate::actions;
 use crate::cards;
+use crate::events;
 use crate::rules;
 use crate::turns;
 
@@ -66,7 +67,7 @@ pub fn r509_1a_r509_1g_r509_1h_r702_9b_r702_17b_declare_blockers(
         }
         let all_legal = assignments.iter().all(|assignment| {
             attacking.get(assignment.attacker).is_ok()
-                && answers.legal::<rules::DeclareBlocker>(&rules::DeclareBlocker {
+                && answers.legal::<events::DeclareBlocker>(&events::DeclareBlocker {
                     blocker: assignment.blocker,
                     attacker: assignment.attacker,
                     player: action.player,
@@ -77,10 +78,10 @@ pub fn r509_1a_r509_1g_r509_1h_r702_9b_r702_17b_declare_blockers(
         });
         let requirement_unmet = blockers.iter().any(|(entity, owner)| {
             **owner == action.player
-                && answers.required::<rules::DeclareBlocker>(entity)
+                && answers.required::<events::DeclareBlocker>(entity)
                 && !assignments.iter().any(|assignment| assignment.blocker == entity)
                 && attacking.iter().any(|(attacker, _)| {
-                    answers.legal::<rules::DeclareBlocker>(&rules::DeclareBlocker {
+                    answers.legal::<events::DeclareBlocker>(&events::DeclareBlocker {
                         blocker: entity,
                         attacker,
                         player: action.player,
@@ -106,6 +107,7 @@ mod tests {
     use crate::HAND;
     use crate::actions;
     use crate::cards;
+    use crate::events;
     use crate::testing::*;
     use crate::turns;
 
@@ -453,7 +455,7 @@ mod tests {
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
-                assert!(answers.required::<rules::DeclareBlocker>(bears_2.into()));
+                assert!(answers.required::<events::DeclareBlocker>(bears_2.into()));
             })
             .unwrap();
         Ok(())

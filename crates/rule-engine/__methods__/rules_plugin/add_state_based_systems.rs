@@ -1,10 +1,10 @@
+use crate::events;
 use bevy::ecs::schedule::ApplyDeferred;
 use bevy::prelude::{App, IntoScheduleConfigs, Update};
 
 use crate::RuleSet;
 use crate::StateBasedActions;
 use crate::comprehensive_rules;
-use crate::rules;
 
 pub fn add_state_based_systems(app: &mut App) {
     app.add_systems(
@@ -23,12 +23,12 @@ pub fn add_state_based_systems(app: &mut App) {
                     comprehensive_rules::r704_5h_deathtouch_damage::r704_5h_deathtouch_damage,
                     comprehensive_rules::r704_5j_legend_rule::r704_5j_legend_rule,
                     comprehensive_rules::r614_1a_r616_1_replacement_effects::r614_1a_r616_1_replacement_effects::<
-                        rules::Destroy,
+                        events::Destroy,
                     >,
                     comprehensive_rules::r702_12b_indestructible::r702_12b_indestructible,
                     comprehensive_rules::r704_5m_aura_illegal::r704_5m_aura_illegal,
                     comprehensive_rules::r614_1a_r616_1_replacement_effects::r614_1a_r616_1_replacement_effects::<
-                        rules::PutIntoGraveyard,
+                        events::PutIntoGraveyard,
                     >,
                     comprehensive_rules::r404_1_put_into_graveyard::r404_1_put_into_graveyard,
                     comprehensive_rules::r704_5d_token_outside_battlefield::r704_5d_token_outside_battlefield,
@@ -37,13 +37,13 @@ pub fn add_state_based_systems(app: &mut App) {
                     comprehensive_rules::r704_5c_poison::r704_5c_poison,
                     comprehensive_rules::r104_2a_wins_when_opponents_left::r104_2a_wins_when_opponents_left,
                     comprehensive_rules::r614_1a_r616_1_replacement_effects::r614_1a_r616_1_replacement_effects::<
-                        rules::DrawFromEmptyLibrary,
+                        events::DrawFromEmptyLibrary,
                     >,
                     comprehensive_rules::r614_1a_r616_1_replacement_effects::r614_1a_r616_1_replacement_effects::<
-                        rules::LoseGame,
+                        events::LoseGame,
                     >,
                     comprehensive_rules::r614_1a_r616_1_replacement_effects::r614_1a_r616_1_replacement_effects::<
-                        rules::WinGame,
+                        events::WinGame,
                     >,
                     comprehensive_rules::r121_4_draw_from_empty_library::r121_4_draw_from_empty_library,
                 )

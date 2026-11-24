@@ -1,32 +1,33 @@
 use crate::HAND;
 use crate::cards;
+use crate::events;
 use crate::rules;
 
 pub fn event_clauses() -> Vec<rules::Clause> {
     vec![
-        rules::cast_spell::PRIORITY.clause(
+        events::cast_spell::PRIORITY.clause(
             "A player who has priority",
             rules::Role::Player,
             rules::has_priority(rules::Role::Player),
         ),
-        rules::cast_spell::FROM_HAND.clause(
+        events::cast_spell::FROM_HAND.clause(
             "from their hand",
             rules::Role::Player,
             rules::in_zone(HAND, rules::Role::Player),
         ),
-        rules::cast_spell::OWNS.clause(
+        events::cast_spell::OWNS.clause(
             "their hand",
             rules::Role::Player,
             rules::points_to::<cards::Owner>(rules::Role::Player),
         ),
-        rules::cast_spell::NOT_A_LAND
+        events::cast_spell::NOT_A_LAND
             .clause(
                 "It can’t be cast as a spell.",
                 rules::Role::Subject,
                 !rules::card_type(cards::CardType::Land),
             )
             .absolute(),
-        rules::cast_spell::TIMING.clause(
+        events::cast_spell::TIMING.clause(
             "during a main phase of their turn when the stack is empty",
             rules::Role::Player,
             rules::card_type(cards::CardType::Instant)

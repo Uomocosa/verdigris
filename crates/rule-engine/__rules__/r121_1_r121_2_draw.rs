@@ -1,9 +1,9 @@
+use crate::events;
 use crate::{HAND, LIBRARY};
 use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query};
 
 use crate::Attempt;
 use crate::Resolve;
-use crate::rules;
 use crate::zones;
 
 /// 121.1. A player draws a card by putting the top card of their library into their hand. This is
@@ -18,8 +18,8 @@ use crate::zones;
 /// The top card of a library is the first card in its `ZoneContents`, and `MockGameBuilder` lists a
 /// library top first.
 pub fn r121_1_r121_2_draw(
-    mut draws: MessageReader<Resolve<rules::Draw>>,
-    mut attempted: MessageWriter<Attempt<rules::DrawFromEmptyLibrary>>,
+    mut draws: MessageReader<Resolve<events::Draw>>,
+    mut attempted: MessageWriter<Attempt<events::DrawFromEmptyLibrary>>,
     mut commands: Commands,
     zones: zones::ZoneLookup,
     zone_contents: Query<&zones::ZoneContents>,
@@ -43,7 +43,7 @@ pub fn r121_1_r121_2_draw(
             }
         }
         if u32::try_from(drawn_from_top.len()).unwrap_or(u32::MAX) < count {
-            attempted.write(Attempt(rules::DrawFromEmptyLibrary(player)));
+            attempted.write(Attempt(events::DrawFromEmptyLibrary(player)));
         }
     }
 }

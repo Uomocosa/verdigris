@@ -1,13 +1,13 @@
+use crate::events;
 use bevy::prelude::{Commands, MessageReader};
 
 use crate::Resolve;
 use crate::cards;
-use crate::rules;
 
 /// 508.1f The active player taps the chosen creatures. Tapping a creature when it’s declared as
 /// an attacker isn’t a cost; attacking simply causes creatures to become tapped.
 pub fn r508_1f_tap_attackers_perform(
-    mut taps: MessageReader<Resolve<rules::TapAttacker>>,
+    mut taps: MessageReader<Resolve<events::TapAttacker>>,
     mut commands: Commands,
 ) {
     for tap in taps.read() {

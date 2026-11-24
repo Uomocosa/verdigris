@@ -39,6 +39,7 @@ mod tests {
 
     use crate::BATTLEFIELD;
     use crate::effects;
+    use crate::events;
     use crate::rules;
     use crate::testing::*;
 
@@ -86,7 +87,7 @@ mod tests {
                 assert!(
                     !mods(&answers, *spider).contains(&effects::Modification::Rule(
                         rules::RuleChange {
-                            target: rules::Target::Clause(rules::declare_blocker::FLYING.key),
+                            target: rules::Target::Clause(events::declare_blocker::FLYING.key),
                             change: rules::Change::AsThough,
                         }
                     ))

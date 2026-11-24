@@ -1,4 +1,5 @@
 use crate::effects;
+use crate::events;
 use crate::rules;
 use crate::rules::traits::event::Event;
 
@@ -25,11 +26,11 @@ impl StaticKeyword {
     pub fn keyword_modifications(self) -> Vec<effects::Modification> {
         match self {
             Self::Haste => vec![effects::Modification::Rule(rules::RuleChange {
-                target: rules::Target::Clause(rules::declare_attacker::SUMMONING_SICK.key),
+                target: rules::Target::Clause(events::declare_attacker::SUMMONING_SICK.key),
                 change: rules::Change::AsThough,
             })],
             Self::Vigilance => vec![effects::Modification::Rule(rules::RuleChange {
-                target: rules::Target::Event(rules::TapAttacker::ID),
+                target: rules::Target::Event(events::TapAttacker::ID),
                 change: rules::Change::Skip,
             })],
             _ => Vec::new(),
@@ -40,6 +41,7 @@ impl StaticKeyword {
 #[cfg(test)]
 mod tests {
     use crate::effects;
+    use crate::events;
     use crate::keywords;
     use crate::rules;
     use crate::rules::traits::event::Event;
@@ -52,14 +54,14 @@ mod tests {
         assert_eq!(
             StaticKeyword::Haste.keyword_modifications(),
             vec![effects::Modification::Rule(rules::RuleChange {
-                target: rules::Target::Clause(rules::declare_attacker::SUMMONING_SICK.key),
+                target: rules::Target::Clause(events::declare_attacker::SUMMONING_SICK.key),
                 change: rules::Change::AsThough,
             })]
         );
         assert_eq!(
             keywords::StaticKeyword::Vigilance.keyword_modifications(),
             vec![effects::Modification::Rule(rules::RuleChange {
-                target: rules::Target::Event(rules::TapAttacker::ID),
+                target: rules::Target::Event(events::TapAttacker::ID),
                 change: rules::Change::Skip,
             })]
         );

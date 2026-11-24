@@ -8,6 +8,7 @@ pub mod cards;
 mod comprehensive_rules;
 pub mod damage;
 pub mod effects;
+pub mod events;
 mod game;
 mod game_mut;
 pub mod keywords;

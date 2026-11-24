@@ -1,3 +1,4 @@
+use crate::events;
 use crate::players;
 use crate::rules;
 use crate::rules::traits::event::Event;
@@ -14,48 +15,48 @@ pub fn instantiate<E: Event>(template: &rules::EventTemplate, event: &E) -> rule
     };
     match template {
         rules::EventTemplate::WinGame { who } => {
-            rules::AnyEvent::WinGame(rules::WinGame(holder(who)))
+            rules::AnyEvent::WinGame(events::WinGame(holder(who)))
         }
         rules::EventTemplate::LoseGame { who } => {
-            rules::AnyEvent::LoseGame(rules::LoseGame(holder(who)))
+            rules::AnyEvent::LoseGame(events::LoseGame(holder(who)))
         }
         rules::EventTemplate::Draw {
             who,
             amount: template_amount,
-        } => rules::AnyEvent::Draw(rules::Draw {
+        } => rules::AnyEvent::Draw(events::Draw {
             player: holder(who),
             amount: amount(template_amount),
         }),
         rules::EventTemplate::LoseLife {
             who,
             amount: template_amount,
-        } => rules::AnyEvent::LoseLife(rules::LoseLife {
+        } => rules::AnyEvent::LoseLife(events::LoseLife {
             player: holder(who),
             amount: amount(template_amount),
         }),
         rules::EventTemplate::Discard {
             who,
             amount: template_amount,
-        } => rules::AnyEvent::Discard(rules::Discard {
+        } => rules::AnyEvent::Discard(events::Discard {
             player: holder(who),
             amount: amount(template_amount),
         }),
         rules::EventTemplate::GainLife {
             who,
             amount: template_amount,
-        } => rules::AnyEvent::GainLife(rules::GainLife {
+        } => rules::AnyEvent::GainLife(events::GainLife {
             player: holder(who),
             amount: amount(template_amount),
         }),
         rules::EventTemplate::Mill {
             who,
             amount: template_amount,
-        } => rules::AnyEvent::Mill(rules::Mill {
+        } => rules::AnyEvent::Mill(events::Mill {
             player: holder(who),
             amount: amount(template_amount),
         }),
         rules::EventTemplate::BeginTheGameOnTheBattlefield => {
-            rules::AnyEvent::BeginTheGameOnTheBattlefield(rules::BeginTheGameOnTheBattlefield {
+            rules::AnyEvent::BeginTheGameOnTheBattlefield(events::BeginTheGameOnTheBattlefield {
                 card: event.subject(),
                 player: event.player(),
             })
@@ -67,6 +68,7 @@ pub fn instantiate<E: Event>(template: &rules::EventTemplate, event: &E) -> rule
 mod tests {
     use bevy::prelude::Entity;
 
+    use crate::events;
     use crate::players;
     use crate::rules;
 
@@ -75,7 +77,7 @@ mod tests {
     #[test]
     fn test_usage() {
         let player = Entity::PLACEHOLDER;
-        let happened = rules::DrawFromEmptyLibrary(players::PlayerId(player));
+        let happened = events::DrawFromEmptyLibrary(players::PlayerId(player));
         assert_eq!(
             instantiate(
                 &rules::EventTemplate::WinGame {
@@ -83,7 +85,7 @@ mod tests {
                 },
                 &happened
             ),
-            rules::AnyEvent::WinGame(rules::WinGame(players::PlayerId(player)))
+            rules::AnyEvent::WinGame(events::WinGame(players::PlayerId(player)))
         );
     }
 }

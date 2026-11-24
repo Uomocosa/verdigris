@@ -1,3 +1,4 @@
+use crate::events;
 use crate::{GRAVEYARD, HAND};
 use std::collections::BTreeSet;
 
@@ -5,7 +6,6 @@ use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query, ResMu
 
 use crate::Resolve;
 use crate::actions;
-use crate::rules;
 use crate::zones;
 
 /// 701.9a To discard a card, move it from its owner’s hand to that player’s graveyard.
@@ -14,7 +14,7 @@ use crate::zones;
 /// choose which card to discard. Some effects, however, require a random discard or allow another
 /// player to choose which card is discarded.
 pub fn r701_9a_r701_9b_discard(
-    mut discards: MessageReader<Resolve<rules::Discard>>,
+    mut discards: MessageReader<Resolve<events::Discard>>,
     mut actions: MessageReader<actions::PlayerAction>,
     mut rejected: MessageWriter<actions::Rejected>,
     mut pending: ResMut<actions::PendingChoice>,

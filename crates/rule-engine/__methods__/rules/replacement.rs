@@ -27,6 +27,7 @@ mod tests {
     use bevy::ecs::system::RunSystemOnce;
 
     use crate::BATTLEFIELD;
+    use crate::events;
     use crate::rules;
     use crate::testing::*;
 
@@ -43,12 +44,12 @@ mod tests {
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
                 assert_eq!(
-                    replacement(&answers, &rules::DrawFromEmptyLibrary(player)),
+                    replacement(&answers, &events::DrawFromEmptyLibrary(player)),
                     Some(rules::Then::Events(vec![rules::EventTemplate::WinGame {
                         who: rules::Role::Player,
                     }]))
                 );
-                assert_eq!(replacement(&answers, &rules::LoseGame(player)), None);
+                assert_eq!(replacement(&answers, &events::LoseGame(player)), None);
             })
             .unwrap();
         Ok(())

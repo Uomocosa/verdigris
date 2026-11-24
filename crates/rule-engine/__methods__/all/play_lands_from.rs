@@ -1,5 +1,6 @@
 use crate::abilities;
 use crate::effects;
+use crate::events;
 use crate::rules;
 use crate::statics;
 use crate::zones;
@@ -8,7 +9,7 @@ pub fn play_lands_from(all: statics::All, zone: zones::Zone) -> abilities::Conti
     abilities::Continuous {
         filter: *all,
         modification: effects::Modification::Rule(rules::RuleChange {
-            target: rules::Target::Clause(rules::play_land::FROM_HAND.key),
+            target: rules::Target::Clause(events::play_land::FROM_HAND.key),
             change: rules::Change::Allow(rules::in_zone(zone, rules::Role::Player)),
         }),
     }

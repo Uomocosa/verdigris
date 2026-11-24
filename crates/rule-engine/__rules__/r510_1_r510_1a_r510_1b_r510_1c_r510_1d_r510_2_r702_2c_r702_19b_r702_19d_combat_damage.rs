@@ -1,3 +1,4 @@
+use crate::events;
 use bevy::prelude::{Entity, MessageReader, MessageWriter, ParamSet, Query, Res, ResMut, With};
 
 use crate::Attempt;
@@ -5,7 +6,6 @@ use crate::actions;
 use crate::cards;
 use crate::damage;
 use crate::players;
-use crate::rules;
 use crate::turns;
 
 type CombatLookups<'w, 's> = (
@@ -83,7 +83,7 @@ pub fn r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_r702_2c_r702_19b_r702_19d_c
     mut actions: MessageReader<actions::PlayerAction>,
     mut rejected: MessageWriter<actions::Rejected>,
     mut pending: ResMut<actions::PendingChoice>,
-    mut dealt: MessageWriter<Attempt<rules::DealDamage>>,
+    mut dealt: MessageWriter<Attempt<events::DealDamage>>,
     attackers: Query<
         (
             Entity,
@@ -120,7 +120,7 @@ pub fn r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_r702_2c_r702_19b_r702_19d_c
                 if amount == 0 || !participants.contains(&attacker) {
                     continue;
                 }
-                dealt.write(Attempt(rules::DealDamage {
+                dealt.write(Attempt(events::DealDamage {
                     source: attacker,
                     recipient: defending,
                     amount,
@@ -175,8 +175,8 @@ pub fn r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_r702_2c_r702_19b_r702_19d_c
 fn announce_damage(
     assigned: damage::AssignedDamage,
     owners: &Query<&cards::Owner>,
-) -> Attempt<rules::DealDamage> {
-    Attempt(rules::DealDamage {
+) -> Attempt<events::DealDamage> {
+    Attempt(events::DealDamage {
         source: assigned.source,
         recipient: assigned.target,
         amount: assigned.amount,

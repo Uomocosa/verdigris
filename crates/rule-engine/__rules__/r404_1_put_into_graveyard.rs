@@ -1,16 +1,16 @@
+use crate::events;
 use bevy::prelude::{Commands, MessageReader, ResMut};
 
 use crate::GRAVEYARD;
 use crate::Resolve;
 use crate::StateBasedActionsPerformed;
-use crate::rules;
 use crate::zones;
 
 /// 404.1. A player’s graveyard is their discard pile. Any object that’s countered, discarded,
 /// destroyed, or sacrificed is put on top of its owner’s graveyard, as is any instant or sorcery
 /// spell that’s finished resolving. Each player’s graveyard starts out empty.
 pub fn r404_1_put_into_graveyard(
-    mut proceeds: MessageReader<Resolve<rules::PutIntoGraveyard>>,
+    mut proceeds: MessageReader<Resolve<events::PutIntoGraveyard>>,
     mut commands: Commands,
     mut state_based_actions_performed: ResMut<StateBasedActionsPerformed>,
     zones: zones::ZoneLookup,

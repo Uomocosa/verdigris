@@ -1,15 +1,15 @@
+use crate::events;
 use crate::{GRAVEYARD, STACK};
 use bevy::prelude::{Commands, MessageReader, Query};
 
 use crate::Resolve;
 use crate::cards;
-use crate::rules;
 use crate::zones;
 
 /// 701.6a To counter a spell or ability means to cancel it, removing it from the stack. It doesn’t
 /// resolve and none of its effects occur. A countered spell is put into its owner’s graveyard.
 pub fn r701_6a_counter(
-    mut countered: MessageReader<Resolve<rules::Counter>>,
+    mut countered: MessageReader<Resolve<events::Counter>>,
     mut commands: Commands,
     spells: Query<(&cards::Owner, &zones::InZone)>,
     zones: zones::ZoneLookup,

@@ -1,3 +1,4 @@
+use crate::events;
 use crate::{BATTLEFIELD, EXILE, STACK};
 use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, ParamSet};
 
@@ -5,23 +6,22 @@ use crate::Attempt;
 use crate::effects;
 use crate::keywords;
 use crate::players;
-use crate::rules;
 use crate::stack;
 use crate::zones;
 
 type EffectMessageWriters<'a, 'b, 'c, 'd> = (
     MessageWriter<'a, effects::PowerToughnessModified>,
     MessageWriter<'b, effects::KeywordGranted>,
-    MessageWriter<'c, Attempt<rules::Mill>>,
-    MessageWriter<'d, Attempt<rules::CreateTokens>>,
+    MessageWriter<'c, Attempt<events::Mill>>,
+    MessageWriter<'d, Attempt<events::CreateTokens>>,
 );
 
 type PlayerEffectWriters<'a, 'b, 'c, 'd, 'e> = (
-    MessageWriter<'a, Attempt<rules::LoseLife>>,
-    MessageWriter<'b, Attempt<rules::Discard>>,
-    MessageWriter<'c, Attempt<rules::GainLife>>,
-    MessageWriter<'d, Attempt<rules::Draw>>,
-    MessageWriter<'e, Attempt<rules::WinGame>>,
+    MessageWriter<'a, Attempt<events::LoseLife>>,
+    MessageWriter<'b, Attempt<events::Discard>>,
+    MessageWriter<'c, Attempt<events::GainLife>>,
+    MessageWriter<'d, Attempt<events::Draw>>,
+    MessageWriter<'e, Attempt<events::WinGame>>,
 );
 
 /// 608.2. If the object that’s resolving is an instant spell, a sorcery spell, or an ability, its
@@ -38,9 +38,9 @@ type PlayerEffectWriters<'a, 'b, 'c, 'd, 'e> = (
 pub fn r608_2_r608_2c_resolve(
     mut commands: Commands,
     mut resolutions: MessageReader<stack::Resolution>,
-    mut damage_dealt: MessageWriter<Attempt<rules::DealDamage>>,
-    mut destructions: MessageWriter<Attempt<rules::Destroy>>,
-    mut countered: MessageWriter<Attempt<rules::Counter>>,
+    mut damage_dealt: MessageWriter<Attempt<events::DealDamage>>,
+    mut destructions: MessageWriter<Attempt<events::Destroy>>,
+    mut countered: MessageWriter<Attempt<events::Counter>>,
     mut player_effects: ParamSet<PlayerEffectWriters<'_, '_, '_, '_, '_>>,
     mut effect_messages: ParamSet<EffectMessageWriters<'_, '_, '_, '_>>,
     lookups: stack::ResolutionLookups<'_, '_>,
@@ -141,7 +141,7 @@ pub fn r608_2_r608_2c_resolve(
                 }
                 effects::EffectKind::WinTheGame => {
                     let winner = controller;
-                    player_effects.p4().write(Attempt(rules::WinGame(winner)));
+                    player_effects.p4().write(Attempt(events::WinGame(winner)));
                 }
             }
         }
@@ -179,13 +179,13 @@ fn effect_of(lookups: &stack::ResolutionLookups<'_, '_>, spell: Entity) -> Optio
 }
 
 fn request_destroy(
-    destructions: &mut MessageWriter<Attempt<rules::Destroy>>,
+    destructions: &mut MessageWriter<Attempt<events::Destroy>>,
     lookups: &stack::ResolutionLookups<'_, '_>,
     target: Option<Entity>,
     controller: players::PlayerId,
 ) {
     if let Some(target) = target {
-        destructions.write(Attempt(rules::Destroy {
+        destructions.write(Attempt(events::Destroy {
             permanent: target,
             controller: permanent_controller(lookups, target, controller),
         }));
@@ -193,7 +193,7 @@ fn request_destroy(
 }
 
 fn request_counter(
-    countered: &mut MessageWriter<Attempt<rules::Counter>>,
+    countered: &mut MessageWriter<Attempt<events::Counter>>,
     lookups: &stack::ResolutionLookups<'_, '_>,
     target: Option<Entity>,
     target_on_stack: bool,
@@ -202,7 +202,7 @@ fn request_counter(
     if let Some(target) = target
         && target_on_stack
     {
-        countered.write(Attempt(rules::Counter {
+        countered.write(Attempt(events::Counter {
             spell: target,
             controller: permanent_controller(lookups, target, controller),
         }));
@@ -264,7 +264,7 @@ fn request_poison(
 }
 
 fn request_damage(
-    damage_dealt: &mut MessageWriter<Attempt<rules::DealDamage>>,
+    damage_dealt: &mut MessageWriter<Attempt<events::DealDamage>>,
     lookups: &stack::ResolutionLookups<'_, '_>,
     spell: Entity,
     target: Option<Entity>,
@@ -280,7 +280,7 @@ fn request_damage(
     {
         return;
     }
-    damage_dealt.write(Attempt(rules::DealDamage {
+    damage_dealt.write(Attempt(events::DealDamage {
         source: spell,
         recipient: target,
         amount,
@@ -300,13 +300,13 @@ fn permanent_controller(
 }
 
 fn request_draws(
-    draws: &mut MessageWriter<Attempt<rules::Draw>>,
+    draws: &mut MessageWriter<Attempt<events::Draw>>,
     players: &[players::PlayerId],
     fallback: players::PlayerId,
     count: u32,
 ) {
     for player in players_or_fallback(players, fallback) {
-        draws.write(Attempt(rules::Draw {
+        draws.write(Attempt(events::Draw {
             player,
             amount: count,
         }));
@@ -314,12 +314,12 @@ fn request_draws(
 }
 
 fn request_life_loss(
-    life_lost: &mut MessageWriter<Attempt<rules::LoseLife>>,
+    life_lost: &mut MessageWriter<Attempt<events::LoseLife>>,
     players: &[players::PlayerId],
     amount: u32,
 ) {
     for player in players {
-        life_lost.write(Attempt(rules::LoseLife {
+        life_lost.write(Attempt(events::LoseLife {
             player: *player,
             amount,
         }));
@@ -327,12 +327,12 @@ fn request_life_loss(
 }
 
 fn request_discard(
-    discarded: &mut MessageWriter<Attempt<rules::Discard>>,
+    discarded: &mut MessageWriter<Attempt<events::Discard>>,
     players: &[players::PlayerId],
     count: u32,
 ) {
     for player in players {
-        discarded.write(Attempt(rules::Discard {
+        discarded.write(Attempt(events::Discard {
             player: *player,
             amount: count,
         }));
@@ -340,13 +340,13 @@ fn request_discard(
 }
 
 fn request_mills(
-    mills: &mut MessageWriter<Attempt<rules::Mill>>,
+    mills: &mut MessageWriter<Attempt<events::Mill>>,
     players: &[players::PlayerId],
     fallback: players::PlayerId,
     count: u32,
 ) {
     for player in players_or_fallback(players, fallback) {
-        mills.write(Attempt(rules::Mill {
+        mills.write(Attempt(events::Mill {
             player,
             amount: count,
         }));
@@ -354,23 +354,23 @@ fn request_mills(
 }
 
 fn request_life_gain(
-    gained: &mut MessageWriter<Attempt<rules::GainLife>>,
+    gained: &mut MessageWriter<Attempt<events::GainLife>>,
     players: &[players::PlayerId],
     fallback: players::PlayerId,
     amount: u32,
 ) {
     for player in players_or_fallback(players, fallback) {
-        gained.write(Attempt(rules::GainLife { player, amount }));
+        gained.write(Attempt(events::GainLife { player, amount }));
     }
 }
 
 fn request_tokens(
-    tokens: &mut MessageWriter<Attempt<rules::CreateTokens>>,
+    tokens: &mut MessageWriter<Attempt<events::CreateTokens>>,
     controller: players::PlayerId,
     count: u32,
     definition: effects::TokenDefinition,
 ) {
-    tokens.write(Attempt(rules::CreateTokens {
+    tokens.write(Attempt(events::CreateTokens {
         controller,
         amount: count,
         token: definition,

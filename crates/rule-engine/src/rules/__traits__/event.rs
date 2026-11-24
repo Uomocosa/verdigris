@@ -17,6 +17,7 @@ pub trait Event: Context + Clone + Send + Sync + 'static {
 mod tests {
     use bevy::prelude::Entity;
 
+    use crate::events;
     use crate::players;
     use crate::rules;
     use crate::rules::traits::context::Context;
@@ -25,8 +26,8 @@ mod tests {
     #[test]
     fn test_usage() {
         let player = players::PlayerId(Entity::PLACEHOLDER);
-        let event = rules::LoseGame(player);
+        let event = events::LoseGame(player);
         assert_eq!(event.player(), player);
-        assert_eq!(rules::LoseGame::ID, rules::EventId("104.3"));
+        assert_eq!(events::LoseGame::ID, rules::EventId("104.3"));
     }
 }

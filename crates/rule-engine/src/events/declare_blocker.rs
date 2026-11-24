@@ -3,16 +3,17 @@ use bevy::prelude::Entity;
 
 use crate::players;
 
+use crate::events;
 use crate::rules;
 use crate::rules::traits::event::Event;
 
-pub const CREATURE: rules::ClauseId<rules::DeclareBlocker> =
+pub const CREATURE: rules::ClauseId<events::DeclareBlocker> =
     rules::ClauseId::new("509.1a/creature");
-pub const CONTROLS: rules::ClauseId<rules::DeclareBlocker> =
+pub const CONTROLS: rules::ClauseId<events::DeclareBlocker> =
     rules::ClauseId::new("509.1a/controls");
-pub const UNTAPPED: rules::ClauseId<rules::DeclareBlocker> =
+pub const UNTAPPED: rules::ClauseId<events::DeclareBlocker> =
     rules::ClauseId::new("509.1a/untapped");
-pub const FLYING: rules::ClauseId<rules::DeclareBlocker> = rules::ClauseId::new("702.9b/flying");
+pub const FLYING: rules::ClauseId<events::DeclareBlocker> = rules::ClauseId::new("702.9b/flying");
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct DeclareBlocker {
@@ -40,6 +41,7 @@ mod tests {
     use std::collections::HashSet;
 
     use crate::cards;
+    use crate::events;
     use crate::rules;
     use crate::rules::traits::event::Event;
 
@@ -86,7 +88,8 @@ mod tests {
     #[test]
     fn clause_keys_are_unique_across_declare_rules() {
         let mut seen = HashSet::new();
-        for clause in DeclareBlocker::clauses().into_iter().chain(rules::DeclareAttacker::clauses())
+        for clause in
+            DeclareBlocker::clauses().into_iter().chain(events::DeclareAttacker::clauses())
         {
             assert!(
                 seen.insert(clause.key),

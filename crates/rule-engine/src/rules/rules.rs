@@ -83,6 +83,7 @@ mod tests {
     use bevy::ecs::system::RunSystemOnce;
 
     use crate::BATTLEFIELD;
+    use crate::events;
     use crate::rules;
     use crate::testing::*;
 
@@ -97,11 +98,11 @@ mod tests {
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
-                assert!(answers.performs(&rules::TapAttacker {
+                assert!(answers.performs(&events::TapAttacker {
                     attacker: *bears,
                     player: p1.id,
                 }));
-                assert!(!answers.performs(&rules::TapAttacker {
+                assert!(!answers.performs(&events::TapAttacker {
                     attacker: *sovereign,
                     player: p2.id,
                 }));

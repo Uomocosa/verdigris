@@ -1,16 +1,16 @@
+use crate::events;
 use bevy::prelude::{MessageReader, MessageWriter, Query, With};
 
 use crate::Attempt;
 use crate::Resolve;
 use crate::cards;
-use crate::rules;
 
 /// 702.15b Damage dealt by a source with lifelink causes that source’s controller, or its owner if it
 /// has no controller, to gain that much life (in addition to any other results that damage causes).
 /// See rule 120.3.
 pub fn r702_15b_lifelink(
-    mut damage_dealt: MessageReader<Resolve<rules::DealDamage>>,
-    mut life_gained: MessageWriter<Attempt<rules::GainLife>>,
+    mut damage_dealt: MessageReader<Resolve<events::DealDamage>>,
+    mut life_gained: MessageWriter<Attempt<events::GainLife>>,
     sources: Query<&cards::Owner, With<cards::Lifelink>>,
 ) {
     for event in damage_dealt.read() {
@@ -20,7 +20,7 @@ pub fn r702_15b_lifelink(
         let Ok(owner) = sources.get(event.source) else {
             continue;
         };
-        life_gained.write(Attempt(rules::GainLife {
+        life_gained.write(Attempt(events::GainLife {
             player: **owner,
             amount: event.amount,
         }));

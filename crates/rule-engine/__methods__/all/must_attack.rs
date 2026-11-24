@@ -1,5 +1,6 @@
 use crate::abilities;
 use crate::effects;
+use crate::events;
 use crate::rules;
 use crate::rules::traits::event::Event;
 use crate::statics;
@@ -8,7 +9,7 @@ pub fn must_attack(all: statics::All) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
         modification: effects::Modification::Rule(rules::RuleChange {
-            target: rules::Target::Event(rules::DeclareAttacker::ID),
+            target: rules::Target::Event(events::DeclareAttacker::ID),
             change: rules::Change::Must,
         }),
     }
@@ -18,6 +19,7 @@ pub fn must_attack(all: statics::All) -> abilities::Continuous {
 mod tests {
     use crate::CREATURE;
     use crate::effects;
+    use crate::events;
     use crate::rules;
     use crate::rules::traits::event::Event;
     use crate::statics;
@@ -31,10 +33,10 @@ mod tests {
         assert_eq!(
             ability.modification,
             effects::Modification::Rule(rules::RuleChange {
-                target: rules::Target::Event(rules::DeclareAttacker::ID),
+                target: rules::Target::Event(events::DeclareAttacker::ID),
                 change: rules::Change::Must,
             })
         );
-        assert_eq!(rules::DeclareAttacker::ID, rules::EventId("508.1a"));
+        assert_eq!(events::DeclareAttacker::ID, rules::EventId("508.1a"));
     }
 }

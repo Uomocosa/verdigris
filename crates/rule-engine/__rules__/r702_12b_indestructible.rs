@@ -1,17 +1,17 @@
 use crate::GRAVEYARD;
+use crate::events;
 use bevy::prelude::{Commands, MessageReader, Query, ResMut, With, Without};
 
 use crate::Resolve;
 use crate::StateBasedActionsPerformed;
 use crate::cards;
-use crate::rules;
 use crate::zones;
 
 /// 702.12b A permanent with indestructible can’t be destroyed. Such permanents aren’t destroyed by
 /// lethal damage, and they ignore the state-based action that checks for lethal damage (see rule
 /// 704.5g).
 pub fn r702_12b_indestructible(
-    mut destructions: MessageReader<Resolve<rules::Destroy>>,
+    mut destructions: MessageReader<Resolve<events::Destroy>>,
     mut commands: Commands,
     mut state_based_actions_performed: ResMut<StateBasedActionsPerformed>,
     cards: Query<&cards::Owner, (With<cards::OnBattlefield>, Without<cards::Indestructible>)>,

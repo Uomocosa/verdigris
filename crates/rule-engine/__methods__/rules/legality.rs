@@ -61,6 +61,7 @@ mod tests {
     use crate::BATTLEFIELD;
     use crate::cards;
     use crate::effects;
+    use crate::events;
     use crate::rules;
     use crate::testing::*;
 
@@ -279,9 +280,9 @@ mod tests {
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
                 assert_eq!(
-                    legality::<rules::GainLife>(
+                    legality::<events::GainLife>(
                         &answers,
-                        &rules::GainLife {
+                        &events::GainLife {
                             player: p1.id,
                             amount: 3
                         }
@@ -289,9 +290,9 @@ mod tests {
                     rules::Legality::Illegal
                 );
                 assert_eq!(
-                    legality::<rules::GainLife>(
+                    legality::<events::GainLife>(
                         &answers,
-                        &rules::GainLife {
+                        &events::GainLife {
                             player: p2.id,
                             amount: 3
                         }
@@ -312,9 +313,9 @@ mod tests {
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
                 assert_eq!(
-                    legality::<rules::Mill>(
+                    legality::<events::Mill>(
                         &answers,
-                        &rules::Mill {
+                        &events::Mill {
                             player: p1.id,
                             amount: 5
                         }
@@ -322,9 +323,9 @@ mod tests {
                     rules::Legality::Illegal
                 );
                 assert_eq!(
-                    legality::<rules::Mill>(
+                    legality::<events::Mill>(
                         &answers,
-                        &rules::Mill {
+                        &events::Mill {
                             player: p2.id,
                             amount: 5
                         }
@@ -345,9 +346,9 @@ mod tests {
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
                 assert_eq!(
-                    legality::<rules::CreateTokens>(
+                    legality::<events::CreateTokens>(
                         &answers,
-                        &rules::CreateTokens {
+                        &events::CreateTokens {
                             controller: p1.id,
                             amount: 2,
                             token: effects::TokenDefinition::from(SOLDIER_TOKEN.definition),
@@ -356,9 +357,9 @@ mod tests {
                     rules::Legality::Illegal
                 );
                 assert_eq!(
-                    legality::<rules::CreateTokens>(
+                    legality::<events::CreateTokens>(
                         &answers,
-                        &rules::CreateTokens {
+                        &events::CreateTokens {
                             controller: p2.id,
                             amount: 2,
                             token: effects::TokenDefinition::from(SOLDIER_TOKEN.definition),
@@ -380,9 +381,9 @@ mod tests {
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
                 assert_eq!(
-                    legality::<rules::GainLife>(
+                    legality::<events::GainLife>(
                         &answers,
-                        &rules::GainLife {
+                        &events::GainLife {
                             player: p1.id,
                             amount: 3
                         }
@@ -390,9 +391,9 @@ mod tests {
                     rules::Legality::Illegal
                 );
                 assert_eq!(
-                    legality::<rules::LoseLife>(
+                    legality::<events::LoseLife>(
                         &answers,
-                        &rules::LoseLife {
+                        &events::LoseLife {
                             player: p1.id,
                             amount: 3
                         }
@@ -417,9 +418,9 @@ mod tests {
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
                 assert_eq!(
-                    legality::<rules::Destroy>(
+                    legality::<events::Destroy>(
                         &answers,
-                        &rules::Destroy {
+                        &events::Destroy {
                             permanent: *protected,
                             controller: p1.id,
                         }
@@ -427,9 +428,9 @@ mod tests {
                     rules::Legality::Illegal
                 );
                 assert_eq!(
-                    legality::<rules::Destroy>(
+                    legality::<events::Destroy>(
                         &answers,
-                        &rules::Destroy {
+                        &events::Destroy {
                             permanent: *exposed,
                             controller: p2.id,
                         }
@@ -453,9 +454,9 @@ mod tests {
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
                 assert_eq!(
-                    legality::<rules::Counter>(
+                    legality::<events::Counter>(
                         &answers,
-                        &rules::Counter {
+                        &events::Counter {
                             spell: *protected,
                             controller: p1.id,
                         }
@@ -463,9 +464,9 @@ mod tests {
                     rules::Legality::Illegal
                 );
                 assert_eq!(
-                    legality::<rules::Counter>(
+                    legality::<events::Counter>(
                         &answers,
-                        &rules::Counter {
+                        &events::Counter {
                             spell: *protected,
                             controller: p2.id,
                         }
@@ -489,9 +490,9 @@ mod tests {
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
                 assert_eq!(
-                    legality::<rules::EnterBattlefield>(
+                    legality::<events::EnterBattlefield>(
                         &answers,
-                        &rules::EnterBattlefield {
+                        &events::EnterBattlefield {
                             permanent: *protected,
                             controller: p1.id,
                             summoning_sick: true,
@@ -500,9 +501,9 @@ mod tests {
                     rules::Legality::Illegal
                 );
                 assert_eq!(
-                    legality::<rules::EnterBattlefield>(
+                    legality::<events::EnterBattlefield>(
                         &answers,
-                        &rules::EnterBattlefield {
+                        &events::EnterBattlefield {
                             permanent: *protected,
                             controller: p2.id,
                             summoning_sick: true,
@@ -528,9 +529,9 @@ mod tests {
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
                 assert_eq!(
-                    legality::<rules::DealDamage>(
+                    legality::<events::DealDamage>(
                         &answers,
-                        &rules::DealDamage {
+                        &events::DealDamage {
                             source: *exposed,
                             recipient: *protected,
                             amount: 3,
@@ -540,9 +541,9 @@ mod tests {
                     rules::Legality::Illegal
                 );
                 assert_eq!(
-                    legality::<rules::DealDamage>(
+                    legality::<events::DealDamage>(
                         &answers,
-                        &rules::DealDamage {
+                        &events::DealDamage {
                             source: *exposed,
                             recipient: *exposed,
                             amount: 3,
@@ -552,9 +553,9 @@ mod tests {
                     rules::Legality::Legal
                 );
                 assert_eq!(
-                    legality::<rules::DealDamage>(
+                    legality::<events::DealDamage>(
                         &answers,
-                        &rules::DealDamage {
+                        &events::DealDamage {
                             source: *protected,
                             recipient: *exposed,
                             amount: 3,

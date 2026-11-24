@@ -2,6 +2,7 @@ use crate::STACK;
 use bevy::prelude::{Commands, MessageReader, MessageWriter};
 
 use crate::actions;
+use crate::events;
 use crate::rules;
 use crate::zones;
 
@@ -41,7 +42,7 @@ pub fn r601_2a_cast(
             continue;
         };
         let spell = *spell;
-        if !answers.legal::<rules::CastSpell>(&rules::CastSpell {
+        if !answers.legal::<events::CastSpell>(&events::CastSpell {
             spell,
             player: action.player,
         }) {

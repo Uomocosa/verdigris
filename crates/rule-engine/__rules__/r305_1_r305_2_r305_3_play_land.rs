@@ -3,6 +3,7 @@ use bevy::prelude::{Commands, MessageReader, MessageWriter, Res};
 use crate::Attempt;
 use crate::BATTLEFIELD;
 use crate::actions;
+use crate::events;
 use crate::players;
 use crate::rules;
 use crate::turns;
@@ -28,7 +29,7 @@ use crate::turns;
 pub fn r305_1_r305_2_r305_3_play_land(
     mut actions: MessageReader<actions::PlayerAction>,
     mut rejected: MessageWriter<actions::Rejected>,
-    mut entering: MessageWriter<Attempt<rules::EnterBattlefield>>,
+    mut entering: MessageWriter<Attempt<events::EnterBattlefield>>,
     mut commands: Commands,
     turn: Res<turns::Turn>,
     answers: rules::Rules,
@@ -39,7 +40,7 @@ pub fn r305_1_r305_2_r305_3_play_land(
             continue;
         };
         let land = *land;
-        let is_legal = answers.legal::<rules::PlayLand>(&rules::PlayLand {
+        let is_legal = answers.legal::<events::PlayLand>(&events::PlayLand {
             land,
             player: action.player,
         });
@@ -69,7 +70,7 @@ pub fn r305_1_r305_2_r305_3_play_land(
         record.record_play(turn.number);
         commands.entity(*action.player).insert(record);
         if answers.zones.find(BATTLEFIELD, Some(action.player)).is_some() {
-            entering.write(Attempt(rules::EnterBattlefield::from_controller(
+            entering.write(Attempt(events::EnterBattlefield::from_controller(
                 action.player,
                 land,
             )));

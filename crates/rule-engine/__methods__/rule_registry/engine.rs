@@ -1,5 +1,6 @@
 use std::collections::HashSet;
 
+use crate::events;
 use crate::rules;
 use crate::rules::traits::event::Event;
 use crate::rules::traits::value_rule::ValueRule;
@@ -15,45 +16,48 @@ pub fn engine() -> rules::RuleRegistry {
             clauses.insert(clause.key);
         }
     };
-    register(rules::CastSpell::ID, rules::CastSpell::clauses());
-    register(rules::Counter::ID, rules::Counter::clauses());
-    register(rules::CreateTokens::ID, rules::CreateTokens::clauses());
-    register(rules::DealDamage::ID, rules::DealDamage::clauses());
+    register(events::CastSpell::ID, events::CastSpell::clauses());
+    register(events::Counter::ID, events::Counter::clauses());
+    register(events::CreateTokens::ID, events::CreateTokens::clauses());
+    register(events::DealDamage::ID, events::DealDamage::clauses());
     register(
-        rules::DeclareAttacker::ID,
-        rules::DeclareAttacker::clauses(),
-    );
-    register(rules::DeclareBlocker::ID, rules::DeclareBlocker::clauses());
-    register(rules::Destroy::ID, rules::Destroy::clauses());
-    register(rules::Discard::ID, rules::Discard::clauses());
-    register(rules::Draw::ID, rules::Draw::clauses());
-    register(
-        rules::DrawFromEmptyLibrary::ID,
-        rules::DrawFromEmptyLibrary::clauses(),
+        events::DeclareAttacker::ID,
+        events::DeclareAttacker::clauses(),
     );
     register(
-        rules::EnterBattlefield::ID,
-        rules::EnterBattlefield::clauses(),
+        events::DeclareBlocker::ID,
+        events::DeclareBlocker::clauses(),
     );
-    register(rules::GainLife::ID, rules::GainLife::clauses());
-    register(rules::LoseGame::ID, rules::LoseGame::clauses());
-    register(rules::LoseLife::ID, rules::LoseLife::clauses());
-    register(rules::Mill::ID, rules::Mill::clauses());
-    register(rules::PlayLand::ID, rules::PlayLand::clauses());
+    register(events::Destroy::ID, events::Destroy::clauses());
+    register(events::Discard::ID, events::Discard::clauses());
+    register(events::Draw::ID, events::Draw::clauses());
     register(
-        rules::PutIntoGraveyard::ID,
-        rules::PutIntoGraveyard::clauses(),
-    );
-    register(rules::TapAttacker::ID, rules::TapAttacker::clauses());
-    register(rules::Untap::ID, rules::Untap::clauses());
-    register(rules::WinGame::ID, rules::WinGame::clauses());
-    register(
-        rules::OpeningHandAction::ID,
-        rules::OpeningHandAction::clauses(),
+        events::DrawFromEmptyLibrary::ID,
+        events::DrawFromEmptyLibrary::clauses(),
     );
     register(
-        rules::BeginTheGameOnTheBattlefield::ID,
-        rules::BeginTheGameOnTheBattlefield::clauses(),
+        events::EnterBattlefield::ID,
+        events::EnterBattlefield::clauses(),
+    );
+    register(events::GainLife::ID, events::GainLife::clauses());
+    register(events::LoseGame::ID, events::LoseGame::clauses());
+    register(events::LoseLife::ID, events::LoseLife::clauses());
+    register(events::Mill::ID, events::Mill::clauses());
+    register(events::PlayLand::ID, events::PlayLand::clauses());
+    register(
+        events::PutIntoGraveyard::ID,
+        events::PutIntoGraveyard::clauses(),
+    );
+    register(events::TapAttacker::ID, events::TapAttacker::clauses());
+    register(events::Untap::ID, events::Untap::clauses());
+    register(events::WinGame::ID, events::WinGame::clauses());
+    register(
+        events::OpeningHandAction::ID,
+        events::OpeningHandAction::clauses(),
+    );
+    register(
+        events::BeginTheGameOnTheBattlefield::ID,
+        events::BeginTheGameOnTheBattlefield::clauses(),
     );
     #[cfg(any(test, feature = "testing"))]
     {
@@ -75,6 +79,7 @@ pub fn engine() -> rules::RuleRegistry {
 
 #[cfg(test)]
 mod tests {
+    use crate::events;
     use crate::rules;
     use crate::rules::traits::event::Event;
     use crate::rules::traits::value_rule::ValueRule;
@@ -84,9 +89,9 @@ mod tests {
     #[test]
     fn test_usage() {
         let registry = engine();
-        assert!(registry.events.contains(&rules::Draw::ID));
-        assert!(registry.clauses.contains(&rules::declare_attacker::SUMMONING_SICK.key));
+        assert!(registry.events.contains(&events::Draw::ID));
+        assert!(registry.clauses.contains(&events::declare_attacker::SUMMONING_SICK.key));
         assert!(registry.values.contains(&rules::LandPlays::ID));
-        assert_eq!(rules::Draw::ID, rules::EventId("121.1"));
+        assert_eq!(events::Draw::ID, rules::EventId("121.1"));
     }
 }

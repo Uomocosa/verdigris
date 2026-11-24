@@ -1,15 +1,15 @@
+use crate::events;
 use bevy::prelude::{Entity, MessageWriter, Query, With};
 
 use crate::Attempt;
 use crate::BATTLEFIELD;
 use crate::cards;
-use crate::rules;
 use crate::zones;
 
 /// 704.5m If an Aura is attached to an illegal object or player, or is not attached to an object or
 /// player, that Aura is put into its owner’s graveyard.
 pub fn r704_5m_aura_illegal(
-    mut burials: MessageWriter<Attempt<rules::PutIntoGraveyard>>,
+    mut burials: MessageWriter<Attempt<events::PutIntoGraveyard>>,
     auras: Query<(Entity, &cards::Owner, &cards::Enchanting), With<cards::OnBattlefield>>,
     enchanted_zones: Query<&zones::InZone>,
     zones: zones::ZoneLookup,
@@ -21,7 +21,7 @@ pub fn r704_5m_aura_illegal(
         if zones.contains(BATTLEFIELD, **enchanted_zone) {
             continue;
         }
-        burials.write(Attempt(rules::PutIntoGraveyard {
+        burials.write(Attempt(events::PutIntoGraveyard {
             object: aura,
             owner: **owner,
         }));

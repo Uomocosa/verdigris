@@ -1,3 +1,4 @@
+use crate::events;
 use bevy::prelude::{Commands, MessageReader, MessageWriter};
 
 use crate::Attempt;
@@ -5,7 +6,6 @@ use crate::GRAVEYARD;
 use crate::Resolve;
 use crate::cards;
 use crate::damage;
-use crate::rules;
 use crate::zones;
 
 /// 701.7a To create one or more tokens with certain characteristics, put the specified number of
@@ -17,8 +17,8 @@ use crate::zones;
 /// characteristics. No replacement effect exists yet, so a token is put onto the battlefield with
 /// the characteristics its creation effect defines.
 pub fn r701_7a_create_tokens(
-    mut requested: MessageReader<Resolve<rules::CreateTokens>>,
-    mut entering: MessageWriter<Attempt<rules::EnterBattlefield>>,
+    mut requested: MessageReader<Resolve<events::CreateTokens>>,
+    mut entering: MessageWriter<Attempt<events::EnterBattlefield>>,
     mut commands: Commands,
     zones: zones::ZoneLookup,
 ) {
@@ -36,7 +36,7 @@ pub fn r701_7a_create_tokens(
                     cards::Token,
                 ))
                 .id();
-            entering.write(Attempt(rules::EnterBattlefield {
+            entering.write(Attempt(events::EnterBattlefield {
                 permanent: token,
                 controller: request.controller,
                 summoning_sick: true,
