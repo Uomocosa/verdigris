@@ -4,7 +4,6 @@ use std::collections::BTreeSet;
 use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query, ResMut};
 
 use crate::actions;
-use crate::players;
 use crate::rules;
 use crate::zones;
 
@@ -23,10 +22,10 @@ pub fn r701_9a_r701_9b_discard(
     zone_contents: Query<&zones::ZoneContents>,
 ) {
     for discard in discards.read() {
-        let Some(hand) = zones.find(HAND, Some(discard.player)) else {
+        let Some(hand) = zones.find(HAND, Some(*discard.player)) else {
             continue;
         };
-        let Some(graveyard) = zones.find(GRAVEYARD, Some(discard.player)) else {
+        let Some(graveyard) = zones.find(GRAVEYARD, Some(*discard.player)) else {
             continue;
         };
         let held: Vec<Entity> = zone_contents
@@ -40,7 +39,7 @@ pub fn r701_9a_r701_9b_discard(
             continue;
         }
         *pending = actions::PendingChoice(Some(actions::Choice::Discard(actions::DiscardChoice {
-            player: players::PlayerId(discard.player),
+            player: discard.player,
             count: discard.amount,
             legal: held.into_iter().collect(),
         })));

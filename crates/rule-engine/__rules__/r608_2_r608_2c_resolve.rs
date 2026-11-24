@@ -139,7 +139,8 @@ pub fn r608_2_r608_2c_resolve(
                     request_gain_keyword(&mut effect_messages, battlefield_target, keyword);
                 }
                 effects::EffectKind::WinTheGame => {
-                    player_effects.p4().write(rules::Would(rules::WinGame(controller)));
+                    let winner = players::PlayerId(controller);
+                    player_effects.p4().write(rules::Would(rules::WinGame(winner)));
                 }
             }
         }
@@ -305,7 +306,7 @@ fn request_draws(
 ) {
     for player in players_or_fallback(players, fallback) {
         draws.write(rules::Would(rules::Draw {
-            player,
+            player: players::PlayerId(player),
             amount: count,
         }));
     }
@@ -318,7 +319,7 @@ fn request_life_loss(
 ) {
     for player in players {
         life_lost.write(rules::Would(rules::LoseLife {
-            player: *player,
+            player: players::PlayerId(*player),
             amount,
         }));
     }
@@ -331,7 +332,7 @@ fn request_discard(
 ) {
     for player in players {
         discarded.write(rules::Would(rules::Discard {
-            player: *player,
+            player: players::PlayerId(*player),
             amount: count,
         }));
     }
@@ -345,7 +346,7 @@ fn request_mills(
 ) {
     for player in players_or_fallback(players, fallback) {
         mills.write(rules::Would(rules::Mill {
-            player,
+            player: players::PlayerId(player),
             amount: count,
         }));
     }
@@ -358,7 +359,10 @@ fn request_life_gain(
     amount: u32,
 ) {
     for player in players_or_fallback(players, fallback) {
-        gained.write(rules::Would(rules::GainLife { player, amount }));
+        gained.write(rules::Would(rules::GainLife {
+            player: players::PlayerId(player),
+            amount,
+        }));
     }
 }
 

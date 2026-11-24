@@ -282,7 +282,7 @@ mod tests {
                     legality::<rules::GainLife>(
                         &answers,
                         &rules::GainLife {
-                            player: p1.into(),
+                            player: p1.id,
                             amount: 3
                         }
                     ),
@@ -292,7 +292,7 @@ mod tests {
                     legality::<rules::GainLife>(
                         &answers,
                         &rules::GainLife {
-                            player: p2.into(),
+                            player: p2.id,
                             amount: 3
                         }
                     ),
@@ -315,7 +315,7 @@ mod tests {
                     legality::<rules::Mill>(
                         &answers,
                         &rules::Mill {
-                            player: p1.into(),
+                            player: p1.id,
                             amount: 5
                         }
                     ),
@@ -325,7 +325,7 @@ mod tests {
                     legality::<rules::Mill>(
                         &answers,
                         &rules::Mill {
-                            player: p2.into(),
+                            player: p2.id,
                             amount: 5
                         }
                     ),
@@ -383,7 +383,7 @@ mod tests {
                     legality::<rules::GainLife>(
                         &answers,
                         &rules::GainLife {
-                            player: p1.into(),
+                            player: p1.id,
                             amount: 3
                         }
                     ),
@@ -393,7 +393,7 @@ mod tests {
                     legality::<rules::LoseLife>(
                         &answers,
                         &rules::LoseLife {
-                            player: p1.into(),
+                            player: p1.id,
                             amount: 3
                         }
                     ),

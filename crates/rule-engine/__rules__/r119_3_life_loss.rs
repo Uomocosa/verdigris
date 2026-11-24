@@ -12,13 +12,13 @@ pub fn r119_3_life_loss(
     mut lives: Query<&mut players::Life>,
 ) {
     for event in life_lost.read() {
-        if let Ok(mut life) = lives.get_mut(event.player) {
+        if let Ok(mut life) = lives.get_mut(*event.player) {
             *life =
                 players::Life((**life).saturating_sub(damage::Damage::signed_amount(event.amount)));
         }
     }
     for event in life_gained.read() {
-        if let Ok(mut life) = lives.get_mut(event.player) {
+        if let Ok(mut life) = lives.get_mut(*event.player) {
             *life =
                 players::Life((**life).saturating_add(damage::Damage::signed_amount(event.amount)));
         }

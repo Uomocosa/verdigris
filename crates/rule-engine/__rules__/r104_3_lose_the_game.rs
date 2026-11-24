@@ -11,7 +11,7 @@ pub fn r104_3_lose_the_game(
     mut state_based_actions_performed: ResMut<StateBasedActionsPerformed>,
 ) {
     for happened in proceeds.read() {
-        commands.entity(***happened).insert(players::Lost);
+        commands.entity(****happened).insert(players::Lost);
         **state_based_actions_performed = true;
     }
 }

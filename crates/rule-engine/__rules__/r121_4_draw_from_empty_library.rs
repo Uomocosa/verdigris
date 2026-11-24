@@ -11,7 +11,7 @@ pub fn r121_4_draw_from_empty_library(
     mut state_based_actions_performed: ResMut<StateBasedActionsPerformed>,
 ) {
     for happened in proceeds.read() {
-        commands.entity(***happened).insert(players::AttemptedDrawFromEmptyLibrary);
+        commands.entity(****happened).insert(players::AttemptedDrawFromEmptyLibrary);
         **state_based_actions_performed = true;
     }
 }

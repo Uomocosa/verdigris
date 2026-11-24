@@ -68,7 +68,7 @@ impl AnyEvent {
 #[cfg(test)]
 mod tests {
     use bevy::ecs::system::RunSystemOnce;
-    use bevy::prelude::{Commands, Entity, MessageReader};
+    use bevy::prelude::{Commands, MessageReader};
 
     use crate::rules;
     use crate::testing::*;
@@ -78,7 +78,7 @@ mod tests {
     #[test]
     fn test_usage() {
         let (mut game, [p1, _]) = MockGame::new([P1, P2]);
-        let player = Entity::from(p1);
+        let player = p1.id;
         game.app
             .world_mut()
             .run_system_once(move |mut commands: Commands| {

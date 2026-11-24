@@ -10,7 +10,7 @@ pub fn r704_5a_zero_life(
 ) {
     for (player, life) in players.iter() {
         if **life <= 0 {
-            losses.write(rules::Would(rules::LoseGame(player)));
+            losses.write(rules::Would(rules::LoseGame(players::PlayerId(player))));
         }
     }
 }

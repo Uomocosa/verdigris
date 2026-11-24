@@ -11,7 +11,7 @@ pub fn r104_2_win_the_game(
     mut state_based_actions_performed: ResMut<StateBasedActionsPerformed>,
 ) {
     for happened in proceeds.read() {
-        commands.entity(***happened).insert(players::Won);
+        commands.entity(****happened).insert(players::Won);
         **state_based_actions_performed = true;
     }
 }

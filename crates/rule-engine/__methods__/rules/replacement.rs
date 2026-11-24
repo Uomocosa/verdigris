@@ -28,7 +28,6 @@ pub fn replacement<E: Event>(
 #[cfg(test)]
 mod tests {
     use bevy::ecs::system::RunSystemOnce;
-    use bevy::prelude::Entity;
 
     use crate::BATTLEFIELD;
     use crate::rules;
@@ -40,7 +39,7 @@ mod tests {
     fn test_usage() -> TestResult {
         let (mut game, [p1, _]) = MockGame::new([P1.battlefield([LABORATORY_MANIAC]), P2]);
         let [maniac] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(LABORATORY_MANIAC)?;
-        let player = Entity::from(p1);
+        let player = p1.id;
         game.pass_priority();
         assert!(game.player(p1).cards_in(BATTLEFIELD).has(maniac));
         game.app

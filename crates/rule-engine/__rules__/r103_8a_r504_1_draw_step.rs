@@ -26,7 +26,7 @@ pub fn r103_8a_r504_1_draw_step(
                 continue;
             }
             draws.write(rules::Would(rules::Draw {
-                player: *turn.active,
+                player: turn.active,
                 amount: 1,
             }));
         }

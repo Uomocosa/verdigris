@@ -1,17 +1,18 @@
 use bevy::prelude::Entity;
 use derive_more::Deref;
 
+use crate::players;
 use crate::rules;
 use crate::rules::traits::event::Event;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deref)]
-pub struct LoseGame(pub Entity);
+pub struct LoseGame(pub players::PlayerId);
 
 #[rustfmt::skip]
 impl rules::traits::context::Context for LoseGame {
-    fn subject(&self) -> Entity { **self }
+    fn subject(&self) -> Entity { ***self }
     fn other(&self) -> Option<Entity> { None }
-    fn player(&self) -> Entity { **self }
+    fn player(&self) -> Entity { ***self }
 }
 
 #[rustfmt::skip]
@@ -23,6 +24,7 @@ impl Event for LoseGame {
 mod tests {
     use bevy::prelude::Entity;
 
+    use crate::players;
     use crate::rules;
     use crate::rules::traits::context::Context;
     use crate::rules::traits::event::Event;
@@ -31,11 +33,11 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let player = Entity::PLACEHOLDER;
+        let player = players::PlayerId(Entity::PLACEHOLDER);
         let event = LoseGame(player);
-        assert_eq!(event.subject(), player);
+        assert_eq!(event.subject(), *player);
         assert_eq!(event.other(), None);
-        assert_eq!(event.player(), player);
+        assert_eq!(event.player(), *player);
         assert_eq!(LoseGame::ID, rules::EventId("104.3"));
         assert_eq!(LoseGame::clauses(), Vec::new());
     }

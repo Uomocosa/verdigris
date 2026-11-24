@@ -16,7 +16,7 @@ pub fn r704_5b_empty_library(
     >,
 ) {
     for player in players.iter() {
-        losses.write(rules::Would(rules::LoseGame(player)));
+        losses.write(rules::Would(rules::LoseGame(players::PlayerId(player))));
     }
 }
 

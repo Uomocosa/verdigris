@@ -33,6 +33,7 @@ pub fn bind<E: Event>(predicate: &rules::Predicate, event: &E) -> rules::Predica
 mod tests {
     use bevy::prelude::Entity;
 
+    use crate::players;
     use crate::rules;
 
     use super::bind;
@@ -40,7 +41,7 @@ mod tests {
     #[test]
     fn test_usage() {
         let draw_two = rules::Draw {
-            player: Entity::PLACEHOLDER,
+            player: players::PlayerId(Entity::PLACEHOLDER),
             amount: 2,
         };
         let at_least_two = rules::event_field(rules::Field::Amount, rules::Comparison::AtLeast, 2);
@@ -50,7 +51,7 @@ mod tests {
     #[test]
     fn bind_rewrites_event_field_against_the_event_amount() {
         let draw_two = rules::Draw {
-            player: Entity::PLACEHOLDER,
+            player: players::PlayerId(Entity::PLACEHOLDER),
             amount: 2,
         };
         let at_least_three =
@@ -66,7 +67,10 @@ mod tests {
         );
         let missing = rules::event_field(rules::Field::Amount, rules::Comparison::AtLeast, 1);
         assert_eq!(
-            bind(&missing, &rules::WinGame(Entity::PLACEHOLDER)),
+            bind(
+                &missing,
+                &rules::WinGame(players::PlayerId(Entity::PLACEHOLDER))
+            ),
             !rules::Predicate::True
         );
     }
