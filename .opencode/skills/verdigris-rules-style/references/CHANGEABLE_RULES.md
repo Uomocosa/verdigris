@@ -105,7 +105,7 @@ Change::Instead { when: ALWAYS, then: Then::Events(vec![EventTemplate::Mill { ..
 ```
 Attempt<Draw> -> pipeline finds the change on the event's subject / player
    Then::Events(vec![..])  -> announces Attempt<Mill>
-   then: may(..)   -> May(the event's player); yes -> Attempt<Mill>, no -> Resolve<Draw>
+   then: may(..)   -> May<Draw> (asks the event's player); yes -> Attempt<Mill>, no -> Resolve<Draw>
    no change       -> Resolve<Draw> (nothing reads it if the default is nothing)
 ```
 

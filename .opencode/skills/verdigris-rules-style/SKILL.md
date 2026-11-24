@@ -196,7 +196,7 @@ Rules that queue triggered abilities (603.2, 508.3a, 509.3a) look them up themse
 
 **Why:** a new card then needs no change in any rule.
 
-## 11. One CR sentence, one system; a general sentence names no case
+## 11. One CR rule, one file; a general sentence names no case
 
 Asking, checking an answer, and performing are different jobs, so they are different systems. When a
 general rule has lettered sub-rules (120.3: "damage may have one or more of the following results";
@@ -212,13 +212,13 @@ compiles, it named a case.
 
 One file per CR rule. The `pub fn` named after the file is the rule's system or, if the sentence needs
 several, it returns them `.chain()`ed; those systems are private in the same file. A different CR rule
-is a different file: 502.3 announces the untap, 701.26b says what untapping does.
+is a different file: 502.3 announces the untap, 701.26b says what untapping does. An old combined `rA_rB_..` file is split when it is refactored.
 
 ## 12. Who gives the choice
 
 | The choice comes from | Who asks |
 |---|---|
-| a card or effect: "you may ..." on the card, or a CR sentence that only points at it ("some cards allow ...", "if an effect lets a player ...") | the card's change (`may` in `CHANGEABLE_RULES.md` §3); the rule is an anchor (§10) and has no `May` |
+| a card or effect: "you may ..." on the card, or a CR sentence that only points at it ("some cards allow ...", "if an effect lets a player ...") | the card's change (`may` in `CHANGEABLE_RULES.md` §3); the rule is an anchor (§10) and has no `Ask` |
 | the CR sentence itself, with no card involved ("the player chooses one of them") | the rule writes `Ask(choice)` and reads `Answered<Choice>` |
 
 Test: remove every card from the game. Does the CR sentence still make the player choose? If not, the
