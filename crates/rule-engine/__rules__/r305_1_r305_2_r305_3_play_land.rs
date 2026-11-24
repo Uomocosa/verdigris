@@ -76,11 +76,10 @@ pub fn r305_1_r305_2_r305_3_play_land(
         record.record_play(turn.number);
         commands.entity(*action.player).insert(record);
         if answers.zones.find(BATTLEFIELD, Some(action.player)).is_some() {
-            entering.write(rules::Would(rules::EnterBattlefield {
-                permanent: land,
-                controller: action.player,
-                summoning_sick: false,
-            }));
+            entering.write(rules::Would(rules::EnterBattlefield::from_controller(
+                action.player,
+                land,
+            )));
         }
     }
 }

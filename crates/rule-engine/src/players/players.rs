@@ -2,8 +2,10 @@ use atomic_delegate_macros::atomic_delegates;
 use bevy::ecs::system::SystemParam;
 use bevy::prelude::{Entity, Query, With};
 
+use crate::cards;
 use crate::players;
 use crate::turns;
+use crate::zones;
 
 #[derive(SystemParam, Clone, Copy)]
 pub struct Players<'w, 's> {
@@ -11,6 +13,15 @@ pub struct Players<'w, 's> {
     still_in_the_game: Query<'w, 's, Entity, players::StillInTheGame>,
     winners: Query<'w, 's, Entity, With<players::Won>>,
     lost: Query<'w, 's, Entity, With<players::Lost>>,
+    pub(crate) zone_contents: Query<
+        'w,
+        's,
+        (
+            &'static zones::Zone,
+            &'static cards::Owner,
+            &'static zones::ZoneContents,
+        ),
+    >,
 }
 
 #[rustfmt::skip]

@@ -1,3 +1,4 @@
+use atomic_delegate_macros::atomic_delegates;
 use bevy::prelude::Entity;
 
 use crate::players;
@@ -10,6 +11,12 @@ pub struct EnterBattlefield {
     pub permanent: Entity,
     pub controller: players::PlayerId,
     pub summoning_sick: bool,
+}
+
+#[atomic_delegates]
+impl EnterBattlefield {
+    #[must_use]
+    pub const fn from_controller(player: players::PlayerId, card: Entity) -> Self {}
 }
 
 #[rustfmt::skip]

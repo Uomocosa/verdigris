@@ -1,4 +1,5 @@
 use atomic_delegate_macros::atomic_delegates;
+use bevy::prelude::Entity;
 
 use crate::players;
 
@@ -30,6 +31,9 @@ impl PlayerView<'_, '_> {
 
     #[must_use]
     pub fn next_in_turn_order(&self) -> Option<Self> {}
+
+    #[must_use]
+    pub fn opening_hand(&self) -> Vec<Entity> {}
 }
 
 #[cfg(test)]
