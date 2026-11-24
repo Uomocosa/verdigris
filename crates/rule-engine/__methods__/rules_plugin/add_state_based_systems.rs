@@ -2,6 +2,7 @@ use crate::events;
 use bevy::ecs::schedule::ApplyDeferred;
 use bevy::prelude::{App, IntoScheduleConfigs, Update};
 
+use crate::Attempt;
 use crate::RuleSet;
 use crate::StateBasedActions;
 use crate::comprehensive_rules;
@@ -22,15 +23,13 @@ pub fn add_state_based_systems(app: &mut App) {
                     comprehensive_rules::r704_5g_lethal_damage::r704_5g_lethal_damage,
                     comprehensive_rules::r704_5h_deathtouch_damage::r704_5h_deathtouch_damage,
                     comprehensive_rules::r704_5j_legend_rule::r704_5j_legend_rule,
-                    comprehensive_rules::r614_1a_r616_1_replacement_effects::r614_1a_r616_1_replacement_effects::<
-                        events::Destroy,
-                    >,
-                    comprehensive_rules::r702_12b_indestructible::r702_12b_indestructible,
+                    Attempt::<events::Destroy>::resolved_by(
+                        comprehensive_rules::r702_12b_indestructible::r702_12b_indestructible,
+                    ),
                     comprehensive_rules::r704_5m_aura_illegal::r704_5m_aura_illegal,
-                    comprehensive_rules::r614_1a_r616_1_replacement_effects::r614_1a_r616_1_replacement_effects::<
-                        events::PutIntoGraveyard,
-                    >,
-                    comprehensive_rules::r404_1_put_into_graveyard::r404_1_put_into_graveyard,
+                    Attempt::<events::PutIntoGraveyard>::resolved_by(
+                        comprehensive_rules::r404_1_put_into_graveyard::r404_1_put_into_graveyard,
+                    ),
                     comprehensive_rules::r704_5d_token_outside_battlefield::r704_5d_token_outside_battlefield,
                     comprehensive_rules::r704_5a_zero_life::r704_5a_zero_life,
                     comprehensive_rules::r704_5b_empty_library::r704_5b_empty_library,

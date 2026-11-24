@@ -1,6 +1,7 @@
 #[cfg(feature = "testing")]
 pub mod absolute_rule;
 pub mod all;
+pub mod attempt;
 pub mod card_definition;
 #[cfg(feature = "testing")]
 pub mod cards;

@@ -1,6 +1,7 @@
 #![cfg_attr(test, allow(clippy::panic_in_result_fn))]
 pub mod abilities;
 pub mod actions;
+mod attempt;
 #[path = "__basic__/mod.rs"]
 mod basic;
 pub mod cards;
@@ -22,8 +23,9 @@ pub mod testing;
 pub mod turns;
 pub mod zones;
 
+pub use attempt::Attempt;
 pub use basic::enums::RuleSet;
-pub use basic::messages::{Attempt, May, Resolve};
+pub use basic::messages::{May, Resolve};
 pub use basic::resources::GameEnded;
 pub use basic::resources::StateBasedActionsPerformed;
 pub use basic::schedules::StateBasedActions;

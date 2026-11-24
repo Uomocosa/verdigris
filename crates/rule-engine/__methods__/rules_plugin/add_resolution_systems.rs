@@ -1,6 +1,7 @@
 use crate::events;
 use bevy::prelude::{App, IntoScheduleConfigs, Update};
 
+use crate::Attempt;
 use crate::RuleSet;
 use crate::comprehensive_rules;
 
@@ -67,14 +68,12 @@ pub fn add_resolution_systems(app: &mut App) {
                 comprehensive_rules::r608_2n_graveyard::r608_2n_graveyard,
                 comprehensive_rules::r608_3a_permanent_enters::r608_3a_permanent_enters,
                 comprehensive_rules::r701_7a_create_tokens::r701_7a_create_tokens,
-                comprehensive_rules::r614_1a_r616_1_replacement_effects::r614_1a_r616_1_replacement_effects::<
-                    events::BeginTheGameOnTheBattlefield,
-                >,
-                comprehensive_rules::r103_6a_begin_the_game_on_the_battlefield::r103_6a_begin_the_game_on_the_battlefield,
-                comprehensive_rules::r614_1a_r616_1_replacement_effects::r614_1a_r616_1_replacement_effects::<
-                    events::EnterBattlefield,
-                >,
-                comprehensive_rules::r110_1_enter_battlefield::r110_1_enter_battlefield,
+                Attempt::<events::BeginTheGameOnTheBattlefield>::resolved_by(
+                    comprehensive_rules::r103_6a_begin_the_game_on_the_battlefield::r103_6a_begin_the_game_on_the_battlefield,
+                ),
+                Attempt::<events::EnterBattlefield>::resolved_by(
+                    comprehensive_rules::r110_1_enter_battlefield::r110_1_enter_battlefield,
+                ),
                 comprehensive_rules::r110_5b_enters_untapped::r110_5b_enters_untapped,
                 (
                     comprehensive_rules::r608_3e_cannot_enter::r608_3e_cannot_enter,

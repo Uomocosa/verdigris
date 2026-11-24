@@ -1,6 +1,7 @@
 use crate::events;
 use bevy::prelude::{App, IntoScheduleConfigs, Update};
 
+use crate::Attempt;
 use crate::RuleSet;
 use crate::comprehensive_rules;
 
@@ -19,10 +20,9 @@ pub fn add_step_started_systems(app: &mut App) {
         (
             (
                 comprehensive_rules::r502_3_untap::r502_3_untap,
-                comprehensive_rules::r614_1a_r616_1_replacement_effects::r614_1a_r616_1_replacement_effects::<
-                    events::Untap,
-                >,
-                comprehensive_rules::r502_3_untap_perform::r502_3_untap_perform,
+                Attempt::<events::Untap>::resolved_by(
+                    comprehensive_rules::r502_3_untap_perform::r502_3_untap_perform,
+                ),
             )
                 .chain(),
             comprehensive_rules::r302_6_summoning_sickness::r302_6_summoning_sickness,

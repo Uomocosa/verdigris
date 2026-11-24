@@ -1,6 +1,7 @@
 use crate::events;
 use bevy::prelude::{App, IntoScheduleConfigs, Update};
 
+use crate::Attempt;
 use crate::RuleSet;
 use crate::comprehensive_rules;
 
@@ -16,10 +17,9 @@ pub fn add_priority_action_systems(app: &mut App) {
             comprehensive_rules::r508_1m_r508_2a_r508_3a_attack_triggers::r508_1m_r508_2a_r508_3a_attack_triggers,
             (
                 comprehensive_rules::r508_1f_tap_attackers::r508_1f_tap_attackers,
-                comprehensive_rules::r614_1a_r616_1_replacement_effects::r614_1a_r616_1_replacement_effects::<
-                    events::TapAttacker,
-                >,
-                comprehensive_rules::r508_1f_tap_attackers_perform::r508_1f_tap_attackers_perform,
+                Attempt::<events::TapAttacker>::resolved_by(
+                    comprehensive_rules::r508_1f_tap_attackers_perform::r508_1f_tap_attackers_perform,
+                ),
             )
                 .chain(),
             comprehensive_rules::r509_1a_r509_1g_r509_1h_r702_9b_r702_17b_declare_blockers::r509_1a_r509_1g_r509_1h_r702_9b_r702_17b_declare_blockers,
