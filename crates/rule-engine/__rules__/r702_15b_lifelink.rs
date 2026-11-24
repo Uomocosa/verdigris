@@ -1,5 +1,7 @@
 use bevy::prelude::{MessageReader, MessageWriter, Query, With};
 
+use crate::Attempt;
+use crate::Resolve;
 use crate::cards;
 use crate::rules;
 
@@ -7,8 +9,8 @@ use crate::rules;
 /// has no controller, to gain that much life (in addition to any other results that damage causes).
 /// See rule 120.3.
 pub fn r702_15b_lifelink(
-    mut damage_dealt: MessageReader<rules::Proceeds<rules::DealDamage>>,
-    mut life_gained: MessageWriter<rules::Would<rules::GainLife>>,
+    mut damage_dealt: MessageReader<Resolve<rules::DealDamage>>,
+    mut life_gained: MessageWriter<Attempt<rules::GainLife>>,
     sources: Query<&cards::Owner, With<cards::Lifelink>>,
 ) {
     for event in damage_dealt.read() {
@@ -18,7 +20,7 @@ pub fn r702_15b_lifelink(
         let Ok(owner) = sources.get(event.source) else {
             continue;
         };
-        life_gained.write(rules::Would(rules::GainLife {
+        life_gained.write(Attempt(rules::GainLife {
             player: **owner,
             amount: event.amount,
         }));

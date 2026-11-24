@@ -1,5 +1,8 @@
 use bevy::prelude::{Commands, MessageReader, MessageWriter, ResMut};
 
+use crate::Attempt;
+use crate::May;
+use crate::Resolve;
 use crate::StateBasedActionsPerformed;
 use crate::rules;
 use crate::rules::traits::event::Event;
@@ -18,15 +21,15 @@ use crate::rules::traits::event::Event;
 /// choose one. This system applies the earliest-timestamped `Instead` instead; player choice
 /// between several replacements is out of scope.
 pub fn r614_1a_r616_1_replacement_effects<E: Event>(
-    mut incoming: MessageReader<rules::Would<E>>,
-    mut proceeds: MessageWriter<rules::Proceeds<E>>,
-    mut asks: MessageWriter<rules::Ask<E>>,
+    mut incoming: MessageReader<Attempt<E>>,
+    mut proceeds: MessageWriter<Resolve<E>>,
+    mut asks: MessageWriter<May<E>>,
     mut commands: Commands,
     mut state_based_actions_performed: ResMut<StateBasedActionsPerformed>,
     answers: rules::Rules,
 ) {
-    for would in incoming.read() {
-        let event = &**would;
+    for attempt in incoming.read() {
+        let event = &**attempt;
         if !answers.legal(event) {
             continue;
         }
@@ -38,13 +41,13 @@ pub fn r614_1a_r616_1_replacement_effects<E: Event>(
                 **state_based_actions_performed = true;
             }
             Some(rules::Then::May(then)) => {
-                asks.write(rules::Ask {
+                asks.write(May {
                     event: event.clone(),
                     then,
                 });
             }
             None => {
-                proceeds.write(rules::Proceeds(event.clone()));
+                proceeds.write(Resolve(event.clone()));
             }
         }
     }

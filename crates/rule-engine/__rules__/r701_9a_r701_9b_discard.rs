@@ -3,6 +3,7 @@ use std::collections::BTreeSet;
 
 use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query, ResMut};
 
+use crate::Resolve;
 use crate::actions;
 use crate::rules;
 use crate::zones;
@@ -13,7 +14,7 @@ use crate::zones;
 /// choose which card to discard. Some effects, however, require a random discard or allow another
 /// player to choose which card is discarded.
 pub fn r701_9a_r701_9b_discard(
-    mut discards: MessageReader<rules::Proceeds<rules::Discard>>,
+    mut discards: MessageReader<Resolve<rules::Discard>>,
     mut actions: MessageReader<actions::PlayerAction>,
     mut rejected: MessageWriter<actions::Rejected>,
     mut pending: ResMut<actions::PendingChoice>,

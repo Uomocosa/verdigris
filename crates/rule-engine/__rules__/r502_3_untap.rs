@@ -1,5 +1,6 @@
 use bevy::prelude::{Entity, MessageReader, MessageWriter, Query, Res, With};
 
+use crate::Attempt;
 use crate::cards;
 use crate::rules;
 use crate::turns;
@@ -10,7 +11,7 @@ use crate::turns;
 /// untapping.
 pub fn r502_3_untap(
     mut step_started: MessageReader<turns::StepStarted>,
-    mut untaps: MessageWriter<rules::Would<rules::Untap>>,
+    mut untaps: MessageWriter<Attempt<rules::Untap>>,
     turn: Res<turns::Turn>,
     tapped: Query<(Entity, &cards::Owner), With<cards::Tapped>>,
 ) {
@@ -21,7 +22,7 @@ pub fn r502_3_untap(
         }
         for (entity, owner) in tapped.iter() {
             if **owner == turn.active {
-                untaps.write(rules::Would(rules::Untap {
+                untaps.write(Attempt(rules::Untap {
                     permanent: entity,
                     controller: **owner,
                 }));

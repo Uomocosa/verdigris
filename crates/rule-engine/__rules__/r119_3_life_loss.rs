@@ -1,5 +1,6 @@
 use bevy::prelude::{MessageReader, Query};
 
+use crate::Resolve;
 use crate::damage;
 use crate::players;
 use crate::rules;
@@ -7,8 +8,8 @@ use crate::rules;
 /// 119.3. If an effect causes a player to gain life or lose life, that player’s life total is
 /// adjusted accordingly.
 pub fn r119_3_life_loss(
-    mut life_lost: MessageReader<rules::Proceeds<rules::LoseLife>>,
-    mut life_gained: MessageReader<rules::Proceeds<rules::GainLife>>,
+    mut life_lost: MessageReader<Resolve<rules::LoseLife>>,
+    mut life_gained: MessageReader<Resolve<rules::GainLife>>,
     mut lives: Query<&mut players::Life>,
 ) {
     for event in life_lost.read() {

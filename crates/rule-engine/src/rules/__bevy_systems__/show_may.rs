@@ -1,12 +1,12 @@
 use bevy::prelude::{MessageReader, MessageWriter, ResMut};
 
+use crate::May;
 use crate::actions;
 use crate::players;
-use crate::rules;
 use crate::rules::traits::event::Event;
 
 pub fn show_may<E: Event>(
-    mut asks: MessageReader<rules::Ask<E>>,
+    mut asks: MessageReader<May<E>>,
     mut offered: MessageWriter<actions::Ask>,
     mut pending: ResMut<actions::PendingMayAsks<E>>,
     players: players::Players,

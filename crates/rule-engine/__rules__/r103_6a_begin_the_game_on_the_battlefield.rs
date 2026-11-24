@@ -1,15 +1,17 @@
 use bevy::prelude::{MessageReader, MessageWriter};
 
+use crate::Attempt;
+use crate::Resolve;
 use crate::rules;
 
 /// 103.6a If a card allows a player to begin the game with that card on the battlefield, the player
 /// taking this action puts that card onto the battlefield.
 pub fn r103_6a_begin_the_game_on_the_battlefield(
-    mut beginning: MessageReader<rules::Proceeds<rules::BeginTheGameOnTheBattlefield>>,
-    mut entering: MessageWriter<rules::Would<rules::EnterBattlefield>>,
+    mut beginning: MessageReader<Resolve<rules::BeginTheGameOnTheBattlefield>>,
+    mut entering: MessageWriter<Attempt<rules::EnterBattlefield>>,
 ) {
     for action in beginning.read() {
-        entering.write(rules::Would(rules::EnterBattlefield::from_controller(
+        entering.write(Attempt(rules::EnterBattlefield::from_controller(
             action.player,
             action.card,
         )));

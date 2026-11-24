@@ -22,6 +22,7 @@ pub mod turns;
 pub mod zones;
 
 pub use basic::enums::RuleSet;
+pub use basic::messages::{Attempt, May, Resolve};
 pub use basic::resources::GameEnded;
 pub use basic::resources::StateBasedActionsPerformed;
 pub use basic::schedules::StateBasedActions;

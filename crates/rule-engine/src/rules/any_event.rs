@@ -1,5 +1,6 @@
 use bevy::prelude::Commands;
 
+use crate::Attempt;
 use crate::rules;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -24,46 +25,46 @@ impl AnyEvent {
     pub fn announce(self, commands: &mut Commands) {
         match self {
             Self::WinGame(happened) => {
-                commands.write_message(rules::Would(happened));
+                commands.write_message(Attempt(happened));
             }
             Self::LoseGame(happened) => {
-                commands.write_message(rules::Would(happened));
+                commands.write_message(Attempt(happened));
             }
             Self::DrawFromEmptyLibrary(happened) => {
-                commands.write_message(rules::Would(happened));
+                commands.write_message(Attempt(happened));
             }
             Self::Draw(happened) => {
-                commands.write_message(rules::Would(happened));
+                commands.write_message(Attempt(happened));
             }
             Self::LoseLife(happened) => {
-                commands.write_message(rules::Would(happened));
+                commands.write_message(Attempt(happened));
             }
             Self::Discard(happened) => {
-                commands.write_message(rules::Would(happened));
+                commands.write_message(Attempt(happened));
             }
             Self::GainLife(happened) => {
-                commands.write_message(rules::Would(happened));
+                commands.write_message(Attempt(happened));
             }
             Self::Mill(happened) => {
-                commands.write_message(rules::Would(happened));
+                commands.write_message(Attempt(happened));
             }
             Self::CreateTokens(happened) => {
-                commands.write_message(rules::Would(happened));
+                commands.write_message(Attempt(happened));
             }
             Self::Destroy(happened) => {
-                commands.write_message(rules::Would(happened));
+                commands.write_message(Attempt(happened));
             }
             Self::Counter(happened) => {
-                commands.write_message(rules::Would(happened));
+                commands.write_message(Attempt(happened));
             }
             Self::DealDamage(happened) => {
-                commands.write_message(rules::Would(happened));
+                commands.write_message(Attempt(happened));
             }
             Self::EnterBattlefield(happened) => {
-                commands.write_message(rules::Would(happened));
+                commands.write_message(Attempt(happened));
             }
             Self::BeginTheGameOnTheBattlefield(happened) => {
-                commands.write_message(rules::Would(happened));
+                commands.write_message(Attempt(happened));
             }
         }
     }
@@ -74,6 +75,7 @@ mod tests {
     use bevy::ecs::system::RunSystemOnce;
     use bevy::prelude::{Commands, MessageReader};
 
+    use crate::Attempt;
     use crate::rules;
     use crate::testing::*;
 
@@ -91,11 +93,9 @@ mod tests {
             .unwrap();
         game.app
             .world_mut()
-            .run_system_once(
-                move |mut reader: MessageReader<rules::Would<rules::WinGame>>| {
-                    assert!(reader.read().any(|would| **would == rules::WinGame(player)));
-                },
-            )
+            .run_system_once(move |mut reader: MessageReader<Attempt<rules::WinGame>>| {
+                assert!(reader.read().any(|attempt| **attempt == rules::WinGame(player)));
+            })
             .unwrap();
     }
 }

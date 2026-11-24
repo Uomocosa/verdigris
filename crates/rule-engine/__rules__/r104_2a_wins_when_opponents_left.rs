@@ -1,17 +1,18 @@
 use bevy::prelude::MessageWriter;
 
+use crate::Resolve;
 use crate::players;
 use crate::rules;
 
 /// 104.2a A player still in the game wins the game if that player’s opponents have all left the game. This
 /// happens immediately and overrides all effects that would preclude that player from winning the game.
 pub fn r104_2a_wins_when_opponents_left(
-    mut wins: MessageWriter<rules::Proceeds<rules::WinGame>>,
+    mut wins: MessageWriter<Resolve<rules::WinGame>>,
     players: players::Players,
 ) {
     for player in players.still_in_the_game() {
         if player.have_all_opponents_left() {
-            wins.write(rules::Proceeds(rules::WinGame(player.id)));
+            wins.write(Resolve(rules::WinGame(player.id)));
         }
     }
 }

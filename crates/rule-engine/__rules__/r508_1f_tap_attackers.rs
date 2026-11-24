@@ -1,5 +1,6 @@
 use bevy::prelude::{Added, Entity, MessageWriter, Query};
 
+use crate::Attempt;
 use crate::cards;
 use crate::rules;
 
@@ -7,10 +8,10 @@ use crate::rules;
 /// an attacker isn’t a cost; attacking simply causes creatures to become tapped.
 pub fn r508_1f_tap_attackers(
     attackers: Query<(Entity, &cards::Owner), Added<cards::Attacking>>,
-    mut taps: MessageWriter<rules::Would<rules::TapAttacker>>,
+    mut taps: MessageWriter<Attempt<rules::TapAttacker>>,
 ) {
     for (attacker, owner) in attackers.iter() {
-        taps.write(rules::Would(rules::TapAttacker {
+        taps.write(Attempt(rules::TapAttacker {
             attacker,
             player: **owner,
         }));

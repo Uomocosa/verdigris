@@ -1,6 +1,7 @@
 use crate::GRAVEYARD;
 use bevy::prelude::{Commands, MessageReader, Query, ResMut, With, Without};
 
+use crate::Resolve;
 use crate::StateBasedActionsPerformed;
 use crate::cards;
 use crate::rules;
@@ -10,7 +11,7 @@ use crate::zones;
 /// lethal damage, and they ignore the state-based action that checks for lethal damage (see rule
 /// 704.5g).
 pub fn r702_12b_indestructible(
-    mut destructions: MessageReader<rules::Proceeds<rules::Destroy>>,
+    mut destructions: MessageReader<Resolve<rules::Destroy>>,
     mut commands: Commands,
     mut state_based_actions_performed: ResMut<StateBasedActionsPerformed>,
     cards: Query<&cards::Owner, (With<cards::OnBattlefield>, Without<cards::Indestructible>)>,

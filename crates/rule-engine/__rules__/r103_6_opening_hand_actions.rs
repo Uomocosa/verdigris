@@ -1,5 +1,6 @@
 use bevy::prelude::{MessageReader, MessageWriter};
 
+use crate::Attempt;
 use crate::players;
 use crate::rules;
 use crate::turns;
@@ -10,17 +11,17 @@ use crate::turns;
 ///
 /// # Notes
 ///
-/// All `Would`s are announced at once, so a mandatory effect of a later player would happen before
+/// All `Attempt`s are announced at once, so a mandatory effect of a later player would happen before
 /// an earlier player answers.
 pub fn r103_6_opening_hand_actions(
     mut mulligans_complete: MessageReader<turns::MulligansComplete>,
-    mut opening_hand_actions: MessageWriter<rules::Would<rules::OpeningHandAction>>,
+    mut opening_hand_actions: MessageWriter<Attempt<rules::OpeningHandAction>>,
     players: players::Players,
 ) {
     for _ in mulligans_complete.read() {
         for player in players.still_in_the_game() {
             for card in player.opening_hand() {
-                opening_hand_actions.write(rules::Would(rules::OpeningHandAction {
+                opening_hand_actions.write(Attempt(rules::OpeningHandAction {
                     card,
                     player: player.id,
                 }));

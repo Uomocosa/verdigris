@@ -1,12 +1,13 @@
 use bevy::prelude::{Entity, MessageWriter, Query, With};
 
+use crate::Attempt;
 use crate::players;
 use crate::rules;
 
 /// 704.5b If a player attempted to draw a card from a library with no cards in it since the last
 /// time state-based actions were checked, that player loses the game.
 pub fn r704_5b_empty_library(
-    mut losses: MessageWriter<rules::Would<rules::LoseGame>>,
+    mut losses: MessageWriter<Attempt<rules::LoseGame>>,
     players: Query<
         Entity,
         (
@@ -16,7 +17,7 @@ pub fn r704_5b_empty_library(
     >,
 ) {
     for player in players.iter() {
-        losses.write(rules::Would(rules::LoseGame(players::PlayerId(player))));
+        losses.write(Attempt(rules::LoseGame(players::PlayerId(player))));
     }
 }
 

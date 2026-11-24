@@ -1,5 +1,7 @@
 use bevy::prelude::{Commands, Has, MessageReader, MessageWriter, Query};
 
+use crate::Attempt;
+use crate::Resolve;
 use crate::cards;
 use crate::damage;
 use crate::players;
@@ -18,8 +20,8 @@ use crate::rules;
 /// 120.3e Damage dealt to a creature by a source with neither wither nor infect causes that much
 /// damage to be marked on that creature.
 pub fn r120_3_r120_3a_r120_3b_r120_3e_damage_results(
-    mut damage_dealt: MessageReader<rules::Proceeds<rules::DealDamage>>,
-    mut life_lost: MessageWriter<rules::Would<rules::LoseLife>>,
+    mut damage_dealt: MessageReader<Resolve<rules::DealDamage>>,
+    mut life_lost: MessageWriter<Attempt<rules::LoseLife>>,
     mut commands: Commands,
     lives: Query<&players::Life>,
     mut poisoned: Query<&mut players::PoisonCounters>,
@@ -40,7 +42,7 @@ pub fn r120_3_r120_3a_r120_3b_r120_3e_damage_results(
                 }
                 continue;
             }
-            life_lost.write(rules::Would(rules::LoseLife {
+            life_lost.write(Attempt(rules::LoseLife {
                 player: players::PlayerId(event.recipient),
                 amount: event.amount,
             }));

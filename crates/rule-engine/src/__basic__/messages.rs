@@ -5,13 +5,13 @@ use crate::rules;
 use crate::rules::traits::event::Event;
 
 #[derive(Message, Clone, Debug, Deref)]
-pub struct Would<E>(pub E);
+pub struct Attempt<E>(pub E);
 
 #[derive(Message, Clone, Debug, Deref)]
-pub struct Proceeds<E>(pub E);
+pub struct Resolve<E>(pub E);
 
 #[derive(Message, Clone, Debug)]
-pub struct Ask<E: Event> {
+pub struct May<E: Event> {
     pub event: E,
     pub then: rules::EventTemplate,
 }

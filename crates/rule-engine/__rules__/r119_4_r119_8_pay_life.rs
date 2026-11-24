@@ -1,6 +1,7 @@
 use crate::HAND;
 use bevy::prelude::{Commands, Entity, MessageWriter, Query};
 
+use crate::Attempt;
 use crate::actions;
 use crate::cards;
 use crate::players;
@@ -26,7 +27,7 @@ use crate::zones;
 /// 2 life. A hybrid Phyrexian mana symbol is both of its component colors.
 pub fn r119_4_r119_8_pay_life(
     mut rejected: MessageWriter<actions::Rejected>,
-    mut life_lost: MessageWriter<rules::Would<rules::LoseLife>>,
+    mut life_lost: MessageWriter<Attempt<rules::LoseLife>>,
     mut commands: Commands,
     cards: Query<(
         Entity,
@@ -68,7 +69,7 @@ pub fn r119_4_r119_8_pay_life(
             commands.entity(spell).remove::<stack::CastingStage>();
             continue;
         }
-        life_lost.write(rules::Would(payment));
+        life_lost.write(Attempt(payment));
         commands.entity(spell).remove::<stack::CastingStage>();
     }
 }

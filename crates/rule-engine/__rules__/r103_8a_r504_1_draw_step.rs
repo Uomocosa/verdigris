@@ -1,5 +1,6 @@
 use bevy::prelude::{Entity, MessageReader, MessageWriter, Query, Res, With};
 
+use crate::Attempt;
 use crate::players;
 use crate::rules;
 use crate::turns;
@@ -10,7 +11,7 @@ use crate::turns;
 /// Step”) of their first turn.
 pub fn r103_8a_r504_1_draw_step(
     mut step_started: MessageReader<turns::StepStarted>,
-    mut draws: MessageWriter<rules::Would<rules::Draw>>,
+    mut draws: MessageWriter<Attempt<rules::Draw>>,
     turn: Res<turns::Turn>,
     turn_order: Res<turns::TurnOrder>,
     players: Query<Entity, With<players::Player>>,
@@ -25,7 +26,7 @@ pub fn r103_8a_r504_1_draw_step(
             if is_first_turn_skip {
                 continue;
             }
-            draws.write(rules::Would(rules::Draw {
+            draws.write(Attempt(rules::Draw {
                 player: turn.active,
                 amount: 1,
             }));

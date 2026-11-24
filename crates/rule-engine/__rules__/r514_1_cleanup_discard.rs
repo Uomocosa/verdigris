@@ -1,5 +1,6 @@
 use bevy::prelude::{MessageReader, MessageWriter, Query, Res};
 
+use crate::Attempt;
 use crate::HAND;
 use crate::rules;
 use crate::turns;
@@ -10,7 +11,7 @@ use crate::zones;
 /// turn-based action doesn’t use the stack.
 pub fn r514_1_cleanup_discard(
     mut step_started: MessageReader<turns::StepStarted>,
-    mut discards: MessageWriter<rules::Would<rules::Discard>>,
+    mut discards: MessageWriter<Attempt<rules::Discard>>,
     turn: Res<turns::Turn>,
     answers: rules::Rules,
     zones: zones::ZoneLookup,
@@ -31,7 +32,7 @@ pub fn r514_1_cleanup_discard(
         if excess == 0 {
             continue;
         }
-        discards.write(rules::Would(rules::Discard {
+        discards.write(Attempt(rules::Discard {
             player: turn.active,
             amount: u32::try_from(excess).unwrap_or(u32::MAX),
         }));

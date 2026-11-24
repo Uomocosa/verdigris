@@ -1,5 +1,6 @@
 use bevy::prelude::{MessageReader, MessageWriter, Query};
 
+use crate::Attempt;
 use crate::STACK;
 use crate::cards;
 use crate::rules;
@@ -10,7 +11,7 @@ use crate::zones;
 /// player puts it into its owner’s graveyard.
 pub fn r608_3e_cannot_enter(
     mut resolutions: MessageReader<stack::Resolution>,
-    mut graveyards: MessageWriter<rules::Would<rules::PutIntoGraveyard>>,
+    mut graveyards: MessageWriter<Attempt<rules::PutIntoGraveyard>>,
     cards: Query<(&cards::CardDefinition, &cards::Owner, &zones::InZone)>,
     answers: rules::Rules,
 ) {
@@ -36,7 +37,7 @@ pub fn r608_3e_cannot_enter(
             controller: **owner,
             summoning_sick: true,
         }) {
-            graveyards.write(rules::Would(rules::PutIntoGraveyard {
+            graveyards.write(Attempt(rules::PutIntoGraveyard {
                 object: spell,
                 owner: **owner,
             }));

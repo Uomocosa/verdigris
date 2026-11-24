@@ -1,6 +1,7 @@
 use bevy::prelude::{Commands, MessageReader, MessageWriter};
 
 use crate::BATTLEFIELD;
+use crate::Resolve;
 use crate::cards;
 use crate::rules;
 use crate::zones;
@@ -9,7 +10,7 @@ use crate::zones;
 /// indefinitely. A card or token becomes a permanent as it enters the battlefield and it stops
 /// being a permanent as it’s moved to another zone by an effect or rule.
 pub fn r110_1_enter_battlefield(
-    mut entering: MessageReader<rules::Proceeds<rules::EnterBattlefield>>,
+    mut entering: MessageReader<Resolve<rules::EnterBattlefield>>,
     mut entered: MessageWriter<cards::Entered>,
     mut commands: Commands,
     zones: zones::ZoneLookup,

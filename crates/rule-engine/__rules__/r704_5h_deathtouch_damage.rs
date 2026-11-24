@@ -1,5 +1,6 @@
 use bevy::prelude::{Commands, Entity, MessageWriter, Query, With};
 
+use crate::Attempt;
 use crate::cards;
 use crate::damage;
 use crate::rules;
@@ -8,7 +9,7 @@ use crate::rules;
 /// deathtouch since the last time state-based actions were checked, that creature is destroyed.
 /// Regeneration can replace this event.
 pub fn r704_5h_deathtouch_damage(
-    mut destructions: MessageWriter<rules::Would<rules::Destroy>>,
+    mut destructions: MessageWriter<Attempt<rules::Destroy>>,
     mut commands: Commands,
     cards: Query<
         (
@@ -26,7 +27,7 @@ pub fn r704_5h_deathtouch_damage(
     }
     for (creature, owner, effective, _) in cards.iter() {
         if effective.toughness > 0 {
-            destructions.write(rules::Would(rules::Destroy {
+            destructions.write(Attempt(rules::Destroy {
                 permanent: creature,
                 controller: **owner,
             }));

@@ -1,5 +1,6 @@
 use bevy::prelude::{Commands, MessageReader, ResMut};
 
+use crate::Resolve;
 use crate::StateBasedActionsPerformed;
 use crate::players;
 use crate::rules;
@@ -7,7 +8,7 @@ use crate::rules::traits::context::Context;
 
 /// 121.4. A player who attempts to draw a card from a library with no cards in it loses the game the next time a player would receive priority. (This is a state-based action. See rule 704.)
 pub fn r121_4_draw_from_empty_library(
-    mut proceeds: MessageReader<rules::Proceeds<rules::DrawFromEmptyLibrary>>,
+    mut proceeds: MessageReader<Resolve<rules::DrawFromEmptyLibrary>>,
     mut commands: Commands,
     mut state_based_actions_performed: ResMut<StateBasedActionsPerformed>,
 ) {
