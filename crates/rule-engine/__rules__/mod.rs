@@ -76,3 +76,4 @@ pub mod r704_5g_lethal_damage;
 pub mod r704_5h_deathtouch_damage;
 pub mod r704_5j_legend_rule;
 pub mod r704_5m_aura_illegal;
+pub mod r800_4a_priority_of_a_player_who_left;

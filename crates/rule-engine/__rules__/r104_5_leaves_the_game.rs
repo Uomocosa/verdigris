@@ -11,7 +11,7 @@ pub fn r104_5_leaves_the_game(
         Entity,
         (
             With<players::Player>,
-            players::LostOrDrawn,
+            players::LostOrGameIsADraw,
             Without<players::LeftTheGame>,
         ),
     >,

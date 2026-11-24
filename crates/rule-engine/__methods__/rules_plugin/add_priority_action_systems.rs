@@ -31,6 +31,7 @@ pub fn add_priority_action_systems(app: &mut App) {
             comprehensive_rules::r104_3a_concede::r104_3a_concede,
             comprehensive_rules::r104_3_lose_the_game::r104_3_lose_the_game,
             comprehensive_rules::r104_5_leaves_the_game::r104_5_leaves_the_game,
+            comprehensive_rules::r800_4a_priority_of_a_player_who_left::r800_4a_priority_of_a_player_who_left,
         )
             .chain()
             .in_set(RuleSet::PriorityAction),
@@ -59,7 +60,7 @@ mod tests {
 
         assert_eq!(
             app.get_schedule(Update).map(Schedule::systems_len),
-            Some(19)
+            Some(20)
         );
     }
 }

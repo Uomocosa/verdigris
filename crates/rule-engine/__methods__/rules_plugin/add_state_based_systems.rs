@@ -65,6 +65,7 @@ pub fn add_state_based_systems(app: &mut App) {
             comprehensive_rules::r603_4_intervening_if::r603_4_intervening_if,
             comprehensive_rules::r603_3_triggers_on_stack::r603_3_triggers_on_stack,
             comprehensive_rules::r117_5_r704_3_state_based_actions::r117_5_r704_3_state_based_actions,
+            comprehensive_rules::r800_4a_priority_of_a_player_who_left::r800_4a_priority_of_a_player_who_left,
             comprehensive_rules::r603_3b_apnap_trigger_order::r603_3b_apnap_trigger_order,
         )
             .chain()
@@ -85,7 +86,7 @@ mod tests {
         let mut app = App::new();
         add_state_based_systems(&mut app);
 
-        assert_eq!(app.get_schedule(Update).map(Schedule::systems_len), Some(6));
+        assert_eq!(app.get_schedule(Update).map(Schedule::systems_len), Some(7));
         assert_eq!(
             app.get_schedule(StateBasedActions).map(Schedule::systems_len),
             Some(24)

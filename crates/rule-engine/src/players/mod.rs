@@ -6,7 +6,7 @@ pub use basic::components::{
     PoisonCounters, Won,
 };
 pub use basic::newtypes::PlayerId;
-pub use basic::type_aliases::{LostOrDrawn, StillInTheGame};
+pub use basic::type_aliases::{LostOrGameIsADraw, StillInTheGame};
 
 mod lands_played_this_turn;
 pub use lands_played_this_turn::LandsPlayedThisTurn;
