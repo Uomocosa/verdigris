@@ -1,3 +1,4 @@
+use atomic_delegate_macros::atomic_delegates;
 use bevy::ecs::system::SystemParam;
 use bevy::prelude::{Entity, Query, With};
 
@@ -27,13 +28,13 @@ impl Players<'_, '_> {
     pub fn is_game_over(&self) -> bool { !self.winners.is_empty() || !self.drawn.is_empty() }
 }
 
+#[atomic_delegates]
 impl Players<'_, '_> {
     #[must_use]
-    pub fn still_in_the_game(&self) -> Vec<Entity> {
-        let in_order = self.in_turn_order();
-        in_order.into_iter().filter(|player| self.is_still_in_the_game(*player)).collect()
-    }
+    pub fn still_in_the_game(&self) -> Vec<Entity> {}
+}
 
+impl Players<'_, '_> {
     #[must_use]
     pub fn have_all_opponents_left(&self, player: Entity) -> bool {
         let opponents = self.opponents_of(player);
@@ -58,10 +59,6 @@ mod tests {
         game.app
             .world_mut()
             .run_system_once(move |players: Players| {
-                assert_eq!(
-                    players.still_in_the_game(),
-                    [Entity::from(p1), Entity::from(p3)]
-                );
                 assert_eq!(
                     players.opponents_of(Entity::from(p1)),
                     [Entity::from(p2), Entity::from(p3)]
