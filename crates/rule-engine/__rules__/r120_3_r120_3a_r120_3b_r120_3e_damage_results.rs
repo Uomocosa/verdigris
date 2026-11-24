@@ -1,4 +1,4 @@
-use bevy::prelude::{Commands, Has, MessageReader, Query};
+use bevy::prelude::{Commands, Has, MessageReader, MessageWriter, Query};
 
 use crate::cards;
 use crate::damage;
@@ -19,8 +19,9 @@ use crate::rules;
 /// damage to be marked on that creature.
 pub fn r120_3_r120_3a_r120_3b_r120_3e_damage_results(
     mut damage_dealt: MessageReader<rules::Proceeds<rules::DealDamage>>,
+    mut life_lost: MessageWriter<rules::Would<rules::LoseLife>>,
     mut commands: Commands,
-    mut lives: Query<&mut players::Life>,
+    lives: Query<&players::Life>,
     mut poisoned: Query<&mut players::PoisonCounters>,
     sources: Query<Has<cards::Deathtouch>>,
     infect_sources: Query<Has<cards::Infect>>,
@@ -30,7 +31,7 @@ pub fn r120_3_r120_3a_r120_3b_r120_3e_damage_results(
         if event.amount == 0 {
             continue;
         }
-        if lives.get_mut(event.recipient).is_ok() {
+        if lives.get(event.recipient).is_ok() {
             if infect_sources.get(event.source).is_ok_and(|has| has) {
                 if let Ok(mut counters) = poisoned.get_mut(event.recipient) {
                     *counters = players::PoisonCounters((**counters).saturating_add(event.amount));
@@ -39,12 +40,11 @@ pub fn r120_3_r120_3a_r120_3b_r120_3e_damage_results(
                 }
                 continue;
             }
-            if let Ok(mut life) = lives.get_mut(event.recipient) {
-                *life = players::Life(
-                    (**life).saturating_sub(damage::Damage::signed_amount(event.amount)),
-                );
-                continue;
-            }
+            life_lost.write(rules::Would(rules::LoseLife {
+                player: players::PlayerId(event.recipient),
+                amount: event.amount,
+            }));
+            continue;
         }
         let marked = targets.get(event.recipient).ok().flatten().map_or(0, |damage| **damage);
         commands
@@ -107,6 +107,21 @@ mod tests {
         ])?;
         assert!(game.player(p1).cards_in(GRAVEYARD).has(corpse));
         assert_eq!(game.life(p1), 20);
+        Ok(())
+    }
+
+    #[test]
+    fn damage_does_not_make_a_player_who_cant_lose_life_lose_any() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
+            P2.battlefield([TEST_CANT_LOSE_LIFE]),
+        ]);
+        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
+        game.play([
+            p1.cast(bolt).targeting(p2).pass_priority(),
+            p2.pass_priority(),
+        ])?;
+        assert_eq!(game.life(p2), 20);
         Ok(())
     }
 }

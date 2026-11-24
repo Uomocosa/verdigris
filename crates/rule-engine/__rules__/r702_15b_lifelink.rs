@@ -1,8 +1,6 @@
-use bevy::prelude::{MessageReader, Query, With};
+use bevy::prelude::{MessageReader, MessageWriter, Query, With};
 
 use crate::cards;
-use crate::damage;
-use crate::players;
 use crate::rules;
 
 /// 702.15b Damage dealt by a source with lifelink causes that source’s controller, or its owner if it
@@ -10,7 +8,7 @@ use crate::rules;
 /// See rule 120.3.
 pub fn r702_15b_lifelink(
     mut damage_dealt: MessageReader<rules::Proceeds<rules::DealDamage>>,
-    mut lives: Query<&mut players::Life>,
+    mut life_gained: MessageWriter<rules::Would<rules::GainLife>>,
     sources: Query<&cards::Owner, With<cards::Lifelink>>,
 ) {
     for event in damage_dealt.read() {
@@ -20,10 +18,10 @@ pub fn r702_15b_lifelink(
         let Ok(owner) = sources.get(event.source) else {
             continue;
         };
-        if let Ok(mut life) = lives.get_mut(***owner) {
-            *life =
-                players::Life((**life).saturating_add(damage::Damage::signed_amount(event.amount)));
-        }
+        life_gained.write(rules::Would(rules::GainLife {
+            player: **owner,
+            amount: event.amount,
+        }));
     }
 }
 
@@ -86,6 +84,30 @@ mod tests {
 
         assert_eq!(game.life(p2), 18);
         assert_eq!(game.life(p1), 22);
+        Ok(())
+    }
+
+    #[test]
+    fn a_player_who_cant_gain_life_gains_none_from_lifelink() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.battlefield([CHILD_OF_NIGHT, TEST_CANT_DISCARD]),
+            P2.battlefield([GRIZZLY_BEARS]),
+        ]);
+        let [vampire] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(CHILD_OF_NIGHT)?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareAttackers),
+            p2.pass_to(turns::Step::DeclareAttackers),
+            p1.declare_attackers([vampire]),
+        ])?;
+        game.play([
+            p1.pass_to(turns::Step::CombatDamage),
+            p2.pass_to(turns::Step::CombatDamage),
+            p1.pass_priority(),
+            p2.pass_priority(),
+        ])?;
+
+        assert_eq!(game.life(p2), 18);
+        assert_eq!(game.life(p1), 20);
         Ok(())
     }
 }
