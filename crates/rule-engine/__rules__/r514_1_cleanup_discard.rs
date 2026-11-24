@@ -27,7 +27,7 @@ pub fn r514_1_cleanup_discard(
         let Ok(contents) = zone_contents.get(hand) else {
             continue;
         };
-        let excess = answers.value::<rules::MaximumHandSize>(*turn.active).excess(contents.len());
+        let excess = answers.value::<rules::MaximumHandSize>(turn.active).excess(contents.len());
         if excess == 0 {
             continue;
         }

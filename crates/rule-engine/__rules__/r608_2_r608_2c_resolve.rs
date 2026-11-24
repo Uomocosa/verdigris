@@ -60,8 +60,8 @@ pub fn r608_2_r608_2c_resolve(
         let chosen_target = lookups.chosen_targets.get(spell).ok().map(|chosen| **chosen);
         let player_targets =
             chosen_target.filter(|target| lookups.lives.get(*target).is_ok()).map_or_else(
-                || resolve_player_targets(&lookups, effect, *controller),
-                |p| vec![p],
+                || resolve_player_targets(&lookups, effect, controller),
+                |p| vec![players::PlayerId(p)],
             );
         let target_zone = chosen_target.and_then(|target| lookups.in_zone.get(target).ok());
         let target_on_stack = target_zone.is_some_and(|zone| zones.contains(STACK, **zone));
@@ -76,12 +76,12 @@ pub fn r608_2_r608_2c_resolve(
                         &lookups,
                         spell,
                         chosen_target,
-                        *controller,
+                        controller,
                         amount,
                     );
                 }
                 effects::EffectKind::Destroy => {
-                    request_destroy(&mut destructions, &lookups, battlefield_target, *controller);
+                    request_destroy(&mut destructions, &lookups, battlefield_target, controller);
                 }
                 #[rustfmt::skip]
                 effects::EffectKind::Exile => {
@@ -93,20 +93,20 @@ pub fn r608_2_r608_2c_resolve(
                         &lookups,
                         chosen_target,
                         target_on_stack,
-                        *controller,
+                        controller,
                     );
                 }
                 effects::EffectKind::CreateTokens { count, definition } => {
-                    request_tokens(&mut effect_messages.p3(), *controller, count, definition);
+                    request_tokens(&mut effect_messages.p3(), controller, count, definition);
                 }
                 effects::EffectKind::Draw(count) => {
-                    request_draws(&mut player_effects.p3(), &player_targets, ***owner, count);
+                    request_draws(&mut player_effects.p3(), &player_targets, **owner, count);
                 }
                 effects::EffectKind::Mill(count) => {
                     request_mills(
                         &mut effect_messages.p2(),
                         &player_targets,
-                        *controller,
+                        controller,
                         count,
                     );
                 }
@@ -120,7 +120,7 @@ pub fn r608_2_r608_2c_resolve(
                     request_life_gain(
                         &mut player_effects.p2(),
                         &player_targets,
-                        *controller,
+                        controller,
                         amount,
                     );
                 }
@@ -181,12 +181,12 @@ fn request_destroy(
     destructions: &mut MessageWriter<rules::Would<rules::Destroy>>,
     lookups: &stack::ResolutionLookups<'_, '_>,
     target: Option<Entity>,
-    controller: Entity,
+    controller: players::PlayerId,
 ) {
     if let Some(target) = target {
         destructions.write(rules::Would(rules::Destroy {
             permanent: target,
-            controller: players::PlayerId(permanent_controller(lookups, target, controller)),
+            controller: permanent_controller(lookups, target, controller),
         }));
     }
 }
@@ -196,14 +196,14 @@ fn request_counter(
     lookups: &stack::ResolutionLookups<'_, '_>,
     target: Option<Entity>,
     target_on_stack: bool,
-    controller: Entity,
+    controller: players::PlayerId,
 ) {
     if let Some(target) = target
         && target_on_stack
     {
         countered.write(rules::Would(rules::Counter {
             spell: target,
-            controller: players::PlayerId(permanent_controller(lookups, target, controller)),
+            controller: permanent_controller(lookups, target, controller),
         }));
     }
 }
@@ -254,7 +254,7 @@ fn request_gain_keyword(
 fn request_poison(
     commands: &mut Commands,
     lookups: &stack::ResolutionLookups<'_, '_>,
-    players: &[Entity],
+    players: &[players::PlayerId],
     amount: u32,
 ) {
     for player in players {
@@ -267,7 +267,7 @@ fn request_damage(
     lookups: &stack::ResolutionLookups<'_, '_>,
     spell: Entity,
     target: Option<Entity>,
-    controller: Entity,
+    controller: players::PlayerId,
     amount: u32,
 ) {
     let Some(target) = target else {
@@ -283,30 +283,30 @@ fn request_damage(
         source: spell,
         recipient: target,
         amount,
-        controller: players::PlayerId(permanent_controller(lookups, target, controller)),
+        controller: permanent_controller(lookups, target, controller),
     }));
 }
 
 fn permanent_controller(
     lookups: &stack::ResolutionLookups<'_, '_>,
     target: Entity,
-    fallback: Entity,
-) -> Entity {
+    fallback: players::PlayerId,
+) -> players::PlayerId {
     if lookups.lives.get(target).is_ok() {
-        return target;
+        return players::PlayerId(target);
     }
-    lookups.owners.get(target).map_or(fallback, |owner| ***owner)
+    lookups.owners.get(target).map_or(fallback, |owner| **owner)
 }
 
 fn request_draws(
     draws: &mut MessageWriter<rules::Would<rules::Draw>>,
-    players: &[Entity],
-    fallback: Entity,
+    players: &[players::PlayerId],
+    fallback: players::PlayerId,
     count: u32,
 ) {
     for player in players_or_fallback(players, fallback) {
         draws.write(rules::Would(rules::Draw {
-            player: players::PlayerId(player),
+            player,
             amount: count,
         }));
     }
@@ -314,12 +314,12 @@ fn request_draws(
 
 fn request_life_loss(
     life_lost: &mut MessageWriter<rules::Would<rules::LoseLife>>,
-    players: &[Entity],
+    players: &[players::PlayerId],
     amount: u32,
 ) {
     for player in players {
         life_lost.write(rules::Would(rules::LoseLife {
-            player: players::PlayerId(*player),
+            player: *player,
             amount,
         }));
     }
@@ -327,12 +327,12 @@ fn request_life_loss(
 
 fn request_discard(
     discarded: &mut MessageWriter<rules::Would<rules::Discard>>,
-    players: &[Entity],
+    players: &[players::PlayerId],
     count: u32,
 ) {
     for player in players {
         discarded.write(rules::Would(rules::Discard {
-            player: players::PlayerId(*player),
+            player: *player,
             amount: count,
         }));
     }
@@ -340,13 +340,13 @@ fn request_discard(
 
 fn request_mills(
     mills: &mut MessageWriter<rules::Would<rules::Mill>>,
-    players: &[Entity],
-    fallback: Entity,
+    players: &[players::PlayerId],
+    fallback: players::PlayerId,
     count: u32,
 ) {
     for player in players_or_fallback(players, fallback) {
         mills.write(rules::Would(rules::Mill {
-            player: players::PlayerId(player),
+            player,
             amount: count,
         }));
     }
@@ -354,32 +354,32 @@ fn request_mills(
 
 fn request_life_gain(
     gained: &mut MessageWriter<rules::Would<rules::GainLife>>,
-    players: &[Entity],
-    fallback: Entity,
+    players: &[players::PlayerId],
+    fallback: players::PlayerId,
     amount: u32,
 ) {
     for player in players_or_fallback(players, fallback) {
-        gained.write(rules::Would(rules::GainLife {
-            player: players::PlayerId(player),
-            amount,
-        }));
+        gained.write(rules::Would(rules::GainLife { player, amount }));
     }
 }
 
 fn request_tokens(
     tokens: &mut MessageWriter<rules::Would<rules::CreateTokens>>,
-    controller: Entity,
+    controller: players::PlayerId,
     count: u32,
     definition: effects::TokenDefinition,
 ) {
     tokens.write(rules::Would(rules::CreateTokens {
-        controller: players::PlayerId(controller),
+        controller,
         amount: count,
         token: definition,
     }));
 }
 
-fn players_or_fallback(players: &[Entity], fallback: Entity) -> Vec<Entity> {
+fn players_or_fallback(
+    players: &[players::PlayerId],
+    fallback: players::PlayerId,
+) -> Vec<players::PlayerId> {
     if players.is_empty() {
         vec![fallback]
     } else {
@@ -390,24 +390,25 @@ fn players_or_fallback(players: &[Entity], fallback: Entity) -> Vec<Entity> {
 fn resolve_player_targets(
     lookups: &stack::ResolutionLookups<'_, '_>,
     effect: effects::Effect,
-    controller: Entity,
-) -> Vec<Entity> {
+    controller: players::PlayerId,
+) -> Vec<players::PlayerId> {
     let Some(player) = effect.target.and_then(|target| target.filter.controlled_by) else {
         return Vec::new();
     };
-    let players: Vec<Entity> = lookups.lives.iter().map(|(player, _)| player).collect();
+    let players: Vec<players::PlayerId> =
+        lookups.lives.iter().map(|(player, _)| players::PlayerId(player)).collect();
     player.resolve(controller, &players)
 }
 
 fn add_poison_counters(
     commands: &mut Commands,
     lookups: &stack::ResolutionLookups<'_, '_>,
-    player: Entity,
+    player: players::PlayerId,
     amount: u32,
 ) {
     let counters =
-        lookups.poison.get(player).map_or(0, |counters| **counters).saturating_add(amount);
-    commands.entity(player).insert(players::PoisonCounters(counters));
+        lookups.poison.get(*player).map_or(0, |counters| **counters).saturating_add(amount);
+    commands.entity(*player).insert(players::PoisonCounters(counters));
 }
 
 #[cfg(test)]

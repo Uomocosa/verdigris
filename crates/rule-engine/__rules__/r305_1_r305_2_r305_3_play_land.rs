@@ -67,7 +67,7 @@ pub fn r305_1_r305_2_r305_3_play_land(
             continue;
         };
         if !answers
-            .value::<rules::LandPlays>(*action.player)
+            .value::<rules::LandPlays>(action.player)
             .allows(u32::from(record.count_for(turn.number)))
         {
             rejected.write(actions::Rejected::CannotPlayLand { land });

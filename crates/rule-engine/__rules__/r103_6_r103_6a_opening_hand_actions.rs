@@ -42,7 +42,7 @@ pub fn r103_6_r103_6a_opening_hand_actions(
             for _ in 0..player_count {
                 if !window.contains(&current) {
                     window.push(current);
-                    let eligible = opening_hand_cards(*current, &opening_hands, &zones);
+                    let eligible = opening_hand_cards(current, &opening_hands, &zones);
                     if !eligible.is_empty() {
                         *pending =
                             actions::PendingChoice(Some(actions::Choice::OpeningHandActions(
@@ -98,7 +98,7 @@ pub fn r103_6_r103_6a_opening_hand_actions(
 }
 
 fn opening_hand_cards(
-    player: Entity,
+    player: players::PlayerId,
     opening_hands: &Query<(
         Entity,
         &cards::CardDefinition,
@@ -107,13 +107,13 @@ fn opening_hand_cards(
     )>,
     zones: &zones::ZoneLookup,
 ) -> Vec<Entity> {
-    let Some(hand) = zones.find(HAND, Some(players::PlayerId(player))) else {
+    let Some(hand) = zones.find(HAND, Some(player)) else {
         return Vec::new();
     };
     opening_hands
         .iter()
         .filter(|(_, definition, owner, in_zone)| {
-            ****owner == player
+            ***owner == player
                 && ***in_zone == hand
                 && definition.begins_the_game_on_the_battlefield()
         })

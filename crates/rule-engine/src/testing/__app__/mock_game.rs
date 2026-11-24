@@ -13,7 +13,7 @@ use crate::turns;
 use crate::zones;
 
 pub struct MockGame {
-    pub(crate) players: Vec<Entity>,
+    pub(crate) players: Vec<players::PlayerId>,
     pub(crate) zones: Vec<BTreeMap<zones::Zone, Entity>>,
     pub(crate) stack: Entity,
     pub(crate) app: App,
@@ -161,7 +161,7 @@ impl MockGame {
 impl MockGame {
     pub(crate) fn cards_in_zone(
         &self,
-        player: Entity,
+        player: players::PlayerId,
         zone: zones::Zone,
     ) -> Vec<testing::ZoneObject> {
     }

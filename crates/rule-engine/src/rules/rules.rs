@@ -5,6 +5,7 @@ use bevy::prelude::{Entity, EntityRef, Query, Without};
 
 use crate::cards;
 use crate::effects;
+use crate::players;
 use crate::rules;
 use crate::turns;
 use crate::zones;
@@ -53,7 +54,11 @@ impl Rules<'_, '_> {
     pub fn changes(&self, entity: Entity, target: rules::Target) -> Vec<rules::Change> {}
 
     #[must_use]
-    pub fn value<V: rules::traits::value_rule::ValueRule>(&self, player: Entity) -> rules::Limit {}
+    pub fn value<V: rules::traits::value_rule::ValueRule>(
+        &self,
+        player: players::PlayerId,
+    ) -> rules::Limit {
+    }
 }
 
 impl Rules<'_, '_> {

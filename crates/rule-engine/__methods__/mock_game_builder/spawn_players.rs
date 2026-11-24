@@ -1,20 +1,22 @@
-use bevy::prelude::{App, Entity};
+use bevy::prelude::App;
 
 use crate::players;
 use crate::testing;
 
-pub fn spawn_players(app: &mut App, setups: &[testing::PlayerSetup]) -> Vec<Entity> {
+pub fn spawn_players(app: &mut App, setups: &[testing::PlayerSetup]) -> Vec<players::PlayerId> {
     setups
         .iter()
         .map(|setup| {
-            app.world_mut()
-                .spawn((
-                    players::Player,
-                    players::Life(setup.life),
-                    players::LandsPlayedThisTurn::NONE,
-                    setup.mana_pool,
-                ))
-                .id()
+            players::PlayerId(
+                app.world_mut()
+                    .spawn((
+                        players::Player,
+                        players::Life(setup.life),
+                        players::LandsPlayedThisTurn::NONE,
+                        setup.mana_pool,
+                    ))
+                    .id(),
+            )
         })
         .collect()
 }
@@ -34,11 +36,11 @@ mod tests {
         let spawned = spawn_players(&mut app, &[P1.life(7), P2]);
         assert_eq!(spawned.len(), 2);
         assert_eq!(
-            app.world().get::<players::Life>(spawned[0]),
+            app.world().get::<players::Life>(*spawned[0]),
             Some(&players::Life(7))
         );
         assert_eq!(
-            app.world().get::<players::Life>(spawned[1]),
+            app.world().get::<players::Life>(*spawned[1]),
             Some(&players::Life(20))
         );
     }

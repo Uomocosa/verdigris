@@ -1,5 +1,6 @@
 use bevy::prelude::Entity;
 
+use crate::players;
 use crate::testing;
 
 pub fn p(game: &testing::MockGame, seat: usize) -> testing::TestPlayer {
@@ -11,7 +12,10 @@ pub fn p(game: &testing::MockGame, seat: usize) -> testing::TestPlayer {
         "MockGame: {player_seat} does not exist; the game has {} players",
         game.players.len()
     );
-    testing::TestPlayer::from_entity_and_seat(player.unwrap_or(Entity::PLACEHOLDER), player_seat)
+    testing::TestPlayer::from_entity_and_seat(
+        *player.unwrap_or(players::PlayerId(Entity::PLACEHOLDER)),
+        player_seat,
+    )
 }
 
 #[cfg(test)]

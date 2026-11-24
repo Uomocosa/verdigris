@@ -4,6 +4,7 @@ use crate::BATTLEFIELD;
 use crate::abilities;
 use crate::cards;
 use crate::effects;
+use crate::players;
 use crate::turns;
 use crate::zones;
 
@@ -50,7 +51,7 @@ pub fn r611_3a_static_effects(
     mut timestamp: ResMut<effects::Timestamp>,
 ) {
     let players = players.into_inner();
-    let players: Vec<Entity> = players.iter().map(|player| **player).collect();
+    let players: Vec<players::PlayerId> = players.iter().copied().collect();
     for (entity, effect) in applied.iter() {
         if effect.until != effects::Duration::WhileSourceOnBattlefield {
             continue;
@@ -74,7 +75,7 @@ pub fn r611_3a_static_effects(
                 effect,
                 source,
                 enchanted,
-                ***source_owner,
+                **source_owner,
                 &candidates,
                 &zones,
                 &players,
@@ -100,7 +101,7 @@ pub fn r611_3a_static_effects(
                     source,
                     ability,
                     enchanted,
-                    ***owner,
+                    **owner,
                     &candidates,
                     &zones,
                     &players,
@@ -112,7 +113,7 @@ pub fn r611_3a_static_effects(
                     source,
                     ability,
                     enchanted,
-                    ***owner,
+                    **owner,
                     &players,
                     &applied,
                     stamp,
@@ -128,10 +129,10 @@ fn ability_still_applies(
     effect: &effects::ContinuousEffect,
     source: Entity,
     enchanted: Option<Entity>,
-    controller: Entity,
+    controller: players::PlayerId,
     candidates: &StaticCandidates<'_, '_, '_, '_, '_, '_, '_>,
     zones: &zones::ZoneLookup,
-    players: &[Entity],
+    players: &[players::PlayerId],
 ) -> bool {
     if ability.modification != effect.modification {
         return false;
@@ -146,7 +147,7 @@ fn ability_still_applies(
                         effect.affected,
                         enchanted,
                         controller,
-                        ***owner,
+                        **owner,
                         attacking.is_some(),
                         token.is_some(),
                         definition,
@@ -157,7 +158,7 @@ fn ability_still_applies(
         effects::FilterKind::Player => player_matches(
             ability.filter,
             source,
-            effect.affected,
+            players::PlayerId(effect.affected),
             enchanted,
             controller,
             players,
@@ -171,10 +172,10 @@ fn spawn_creature_effects(
     source: Entity,
     ability: &abilities::Continuous,
     enchanted: Option<Entity>,
-    controller: Entity,
+    controller: players::PlayerId,
     candidates: &StaticCandidates<'_, '_, '_, '_, '_, '_, '_>,
     zones: &zones::ZoneLookup,
-    players: &[Entity],
+    players: &[players::PlayerId],
     applied: &Query<(Entity, &effects::ContinuousEffect)>,
     stamp: u64,
 ) {
@@ -188,7 +189,7 @@ fn spawn_creature_effects(
             candidate,
             enchanted,
             controller,
-            ***owner,
+            **owner,
             attacking.is_some(),
             token.is_some(),
             definition,
@@ -214,8 +215,8 @@ fn spawn_player_effects(
     source: Entity,
     ability: &abilities::Continuous,
     enchanted: Option<Entity>,
-    controller: Entity,
-    players: &[Entity],
+    controller: players::PlayerId,
+    players: &[players::PlayerId],
     applied: &Query<(Entity, &effects::ContinuousEffect)>,
     stamp: u64,
 ) {
@@ -230,11 +231,11 @@ fn spawn_player_effects(
         ) {
             continue;
         }
-        if already_applied(applied, source, *candidate, &ability.modification) {
+        if already_applied(applied, source, **candidate, &ability.modification) {
             continue;
         }
         commands.spawn(effects::ContinuousEffect {
-            affected: *candidate,
+            affected: **candidate,
             source: Some(source),
             modification: ability.modification.clone(),
             until: effects::Duration::WhileSourceOnBattlefield,
@@ -264,12 +265,12 @@ fn candidate_matches(
     source: Entity,
     candidate: Entity,
     enchanted: Option<Entity>,
-    controller: Entity,
-    candidate_owner: Entity,
+    controller: players::PlayerId,
+    candidate_owner: players::PlayerId,
     is_attacking: bool,
     is_token: bool,
     definition: &cards::CardDefinition,
-    players: &[Entity],
+    players: &[players::PlayerId],
 ) -> bool {
     match filter.object {
         Some(effects::ObjectRelation::ThisObject) if candidate != source => return false,
@@ -295,14 +296,14 @@ fn candidate_matches(
 fn player_matches(
     filter: effects::Filter,
     source: Entity,
-    candidate: Entity,
+    candidate: players::PlayerId,
     enchanted: Option<Entity>,
-    controller: Entity,
-    players: &[Entity],
+    controller: players::PlayerId,
+    players: &[players::PlayerId],
 ) -> bool {
     match filter.object {
-        Some(effects::ObjectRelation::ThisObject) if candidate != source => return false,
-        Some(effects::ObjectRelation::EnchantedObject) if enchanted != Some(candidate) => {
+        Some(effects::ObjectRelation::ThisObject) if *candidate != source => return false,
+        Some(effects::ObjectRelation::EnchantedObject) if enchanted != Some(*candidate) => {
             return false;
         }
         _ => {}

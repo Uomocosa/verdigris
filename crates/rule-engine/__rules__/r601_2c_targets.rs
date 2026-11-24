@@ -71,7 +71,7 @@ pub fn r601_2c_targets(
                 let legal = legal_targets(
                     spell,
                     target.filter,
-                    *controller,
+                    controller,
                     &players,
                     &cards,
                     &battlefield,
@@ -140,7 +140,7 @@ pub fn r601_2c_targets(
 fn legal_targets(
     casting_spell: Entity,
     filter: effects::Filter,
-    controller: Entity,
+    controller: players::PlayerId,
     players: &Query<Entity, With<players::Player>>,
     cards: &Query<(
         Entity,
@@ -151,8 +151,8 @@ fn legal_targets(
     battlefield: &Query<Entity, With<cards::OnBattlefield>>,
     zones: &zones::ZoneLookup,
 ) -> BTreeSet<Entity> {
-    let all_players: Vec<Entity> = players.iter().collect();
-    let allowed_controllers: Option<BTreeSet<Entity>> = filter
+    let all_players: Vec<players::PlayerId> = players.iter().map(players::PlayerId).collect();
+    let allowed_controllers: Option<BTreeSet<players::PlayerId>> = filter
         .controlled_by
         .map(|player| player.resolve(controller, &all_players).into_iter().collect());
     let mut legal = BTreeSet::new();
@@ -160,7 +160,7 @@ fn legal_targets(
         filter.kind,
         effects::FilterKind::AnyTarget | effects::FilterKind::Player
     ) {
-        legal.extend(all_players.iter().copied());
+        legal.extend(all_players.iter().map(|player| **player));
     }
     for (entity, definition, owner, in_zone) in cards.iter() {
         if entity == casting_spell {
@@ -181,13 +181,13 @@ fn legal_targets(
             effects::FilterKind::Creature | effects::FilterKind::AnyTarget => {
                 filter.does_creature_match(definition)
                     && battlefield.contains(entity)
-                    && (***owner == controller
+                    && (**owner == controller
                         || !definition.has_keyword(keywords::StaticKeyword::Hexproof))
             }
             effects::FilterKind::Enchantment => {
                 filter.does_enchantment_match(definition)
                     && battlefield.contains(entity)
-                    && (***owner == controller
+                    && (**owner == controller
                         || !definition.has_keyword(keywords::StaticKeyword::Hexproof))
             }
             effects::FilterKind::Player => false,

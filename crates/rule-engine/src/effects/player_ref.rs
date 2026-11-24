@@ -1,6 +1,5 @@
-use bevy::prelude::Entity;
-
 use crate::abilities;
+use crate::players;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum PlayerRef {
@@ -11,7 +10,11 @@ pub enum PlayerRef {
 
 impl PlayerRef {
     #[must_use]
-    pub fn resolve(self, controller: Entity, players: &[Entity]) -> Vec<Entity> {
+    pub fn resolve(
+        self,
+        controller: players::PlayerId,
+        players: &[players::PlayerId],
+    ) -> Vec<players::PlayerId> {
         match self {
             Self::You => vec![controller],
             Self::Opponent => Self::players_other_than(players, controller),
@@ -26,13 +29,14 @@ impl PlayerRef {
     pub const fn has_life_at_least(self, amount: i32) -> abilities::Condition { abilities::Condition::LifeAtLeast(self, amount) }
 
     #[must_use]
-    pub(crate) fn players_other_than(players: &[Entity], controller: Entity) -> Vec<Entity> { players.iter().copied().filter(|player| *player != controller).collect() }
+    pub(crate) fn players_other_than(
+        players: &[players::PlayerId],
+        controller: players::PlayerId,
+    ) -> Vec<players::PlayerId> { players.iter().copied().filter(|player| *player != controller).collect() }
 }
 
 #[cfg(test)]
 mod tests {
-    use bevy::prelude::Entity;
-
     use crate::testing::*;
 
     use super::PlayerRef;
@@ -40,12 +44,7 @@ mod tests {
     #[test]
     fn test_usage() {
         let (_, [p1, p2, p3, p4]) = MockGame::new([P1, P2, P3, P4]);
-        let players = vec![
-            Entity::from(p1),
-            Entity::from(p2),
-            Entity::from(p3),
-            Entity::from(p4),
-        ];
+        let players = vec![p1.id, p2.id, p3.id, p4.id];
         let controller = players[0];
         assert_eq!(
             PlayerRef::You.resolve(controller, &players),

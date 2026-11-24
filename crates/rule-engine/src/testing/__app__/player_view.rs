@@ -32,7 +32,7 @@ impl PlayerView<'_> {
 impl PlayerView<'_> {
     #[must_use]
     pub fn cards_in(&self, zone: zones::Zone) -> testing::CardsInZone {
-        let cards = self.game.cards_in_zone(*self.player, zone);
+        let cards = self.game.cards_in_zone(self.player.id, zone);
         testing::CardsInZone::from_objects(cards, zone, testing::ZoneOwner::from(self.player))
     }
 }

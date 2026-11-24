@@ -14,7 +14,7 @@ use crate::{BATTLEFIELD, EXILE, GRAVEYARD, HAND, LIBRARY};
 pub fn spawn_game(
     builder: &testing::MockGameBuilder,
     players: &[testing::PlayerSetup],
-) -> (testing::MockGame, Vec<Entity>) {
+) -> (testing::MockGame, Vec<players::PlayerId>) {
     for (index, setup) in players.iter().enumerate() {
         assert!(
             setup.seat == index.saturating_add(1),
@@ -42,10 +42,7 @@ pub fn spawn_game(
             [LIBRARY, HAND, BATTLEFIELD, GRAVEYARD, EXILE]
                 .into_iter()
                 .map(|zone| {
-                    let zone_entity = app
-                        .world_mut()
-                        .spawn((zone, cards::Owner(players::PlayerId(*player))))
-                        .id();
+                    let zone_entity = app.world_mut().spawn((zone, cards::Owner(*player))).id();
                     (zone, zone_entity)
                 })
                 .collect()
@@ -59,11 +56,7 @@ pub fn spawn_game(
         };
         let hand = player_zones.get(&HAND).copied().unwrap_or(Entity::PLACEHOLDER);
         for definition in setup.hand.iter().cloned() {
-            let _ = app.world_mut().spawn((
-                definition,
-                zones::InZone(hand),
-                cards::Owner(players::PlayerId(*player)),
-            ));
+            let _ = app.world_mut().spawn((definition, zones::InZone(hand), cards::Owner(*player)));
         }
 
         let battlefield = player_zones.get(&BATTLEFIELD).copied().unwrap_or(Entity::PLACEHOLDER);
@@ -71,7 +64,7 @@ pub fn spawn_game(
             let _ = app.world_mut().spawn((
                 definition,
                 zones::InZone(battlefield),
-                cards::Owner(players::PlayerId(*player)),
+                cards::Owner(*player),
                 damage::Damage(0),
             ));
         }
@@ -83,19 +76,15 @@ pub fn spawn_game(
             .clone()
             .unwrap_or_else(|| vec![cards::CardDefinition::from(testing::GRIZZLY_BEARS); 12]);
         for definition in library_cards {
-            let _ = app.world_mut().spawn((
-                definition,
-                zones::InZone(library),
-                cards::Owner(players::PlayerId(*player)),
-            ));
+            let _ =
+                app.world_mut().spawn((definition, zones::InZone(library), cards::Owner(*player)));
         }
     }
 
     let active = entities
         .get(players.iter().position(|setup| setup.active).unwrap_or(0))
         .copied()
-        .unwrap_or(Entity::PLACEHOLDER);
-    let active = players::PlayerId(active);
+        .unwrap_or(players::PlayerId(Entity::PLACEHOLDER));
     app.insert_resource(turns::Turn {
         number: builder.turn_number,
         active,
@@ -105,9 +94,7 @@ pub fn spawn_game(
         player: active,
         consecutive_passes: 0,
     });
-    app.insert_resource(turns::TurnOrder::from(
-        entities.iter().copied().map(players::PlayerId).collect::<Vec<_>>(),
-    ));
+    app.insert_resource(turns::TurnOrder::from(entities.clone()));
 
     let game = testing::MockGame {
         players: entities.clone(),
@@ -120,7 +107,6 @@ pub fn spawn_game(
 
 #[cfg(test)]
 mod tests {
-    use crate::players;
     use crate::testing::*;
     use crate::turns;
     use crate::zones;
@@ -133,10 +119,10 @@ mod tests {
         let (game, entities) = spawn_game(&builder, &[P1, P2.active()]);
 
         assert_eq!(entities.len(), 2);
-        assert_eq!(game.life(entities[0]), 20);
+        assert_eq!(game.life(*entities[0]), 20);
         let turn = game.turn();
-        assert_eq!(turn.active, players::PlayerId(entities[1]));
-        assert_eq!(game.priority_player(), players::PlayerId(entities[1]));
+        assert_eq!(turn.active, entities[1]);
+        assert_eq!(game.priority_player(), entities[1]);
         assert_eq!(game.app.world().resource::<turns::TurnOrder>().len(), 2);
         assert_eq!(
             game.get::<zones::Zone>(game.stack),

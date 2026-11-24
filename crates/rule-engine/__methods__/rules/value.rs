@@ -1,13 +1,12 @@
-use bevy::prelude::Entity;
-
+use crate::players;
 use crate::rules;
 
 pub fn value<V: rules::traits::value_rule::ValueRule>(
     answers: &rules::Rules,
-    player: Entity,
+    player: players::PlayerId,
 ) -> rules::Limit {
     let mut limit = V::default();
-    for change in answers.changes(player, rules::Target::Value(V::ID)) {
+    for change in answers.changes(*player, rules::Target::Value(V::ID)) {
         limit = match change {
             rules::Change::Set(count) => rules::Limit::At(count),
             rules::Change::Increase(count) => match limit {
@@ -41,7 +40,7 @@ mod tests {
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
                 assert_eq!(
-                    value::<rules::MaximumHandSize>(&answers, p1.into()),
+                    value::<rules::MaximumHandSize>(&answers, p1.id),
                     rules::Limit::At(7)
                 );
             })
@@ -59,11 +58,11 @@ mod tests {
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
                 assert_eq!(
-                    value::<rules::LandPlays>(&answers, p1.into()),
+                    value::<rules::LandPlays>(&answers, p1.id),
                     rules::Limit::At(3)
                 );
                 assert_eq!(
-                    value::<rules::MaximumHandSize>(&answers, p1.into()),
+                    value::<rules::MaximumHandSize>(&answers, p1.id),
                     rules::Limit::NoMaximum
                 );
             })

@@ -56,15 +56,16 @@ pub fn r404_3_graveyard_order(
     if pending.is_some() {
         return;
     }
-    let mut moved_cards_by_graveyard: BTreeMap<Entity, (Entity, Vec<Entity>)> = BTreeMap::new();
+    let mut moved_cards_by_graveyard: BTreeMap<Entity, (players::PlayerId, Vec<Entity>)> =
+        BTreeMap::new();
     for (card, owner, in_zone) in &moved {
         let graveyard = **in_zone;
         if zones.find(GRAVEYARD, Some(**owner)) != Some(graveyard) {
             continue;
         }
         let (owner_entity, batch) =
-            moved_cards_by_graveyard.entry(graveyard).or_insert_with(|| (***owner, Vec::new()));
-        *owner_entity = ***owner;
+            moved_cards_by_graveyard.entry(graveyard).or_insert_with(|| (**owner, Vec::new()));
+        *owner_entity = **owner;
         batch.push(card);
     }
     for (graveyard, (owner_entity, moved_cards)) in moved_cards_by_graveyard {
@@ -80,7 +81,7 @@ pub fn r404_3_graveyard_order(
         batch.sort_by_key(|card| positions.get(card).copied().unwrap_or(usize::MAX));
         *pending = actions::PendingChoice(Some(actions::Choice::ArrangeGraveyard(
             actions::ArrangeGraveyardChoice {
-                player: players::PlayerId(owner_entity),
+                player: owner_entity,
                 graveyard,
                 cards: batch,
             },

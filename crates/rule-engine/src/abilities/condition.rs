@@ -9,13 +9,18 @@ pub enum Condition {
 }
 
 impl Condition {
-    pub(crate) fn holds(self, controller: Entity, lives: &Query<(Entity, &players::Life)>) -> bool {
+    pub(crate) fn holds(
+        self,
+        controller: players::PlayerId,
+        lives: &Query<(Entity, &players::Life)>,
+    ) -> bool {
         let Self::LifeAtLeast(target, amount) = self;
-        let players: Vec<Entity> = lives.iter().map(|(player, _)| player).collect();
+        let players: Vec<players::PlayerId> =
+            lives.iter().map(|(player, _)| players::PlayerId(player)).collect();
         target
             .resolve(controller, &players)
             .iter()
-            .all(|player| lives.get(*player).is_ok_and(|(_, life)| **life >= amount))
+            .all(|player| lives.get(**player).is_ok_and(|(_, life)| **life >= amount))
     }
 }
 

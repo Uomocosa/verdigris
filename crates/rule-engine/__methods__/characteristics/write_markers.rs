@@ -98,7 +98,6 @@ mod tests {
     use crate::RulesPlugin;
     use crate::cards;
     use crate::damage;
-    use crate::players;
     use crate::pt;
     use crate::testing;
     use crate::turns;
@@ -182,29 +181,26 @@ mod tests {
         app.add_plugins(RulesPlugin);
         let players =
             testing::MockGameBuilder::spawn_players(&mut app, &[testing::P1, testing::P2]);
-        let battlefield =
-            app.world_mut().spawn((BATTLEFIELD, cards::Owner(players::PlayerId(players[0])))).id();
+        let battlefield = app.world_mut().spawn((BATTLEFIELD, cards::Owner(players[0]))).id();
         let bears = app
             .world_mut()
             .spawn((
                 (testing::GRIZZLY_BEARS.definition)(),
                 zones::InZone(battlefield),
-                cards::Owner(players::PlayerId(players[0])),
+                cards::Owner(players[0]),
                 damage::Damage(0),
             ))
             .id();
         app.insert_resource(turns::Turn {
             number: 1,
-            active: players::PlayerId(players[0]),
+            active: players[0],
             step: turns::Step::PrecombatMain,
         });
         app.insert_resource(turns::Priority {
-            player: players::PlayerId(players[0]),
+            player: players[0],
             consecutive_passes: 0,
         });
-        app.insert_resource(turns::TurnOrder::from(
-            players.iter().copied().map(players::PlayerId).collect::<Vec<_>>(),
-        ));
+        app.insert_resource(turns::TurnOrder::from(players));
         app.update();
 
         let snapshot = |app: &App| {
