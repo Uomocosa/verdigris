@@ -15,36 +15,3 @@ pub const TEST_WAR_DRUMS: testing::Card = testing::Card {
         }
     },
 };
-
-#[cfg(test)]
-mod tests {
-    use crate::CREATURE;
-    use crate::YOU;
-    use crate::abilities;
-    use crate::cards;
-    use crate::cost;
-    use crate::effects;
-    use crate::rules;
-    use crate::rules::traits::event::Event;
-
-    use super::TEST_WAR_DRUMS;
-
-    #[test]
-    fn test_usage() {
-        let drums = (TEST_WAR_DRUMS.definition)();
-        assert_eq!(*drums.name, "Test War Drums");
-        assert_eq!(drums.type_line.types, vec![cards::CardType::Enchantment]);
-        assert_eq!(drums.cost, cost![2, R]);
-        assert_eq!(drums.colors(), vec![cards::Color::Red]);
-        assert_eq!(
-            drums.continuous_abilities().cloned().collect::<Vec<_>>(),
-            [abilities::Continuous {
-                filter: CREATURE.controlled_by(YOU),
-                modification: effects::Modification::Rule(rules::RuleChange {
-                    target: rules::Target::Event(rules::DeclareAttacker::ID),
-                    change: rules::Change::Must,
-                }),
-            }]
-        );
-    }
-}

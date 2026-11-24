@@ -15,31 +15,3 @@ pub const CARESS_OF_PHYREXIA: testing::Card = testing::Card {
         )
     },
 };
-
-#[cfg(test)]
-mod tests {
-    use crate::PLAYER;
-    use crate::cards;
-    use crate::cost;
-    use crate::effects;
-
-    use super::CARESS_OF_PHYREXIA;
-
-    #[test]
-    fn test_usage() {
-        let spell = (CARESS_OF_PHYREXIA.definition)();
-        assert_eq!(*spell.name, "Caress of Phyrexia");
-        assert_eq!(spell.type_line.types, vec![cards::CardType::Sorcery]);
-        assert_eq!(spell.cost, cost![3, B, B]);
-        assert_eq!(spell.colors(), vec![cards::Color::Black]);
-        assert_eq!(
-            spell.spell_ability().copied(),
-            Some(
-                effects::draw(3)
-                    .and(effects::lose_life(3))
-                    .and(effects::poison(3))
-                    .to(effects::target(1, PLAYER))
-            )
-        );
-    }
-}

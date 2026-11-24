@@ -14,26 +14,3 @@ pub const WALL_OF_STONE: testing::Card = testing::Card {
         }
     },
 };
-
-#[cfg(test)]
-mod tests {
-    use crate::cards;
-    use crate::cost;
-    use crate::keywords;
-    use crate::pt;
-
-    use super::WALL_OF_STONE;
-
-    #[test]
-    fn test_usage() {
-        let wall = (WALL_OF_STONE.definition)();
-        assert_eq!(*wall.name, "Wall of Stone");
-        assert_eq!(wall.type_line.types, vec![cards::CardType::Creature]);
-        assert_eq!(wall.cost, cost![1, R, R]);
-        assert_eq!(wall.power_toughness, Some(pt!(0, 8)));
-        assert_eq!(
-            wall.keywords().collect::<Vec<_>>(),
-            vec![keywords::StaticKeyword::Defender]
-        );
-    }
-}

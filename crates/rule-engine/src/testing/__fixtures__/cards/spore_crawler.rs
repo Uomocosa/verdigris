@@ -15,31 +15,3 @@ pub const SPORE_CRAWLER: testing::Card = testing::Card {
         }
     },
 };
-
-#[cfg(test)]
-mod tests {
-    use crate::abilities;
-    use crate::cards;
-    use crate::cost;
-    use crate::effects;
-    use crate::pt;
-
-    use super::SPORE_CRAWLER;
-
-    #[test]
-    fn test_usage() {
-        let crawler = (SPORE_CRAWLER.definition)();
-        assert_eq!(*crawler.name, "Spore Crawler");
-        assert_eq!(crawler.type_line.types, vec![cards::CardType::Creature]);
-        assert_eq!(crawler.cost, cost![2, G]);
-        assert_eq!(crawler.power_toughness, Some(pt!(3, 2)));
-        assert_eq!(
-            crawler.triggered_abilities().copied().collect::<Vec<_>>(),
-            [abilities::TriggeredAbility {
-                event: abilities::when_this_dies(),
-                intervening_if: None,
-                effect: effects::draw(1),
-            }]
-        );
-    }
-}

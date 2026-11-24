@@ -51,6 +51,10 @@ path = "crates/rule-engine/__rules__"
 reason = "Rule files have no test_usage by VRDG005; every rule test is named for the behaviour it checks."
 replaced_by = "rule_tests"
 
+[[lele.rules.lint.test_usage.exempt]]
+path = "crates/rule-engine/src/testing/__fixtures__/cards"
+reason = "A test card is only its printed definition; a test_usage would repeat it. The registry test walks every fixture card and the rule tests use them."
+
 # LELECORE007 · locked · A file has exactly one `test_usage`; it calls the file's primary item and asserts on a value…
 [lele.rules.lint.test_usage_shape]
 

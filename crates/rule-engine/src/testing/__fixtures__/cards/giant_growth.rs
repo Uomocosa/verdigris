@@ -11,26 +11,3 @@ pub const GIANT_GROWTH: testing::Card = testing::Card {
             .spell(effects::gets(3, 3).to(effects::target(1, CREATURE)))
     },
 };
-
-#[cfg(test)]
-mod tests {
-    use crate::CREATURE;
-    use crate::cards;
-    use crate::cost;
-    use crate::effects;
-
-    use super::GIANT_GROWTH;
-
-    #[test]
-    fn test_usage() {
-        let growth = (GIANT_GROWTH.definition)();
-        assert_eq!(*growth.name, "Giant Growth");
-        assert_eq!(growth.type_line.types, vec![cards::CardType::Instant]);
-        assert_eq!(growth.cost, cost![G]);
-        assert_eq!(growth.colors(), vec![cards::Color::Green]);
-        assert_eq!(
-            growth.spell_ability().copied(),
-            Some(effects::gets(3, 3).to(effects::target(1, CREATURE)))
-        );
-    }
-}

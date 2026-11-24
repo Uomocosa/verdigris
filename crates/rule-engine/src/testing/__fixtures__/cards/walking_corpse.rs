@@ -7,22 +7,3 @@ pub const WALKING_CORPSE: testing::Card = testing::Card {
     name: testing::TestCardName("Walking Corpse"),
     definition: || cards::creature("Walking Corpse", cost![1, B], pt!(2, 2)),
 };
-
-#[cfg(test)]
-mod tests {
-    use crate::cards;
-    use crate::cost;
-    use crate::pt;
-
-    use super::WALKING_CORPSE;
-
-    #[test]
-    fn test_usage() {
-        let corpse = (WALKING_CORPSE.definition)();
-        assert_eq!(*corpse.name, "Walking Corpse");
-        assert_eq!(corpse.type_line.types, vec![cards::CardType::Creature]);
-        assert_eq!(corpse.power_toughness, Some(pt!(2, 2)));
-        assert_eq!(corpse.cost, cost![1, B]);
-        assert_eq!(corpse.colors(), vec![cards::Color::Black]);
-    }
-}

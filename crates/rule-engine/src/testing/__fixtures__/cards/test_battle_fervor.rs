@@ -15,35 +15,3 @@ pub const TEST_BATTLE_FERVOR: testing::Card = testing::Card {
         }
     },
 };
-
-#[cfg(test)]
-mod tests {
-    use crate::CREATURE;
-    use crate::YOU;
-    use crate::abilities;
-    use crate::cards;
-    use crate::cost;
-    use crate::effects;
-    use crate::rules;
-
-    use super::TEST_BATTLE_FERVOR;
-
-    #[test]
-    fn test_usage() {
-        let fervor = (TEST_BATTLE_FERVOR.definition)();
-        assert_eq!(*fervor.name, "Test Battle Fervor");
-        assert_eq!(fervor.type_line.types, vec![cards::CardType::Enchantment]);
-        assert_eq!(fervor.cost, cost![1, R]);
-        assert_eq!(fervor.colors(), vec![cards::Color::Red]);
-        assert_eq!(
-            fervor.continuous_abilities().cloned().collect::<Vec<_>>(),
-            [abilities::Continuous {
-                filter: CREATURE.controlled_by(YOU),
-                modification: effects::Modification::Rule(rules::RuleChange {
-                    target: rules::Target::Clause(rules::declare_attacker::SUMMONING_SICK.key),
-                    change: rules::Change::AsThough,
-                }),
-            }]
-        );
-    }
-}

@@ -27,7 +27,7 @@ If a git hook fails, stop and report the root cause; never use `--no-verify`.
 - Rust 2024, nightly toolchain pinned in `rust-toolchain.toml`; formatting via `just fmt`.
 - Errors are `thiserror` enums; no `unwrap`/`expect`/`panic` in production code.
 - One primary item per file, named after it; methods are `#[atomic_delegates]` shells with bodies in `__methods__/`.
-- Tests live inline (`#[cfg(test)]`) and each non-trivial file ends with a `test_usage` test (except `__rules__/` files, whose tests are named for the behaviour they check).
+- Tests live inline (`#[cfg(test)]`) and each non-trivial file ends with a `test_usage` test (except `__rules__/` files, whose tests are named for the behaviour they check, and test-card fixtures, which have none).
 - Never add `#[allow(clippy::…)]` for pedantic/nursery without explicit user approval.
 - Every claim about existing code cites a `file:line` you actually read.
 - Load the `verdigris-style` skill before writing or reviewing Rust here; repo-specific style decisions live there.

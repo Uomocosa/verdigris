@@ -11,26 +11,3 @@ pub const ESSENCE_SCATTER: testing::Card = testing::Card {
             .spell(effects::counter().to(effects::target(1, CREATURE_SPELL)))
     },
 };
-
-#[cfg(test)]
-mod tests {
-    use crate::CREATURE_SPELL;
-    use crate::cards;
-    use crate::cost;
-    use crate::effects;
-
-    use super::ESSENCE_SCATTER;
-
-    #[test]
-    fn test_usage() {
-        let counter = (ESSENCE_SCATTER.definition)();
-        assert_eq!(*counter.name, "Essence Scatter");
-        assert_eq!(counter.type_line.types, vec![cards::CardType::Instant]);
-        assert_eq!(counter.cost, cost![1, U]);
-        assert_eq!(counter.colors(), vec![cards::Color::Blue]);
-        assert_eq!(
-            counter.spell_ability().copied(),
-            Some(effects::counter().to(effects::target(1, CREATURE_SPELL)))
-        );
-    }
-}

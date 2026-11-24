@@ -11,23 +11,3 @@ pub const MURDER: testing::Card = testing::Card {
             .spell(effects::destroy().to(effects::target(1, CREATURE)))
     },
 };
-
-#[cfg(test)]
-mod tests {
-    use crate::CREATURE;
-    use crate::cards;
-    use crate::effects;
-
-    use super::MURDER;
-
-    #[test]
-    fn test_usage() {
-        let removal = (MURDER.definition)();
-        assert_eq!(*removal.name, "Murder");
-        assert_eq!(removal.type_line.types, vec![cards::CardType::Instant]);
-        assert_eq!(
-            removal.spell_ability().copied(),
-            Some(effects::destroy().to(effects::target(1, CREATURE)))
-        );
-    }
-}

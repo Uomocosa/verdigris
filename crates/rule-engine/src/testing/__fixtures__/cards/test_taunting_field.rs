@@ -15,36 +15,3 @@ pub const TEST_TAUNTING_FIELD: testing::Card = testing::Card {
         }
     },
 };
-
-#[cfg(test)]
-mod tests {
-    use crate::CREATURE;
-    use crate::OPPONENT;
-    use crate::abilities;
-    use crate::cards;
-    use crate::cost;
-    use crate::effects;
-    use crate::rules;
-    use crate::rules::traits::event::Event;
-
-    use super::TEST_TAUNTING_FIELD;
-
-    #[test]
-    fn test_usage() {
-        let field = (TEST_TAUNTING_FIELD.definition)();
-        assert_eq!(*field.name, "Test Taunting Field");
-        assert_eq!(field.type_line.types, vec![cards::CardType::Enchantment]);
-        assert_eq!(field.cost, cost![1, G]);
-        assert_eq!(field.colors(), vec![cards::Color::Green]);
-        assert_eq!(
-            field.continuous_abilities().cloned().collect::<Vec<_>>(),
-            [abilities::Continuous {
-                filter: CREATURE.controlled_by(OPPONENT),
-                modification: effects::Modification::Rule(rules::RuleChange {
-                    target: rules::Target::Event(rules::DeclareBlocker::ID),
-                    change: rules::Change::Must,
-                }),
-            }]
-        );
-    }
-}

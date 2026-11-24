@@ -16,34 +16,3 @@ pub const TEST_NIGHT_OF_THE_HUNT: testing::Card = testing::Card {
         }
     },
 };
-
-#[cfg(test)]
-mod tests {
-    use crate::CREATURE;
-    use crate::OPPONENT;
-    use crate::abilities;
-    use crate::cards;
-    use crate::cost;
-    use crate::effects;
-    use crate::keywords;
-
-    use super::TEST_NIGHT_OF_THE_HUNT;
-
-    #[test]
-    fn test_usage() {
-        let night = (TEST_NIGHT_OF_THE_HUNT.definition)();
-        assert_eq!(*night.name, "Test Night of the Hunt");
-        assert_eq!(night.type_line.types, vec![cards::CardType::Enchantment]);
-        assert_eq!(night.cost, cost![2, B]);
-        assert_eq!(night.colors(), vec![cards::Color::Black]);
-        assert_eq!(
-            night.continuous_abilities().cloned().collect::<Vec<_>>(),
-            [abilities::Continuous {
-                filter: CREATURE.controlled_by(OPPONENT),
-                modification: effects::Modification::Characteristic(effects::Layered::LoseKeyword(
-                    keywords::StaticKeyword::Vigilance,
-                )),
-            }]
-        );
-    }
-}

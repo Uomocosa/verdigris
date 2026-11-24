@@ -16,31 +16,3 @@ pub const RAISE_THE_ALARM: testing::Card = testing::Card {
             .spell(effects::creates(2, SOLDIER_TOKEN.definition.into()))
     },
 };
-
-#[cfg(test)]
-mod tests {
-    use crate::cards;
-    use crate::cost;
-    use crate::effects;
-    use crate::pt;
-
-    use super::{RAISE_THE_ALARM, SOLDIER_TOKEN};
-
-    #[test]
-    fn test_usage() {
-        let soldier = (SOLDIER_TOKEN.definition)();
-        assert_eq!(*soldier.name, "Soldier");
-        assert_eq!(soldier.type_line.types, vec![cards::CardType::Creature]);
-        assert_eq!(soldier.power_toughness, Some(pt!(1, 1)));
-        assert_eq!(soldier.colors(), vec![cards::Color::White]);
-
-        let alarm = (RAISE_THE_ALARM.definition)();
-        assert_eq!(*alarm.name, "Raise the Alarm");
-        assert_eq!(alarm.type_line.types, vec![cards::CardType::Instant]);
-        assert_eq!(alarm.cost, cost![1, W]);
-        assert_eq!(
-            alarm.spell_ability().copied(),
-            Some(effects::creates(2, SOLDIER_TOKEN.definition.into()))
-        );
-    }
-}
