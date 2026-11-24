@@ -33,7 +33,7 @@ pub fn r117_3a_r117_3c_r117_3d_priority(
             });
             continue;
         }
-        if action.player != priority.player {
+        if action.player != priority.holder {
             if matches!(&action.action, actions::Action::PassPriority) {
                 rejected.write(actions::Rejected::NoPriority {
                     player: action.player,
@@ -42,13 +42,12 @@ pub fn r117_3a_r117_3c_r117_3d_priority(
             continue;
         }
         if matches!(&action.action, actions::Action::PassPriority) {
-            priority.consecutive_passes = priority.consecutive_passes.saturating_add(1);
-            if let Some(next) = turn_order.next_after(priority.player) {
-                priority.player = next;
+            if let Some(next) = turn_order.next_after(priority.holder) {
+                priority.pass_to(next);
             }
             continue;
         }
-        priority.consecutive_passes = 0;
+        priority.give_to(action.player);
     }
 }
 
@@ -66,9 +65,9 @@ mod tests {
         game.play([p1.pass_priority()])?;
 
         let priority = game.priority();
-        assert_eq!(priority.player, p2.id);
-        assert_eq!(priority.consecutive_passes, 1);
-        assert_ne!(priority.player, p1.id);
+        assert_eq!(priority.holder, p2.id);
+        assert!(priority.has_passed(p1.id));
+        assert_ne!(priority.holder, p1.id);
         Ok(())
     }
 
@@ -94,8 +93,8 @@ mod tests {
         game.play([p1.pass_priority(), p2.cast(bolt)])?;
 
         let priority = game.priority();
-        assert_eq!(priority.player, p2.id);
-        assert_eq!(priority.consecutive_passes, 0);
+        assert_eq!(priority.holder, p2.id);
+        assert!(priority.passed.is_empty());
         Ok(())
     }
 

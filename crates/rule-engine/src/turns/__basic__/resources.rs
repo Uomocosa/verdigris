@@ -13,12 +13,6 @@ pub struct Turn {
     pub step: turns::Step,
 }
 
-#[derive(Resource, Debug, Clone, Copy, PartialEq, Eq)]
-pub struct Priority {
-    pub player: players::PlayerId,
-    pub consecutive_passes: u32,
-}
-
 #[derive(Resource, Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum CombatDamageSteps {
     #[default]

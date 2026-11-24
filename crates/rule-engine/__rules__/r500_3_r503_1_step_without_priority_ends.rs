@@ -50,14 +50,12 @@ pub fn r500_3_r503_1_step_without_priority_ends(
             turn.number = turn.number.saturating_add(1);
             turn.active = next;
             turn.step = turns::Step::Untap;
-            priority.consecutive_passes = 0;
-            priority.player = next;
+            priority.give_to(next);
             step_started.write(turns::StepStarted(turns::Step::Untap));
         }
         turns::Step::Untap => {
             turn.step = turns::Step::Upkeep;
-            priority.consecutive_passes = 0;
-            priority.player = turn.active;
+            priority.give_to(turn.active);
             step_started.write(turns::StepStarted(turns::Step::Upkeep));
         }
         _ => {}
@@ -81,15 +79,15 @@ mod tests {
         assert_eq!(turn.active, p2.id);
         assert_ne!(turn.active, p1.id);
         assert_eq!(turn.step, turns::Step::Untap);
-        assert_eq!(priority.player, p2.id);
-        assert_eq!(priority.consecutive_passes, 0);
+        assert_eq!(priority.holder, p2.id);
+        assert!(priority.passed.is_empty());
 
         game.app.update();
 
         let turn = *game.turn();
         let priority = game.priority();
         assert_eq!(turn.step, turns::Step::Upkeep);
-        assert_eq!(priority.player, p2.id);
+        assert_eq!(priority.holder, p2.id);
         Ok(())
     }
 }

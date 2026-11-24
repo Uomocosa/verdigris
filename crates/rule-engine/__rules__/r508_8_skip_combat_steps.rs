@@ -30,8 +30,7 @@ pub fn r508_8_skip_combat_steps(
         turns::Step::DeclareBlockers
     };
     turn.step = next;
-    priority.consecutive_passes = 0;
-    priority.player = turn.active;
+    priority.give_to(turn.active);
     step_started.write(turns::StepStarted(next));
 }
 

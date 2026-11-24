@@ -90,10 +90,7 @@ pub fn spawn_game(
         active,
         step: builder.step,
     });
-    app.insert_resource(turns::Priority {
-        player: active,
-        consecutive_passes: 0,
-    });
+    app.insert_resource(turns::Priority::held_by(active));
     app.insert_resource(turns::TurnOrder::from(entities.clone()));
 
     let game = testing::MockGame {

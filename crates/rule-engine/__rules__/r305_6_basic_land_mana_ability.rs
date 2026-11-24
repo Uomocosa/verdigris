@@ -83,7 +83,7 @@ pub fn r305_6_basic_land_mana_ability(
             rejected.write(actions::Rejected::CannotActivateManaAbility { permanent });
             continue;
         };
-        if action.player != priority.player || **owner != action.player || tapped.is_some() {
+        if action.player != priority.holder || **owner != action.player || tapped.is_some() {
             rejected.write(actions::Rejected::CannotActivateManaAbility { permanent });
             continue;
         }

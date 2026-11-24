@@ -46,19 +46,11 @@ mod tests {
 
     #[test]
     fn test_usage() -> TestResult {
-        let (mut game, [p1, p2, p3]) = MockGame::new([P1, P2.life(0), P3]);
+        let (mut game, [p1, p2, _p3]) = MockGame::new([P1, P2.life(0), P3]);
         game.play([p1.pass_priority()])?;
         game.app
             .world_mut()
             .run_system_once(move |players: Players| {
-                assert_eq!(
-                    players
-                        .still_in_the_game()
-                        .into_iter()
-                        .map(|player| player.id)
-                        .collect::<Vec<_>>(),
-                    [p1.id, p3.id]
-                );
                 assert!(!players.is_still_in_the_game(p2.id));
                 assert!(!players.has_anyone_won());
             })

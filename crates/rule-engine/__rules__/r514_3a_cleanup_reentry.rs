@@ -29,16 +29,14 @@ pub fn r514_3a_cleanup_reentry(
         }
         if **performed || !triggers.is_empty() {
             reentry.is_priority_window = true;
-            priority.player = turn.active;
-            priority.consecutive_passes = 0;
+            priority.give_to(turn.active);
         }
     }
     for _ in passed.read() {
         if !reentry.is_priority_window {
             continue;
         }
-        priority.player = turn.active;
-        priority.consecutive_passes = 0;
+        priority.give_to(turn.active);
         reentry.should_repeat = true;
     }
 }
@@ -62,7 +60,7 @@ mod tests {
 
         game.play([p1.pass_to(CLEANUP), p2.pass_to(CLEANUP)])?;
         assert_eq!(game.turn().step, turns::Step::Cleanup);
-        assert_eq!(game.priority().player, p1.id);
+        assert_eq!(game.priority().holder, p1.id);
 
         game.play([p1.order_triggers([knight_1, knight_2, knight_3])])?;
         assert_eq!(game.trigger_sources().len(), 3);

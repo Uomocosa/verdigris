@@ -196,10 +196,7 @@ mod tests {
             active: players[0],
             step: turns::Step::PrecombatMain,
         });
-        app.insert_resource(turns::Priority {
-            player: players[0],
-            consecutive_passes: 0,
-        });
+        app.insert_resource(turns::Priority::held_by(players[0]));
         app.insert_resource(turns::TurnOrder::from(players));
         app.update();
 

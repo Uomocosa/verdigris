@@ -52,7 +52,7 @@ pub fn r506_2a_r507_1_r508_1b_defending_player(
         };
         let is_legal = turn.step == turns::Step::BeginningOfCombat
             && action.player == turn.active
-            && action.player == priority.player
+            && action.player == priority.holder
             && players.get(**chosen).is_ok()
             && *chosen != turn.active
             && lost.get(**chosen).is_err();

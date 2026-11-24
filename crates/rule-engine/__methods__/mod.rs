@@ -29,6 +29,7 @@ pub mod play_land;
 pub mod player_view;
 pub mod players;
 pub mod predicate;
+pub mod priority;
 #[cfg(feature = "testing")]
 pub mod restricted_rule;
 pub mod rule_registry;

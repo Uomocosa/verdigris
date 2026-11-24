@@ -40,8 +40,7 @@ pub fn r500_1_r500_2_step_ends(
             turns::Step::End => turns::Step::Cleanup,
         };
         turn.step = next;
-        priority.consecutive_passes = 0;
-        priority.player = turn.active;
+        priority.give_to(turn.active);
         step_started.write(turns::StepStarted(next));
     }
 }
@@ -60,8 +59,8 @@ mod tests {
         let priority = game.priority();
         let turn = *game.turn();
         assert_eq!(turn.step, turns::Step::BeginningOfCombat);
-        assert_eq!(priority.player, p1.id);
-        assert_eq!(priority.consecutive_passes, 0);
+        assert_eq!(priority.holder, p1.id);
+        assert!(priority.passed.is_empty());
         Ok(())
     }
 }

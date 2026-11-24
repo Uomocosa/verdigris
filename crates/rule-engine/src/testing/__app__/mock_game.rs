@@ -74,10 +74,12 @@ impl MockGame {
     pub fn turn(&self) -> &turns::Turn { self.app.world().resource::<turns::Turn>() }
 
     #[must_use]
-    pub fn priority(&self) -> turns::Priority { *self.app.world().resource::<turns::Priority>() }
+    pub fn priority(&self) -> turns::Priority {
+        self.app.world().resource::<turns::Priority>().clone()
+    }
 
     #[must_use]
-    pub fn priority_player(&self) -> players::PlayerId { self.priority().player }
+    pub fn priority_player(&self) -> players::PlayerId { self.priority().holder }
 }
 
 impl MockGame {
@@ -102,7 +104,7 @@ impl MockGame {
     }
 
     pub fn pass_priority(&mut self) {
-        let player = self.priority().player;
+        let player = self.priority().holder;
         let _ = self.app.world_mut().write_message(actions::PlayerAction {
             player,
             action: actions::Action::PassPriority,
@@ -111,9 +113,9 @@ impl MockGame {
     }
 
     pub fn pass_priority_all(&mut self) {
-        let passes = self.priority().consecutive_passes;
-        let player_count = u32::try_from(self.players.len()).unwrap_or(u32::MAX);
-        for _ in passes..player_count {
+        let remaining =
+            self.players.iter().filter(|player| !self.priority().has_passed(**player)).count();
+        for _ in 0..remaining {
             self.pass_priority();
         }
     }
@@ -196,8 +198,8 @@ mod tests {
         assert_eq!(game.damage(p1), 0);
         assert_eq!(game.turn().number, 1);
         assert_eq!(game.priority_player(), p1.id);
-        assert_eq!(game.priority().player, p1.id);
-        assert_eq!(game.priority().consecutive_passes, 0);
+        assert_eq!(game.priority().holder, p1.id);
+        assert!(game.priority().passed.is_empty());
         assert_eq!(game.player(p2).cards_in(BATTLEFIELD).count(), 1);
         assert_eq!(game.stack().count(), 0);
 

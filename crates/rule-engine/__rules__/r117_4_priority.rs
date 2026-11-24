@@ -20,11 +20,11 @@ pub fn r117_4_priority(
 ) {
     let turn = turn.into_inner();
     let turn_order = turn_order.into_inner();
-    let player_count = u32::try_from(turn_order.len()).unwrap_or(u32::MAX);
-    if priority.consecutive_passes < player_count {
+    if !turn_order.iter().all(|player| priority.has_passed(*player)) {
         return;
     }
-    priority.consecutive_passes = 0;
+    let holder = priority.holder;
+    priority.give_to(holder);
     let top = zones
         .find(STACK, None)
         .and_then(|stack| stack_contents.get(stack).ok())
@@ -37,7 +37,7 @@ pub fn r117_4_priority(
     if is_still_casting {
         return;
     }
-    priority.player = turn.active;
+    priority.give_to(turn.active);
     resolutions.write(stack::Resolution(top));
 }
 
@@ -111,8 +111,8 @@ mod tests {
         game.play([p2.pass_priority()])?;
 
         let priority = game.priority();
-        assert_eq!(priority.player, p1.id);
-        assert_eq!(priority.consecutive_passes, 0);
+        assert_eq!(priority.holder, p1.id);
+        assert!(priority.passed.is_empty());
         Ok(())
     }
 }

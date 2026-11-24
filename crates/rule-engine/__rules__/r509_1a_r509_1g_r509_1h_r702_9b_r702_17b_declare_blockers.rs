@@ -56,7 +56,7 @@ pub fn r509_1a_r509_1g_r509_1h_r702_9b_r702_17b_declare_blockers(
             continue;
         };
         if turn.step != turns::Step::DeclareBlockers
-            || action.player != priority.player
+            || action.player != priority.holder
             || action.player == turn.active
         {
             rejected.write(actions::Rejected::CannotBlock {

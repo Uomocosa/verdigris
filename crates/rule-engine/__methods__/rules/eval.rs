@@ -97,7 +97,7 @@ pub fn eval(
         rules::Predicate::ActivePlayer(role) => target(role)
             .is_some_and(|holder| answers.turn.single().is_ok_and(|turn| *turn.active == holder)),
         rules::Predicate::HasPriority(role) => target(role).is_some_and(|holder| {
-            answers.priority.single().is_ok_and(|priority| *priority.player == holder)
+            answers.priority.single().is_ok_and(|priority| *priority.holder == holder)
         }),
         rules::Predicate::EventField(..) => false,
     }
