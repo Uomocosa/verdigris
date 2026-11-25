@@ -51,6 +51,6 @@ mod tests {
             Hooked::<events::OpeningHandAction>::ID,
             rules::EventId("103.6")
         );
-        assert_eq!(Hooked::<events::OpeningHandAction>::clauses(), Vec::new());
+        assert_eq!(Hooked::<events::OpeningHandAction>::clauses().len(), 1);
     }
 }

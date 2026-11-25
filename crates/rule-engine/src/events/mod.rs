@@ -4,7 +4,7 @@ pub use cast_spell::CastSpell;
 mod begin_the_game_on_the_battlefield;
 pub use begin_the_game_on_the_battlefield::BeginTheGameOnTheBattlefield;
 
-mod opening_hand_action;
+pub mod opening_hand_action;
 pub use opening_hand_action::OpeningHandAction;
 
 mod create_tokens;

@@ -26,6 +26,7 @@ pub mod mana_pool;
 pub mod mock_game;
 #[cfg(feature = "testing")]
 pub mod mock_game_builder;
+pub mod opening_hand_action;
 #[cfg(feature = "testing")]
 pub mod pass_budget;
 pub mod play_land;

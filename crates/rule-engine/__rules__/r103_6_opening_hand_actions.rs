@@ -34,7 +34,26 @@ mod tests {
     use crate::mana;
     use crate::testing::*;
     use crate::turns;
-    use crate::{BATTLEFIELD, HAND};
+    use crate::{BATTLEFIELD, GRAVEYARD, HAND};
+
+    #[test]
+    fn a_card_that_left_the_opening_hand_takes_no_action() -> TestResult {
+        let (mut game, [p1, ..]) =
+            MockGame::new([P1.hand([TEST_OPENING_PURGE, LEYLINE_OF_ANTICIPATION]), P2]);
+        let [purge] = game.player(p1).cards_in(HAND).exactly::<1>(TEST_OPENING_PURGE)?;
+        let [leyline] = game.player(p1).cards_in(HAND).exactly::<1>(LEYLINE_OF_ANTICIPATION)?;
+
+        game.act(p1, actions::Action::PassPriority);
+
+        assert!(game.player(p1).cards_in(GRAVEYARD).has(purge));
+        assert!(game.player(p1).cards_in(GRAVEYARD).has(leyline));
+
+        game.act(p1, actions::Action::ChooseMay(vec![leyline.into()]));
+
+        assert!(game.player(p1).cards_in(GRAVEYARD).has(leyline));
+        assert!(game.player(p1).cards_in(BATTLEFIELD).has_no(leyline));
+        Ok(())
+    }
 
     #[test]
     fn every_opening_hand_action_of_a_card_is_taken() {

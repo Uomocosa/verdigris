@@ -2,6 +2,7 @@ use bevy::prelude::{Commands, MessageReader, MessageWriter, ResMut};
 
 use crate::Resolve;
 use crate::actions;
+use crate::rules;
 use crate::rules::traits::event::Event;
 
 pub fn answer_may<E: Event>(
@@ -9,6 +10,7 @@ pub fn answer_may<E: Event>(
     mut proceeds: MessageWriter<Resolve<E>>,
     mut commands: Commands,
     mut pending: ResMut<actions::PendingMayAsks<E>>,
+    answers: rules::Rules,
 ) {
     for answer in answered.read() {
         if answer.event != E::ID {
@@ -21,7 +23,9 @@ pub fn answer_may<E: Event>(
         };
         let ask = pending.remove(index);
         if answer.is_accepted {
-            ask.then.instantiate(&ask.event).announce(&mut commands);
+            if answers.legal(&ask.event) {
+                ask.then.instantiate(&ask.event).announce(&mut commands);
+            }
         } else {
             proceeds.write(Resolve(ask.event));
         }
