@@ -1,10 +1,9 @@
-use std::collections::BTreeSet;
+use bevy::prelude::{MessageReader, Query, ResMut};
 
-use bevy::prelude::{Entity, MessageReader, Query, ResMut};
-
+use crate::Did;
 use crate::abilities;
-use crate::actions;
 use crate::cards;
+use crate::events;
 use crate::stack;
 
 /// 508.1m Any abilities that trigger on attackers being declared trigger.
@@ -19,39 +18,23 @@ use crate::stack;
 /// attacking that player or permanent. Such abilities won’t trigger if a creature is put onto
 /// the battlefield attacking.
 pub fn r508_1m_r508_2a_r508_3a_attack_triggers(
-    mut declared: MessageReader<actions::PlayerAction>,
-    mut rejected: MessageReader<actions::Rejected>,
+    mut declared: MessageReader<Did<events::DeclareAttacker>>,
     mut queue: ResMut<stack::TriggerQueue>,
     attackers: Query<(&cards::CardDefinition, &cards::Owner)>,
 ) {
-    let mut illegal: BTreeSet<Entity> = BTreeSet::new();
-    for rejection in rejected.read() {
-        let actions::Rejected::CannotAttack { attackers } = rejection else {
+    for declared in declared.read() {
+        let Ok((definition, owner)) = attackers.get(declared.attacker) else {
             continue;
         };
-        illegal.extend(attackers.iter());
-    }
-    for action in declared.read() {
-        let actions::Action::DeclareAttackers(declared_attackers) = &action.action else {
-            continue;
-        };
-        for attacker in declared_attackers {
-            if illegal.contains(attacker) {
+        for ability in definition.triggered_abilities() {
+            if !matches!(ability.event, abilities::TriggerEvent::Attacks) {
                 continue;
             }
-            let Ok((definition, owner)) = attackers.get(*attacker) else {
-                continue;
-            };
-            for ability in definition.triggered_abilities() {
-                if !matches!(ability.event, abilities::TriggerEvent::Attacks) {
-                    continue;
-                }
-                queue.push(stack::PendingTrigger {
-                    source: *attacker,
-                    controller: **owner,
-                    ability: *ability,
-                });
-            }
+            queue.push(stack::PendingTrigger {
+                source: declared.attacker,
+                controller: **owner,
+                ability: *ability,
+            });
         }
     }
 }

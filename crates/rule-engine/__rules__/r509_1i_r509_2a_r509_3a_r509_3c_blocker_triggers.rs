@@ -2,9 +2,10 @@ use std::collections::BTreeSet;
 
 use bevy::prelude::{Entity, MessageReader, Query, ResMut};
 
+use crate::Did;
 use crate::abilities;
-use crate::actions;
 use crate::cards;
+use crate::events;
 use crate::stack;
 
 /// 509.1i Any abilities that trigger on blockers being declared trigger. See rule 509.2a for
@@ -28,55 +29,38 @@ use crate::stack;
 /// or by a creature that’s put onto the battlefield as a blocker, but only if the attacking
 /// creature was an unblocked creature at that time. (See rule 509.1h.)
 pub fn r509_1i_r509_2a_r509_3a_r509_3c_blocker_triggers(
-    mut declared: MessageReader<actions::PlayerAction>,
-    mut rejected: MessageReader<actions::Rejected>,
+    mut declared: MessageReader<Did<events::DeclareBlocker>>,
     mut queue: ResMut<stack::TriggerQueue>,
     creatures: Query<(&cards::CardDefinition, &cards::Owner)>,
 ) {
-    let mut illegal: BTreeSet<(Entity, Entity)> = BTreeSet::new();
-    for rejection in rejected.read() {
-        let actions::Rejected::CannotBlock { assignments } = rejection else {
-            continue;
-        };
-        illegal
-            .extend(assignments.iter().map(|assignment| (assignment.blocker, assignment.attacker)));
-    }
-    for action in declared.read() {
-        let actions::Action::DeclareBlockers(assignments) = &action.action else {
-            continue;
-        };
-        let mut fired: BTreeSet<Entity> = BTreeSet::new();
-        for assignment in assignments {
-            if illegal.contains(&(assignment.blocker, assignment.attacker)) {
-                continue;
-            }
-            if fired.insert(assignment.blocker)
-                && let Ok((definition, owner)) = creatures.get(assignment.blocker)
-            {
-                for ability in definition.triggered_abilities() {
-                    if !matches!(ability.event, abilities::TriggerEvent::Blocks) {
-                        continue;
-                    }
-                    queue.push(stack::PendingTrigger {
-                        source: assignment.blocker,
-                        controller: **owner,
-                        ability: *ability,
-                    });
+    let mut fired: BTreeSet<Entity> = BTreeSet::new();
+    for declared in declared.read() {
+        if fired.insert(declared.blocker)
+            && let Ok((definition, owner)) = creatures.get(declared.blocker)
+        {
+            for ability in definition.triggered_abilities() {
+                if !matches!(ability.event, abilities::TriggerEvent::Blocks) {
+                    continue;
                 }
+                queue.push(stack::PendingTrigger {
+                    source: declared.blocker,
+                    controller: **owner,
+                    ability: *ability,
+                });
             }
-            if fired.insert(assignment.attacker)
-                && let Ok((definition, owner)) = creatures.get(assignment.attacker)
-            {
-                for ability in definition.triggered_abilities() {
-                    if !matches!(ability.event, abilities::TriggerEvent::BecomesBlocked) {
-                        continue;
-                    }
-                    queue.push(stack::PendingTrigger {
-                        source: assignment.attacker,
-                        controller: **owner,
-                        ability: *ability,
-                    });
+        }
+        if fired.insert(declared.attacker)
+            && let Ok((definition, owner)) = creatures.get(declared.attacker)
+        {
+            for ability in definition.triggered_abilities() {
+                if !matches!(ability.event, abilities::TriggerEvent::BecomesBlocked) {
+                    continue;
                 }
+                queue.push(stack::PendingTrigger {
+                    source: declared.attacker,
+                    controller: **owner,
+                    ability: *ability,
+                });
             }
         }
     }
