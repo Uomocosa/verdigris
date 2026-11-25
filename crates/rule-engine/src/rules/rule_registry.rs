@@ -29,6 +29,8 @@ impl RuleRegistry {
 
 #[cfg(test)]
 mod tests {
+    use std::collections::HashMap;
+
     use crate::abilities;
     use crate::effects;
     use crate::events;
@@ -80,6 +82,55 @@ mod tests {
                         );
                     }
                 }
+            }
+        }
+    }
+
+    #[test]
+    fn no_fixture_card_has_two_optional_hooks_on_one_event() {
+        for card in testing::ALL_CARDS {
+            let definition = (card.definition)();
+            let mut may_hooks_by_target = HashMap::new();
+            for ability in &definition.text {
+                let mut modifications = Vec::new();
+                if let abilities::Ability::Static(static_ability) = ability {
+                    match static_ability {
+                        abilities::StaticAbility::Continuous(continuous) => {
+                            modifications.push(continuous.modification.clone());
+                        }
+                        abilities::StaticAbility::Keyword(keyword) => {
+                            modifications.extend(keyword.keyword_modifications());
+                        }
+                        abilities::StaticAbility::Replacement(replacement) => {
+                            if let abilities::Replacement::Rule(change) = replacement {
+                                modifications.push(effects::Modification::Rule(change.clone()));
+                            }
+                        }
+                    }
+                }
+                for modification in modifications {
+                    if let effects::Modification::Rule(rules::RuleChange { target, change }) =
+                        modification
+                        && matches!(
+                            change,
+                            rules::Change::Hook {
+                                then: rules::Then::May(_),
+                                ..
+                            }
+                        )
+                    {
+                        *may_hooks_by_target.entry(target).or_insert(0) += 1;
+                    }
+                }
+            }
+            for (target, count) in &may_hooks_by_target {
+                assert!(
+                    *count <= 1,
+                    "card {} has {} optional hooks on {:?}",
+                    card.name,
+                    count,
+                    target
+                );
             }
         }
     }
