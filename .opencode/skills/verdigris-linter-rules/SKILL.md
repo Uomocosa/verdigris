@@ -137,7 +137,7 @@ untaps.write(rules::Would(rules::Untap {
 }));
 ```
 
-Good — `crates/rule-engine/__rules__/r502_3_untap.rs:25`:
+Good — `crates/rule-engine/__rules__/r502_3_untap.rs:26`:
 
 ```rust
 use crate::Attempt;
@@ -161,27 +161,25 @@ mut rejected: MessageWriter<actions::Rejected>,
 mut pending: ResMut<actions::PendingChoice>,
 ```
 
-Good — `crates/rule-engine/__rules__/r502_3_untap.rs:12` (the rule announces; the card or shared ask carries the choice):
+Good — `crates/rule-engine/__rules__/r502_3_untap.rs:14-32` (the rule announces; the card or shared ask carries the choice):
 
 ```rust
-pub fn r502_3_untap(
-    mut step_started: MessageReader<turns::StepStarted>,
+pub fn r502_3_untap() -> ScheduleConfigs<ScheduleSystem> {
+    untap.run_if(turns::Step::Untap.begins())
+}
+
+fn untap(
     mut untaps: MessageWriter<Attempt<events::Untap>>,
     turn: Res<turns::Turn>,
     tapped: Query<(Entity, &cards::Owner), With<cards::Tapped>>,
 ) {
     let turn = turn.into_inner();
-    for step in step_started.read() {
-        if **step != turns::Step::Untap {
-            continue;
-        }
-        for (entity, owner) in tapped.iter() {
-            if **owner == turn.active {
-                untaps.write(Attempt(events::Untap {
-                    permanent: entity,
-                    controller: **owner,
-                }));
-            }
+    for (entity, owner) in tapped.iter() {
+        if **owner == turn.active {
+            untaps.write(Attempt(events::Untap {
+                permanent: entity,
+                controller: **owner,
+            }));
         }
     }
 }

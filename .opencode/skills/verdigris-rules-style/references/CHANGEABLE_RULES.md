@@ -148,6 +148,9 @@ A hook on permanents needs a controller, which the engine doesn't have yet (`Hoo
 `cards::Owner`), so 502.1 phasing waits for it. "At the beginning of ..." is a triggered ability,
 never a hook.
 
+**Skipping a step**: a CR rule changes `turns::NextStep` (SKILL.md §17). No card skips a step
+yet; the first one makes `NextStep` go through the pipeline.
+
 **A card that works outside the battlefield** (611.3b "or the object generating it is in the
 appropriate zone"): the change applies from the zone its text names. If the engine reads changes only
 from the battlefield, that is a gap to close there, not a reason for a rule to look into the zone.

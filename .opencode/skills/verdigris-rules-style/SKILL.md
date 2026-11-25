@@ -158,6 +158,8 @@ if let Some(next) = game.priority_holder().next_in_turn_order() {
 `next_in_turn_order()` skips players who left. Cards don't override it: a card changes the answer,
 through the pipeline.
 
+Only `r500_1` begins a step from `NextStep`; a skip rule takes no `GameMut`.
+
 ## 9. A player is a `players::PlayerId`
 
 A field or parameter that is always a player is a `PlayerId`, never an `Entity`. A value that can be
@@ -286,7 +288,10 @@ that stands for "everyone did it".
    (`LoseLife::by(player, amount)`; if the linter wants another name, its name wins).
 
 A missing engine part is not a reason to keep a rule complicated. Name the part, say what else it
-would serve, and plan the rule as if it existed. Moving an old rule to the shapes of §5, §6, §10-§13
+would serve, and plan the rule as if it existed. This applies when a rule or a fixture card needs
+the part today. Otherwise leave a seam and name what would trigger building it (the pipeline
+for skipping steps waits for the first card that skips a step). Moving an old rule to the shapes
+of §5, §6, §10-§13
 is in scope of refactoring that rule. A plan applies them; "keep it smaller for now" is
 not a reason to skip one.
 
@@ -309,7 +314,8 @@ Red first, then green, but reuse. In this order:
 ```
 
 RUN it red on the old code. A refactor adds no test: players see the same, and an assert on internal
-bookkeeping becomes one on what players see. Commit only on the full suite
+bookkeeping becomes one on what players see. A refactor that uncovers a CR bug becomes a fix:
+its own commit, red first. Commit only on the full suite
 (`cargo nextest run ... --no-fail-fast`): `just test` stops at the first failure.
 
 ## 16. Create the data first, then act on it
@@ -354,10 +360,31 @@ pub fn r103_6_opening_hand_actions() -> ScheduleConfigs<ScheduleSystem> {
 }
 ```
 
-A message that carries data (`StepStarted(step)`) is still read. One flat loop with one write
+A message compared with ONE fixed value is a moment too: `.run_if(turns::Step::Draw.begins())`
+(Good: `r504_1_draw_step`; Bad: `if **step != turns::Step::X { continue; }`).
+Only a rule that uses the varying data reads the message. One flat loop with one write
 (104.2a, §0) is already clear and stays.
 
 **Why:** the order can be read and checked in one place, next to the CR words that give it.
+
+## 17. A CR rule that skips a step changes NextStep
+
+`AllPlayersPassed -> r500_2 writes NextStep -> skip rules (r103_8a, r508_8) change it ->
+r500_1 begins it -> StepStarted`. Never edit `StepStarted` (614.10: a started step can no
+longer be skipped).
+
+```rust
+// Good — the step never started, and r500_2 names no case
+// crates/rule-engine/__rules__/r103_8a_skip_first_draw_step.rs:14
+for step in next_step.read() {
+    if **step == turns::Step::Draw && game.is_first_turn() && players.is_two_player_game() {
+        *step = turns::NextStep(turns::Step::PrecombatMain);
+    }
+}
+```
+
+**Why:** the step never started, and `r500_2` names no case. Skip rules go between r500_2
+and r500_1 in `add_step_end_systems`. Not yet through it: `r500_3` (untap to upkeep, next turn).
 
 ## Checklist for a rule (or a plan for one)
 
@@ -388,6 +415,8 @@ A message that carries data (`StepStarted(step)`) is still read. One flat loop w
 | a helper that returns "all that this rule needs" | §14.3 |
 | nested loops that find, order and write at once; `for _ in some_message.read()` | §16 |
 | a rule that polls state every frame to announce something | read the message of that moment, §10 |
+| `if **step != X { continue }` | §16 |
+| a write to `StepStarted` outside `r500_1`/`r500_3` | §17 |
 
 ## Adding rules here
 
