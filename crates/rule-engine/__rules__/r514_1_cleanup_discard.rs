@@ -36,6 +36,7 @@ fn discard_to_maximum_hand_size(
 #[cfg(test)]
 mod tests {
     use crate::testing::*;
+    use crate::turns;
     use crate::{GRAVEYARD, HAND};
 
     #[test]
@@ -64,7 +65,11 @@ mod tests {
         ]);
         let [bears] = game.player(p1).cards_in(HAND).exactly::<1>(GRIZZLY_BEARS)?;
         game.play([p1.end_turn(), p2.end_turn()])?;
+        assert_eq!(game.turn().number, 1);
+        assert_eq!(game.turn().step, turns::Step::Cleanup);
         game.play([p1.discard([bears])])?;
+        assert_eq!(game.turn().number, 2);
+        assert_eq!(game.turn().active, p2.id);
         assert!(game.player(p1).cards_in(GRAVEYARD).has(bears));
         assert_eq!(game.player(p1).cards_in(HAND).count(), 7);
         Ok(())

@@ -1,9 +1,14 @@
-use bevy::prelude::{MessageReader, Res, ResMut};
+use bevy::ecs::schedule::{IntoScheduleConfigs, ScheduleConfigs};
+use bevy::ecs::system::ScheduleSystem;
+use bevy::prelude::{MessageReader, Query, Res, ResMut, not, on_message};
 
 use crate::GameMut;
+use crate::STACK;
 use crate::StateBasedActionsPerformed;
+use crate::actions;
 use crate::stack;
 use crate::turns;
+use crate::zones;
 
 /// 514.3a At this point, the game checks to see if any state-based actions would be performed
 /// and/or any triggered abilities are waiting to be put onto the stack (including those that
@@ -11,26 +16,52 @@ use crate::turns;
 /// performed, then those triggered abilities are put on the stack, then the active player gets
 /// priority. Players may cast spells and activate abilities. Once the stack is empty and all
 /// players pass in succession, another cleanup step begins.
-pub fn r514_3a_cleanup_reentry(
-    mut steps: MessageReader<turns::StepStarted>,
-    mut passed: MessageReader<turns::AllPlayersPassed>,
-    reentry: ResMut<turns::CleanupReentry>,
+pub fn r514_3a_cleanup_reentry() -> ScheduleConfigs<ScheduleSystem> {
+    (
+        check_for_a_priority_window.run_if(not(turns::Step::Cleanup.begins())),
+        repeat_cleanup_step.run_if(on_message::<turns::AllPlayersPassed>),
+    )
+        .chain()
+}
+
+fn check_for_a_priority_window(
     mut game: GameMut,
+    reentry: ResMut<turns::CleanupReentry>,
     triggers: Res<stack::TriggerQueue>,
     performed: Res<StateBasedActionsPerformed>,
+    pending: Res<actions::PendingChoice>,
+    zones: zones::ZoneLookup,
+    stack_contents: Query<&zones::ZoneContents>,
 ) {
     let reentry = reentry.into_inner();
     let triggers = triggers.into_inner();
     let performed = performed.into_inner();
-    for step in steps.read() {
-        if **step != turns::Step::Cleanup || reentry.is_priority_window {
-            continue;
-        }
-        if **performed || !triggers.is_empty() {
-            reentry.is_priority_window = true;
-            game.give_priority_to_active_player();
-        }
+    let pending = pending.into_inner();
+    if game.step() != turns::Step::Cleanup {
+        return;
     }
+    if reentry.is_priority_window || reentry.should_repeat {
+        return;
+    }
+    if pending.is_discard() {
+        return;
+    }
+    let stack_is_empty = zones
+        .find(STACK, None)
+        .and_then(|stack| stack_contents.get(stack).ok())
+        .is_none_or(|contents| contents.is_empty());
+    if **performed || !triggers.is_empty() || !stack_is_empty {
+        reentry.is_priority_window = true;
+        game.give_priority_to_active_player();
+    }
+}
+
+fn repeat_cleanup_step(
+    mut passed: MessageReader<turns::AllPlayersPassed>,
+    reentry: ResMut<turns::CleanupReentry>,
+    mut game: GameMut,
+) {
+    let reentry = reentry.into_inner();
     for _ in passed.read() {
         if !reentry.is_priority_window {
             continue;

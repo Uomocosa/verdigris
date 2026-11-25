@@ -1,6 +1,9 @@
-use bevy::prelude::{MessageWriter, ResMut};
+use bevy::ecs::schedule::{IntoScheduleConfigs, ScheduleConfigs};
+use bevy::ecs::system::ScheduleSystem;
+use bevy::prelude::{MessageWriter, Res, ResMut, not};
 
 use crate::GameMut;
+use crate::actions;
 use crate::turns;
 
 /// 500.3. A step in which no players receive priority ends when all specified actions that take
@@ -21,40 +24,50 @@ use crate::turns;
 ///
 /// 514.3. Normally, no player receives priority during the cleanup step, so no spells can be cast
 /// and no abilities can be activated. However, this rule is subject to the following exception:
-pub fn r500_3_r503_1_step_without_priority_ends(
+pub fn r500_3_r503_1_step_without_priority_ends() -> ScheduleConfigs<ScheduleSystem> {
+    (
+        end_cleanup_step.run_if(not(turns::Step::Cleanup.begins())),
+        begin_upkeep_step.run_if(not(turns::Step::Untap.begins())),
+    )
+        .chain()
+}
+
+fn end_cleanup_step(
     mut step_started: MessageWriter<turns::StepStarted>,
     mut turn_started: MessageWriter<turns::TurnStarted>,
     mut game: GameMut,
     mut reentry: ResMut<turns::CleanupReentry>,
+    pending: Res<actions::PendingChoice>,
 ) {
-    match game.step() {
-        turns::Step::Cleanup => {
-            if reentry.should_repeat {
-                reentry.should_repeat = false;
-                reentry.is_priority_window = false;
-                reentry.is_extra_cleanup = true;
-                step_started.write(turns::StepStarted(turns::Step::Cleanup));
-                return;
-            }
-            if reentry.is_extra_cleanup {
-                reentry.is_extra_cleanup = false;
-                return;
-            }
-            if reentry.is_priority_window {
-                return;
-            }
-            if game.begin_next_turn().is_some() {
-                turn_started.write(turns::TurnStarted);
-                step_started.write(turns::StepStarted(turns::Step::Untap));
-            }
-        }
-        turns::Step::Untap => {
-            game.begin_step(turns::Step::Upkeep);
-            game.give_priority_to_active_player();
-            step_started.write(turns::StepStarted(turns::Step::Upkeep));
-        }
-        _ => {}
+    let pending = pending.into_inner();
+    if pending.is_discard() {
+        return;
     }
+    if game.step() != turns::Step::Cleanup {
+        return;
+    }
+    if reentry.should_repeat {
+        reentry.should_repeat = false;
+        reentry.is_priority_window = false;
+        step_started.write(turns::StepStarted(turns::Step::Cleanup));
+        return;
+    }
+    if reentry.is_priority_window {
+        return;
+    }
+    if game.begin_next_turn().is_some() {
+        turn_started.write(turns::TurnStarted);
+        step_started.write(turns::StepStarted(turns::Step::Untap));
+    }
+}
+
+fn begin_upkeep_step(mut step_started: MessageWriter<turns::StepStarted>, mut game: GameMut) {
+    if game.step() != turns::Step::Untap {
+        return;
+    }
+    game.begin_step(turns::Step::Upkeep);
+    game.give_priority_to_active_player();
+    step_started.write(turns::StepStarted(turns::Step::Upkeep));
 }
 
 #[cfg(test)]

@@ -8,8 +8,8 @@ pub fn add_turn_end_systems(app: &mut App) {
     app.add_systems(
         Update,
         (
-            comprehensive_rules::r500_3_r503_1_step_without_priority_ends::r500_3_r503_1_step_without_priority_ends,
             actions::bevy_systems::show_asks::show_asks,
+            comprehensive_rules::r500_3_r503_1_step_without_priority_ends::r500_3_r503_1_step_without_priority_ends(),
         )
             .chain()
             .in_set(RuleSet::TurnEnd),
@@ -27,6 +27,6 @@ mod tests {
         let mut app = App::new();
         add_turn_end_systems(&mut app);
 
-        assert_eq!(app.get_schedule(Update).map(Schedule::systems_len), Some(2));
+        assert_eq!(app.get_schedule(Update).map(Schedule::systems_len), Some(3));
     }
 }

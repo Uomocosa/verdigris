@@ -81,16 +81,15 @@ pub fn play(
                 });
             }
         }
-        loop {
+        while !game.app.world().resource::<actions::PendingChoice>().is_discard() {
             let holder = game.priority().holder.unwrap_or_else(|| game.turn().active);
             let Some(position) = auto_passes.iter().position(|pass| pass.player == *holder) else {
                 break;
             };
-            let now = game.app.world().resource::<turns::TurnState>().turn;
             let Some(auto_pass) = auto_passes.get(position) else {
                 break;
             };
-            if auto_pass.is_stop_reached(now) {
+            if auto_pass.is_stop_reached(game.app.world().resource::<turns::TurnState>().turn) {
                 auto_passes.remove(position);
                 break;
             }

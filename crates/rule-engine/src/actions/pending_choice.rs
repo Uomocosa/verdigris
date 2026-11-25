@@ -21,6 +21,12 @@ impl PendingChoice {
     }
 }
 
+#[rustfmt::skip]
+impl PendingChoice {
+    #[must_use]
+    pub(crate) const fn is_discard(&self) -> bool { matches!(self.0, Some(actions::Choice::Discard(_))) }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::HAND;

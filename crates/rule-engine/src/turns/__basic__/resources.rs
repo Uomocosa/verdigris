@@ -10,5 +10,4 @@ pub struct CombatDamageParticipants(pub BTreeSet<Entity>);
 pub struct CleanupReentry {
     pub is_priority_window: bool,
     pub should_repeat: bool,
-    pub is_extra_cleanup: bool,
 }
