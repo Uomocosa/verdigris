@@ -17,6 +17,7 @@ pub fn engine() -> rules::RuleRegistry {
             clauses.insert(clause.key);
         }
     };
+    register(events::AddPhase::ID, events::AddPhase::clauses());
     register(events::CastSpell::ID, events::CastSpell::clauses());
     register(events::Counter::ID, events::Counter::clauses());
     register(events::CreateTokens::ID, events::CreateTokens::clauses());

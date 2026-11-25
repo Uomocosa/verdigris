@@ -1,6 +1,9 @@
 pub mod cast_spell;
 pub use cast_spell::CastSpell;
 
+mod add_phase;
+pub use add_phase::AddPhase;
+
 mod begin_the_game_on_the_battlefield;
 pub use begin_the_game_on_the_battlefield::BeginTheGameOnTheBattlefield;
 

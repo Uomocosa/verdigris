@@ -23,6 +23,8 @@ pub enum Step {
 #[atomic_delegates]
 impl Step {
     pub fn begins(self) -> impl FnMut(MessageReader<turns::StepStarted>) -> bool + Clone {}
+
+    pub fn begins_a_phase(self) -> bool {}
 }
 
 impl Step {

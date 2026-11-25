@@ -27,6 +27,8 @@ impl<'w, 's> GameMut<'w, 's> {
 
     pub fn add_step_after_this_one(&mut self, step: turns::Step) { self.state.add_step_after_this_one(step); }
 
+    pub fn add_phase_after_this_one(&mut self, phase: turns::Phase) { self.state.add_phase_after_this_one(phase); }
+
     pub fn begin_step(&mut self, step: turns::Step) { self.state.begin_step(step); }
 }
 

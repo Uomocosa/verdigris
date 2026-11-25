@@ -7,6 +7,7 @@ use crate::effects;
 use crate::keywords;
 use crate::players;
 use crate::stack;
+use crate::turns;
 use crate::zones;
 
 type EffectMessageWriters<'a, 'b, 'c, 'd> = (
@@ -16,12 +17,13 @@ type EffectMessageWriters<'a, 'b, 'c, 'd> = (
     MessageWriter<'d, Attempt<events::CreateTokens>>,
 );
 
-type PlayerEffectWriters<'a, 'b, 'c, 'd, 'e> = (
+type PlayerEffectWriters<'a, 'b, 'c, 'd, 'e, 'f> = (
     MessageWriter<'a, Attempt<events::LoseLife>>,
     MessageWriter<'b, Attempt<events::Discard>>,
     MessageWriter<'c, Attempt<events::GainLife>>,
     MessageWriter<'d, Attempt<events::Draw>>,
     MessageWriter<'e, Attempt<events::WinGame>>,
+    MessageWriter<'f, Attempt<events::AddPhase>>,
 );
 
 /// 608.2. If the object that’s resolving is an instant spell, a sorcery spell, or an ability, its
@@ -41,7 +43,7 @@ pub fn r608_2_r608_2c_resolve(
     mut damage_dealt: MessageWriter<Attempt<events::DealDamage>>,
     mut destructions: MessageWriter<Attempt<events::Destroy>>,
     mut countered: MessageWriter<Attempt<events::Counter>>,
-    mut player_effects: ParamSet<PlayerEffectWriters<'_, '_, '_, '_, '_>>,
+    mut player_effects: ParamSet<PlayerEffectWriters<'_, '_, '_, '_, '_, '_>>,
     mut effect_messages: ParamSet<EffectMessageWriters<'_, '_, '_, '_>>,
     lookups: stack::ResolutionLookups<'_, '_>,
     zones: zones::ZoneLookup,
@@ -59,16 +61,10 @@ pub fn r608_2_r608_2c_resolve(
         };
         let controller = lookups.abilities.get(spell).map_or(**owner, |ability| ability.controller);
         let chosen_target = lookups.chosen_targets.get(spell).ok().map(|chosen| **chosen);
-        let player_targets =
-            chosen_target.filter(|target| lookups.lives.get(*target).is_ok()).map_or_else(
-                || resolve_player_targets(&lookups, effect, controller),
-                |p| vec![players::PlayerId(p)],
-            );
+        let player_targets = player_targets_for(&lookups, chosen_target, effect, controller);
         let target_zone = chosen_target.and_then(|target| lookups.in_zone.get(target).ok());
-        let target_on_stack = target_zone.is_some_and(|zone| zones.contains(STACK, **zone));
-        let battlefield_target = chosen_target
-            .filter(|_| target_zone.is_some_and(|zone| zones.contains(BATTLEFIELD, **zone)))
-            .or_else(|| self_target_on_battlefield(&lookups, spell, effect, &zones));
+        let battlefield_target =
+            battlefield_target_for(&lookups, chosen_target, target_zone, spell, effect, &zones);
         for kind in std::iter::once(effect.kind).chain(effect.follow_ups.into_iter().flatten()) {
             match kind {
                 effects::EffectKind::Damage(amount) => {
@@ -93,7 +89,8 @@ pub fn r608_2_r608_2c_resolve(
                         &mut countered,
                         &lookups,
                         chosen_target,
-                        target_on_stack,
+                        target_zone,
+                        &zones,
                         controller,
                     );
                 }
@@ -143,9 +140,25 @@ pub fn r608_2_r608_2c_resolve(
                     let winner = controller;
                     player_effects.p4().write(Attempt(events::WinGame(winner)));
                 }
+                effects::EffectKind::AdditionalPhase(phase) => {
+                    request_additional_phase(&mut player_effects.p5(), controller, phase);
+                }
             }
         }
     }
+}
+
+fn battlefield_target_for(
+    lookups: &stack::ResolutionLookups<'_, '_>,
+    chosen_target: Option<Entity>,
+    target_zone: Option<&zones::InZone>,
+    spell: Entity,
+    effect: effects::Effect,
+    zones: &zones::ZoneLookup,
+) -> Option<Entity> {
+    chosen_target
+        .filter(|_| target_zone.is_some_and(|zone| zones.contains(BATTLEFIELD, **zone)))
+        .or_else(|| self_target_on_battlefield(lookups, spell, effect, zones))
 }
 
 fn self_target_on_battlefield(
@@ -196,9 +209,11 @@ fn request_counter(
     countered: &mut MessageWriter<Attempt<events::Counter>>,
     lookups: &stack::ResolutionLookups<'_, '_>,
     target: Option<Entity>,
-    target_on_stack: bool,
+    target_zone: Option<&zones::InZone>,
+    zones: &zones::ZoneLookup,
     controller: players::PlayerId,
 ) {
+    let target_on_stack = target_zone.is_some_and(|zone| zones.contains(STACK, **zone));
     if let Some(target) = target
         && target_on_stack
     {
@@ -364,6 +379,17 @@ fn request_life_gain(
     }
 }
 
+fn request_additional_phase(
+    phases: &mut MessageWriter<Attempt<events::AddPhase>>,
+    controller: players::PlayerId,
+    phase: turns::Phase,
+) {
+    phases.write(Attempt(events::AddPhase {
+        player: controller,
+        phase,
+    }));
+}
+
 fn request_tokens(
     tokens: &mut MessageWriter<Attempt<events::CreateTokens>>,
     controller: players::PlayerId,
@@ -386,6 +412,18 @@ fn players_or_fallback(
     } else {
         players.to_vec()
     }
+}
+
+fn player_targets_for(
+    lookups: &stack::ResolutionLookups<'_, '_>,
+    chosen_target: Option<Entity>,
+    effect: effects::Effect,
+    controller: players::PlayerId,
+) -> Vec<players::PlayerId> {
+    chosen_target.filter(|target| lookups.lives.get(*target).is_ok()).map_or_else(
+        || resolve_player_targets(lookups, effect, controller),
+        |target| vec![players::PlayerId(target)],
+    )
 }
 
 fn resolve_player_targets(

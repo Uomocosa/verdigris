@@ -1,5 +1,6 @@
 use crate::effects;
 use crate::keywords;
+use crate::turns;
 
 #[must_use]
 pub const fn damage(amount: u32) -> effects::Effect {
@@ -113,6 +114,15 @@ pub const fn gets(power: i32, toughness: i32) -> effects::Effect {
 pub const fn gains(keyword: keywords::StaticKeyword) -> effects::Effect {
     effects::Effect {
         kind: effects::EffectKind::GainKeyword(keyword),
+        follow_ups: [None; 4],
+        target: None,
+    }
+}
+
+#[must_use]
+pub const fn additional_phase(phase: turns::Phase) -> effects::Effect {
+    effects::Effect {
+        kind: effects::EffectKind::AdditionalPhase(phase),
         follow_ups: [None; 4],
         target: None,
     }

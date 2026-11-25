@@ -1,6 +1,7 @@
 use crate::effects;
 use crate::keywords;
 use crate::rules;
+use crate::turns;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum EffectKind {
@@ -23,6 +24,7 @@ pub enum EffectKind {
         toughness: i32,
     },
     GainKeyword(keywords::StaticKeyword),
+    AdditionalPhase(turns::Phase),
     WinTheGame,
 }
 

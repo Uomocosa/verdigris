@@ -1,3 +1,4 @@
+use atomic_delegate_macros::atomic_delegates;
 use std::collections::VecDeque;
 
 use bevy::prelude::Resource;
@@ -35,6 +36,11 @@ impl TurnState {
     pub fn next_step(&self) -> Option<turns::Step> { self.upcoming_steps.front().copied() }
 
     pub fn add_step_after_this_one(&mut self, step: turns::Step) { self.upcoming_steps.push_front(step); }
+}
+
+#[atomic_delegates]
+impl TurnState {
+    pub fn add_phase_after_this_one(&mut self, phase: turns::Phase) {}
 }
 
 impl TurnState {

@@ -48,6 +48,7 @@ pub const ALL_CARDS: &[testing::Card] = &[
     testing::SCROLL_THIEF,
     testing::SIGN_IN_BLOOD,
     testing::SOUL_WARDEN,
+    testing::SPHINX_OF_THE_SECOND_SUN,
     testing::SPORE_CRAWLER,
     testing::TEST_BATTLE_FERVOR,
     testing::TEST_CALL_TO_ARMS,

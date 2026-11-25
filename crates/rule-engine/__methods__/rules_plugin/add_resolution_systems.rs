@@ -59,6 +59,9 @@ pub fn add_resolution_systems(app: &mut App) {
             )
                 .chain(),
             (
+                Attempt::<events::AddPhase>::resolved_by(
+                    comprehensive_rules::r500_8_add_phases::r500_8_add_phases,
+                ),
                 comprehensive_rules::r121_1_r121_2_draw::r121_1_r121_2_draw,
                 comprehensive_rules::r701_17a_r701_17b_mill::r701_17a_r701_17b_mill,
                 comprehensive_rules::r119_3_life_loss::r119_3_life_loss,
@@ -100,7 +103,7 @@ mod tests {
 
         assert_eq!(
             app.get_schedule(Update).map(Schedule::systems_len),
-            Some(30)
+            Some(32)
         );
     }
 }

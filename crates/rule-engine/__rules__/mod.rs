@@ -30,6 +30,7 @@ pub mod r500_1_steps_proceed_in_order;
 pub mod r500_2_step_ends;
 pub mod r500_3_r503_1_step_without_priority_ends;
 pub mod r500_4_mana_pools_empty;
+pub mod r500_8_add_phases;
 pub mod r502_3_untap;
 pub mod r504_1_draw_step;
 pub mod r506_1_r510_4_r702_4b_r702_7b_combat_damage_steps;

@@ -17,6 +17,7 @@ pub fn register_messages_and_resources(app: &mut App) {
         .add_message::<actions::Ask>()
         .add_message::<actions::Answered>()
         .add_message::<stack::Resolution>();
+    events::AddPhase::register(app);
     events::LoseGame::register(app);
     events::LoseUnspentMana::register(app);
     events::WinGame::register(app);
