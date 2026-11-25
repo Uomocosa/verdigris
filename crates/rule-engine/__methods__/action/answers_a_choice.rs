@@ -9,6 +9,7 @@ pub const fn answers_a_choice(action: &actions::Action) -> bool {
             | actions::Action::ChooseLegendary(_)
             | actions::Action::ArrangeGraveyard(_)
             | actions::Action::OrderTriggers(_)
+            | actions::Action::AssignCombatDamage(_)
     )
 }
 

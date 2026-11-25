@@ -1,4 +1,5 @@
 mod arrange_graveyard;
+mod assign_combat_damage;
 mod declare_attackers;
 mod declare_blockers;
 mod discard;
@@ -7,6 +8,7 @@ mod of;
 mod order_triggers;
 mod targeting;
 pub use arrange_graveyard::arrange_graveyard;
+pub use assign_combat_damage::assign_combat_damage;
 pub use declare_attackers::declare_attackers;
 pub use declare_blockers::declare_blockers;
 pub use discard::discard;

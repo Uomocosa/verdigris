@@ -49,7 +49,7 @@ pub fn add_step_started_systems(app: &mut App) {
         Update,
         (
             comprehensive_rules::r506_1_r510_4_r702_4b_r702_7b_combat_damage_steps::r506_1_r510_4_r702_4b_r702_7b_combat_damage_steps,
-            comprehensive_rules::r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_r702_2c_r702_19b_r702_19d_combat_damage::r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_r702_2c_r702_19b_r702_19d_combat_damage,
+            comprehensive_rules::r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_r702_2c_r702_19b_r702_19d_combat_damage::r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_r702_2c_r702_19b_r702_19d_combat_damage(),
         )
             .chain()
             .in_set(RuleSet::StepStarted),
@@ -69,7 +69,7 @@ mod tests {
 
         assert_eq!(
             app.get_schedule(Update).map(Schedule::systems_len),
-            Some(14)
+            Some(15)
         );
     }
 }

@@ -4,14 +4,12 @@ use bevy::prelude::Entity;
 
 use crate::actions;
 use crate::damage;
-use crate::players;
 
 pub fn assigned_damage(
     choice: &actions::CombatDamageChoice,
-    player: players::PlayerId,
     assignments: &[actions::DamageAssignment],
 ) -> Option<Vec<damage::AssignedDamage>> {
-    if player != choice.player || assignments.is_empty() {
+    if assignments.is_empty() {
         return None;
     }
     let mut seen: BTreeSet<Entity> = BTreeSet::new();
@@ -91,7 +89,6 @@ mod tests {
         let source = Entity::from(companion);
         let bears_blocking = Entity::from(bears);
         let spider_blocking = Entity::from(spider);
-        let outsider = p2.id;
 
         let choice = actions::CombatDamageChoice {
             player,
@@ -114,8 +111,7 @@ mod tests {
             },
         ];
 
-        assert!(assigned_damage(&choice, player, &split).is_some());
-        assert!(assigned_damage(&choice, outsider, &split).is_none());
+        assert!(assigned_damage(&choice, &split).is_some());
         Ok(())
     }
 
@@ -149,7 +145,7 @@ mod tests {
             target: bears_blocking,
             amount: 1,
         }];
-        assert!(assigned_damage(&choice, player, &short).is_none());
+        assert!(assigned_damage(&choice, &short).is_none());
 
         let illegal = [
             actions::DamageAssignment {
@@ -161,7 +157,7 @@ mod tests {
                 amount: 1,
             },
         ];
-        assert!(assigned_damage(&choice, player, &illegal).is_none());
+        assert!(assigned_damage(&choice, &illegal).is_none());
 
         let repeated = [
             actions::DamageAssignment {
@@ -173,13 +169,13 @@ mod tests {
                 amount: 1,
             },
         ];
-        assert!(assigned_damage(&choice, player, &repeated).is_none());
+        assert!(assigned_damage(&choice, &repeated).is_none());
 
         let zero = [actions::DamageAssignment {
             target: bears_blocking,
             amount: 0,
         }];
-        assert!(assigned_damage(&choice, player, &zero).is_none());
+        assert!(assigned_damage(&choice, &zero).is_none());
         Ok(())
     }
 }

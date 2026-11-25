@@ -41,6 +41,7 @@ impl Action {
             Self::ChooseDiscard(_) => Some(actions::Rejected::InvalidDiscard { player }),
             Self::ArrangeGraveyard(_) => Some(actions::Rejected::InvalidGraveyardOrder { player }),
             Self::OrderTriggers(_) => Some(actions::Rejected::InvalidTriggerOrder { player }),
+            Self::AssignCombatDamage(_) => Some(actions::Rejected::InvalidCombatDamage { player }),
             _ => None,
         }
     }

@@ -1,5 +1,7 @@
 use crate::events;
-use bevy::prelude::{Entity, MessageReader, MessageWriter, ParamSet, Query, Res, ResMut, With};
+use bevy::ecs::schedule::{IntoScheduleConfigs, ScheduleConfigs, SystemCondition};
+use bevy::ecs::system::ScheduleSystem;
+use bevy::prelude::{Entity, MessageReader, MessageWriter, ParamSet, Query, Res, With};
 
 use crate::Attempt;
 use crate::actions;
@@ -78,11 +80,19 @@ type CombatLookups<'w, 's> = (
 /// assigns damage to it. Trample: a single blocker is assigned lethal damage first (toughness minus
 /// damage already marked on it) and any excess goes to the defending player; a blocked attacker
 /// with no blockers left assigns all its damage to the defending player.
-pub fn r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_r702_2c_r702_19b_r702_19d_combat_damage(
-    mut step_started: MessageReader<turns::StepStarted>,
-    mut actions: MessageReader<actions::PlayerAction>,
-    mut rejected: MessageWriter<actions::Rejected>,
-    mut pending: ResMut<actions::PendingChoice>,
+pub fn r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_r702_2c_r702_19b_r702_19d_combat_damage()
+-> ScheduleConfigs<ScheduleSystem> {
+    (
+        announce_combat_damage.run_if(
+            turns::Step::CombatDamage.begins().or_eager(turns::Step::SecondCombatDamage.begins()),
+        ),
+        deal_assigned_combat_damage,
+    )
+        .chain()
+}
+
+fn announce_combat_damage(
+    mut asks: MessageWriter<actions::Ask>,
     mut dealt: MessageWriter<Attempt<events::DealDamage>>,
     attackers: Query<
         (
@@ -100,75 +110,66 @@ pub fn r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_r702_2c_r702_19b_r702_19d_c
 ) {
     let state = state.into_inner();
     let participants = participants.into_inner();
-    for step in step_started.read() {
-        if !matches!(
-            **step,
-            turns::Step::CombatDamage | turns::Step::SecondCombatDamage
-        ) {
-            continue;
-        }
-        let Some(defending) = defenders.iter().next() else {
+    let Some(defending) = defenders.iter().next() else {
+        return;
+    };
+    let mut needed: Vec<actions::RequiredCombatDamage> = Vec::new();
+    for (attacker, definition, blocked, markers) in attackers.iter() {
+        let Some(effective) = markers.effective else {
             continue;
         };
-        let mut needed: Vec<actions::RequiredCombatDamage> = Vec::new();
-        for (attacker, definition, blocked, markers) in attackers.iter() {
-            let Some(effective) = markers.effective else {
+        let amount = u32::try_from(effective.power).unwrap_or(0);
+        if blocked.is_none() {
+            if amount == 0 || !participants.contains(&attacker) {
                 continue;
-            };
-            let amount = u32::try_from(effective.power).unwrap_or(0);
-            if blocked.is_none() {
-                if amount == 0 || !participants.contains(&attacker) {
-                    continue;
-                }
-                dealt.write(Attempt(events::DealDamage {
-                    source: attacker,
-                    recipient: defending,
-                    amount,
-                    controller: recipient_controller(&lookups.p1(), defending),
-                }));
-            } else {
-                for write in definition.assigned_blocked_damage(
-                    attacker,
-                    amount,
-                    defending,
-                    &lookups.p0(),
-                    participants,
-                    &mut needed,
-                    markers.deathtouch,
-                ) {
-                    dealt.write(announce_damage(write, &lookups.p1()));
-                }
+            }
+            dealt.write(Attempt(events::DealDamage {
+                source: attacker,
+                recipient: defending,
+                amount,
+                controller: recipient_controller(&lookups.p1(), defending),
+            }));
+        } else {
+            for write in definition.assigned_blocked_damage(
+                attacker,
+                amount,
+                defending,
+                &lookups.p0(),
+                participants,
+                &mut needed,
+                markers.deathtouch,
+            ) {
+                dealt.write(announce_damage(write, &lookups.p1()));
             }
         }
-        if !needed.is_empty() {
-            *pending = actions::PendingChoice(Some(actions::Choice::CombatDamage(
-                actions::CombatDamageChoice {
-                    player: state.turn.active,
-                    needed,
-                },
-            )));
-        }
     }
-    for action in actions.read() {
-        let actions::Action::AssignCombatDamage(assignments) = &action.action else {
+    if !needed.is_empty() {
+        asks.write(actions::Ask(actions::Choice::CombatDamage(
+            actions::CombatDamageChoice {
+                player: state.turn.active,
+                needed,
+            },
+        )));
+    }
+}
+
+fn deal_assigned_combat_damage(
+    mut answers: MessageReader<actions::Answered>,
+    mut dealt: MessageWriter<Attempt<events::DealDamage>>,
+    owners: Query<&cards::Owner>,
+) {
+    for answered in answers.read() {
+        let actions::Choice::CombatDamage(choice) = &answered.choice else {
             continue;
         };
-        let Some(actions::Choice::CombatDamage(choice)) = (*pending).as_ref().cloned() else {
-            rejected.write(actions::Rejected::InvalidCombatDamage {
-                player: action.player,
-            });
+        let actions::Action::AssignCombatDamage(assignments) = &answered.answer else {
             continue;
         };
-        let Some(writes) = choice.assigned_damage(action.player, assignments) else {
-            rejected.write(actions::Rejected::InvalidCombatDamage {
-                player: action.player,
-            });
-            continue;
-        };
-        for write in writes {
-            dealt.write(announce_damage(write, &lookups.p1()));
+        if let Some(writes) = choice.assigned_damage(assignments) {
+            for write in writes {
+                dealt.write(announce_damage(write, &owners));
+            }
         }
-        *pending = actions::PendingChoice(None);
     }
 }
 
@@ -288,7 +289,6 @@ mod tests {
     #[test]
     fn a_blocked_creature_divides_its_damage_among_its_blockers() -> TestResult {
         use crate::BATTLEFIELD;
-        use crate::actions;
         use crate::damage;
 
         let (mut game, [p1, p2]) = MockGame::new([
@@ -315,19 +315,7 @@ mod tests {
             p2.pass_to(turns::Step::CombatDamage),
         ])?;
 
-        game.act(
-            p1,
-            actions::Action::AssignCombatDamage(vec![
-                actions::DamageAssignment {
-                    target: myr_1.into(),
-                    amount: 1,
-                },
-                actions::DamageAssignment {
-                    target: myr_2.into(),
-                    amount: 1,
-                },
-            ]),
-        );
+        game.play([p1.assign_combat_damage([(myr_1.into(), 1), (myr_2.into(), 1)])])?;
         game.play([p1.pass_priority(), p2.pass_priority()])?;
 
         assert_eq!(game.get::<damage::Damage>(myr_1), Some(damage::Damage(1)));
@@ -375,7 +363,6 @@ mod tests {
     #[test]
     fn trample_assigns_excess_damage_past_two_blockers_to_the_defending_player() -> TestResult {
         use crate::BATTLEFIELD;
-        use crate::actions;
         use crate::turns;
 
         let (mut game, [p1, p2]) = MockGame::new([
@@ -401,23 +388,11 @@ mod tests {
             p1.pass_to(turns::Step::CombatDamage),
             p2.pass_to(turns::Step::CombatDamage),
         ])?;
-        game.act(
-            p1,
-            actions::Action::AssignCombatDamage(vec![
-                actions::DamageAssignment {
-                    target: rats_1.into(),
-                    amount: 1,
-                },
-                actions::DamageAssignment {
-                    target: rats_2.into(),
-                    amount: 1,
-                },
-                actions::DamageAssignment {
-                    target: p2.into(),
-                    amount: 1,
-                },
-            ]),
-        );
+        game.play([p1.assign_combat_damage([
+            (rats_1.into(), 1),
+            (rats_2.into(), 1),
+            (p2.into(), 1),
+        ])])?;
         game.play([p1.pass_priority(), p2.pass_priority()])?;
 
         game.play([p2.arrange_graveyard([rats_1, rats_2])])?;

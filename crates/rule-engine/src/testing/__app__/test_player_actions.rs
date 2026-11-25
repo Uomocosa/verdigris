@@ -43,6 +43,13 @@ impl TestPlayerActions {
 
     #[must_use]
     pub fn arrange_graveyard<const N: usize>(self, cards: [testing::TestCard; N]) -> Self {}
+
+    #[must_use]
+    pub fn assign_combat_damage<const N: usize>(
+        self,
+        assignments: [(testing::Targets, u32); N],
+    ) -> Self {
+    }
 }
 
 #[rustfmt::skip]

@@ -68,6 +68,9 @@ impl TestPlayer {
     pub fn arrange_graveyard<const N: usize>(self, cards: [testing::TestCard; N]) -> testing::TestPlayerActions { testing::TestPlayerActions::of(self).arrange_graveyard(cards) }
 
     #[must_use]
+    pub fn assign_combat_damage<const N: usize>(self, assignments: [(testing::Targets, u32); N]) -> testing::TestPlayerActions { testing::TestPlayerActions::of(self).assign_combat_damage(assignments) }
+
+    #[must_use]
     pub fn pass_to(self, step: turns::Step) -> testing::TestPlayerActions { testing::TestPlayerActions::of(self).pass_to(step) }
 
     #[must_use]

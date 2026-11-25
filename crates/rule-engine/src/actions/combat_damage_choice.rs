@@ -15,7 +15,6 @@ impl CombatDamageChoice {
     #[must_use]
     pub(crate) fn assigned_damage(
         &self,
-        player: players::PlayerId,
         assignments: &[actions::DamageAssignment],
     ) -> Option<Vec<damage::AssignedDamage>> {
     }

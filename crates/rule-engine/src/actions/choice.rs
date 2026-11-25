@@ -54,9 +54,10 @@ impl Choice {
             }),
             Self::May(_) => Some(actions::Rejected::InvalidMay { player }),
             Self::Discard(_) => Some(actions::Rejected::InvalidDiscard { player }),
+            Self::CombatDamage(_) => Some(actions::Rejected::InvalidCombatDamage { player }),
             Self::ArrangeGraveyard(_) => Some(actions::Rejected::InvalidGraveyardOrder { player }),
             Self::OrderTriggers(_) => Some(actions::Rejected::InvalidTriggerOrder { player }),
-            _ => None,
+            Self::Legendary(_) => None,
         }
     }
 }

@@ -55,7 +55,12 @@ pub fn accepts(choice: &actions::Choice, answer: &actions::Action) -> bool {
             let received: BTreeSet<Entity> = answered.iter().copied().collect();
             received == expected && answered.len() == choice.triggers.len()
         }
-        actions::Choice::CombatDamage(_) => false,
+        actions::Choice::CombatDamage(choice) => {
+            let actions::Action::AssignCombatDamage(assignments) = answer else {
+                return false;
+            };
+            choice.assigned_damage(assignments).is_some()
+        }
     }
 }
 
