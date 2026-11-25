@@ -25,7 +25,7 @@ pub mod zones;
 
 pub use attempt::Attempt;
 pub use basic::enums::RuleSet;
-pub use basic::messages::{Did, May, Resolve};
+pub use basic::messages::{Did, HooksDone, May, Resolve};
 pub use basic::resources::GameEnded;
 pub use basic::resources::StateBasedActionsPerformed;
 pub use basic::schedules::StateBasedActions;

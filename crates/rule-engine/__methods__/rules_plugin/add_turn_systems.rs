@@ -5,7 +5,6 @@ use crate::actions;
 use crate::comprehensive_rules;
 use crate::events;
 use crate::rules;
-use crate::turns;
 
 pub fn add_turn_systems(app: &mut App) {
     app.add_systems(
@@ -16,8 +15,8 @@ pub fn add_turn_systems(app: &mut App) {
             rules::bevy_systems::show_may::show_may::<rules::Hooked<events::OpeningHandAction>>,
             actions::bevy_systems::answer_asks::answer_asks,
             rules::bevy_systems::answer_may::answer_may::<rules::Hooked<events::OpeningHandAction>>,
-            turns::bevy_systems::opening_hand_actions_complete::opening_hand_actions_complete,
-            comprehensive_rules::r103_8_first_turn::r103_8_first_turn,
+            rules::bevy_systems::hooks_done::hooks_done::<events::OpeningHandAction>,
+            comprehensive_rules::r103_8_first_turn::r103_8_first_turn(),
             comprehensive_rules::r117_3a_r117_3c_r117_3d_priority::r117_3a_r117_3c_r117_3d_priority,
         )
             .chain()

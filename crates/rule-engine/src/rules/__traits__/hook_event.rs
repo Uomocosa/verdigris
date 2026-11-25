@@ -1,5 +1,6 @@
 use bevy::prelude::App;
 
+use crate::HooksDone;
 use crate::actions;
 use crate::cards;
 use crate::rules;
@@ -13,6 +14,7 @@ pub trait HookEvent: Clone + Send + Sync + 'static {
         Vec::new()
     }
     fn register(app: &mut App) {
+        app.add_message::<HooksDone<Self>>();
         <rules::Hooked<Self> as Event>::register(app);
         app.init_resource::<rules::HookQueue<Self>>()
             .insert_resource(actions::PendingMayAsks::<rules::Hooked<Self>>(Vec::new()));

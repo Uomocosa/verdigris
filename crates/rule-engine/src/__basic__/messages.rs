@@ -1,3 +1,5 @@
+use std::marker::PhantomData;
+
 use bevy::prelude::Message;
 use derive_more::Deref;
 
@@ -15,3 +17,6 @@ pub struct May<E: Event> {
     pub event: E,
     pub then: rules::EventTemplate,
 }
+
+#[derive(Message, Clone, Copy, Debug, Deref, PartialEq, Eq)]
+pub struct HooksDone<E>(pub PhantomData<E>);

@@ -1,0 +1,24 @@
+use std::marker::PhantomData;
+
+use bevy::prelude::{MessageWriter, Res, ResMut};
+
+use crate::HooksDone;
+use crate::actions;
+use crate::rules;
+use crate::rules::traits::hook_event::HookEvent;
+
+pub fn hooks_done<E: HookEvent>(
+    mut queue: ResMut<rules::HookQueue<E>>,
+    asks: Res<actions::AskQueue>,
+    mut done: MessageWriter<HooksDone<E>>,
+) {
+    let asks = asks.into_inner();
+    let Some(events) = (**queue).as_ref() else {
+        return;
+    };
+    if !events.is_empty() || asks.iter().any(|ask| ask.event == E::ID) {
+        return;
+    }
+    done.write(HooksDone(PhantomData));
+    **queue = None;
+}

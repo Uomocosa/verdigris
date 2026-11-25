@@ -40,8 +40,7 @@ pub fn register_messages_and_resources(app: &mut App) {
         .add_message::<effects::KeywordGranted>()
         .add_message::<turns::StepStarted>()
         .add_message::<turns::AllPlayersPassed>()
-        .add_message::<turns::MulligansComplete>()
-        .add_message::<turns::OpeningHandActionsComplete>();
+        .add_message::<turns::MulligansComplete>();
     app.init_resource::<actions::PendingChoice>();
     app.init_resource::<actions::AskQueue>();
     app.init_resource::<turns::CombatDamageSteps>();
