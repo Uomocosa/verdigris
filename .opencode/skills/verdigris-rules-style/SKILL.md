@@ -311,10 +311,55 @@ RUN it red on the old code. A refactor adds no test: players see the same, and a
 bookkeeping becomes one on what players see. Commit only on the full suite
 (`cargo nextest run ... --no-fail-fast`): `just test` stops at the first failure.
 
+## 16. Create the data first, then act on it
+
+A rule body has two parts: build a named list of what would happen, in the order the CR gives, then
+send the whole list in one statement. The name says what it holds and its order
+(`events_in_turn_order`). Propose this shape first for any rule that needs nested loops or an order.
+
+```rust
+// Bad: finding the cards, ordering them and writing are mixed in nested loops
+for player in players.still_in_the_game() {
+    for card in player.opening_hand() {
+        opening_hand_actions.write(Attempt(events::OpeningHandAction { card, player: player.id }));
+    }
+}
+
+// Good: first the data (103.6: "the starting player ... then each other player in turn order")
+let events_in_turn_order: Vec<events::OpeningHandAction> = players
+    .still_in_the_game()
+    .iter()
+    .flat_map(|player| {
+        player
+            .opening_hand()
+            .into_iter()
+            .map(|card| events::OpeningHandAction { card, player: player.id })
+    })
+    .collect();
+// then the action
+opening_hand_actions.write_batch(events_in_turn_order.into_iter().map(Attempt));
+```
+
+A moment with no data ("once the mulligan process is complete") is a run condition, not a loop over
+its messages. The rule's `pub fn` returns it, so the moment stays in the rule's file:
+
+```rust
+// Bad: for _ in mulligans_complete.read() { .. }
+pub fn r103_6_opening_hand_actions() -> ScheduleConfigs<ScheduleSystem> {
+    opening_hand_actions.run_if(on_message::<turns::MulligansComplete>)
+}
+```
+
+A message that carries data (`StepStarted(step)`) is still read. One flat loop with one write
+(104.2a, §0) is already clear and stays.
+
+**Why:** the order can be read and checked in one place, next to the CR words that give it.
+
 ## Checklist for a rule (or a plan for one)
 
 - Delete the body and read only the CR sentence: does each clause map to one line, and no line is left?
 - Is the choice the CR's or a card's (§12)? Is there a gate other rules still mention (§13)?
+- Is the data built first, under a name that says its order, and sent in one statement (§16)?
 - What does it do if no card in the game cares? That is the only thing it may perform itself.
 - Does it name a card, an ability or a single case of a list? Move it to the case's own rule.
 - Does it validate, reject, or wait for a player? Move it to the shared part.
@@ -337,6 +382,7 @@ bookkeeping becomes one on what players see. Commit only on the full suite
 | `PendingChoice`, `Rejected`, or an answer check in a rule body | the shared ask / answer, §12 |
 | the same gate copied in several rules ("not yet", "already done") | make the CR concept true, §13 |
 | a helper that returns "all that this rule needs" | §14.3 |
+| nested loops that find, order and write at once; `for _ in some_message.read()` | §16 |
 | a rule that polls state every frame to announce something | read the message of that moment, §10 |
 
 ## Adding rules here
