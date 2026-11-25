@@ -1,37 +1,19 @@
-use bevy::prelude::{MessageMutator, MessageReader, Query, With};
+use bevy::prelude::{MessageMutator, Query, With};
 
-use crate::GameMut;
 use crate::cards;
 use crate::turns;
 
 /// 508.8. If no creatures are declared as attackers or put onto the battlefield attacking, skip
 /// the declare blockers and combat damage steps.
 pub fn r508_8_skip_combat_steps(
-    mut all_players_passed: MessageReader<turns::AllPlayersPassed>,
-    mut step_started: MessageMutator<turns::StepStarted>,
-    mut game: GameMut,
+    mut next_step: MessageMutator<turns::NextStep>,
     attackers: Query<(), With<cards::Attacking>>,
 ) {
-    if all_players_passed.is_empty() {
-        return;
-    }
-    all_players_passed.clear();
-    if game.step() != turns::Step::DeclareAttackers {
-        return;
-    }
-    for step in step_started.read() {
-        if **step == turns::Step::DeclareAttackers {
-            return;
+    for step in next_step.read() {
+        if **step == turns::Step::DeclareBlockers && attackers.is_empty() {
+            *step = turns::NextStep(turns::Step::EndOfCombat);
         }
     }
-    let next = if attackers.is_empty() {
-        turns::Step::EndOfCombat
-    } else {
-        turns::Step::DeclareBlockers
-    };
-    game.begin_step(next);
-    game.give_priority_to_active_player();
-    step_started.write(turns::StepStarted(next));
 }
 
 #[cfg(test)]

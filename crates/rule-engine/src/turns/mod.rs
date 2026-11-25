@@ -6,7 +6,7 @@ mod turn_order;
 
 pub use basic::card_text::beginning_of;
 pub use basic::enums::Phase;
-pub use basic::messages::{AllPlayersPassed, MulligansComplete, StepStarted};
+pub use basic::messages::{AllPlayersPassed, MulligansComplete, NextStep, StepStarted};
 pub use basic::resources::{CleanupReentry, CombatDamageParticipants, CombatDamageSteps, Turn};
 pub use priority::Priority;
 pub use step::Step;
