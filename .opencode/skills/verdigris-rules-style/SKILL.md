@@ -128,7 +128,7 @@ Only the system that performs an event writes its result; every other rule sends
 | `GameIsADraw` / `LeftTheGame` | `r104_4a_draw` / `r104_5_leaves_the_game` |
 | gaining, losing or paying life | `r119_3_life_loss`, through `GainLife` / `LoseLife` |
 | losing unspent mana | `r106_4_lose_unspent_mana`, through `LoseUnspentMana` |
-| `Turn`, `Priority`, `UpcomingSteps` | `GameMut` (§8) |
+| `TurnState` (turn, priority, upcoming steps) | `GameMut` (§8) |
 
 **Why:** a trigger or a replacement hooks in at one place, and no path forgets a side effect
 (such as `StateBasedActionsPerformed`).
@@ -150,8 +150,8 @@ it: no `loop`, no `next_in_turn_order()` chain, no start / stop test.
 
 ## 8. `Game` asks, `GameMut` moves the game
 
-`Game` is read-only and any rule can take it. `GameMut` is the only writer of `Turn` and
-`Priority`; only the priority and turn-structure rules take it, and a system that takes it can't
+`Game` is read-only and any rule can take it. Questions about the turn itself go through
+`game.turn()` (`game.turn().next_step()`). `GameMut` is the only writer of `turns::TurnState`; only the priority and turn-structure rules take it, and a system that takes it can't
 also take `Game` or `Rules`.
 
 ```rust
@@ -165,6 +165,11 @@ if let Some(next) = game.priority_holder().next_in_turn_order() {
 through the pipeline.
 
 Only `r500_1` begins a step from `NextStep`; a skip rule takes no `GameMut`.
+
+`Game`, `Players` and `Rules` are passed by value, and clippy refuses more than 256 bytes: one query is
+32. So data is grouped behind ONE query: a new turn value is a field of `TurnState`, a new player marker a
+`Has<..>` field of `players::Status` (never `&Component`: it conflicts with the systems that write it).
+Don't add a query per question.
 
 ## 9. A player is a `players::PlayerId`
 
@@ -398,9 +403,9 @@ Only a rule that uses the varying data reads the message. One flat loop with one
 
 ## 17. The steps of a turn are a list; a CR rule that skips a step changes NextStep
 
-`turns::UpcomingSteps` holds the steps still to come this turn. `r500_2` proposes its first one; only
+`turns::TurnState` holds the steps still to come this turn. `r500_2` proposes `game.turn().next_step()`; only
 `r500_3` and the skip rules still name the step they go to. Adding a step inserts it into the list (500.9); `begin_step` drops the steps
-it passes over. `Game` can't hold the list (clippy's 256-byte limit), so `r500_2` reads it as a `Res`.
+it passes over.
 
 ```rust
 // 510.4 "the phase gets a second combat damage step"
@@ -415,7 +420,10 @@ longer be skipped).
 // Good — the step never started, and r500_2 names no case
 // crates/rule-engine/__rules__/r103_8a_skip_first_draw_step.rs:14
 for step in next_step.read() {
-    if **step == turns::Step::Draw && game.is_first_turn() && players.is_two_player_game() {
+    if **step == turns::Step::Draw
+        && game.turn().is_first_turn()
+        && players.is_two_player_game()
+    {
         *step = turns::NextStep(turns::Step::PrecombatMain);
     }
 }
