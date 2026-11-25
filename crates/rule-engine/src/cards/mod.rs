@@ -8,7 +8,7 @@ pub use basic::components::{
 };
 pub use basic::current_markers::{CurrentMarkers, CurrentMarkersItem};
 pub use basic::enums::{CardType, Color, CreatureType, EnchantmentType, ManaSymbol, Supertype};
-pub use basic::newtypes::CardName;
+pub use basic::newtypes::{CardId, CardName};
 pub use basic::structs::PowerToughness;
 
 mod attacking;

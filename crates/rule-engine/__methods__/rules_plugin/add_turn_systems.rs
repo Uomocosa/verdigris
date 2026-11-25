@@ -11,7 +11,7 @@ pub fn add_turn_systems(app: &mut App) {
     app.add_systems(
         Update,
         (
-            comprehensive_rules::r103_6_opening_hand_actions::r103_6_opening_hand_actions,
+            comprehensive_rules::r103_6_opening_hand_actions::r103_6_opening_hand_actions(),
             comprehensive_rules::r614_1a_r616_1_replacement_effects::r614_1a_r616_1_replacement_effects::<
                 events::OpeningHandAction,
             >,

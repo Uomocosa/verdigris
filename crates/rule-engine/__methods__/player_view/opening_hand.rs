@@ -1,14 +1,13 @@
-use bevy::prelude::Entity;
-
 use crate::HAND;
+use crate::cards;
 use crate::players;
 
-pub fn opening_hand(view: &players::PlayerView<'_, '_>) -> Vec<Entity> {
+pub fn opening_hand(view: &players::PlayerView<'_, '_>) -> Vec<cards::CardId> {
     view.players
         .zone_contents
         .iter()
         .filter(|(zone, owner, _)| **zone == HAND && ***owner == view.id)
-        .flat_map(|(_, _, contents)| contents.iter().copied())
+        .flat_map(|(_, _, contents)| contents.iter().copied().map(cards::CardId))
         .collect()
 }
 

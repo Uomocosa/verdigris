@@ -1,7 +1,9 @@
-use crate::events;
-use bevy::prelude::{MessageReader, MessageWriter};
+use bevy::ecs::schedule::{IntoScheduleConfigs, ScheduleConfigs};
+use bevy::ecs::system::ScheduleSystem;
+use bevy::prelude::{MessageWriter, on_message};
 
 use crate::Attempt;
+use crate::events;
 use crate::players;
 use crate::turns;
 
@@ -13,21 +15,25 @@ use crate::turns;
 ///
 /// All `Attempt`s are announced at once, so a mandatory effect of a later player would happen before
 /// an earlier player answers.
-pub fn r103_6_opening_hand_actions(
-    mut mulligans_complete: MessageReader<turns::MulligansComplete>,
+pub fn r103_6_opening_hand_actions() -> ScheduleConfigs<ScheduleSystem> {
+    opening_hand_actions.run_if(on_message::<turns::MulligansComplete>)
+}
+
+fn opening_hand_actions(
     mut opening_hand_actions: MessageWriter<Attempt<events::OpeningHandAction>>,
     players: players::Players,
 ) {
-    for _ in mulligans_complete.read() {
-        for player in players.still_in_the_game() {
-            for card in player.opening_hand() {
-                opening_hand_actions.write(Attempt(events::OpeningHandAction {
-                    card,
-                    player: player.id,
-                }));
-            }
-        }
-    }
+    let events_in_turn_order: Vec<events::OpeningHandAction> = players
+        .still_in_the_game()
+        .iter()
+        .flat_map(|player| {
+            player.opening_hand().into_iter().map(|card| events::OpeningHandAction {
+                card,
+                player: player.id,
+            })
+        })
+        .collect();
+    opening_hand_actions.write_batch(events_in_turn_order.iter().copied().map(Attempt));
 }
 
 #[cfg(test)]

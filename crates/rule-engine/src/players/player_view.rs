@@ -1,7 +1,6 @@
-use atomic_delegate_macros::atomic_delegates;
-use bevy::prelude::Entity;
-
+use crate::cards;
 use crate::players;
+use atomic_delegate_macros::atomic_delegates;
 
 #[derive(Clone, Copy)]
 pub struct PlayerView<'w, 's> {
@@ -33,7 +32,7 @@ impl PlayerView<'_, '_> {
     pub fn next_in_turn_order(&self) -> Option<Self> {}
 
     #[must_use]
-    pub fn opening_hand(&self) -> Vec<Entity> {}
+    pub fn opening_hand(&self) -> Vec<cards::CardId> {}
 }
 
 #[cfg(test)]
