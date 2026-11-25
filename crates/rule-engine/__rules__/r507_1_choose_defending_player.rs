@@ -1,3 +1,5 @@
+use bevy::ecs::schedule::{IntoScheduleConfigs, ScheduleConfigs};
+use bevy::ecs::system::ScheduleSystem;
 use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query, With};
 
 use crate::Game;
@@ -20,30 +22,48 @@ use crate::turns;
 /// the options chosen for it.) That player becomes the defending player. See rule 802, “Attack
 /// Multiple Players Option,” rule 803, “Attack Left and Attack Right Options,” and rule 809,
 /// “Emperor Variant.”
-pub fn r507_1_choose_defending_player(
-    mut actions: MessageReader<actions::PlayerAction>,
-    mut rejected: MessageWriter<actions::Rejected>,
+pub fn r507_1_choose_defending_player() -> ScheduleConfigs<ScheduleSystem> {
+    (
+        ask_which_opponent.run_if(turns::Step::BeginningOfCombat.begins()),
+        mark_the_chosen_opponent,
+    )
+        .chain()
+}
+
+fn ask_which_opponent(mut asks: MessageWriter<actions::Ask>, game: Game) {
+    let Some(attacking_player) = game.active_player() else {
+        return;
+    };
+    let opponents: Vec<players::PlayerId> = attacking_player
+        .opponents_still_in_the_game()
+        .into_iter()
+        .map(|opponent| opponent.id)
+        .collect();
+    if opponents.len() < 2 {
+        return;
+    }
+    asks.write(actions::Ask(actions::Choice::DefendingPlayer(
+        actions::DefendingPlayerChoice {
+            player: attacking_player.id,
+            legal: opponents,
+        },
+    )));
+}
+
+fn mark_the_chosen_opponent(
+    mut answers: MessageReader<actions::Answered>,
     mut commands: Commands,
-    game: Game,
     defending: Query<Entity, With<players::DefendingPlayer>>,
+    players: players::Players,
 ) {
-    for action in actions.read() {
-        let actions::Action::ChooseDefendingPlayer(chosen) = &action.action else {
+    for answered in answers.read() {
+        let actions::Choice::DefendingPlayer(_) = &answered.choice else {
             continue;
         };
-        let is_legal = game.turn().step() == Some(turns::Step::BeginningOfCombat)
-            && game.active_player().is_some_and(|attacking_player| {
-                action.player == attacking_player.id
-                    && game.priority_holder().is_some_and(|holder| action.player == holder.id)
-                    && attacking_player
-                        .opponents_still_in_the_game()
-                        .iter()
-                        .any(|opponent| opponent.id == *chosen)
-            });
-        if !is_legal {
-            rejected.write(actions::Rejected::CannotChooseDefendingPlayer {
-                player: action.player,
-            });
+        let actions::Action::ChooseDefendingPlayer(chosen) = &answered.answer else {
+            continue;
+        };
+        if !players.is_still_in_the_game(*chosen) {
             continue;
         }
         for player in defending.iter() {
@@ -64,14 +84,19 @@ mod tests {
     #[test]
     fn the_active_player_chooses_one_opponent_as_the_defending_player() -> TestResult {
         let (mut game, [p1, p2, p3]) =
-            MockGame::builder().turn(2, turns::Step::BeginningOfCombat).players([
+            MockGame::builder().turn(2, turns::Step::PrecombatMain).players([
                 P1,
                 P2.active().battlefield([GRIZZLY_BEARS]),
                 P3.battlefield([GRIZZLY_BEARS]),
             ]);
         let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
 
-        game.act(p2, actions::Action::ChooseDefendingPlayer(p3.id));
+        game.play([
+            p2.pass_to(turns::Step::BeginningOfCombat),
+            p1.pass_to(turns::Step::BeginningOfCombat),
+            p3.pass_to(turns::Step::BeginningOfCombat),
+            p2.choose_defending_player(p3),
+        ])?;
         game.play([
             p2.pass_to(turns::Step::DeclareAttackers),
             p1.pass_to(turns::Step::DeclareAttackers),

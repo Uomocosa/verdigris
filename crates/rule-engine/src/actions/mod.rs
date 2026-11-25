@@ -10,8 +10,9 @@ pub use ask_queue::AskQueue;
 pub use basic::messages::{Answered, Ask, PlayerAction, Rejected};
 pub use basic::resources::{AcceptedMays, PendingMayAsks};
 pub use basic::structs::{
-    ArrangeGraveyardChoice, BlockAssignment, DamageAssignment, DiscardChoice, LegendaryChoice,
-    MayChoice, OrderTriggersChoice, RequiredCombatDamage, TargetChoice,
+    ArrangeGraveyardChoice, BlockAssignment, DamageAssignment, DefendingPlayerChoice,
+    DiscardChoice, LegendaryChoice, MayChoice, OrderTriggersChoice, RequiredCombatDamage,
+    TargetChoice,
 };
 pub use choice::Choice;
 pub use pending_choice::PendingChoice;

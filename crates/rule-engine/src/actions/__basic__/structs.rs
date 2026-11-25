@@ -66,3 +66,9 @@ pub struct ArrangeGraveyardChoice {
     pub graveyard: Entity,
     pub cards: Vec<Entity>,
 }
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DefendingPlayerChoice {
+    pub player: players::PlayerId,
+    pub legal: Vec<players::PlayerId>,
+}

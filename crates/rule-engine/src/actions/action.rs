@@ -38,6 +38,9 @@ impl Action {
     pub const fn rejection(&self, player: players::PlayerId) -> Option<actions::Rejected> {
         match self {
             Self::ChooseMay(_) => Some(actions::Rejected::InvalidMay { player }),
+            Self::ChooseDefendingPlayer(_) => {
+                Some(actions::Rejected::CannotChooseDefendingPlayer { player })
+            }
             Self::ChooseDiscard(_) => Some(actions::Rejected::InvalidDiscard { player }),
             Self::ArrangeGraveyard(_) => Some(actions::Rejected::InvalidGraveyardOrder { player }),
             Self::OrderTriggers(_) => Some(actions::Rejected::InvalidTriggerOrder { player }),

@@ -13,6 +13,7 @@ pub fn target_choice(game: &testing::MockGame) -> Option<testing::ExpectedTarget
         | actions::Choice::CombatDamage(_)
         | actions::Choice::OrderTriggers(_)
         | actions::Choice::ArrangeGraveyard(_)
+        | actions::Choice::DefendingPlayer(_)
         | actions::Choice::Legendary(_) => None,
     }
 }

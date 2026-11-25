@@ -33,7 +33,6 @@ fn only_opponent_is_the_defending_player(
 mod tests {
     use bevy::prelude::Entity;
 
-    use crate::actions;
     use crate::players;
     use crate::testing::*;
     use crate::turns;
@@ -47,7 +46,7 @@ mod tests {
             p3.pass_to(turns::Step::BeginningOfCombat),
         ])?;
 
-        game.act(p1, actions::Action::ChooseDefendingPlayer(p3.id));
+        game.play([p1.choose_defending_player(p3)])?;
         let marker: Option<Entity> = game.get::<players::DefendingPlayer>(p3).map(|_| p3.into());
         assert_eq!(marker, Some(p3.into()));
 

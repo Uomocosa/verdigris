@@ -37,7 +37,8 @@ pub fn add_step_started_systems(app: &mut App) {
         (
             (
                 comprehensive_rules::r506_2_defending_player::r506_2_defending_player(),
-                comprehensive_rules::r507_1_choose_defending_player::r507_1_choose_defending_player,
+                comprehensive_rules::r507_1_choose_defending_player::r507_1_choose_defending_player(
+                ),
             )
                 .chain(),
             comprehensive_rules::r506_4_leaves_the_battlefield::r506_4_leaves_the_battlefield,
@@ -69,7 +70,7 @@ mod tests {
 
         assert_eq!(
             app.get_schedule(Update).map(Schedule::systems_len),
-            Some(15)
+            Some(16)
         );
     }
 }

@@ -71,6 +71,9 @@ impl TestPlayer {
     pub fn assign_combat_damage<const N: usize>(self, assignments: [(testing::Targets, u32); N]) -> testing::TestPlayerActions { testing::TestPlayerActions::of(self).assign_combat_damage(assignments) }
 
     #[must_use]
+    pub fn choose_defending_player(self, defender: Self) -> testing::TestPlayerActions { testing::TestPlayerActions::of(self).choose_defending_player(defender) }
+
+    #[must_use]
     pub fn pass_to(self, step: turns::Step) -> testing::TestPlayerActions { testing::TestPlayerActions::of(self).pass_to(step) }
 
     #[must_use]

@@ -64,6 +64,9 @@ impl TestPlayerActions {
     pub fn play_land(self, land: testing::TestCard) -> Self { self.act(actions::Action::PlayLand(land.into())) }
 
     #[must_use]
+    pub fn choose_defending_player(self, defender: testing::TestPlayer) -> Self { self.act(actions::Action::ChooseDefendingPlayer(defender.id)) }
+
+    #[must_use]
     pub fn keep_legendary(self, card: testing::TestCard) -> Self { self.act(actions::Action::ChooseLegendary(card.into())) }
 }
 

@@ -13,6 +13,7 @@ pub enum Choice {
     OrderTriggers(actions::OrderTriggersChoice),
     ArrangeGraveyard(actions::ArrangeGraveyardChoice),
     Legendary(actions::LegendaryChoice),
+    DefendingPlayer(actions::DefendingPlayerChoice),
 }
 
 #[atomic_delegates]
@@ -41,6 +42,7 @@ impl Choice {
             Self::OrderTriggers(choice) => choice.player,
             Self::ArrangeGraveyard(choice) => choice.player,
             Self::Legendary(choice) => choice.player,
+            Self::DefendingPlayer(choice) => choice.player,
         }
     }
 }
@@ -58,6 +60,9 @@ impl Choice {
             Self::ArrangeGraveyard(_) => Some(actions::Rejected::InvalidGraveyardOrder { player }),
             Self::OrderTriggers(_) => Some(actions::Rejected::InvalidTriggerOrder { player }),
             Self::Legendary(_) => None,
+            Self::DefendingPlayer(_) => {
+                Some(actions::Rejected::CannotChooseDefendingPlayer { player })
+            }
         }
     }
 }
