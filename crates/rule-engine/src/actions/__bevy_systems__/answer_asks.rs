@@ -31,13 +31,21 @@ pub fn answer_asks(
             choice: choice.clone(),
             answer: action.action.clone(),
         });
+        let mut has_removed_first_equal = false;
         queue.retain(|ask| {
             let asked: &actions::Choice = ask;
             match (asked, &choice) {
                 (actions::Choice::May(asked), actions::Choice::May(answered)) => {
                     asked.player != answered.player || asked.event != answered.event
                 }
-                (asked, answered) => asked != answered,
+                (asked, answered) => {
+                    if !has_removed_first_equal && asked == answered {
+                        has_removed_first_equal = true;
+                        false
+                    } else {
+                        true
+                    }
+                }
             }
         });
         *pending = actions::PendingChoice(None);

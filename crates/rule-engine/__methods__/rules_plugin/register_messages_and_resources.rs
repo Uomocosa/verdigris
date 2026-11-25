@@ -25,6 +25,7 @@ pub fn register_messages_and_resources(app: &mut App) {
     events::Draw::register(app);
     events::LoseLife::register(app);
     events::Discard::register(app);
+    events::DiscardCard::register(app);
     events::GainLife::register(app);
     events::Mill::register(app);
     events::CreateTokens::register(app);

@@ -1,6 +1,6 @@
 use bevy::ecs::schedule::{IntoScheduleConfigs, ScheduleConfigs};
 use bevy::ecs::system::ScheduleSystem;
-use bevy::prelude::{MessageReader, Query, Res, ResMut, not, on_message};
+use bevy::prelude::{Query, Res, ResMut, not, on_message};
 
 use crate::GameMut;
 use crate::STACK;
@@ -56,19 +56,13 @@ fn check_for_a_priority_window(
     }
 }
 
-fn repeat_cleanup_step(
-    mut passed: MessageReader<turns::AllPlayersPassed>,
-    reentry: ResMut<turns::CleanupReentry>,
-    mut game: GameMut,
-) {
+fn repeat_cleanup_step(reentry: ResMut<turns::CleanupReentry>, mut game: GameMut) {
     let reentry = reentry.into_inner();
-    for _ in passed.read() {
-        if !reentry.is_priority_window {
-            continue;
-        }
-        game.give_priority_to_active_player();
-        reentry.should_repeat = true;
+    if !reentry.is_priority_window {
+        return;
     }
+    game.give_priority_to_active_player();
+    reentry.should_repeat = true;
 }
 
 #[cfg(test)]

@@ -32,6 +32,7 @@ pub fn engine() -> rules::RuleRegistry {
     );
     register(events::Destroy::ID, events::Destroy::clauses());
     register(events::Discard::ID, events::Discard::clauses());
+    register(events::DiscardCard::ID, events::DiscardCard::clauses());
     register(events::Draw::ID, events::Draw::clauses());
     register(
         events::DrawFromEmptyLibrary::ID,

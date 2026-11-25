@@ -65,7 +65,13 @@ pub fn add_resolution_systems(app: &mut App) {
                 comprehensive_rules::r121_1_r121_2_draw::r121_1_r121_2_draw,
                 comprehensive_rules::r701_17a_r701_17b_mill::r701_17a_r701_17b_mill,
                 comprehensive_rules::r119_3_life_loss::r119_3_life_loss,
-                comprehensive_rules::r701_9a_r701_9b_discard::r701_9a_r701_9b_discard,
+                (
+                    comprehensive_rules::r701_9b_choose_discards::r701_9b_choose_discards(),
+                    Attempt::<events::DiscardCard>::resolved_by(
+                        comprehensive_rules::r701_9a_discard::r701_9a_discard,
+                    ),
+                )
+                    .chain(),
                 comprehensive_rules::r701_6a_counter::r701_6a_counter,
                 comprehensive_rules::r510_3a_combat_damage_triggers::r510_3a_combat_damage_triggers,
                 comprehensive_rules::r608_2n_graveyard::r608_2n_graveyard,
@@ -103,7 +109,7 @@ mod tests {
 
         assert_eq!(
             app.get_schedule(Update).map(Schedule::systems_len),
-            Some(32)
+            Some(35)
         );
     }
 }

@@ -29,10 +29,10 @@ pub enum Action {
 impl Action {
     #[must_use]
     pub const fn rejection(&self, player: players::PlayerId) -> Option<actions::Rejected> {
-        if matches!(self, Self::ChooseMay(_)) {
-            Some(actions::Rejected::InvalidMay { player })
-        } else {
-            None
+        match self {
+            Self::ChooseMay(_) => Some(actions::Rejected::InvalidMay { player }),
+            Self::ChooseDiscard(_) => Some(actions::Rejected::InvalidDiscard { player }),
+            _ => None,
         }
     }
 }
@@ -55,8 +55,12 @@ mod tests {
     }
 
     #[test]
-    fn only_may_answers_carry_a_rejection() {
+    fn only_shared_choices_carry_a_rejection() {
         let (_, [p1, ..]) = MockGame::new([P1, P2]);
+        assert_eq!(
+            actions::Action::ChooseDiscard(Vec::new()).rejection(p1.id),
+            Some(actions::Rejected::InvalidDiscard { player: p1.id })
+        );
         assert_eq!(actions::Action::PassPriority.rejection(p1.id), None);
     }
 }

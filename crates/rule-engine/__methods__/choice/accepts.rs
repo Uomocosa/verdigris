@@ -5,15 +5,26 @@ use bevy::prelude::Entity;
 use crate::actions;
 
 pub fn accepts(choice: &actions::Choice, answer: &actions::Action) -> bool {
-    let actions::Choice::May(choice) = choice else {
-        return false;
-    };
-    let actions::Action::ChooseMay(chosen) = answer else {
-        return false;
-    };
-    let chosen_set: BTreeSet<Entity> = chosen.iter().copied().collect();
-    let options: BTreeSet<Entity> = choice.options.iter().copied().collect();
-    chosen_set.len() == chosen.len() && chosen_set.is_subset(&options)
+    match choice {
+        actions::Choice::May(choice) => {
+            let actions::Action::ChooseMay(chosen) = answer else {
+                return false;
+            };
+            let chosen_set: BTreeSet<Entity> = chosen.iter().copied().collect();
+            let options: BTreeSet<Entity> = choice.options.iter().copied().collect();
+            chosen_set.len() == chosen.len() && chosen_set.is_subset(&options)
+        }
+        actions::Choice::Discard(choice) => {
+            let actions::Action::ChooseDiscard(chosen) = answer else {
+                return false;
+            };
+            let chosen_set: BTreeSet<Entity> = chosen.iter().copied().collect();
+            u32::try_from(chosen.len()).unwrap_or(u32::MAX) == choice.count
+                && chosen_set.len() == chosen.len()
+                && chosen_set.is_subset(&choice.legal)
+        }
+        _ => false,
+    }
 }
 
 #[cfg(test)]
