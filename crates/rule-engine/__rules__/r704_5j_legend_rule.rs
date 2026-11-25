@@ -2,7 +2,7 @@ use std::collections::BTreeMap;
 
 use bevy::ecs::schedule::{IntoScheduleConfigs, ScheduleConfigs};
 use bevy::ecs::system::ScheduleSystem;
-use bevy::prelude::{Entity, MessageReader, MessageWriter, Query, ResMut, With};
+use bevy::prelude::{Entity, MessageReader, MessageWriter, Query, ResMut, With, not, on_message};
 
 use crate::Attempt;
 use crate::StateBasedActionsPerformed;
@@ -15,7 +15,11 @@ use crate::players;
 /// player, that player chooses one of them, and the rest are put into their owners’ graveyards.
 /// This is called the “legend rule.”
 pub fn r704_5j_legend_rule() -> ScheduleConfigs<ScheduleSystem> {
-    (ask_which_to_keep, put_the_rest_into_graveyards).chain()
+    (
+        put_the_rest_into_graveyards,
+        ask_which_to_keep.run_if(not(on_message::<actions::Answered>)),
+    )
+        .chain()
 }
 
 fn ask_which_to_keep(
@@ -75,6 +79,7 @@ fn put_the_rest_into_graveyards(
 mod tests {
     use crate::BATTLEFIELD;
     use crate::GRAVEYARD;
+    use crate::actions;
     use crate::testing::*;
 
     #[test]
@@ -91,6 +96,7 @@ mod tests {
 
         assert!(game.player(p1).cards_in(BATTLEFIELD).has(isamaru_1));
         assert!(game.player(p1).cards_in(GRAVEYARD).has(isamaru_2));
+        assert!(game.app.world().resource::<actions::PendingChoice>().is_none());
         Ok(())
     }
 
