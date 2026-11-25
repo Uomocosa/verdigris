@@ -152,9 +152,9 @@ How the linter will check it: flag `rules::Would` / `rules::Proceeds` (and any p
 
 ## VRDG012 no_choice_in_rules · WILL_BE_ENFORCED
 
-No `PendingChoice` / `Rejected` in a rule body (rules-style §12). The rules that still have them are exempt until refactored: `r117_3a_r117_3c_r117_3d_priority.rs`, `r117_5_r704_3_state_based_actions.rs`, `r119_4_r119_8_pay_life.rs`, `r305_1_r305_2_r305_3_play_land.rs`, `r305_6_basic_land_mana_ability.rs`, `r404_3_graveyard_order.rs`, `r507_1_choose_defending_player.rs`, `r508_1a_declare_attackers.rs`, `r509_1a_declare_blockers.rs`, `r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_r702_2c_r702_19b_r702_19d_combat_damage.rs`, `r601_2a_cast.rs`, `r601_2c_targets.rs`, `r601_2g_mana_abilities.rs`, `r601_2h_pay.rs`, `r603_3_triggers_on_stack.rs`, `r603_3b_apnap_trigger_order.rs`, `r605_3a_mana_abilities.rs`, `r701_9a_r701_9b_discard.rs`, `r704_5j_legend_rule.rs`.
+No `PendingChoice` / `Rejected` in a rule body (rules-style §12). The rules that still have them are exempt until refactored: `r117_3a_r117_3c_r117_3d_priority.rs`, `r117_5_r704_3_state_based_actions.rs`, `r119_4_r119_8_pay_life.rs`, `r305_1_r305_2_r305_3_play_land.rs`, `r305_6_basic_land_mana_ability.rs`, `r508_1a_declare_attackers.rs`, `r509_1a_declare_blockers.rs`, `r601_2a_cast.rs`, `r601_2c_targets.rs`, `r601_2g_mana_abilities.rs`, `r601_2h_pay.rs`, `r603_3_triggers_on_stack.rs`, `r605_3a_mana_abilities.rs`. `r500_3_..` and `r514_3a_..` read `PendingChoice` only to wait for an open choice.
 
-Bad — `crates/rule-engine/__rules__/r701_9a_r701_9b_discard.rs:19`:
+Bad — `git show 65f4217:crates/rule-engine/__rules__/r701_9a_r701_9b_discard.rs`:
 
 ```rust
 mut rejected: MessageWriter<actions::Rejected>,

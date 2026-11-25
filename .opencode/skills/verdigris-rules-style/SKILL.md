@@ -133,7 +133,7 @@ Only the system that performs an event writes its result; every other rule sends
 **Why:** a trigger or a replacement hooks in at one place, and no path forgets a side effect
 (such as `StateBasedActionsPerformed`).
 
-Some older rules do not follow this yet: destroy, counter, discard, mill and finished spells still
+Some older rules do not follow this yet: destroy, counter, mill and finished spells still
 insert `InZone(graveyard)` themselves instead of sending `PutIntoGraveyard`. Don't copy them.
 
 Before replacing a direct write with an event, check WHEN the event is performed:
@@ -239,33 +239,42 @@ both: 500.4 announces that pools empty, 106.4 performs the loss.
 | The choice comes from | Who asks |
 |---|---|
 | a card or effect: "you may ..." on the card, or a CR sentence that only points at it ("some cards allow ...", "if an effect lets a player ...") | the card's change (`may` in `CHANGEABLE_RULES.md` §3); the rule is a hook point (§10) and has no `Ask` |
-| the CR sentence itself, with no card involved ("the player chooses one of them") | the rule writes `Ask(choice)` and reads `Answered<Choice>` |
+| the CR sentence itself, with no card involved ("the player chooses one of them") | the rule writes `Ask(choice)` and reads `Answered` |
 
 Test: remove every card from the game. Does the CR sentence still make the player choose? If not, the
 choice isn't the rule's. Not every card gives a choice: another one may simply do something at that
 moment, and the same hook point must serve both.
 
 Asking, waiting and validating is ONE shared mechanism for the whole engine, not code in a rule: it
-shows one ask at a time, in turn order, drops an ask with no options or whose player left, checks
+shows one ask at a time, in the order they were asked (so a rule asks in turn order), drops an ask whose player left, checks
 player / legality / count / duplicates, and writes `Answered` or `Rejected`. The choice type alone
 says what a legal answer is. A rule body that needs a choice has no `PendingChoice` and no answer check.
 
 ```rust
-// 701.22a "look at the top N cards ..., then put any number of them on the bottom": the CR asks
-for scry in scries.read() { asks.write(actions::Ask(actions::ScryChoice::new(scry))); }
+// 701.9b in a rule: the CR asks ...
+asks.write(actions::Ask(actions::Choice::Discard(choice)));
 
-// another system, 701.22a's result: only valid answers arrive here
-for answered in answers.read() { .. }
+// ... and another private system of the same rule performs; only legal answers arrive here
+for answered in answers.read() {
+    let actions::Choice::Discard(choice) = &answered.choice else { continue };
+    ..
+}
 ```
 
-For a card's `may` the mechanism exists: `actions::Ask` / `actions::Answered`, shown and checked
-by `answer_asks`; `HookEvent::register` registers what `show_may` / `answer_may` need
-(`PendingMayAsks` and `AcceptedMays` for `Hooked<E>`), and the systems still go into the rule's
-chain (see `add_turn_systems`). For a choice the CR itself gives, rules still write `PendingChoice`:
-don't copy them; a refactor of such a rule extends this mechanism and uses it.
+`actions::Ask(Choice)` / `actions::Answered { choice, answer }`, shown and checked by `show_asks` /
+`answer_asks`. A new choice adds a `Choice` variant and one arm in `Choice::player`, `Choice::accepts`
+(what is legal) and the two `rejection`s; no rule checks an answer. Good: `r701_9b_choose_discards`,
+`r704_5j_legend_rule`, `r507_1_choose_defending_player`. A card's `may` uses the same mechanism.
 
-Other choice rules may keep their own `PendingChoice` until they are refactored; the old and new way
-can live side by side.
+- An ask written in frame N is shown at the end of frame N and can be answered from frame N+1 (checked in
+  the Turn set, so every later set of that frame can read `Answered`).
+- The asking system must not write the same ask again in the frame of the answer from state the answer has
+  not changed yet. A rule that finds its situation again in every pass (a state-based check) performs first
+  and asks after (`r704_5j`); one that reacts to a change (`Changed<..>`) needs nothing.
+- While any choice but `Target` is open nobody has priority (`TurnState::suspend_priority`): a fact about
+  the holder, so no rule tests it. `Target` belongs to casting, the caster keeps priority.
+- In tests the choice is answered where it opens, with its verb (`discard`, `arrange_graveyard`,
+  `order_triggers`, `keep_legendary`, `assign_combat_damage`, `choose_defending_player`).
 
 Rules that read a `PlayerAction` (play, cast, attack) keep doing so for now: such a rule checks, writes its own
 `Rejected`, and then `Attempt(..)`, one event per declared object. Another rule performs it and writes `Did`
