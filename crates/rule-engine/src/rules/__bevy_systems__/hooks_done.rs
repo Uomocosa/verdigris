@@ -18,7 +18,7 @@ pub fn hooks_done<E: HookEvent>(
     let Some(events) = (**queue).as_ref() else {
         return;
     };
-    if !events.is_empty() || asks.iter().any(|ask| ask.event == E::ID) || !accepted.is_empty() {
+    if !events.is_empty() || asks.iter().any(|ask| ask.is_may_of(E::ID)) || !accepted.is_empty() {
         return;
     }
     done.write(HooksDone(PhantomData));

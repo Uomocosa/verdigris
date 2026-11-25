@@ -9,6 +9,7 @@ pub mod cards;
 pub mod cards_in_zone;
 pub mod cast_spell;
 pub mod characteristics;
+pub mod choice;
 pub mod clause;
 pub mod clause_id;
 pub mod combat_damage_choice;

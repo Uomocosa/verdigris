@@ -1,22 +1,16 @@
 use bevy::prelude::{Entity, Message};
+use derive_more::Deref;
 
 use crate::actions;
 use crate::players;
-use crate::rules;
 
-#[derive(Message, Debug, Clone, PartialEq, Eq)]
-pub struct Ask {
-    pub player: players::PlayerId,
-    pub event: rules::EventId,
-    pub option: Entity,
-}
+#[derive(Message, Debug, Clone, PartialEq, Eq, Deref)]
+pub struct Ask(pub actions::Choice);
 
 #[derive(Message, Debug, Clone, PartialEq, Eq)]
 pub struct Answered {
-    pub player: players::PlayerId,
-    pub event: rules::EventId,
-    pub option: Entity,
-    pub is_accepted: bool,
+    pub choice: actions::Choice,
+    pub answer: actions::Action,
 }
 
 #[derive(Message, Debug, Clone, PartialEq, Eq)]

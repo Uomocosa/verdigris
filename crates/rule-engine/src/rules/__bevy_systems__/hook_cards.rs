@@ -26,7 +26,7 @@ pub fn hook_cards<E: HookEvent>(
         return;
     }
     let asked = asked.into_inner();
-    if asked.iter().any(|ask| ask.event == E::ID) {
+    if asked.iter().any(|ask| ask.is_may_of(E::ID)) {
         return;
     }
     while let Some(events) = (**queue).as_ref() {

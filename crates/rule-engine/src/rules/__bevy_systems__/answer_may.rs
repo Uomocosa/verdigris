@@ -1,4 +1,4 @@
-use bevy::prelude::{Commands, MessageReader, MessageWriter, Res, ResMut};
+use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Res, ResMut};
 
 use crate::Resolve;
 use crate::actions;
@@ -15,19 +15,38 @@ pub fn answer_may<E: Event>(
     answers: rules::Rules,
 ) {
     for answer in answered.read() {
-        if answer.event != E::ID {
+        if !answer.choice.is_may_of(E::ID) {
             continue;
         }
-        let Some(index) = pending.iter().position(|ask| {
-            ask.event.player() == answer.player && ask.event.subject() == answer.option
-        }) else {
+        let actions::Choice::May(choice) = &answer.choice else {
             continue;
         };
-        let ask = pending.remove(index);
-        if answer.is_accepted {
-            accepted.push(ask);
-        } else {
-            proceeds.write(Resolve(ask.event));
+        let actions::Action::ChooseMay(chosen) = &answer.answer else {
+            continue;
+        };
+        let decisions: Vec<(&Entity, bool)> = chosen
+            .iter()
+            .map(|option| (option, true))
+            .chain(
+                choice
+                    .options
+                    .iter()
+                    .filter(|option| !chosen.contains(option))
+                    .map(|option| (option, false)),
+            )
+            .collect();
+        for (option, is_accepted) in decisions {
+            let Some(index) = pending.iter().position(|ask| {
+                ask.event.player() == choice.player && ask.event.subject() == *option
+            }) else {
+                continue;
+            };
+            let ask = pending.remove(index);
+            if is_accepted {
+                accepted.push(ask);
+            } else {
+                proceeds.write(Resolve(ask.event));
+            }
         }
     }
     let choice = choice.into_inner();

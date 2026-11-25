@@ -14,11 +14,11 @@ pub fn show_may<E: Event>(
     for ask in asks.read() {
         let player = ask.event.player();
         if players.is_still_in_the_game(player) {
-            offered.write(actions::Ask {
+            offered.write(actions::Ask(actions::Choice::May(actions::MayChoice {
                 player,
                 event: E::ID,
-                option: ask.event.subject(),
-            });
+                options: vec![ask.event.subject()],
+            })));
             pending.push(ask.clone());
         }
     }
