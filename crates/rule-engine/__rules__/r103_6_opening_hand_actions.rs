@@ -10,11 +10,6 @@ use crate::turns;
 /// 103.6. Some cards allow a player to take actions with them from their opening hand. Once the
 /// mulligan process (see rule 103.5) is complete, the starting player may take any such actions in
 /// any order. Then each other player in turn order may do the same.
-///
-/// # Notes
-///
-/// All hooks are announced at once, so a mandatory effect of a later player would happen before
-/// an earlier player answers.
 pub fn r103_6_opening_hand_actions() -> ScheduleConfigs<ScheduleSystem> {
     opening_hand_actions.run_if(on_message::<turns::MulligansComplete>)
 }
@@ -135,7 +130,7 @@ mod tests {
     fn opening_hand_choices_follow_turn_order() -> TestResult {
         let (mut game, [p1, p2, p3]) = MockGame::new([
             P1.hand([LEYLINE_OF_ANTICIPATION]),
-            P2.hand([LEYLINE_OF_ANTICIPATION]),
+            P2.hand([LEYLINE_OF_ANTICIPATION, TEST_DOUBLE_GIFT]),
             P3.hand([LEYLINE_OF_ANTICIPATION]),
         ]);
         let [p1_leyline] = game.player(p1).cards_in(HAND).exactly::<1>(LEYLINE_OF_ANTICIPATION)?;
@@ -158,6 +153,8 @@ mod tests {
         );
         assert!(game.player(p2).cards_in(HAND).has(p2_leyline));
 
+        assert_eq!(game.life(p2), 20);
+
         game.act(p1, actions::Action::ChooseMay(vec![p1_leyline.into()]));
 
         assert!(game.player(p1).cards_in(BATTLEFIELD).has(p1_leyline));
@@ -170,6 +167,7 @@ mod tests {
             Some(&actions::Rejected::NoPriority { player: p1.id })
         );
         assert_eq!(game.priority().holder, None);
+        assert_eq!(game.life(p2), 23);
 
         game.act(p2, actions::Action::ChooseMay(vec![p2_leyline.into()]));
 
