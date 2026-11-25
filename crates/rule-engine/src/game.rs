@@ -7,8 +7,7 @@ use crate::turns;
 #[derive(SystemParam, Clone, Copy)]
 pub struct Game<'w, 's> {
     players: players::Players<'w, 's>,
-    turn: Query<'w, 's, &'static turns::Turn>,
-    priority: Query<'w, 's, &'static turns::Priority>,
+    state: Query<'w, 's, &'static turns::TurnState>,
 }
 
 #[rustfmt::skip]
@@ -18,24 +17,28 @@ impl Game<'_, '_> {
 
     #[must_use]
     pub fn is_over(&self) -> bool { self.players.has_anyone_won() || self.is_a_draw() }
-
-    #[must_use]
-    pub fn is_first_turn(&self) -> bool { self.turn.single().is_ok_and(|turn| turn.number == 1) }
-
-    #[must_use]
-    pub fn step(&self) -> Option<turns::Step> { self.turn.single().ok().map(|turn| turn.step) }
 }
 
-impl<'w, 's> Game<'w, 's> {
+impl Game<'_, '_> {
     #[must_use]
-    pub fn priority_holder(&self) -> Option<players::PlayerView<'w, 's>> {
-        let holder = self.priority.single().ok()?.holder?;
+    pub fn turn(&self) -> turns::TurnView<'_> {
+        let Ok(state) = self.state.single_inner() else {
+            return turns::TurnView(None);
+        };
+        turns::TurnView(Some(state))
+    }
+}
+
+impl Game<'_, '_> {
+    #[must_use]
+    pub fn priority_holder(&self) -> Option<players::PlayerView<'_, '_>> {
+        let holder = self.state.single_inner().ok()?.priority.holder?;
         Some(self.players.view(holder))
     }
 
     #[must_use]
-    pub fn active_player(&self) -> Option<players::PlayerView<'w, 's>> {
-        let active = self.turn.single().ok()?.active;
+    pub fn active_player(&self) -> Option<players::PlayerView<'_, '_>> {
+        let active = self.state.single_inner().ok()?.turn.active;
         if self.players.is_still_in_the_game(active) {
             Some(self.players.view(active))
         } else {
@@ -60,8 +63,8 @@ mod tests {
             .world_mut()
             .run_system_once(move |answers: Game| {
                 assert_eq!(answers.active_player().map(|player| player.id), Some(p1.id));
-                assert_eq!(answers.step(), Some(turns::Step::PrecombatMain));
-                assert!(answers.is_first_turn());
+                assert_eq!(answers.turn().step(), Some(turns::Step::PrecombatMain));
+                assert!(answers.turn().is_first_turn());
                 assert_eq!(
                     answers.priority_holder().map(|player| player.id),
                     Some(p1.id)

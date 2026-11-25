@@ -12,7 +12,10 @@ pub fn r103_8a_skip_first_draw_step(
     players: players::Players,
 ) {
     for step in next_step.read() {
-        if **step == turns::Step::Draw && game.is_first_turn() && players.is_two_player_game() {
+        if **step == turns::Step::Draw
+            && game.turn().is_first_turn()
+            && players.is_two_player_game()
+        {
             *step = turns::NextStep(turns::Step::PrecombatMain);
         }
     }

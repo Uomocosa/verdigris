@@ -31,10 +31,10 @@ pub fn r305_1_r305_2_r305_3_play_land(
     mut rejected: MessageWriter<actions::Rejected>,
     mut entering: MessageWriter<Attempt<events::EnterBattlefield>>,
     mut commands: Commands,
-    turn: Res<turns::Turn>,
+    state: Res<turns::TurnState>,
     answers: rules::Rules,
 ) {
-    let turn = turn.into_inner();
+    let state = state.into_inner();
     for action in actions.read() {
         let actions::Action::PlayLand(land) = &action.action else {
             continue;
@@ -62,12 +62,12 @@ pub fn r305_1_r305_2_r305_3_play_land(
         };
         if !answers
             .value::<rules::LandPlays>(action.player)
-            .allows(u32::from(record.count_for(turn.number)))
+            .allows(u32::from(record.count_for(state.turn.number)))
         {
             rejected.write(actions::Rejected::CannotPlayLand { land });
             continue;
         }
-        record.record_play(turn.number);
+        record.record_play(state.turn.number);
         commands.entity(*action.player).insert(record);
         if answers.zones.find(BATTLEFIELD, Some(action.player)).is_some() {
             entering.write(Attempt(events::EnterBattlefield::from_controller(

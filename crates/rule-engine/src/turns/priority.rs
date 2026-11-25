@@ -1,11 +1,10 @@
 use std::collections::BTreeSet;
 
 use atomic_delegate_macros::atomic_delegates;
-use bevy::prelude::Resource;
 
 use crate::players;
 
-#[derive(Resource, Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Priority {
     pub holder: Option<players::PlayerId>,
     pub(crate) passed: BTreeSet<players::PlayerId>,

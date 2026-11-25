@@ -3,12 +3,14 @@ use crate::players;
 use crate::turns;
 
 pub fn begin_next_turn<'w, 's>(game: &mut GameMut<'w, 's>) -> Option<players::PlayerView<'w, 's>> {
-    let next = game.players.view(game.turn.active).next_in_turn_order()?;
-    game.turn.number = game.turn.number.saturating_add(1);
-    game.turn.active = next.id;
-    game.turn.step = turns::Step::Untap;
-    *game.upcoming_steps = turns::UpcomingSteps::from(turns::Step::Untap);
-    game.priority.give_to(next.id);
+    let next = game.players.view(game.state.turn.active).next_in_turn_order()?;
+    let number = game.state.turn.number.saturating_add(1);
+    *game.state = turns::TurnState::from(turns::Turn {
+        number,
+        active: next.id,
+        step: turns::Step::Untap,
+    });
+    game.state.priority.give_to(next.id);
     Some(next)
 }
 

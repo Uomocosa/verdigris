@@ -1,7 +1,8 @@
 use bevy::ecs::schedule::{IntoScheduleConfigs, ScheduleConfigs};
 use bevy::ecs::system::ScheduleSystem;
-use bevy::prelude::{MessageWriter, Res, on_message};
+use bevy::prelude::{MessageWriter, on_message};
 
+use crate::Game;
 use crate::turns;
 
 /// 500.2. A phase or step in which players receive priority ends when the stack is empty and all
@@ -12,11 +13,8 @@ pub fn r500_2_step_ends() -> ScheduleConfigs<ScheduleSystem> {
     step_ends.run_if(on_message::<turns::AllPlayersPassed>)
 }
 
-fn step_ends(
-    mut next_step: MessageWriter<turns::NextStep>,
-    upcoming_steps: Res<turns::UpcomingSteps>,
-) {
-    if let Some(next) = upcoming_steps.into_inner().next_step() {
+fn step_ends(mut next_step: MessageWriter<turns::NextStep>, game: Game) {
+    if let Some(next) = game.turn().next_step() {
         next_step.write(turns::NextStep(next));
     }
 }

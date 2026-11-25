@@ -85,13 +85,11 @@ pub fn spawn_game(
         .get(players.iter().position(|setup| setup.active).unwrap_or(0))
         .copied()
         .unwrap_or(players::PlayerId(Entity::PLACEHOLDER));
-    app.insert_resource(turns::Turn {
+    app.insert_resource(turns::TurnState::from(turns::Turn {
         number: builder.turn_number,
         active,
         step: builder.step,
-    });
-    app.insert_resource(turns::UpcomingSteps::from(builder.step));
-    app.insert_resource(turns::Priority::NO_HOLDER);
+    }));
     app.insert_resource(turns::TurnOrder::from(entities.clone()));
     app.world_mut().write_message(turns::MulligansComplete);
 

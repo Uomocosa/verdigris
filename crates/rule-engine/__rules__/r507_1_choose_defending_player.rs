@@ -31,7 +31,7 @@ pub fn r507_1_choose_defending_player(
         let actions::Action::ChooseDefendingPlayer(chosen) = &action.action else {
             continue;
         };
-        let is_legal = game.step() == Some(turns::Step::BeginningOfCombat)
+        let is_legal = game.turn().step() == Some(turns::Step::BeginningOfCombat)
             && game.active_player().is_some_and(|attacking_player| {
                 action.player == attacking_player.id
                     && game.priority_holder().is_some_and(|holder| action.player == holder.id)

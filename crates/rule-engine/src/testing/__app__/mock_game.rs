@@ -71,11 +71,11 @@ impl MockGame {
     pub fn pt(&self, card: impl Into<Entity>) -> Option<cards::PowerToughness> { self.app.world().get::<cards::EffectivePT>(card.into()).map(|effective| **effective) }
 
     #[must_use]
-    pub fn turn(&self) -> &turns::Turn { self.app.world().resource::<turns::Turn>() }
+    pub fn turn(&self) -> &turns::Turn { &self.app.world().resource::<turns::TurnState>().turn }
 
     #[must_use]
     pub fn priority(&self) -> turns::Priority {
-        self.app.world().resource::<turns::Priority>().clone()
+        self.app.world().resource::<turns::TurnState>().priority.clone()
     }
 
     #[must_use]

@@ -29,9 +29,9 @@ pub fn r603_4_intervening_if(
     mut queue: ResMut<stack::TriggerQueue>,
     sources: Query<(Entity, &cards::Owner, &cards::TriggeredAtStep), With<cards::OnBattlefield>>,
     lives: Query<(Entity, &players::Life)>,
-    turn: Res<turns::Turn>,
+    state: Res<turns::TurnState>,
 ) {
-    let turn = turn.into_inner();
+    let state = state.into_inner();
     for step in steps.read() {
         for (source, owner, at_step) in sources.iter() {
             let controller = **owner;
@@ -40,11 +40,11 @@ pub fn r603_4_intervening_if(
                     **step == expected && {
                         let players: Vec<players::PlayerId> =
                             lives.iter().map(|(player, _)| players::PlayerId(player)).collect();
-                        who.resolve(controller, &players).contains(&turn.active)
+                        who.resolve(controller, &players).contains(&state.turn.active)
                     }
                 }
                 abilities::TriggerEvent::BeginningOfNextCleanup => {
-                    **step == turns::Step::Cleanup && turn.active == controller
+                    **step == turns::Step::Cleanup && state.turn.active == controller
                 }
                 abilities::TriggerEvent::Enters(_)
                 | abilities::TriggerEvent::Dies

@@ -191,12 +191,13 @@ mod tests {
                 damage::Damage(0),
             ))
             .id();
-        app.insert_resource(turns::Turn {
+        let mut state = turns::TurnState::from(turns::Turn {
             number: 1,
             active: players[0],
             step: turns::Step::PrecombatMain,
         });
-        app.insert_resource(turns::Priority::held_by(players[0]));
+        state.priority = turns::Priority::held_by(players[0]);
+        app.insert_resource(state);
         app.insert_resource(turns::TurnOrder::from(players));
         app.update();
 

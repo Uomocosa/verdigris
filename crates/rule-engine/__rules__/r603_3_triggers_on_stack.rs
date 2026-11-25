@@ -36,7 +36,7 @@ pub fn r603_3_triggers_on_stack(world: &mut World) {
     if pending.is_empty() {
         return;
     }
-    let active = world.resource::<turns::Turn>().active;
+    let active = world.resource::<turns::TurnState>().turn.active;
     let turn_order = world.resource::<turns::TurnOrder>().clone();
     let apnap = players_in_apnap_order(active, &turn_order);
     pending.sort_by_key(|trigger| apnap_position(&apnap, trigger.controller));

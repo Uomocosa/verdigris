@@ -95,10 +95,10 @@ pub fn r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_r702_2c_r702_19b_r702_19d_c
     >,
     mut lookups: ParamSet<CombatLookups<'_, '_>>,
     defenders: Query<Entity, With<players::DefendingPlayer>>,
-    turn: Res<turns::Turn>,
+    state: Res<turns::TurnState>,
     participants: Res<turns::CombatDamageParticipants>,
 ) {
-    let turn = turn.into_inner();
+    let state = state.into_inner();
     let participants = participants.into_inner();
     for step in step_started.read() {
         if !matches!(
@@ -143,7 +143,7 @@ pub fn r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_r702_2c_r702_19b_r702_19d_c
         if !needed.is_empty() {
             *pending = actions::PendingChoice(Some(actions::Choice::CombatDamage(
                 actions::CombatDamageChoice {
-                    player: turn.active,
+                    player: state.turn.active,
                     needed,
                 },
             )));

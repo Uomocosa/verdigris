@@ -88,19 +88,20 @@ pub fn eval(
                 })
         }),
         rules::Predicate::StepIs(step) => {
-            answers.turn.single().is_ok_and(|turn| turn.step == *step)
+            answers.state.single().is_ok_and(|state| state.turn.step == *step)
         }
         rules::Predicate::StackEmpty => answers
             .zones
             .find(zones::SharedZone::Stack, None)
             .is_none_or(|stack| !answers.in_zone.iter().any(|in_zone| **in_zone == stack)),
-        rules::Predicate::ActivePlayer(role) => target(role)
-            .is_some_and(|holder| answers.turn.single().is_ok_and(|turn| *turn.active == holder)),
+        rules::Predicate::ActivePlayer(role) => target(role).is_some_and(|holder| {
+            answers.state.single().is_ok_and(|state| *state.turn.active == holder)
+        }),
         rules::Predicate::HasPriority(role) => target(role).is_some_and(|holder| {
             answers
-                .priority
+                .state
                 .single()
-                .is_ok_and(|priority| priority.holder.is_some_and(|id| *id == holder))
+                .is_ok_and(|state| state.priority.holder.is_some_and(|id| *id == holder))
         }),
         rules::Predicate::EventField(..) => false,
     }

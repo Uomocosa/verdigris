@@ -40,7 +40,7 @@ pub fn r305_6_basic_land_mana_ability(
     mut actions: MessageReader<actions::PlayerAction>,
     mut rejected: MessageWriter<actions::Rejected>,
     mut commands: Commands,
-    priority: Res<turns::Priority>,
+    state: Res<turns::TurnState>,
     permanents: Query<
         (
             &cards::CardDefinition,
@@ -51,7 +51,7 @@ pub fn r305_6_basic_land_mana_ability(
     >,
     mut pools: Query<&mut cards::ManaPool>,
 ) {
-    let priority = priority.into_inner();
+    let state = state.into_inner();
     for action in actions.read() {
         let actions::Action::ActivateManaAbility { source, produces } = &action.action else {
             continue;
@@ -75,7 +75,10 @@ pub fn r305_6_basic_land_mana_ability(
             rejected.write(actions::Rejected::CannotActivateManaAbility { permanent });
             continue;
         };
-        if priority.holder != Some(action.player) || **owner != action.player || tapped.is_some() {
+        if state.priority.holder != Some(action.player)
+            || **owner != action.player
+            || tapped.is_some()
+        {
             rejected.write(actions::Rejected::CannotActivateManaAbility { permanent });
             continue;
         }

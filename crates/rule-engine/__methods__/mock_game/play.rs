@@ -73,7 +73,7 @@ pub fn play(
                 }
             }
             testing::PlayStep::AutoPass { player, until } => {
-                let start = *game.app.world().resource::<turns::Turn>();
+                let start = game.app.world().resource::<turns::TurnState>().turn;
                 auto_passes.push(testing::ActiveAutoPass {
                     player: *player,
                     until: *until,
@@ -86,7 +86,7 @@ pub fn play(
             let Some(position) = auto_passes.iter().position(|pass| pass.player == *holder) else {
                 break;
             };
-            let now = *game.app.world().resource::<turns::Turn>();
+            let now = game.app.world().resource::<turns::TurnState>().turn;
             let Some(auto_pass) = auto_passes.get(position) else {
                 break;
             };

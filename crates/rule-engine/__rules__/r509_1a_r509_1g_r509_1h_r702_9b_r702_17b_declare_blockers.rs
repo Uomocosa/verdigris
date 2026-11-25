@@ -44,21 +44,19 @@ pub fn r509_1a_r509_1g_r509_1h_r702_9b_r702_17b_declare_blockers(
     mut actions: MessageReader<actions::PlayerAction>,
     mut rejected: MessageWriter<actions::Rejected>,
     mut commands: Commands,
-    priority: Res<turns::Priority>,
-    turn: Res<turns::Turn>,
+    state: Res<turns::TurnState>,
     blockers: Query<(Entity, &cards::Owner), With<cards::Creature>>,
     attacking: Query<(Entity, &cards::Attacking)>,
     answers: rules::Rules,
 ) {
-    let priority = priority.into_inner();
-    let turn = turn.into_inner();
+    let state = state.into_inner();
     for action in actions.read() {
         let actions::Action::DeclareBlockers(assignments) = &action.action else {
             continue;
         };
-        if turn.step != turns::Step::DeclareBlockers
-            || priority.holder != Some(action.player)
-            || action.player == turn.active
+        if state.turn.step != turns::Step::DeclareBlockers
+            || state.priority.holder != Some(action.player)
+            || action.player == state.turn.active
         {
             rejected.write(actions::Rejected::CannotBlock {
                 assignments: assignments.clone(),
