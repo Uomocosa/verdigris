@@ -13,7 +13,10 @@ pub fn add_priority_action_systems(app: &mut App) {
             comprehensive_rules::r601_2c_targets::r601_2c_targets,
             comprehensive_rules::r119_4_r119_8_pay_life::r119_4_r119_8_pay_life,
             comprehensive_rules::r601_2h_pay::r601_2h_pay,
-            comprehensive_rules::r508_1a_r508_1k_declare_attackers::r508_1a_r508_1k_declare_attackers,
+            comprehensive_rules::r508_1a_declare_attackers::r508_1a_declare_attackers,
+            Attempt::<events::DeclareAttacker>::resolved_by(
+                comprehensive_rules::r508_1k_becomes_attacking::r508_1k_becomes_attacking,
+            ),
             comprehensive_rules::r508_1m_r508_2a_r508_3a_attack_triggers::r508_1m_r508_2a_r508_3a_attack_triggers,
             comprehensive_rules::r611_3a_static_effects::r611_3a_static_effects,
             (
@@ -52,7 +55,7 @@ mod tests {
 
         assert_eq!(
             app.get_schedule(Update).map(Schedule::systems_len),
-            Some(22)
+            Some(24)
         );
     }
 }
