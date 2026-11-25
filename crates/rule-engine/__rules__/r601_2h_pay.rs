@@ -6,7 +6,7 @@ use crate::cards;
 use crate::stack;
 use crate::zones;
 
-type UntappedLands<'w, 's, 'owner, 'definition> = Query<
+type UntappedPermanents<'w, 's, 'owner, 'definition> = Query<
     'w,
     's,
     (&'owner cards::Owner, &'definition cards::CardDefinition),
@@ -26,7 +26,7 @@ pub fn r601_2h_pay(
         &stack::CastingStage,
     )>,
     mut pools: Query<&mut cards::ManaPool>,
-    untapped_lands: UntappedLands<'_, '_, '_, '_>,
+    untapped_permanents: UntappedPermanents<'_, '_, '_, '_>,
     zones: zones::ZoneLookup,
 ) {
     for (spell, definition, owner, stage) in cards.iter() {
@@ -40,11 +40,11 @@ pub fn r601_2h_pay(
             commands.entity(spell).remove::<stack::CastingStage>();
             continue;
         }
-        let does_owner_control_an_untapped_land =
-            untapped_lands.iter().any(|(land_owner, land)| {
-                **land_owner == **owner && land.type_line.land_types().next().is_some()
+        let does_owner_control_an_untapped_permanent_with_a_mana_ability =
+            untapped_permanents.iter().any(|(permanent_owner, permanent)| {
+                **permanent_owner == **owner && permanent.has_mana_ability()
             });
-        if !does_owner_control_an_untapped_land {
+        if !does_owner_control_an_untapped_permanent_with_a_mana_ability {
             rejected.write(actions::Rejected::CannotPay { spell });
             if let Some(hand) = zones.find(HAND, Some(**owner)) {
                 commands.entity(spell).insert(zones::InZone(hand));

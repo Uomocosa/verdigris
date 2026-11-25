@@ -175,9 +175,10 @@ mod tests {
 
         game.play([
             p1.activate_ability(tower_1.mana_ability(cards::ManaType::Colorless))
+                .cast(myr)
                 .activate_ability(tower_2.mana_ability(cards::ManaType::Colorless))
-                .activate_ability(tower_3.mana_ability(cards::ManaType::Colorless)),
-            p1.cast(myr).end_turn(),
+                .activate_ability(tower_3.mana_ability(cards::ManaType::Colorless))
+                .end_turn(),
             p2.end_turn(),
         ])?;
 

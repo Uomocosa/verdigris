@@ -85,6 +85,9 @@ impl CardDefinition {
     pub fn keywords(&self) -> impl Iterator<Item = keywords::StaticKeyword> + '_ {}
 
     #[must_use]
+    pub fn has_mana_ability(&self) -> bool {}
+
+    #[must_use]
     pub fn enters_tapped(&self) -> bool {}
 
     #[must_use]
