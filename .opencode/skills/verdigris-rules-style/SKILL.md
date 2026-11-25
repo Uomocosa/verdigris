@@ -206,7 +206,8 @@ turn", "receives priority") is another sentence, so another rule.
 The event is about the object that can change it: one event per object when each object may change
 its own (the pipeline applies only the first matching `Instead` to an event).
 
-Rules that queue triggered abilities (603.2, 508.3a, 509.3a) look them up themselves today; this section doesn't cover them.
+Rules that queue triggered abilities (603.2, 508.3a, 509.3a) look the ability up themselves today; this section
+doesn't cover that lookup. What happened they read from `Did<E>`, never from another rule's `Rejected` (§13).
 
 **Why:** a new card then needs no change in any rule.
 
@@ -266,7 +267,9 @@ don't copy them; a refactor of such a rule extends this mechanism and uses it.
 Other choice rules may keep their own `PendingChoice` until they are refactored; the old and new way
 can live side by side.
 
-Rules that read a `PlayerAction` (play, cast, attack) keep doing so for now.
+Rules that read a `PlayerAction` (play, cast, attack) keep doing so for now: such a rule checks, writes its own
+`Rejected`, and then `Attempt(..)`, one event per declared object. Another rule performs it and writes `Did`
+(`r508_1a` / `r508_1k`, `r509_1a` / `r509_1g` / `r509_1h`).
 
 ## 13. State another rule needs is a CR concept
 
@@ -404,8 +407,9 @@ Only a rule that uses the varying data reads the message. One flat loop with one
 ## 17. The steps of a turn are a list; a CR rule that skips a step changes NextStep
 
 `turns::TurnState` holds the steps still to come this turn. `r500_2` proposes `game.turn().next_step()`; only
-`r500_3` and the skip rules still name the step they go to. Adding a step inserts it into the list (500.9); `begin_step` drops the steps
-it passes over.
+`r500_3` and `r508_8` still name the step they go to. Adding a step inserts it into the list (500.9), adding a phase
+is the event `AddPhase` (`r500_8`, 500.8); `begin_step` drops the steps it passes over. A turn can have several
+beginning or combat phases, so "the turn began" is `turns::TurnStarted`, never the untap step (302.6).
 
 ```rust
 // 510.4 "the phase gets a second combat damage step"
@@ -423,8 +427,9 @@ for step in next_step.read() {
     if **step == turns::Step::Draw
         && game.turn().is_first_turn()
         && players.is_two_player_game()
+        && let Some(step_after) = game.turn().step_after_next()
     {
-        *step = turns::NextStep(turns::Step::PrecombatMain);
+        *step = turns::NextStep(step_after); // 500.11: past it, no destination named
     }
 }
 ```
