@@ -19,13 +19,13 @@ pub fn add_step_started_systems(app: &mut App) {
         Update,
         (
             (
-                comprehensive_rules::r502_3_untap::r502_3_untap,
+                comprehensive_rules::r502_3_untap::r502_3_untap(),
                 Attempt::<events::Untap>::resolved_by(
                     comprehensive_rules::r701_26b_untap::r701_26b_untap,
                 ),
             )
                 .chain(),
-            comprehensive_rules::r302_6_summoning_sickness::r302_6_summoning_sickness,
+            comprehensive_rules::r302_6_summoning_sickness::r302_6_summoning_sickness(),
         )
             .in_set(RuleSet::StepStarted),
     );

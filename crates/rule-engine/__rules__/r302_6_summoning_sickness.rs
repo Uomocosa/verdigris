@@ -1,24 +1,24 @@
-use bevy::prelude::{Commands, Entity, MessageReader, Query, Res, With};
+use bevy::ecs::schedule::{IntoScheduleConfigs, ScheduleConfigs};
+use bevy::ecs::system::ScheduleSystem;
+use bevy::prelude::{Commands, Entity, Query, Res, With};
 
 use crate::cards;
 use crate::turns;
 
 /// 302.6. A creature’s activated ability with the tap symbol or the untap symbol in its activation cost can’t be activated unless the creature has been under its controller’s control continuously since their most recent turn began. A creature can’t attack unless it has been under its controller’s control continuously since their most recent turn began. This rule is informally called the “summoning sickness” rule.
-pub fn r302_6_summoning_sickness(
-    mut step_started: MessageReader<turns::StepStarted>,
+pub fn r302_6_summoning_sickness() -> ScheduleConfigs<ScheduleSystem> {
+    remove_summoning_sickness.run_if(turns::Step::Untap.begins())
+}
+
+fn remove_summoning_sickness(
     mut commands: Commands,
     turn: Res<turns::Turn>,
     sick: Query<(Entity, &cards::Owner), With<cards::SummoningSick>>,
 ) {
     let turn = turn.into_inner();
-    for step in step_started.read() {
-        if **step != turns::Step::Untap {
-            continue;
-        }
-        for (entity, owner) in sick.iter() {
-            if **owner == turn.active {
-                commands.entity(entity).remove::<cards::SummoningSick>();
-            }
+    for (entity, owner) in sick.iter() {
+        if **owner == turn.active {
+            commands.entity(entity).remove::<cards::SummoningSick>();
         }
     }
 }

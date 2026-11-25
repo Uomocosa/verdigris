@@ -1,32 +1,32 @@
-use crate::events;
-use bevy::prelude::{Entity, MessageReader, MessageWriter, Query, Res, With};
+use bevy::ecs::schedule::{IntoScheduleConfigs, ScheduleConfigs};
+use bevy::ecs::system::ScheduleSystem;
+use bevy::prelude::{Entity, MessageWriter, Query, Res, With};
 
 use crate::Attempt;
 use crate::cards;
+use crate::events;
 use crate::turns;
 
 /// 502.3. Third, the active player determines which permanents they control will untap. Then they
 /// untap them all simultaneously. This turn-based action doesn’t use the stack. Normally, all of
 /// a player’s permanents untap, but effects can keep one or more of a player’s permanents from
 /// untapping.
-pub fn r502_3_untap(
-    mut step_started: MessageReader<turns::StepStarted>,
+pub fn r502_3_untap() -> ScheduleConfigs<ScheduleSystem> {
+    untap.run_if(turns::Step::Untap.begins())
+}
+
+fn untap(
     mut untaps: MessageWriter<Attempt<events::Untap>>,
     turn: Res<turns::Turn>,
     tapped: Query<(Entity, &cards::Owner), With<cards::Tapped>>,
 ) {
     let turn = turn.into_inner();
-    for step in step_started.read() {
-        if **step != turns::Step::Untap {
-            continue;
-        }
-        for (entity, owner) in tapped.iter() {
-            if **owner == turn.active {
-                untaps.write(Attempt(events::Untap {
-                    permanent: entity,
-                    controller: **owner,
-                }));
-            }
+    for (entity, owner) in tapped.iter() {
+        if **owner == turn.active {
+            untaps.write(Attempt(events::Untap {
+                permanent: entity,
+                controller: **owner,
+            }));
         }
     }
 }

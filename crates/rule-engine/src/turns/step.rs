@@ -1,3 +1,6 @@
+use atomic_delegate_macros::atomic_delegates;
+use bevy::prelude::MessageReader;
+
 use crate::turns;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -15,6 +18,11 @@ pub enum Step {
     PostcombatMain,
     End,
     Cleanup,
+}
+
+#[atomic_delegates]
+impl Step {
+    pub fn begins(self) -> impl FnMut(MessageReader<turns::StepStarted>) -> bool + Clone {}
 }
 
 impl Step {

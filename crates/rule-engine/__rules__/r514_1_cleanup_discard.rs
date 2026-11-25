@@ -1,4 +1,6 @@
-use bevy::prelude::{MessageReader, MessageWriter, Query, Res};
+use bevy::ecs::schedule::{IntoScheduleConfigs, ScheduleConfigs};
+use bevy::ecs::system::ScheduleSystem;
+use bevy::prelude::{MessageWriter, Query, Res};
 
 use crate::Attempt;
 use crate::HAND;
@@ -10,8 +12,11 @@ use crate::zones;
 /// 514.1. First, if the active player’s hand contains more cards than their maximum hand size
 /// (normally seven), they discard enough cards to reduce their hand size to that number. This
 /// turn-based action doesn’t use the stack.
-pub fn r514_1_cleanup_discard(
-    mut step_started: MessageReader<turns::StepStarted>,
+pub fn r514_1_cleanup_discard() -> ScheduleConfigs<ScheduleSystem> {
+    discard_to_maximum_hand_size.run_if(turns::Step::Cleanup.begins())
+}
+
+fn discard_to_maximum_hand_size(
     mut discards: MessageWriter<Attempt<events::Discard>>,
     turn: Res<turns::Turn>,
     answers: rules::Rules,
@@ -19,25 +24,20 @@ pub fn r514_1_cleanup_discard(
     zone_contents: Query<&zones::ZoneContents>,
 ) {
     let turn = turn.into_inner();
-    for step in step_started.read() {
-        if **step != turns::Step::Cleanup {
-            continue;
-        }
-        let Some(hand) = zones.find(HAND, Some(turn.active)) else {
-            continue;
-        };
-        let Ok(contents) = zone_contents.get(hand) else {
-            continue;
-        };
-        let excess = answers.value::<rules::MaximumHandSize>(turn.active).excess(contents.len());
-        if excess == 0 {
-            continue;
-        }
-        discards.write(Attempt(events::Discard {
-            player: turn.active,
-            amount: u32::try_from(excess).unwrap_or(u32::MAX),
-        }));
+    let Some(hand) = zones.find(HAND, Some(turn.active)) else {
+        return;
+    };
+    let Ok(contents) = zone_contents.get(hand) else {
+        return;
+    };
+    let excess = answers.value::<rules::MaximumHandSize>(turn.active).excess(contents.len());
+    if excess == 0 {
+        return;
     }
+    discards.write(Attempt(events::Discard {
+        player: turn.active,
+        amount: u32::try_from(excess).unwrap_or(u32::MAX),
+    }));
 }
 
 #[cfg(test)]

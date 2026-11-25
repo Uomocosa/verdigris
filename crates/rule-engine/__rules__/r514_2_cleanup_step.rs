@@ -1,4 +1,6 @@
-use bevy::prelude::{Commands, Entity, MessageReader, Query};
+use bevy::ecs::schedule::{IntoScheduleConfigs, ScheduleConfigs};
+use bevy::ecs::system::ScheduleSystem;
+use bevy::prelude::{Commands, Entity, Query};
 
 use crate::damage;
 use crate::effects;
@@ -7,23 +9,21 @@ use crate::turns;
 /// 514.2. Second, the following actions happen simultaneously: all damage marked on permanents
 /// (including phased-out permanents) is removed and all “until end of turn” and “this turn” effects
 /// end. This turn-based action doesn’t use the stack.
-pub fn r514_2_cleanup_step(
-    mut step_started: MessageReader<turns::StepStarted>,
+pub fn r514_2_cleanup_step() -> ScheduleConfigs<ScheduleSystem> {
+    clear_damage_and_end_effects.run_if(turns::Step::Cleanup.begins())
+}
+
+fn clear_damage_and_end_effects(
     mut commands: Commands,
     damaged: Query<(Entity, &damage::Damage)>,
     expiring: Query<(Entity, &effects::ContinuousEffect)>,
 ) {
-    for step in step_started.read() {
-        if **step != turns::Step::Cleanup {
-            continue;
-        }
-        for (entity, _) in damaged.iter() {
-            commands.entity(entity).insert(damage::Damage(0));
-        }
-        for (entity, effect) in expiring.iter() {
-            if effect.until == effects::Duration::UntilEndOfTurn {
-                commands.entity(entity).despawn();
-            }
+    for (entity, _) in damaged.iter() {
+        commands.entity(entity).insert(damage::Damage(0));
+    }
+    for (entity, effect) in expiring.iter() {
+        if effect.until == effects::Duration::UntilEndOfTurn {
+            commands.entity(entity).despawn();
         }
     }
 }

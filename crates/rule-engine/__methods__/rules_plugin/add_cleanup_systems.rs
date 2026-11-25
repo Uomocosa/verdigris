@@ -9,8 +9,8 @@ pub fn add_cleanup_systems(app: &mut App) {
     app.add_systems(
         Update,
         (
-            comprehensive_rules::r514_1_cleanup_discard::r514_1_cleanup_discard,
-            comprehensive_rules::r514_2_cleanup_step::r514_2_cleanup_step,
+            comprehensive_rules::r514_1_cleanup_discard::r514_1_cleanup_discard(),
+            comprehensive_rules::r514_2_cleanup_step::r514_2_cleanup_step(),
             comprehensive_rules::r514_3a_cleanup_reentry::r514_3a_cleanup_reentry,
         )
             .chain()

@@ -40,6 +40,7 @@ pub mod restricted_rule;
 pub mod rule_registry;
 pub mod rules;
 pub mod rules_plugin;
+pub mod step;
 #[cfg(feature = "testing")]
 pub mod test_card;
 #[cfg(feature = "testing")]
