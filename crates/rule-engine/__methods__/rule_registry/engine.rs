@@ -3,6 +3,7 @@ use std::collections::HashSet;
 use crate::events;
 use crate::rules;
 use crate::rules::traits::event::Event;
+use crate::rules::traits::hook_event::HookEvent;
 use crate::rules::traits::value_rule::ValueRule;
 #[cfg(any(test, feature = "testing"))]
 use crate::testing;

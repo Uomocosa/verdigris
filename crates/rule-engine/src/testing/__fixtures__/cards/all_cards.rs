@@ -54,6 +54,7 @@ pub const ALL_CARDS: &[testing::Card] = &[
     testing::TEST_CANT_DISCARD,
     testing::TEST_CANT_LOSE_LIFE,
     testing::TEST_COVER_OF_DUSK,
+    testing::TEST_DOUBLE_GIFT,
     testing::TEST_EAGER_WALL,
     testing::TEST_FROZEN_RELIC,
     testing::TEST_GROUNDING_MIST,

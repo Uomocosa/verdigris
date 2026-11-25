@@ -1,10 +1,10 @@
 use bevy::ecs::schedule::{IntoScheduleConfigs, ScheduleConfigs};
 use bevy::ecs::system::ScheduleSystem;
-use bevy::prelude::{MessageWriter, on_message};
+use bevy::prelude::{ResMut, on_message};
 
-use crate::Attempt;
 use crate::events;
 use crate::players;
+use crate::rules;
 use crate::turns;
 
 /// 103.6. Some cards allow a player to take actions with them from their opening hand. Once the
@@ -13,27 +13,23 @@ use crate::turns;
 ///
 /// # Notes
 ///
-/// All `Attempt`s are announced at once, so a mandatory effect of a later player would happen before
+/// All hooks are announced at once, so a mandatory effect of a later player would happen before
 /// an earlier player answers.
 pub fn r103_6_opening_hand_actions() -> ScheduleConfigs<ScheduleSystem> {
     opening_hand_actions.run_if(on_message::<turns::MulligansComplete>)
 }
 
 fn opening_hand_actions(
-    mut opening_hand_actions: MessageWriter<Attempt<events::OpeningHandAction>>,
+    mut hooks: ResMut<rules::HookQueue<events::OpeningHandAction>>,
     players: players::Players,
 ) {
     let events_in_turn_order: Vec<events::OpeningHandAction> = players
         .still_in_the_game()
         .iter()
-        .flat_map(|player| {
-            player.opening_hand().into_iter().map(|card| events::OpeningHandAction {
-                card,
-                player: player.id,
-            })
-        })
+        .flat_map(players::PlayerView::opening_hand)
+        .map(events::OpeningHandAction)
         .collect();
-    opening_hand_actions.write_batch(events_in_turn_order.iter().copied().map(Attempt));
+    hooks.announce(events_in_turn_order);
 }
 
 #[cfg(test)]
@@ -44,6 +40,13 @@ mod tests {
     use crate::testing::*;
     use crate::turns;
     use crate::{BATTLEFIELD, HAND};
+
+    #[test]
+    fn every_opening_hand_action_of_a_card_is_taken() {
+        let (mut game, [p1, _]) = MockGame::new([P1.hand([TEST_DOUBLE_GIFT]), P2]);
+        game.pass_priority();
+        assert_eq!(game.life(p1), 23);
+    }
 
     #[test]
     fn casting_while_an_opening_hand_action_is_waiting_is_rejected() -> TestResult {

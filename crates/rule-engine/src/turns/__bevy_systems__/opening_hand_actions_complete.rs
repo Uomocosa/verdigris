@@ -2,7 +2,7 @@ use crate::events;
 use bevy::prelude::{Local, MessageReader, MessageWriter, Res};
 
 use crate::actions;
-use crate::rules::traits::event::Event;
+use crate::rules::traits::hook_event::HookEvent;
 use crate::turns;
 
 pub fn opening_hand_actions_complete(

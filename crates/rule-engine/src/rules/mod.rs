@@ -24,6 +24,12 @@ pub use any_event::AnyEvent;
 mod event_template;
 pub use event_template::EventTemplate;
 
+mod hook_queue;
+pub use hook_queue::HookQueue;
+
+mod hooked;
+pub use hooked::Hooked;
+
 mod clause;
 pub use clause::Clause;
 

@@ -3,7 +3,7 @@ use crate::cards;
 use crate::effects;
 use crate::events;
 use crate::rules;
-use crate::rules::traits::event::Event;
+use crate::rules::traits::hook_event::HookEvent;
 
 #[must_use]
 pub fn whenever(
@@ -48,12 +48,19 @@ pub const fn tap_add(produces: cards::ManaType) -> abilities::ActivatedAbility {
 }
 
 #[must_use]
-pub const fn begin_the_game_with_it_on_the_battlefield() -> abilities::StaticAbility {
+pub fn opening_hand_action(then: impl Into<rules::Then>) -> abilities::StaticAbility {
     abilities::StaticAbility::Replacement(abilities::Replacement::Rule(rules::RuleChange {
         target: rules::Target::Event(events::OpeningHandAction::ID),
-        change: rules::Change::Instead {
+        change: rules::Change::Hook {
             when: rules::Predicate::True,
-            then: rules::may(rules::EventTemplate::BeginTheGameOnTheBattlefield),
+            then: then.into(),
         },
     }))
+}
+
+#[must_use]
+pub fn begin_the_game_with_it_on_the_battlefield() -> abilities::StaticAbility {
+    opening_hand_action(rules::may(
+        rules::EventTemplate::BeginTheGameOnTheBattlefield,
+    ))
 }

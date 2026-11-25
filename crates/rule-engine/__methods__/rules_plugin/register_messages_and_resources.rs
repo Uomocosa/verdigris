@@ -7,6 +7,7 @@ use crate::effects;
 use crate::events;
 use crate::rules;
 use crate::rules::traits::event::Event;
+use crate::rules::traits::hook_event::HookEvent;
 use crate::stack;
 use crate::turns;
 
@@ -43,9 +44,6 @@ pub fn register_messages_and_resources(app: &mut App) {
         .add_message::<turns::OpeningHandActionsComplete>();
     app.init_resource::<actions::PendingChoice>();
     app.init_resource::<actions::AskQueue>();
-    app.insert_resource(actions::PendingMayAsks::<events::OpeningHandAction>(
-        Vec::new(),
-    ));
     app.init_resource::<turns::CombatDamageSteps>();
     app.init_resource::<turns::CombatDamageParticipants>();
     app.init_resource::<StateBasedActionsPerformed>();
