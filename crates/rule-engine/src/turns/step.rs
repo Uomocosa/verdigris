@@ -23,8 +23,12 @@ pub enum Step {
 #[atomic_delegates]
 impl Step {
     pub fn begins(self) -> impl FnMut(MessageReader<turns::StepStarted>) -> bool + Clone {}
+}
 
-    pub fn begins_a_phase(self) -> bool {}
+#[rustfmt::skip]
+impl Step {
+    #[must_use]
+    pub fn begins_a_phase(self) -> bool { self.phase().steps().first() == Some(&self) }
 }
 
 impl Step {
@@ -72,5 +76,16 @@ mod tests {
         for (step, phase) in phases {
             assert_eq!(step.phase(), phase);
         }
+        assert!(Step::Untap.begins_a_phase());
+        assert!(Step::PrecombatMain.begins_a_phase());
+        assert!(Step::BeginningOfCombat.begins_a_phase());
+        assert!(Step::PostcombatMain.begins_a_phase());
+        assert!(Step::End.begins_a_phase());
+        assert!(!Step::Upkeep.begins_a_phase());
+        assert!(!Step::Draw.begins_a_phase());
+        assert!(!Step::CombatDamage.begins_a_phase());
+        assert!(!Step::SecondCombatDamage.begins_a_phase());
+        assert!(!Step::EndOfCombat.begins_a_phase());
+        assert!(!Step::Cleanup.begins_a_phase());
     }
 }

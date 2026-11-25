@@ -21,8 +21,10 @@ impl From<turns::Turn> for TurnState {
         Self {
             turn,
             priority: turns::Priority::NO_HOLDER,
-            upcoming_steps: STEPS_IN_ORDER
+            upcoming_steps: PHASES_IN_ORDER
                 .into_iter()
+                .flat_map(turns::Phase::steps)
+                .copied()
                 .skip_while(|step| *step != current)
                 .skip(1)
                 .collect(),
@@ -52,19 +54,12 @@ impl TurnState {
     }
 }
 
-const STEPS_IN_ORDER: [turns::Step; 12] = [
-    turns::Step::Untap,
-    turns::Step::Upkeep,
-    turns::Step::Draw,
-    turns::Step::PrecombatMain,
-    turns::Step::BeginningOfCombat,
-    turns::Step::DeclareAttackers,
-    turns::Step::DeclareBlockers,
-    turns::Step::CombatDamage,
-    turns::Step::EndOfCombat,
-    turns::Step::PostcombatMain,
-    turns::Step::End,
-    turns::Step::Cleanup,
+const PHASES_IN_ORDER: [turns::Phase; 5] = [
+    turns::Phase::Beginning,
+    turns::Phase::PrecombatMain,
+    turns::Phase::Combat,
+    turns::Phase::PostcombatMain,
+    turns::Phase::Ending,
 ];
 
 #[cfg(test)]
