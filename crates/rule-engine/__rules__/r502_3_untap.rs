@@ -1,8 +1,9 @@
 use bevy::ecs::schedule::{IntoScheduleConfigs, ScheduleConfigs};
 use bevy::ecs::system::ScheduleSystem;
-use bevy::prelude::{Entity, MessageWriter, Query, Res, With};
+use bevy::prelude::{Entity, MessageWriter, Query, With};
 
 use crate::Attempt;
+use crate::Game;
 use crate::cards;
 use crate::events;
 use crate::turns;
@@ -17,12 +18,14 @@ pub fn r502_3_untap() -> ScheduleConfigs<ScheduleSystem> {
 
 fn untap(
     mut untaps: MessageWriter<Attempt<events::Untap>>,
-    turn: Res<turns::Turn>,
+    game: Game,
     tapped: Query<(Entity, &cards::Owner), With<cards::Tapped>>,
 ) {
-    let turn = turn.into_inner();
-    for (entity, owner) in tapped.iter() {
-        if **owner == turn.active {
+    let Some(active_player) = game.active_player() else {
+        return;
+    };
+    for (entity, owner) in &tapped {
+        if **owner == active_player.id {
             untaps.write(Attempt(events::Untap {
                 permanent: entity,
                 controller: **owner,

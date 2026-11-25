@@ -1,7 +1,8 @@
 use bevy::ecs::schedule::{IntoScheduleConfigs, ScheduleConfigs};
 use bevy::ecs::system::ScheduleSystem;
-use bevy::prelude::{Commands, Entity, Query, Res, With};
+use bevy::prelude::{Commands, Entity, Query, With};
 
+use crate::Game;
 use crate::cards;
 use crate::turns;
 
@@ -12,12 +13,14 @@ pub fn r302_6_summoning_sickness() -> ScheduleConfigs<ScheduleSystem> {
 
 fn remove_summoning_sickness(
     mut commands: Commands,
-    turn: Res<turns::Turn>,
+    game: Game,
     sick: Query<(Entity, &cards::Owner), With<cards::SummoningSick>>,
 ) {
-    let turn = turn.into_inner();
-    for (entity, owner) in sick.iter() {
-        if **owner == turn.active {
+    let Some(active_player) = game.active_player() else {
+        return;
+    };
+    for (entity, owner) in &sick {
+        if **owner == active_player.id {
             commands.entity(entity).remove::<cards::SummoningSick>();
         }
     }
