@@ -1,6 +1,6 @@
 use atomic_delegate_macros::atomic_delegates;
 use bevy::ecs::system::SystemParam;
-use bevy::prelude::{Entity, Query, With};
+use bevy::prelude::{Query, With};
 
 use crate::cards;
 use crate::players;
@@ -10,9 +10,7 @@ use crate::zones;
 #[derive(SystemParam, Clone, Copy)]
 pub struct Players<'w, 's> {
     pub(crate) turn_order: Query<'w, 's, &'static turns::TurnOrder>,
-    still_in_the_game: Query<'w, 's, Entity, players::StillInTheGame>,
-    winners: Query<'w, 's, Entity, With<players::Won>>,
-    lost: Query<'w, 's, Entity, With<players::Lost>>,
+    statuses: Query<'w, 's, players::Status, With<players::Player>>,
     pub(crate) zone_contents: Query<
         'w,
         's,
@@ -27,13 +25,13 @@ pub struct Players<'w, 's> {
 #[rustfmt::skip]
 impl Players<'_, '_> {
     #[must_use]
-    pub fn is_still_in_the_game(&self, player: players::PlayerId) -> bool { self.still_in_the_game.contains(*player) }
+    pub fn is_still_in_the_game(&self, player: players::PlayerId) -> bool { self.statuses.get(*player).is_ok_and(|status| !status.has_left_the_game) }
 
     #[must_use]
-    pub fn has_lost(&self, player: players::PlayerId) -> bool { self.lost.contains(*player) }
+    pub fn has_lost(&self, player: players::PlayerId) -> bool { self.statuses.get(*player).is_ok_and(|status| status.has_lost) }
 
     #[must_use]
-    pub fn has_anyone_won(&self) -> bool { !self.winners.is_empty() }
+    pub fn has_anyone_won(&self) -> bool { self.statuses.iter().any(|status| status.has_won) }
 
     #[must_use]
     pub fn is_two_player_game(&self) -> bool { self.in_turn_order().len() == 2 }
@@ -52,6 +50,9 @@ impl Players<'_, '_> {
 impl<'w, 's> Players<'w, 's> {
     #[must_use]
     pub(crate) const fn view(self, id: players::PlayerId) -> players::PlayerView<'w, 's> { players::PlayerView { id, players: self } }
+
+    #[must_use]
+    pub(crate) fn is_a_draw_for_anyone(&self) -> bool { self.statuses.iter().any(|status| status.is_game_a_draw) }
 }
 
 #[cfg(test)]
