@@ -2,7 +2,7 @@ use crate::HAND;
 use crate::cards;
 use crate::players;
 
-pub fn opening_hand(view: &players::PlayerView<'_, '_>) -> Vec<cards::CardId> {
+pub fn hand(view: &players::PlayerView<'_, '_>) -> Vec<cards::CardId> {
     view.players
         .zone_contents
         .iter()
@@ -17,7 +17,7 @@ mod tests {
 
     use crate::testing::*;
 
-    use super::opening_hand;
+    use super::hand;
     use crate::players;
 
     #[test]
@@ -27,7 +27,7 @@ mod tests {
         game.app
             .world_mut()
             .run_system_once(move |all: players::Players| {
-                assert_eq!(opening_hand(&all.view(p1.id)).len(), 1);
+                assert_eq!(hand(&all.view(p1.id)).len(), 1);
             })
             .unwrap();
         Ok(())

@@ -1,13 +1,12 @@
 use bevy::ecs::schedule::{IntoScheduleConfigs, ScheduleConfigs};
 use bevy::ecs::system::ScheduleSystem;
-use bevy::prelude::{MessageWriter, Query, Res};
+use bevy::prelude::MessageWriter;
 
 use crate::Attempt;
-use crate::HAND;
+use crate::Game;
 use crate::events;
 use crate::rules;
 use crate::turns;
-use crate::zones;
 
 /// 514.1. First, if the active player’s hand contains more cards than their maximum hand size
 /// (normally seven), they discard enough cards to reduce their hand size to that number. This
@@ -18,26 +17,20 @@ pub fn r514_1_cleanup_discard() -> ScheduleConfigs<ScheduleSystem> {
 
 fn discard_to_maximum_hand_size(
     mut discards: MessageWriter<Attempt<events::Discard>>,
-    turn: Res<turns::Turn>,
+    game: Game,
     answers: rules::Rules,
-    zones: zones::ZoneLookup,
-    zone_contents: Query<&zones::ZoneContents>,
 ) {
-    let turn = turn.into_inner();
-    let Some(hand) = zones.find(HAND, Some(turn.active)) else {
+    let Some(active_player) = game.active_player() else {
         return;
     };
-    let Ok(contents) = zone_contents.get(hand) else {
-        return;
-    };
-    let excess = answers.value::<rules::MaximumHandSize>(turn.active).excess(contents.len());
-    if excess == 0 {
-        return;
+    let maximum_hand_size = answers.value::<rules::MaximumHandSize>(active_player.id);
+    let excess = maximum_hand_size.excess(active_player.hand().len());
+    if excess > 0 {
+        discards.write(Attempt(events::Discard {
+            player: active_player.id,
+            amount: u32::try_from(excess).unwrap_or(u32::MAX),
+        }));
     }
-    discards.write(Attempt(events::Discard {
-        player: turn.active,
-        amount: u32::try_from(excess).unwrap_or(u32::MAX),
-    }));
 }
 
 #[cfg(test)]

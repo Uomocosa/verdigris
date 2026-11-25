@@ -21,6 +21,9 @@ impl PlayerView<'_, '_> {
 
     #[must_use]
     pub fn have_all_opponents_left(&self) -> bool { !self.opponents().is_empty() && self.opponents_still_in_the_game().is_empty() }
+
+    #[must_use]
+    pub fn opening_hand(&self) -> Vec<cards::CardId> { self.hand() }
 }
 
 #[atomic_delegates]
@@ -32,7 +35,7 @@ impl PlayerView<'_, '_> {
     pub fn next_in_turn_order(&self) -> Option<Self> {}
 
     #[must_use]
-    pub fn opening_hand(&self) -> Vec<cards::CardId> {}
+    pub fn hand(&self) -> Vec<cards::CardId> {}
 }
 
 #[cfg(test)]
