@@ -73,10 +73,15 @@ mod tests {
         );
         assert!(actions::Action::ChooseMay(Vec::new()).answers_a_choice());
         assert!(actions::Action::ChooseDiscard(Vec::new()).answers_a_choice());
+        assert!(actions::Action::ChooseTargets(Vec::new()).answers_a_choice());
         assert!(actions::Action::ChooseLegendary(legend).answers_a_choice());
         assert!(!actions::Action::PassPriority.answers_a_choice());
         assert_eq!(
             actions::Action::ChooseLegendary(legend).rejection(p1.id),
+            None
+        );
+        assert_eq!(
+            actions::Action::ChooseTargets(Vec::new()).rejection(p1.id),
             None
         );
         assert_eq!(actions::Action::PassPriority.rejection(p1.id), None);

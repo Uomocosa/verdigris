@@ -10,7 +10,7 @@ pub fn add_priority_action_systems(app: &mut App) {
         Update,
         (
             comprehensive_rules::r601_2a_cast::r601_2a_cast,
-            comprehensive_rules::r601_2c_targets::r601_2c_targets,
+            comprehensive_rules::r601_2c_targets::r601_2c_targets(),
             comprehensive_rules::r119_4_r119_8_pay_life::r119_4_r119_8_pay_life,
             comprehensive_rules::r601_2h_pay::r601_2h_pay,
             comprehensive_rules::r508_1a_declare_attackers::r508_1a_declare_attackers,
@@ -62,7 +62,7 @@ mod tests {
 
         assert_eq!(
             app.get_schedule(Update).map(Schedule::systems_len),
-            Some(27)
+            Some(28)
         );
     }
 }

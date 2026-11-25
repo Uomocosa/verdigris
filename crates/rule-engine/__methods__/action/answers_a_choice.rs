@@ -4,6 +4,7 @@ pub const fn answers_a_choice(action: &actions::Action) -> bool {
     matches!(
         action,
         actions::Action::ChooseMay(_)
+            | actions::Action::ChooseTargets(_)
             | actions::Action::ChooseDiscard(_)
             | actions::Action::ChooseLegendary(_)
             | actions::Action::ArrangeGraveyard(_)

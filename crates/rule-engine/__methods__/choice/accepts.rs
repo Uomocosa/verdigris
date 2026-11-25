@@ -23,6 +23,16 @@ pub fn accepts(choice: &actions::Choice, answer: &actions::Action) -> bool {
                 && chosen_set.len() == chosen.len()
                 && chosen_set.is_subset(&choice.legal)
         }
+        actions::Choice::Target(choice) => {
+            let actions::Action::ChooseTargets(chosen) = answer else {
+                return false;
+            };
+            let chosen_set: BTreeSet<Entity> = chosen.iter().copied().collect();
+            !chosen.is_empty()
+                && u32::try_from(chosen.len()).unwrap_or(u32::MAX) == choice.count
+                && chosen_set.len() == chosen.len()
+                && chosen_set.is_subset(&choice.legal)
+        }
         actions::Choice::Legendary(choice) => {
             let actions::Action::ChooseLegendary(chosen) = answer else {
                 return false;

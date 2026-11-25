@@ -18,7 +18,7 @@ impl AskQueue {
             }
             queued.push(ask);
         }
-        queued.retain(|ask| ask.player().is_none_or(|player| players.is_still_in_the_game(player)));
+        queued.retain(|ask| players.is_still_in_the_game(ask.player()));
     }
 }
 

@@ -24,7 +24,7 @@ pub fn answer_asks(
             }
             continue;
         };
-        let is_chooser = choice.player().is_none_or(|player| player == action.player);
+        let is_chooser = choice.player() == action.player;
         if !(is_chooser && choice.accepts(&action.action)) {
             if let Some(rejection) = choice.rejection(action.player) {
                 rejected.write(rejection);

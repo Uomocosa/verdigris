@@ -7,6 +7,7 @@ use crate::rules;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TargetChoice {
+    pub player: players::PlayerId,
     pub spell: Entity,
     pub count: u32,
     pub legal: BTreeSet<Entity>,

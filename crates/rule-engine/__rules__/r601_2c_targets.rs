@@ -1,7 +1,7 @@
-use crate::{HAND, STACK};
+use bevy::ecs::schedule::{IntoScheduleConfigs, ScheduleConfigs};
+use bevy::ecs::system::ScheduleSystem;
+use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query, With};
 use std::collections::BTreeSet;
-
-use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query, ResMut, With};
 
 use crate::actions;
 use crate::cards;
@@ -10,6 +10,7 @@ use crate::keywords;
 use crate::players;
 use crate::stack;
 use crate::zones;
+use crate::{HAND, STACK};
 
 /// 601.2c The player announces their choice of an appropriate object or player for each target the
 /// spell requires. A spell may require some targets only if an alternative or additional cost (such
@@ -34,10 +35,14 @@ use crate::zones;
 ///
 /// 702.11b “Hexproof” on a permanent means “This permanent can’t be the target of spells or
 /// abilities your opponents control.”
-pub fn r601_2c_targets(
+pub fn r601_2c_targets() -> ScheduleConfigs<ScheduleSystem> {
+    (ask_for_targets, take_the_chosen_targets).chain()
+}
+
+fn ask_for_targets(
     mut actions: MessageReader<actions::PlayerAction>,
     mut rejected: MessageWriter<actions::Rejected>,
-    mut pending: ResMut<actions::PendingChoice>,
+    mut asks: MessageWriter<actions::Ask>,
     mut commands: Commands,
     players: Query<Entity, With<players::Player>>,
     cards: Query<(
@@ -50,90 +55,69 @@ pub fn r601_2c_targets(
     zones: zones::ZoneLookup,
 ) {
     for action in actions.read() {
-        match &action.action {
-            actions::Action::Cast(spell) => {
-                let spell = *spell;
-                let Ok((_, definition, owner, in_zone)) = cards.get(spell) else {
-                    continue;
-                };
-                if !zones.contains(STACK, **in_zone) {
-                    continue;
-                }
-                let controller = **owner;
-                let target = definition
-                    .spell_ability()
-                    .and_then(|effect| effect.target)
-                    .or_else(|| definition.enchant().map(|filter| effects::target(1, filter)));
-                let Some(target) = target else {
-                    commands.entity(spell).insert(stack::CastingStage::AwaitingPayment);
-                    continue;
-                };
-                let legal = legal_targets(
-                    spell,
-                    target.filter,
-                    controller,
-                    &players,
-                    &cards,
-                    &battlefield,
-                    &zones,
-                );
-                if legal.is_empty() {
-                    rejected.write(actions::Rejected::NoLegalTargets { spell });
-                    if let Some(hand) = zones.find(HAND, Some(controller)) {
-                        commands.entity(spell).insert(zones::InZone(hand));
-                    }
-                    commands.entity(spell).remove::<stack::CastingStage>();
-                    continue;
-                }
-                *pending =
-                    actions::PendingChoice(Some(actions::Choice::Target(actions::TargetChoice {
-                        spell,
-                        count: target.count,
-                        legal,
-                    })));
-                commands.entity(spell).insert(stack::CastingStage::AwaitingTargets);
-            }
-            actions::Action::ChooseTargets(targets) => {
-                let Some(actions::Choice::Target(choice)) = (*pending).as_ref().cloned() else {
-                    continue;
-                };
-                let chosen: BTreeSet<Entity> = targets.iter().copied().collect();
-                let count_matches =
-                    u32::try_from(targets.len()).unwrap_or(u32::MAX) == choice.count;
-                let are_unique = chosen.len() == targets.len();
-                let do_all_targets_are_legal = chosen.is_subset(&choice.legal);
-                if !(count_matches && are_unique && do_all_targets_are_legal) {
-                    rejected.write(actions::Rejected::InvalidTargets {
-                        spell: choice.spell,
-                    });
-                    continue;
-                }
-                let Some(first) = targets.first() else {
-                    rejected.write(actions::Rejected::InvalidTargets {
-                        spell: choice.spell,
-                    });
-                    continue;
-                };
-                commands.entity(choice.spell).insert((
-                    stack::ChosenTarget(*first),
-                    stack::CastingStage::AwaitingPayment,
-                ));
-                *pending = actions::PendingChoice(None);
-            }
-            actions::Action::ChooseDiscard(_)
-            | actions::Action::ChooseDefendingPlayer(_)
-            | actions::Action::OrderTriggers(_)
-            | actions::Action::AssignCombatDamage(_)
-            | actions::Action::DeclareAttackers(_)
-            | actions::Action::DeclareBlockers(_)
-            | actions::Action::PlayLand(_)
-            | actions::Action::ActivateManaAbility { .. }
-            | actions::Action::ChooseLegendary(_)
-            | actions::Action::ArrangeGraveyard(_)
-            | actions::Action::ChooseMay(_)
-            | actions::Action::PassPriority
-            | actions::Action::Concede => {}
+        let actions::Action::Cast(spell) = &action.action else {
+            continue;
+        };
+        let spell = *spell;
+        let Ok((_, definition, owner, in_zone)) = cards.get(spell) else {
+            continue;
+        };
+        if !zones.contains(STACK, **in_zone) {
+            continue;
         }
+        let controller = **owner;
+        let target = definition
+            .spell_ability()
+            .and_then(|effect| effect.target)
+            .or_else(|| definition.enchant().map(|filter| effects::target(1, filter)));
+        let Some(target) = target else {
+            commands.entity(spell).insert(stack::CastingStage::AwaitingPayment);
+            continue;
+        };
+        let legal = legal_targets(
+            spell,
+            target.filter,
+            controller,
+            &players,
+            &cards,
+            &battlefield,
+            &zones,
+        );
+        if legal.is_empty() {
+            rejected.write(actions::Rejected::NoLegalTargets { spell });
+            if let Some(hand) = zones.find(HAND, Some(controller)) {
+                commands.entity(spell).insert(zones::InZone(hand));
+            }
+            commands.entity(spell).remove::<stack::CastingStage>();
+            continue;
+        }
+        asks.write(actions::Ask(actions::Choice::Target(
+            actions::TargetChoice {
+                player: controller,
+                spell,
+                count: target.count,
+                legal,
+            },
+        )));
+        commands.entity(spell).insert(stack::CastingStage::AwaitingTargets);
+    }
+}
+
+fn take_the_chosen_targets(mut answers: MessageReader<actions::Answered>, mut commands: Commands) {
+    for answered in answers.read() {
+        let actions::Choice::Target(choice) = &answered.choice else {
+            continue;
+        };
+        let actions::Action::ChooseTargets(targets) = &answered.answer else {
+            continue;
+        };
+        let Some(first) = targets.first() else {
+            continue;
+        };
+        commands.entity(choice.spell).insert((
+            stack::ChosenTarget(*first),
+            stack::CastingStage::AwaitingPayment,
+        ));
     }
 }
 

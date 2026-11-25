@@ -10,9 +10,7 @@ pub struct PendingChoice(pub Option<actions::Choice>);
 impl PendingChoice {
     pub(crate) fn refresh(&mut self, queue: &actions::AskQueue, players: &players::Players) {
         let Self(pending) = self;
-        if pending.as_ref().is_some_and(|choice| {
-            choice.player().is_some_and(|player| !players.is_still_in_the_game(player))
-        }) {
+        if pending.as_ref().is_some_and(|choice| !players.is_still_in_the_game(choice.player())) {
             *pending = None;
         }
         if pending.is_none() {

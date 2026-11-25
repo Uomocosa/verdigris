@@ -32,15 +32,15 @@ impl Choice {
 
 impl Choice {
     #[must_use]
-    pub const fn player(&self) -> Option<players::PlayerId> {
+    pub const fn player(&self) -> players::PlayerId {
         match self {
-            Self::Target(_) => None,
-            Self::May(choice) => Some(choice.player),
-            Self::Discard(choice) => Some(choice.player),
-            Self::CombatDamage(choice) => Some(choice.player),
-            Self::OrderTriggers(choice) => Some(choice.player),
-            Self::ArrangeGraveyard(choice) => Some(choice.player),
-            Self::Legendary(choice) => Some(choice.player),
+            Self::Target(choice) => choice.player,
+            Self::May(choice) => choice.player,
+            Self::Discard(choice) => choice.player,
+            Self::CombatDamage(choice) => choice.player,
+            Self::OrderTriggers(choice) => choice.player,
+            Self::ArrangeGraveyard(choice) => choice.player,
+            Self::Legendary(choice) => choice.player,
         }
     }
 }
@@ -49,6 +49,9 @@ impl Choice {
     #[must_use]
     pub const fn rejection(&self, player: players::PlayerId) -> Option<actions::Rejected> {
         match self {
+            Self::Target(choice) => Some(actions::Rejected::InvalidTargets {
+                spell: choice.spell,
+            }),
             Self::May(_) => Some(actions::Rejected::InvalidMay { player }),
             Self::Discard(_) => Some(actions::Rejected::InvalidDiscard { player }),
             Self::ArrangeGraveyard(_) => Some(actions::Rejected::InvalidGraveyardOrder { player }),
@@ -82,18 +85,19 @@ mod tests {
             event: rules::EventId("may"),
             options: Vec::new(),
         });
-        assert_eq!(choice.player(), Some(p1.id));
+        assert_eq!(choice.player(), p1.id);
         assert!(game.player(p1).cards_in(HAND).has_no(GRIZZLY_BEARS));
     }
 
     #[test]
-    fn target_has_no_player_while_every_other_choice_names_its_player() {
+    fn every_choice_names_its_player() {
         let (game, [p1, ..]) = MockGame::new([P1, P2]);
         let first = game.zone_entity(p1, BATTLEFIELD).unwrap();
         let chooser = p1.id;
         let event = rules::EventId("may");
         let choices = [
             actions::Choice::Target(actions::TargetChoice {
+                player: chooser,
                 spell: first,
                 count: 1,
                 legal: BTreeSet::from([first]),
@@ -126,18 +130,12 @@ mod tests {
                 legal: BTreeSet::from([first]),
             }),
         ];
-        let answered_by: Vec<Option<players::PlayerId>> =
+        let answered_by: Vec<players::PlayerId> =
             choices.iter().map(actions::Choice::player).collect();
         assert_eq!(
             answered_by,
             [
-                None,
-                Some(chooser),
-                Some(chooser),
-                Some(chooser),
-                Some(chooser),
-                Some(chooser),
-                Some(chooser),
+                chooser, chooser, chooser, chooser, chooser, chooser, chooser,
             ]
         );
     }
