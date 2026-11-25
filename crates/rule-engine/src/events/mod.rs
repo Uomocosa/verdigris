@@ -37,6 +37,9 @@ pub use lose_game::LoseGame;
 mod lose_life;
 pub use lose_life::LoseLife;
 
+mod lose_unspent_mana;
+pub use lose_unspent_mana::LoseUnspentMana;
+
 mod mill;
 pub use mill::Mill;
 

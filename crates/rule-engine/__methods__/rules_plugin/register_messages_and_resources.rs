@@ -18,6 +18,7 @@ pub fn register_messages_and_resources(app: &mut App) {
         .add_message::<actions::Answered>()
         .add_message::<stack::Resolution>();
     events::LoseGame::register(app);
+    events::LoseUnspentMana::register(app);
     events::WinGame::register(app);
     events::DrawFromEmptyLibrary::register(app);
     events::Draw::register(app);

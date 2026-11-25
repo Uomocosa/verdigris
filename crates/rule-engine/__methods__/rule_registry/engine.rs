@@ -43,6 +43,10 @@ pub fn engine() -> rules::RuleRegistry {
     register(events::GainLife::ID, events::GainLife::clauses());
     register(events::LoseGame::ID, events::LoseGame::clauses());
     register(events::LoseLife::ID, events::LoseLife::clauses());
+    register(
+        events::LoseUnspentMana::ID,
+        events::LoseUnspentMana::clauses(),
+    );
     register(events::Mill::ID, events::Mill::clauses());
     register(events::PlayLand::ID, events::PlayLand::clauses());
     register(

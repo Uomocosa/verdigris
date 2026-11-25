@@ -55,6 +55,9 @@ impl All {
     pub fn cant_win_the_game(self) -> abilities::Continuous {}
 
     #[must_use]
+    pub fn dont_lose_unspent_mana(self) -> abilities::Continuous {}
+
+    #[must_use]
     pub fn tap_when_attacking(self) -> abilities::Continuous {}
 
     #[must_use]

@@ -9,7 +9,10 @@ pub fn add_step_started_systems(app: &mut App) {
     app.add_systems(
         Update,
         (
-            comprehensive_rules::r106_4_mana_empties::r106_4_mana_empties,
+            comprehensive_rules::r500_4_mana_pools_empty::r500_4_mana_pools_empty(),
+            Attempt::<events::LoseUnspentMana>::resolved_by(
+                comprehensive_rules::r106_4_lose_unspent_mana::r106_4_lose_unspent_mana,
+            ),
             comprehensive_rules::r504_1_draw_step::r504_1_draw_step(),
         )
             .chain()
@@ -61,7 +64,7 @@ mod tests {
 
         assert_eq!(
             app.get_schedule(Update).map(Schedule::systems_len),
-            Some(10)
+            Some(12)
         );
     }
 }

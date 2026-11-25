@@ -85,6 +85,7 @@ pub const ALL_CARDS: &[testing::Card] = &[
     testing::TOME_SCOUR,
     testing::TUNDRA,
     testing::TYPHOID_RATS,
+    testing::UPWELLING,
     testing::WALKING_CORPSE,
     testing::WALL_OF_STONE,
     testing::WATCHWOLF,
