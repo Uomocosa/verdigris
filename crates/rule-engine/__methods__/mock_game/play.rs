@@ -81,7 +81,7 @@ pub fn play(
                 });
             }
         }
-        while !game.app.world().resource::<actions::PendingChoice>().is_discard() {
+        while !game.app.world().resource::<actions::PendingChoice>().blocks_priority() {
             let holder = game.priority().holder.unwrap_or_else(|| game.turn().active);
             let Some(position) = auto_passes.iter().position(|pass| pass.player == *holder) else {
                 break;

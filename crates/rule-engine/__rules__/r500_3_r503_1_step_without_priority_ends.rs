@@ -40,7 +40,7 @@ fn end_cleanup_step(
     pending: Res<actions::PendingChoice>,
 ) {
     let pending = pending.into_inner();
-    if pending.is_discard() {
+    if pending.blocks_priority() {
         return;
     }
     if game.step() != turns::Step::Cleanup {

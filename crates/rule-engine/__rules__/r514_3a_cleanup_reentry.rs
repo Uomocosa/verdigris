@@ -43,7 +43,7 @@ fn check_for_a_priority_window(
     if reentry.is_priority_window || reentry.should_repeat {
         return;
     }
-    if pending.is_discard() {
+    if pending.blocks_priority() {
         return;
     }
     let stack_is_empty = zones

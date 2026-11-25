@@ -113,6 +113,7 @@ mod tests {
         assert!(game.player(p2).cards_in(GRAVEYARD).has(bears));
         assert!(game.stack().has(strength));
 
+        game.play([p2.arrange_graveyard([bears, bolt])])?;
         game.play([p1.pass_priority(), p2.pass_priority()])?;
         assert!(game.player(p1).cards_in(GRAVEYARD).has(strength));
         assert!(!game.player(p1).cards_in(BATTLEFIELD).has(strength));

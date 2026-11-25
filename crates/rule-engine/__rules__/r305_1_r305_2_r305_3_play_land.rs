@@ -176,8 +176,9 @@ mod tests {
         game.play([
             p1.cast(mind_rot).targeting(p1).pass_priority(),
             p2.pass_priority(),
-            p1.play_land(forest),
         ])?;
+        game.play([p1.arrange_graveyard([forest, mind_rot])])?;
+        game.play([p1.play_land(forest)])?;
 
         assert!(game.player(p1).cards_in(BATTLEFIELD).has(forest));
         assert!(game.last_rejection().is_none());
@@ -246,7 +247,12 @@ mod tests {
         let [mind_rot] = game.player(p1).cards_in(HAND).exactly::<1>(MIND_ROT)?;
         let [forest] = game.player(p1).cards_in(HAND).exactly::<1>(FOREST)?;
 
-        game.play([p1.cast(mind_rot).targeting(p1).end_turn(), p2.end_turn()])?;
+        game.play([
+            p1.cast(mind_rot).targeting(p1).pass_priority(),
+            p2.pass_priority(),
+        ])?;
+        game.play([p1.arrange_graveyard([forest, mind_rot])])?;
+        game.play([p1.end_turn(), p2.end_turn()])?;
         assert!(game.player(p1).cards_in(GRAVEYARD).has(forest));
 
         game.act(p1, actions::Action::PlayLand(forest.into()));

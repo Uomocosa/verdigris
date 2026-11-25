@@ -68,6 +68,14 @@ impl Choice {
     pub fn accepts(&self, answer: &actions::Action) -> bool {}
 }
 
+#[rustfmt::skip]
+impl Choice {
+    #[must_use]
+    pub(crate) fn blocks_priority(&self) -> bool {
+        !matches!(self, Self::Target(_)) && !self.is_may_of(rules::EventId("103.6"))
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use std::collections::BTreeSet;

@@ -80,6 +80,7 @@ mod tests {
         assert!(game.player(p1).cards_in(GRAVEYARD).has(purge));
         assert!(game.player(p1).cards_in(GRAVEYARD).has(leyline));
         assert!(game.player(p1).cards_in(BATTLEFIELD).has_no(leyline));
+        game.play([p1.arrange_graveyard([purge, leyline])])?;
         assert_eq!(game.priority_player(), Some(p1.id));
 
         let (mut game, [p1, p2]) =

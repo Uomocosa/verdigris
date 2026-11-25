@@ -3,12 +3,14 @@ use std::collections::VecDeque;
 
 use bevy::prelude::Resource;
 
+use crate::players;
 use crate::turns;
 
 #[derive(Resource, Debug, Clone, PartialEq, Eq)]
 pub struct TurnState {
     pub turn: turns::Turn,
     pub priority: turns::Priority,
+    pub(crate) suspended_priority_holder: Option<players::PlayerId>,
     pub(crate) upcoming_steps: VecDeque<turns::Step>,
 }
 
@@ -21,6 +23,7 @@ impl From<turns::Turn> for TurnState {
         Self {
             turn,
             priority: turns::Priority::NO_HOLDER,
+            suspended_priority_holder: None,
             upcoming_steps: PHASES_IN_ORDER
                 .into_iter()
                 .flat_map(turns::Phase::steps)

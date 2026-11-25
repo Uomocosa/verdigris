@@ -22,7 +22,9 @@ impl PendingChoice {
 #[rustfmt::skip]
 impl PendingChoice {
     #[must_use]
-    pub(crate) const fn is_discard(&self) -> bool { matches!(self.0, Some(actions::Choice::Discard(_))) }
+    pub(crate) fn blocks_priority(&self) -> bool {
+        self.as_ref().is_some_and(actions::Choice::blocks_priority)
+    }
 }
 
 #[cfg(test)]

@@ -71,6 +71,7 @@ fn discard_chosen_cards(
 mod tests {
     use crate::mana;
     use crate::testing::*;
+    use crate::turns;
     use crate::{GRAVEYARD, HAND};
 
     #[test]
@@ -83,6 +84,9 @@ mod tests {
         let [bears] = game.player(p2).cards_in(HAND).exactly::<1>(GRIZZLY_BEARS)?;
         let [bolt] = game.player(p2).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
         game.play([p1.cast(mind_rot).targeting(p2).end_turn(), p2.end_turn()])?;
+        assert_eq!(game.priority().holder, None);
+        assert_eq!(game.turn().step, turns::Step::PrecombatMain);
+        assert_eq!(game.turn().number, 1);
 
         game.play([p2.discard([bears, bolt])])?;
         game.play([p2.arrange_graveyard([bolt, bears])])?;

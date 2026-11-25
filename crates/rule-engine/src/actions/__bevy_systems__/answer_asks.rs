@@ -2,6 +2,7 @@ use bevy::prelude::{MessageReader, MessageWriter, Messages, ResMut};
 
 use crate::actions;
 use crate::players;
+use crate::turns;
 
 pub fn answer_asks(
     mut asks: ResMut<Messages<actions::Ask>>,
@@ -10,6 +11,7 @@ pub fn answer_asks(
     mut rejected: MessageWriter<actions::Rejected>,
     mut pending: ResMut<actions::PendingChoice>,
     mut queue: ResMut<actions::AskQueue>,
+    mut state: ResMut<turns::TurnState>,
     players: players::Players,
 ) {
     queue.ingest(&mut asks, &players);
@@ -55,4 +57,10 @@ pub fn answer_asks(
         *pending = actions::PendingChoice(None);
     }
     pending.refresh(&queue, &players);
+    if !pending.blocks_priority()
+        && state.priority.holder.is_none()
+        && let Some(suspended) = state.suspended_priority_holder.take()
+    {
+        state.priority.holder = Some(suspended);
+    }
 }
