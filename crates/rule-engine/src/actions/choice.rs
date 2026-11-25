@@ -51,6 +51,7 @@ impl Choice {
         match self {
             Self::May(_) => Some(actions::Rejected::InvalidMay { player }),
             Self::Discard(_) => Some(actions::Rejected::InvalidDiscard { player }),
+            Self::ArrangeGraveyard(_) => Some(actions::Rejected::InvalidGraveyardOrder { player }),
             _ => None,
         }
     }

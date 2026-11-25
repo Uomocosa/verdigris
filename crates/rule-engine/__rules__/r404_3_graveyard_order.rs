@@ -1,6 +1,8 @@
 use std::collections::{BTreeMap, BTreeSet};
 
-use bevy::prelude::{Changed, Entity, MessageReader, MessageWriter, Query, ResMut};
+use bevy::ecs::schedule::{IntoScheduleConfigs, ScheduleConfigs};
+use bevy::ecs::system::ScheduleSystem;
+use bevy::prelude::{Changed, Entity, MessageReader, MessageWriter, Query};
 
 use crate::GRAVEYARD;
 use crate::actions;
@@ -10,52 +12,43 @@ use crate::zones;
 
 /// 404.3. If an effect or rule puts two or more cards into the same graveyard at the same time,
 /// the owner of those cards may arrange them in any order.
-pub fn r404_3_graveyard_order(
-    mut player_actions: MessageReader<actions::PlayerAction>,
-    mut rejected: MessageWriter<actions::Rejected>,
-    mut pending: ResMut<actions::PendingChoice>,
+pub fn r404_3_graveyard_order() -> ScheduleConfigs<ScheduleSystem> {
+    (arrange_as_answered, ask_for_the_order).chain()
+}
+
+fn arrange_as_answered(
+    mut answers: MessageReader<actions::Answered>,
     mut zone_contents: Query<&mut zones::ZoneContents>,
-    moved: Query<(Entity, &cards::Owner, &zones::InZone), Changed<zones::InZone>>,
-    zones: zones::ZoneLookup,
 ) {
-    for action in player_actions.read() {
-        let actions::Action::ArrangeGraveyard(answered) = &action.action else {
+    for answered in answers.read() {
+        let actions::Choice::ArrangeGraveyard(choice) = &answered.choice else {
             continue;
         };
-        let Some(actions::Choice::ArrangeGraveyard(choice)) = (*pending).as_ref().cloned() else {
-            rejected.write(actions::Rejected::InvalidGraveyardOrder {
-                player: action.player,
-            });
+        let actions::Action::ArrangeGraveyard(ordered) = &answered.answer else {
             continue;
         };
-        let expected: BTreeSet<Entity> = choice.cards.iter().copied().collect();
-        let received: BTreeSet<Entity> = answered.iter().copied().collect();
-        let is_chooser = action.player == choice.player;
-        let is_permutation = received == expected && answered.len() == choice.cards.len();
-        if !(is_chooser && is_permutation) {
-            rejected.write(actions::Rejected::InvalidGraveyardOrder {
-                player: action.player,
-            });
-            continue;
-        }
         let Ok(mut contents) = zone_contents.get_mut(choice.graveyard) else {
             continue;
         };
-        let mut answered = answered.iter().copied();
+        let expected: BTreeSet<Entity> = choice.cards.iter().copied().collect();
+        let mut ordered = ordered.iter().copied();
         for card in contents.iter_mut() {
             if expected.contains(card) {
-                let Some(next) = answered.next() else {
+                let Some(next) = ordered.next() else {
                     break;
                 };
                 *card = next;
             }
         }
-        *pending = actions::PendingChoice(None);
     }
+}
 
-    if pending.is_some() {
-        return;
-    }
+fn ask_for_the_order(
+    mut asks: MessageWriter<actions::Ask>,
+    moved: Query<(Entity, &cards::Owner, &zones::InZone), Changed<zones::InZone>>,
+    zone_contents: Query<&zones::ZoneContents>,
+    zones: zones::ZoneLookup,
+) {
     let mut moved_cards_by_graveyard: BTreeMap<Entity, (players::PlayerId, Vec<Entity>)> =
         BTreeMap::new();
     for (card, owner, in_zone) in &moved {
@@ -79,14 +72,13 @@ pub fn r404_3_graveyard_order(
             contents.iter().copied().enumerate().map(|(position, card)| (card, position)).collect();
         let mut batch: Vec<Entity> = moved_cards;
         batch.sort_by_key(|card| positions.get(card).copied().unwrap_or(usize::MAX));
-        *pending = actions::PendingChoice(Some(actions::Choice::ArrangeGraveyard(
+        asks.write(actions::Ask(actions::Choice::ArrangeGraveyard(
             actions::ArrangeGraveyardChoice {
                 player: owner_entity,
                 graveyard,
                 cards: batch,
             },
         )));
-        return;
     }
 }
 
