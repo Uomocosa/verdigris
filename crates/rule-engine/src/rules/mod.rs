@@ -2,7 +2,7 @@
 mod basic;
 
 pub use basic::enums::{
-    Amount, Change, Characteristic, Comparison, Field, Legality, Role, Target, Then, may,
+    Amount, Change, Characteristic, Comparison, Field, Legality, Role, Target, may,
 };
 pub use basic::newtypes::{ClauseKey, ComponentKey, EventId, RuleId};
 pub use basic::predicate_builders::{
@@ -50,3 +50,6 @@ pub use rules::Rules;
 
 mod rule_registry;
 pub use rule_registry::RuleRegistry;
+
+mod then;
+pub use then::Then;

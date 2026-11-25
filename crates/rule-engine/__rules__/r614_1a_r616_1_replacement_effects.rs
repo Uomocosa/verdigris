@@ -34,17 +34,13 @@ pub fn r614_1a_r616_1_replacement_effects<E: Event>(
             continue;
         }
         match answers.replacement(event) {
-            Some(rules::Then::Events(then)) => {
-                for template in then {
-                    template.instantiate(event).announce(&mut commands);
-                }
-                **state_based_actions_performed = true;
-            }
-            Some(rules::Then::May(then)) => {
-                asks.write(May {
-                    event: event.clone(),
-                    then,
-                });
+            Some(then) => {
+                then.announce(
+                    event,
+                    &mut commands,
+                    &mut asks,
+                    &mut state_based_actions_performed,
+                );
             }
             None => {
                 proceeds.write(Resolve(event.clone()));

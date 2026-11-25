@@ -1,5 +1,3 @@
-use derive_more::From;
-
 use crate::rules;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -40,17 +38,6 @@ pub enum Target {
     Value(rules::RuleId),
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash, From)]
-pub enum Then {
-    Events(Vec<rules::EventTemplate>),
-    May(rules::EventTemplate),
-}
-
-#[must_use]
-pub const fn may(then: rules::EventTemplate) -> Then {
-    Then::May(then)
-}
-
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Change {
     AsThough,
@@ -71,7 +58,11 @@ pub enum Change {
     NoMaximum,
     Instead {
         when: rules::Predicate,
-        then: Then,
+        then: rules::Then,
+    },
+    Hook {
+        when: rules::Predicate,
+        then: rules::Then,
     },
 }
 
@@ -79,4 +70,9 @@ pub enum Change {
 pub enum Legality {
     Legal,
     Illegal,
+}
+
+#[must_use]
+pub const fn may(then: rules::EventTemplate) -> rules::Then {
+    rules::Then::May(then)
 }

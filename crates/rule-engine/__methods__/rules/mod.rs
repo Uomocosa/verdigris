@@ -1,6 +1,7 @@
 mod changes;
 mod characteristics;
 mod eval;
+mod hooks;
 mod legality;
 mod mods;
 mod performs;
@@ -9,6 +10,7 @@ mod value;
 pub use changes::changes;
 pub use characteristics::characteristics;
 pub use eval::eval;
+pub use hooks::hooks;
 pub use legality::legality;
 pub use mods::mods;
 pub use performs::performs;
