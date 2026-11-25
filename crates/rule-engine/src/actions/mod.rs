@@ -3,7 +3,7 @@ mod basic;
 
 pub use basic::enums::{Action, Choice};
 pub use basic::messages::{Answered, Ask, PlayerAction, Rejected};
-pub use basic::resources::{AskQueue, PendingChoice, PendingMayAsks};
+pub use basic::resources::{AcceptedMays, AskQueue, PendingChoice, PendingMayAsks};
 pub use basic::structs::{
     ArrangeGraveyardChoice, BlockAssignment, DamageAssignment, DiscardChoice, LegendaryChoice,
     MayChoice, OrderTriggersChoice, RequiredCombatDamage, TargetChoice,

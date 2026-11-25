@@ -1,3 +1,4 @@
+use atomic_delegate_macros::atomic_delegates;
 use bevy::prelude::Resource;
 use derive_more::{Deref, DerefMut};
 
@@ -15,6 +16,11 @@ impl<E: HookEvent> Default for HookQueue<E> {
 #[rustfmt::skip]
 impl<E: HookEvent> HookQueue<E> {
     pub fn announce(&mut self, events: Vec<E>) { **self = Some(events); }
+}
+
+#[atomic_delegates]
+impl<E: HookEvent> HookQueue<E> {
+    pub fn take_first_group(&mut self, same_group: impl Fn(&E, &E) -> bool) -> Vec<E> {}
 }
 
 #[cfg(test)]

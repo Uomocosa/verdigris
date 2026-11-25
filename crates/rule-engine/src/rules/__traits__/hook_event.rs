@@ -17,7 +17,8 @@ pub trait HookEvent: Clone + Send + Sync + 'static {
         app.add_message::<HooksDone<Self>>();
         <rules::Hooked<Self> as Event>::register(app);
         app.init_resource::<rules::HookQueue<Self>>()
-            .insert_resource(actions::PendingMayAsks::<rules::Hooked<Self>>(Vec::new()));
+            .insert_resource(actions::PendingMayAsks::<rules::Hooked<Self>>(Vec::new()))
+            .insert_resource(actions::AcceptedMays::<rules::Hooked<Self>>(Vec::new()));
     }
 }
 

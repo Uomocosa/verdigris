@@ -56,6 +56,58 @@ mod tests {
     }
 
     #[test]
+    fn opening_hand_actions_happen_in_the_chosen_order() -> TestResult {
+        let (mut game, [p1, p2]) =
+            MockGame::new([P1.hand([TEST_MAY_PURGE, LEYLINE_OF_ANTICIPATION]), P2]);
+        let [purge] = game.player(p1).cards_in(HAND).exactly::<1>(TEST_MAY_PURGE)?;
+        let [leyline] = game.player(p1).cards_in(HAND).exactly::<1>(LEYLINE_OF_ANTICIPATION)?;
+
+        game.act(
+            p1,
+            actions::Action::ChooseMay(vec![purge.into(), leyline.into()]),
+        );
+
+        assert_eq!(game.priority().holder, None);
+        assert!(game.player(p1).cards_in(GRAVEYARD).has(purge));
+        assert!(game.player(p1).cards_in(GRAVEYARD).has(leyline));
+
+        game.act(p2, actions::Action::PassPriority);
+
+        assert_eq!(
+            game.last_rejection(),
+            Some(&actions::Rejected::NoPriority { player: p2.id })
+        );
+        assert!(game.player(p1).cards_in(GRAVEYARD).has(purge));
+        assert!(game.player(p1).cards_in(GRAVEYARD).has(leyline));
+        assert!(game.player(p1).cards_in(BATTLEFIELD).has_no(leyline));
+        assert_eq!(game.priority_player(), Some(p1.id));
+
+        let (mut game, [p1, p2]) =
+            MockGame::new([P1.hand([TEST_MAY_PURGE, LEYLINE_OF_ANTICIPATION]), P2]);
+        let [purge] = game.player(p1).cards_in(HAND).exactly::<1>(TEST_MAY_PURGE)?;
+        let [leyline] = game.player(p1).cards_in(HAND).exactly::<1>(LEYLINE_OF_ANTICIPATION)?;
+
+        game.act(
+            p1,
+            actions::Action::ChooseMay(vec![leyline.into(), purge.into()]),
+        );
+
+        assert_eq!(game.priority().holder, None);
+        assert!(game.player(p1).cards_in(BATTLEFIELD).has(leyline));
+
+        game.act(p2, actions::Action::PassPriority);
+
+        assert_eq!(
+            game.last_rejection(),
+            Some(&actions::Rejected::NoPriority { player: p2.id })
+        );
+        assert!(game.player(p1).cards_in(BATTLEFIELD).has(leyline));
+        assert!(game.player(p1).cards_in(GRAVEYARD).has(purge));
+        assert_eq!(game.priority_player(), Some(p1.id));
+        Ok(())
+    }
+
+    #[test]
     fn every_opening_hand_action_of_a_card_is_taken() {
         let (mut game, [p1, _]) = MockGame::new([P1.hand([TEST_DOUBLE_GIFT]), P2]);
         game.pass_priority();

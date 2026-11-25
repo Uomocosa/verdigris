@@ -33,6 +33,7 @@ mod tests {
     use crate::rules;
     use crate::rules::traits::context::Context;
     use crate::rules::traits::event::Event;
+    use crate::rules::traits::hook_event::HookEvent;
 
     use super::Hooked;
 
@@ -51,6 +52,9 @@ mod tests {
             Hooked::<events::OpeningHandAction>::ID,
             rules::EventId("103.6")
         );
-        assert_eq!(Hooked::<events::OpeningHandAction>::clauses().len(), 1);
+        assert_eq!(
+            Hooked::<events::OpeningHandAction>::clauses(),
+            events::OpeningHandAction::clauses()
+        );
     }
 }

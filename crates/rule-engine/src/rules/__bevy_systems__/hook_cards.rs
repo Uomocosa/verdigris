@@ -15,48 +15,55 @@ pub fn hook_cards<E: HookEvent>(
     mut state_based_actions_performed: ResMut<StateBasedActionsPerformed>,
     answers: rules::Rules,
     asked: Res<actions::AskQueue>,
+    accepted: Res<actions::AcceptedMays<rules::Hooked<E>>>,
 ) {
+    if !accepted.into_inner().is_empty() {
+        return;
+    }
     let asked = asked.into_inner();
     if asked.iter().any(|ask| ask.event == E::ID) {
         return;
     }
-    let Some(waiting) = &mut **queue else { return };
-    while let Some(first) = waiting.first() {
-        let Ok(first_owner) = owners.get(*first.card()) else {
-            waiting.remove(0);
-            continue;
-        };
-        let mut batch = Vec::new();
-        while let Some(next) = waiting.first() {
-            let Ok(owner) = owners.get(*next.card()) else {
-                waiting.remove(0);
-                continue;
-            };
-            if **owner != **first_owner {
-                break;
-            }
-            batch.push(waiting.remove(0));
+    while let Some(events) = (**queue).as_ref() {
+        if events.is_empty() {
+            break;
         }
-        let mut waits_for_answer = false;
-        for event in batch {
-            let hooked = rules::Hooked {
-                hook: event,
-                player: **first_owner,
-            };
-            if !answers.legal(&hooked) {
-                continue;
-            }
-            for then in answers.hooks(&hooked) {
-                if matches!(then, rules::Then::May(_)) {
-                    waits_for_answer = true;
+        let hooks_of_the_first_player: Vec<rules::Hooked<E>> = queue
+            .take_first_group(|first, next| {
+                match (owners.get(*first.card()), owners.get(*next.card())) {
+                    (Ok(first_owner), Ok(next_owner)) => **first_owner == **next_owner,
+                    _ => false,
                 }
-                then.announce(
-                    &hooked,
-                    &mut commands,
-                    &mut asks,
-                    &mut state_based_actions_performed,
-                );
-            }
+            })
+            .into_iter()
+            .filter_map(|hook| {
+                let owner = owners.get(*hook.card()).ok()?;
+                let hooked = rules::Hooked {
+                    hook,
+                    player: **owner,
+                };
+                answers.legal(&hooked).then_some(hooked)
+            })
+            .collect();
+        if hooks_of_the_first_player.is_empty() {
+            continue;
+        }
+        let thens_of_the_first_player: Vec<(rules::Hooked<E>, rules::Then)> =
+            hooks_of_the_first_player
+                .iter()
+                .flat_map(|hooked| {
+                    answers.hooks(hooked).into_iter().map(|then| (hooked.clone(), then))
+                })
+                .collect();
+        let waits_for_answer =
+            thens_of_the_first_player.iter().any(|(_, then)| matches!(then, rules::Then::May(_)));
+        for (hooked, then) in thens_of_the_first_player {
+            then.announce(
+                &hooked,
+                &mut commands,
+                &mut asks,
+                &mut state_based_actions_performed,
+            );
         }
         if waits_for_answer {
             break;

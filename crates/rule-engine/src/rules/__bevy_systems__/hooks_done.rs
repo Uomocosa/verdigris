@@ -10,13 +10,15 @@ use crate::rules::traits::hook_event::HookEvent;
 pub fn hooks_done<E: HookEvent>(
     mut queue: ResMut<rules::HookQueue<E>>,
     asks: Res<actions::AskQueue>,
+    accepted: Res<actions::AcceptedMays<rules::Hooked<E>>>,
     mut done: MessageWriter<HooksDone<E>>,
 ) {
     let asks = asks.into_inner();
+    let accepted = accepted.into_inner();
     let Some(events) = (**queue).as_ref() else {
         return;
     };
-    if !events.is_empty() || asks.iter().any(|ask| ask.event == E::ID) {
+    if !events.is_empty() || asks.iter().any(|ask| ask.event == E::ID) || !accepted.is_empty() {
         return;
     }
     done.write(HooksDone(PhantomData));

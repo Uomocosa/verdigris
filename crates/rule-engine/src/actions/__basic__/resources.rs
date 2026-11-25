@@ -13,3 +13,6 @@ pub struct AskQueue(pub Vec<actions::Ask>);
 
 #[derive(Resource, Debug, Deref, DerefMut)]
 pub struct PendingMayAsks<E: Event>(pub Vec<May<E>>);
+
+#[derive(Resource, Debug, Deref, DerefMut)]
+pub struct AcceptedMays<E: Event>(pub Vec<May<E>>);

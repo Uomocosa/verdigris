@@ -63,12 +63,23 @@ pub fn answer_asks(
             });
             continue;
         }
-        for option in &choice.options {
+        for option in chosen {
             answered.write(actions::Answered {
                 player: choice.player,
                 event: choice.event,
                 option: *option,
-                is_accepted: chosen_set.contains(option),
+                is_accepted: true,
+            });
+        }
+        for option in &choice.options {
+            if chosen_set.contains(option) {
+                continue;
+            }
+            answered.write(actions::Answered {
+                player: choice.player,
+                event: choice.event,
+                option: *option,
+                is_accepted: false,
             });
         }
         queue.retain(|ask| {
