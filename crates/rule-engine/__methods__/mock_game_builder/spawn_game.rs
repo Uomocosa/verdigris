@@ -90,6 +90,7 @@ pub fn spawn_game(
         active,
         step: builder.step,
     });
+    app.insert_resource(turns::UpcomingSteps::from(builder.step));
     app.insert_resource(turns::Priority::NO_HOLDER);
     app.insert_resource(turns::TurnOrder::from(entities.clone()));
     app.world_mut().write_message(turns::MulligansComplete);

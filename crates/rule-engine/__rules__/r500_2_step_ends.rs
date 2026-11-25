@@ -1,41 +1,22 @@
-use bevy::prelude::{MessageReader, MessageWriter, Res};
+use bevy::ecs::schedule::{IntoScheduleConfigs, ScheduleConfigs};
+use bevy::ecs::system::ScheduleSystem;
+use bevy::prelude::{MessageWriter, Res, on_message};
 
-use crate::Game;
 use crate::turns;
 
 /// 500.2. A phase or step in which players receive priority ends when the stack is empty and all
 /// players pass in succession. Simply having the stack become empty doesn’t cause such a phase or
 /// step to end; all players have to pass in succession with the stack empty. Because of this, each
 /// player gets a chance to add new things to the stack before that phase or step ends.
-pub fn r500_2_step_ends(
-    mut all_players_passed: MessageReader<turns::AllPlayersPassed>,
+pub fn r500_2_step_ends() -> ScheduleConfigs<ScheduleSystem> {
+    step_ends.run_if(on_message::<turns::AllPlayersPassed>)
+}
+
+fn step_ends(
     mut next_step: MessageWriter<turns::NextStep>,
-    game: Game,
-    combat_damage_steps: Res<turns::CombatDamageSteps>,
+    upcoming_steps: Res<turns::UpcomingSteps>,
 ) {
-    let combat_damage_steps = *combat_damage_steps.into_inner();
-    for _ in all_players_passed.read() {
-        let Some(current) = game.step() else { continue };
-        let next = match current {
-            turns::Step::Untap => turns::Step::Upkeep,
-            turns::Step::Upkeep => turns::Step::Draw,
-            turns::Step::Draw => turns::Step::PrecombatMain,
-            turns::Step::PrecombatMain => turns::Step::BeginningOfCombat,
-            turns::Step::BeginningOfCombat => turns::Step::DeclareAttackers,
-            turns::Step::DeclareAttackers => turns::Step::DeclareBlockers,
-            turns::Step::Cleanup => continue,
-            turns::Step::DeclareBlockers => turns::Step::CombatDamage,
-            turns::Step::CombatDamage => match combat_damage_steps {
-                turns::CombatDamageSteps::FirstOfTwo => turns::Step::SecondCombatDamage,
-                turns::CombatDamageSteps::Single | turns::CombatDamageSteps::SecondOfTwo => {
-                    turns::Step::EndOfCombat
-                }
-            },
-            turns::Step::SecondCombatDamage => turns::Step::EndOfCombat,
-            turns::Step::EndOfCombat => turns::Step::PostcombatMain,
-            turns::Step::PostcombatMain => turns::Step::End,
-            turns::Step::End => turns::Step::Cleanup,
-        };
+    if let Some(next) = upcoming_steps.into_inner().next_step() {
         next_step.write(turns::NextStep(next));
     }
 }

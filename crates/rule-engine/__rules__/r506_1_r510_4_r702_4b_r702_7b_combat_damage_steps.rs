@@ -1,5 +1,6 @@
 use bevy::prelude::{Entity, MessageReader, Query, ResMut, With};
 
+use crate::GameMut;
 use crate::cards;
 use crate::keywords;
 use crate::turns;
@@ -38,7 +39,7 @@ use crate::turns;
 /// to the end of combat step.
 pub fn r506_1_r510_4_r702_4b_r702_7b_combat_damage_steps(
     mut step_started: MessageReader<turns::StepStarted>,
-    mut combat_damage_steps: ResMut<turns::CombatDamageSteps>,
+    mut game: GameMut,
     mut participants: ResMut<turns::CombatDamageParticipants>,
     attackers: Query<(Entity, &cards::CardDefinition), With<cards::Attacking>>,
     blockers: Query<(Entity, &cards::CardDefinition), With<cards::Blocking>>,
@@ -58,17 +59,15 @@ pub fn r506_1_r510_4_r702_4b_r702_7b_combat_damage_steps(
     for step in step_started.read() {
         match **step {
             turns::Step::CombatDamage => {
-                let does_a_striker_exist = attackers
+                let does_any_have_first_or_double_strike = attackers
                     .iter()
                     .chain(blockers.iter())
                     .any(|(_, definition)| does_assign_in_first_step(definition));
-                *combat_damage_steps = if does_a_striker_exist {
-                    turns::CombatDamageSteps::FirstOfTwo
-                } else {
-                    turns::CombatDamageSteps::Single
-                };
+                if does_any_have_first_or_double_strike {
+                    game.add_step_after_this_one(turns::Step::SecondCombatDamage);
+                }
                 let does_assign = |definition: &cards::CardDefinition| {
-                    !does_a_striker_exist || does_assign_in_first_step(definition)
+                    !does_any_have_first_or_double_strike || does_assign_in_first_step(definition)
                 };
                 **participants = attackers
                     .iter()
@@ -83,7 +82,6 @@ pub fn r506_1_r510_4_r702_4b_r702_7b_combat_damage_steps(
                     .collect();
             }
             turns::Step::SecondCombatDamage => {
-                *combat_damage_steps = turns::CombatDamageSteps::SecondOfTwo;
                 **participants = attackers
                     .iter()
                     .filter(|(_, definition)| does_assign_in_second_step(definition))

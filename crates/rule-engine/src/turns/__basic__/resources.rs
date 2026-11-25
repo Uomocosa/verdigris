@@ -13,14 +13,6 @@ pub struct Turn {
     pub step: turns::Step,
 }
 
-#[derive(Resource, Debug, Clone, Copy, PartialEq, Eq, Default)]
-pub enum CombatDamageSteps {
-    #[default]
-    Single,
-    FirstOfTwo,
-    SecondOfTwo,
-}
-
 #[derive(Resource, Debug, Default, Deref, DerefMut)]
 pub struct CombatDamageParticipants(pub BTreeSet<Entity>);
 

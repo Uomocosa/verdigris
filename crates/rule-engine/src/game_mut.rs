@@ -10,6 +10,7 @@ pub struct GameMut<'w, 's> {
     pub(crate) players: players::Players<'w, 's>,
     pub(crate) turn: ResMut<'w, turns::Turn>,
     pub(crate) priority: ResMut<'w, turns::Priority>,
+    pub(crate) upcoming_steps: ResMut<'w, turns::UpcomingSteps>,
 }
 
 #[rustfmt::skip]
@@ -26,7 +27,14 @@ impl<'w, 's> GameMut<'w, 's> {
 
     pub fn pass_priority_to(&mut self, next: players::PlayerId) { self.priority.pass_to(next); }
 
-    pub fn begin_step(&mut self, step: turns::Step) { self.turn.step = step; }
+    pub fn add_step_after_this_one(&mut self, step: turns::Step) { self.upcoming_steps.add_directly_after_this_step(step); }
+}
+
+impl GameMut<'_, '_> {
+    pub fn begin_step(&mut self, step: turns::Step) {
+        self.turn.step = step;
+        self.upcoming_steps.proceed_to(step);
+    }
 }
 
 impl GameMut<'_, '_> {

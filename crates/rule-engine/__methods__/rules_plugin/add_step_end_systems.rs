@@ -7,7 +7,7 @@ pub fn add_step_end_systems(app: &mut App) {
     app.add_systems(
         Update,
         (
-            comprehensive_rules::r500_2_step_ends::r500_2_step_ends,
+            comprehensive_rules::r500_2_step_ends::r500_2_step_ends(),
             comprehensive_rules::r103_8a_skip_first_draw_step::r103_8a_skip_first_draw_step,
             comprehensive_rules::r508_8_skip_combat_steps::r508_8_skip_combat_steps,
             comprehensive_rules::r500_1_steps_proceed_in_order::r500_1_steps_proceed_in_order,

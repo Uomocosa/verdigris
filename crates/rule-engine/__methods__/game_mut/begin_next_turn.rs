@@ -7,6 +7,7 @@ pub fn begin_next_turn<'w, 's>(game: &mut GameMut<'w, 's>) -> Option<players::Pl
     game.turn.number = game.turn.number.saturating_add(1);
     game.turn.active = next.id;
     game.turn.step = turns::Step::Untap;
+    *game.upcoming_steps = turns::UpcomingSteps::from(turns::Step::Untap);
     game.priority.give_to(next.id);
     Some(next)
 }
