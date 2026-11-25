@@ -1,5 +1,7 @@
-use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query, Res, With};
+use bevy::prelude::{Entity, MessageReader, MessageWriter, Query, With};
 
+use crate::Attempt;
+use crate::Game;
 use crate::actions;
 use crate::cards;
 use crate::events;
@@ -10,24 +12,6 @@ use crate::turns;
 /// creatures must be untapped and they can’t also be battles. For each of the chosen creatures, the
 /// defending player chooses one creature for it to block that’s attacking that player, a
 /// planeswalker they control, or a battle they protect.
-///
-/// 509.1g Each chosen creature still controlled by the defending player becomes a blocking
-/// creature. Each one is blocking the attacking creatures chosen for it. It remains a blocking
-/// creature until it’s removed from combat or the combat phase ends, whichever comes first. See
-/// rule 506.4.
-///
-/// 509.1h An attacking creature with one or more creatures declared as blockers for it becomes a
-/// blocked creature; one with no creatures declared as blockers for it becomes an unblocked
-/// creature. This remains unchanged until the creature is removed from combat, an effect says that
-/// it becomes blocked or unblocked, or the combat phase ends, whichever comes first. A creature
-/// remains blocked even if all the creatures blocking it are removed from combat.
-///
-/// 702.9b A creature with flying can’t be blocked except by creatures with flying and/or reach. A
-/// creature with flying can block a creature with or without flying. (See rule 509, “Declare
-/// Blockers Step,” and rule 702.17, “Reach.”)
-///
-/// 702.17b A creature with flying can’t be blocked except by creatures with flying and/or reach.
-/// (See rule 509, “Declare Blockers Step,” and rule 702.9, “Flying.”)
 ///
 /// # See also
 ///
@@ -40,23 +24,29 @@ use crate::turns;
 /// requirements being obeyed. If a requirement that says a creature blocks if able during a certain
 /// turn refers to a turn with multiple combat phases, the creature blocks if able during each declare
 /// blockers step in that turn.
-pub fn r509_1a_r509_1g_r509_1h_r702_9b_r702_17b_declare_blockers(
+///
+/// 702.9b A creature with flying can’t be blocked except by creatures with flying and/or reach. A
+/// creature with flying can block a creature with or without flying. (See rule 509, “Declare
+/// Blockers Step,” and rule 702.17, “Reach.”)
+///
+/// 702.17b A creature with flying can’t be blocked except by creatures with flying and/or reach.
+/// (See rule 509, “Declare Blockers Step,” and rule 702.9, “Flying.”)
+pub fn r509_1a_declare_blockers(
     mut actions: MessageReader<actions::PlayerAction>,
     mut rejected: MessageWriter<actions::Rejected>,
-    mut commands: Commands,
-    state: Res<turns::TurnState>,
+    mut declared: MessageWriter<Attempt<events::DeclareBlocker>>,
+    game: Game,
     blockers: Query<(Entity, &cards::Owner), With<cards::Creature>>,
-    attacking: Query<(Entity, &cards::Attacking)>,
+    attacking: Query<Entity, With<cards::Attacking>>,
     answers: rules::Rules,
 ) {
-    let state = state.into_inner();
     for action in actions.read() {
         let actions::Action::DeclareBlockers(assignments) = &action.action else {
             continue;
         };
-        if state.turn.step != turns::Step::DeclareBlockers
-            || state.priority.holder != Some(action.player)
-            || action.player == state.turn.active
+        if game.turn().step() != Some(turns::Step::DeclareBlockers)
+            || game.priority_holder().is_none_or(|holder| holder.id != action.player)
+            || game.active_player().is_some_and(|active| active.id == action.player)
         {
             rejected.write(actions::Rejected::CannotBlock {
                 assignments: assignments.clone(),
@@ -78,7 +68,7 @@ pub fn r509_1a_r509_1g_r509_1h_r702_9b_r702_17b_declare_blockers(
             **owner == action.player
                 && answers.required::<events::DeclareBlocker>(entity)
                 && !assignments.iter().any(|assignment| assignment.blocker == entity)
-                && attacking.iter().any(|(attacker, _)| {
+                && attacking.iter().any(|attacker| {
                     answers.legal::<events::DeclareBlocker>(&events::DeclareBlocker {
                         blocker: entity,
                         attacker,
@@ -93,8 +83,11 @@ pub fn r509_1a_r509_1g_r509_1h_r702_9b_r702_17b_declare_blockers(
             continue;
         }
         for assignment in assignments {
-            commands.entity(assignment.blocker).insert(cards::Blocking(assignment.attacker));
-            commands.entity(assignment.attacker).insert(cards::Blocked);
+            declared.write(Attempt(events::DeclareBlocker {
+                blocker: assignment.blocker,
+                attacker: assignment.attacker,
+                player: action.player,
+            }));
         }
     }
 }
@@ -108,54 +101,6 @@ mod tests {
     use crate::events;
     use crate::testing::*;
     use crate::turns;
-
-    #[test]
-    fn declared_blockers_become_blocking_and_attacker_blocked() -> TestResult {
-        let (mut game, [p1, p2]) = MockGame::new([
-            P1.battlefield([TYPHOID_RATS, GRIZZLY_BEARS]),
-            P2.battlefield([GRIZZLY_BEARS]),
-        ]);
-        let [rats] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TYPHOID_RATS)?;
-        let [bears_1] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
-        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
-        game.play([
-            p1.pass_to(turns::Step::DeclareAttackers),
-            p2.pass_to(turns::Step::DeclareAttackers),
-            p1.declare_attackers([rats, bears_1]),
-        ])?;
-
-        game.play([
-            p1.pass_to(turns::Step::DeclareBlockers),
-            p2.pass_to(turns::Step::DeclareBlockers),
-        ])?;
-        game.play([p1.pass_priority()])?;
-        let assignments = vec![
-            actions::BlockAssignment {
-                blocker: bears.into(),
-                attacker: rats.into(),
-            },
-            actions::BlockAssignment {
-                blocker: bears.into(),
-                attacker: bears_1.into(),
-            },
-        ];
-
-        game.act(p2, actions::Action::DeclareBlockers(assignments.clone()));
-
-        assert_eq!(
-            game.last_rejection(),
-            Some(&actions::Rejected::CannotBlock { assignments })
-        );
-        assert!(!game.is_blocking(bears));
-        game.play([p2.declare_blockers([(bears, rats)])])?;
-
-        assert_eq!(
-            game.get::<crate::cards::Blocking>(bears),
-            Some(crate::cards::Blocking(rats.into()))
-        );
-        assert!(game.has::<crate::cards::Blocked>(rats));
-        Ok(())
-    }
 
     #[test]
     fn a_tapped_creature_cannot_be_declared_as_a_blocker() -> TestResult {
@@ -280,30 +225,6 @@ mod tests {
             Some(&actions::Rejected::CannotBlock { assignments })
         );
         assert!(!game.is_blocking(bears));
-        Ok(())
-    }
-
-    #[test]
-    fn a_creature_with_reach_can_block_a_flyer() -> TestResult {
-        let (mut game, [p1, p2]) =
-            MockGame::new([P1.battlefield([WIND_DRAKE]), P2.battlefield([GIANT_SPIDER])]);
-        let [drake] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(WIND_DRAKE)?;
-        let [spider] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GIANT_SPIDER)?;
-        game.play([
-            p1.pass_to(turns::Step::DeclareAttackers),
-            p2.pass_to(turns::Step::DeclareAttackers),
-            p1.declare_attackers([drake]),
-        ])?;
-        game.play([
-            p1.pass_to(turns::Step::DeclareBlockers),
-            p2.pass_to(turns::Step::DeclareBlockers),
-        ])?;
-        game.play([p1.pass_priority(), p2.declare_blockers([(spider, drake)])])?;
-
-        assert_eq!(
-            game.get::<crate::cards::Blocking>(spider),
-            Some(crate::cards::Blocking(drake.into()))
-        );
         Ok(())
     }
 

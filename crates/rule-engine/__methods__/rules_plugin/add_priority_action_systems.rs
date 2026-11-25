@@ -26,7 +26,14 @@ pub fn add_priority_action_systems(app: &mut App) {
                 ),
             )
                 .chain(),
-            comprehensive_rules::r509_1a_r509_1g_r509_1h_r702_9b_r702_17b_declare_blockers::r509_1a_r509_1g_r509_1h_r702_9b_r702_17b_declare_blockers,
+            (
+                comprehensive_rules::r509_1a_declare_blockers::r509_1a_declare_blockers,
+                Attempt::<events::DeclareBlocker>::resolved_by(
+                    comprehensive_rules::r509_1g_becomes_blocking::r509_1g_becomes_blocking,
+                ),
+                comprehensive_rules::r509_1h_becomes_blocked::r509_1h_becomes_blocked,
+            )
+                .chain(),
             comprehensive_rules::r509_1i_r509_2a_r509_3a_r509_3c_blocker_triggers::r509_1i_r509_2a_r509_3a_r509_3c_blocker_triggers,
             comprehensive_rules::r305_1_r305_2_r305_3_play_land::r305_1_r305_2_r305_3_play_land,
             comprehensive_rules::r305_6_basic_land_mana_ability::r305_6_basic_land_mana_ability,
@@ -55,7 +62,7 @@ mod tests {
 
         assert_eq!(
             app.get_schedule(Update).map(Schedule::systems_len),
-            Some(24)
+            Some(27)
         );
     }
 }
