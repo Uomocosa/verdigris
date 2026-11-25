@@ -16,8 +16,13 @@ pub fn hook_cards<E: HookEvent>(
     answers: rules::Rules,
     asked: Res<actions::AskQueue>,
     accepted: Res<actions::AcceptedMays<rules::Hooked<E>>>,
+    choice: Res<actions::PendingChoice>,
 ) {
     if !accepted.into_inner().is_empty() {
+        return;
+    }
+    let choice = choice.into_inner();
+    if choice.as_ref().is_some_and(|choice| !matches!(choice, actions::Choice::May(_))) {
         return;
     }
     let asked = asked.into_inner();
@@ -55,8 +60,9 @@ pub fn hook_cards<E: HookEvent>(
                     answers.hooks(hooked).into_iter().map(|then| (hooked.clone(), then))
                 })
                 .collect();
-        let waits_for_answer =
-            thens_of_the_first_player.iter().any(|(_, then)| matches!(then, rules::Then::May(_)));
+        if thens_of_the_first_player.is_empty() {
+            continue;
+        }
         for (hooked, then) in thens_of_the_first_player {
             then.announce(
                 &hooked,
@@ -65,8 +71,6 @@ pub fn hook_cards<E: HookEvent>(
                 &mut state_based_actions_performed,
             );
         }
-        if waits_for_answer {
-            break;
-        }
+        break;
     }
 }

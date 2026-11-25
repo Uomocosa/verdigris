@@ -9,7 +9,11 @@ pub fn take_first_group<E: HookEvent>(
         return Vec::new();
     };
     let end = events.first().map_or(0, |first| {
-        events.iter().position(|next| !same_group(first, next)).unwrap_or(events.len())
+        events
+            .iter()
+            .enumerate()
+            .position(|(index, next)| index > 0 && !same_group(first, next))
+            .unwrap_or(events.len())
     });
     events.drain(..end).collect()
 }
@@ -38,6 +42,14 @@ mod tests {
         let group = take_first_group(&mut queue, |current, next| current.card() == next.card());
         assert_eq!(group.len(), 2);
         assert!(group.iter().all(|event| event.card() == first));
+        assert_eq!(queue.as_ref().map(Vec::len), Some(1));
+        let mut queue = rules::HookQueue::<events::OpeningHandAction>::default();
+        queue.announce(vec![
+            events::OpeningHandAction(first),
+            events::OpeningHandAction(second),
+        ]);
+        let group = take_first_group(&mut queue, |_, _| false);
+        assert_eq!(group.len(), 1);
         assert_eq!(queue.as_ref().map(Vec::len), Some(1));
     }
 }

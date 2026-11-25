@@ -108,6 +108,38 @@ mod tests {
     }
 
     #[test]
+    fn a_later_player_waits_for_the_choice_of_an_earlier_players_action() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.hand([TEST_OPENING_TOLL, GRIZZLY_BEARS]),
+            P2.hand([TEST_DOUBLE_GIFT]),
+        ]);
+        let [bears] = game.player(p1).cards_in(HAND).exactly::<1>(GRIZZLY_BEARS)?;
+
+        game.act(p2, actions::Action::PassPriority);
+
+        assert_eq!(
+            game.last_rejection(),
+            Some(&actions::Rejected::NoPriority { player: p2.id })
+        );
+        assert_eq!(game.life(p2), 20);
+
+        game.act(p1, actions::Action::ChooseDiscard(vec![bears.into()]));
+
+        assert!(game.player(p1).cards_in(GRAVEYARD).has(bears));
+        assert_eq!(game.life(p2), 20);
+
+        game.act(p2, actions::Action::PassPriority);
+
+        assert_eq!(
+            game.last_rejection(),
+            Some(&actions::Rejected::NoPriority { player: p2.id })
+        );
+        assert_eq!(game.life(p2), 23);
+        assert_eq!(game.priority_player(), Some(p1.id));
+        Ok(())
+    }
+
+    #[test]
     fn every_opening_hand_action_of_a_card_is_taken() {
         let (mut game, [p1, _]) = MockGame::new([P1.hand([TEST_DOUBLE_GIFT]), P2]);
         game.pass_priority();
