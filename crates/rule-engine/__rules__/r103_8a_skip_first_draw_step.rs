@@ -15,8 +15,9 @@ pub fn r103_8a_skip_first_draw_step(
         if **step == turns::Step::Draw
             && game.turn().is_first_turn()
             && players.is_two_player_game()
+            && let Some(step_after) = game.turn().step_after_next()
         {
-            *step = turns::NextStep(turns::Step::PrecombatMain);
+            *step = turns::NextStep(step_after);
         }
     }
 }
@@ -37,6 +38,16 @@ mod tests {
         game.play([p1.pass_priority(), p2.pass_priority()])?;
 
         assert_eq!(game.turn().step, turns::Step::PrecombatMain);
+        assert_eq!(game.player(p1).cards_in(HAND).count(), hand_before);
+
+        let (mut game, [p1, p2]) = MockGame::builder()
+            .turn(1, turns::Step::EndOfCombat)
+            .players([P1.battlefield([SPHINX_OF_THE_SECOND_SUN]), P2]);
+        let hand_before = game.player(p1).cards_in(HAND).count();
+
+        game.play([p1.pass_to(turns::Step::End), p2.pass_to(turns::Step::End)])?;
+
+        assert_eq!(game.turn().step, turns::Step::End);
         assert_eq!(game.player(p1).cards_in(HAND).count(), hand_before);
         Ok(())
     }

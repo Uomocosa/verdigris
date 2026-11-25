@@ -14,3 +14,6 @@ pub struct AllPlayersPassed;
 
 #[derive(Message, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct MulligansComplete;
+
+#[derive(Message, Debug, Clone, Copy, PartialEq, Eq)]
+pub struct TurnStarted;

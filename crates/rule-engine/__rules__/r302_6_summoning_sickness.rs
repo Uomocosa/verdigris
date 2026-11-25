@@ -1,6 +1,6 @@
 use bevy::ecs::schedule::{IntoScheduleConfigs, ScheduleConfigs};
 use bevy::ecs::system::ScheduleSystem;
-use bevy::prelude::{Commands, Entity, Query, With};
+use bevy::prelude::{Commands, Entity, Query, With, on_message};
 
 use crate::Game;
 use crate::cards;
@@ -8,7 +8,7 @@ use crate::turns;
 
 /// 302.6. A creature’s activated ability with the tap symbol or the untap symbol in its activation cost can’t be activated unless the creature has been under its controller’s control continuously since their most recent turn began. A creature can’t attack unless it has been under its controller’s control continuously since their most recent turn began. This rule is informally called the “summoning sickness” rule.
 pub fn r302_6_summoning_sickness() -> ScheduleConfigs<ScheduleSystem> {
-    remove_summoning_sickness.run_if(turns::Step::Untap.begins())
+    remove_summoning_sickness.run_if(on_message::<turns::TurnStarted>)
 }
 
 fn remove_summoning_sickness(
@@ -36,8 +36,12 @@ mod tests {
 
     #[test]
     fn summoning_sickness_lifts_at_the_controllers_next_untap() -> TestResult {
-        let (mut game, [p1, p2]) =
-            MockGame::new([P1.hand([WALKING_CORPSE]).mana_pool(mana![1, B]), P2]);
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.hand([WALKING_CORPSE])
+                .mana_pool(mana![1, B])
+                .battlefield([SPHINX_OF_THE_SECOND_SUN]),
+            P2,
+        ]);
         let [corpse] = game.player(p1).cards_in(HAND).exactly::<1>(WALKING_CORPSE)?;
         game.play([p1.cast(corpse).pass_priority(), p2.pass_priority()])?;
 

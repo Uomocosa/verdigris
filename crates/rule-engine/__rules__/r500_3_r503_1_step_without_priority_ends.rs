@@ -23,6 +23,7 @@ use crate::turns;
 /// and no abilities can be activated. However, this rule is subject to the following exception:
 pub fn r500_3_r503_1_step_without_priority_ends(
     mut step_started: MessageWriter<turns::StepStarted>,
+    mut turn_started: MessageWriter<turns::TurnStarted>,
     mut game: GameMut,
     mut reentry: ResMut<turns::CleanupReentry>,
 ) {
@@ -43,6 +44,7 @@ pub fn r500_3_r503_1_step_without_priority_ends(
                 return;
             }
             if game.begin_next_turn().is_some() {
+                turn_started.write(turns::TurnStarted);
                 step_started.write(turns::StepStarted(turns::Step::Untap));
             }
         }

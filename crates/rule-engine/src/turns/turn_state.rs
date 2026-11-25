@@ -37,6 +37,9 @@ impl TurnState {
     #[must_use]
     pub fn next_step(&self) -> Option<turns::Step> { self.upcoming_steps.front().copied() }
 
+    #[must_use]
+    pub fn step_after_next(&self) -> Option<turns::Step> { self.upcoming_steps.get(1).copied() }
+
     pub fn add_step_after_this_one(&mut self, step: turns::Step) { self.upcoming_steps.push_front(step); }
 }
 
@@ -82,6 +85,7 @@ mod tests {
         assert_eq!(state.priority, turns::Priority::NO_HOLDER);
         assert_eq!(state.upcoming_steps.len(), 11);
         assert_eq!(state.next_step(), Some(turns::Step::Upkeep));
+        assert_eq!(state.step_after_next(), Some(turns::Step::Draw));
         state.add_step_after_this_one(turns::Step::SecondCombatDamage);
         state.add_step_after_this_one(turns::Step::EndOfCombat);
         assert_eq!(state.next_step(), Some(turns::Step::EndOfCombat));

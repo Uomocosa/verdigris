@@ -8,7 +8,9 @@ mod turn_state;
 mod turn_view;
 
 pub use basic::card_text::beginning_of;
-pub use basic::messages::{AllPlayersPassed, MulligansComplete, NextStep, StepStarted};
+pub use basic::messages::{
+    AllPlayersPassed, MulligansComplete, NextStep, StepStarted, TurnStarted,
+};
 pub use basic::resources::{CleanupReentry, CombatDamageParticipants};
 pub use basic::structs::Turn;
 pub use phase::Phase;

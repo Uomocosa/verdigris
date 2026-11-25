@@ -14,6 +14,11 @@ impl TurnView<'_> {
     pub fn next_step(self) -> Option<turns::Step> { self.and_then(turns::TurnState::next_step) }
 
     #[must_use]
+    pub fn step_after_next(self) -> Option<turns::Step> {
+        self.and_then(turns::TurnState::step_after_next)
+    }
+
+    #[must_use]
     pub fn is_first_turn(self) -> bool { self.is_some_and(|state| state.turn.number == 1) }
 }
 
@@ -36,6 +41,7 @@ mod tests {
         let view = TurnView(Some(&state));
         assert_eq!(view.step(), Some(turns::Step::PrecombatMain));
         assert_eq!(view.next_step(), Some(turns::Step::BeginningOfCombat));
+        assert_eq!(view.step_after_next(), Some(turns::Step::DeclareAttackers));
         assert!(view.is_first_turn());
         let missing = TurnView(None);
         assert_eq!(missing.step(), None);
