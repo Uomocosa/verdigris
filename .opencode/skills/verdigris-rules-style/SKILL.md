@@ -109,6 +109,7 @@ CR rule behind it stays (800.4a: `if holder.is_still_in_the_game() { return; }`)
 |---|---|
 | `Attempt(event)` | the default: cards may forbid or replace the event |
 | `Resolve(event)` | only when the CR says no effect can stop it |
+| `hooks.announce(events_in_turn_order)` | "some cards allow ..." (103.6): with no card, nothing happens |
 
 Besides the pipeline itself, the rules that write `Resolve` are 104.2a ("overrides all effects
 that would preclude that player from winning") and 104.3a (conceding, the exception named in
@@ -163,7 +164,7 @@ A field or parameter that is always a player is a `PlayerId`, never an `Entity`.
 a player or a permanent (a damage recipient, a target, `Context::subject`) stays an `Entity`. Never
 wrap an `Entity` in `PlayerId(..)` just to make it compile.
 
-## 10. A rule is an anchor
+## 10. A rule is a hook point
 
 A rule says WHEN something would happen and to whom; cards decide WHAT is different. So the rule
 announces `Attempt(event)` and stops there. If no card reacts, the performing system does the CR's
@@ -218,12 +219,12 @@ is a different file: 502.3 announces the untap, 701.26b says what untapping does
 
 | The choice comes from | Who asks |
 |---|---|
-| a card or effect: "you may ..." on the card, or a CR sentence that only points at it ("some cards allow ...", "if an effect lets a player ...") | the card's change (`may` in `CHANGEABLE_RULES.md` §3); the rule is an anchor (§10) and has no `Ask` |
+| a card or effect: "you may ..." on the card, or a CR sentence that only points at it ("some cards allow ...", "if an effect lets a player ...") | the card's change (`may` in `CHANGEABLE_RULES.md` §3); the rule is a hook point (§10) and has no `Ask` |
 | the CR sentence itself, with no card involved ("the player chooses one of them") | the rule writes `Ask(choice)` and reads `Answered<Choice>` |
 
 Test: remove every card from the game. Does the CR sentence still make the player choose? If not, the
 choice isn't the rule's. Not every card gives a choice: another one may simply do something at that
-moment, and the same anchor must serve both.
+moment, and the same hook point must serve both.
 
 Asking, waiting and validating is ONE shared mechanism for the whole engine, not code in a rule: it
 shows one ask at a time, in turn order, drops an ask with no options or whose player left, checks
@@ -239,10 +240,10 @@ for answered in answers.read() { .. }
 ```
 
 For a card's `may` the mechanism exists: `actions::Ask` / `actions::Answered`, shown and checked
-by `answer_asks`; an event that can carry a `may` registers `show_may::<E>`, `answer_may::<E>`
-and its `PendingMayAsks<E>` (see `OpeningHandAction`). For a choice the CR itself gives, rules
-still write `PendingChoice`: don't copy them; a refactor of such a rule extends this mechanism
-and uses it.
+by `answer_asks`; `HookEvent::register` registers what `show_may` / `answer_may` need
+(`PendingMayAsks` and `AcceptedMays` for `Hooked<E>`), and the systems still go into the rule's
+chain (see `add_turn_systems`). For a choice the CR itself gives, rules still write `PendingChoice`:
+don't copy them; a refactor of such a rule extends this mechanism and uses it.
 
 Other choice rules may keep their own `PendingChoice` until they are refactored; the old and new way
 can live side by side.
@@ -321,24 +322,27 @@ send the whole list in one statement. The name says what it holds and its order
 // Bad: finding the cards, ordering them and writing are mixed in nested loops
 for player in players.still_in_the_game() {
     for card in player.opening_hand() {
-        opening_hand_actions.write(Attempt(events::OpeningHandAction { card, player: player.id }));
+        opening_hand_actions.write(Attempt(events::OpeningHandAction(card)));
     }
 }
 
 // Good: first the data (103.6: "the starting player ... then each other player in turn order")
-let events_in_turn_order: Vec<events::OpeningHandAction> = players
-    .still_in_the_game()
-    .iter()
-    .flat_map(|player| {
-        player
-            .opening_hand()
-            .into_iter()
-            .map(|card| events::OpeningHandAction { card, player: player.id })
-    })
-    .collect();
-// then the action
-opening_hand_actions.write_batch(events_in_turn_order.into_iter().map(Attempt));
+fn opening_hand_actions(
+    mut hooks: ResMut<rules::HookQueue<events::OpeningHandAction>>,
+    players: players::Players,
+) {
+    let events_in_turn_order: Vec<events::OpeningHandAction> = players
+        .still_in_the_game()
+        .iter()
+        .flat_map(players::PlayerView::opening_hand)
+        .map(events::OpeningHandAction)
+        .collect();
+    hooks.announce(events_in_turn_order);
+}
 ```
+
+With a plain `MessageWriter`, `into_iter().map(Attempt)` on the collected list trips
+`clippy::needless_collect`; write `write_batch(events_in_turn_order.iter().copied().map(Attempt))`.
 
 A moment with no data ("once the mulligan process is complete") is a run condition, not a loop over
 its messages. The rule's `pub fn` returns it, so the moment stays in the rule's file:
@@ -363,7 +367,7 @@ A message that carries data (`StepStarted(step)`) is still read. One flat loop w
 - What does it do if no card in the game cares? That is the only thing it may perform itself.
 - Does it name a card, an ability or a single case of a list? Move it to the case's own rule.
 - Does it validate, reject, or wait for a player? Move it to the shared part.
-- Would the next card or sub-rule edit this file? Then it isn't an anchor yet.
+- Would the next card or sub-rule edit this file? Then it isn't a hook point yet.
 
 ## Smells
 

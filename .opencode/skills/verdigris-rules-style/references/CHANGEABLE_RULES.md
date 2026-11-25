@@ -19,6 +19,19 @@ Resolve<E>                  (nothing can stop E any more; only the pipeline writ
           -> Did<E>         (triggers: "whenever a player draws ...")    (written by the rule that performs E)
 ```
 
+A moment where, with no card reacting, NOTHING happens is not an event but a **hook**. The rule
+announces a `HookEvent` list into `HookQueue<E>`; `hook_cards` applies every `Change::Hook` of each
+card, one player at a time in the announced order; `HooksDone<E>` says it is over.
+
+```
+rule             -> hooks.announce(events_in_turn_order) into HookQueue<E>
+hook_cards<E>    -> every Change::Hook of each card, one player at a time, in the announced order
+HooksDone<E>     -> the queue is empty and no may is pending or accepted: the hook is over
+```
+
+Test: with no cards reacting, does anything happen? No: hook. Yes: `Attempt`. It reacts to something
+that happened: `Did`.
+
 A card never adds engine code to change a rule. It adds a `RuleChange { target, change }`
 (a `Modification::Rule`) through `statics::all(...)`, and the pipeline reads it.
 
@@ -32,6 +45,14 @@ folded in timestamp order from the rule's default.
 pub trait Event: Context + Clone + Send + Sync + 'static {
     const ID: rules::EventId;                       // the CR rule number, e.g. "121.1"
     fn clauses() -> Vec<rules::Clause> { Vec::new() } // CR conditions; most events have none
+}
+
+// rules/__traits__/hook_event.rs : a hook IS its subject, the card that may act.
+pub trait HookEvent: Clone + Send + Sync + 'static {
+    const ID: rules::EventId;                        // the CR rule number, e.g. "103.6"
+    fn card(&self) -> cards::CardId;                 // the card whose hook this is
+    #[must_use]
+    fn clauses() -> Vec<rules::Clause> { Vec::new() } // CR conditions; most hooks have none
 }
 
 // rules/__traits__/value_rule.rs (unchanged idea)
@@ -56,6 +77,8 @@ pub enum Change {
     Set(u32), Increase(u32), Decrease(u32), NoMaximum,
     // replacement (614)
     Instead { when: rules::Predicate, then: rules::Then }, // Then::{Events(Vec<EventTemplate>), May(EventTemplate)}
+    // hook: ALL hooks of the subject apply (103.6: "some cards allow ...")
+    Hook { when: rules::Predicate, then: rules::Then },
 }
 
 pub struct RuleChange { pub target: Target, pub change: Change }
@@ -115,9 +138,15 @@ asked, and the chosen event reaches the rule that owns it as its own `Resolve`.
 Several optional changes of one player may be grouped into one ask. `then` may name any event: a new
 template is one variant plus its `instantiate`, and the event's own rule performs it.
 
-**Text that points at cards** ("some cards / effects allow a player to ...") is announced as an event
-whose subject is the object that may carry the change; its default is nothing. The card then writes a
-change to that event, for its own object. Nothing is asked for an object without a change.
+**Text that points at cards** ("some cards / effects allow a player to ...") is a **hook**, not an
+event: the rule announces a `HookEvent` for each object into `HookQueue<E>`, and the card writes a
+change to that hook, for its own object — e.g.
+`abilities::opening_hand_action(may(EventTemplate::BeginTheGameOnTheBattlefield))`. Nothing is asked
+for an object without a change. An `Instead` aimed at a hook is a silent no-op (§2): `Rules::hooks`
+reads only `Change::Hook`. At most one `may` hook per card and event (guard test in `rule_registry.rs`).
+A hook on permanents needs a controller, which the engine doesn't have yet (`Hooked` uses
+`cards::Owner`), so 502.1 phasing waits for it. "At the beginning of ..." is a triggered ability,
+never a hook.
 
 **A card that works outside the battlefield** (611.3b "or the object generating it is in the
 appropriate zone"): the change applies from the zone its text names. If the engine reads changes only

@@ -103,7 +103,7 @@ How the linter will check it: flag any `__rules__/*_perform.rs`; require the CR 
 
 ## VRDG010 who_writes_resolve · WILL_BE_ENFORCED
 
-Only the pipeline (614.1a), 104.2a and 104.3a write `Resolve<E>`; every other rule writes `Attempt<E>`. (rules-style §5–§6; CHANGEABLE_RULES.md §0.)
+Only the pipeline (614.1a), 104.2a and 104.3a write `Resolve<E>`; every other rule writes `Attempt<E>` (or announces hooks). (rules-style §5–§6; CHANGEABLE_RULES.md §0.)
 
 Bad — a rule resolving its own event (the real line from `git show fb680a2:crates/rule-engine/__rules__/r608_3e_cannot_enter.rs`, with the wrapper changed):
 
@@ -161,15 +161,30 @@ mut rejected: MessageWriter<actions::Rejected>,
 mut pending: ResMut<actions::PendingChoice>,
 ```
 
-Good — `crates/rule-engine/__rules__/r103_6_opening_hand_actions.rs:18` (the rule announces; the card or shared ask carries the choice):
+Good — `crates/rule-engine/__rules__/r502_3_untap.rs:12` (the rule announces; the card or shared ask carries the choice):
 
 ```rust
-mut opening_hand_actions: MessageWriter<Attempt<events::OpeningHandAction>>,
-
-opening_hand_actions.write(Attempt(events::OpeningHandAction {
-    card,
-    player: player.id,
-}));
+pub fn r502_3_untap(
+    mut step_started: MessageReader<turns::StepStarted>,
+    mut untaps: MessageWriter<Attempt<events::Untap>>,
+    turn: Res<turns::Turn>,
+    tapped: Query<(Entity, &cards::Owner), With<cards::Tapped>>,
+) {
+    let turn = turn.into_inner();
+    for step in step_started.read() {
+        if **step != turns::Step::Untap {
+            continue;
+        }
+        for (entity, owner) in tapped.iter() {
+            if **owner == turn.active {
+                untaps.write(Attempt(events::Untap {
+                    permanent: entity,
+                    controller: **owner,
+                }));
+            }
+        }
+    }
+}
 ```
 
 How the linter will check it: scan each rule body (before `#[cfg(test)]`) for `PendingChoice` / `Rejected`, skipping the exempt file list.
