@@ -42,7 +42,6 @@ pub fn r117_4_priority(
 
 #[cfg(test)]
 mod tests {
-    use crate::actions;
     use crate::mana;
     use crate::testing::*;
     use crate::turns;
@@ -121,7 +120,7 @@ mod tests {
     fn the_step_ends_when_every_player_still_in_the_game_has_passed() -> TestResult {
         let (mut game, [p1, p2, p3]) = MockGame::new([P1, P2, P3]);
 
-        game.act(p3, actions::Action::Concede);
+        game.play([p3.concede()])?;
         game.play([p1.pass_priority(), p2.pass_priority()])?;
 
         assert_eq!(game.turn().step, turns::Step::BeginningOfCombat);
@@ -133,7 +132,7 @@ mod tests {
         let (mut game, [p1, p2, p3]) = MockGame::new([P1, P2, P3]);
 
         game.play([p1.pass_priority()])?;
-        game.act(p1, actions::Action::Concede);
+        game.play([p1.concede()])?;
         game.play([p2.pass_priority()])?;
 
         assert_eq!(game.turn().step, turns::Step::PrecombatMain);

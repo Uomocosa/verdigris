@@ -26,16 +26,16 @@ pub fn r800_4a_priority_of_a_player_who_left(mut game: GameMut) {
 
 #[cfg(test)]
 mod tests {
-    use crate::actions;
     use crate::testing::*;
 
     #[test]
-    fn priority_passes_on_when_its_holder_concedes() {
+    fn priority_passes_on_when_its_holder_concedes() -> TestResult {
         let (mut game, [p1, p2, _p3]) = MockGame::new([P1, P2, P3]);
 
-        game.act(p1, actions::Action::Concede);
+        game.play([p1.concede()])?;
 
         assert_eq!(game.priority_player(), Some(p2.id));
+        Ok(())
     }
 
     #[test]

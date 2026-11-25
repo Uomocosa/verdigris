@@ -21,7 +21,6 @@ pub fn r104_4a_draw(
 
 #[cfg(test)]
 mod tests {
-    use crate::actions;
     use crate::players;
     use crate::testing::*;
 
@@ -53,14 +52,15 @@ mod tests {
     }
 
     #[test]
-    fn a_player_who_already_left_is_not_part_of_the_draw() {
+    fn a_player_who_already_left_is_not_part_of_the_draw() -> TestResult {
         let (mut game, [p1, p2, p3]) = MockGame::new([P1.life(0), P2.life(0), P3]);
 
-        game.act(p3, actions::Action::Concede);
+        game.play([p3.concede()])?;
 
         assert!(game.has_lost(p3));
         assert!(!game.has::<players::GameIsADraw>(p3));
         assert!(game.has::<players::GameIsADraw>(p1));
         assert!(game.has::<players::GameIsADraw>(p2));
+        Ok(())
     }
 }

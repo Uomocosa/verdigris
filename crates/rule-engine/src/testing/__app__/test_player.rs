@@ -44,6 +44,9 @@ impl TestPlayer {
     pub fn pass_priority(self) -> testing::TestPlayerActions { testing::TestPlayerActions::of(self).pass_priority() }
 
     #[must_use]
+    pub fn concede(self) -> testing::TestPlayerActions { testing::TestPlayerActions::of(self).concede() }
+
+    #[must_use]
     pub fn declare_attackers<const N: usize>(self, attackers: [testing::TestCard; N]) -> testing::TestPlayerActions { testing::TestPlayerActions::of(self).declare_attackers(attackers) }
 
     #[must_use]

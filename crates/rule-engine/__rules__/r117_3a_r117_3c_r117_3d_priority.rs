@@ -106,7 +106,7 @@ mod tests {
     fn a_player_who_left_does_not_receive_priority() -> TestResult {
         let (mut game, [p1, p2, p3]) = MockGame::new([P1, P2, P3]);
 
-        game.act(p2, actions::Action::Concede);
+        game.play([p2.concede()])?;
         game.play([p1.pass_priority()])?;
 
         assert_eq!(game.priority_player(), Some(p3.id));

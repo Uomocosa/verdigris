@@ -551,7 +551,7 @@ mod tests {
     }
 
     #[test]
-    fn r611_3a_player_static_modifies_only_its_controller() -> TestResult {
+    fn player_static_modifies_only_its_controller() -> TestResult {
         use bevy::ecs::system::RunSystemOnce;
         use bevy::prelude::Entity;
 

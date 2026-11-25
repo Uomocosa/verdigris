@@ -51,6 +51,9 @@ impl TestPlayerActions {
     pub fn pass_priority(self) -> Self { self.act(actions::Action::PassPriority) }
 
     #[must_use]
+    pub fn concede(self) -> Self { self.act(actions::Action::Concede) }
+
+    #[must_use]
     pub fn play_land(self, land: testing::TestCard) -> Self { self.act(actions::Action::PlayLand(land.into())) }
 }
 

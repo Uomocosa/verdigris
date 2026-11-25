@@ -21,7 +21,6 @@ pub fn r500_1_steps_proceed_in_order(
 
 #[cfg(test)]
 mod tests {
-    use crate::actions;
     use crate::testing::*;
     use crate::turns;
 
@@ -30,7 +29,7 @@ mod tests {
         let (mut game, [p1, p2, p3]) = MockGame::new([P1, P2, P3]);
 
         game.play([p1.pass_priority()])?;
-        game.act(p1, actions::Action::Concede);
+        game.play([p1.concede()])?;
         game.play([p2.pass_priority(), p3.pass_priority()])?;
 
         assert_eq!(game.turn().step, turns::Step::BeginningOfCombat);

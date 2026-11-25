@@ -22,25 +22,26 @@ pub fn r104_3a_concede(
 
 #[cfg(test)]
 mod tests {
-    use crate::actions;
     use crate::testing::*;
 
     #[test]
-    fn conceding_leaves_the_game_and_the_opponent_wins() {
+    fn conceding_leaves_the_game_and_the_opponent_wins() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([P1, P2]);
 
-        game.act(p1, actions::Action::Concede);
+        game.play([p1.concede()])?;
 
         assert!(game.has_lost(p1));
         assert!(game.has_won(p2));
+        Ok(())
     }
 
     #[test]
-    fn platinum_angel_controller_can_still_concede() {
+    fn platinum_angel_controller_can_still_concede() -> TestResult {
         let (mut game, [p1, _p2]) = MockGame::new([P1.battlefield([PLATINUM_ANGEL]), P2]);
 
-        game.act(p1, actions::Action::Concede);
+        game.play([p1.concede()])?;
 
         assert!(game.has_lost(p1));
+        Ok(())
     }
 }

@@ -19,18 +19,18 @@ pub fn r104_2a_wins_when_opponents_left(
 
 #[cfg(test)]
 mod tests {
-    use crate::actions;
     use crate::testing::*;
     use crate::turns;
 
     #[test]
-    fn r104_2a_sole_survivor_wins_despite_cant_win_effect() {
+    fn sole_survivor_wins_despite_cant_win_effect() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([P1.battlefield([PLATINUM_ANGEL]), P2]);
 
-        game.act(p1, actions::Action::Concede);
+        game.play([p1.concede()])?;
 
         assert!(game.has_lost(p1));
         assert!(game.has_won(p2));
+        Ok(())
     }
 
     #[test]
@@ -73,7 +73,7 @@ mod tests {
             .turn(2, turns::Step::Upkeep)
             .players([P1.battlefield([LABORATORY_MANIAC]).empty_library(), P2]);
         game.play([p1.pass_priority(), p2.pass_priority(), p1.pass_priority()])?;
-        game.act(p1, actions::Action::Concede);
+        game.play([p1.concede()])?;
         assert!(game.has_won(p1));
         assert!(!game.has_won(p2));
         Ok(())

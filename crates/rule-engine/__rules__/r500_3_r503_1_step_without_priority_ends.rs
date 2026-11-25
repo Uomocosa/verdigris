@@ -59,7 +59,6 @@ pub fn r500_3_r503_1_step_without_priority_ends(
 
 #[cfg(test)]
 mod tests {
-    use crate::actions;
     use crate::testing::*;
     use crate::turns;
 
@@ -91,7 +90,7 @@ mod tests {
     fn a_player_who_left_does_not_begin_a_turn() -> TestResult {
         let (mut game, [p1, p2, p3]) = MockGame::new([P1, P2, P3]);
 
-        game.act(p2, actions::Action::Concede);
+        game.play([p2.concede()])?;
         game.play([p1.end_turn(), p3.end_turn()])?;
 
         assert_eq!(game.turn().active, p3.id);
