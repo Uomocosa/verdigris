@@ -1,6 +1,6 @@
 use std::collections::BTreeSet;
 
-use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, ResMut};
+use bevy::prelude::{Commands, Entity, MessageReader, ResMut};
 
 use crate::STACK;
 use crate::actions;
@@ -27,33 +27,19 @@ use crate::zones;
 /// simultaneously. This rule is often referred to as the “Active Player, Nonactive Player (APNAP)
 /// order” rule.
 pub fn r603_3b_apnap_trigger_order(
-    mut actions: MessageReader<actions::PlayerAction>,
-    mut rejected: MessageWriter<actions::Rejected>,
-    mut pending: ResMut<actions::PendingChoice>,
+    mut answers: MessageReader<actions::Answered>,
     mut queue: ResMut<stack::TriggerQueue>,
     mut commands: Commands,
     zones: zones::ZoneLookup,
 ) {
-    for action in actions.read() {
-        let actions::Action::OrderTriggers(answered) = &action.action else {
+    for answered in answers.read() {
+        let actions::Choice::OrderTriggers(choice) = &answered.choice else {
             continue;
         };
-        let Some(actions::Choice::OrderTriggers(choice)) = (*pending).as_ref().cloned() else {
-            rejected.write(actions::Rejected::InvalidTriggerOrder {
-                player: action.player,
-            });
+        let actions::Action::OrderTriggers(ordered) = &answered.answer else {
             continue;
         };
         let expected: BTreeSet<Entity> = choice.triggers.iter().copied().collect();
-        let received: BTreeSet<Entity> = answered.iter().copied().collect();
-        let is_chooser = action.player == choice.player;
-        let is_permutation = received == expected && answered.len() == choice.triggers.len();
-        if !(is_chooser && is_permutation) {
-            rejected.write(actions::Rejected::InvalidTriggerOrder {
-                player: action.player,
-            });
-            continue;
-        }
         let Some(stack) = zones.find(STACK, None) else {
             continue;
         };
@@ -65,7 +51,7 @@ pub fn r603_3b_apnap_trigger_order(
                 queue.push(trigger);
             }
         }
-        for source in answered {
+        for source in ordered {
             if let Some(position) = held.iter().position(|trigger| trigger.source == *source) {
                 let trigger = held.remove(position);
                 commands.spawn((
@@ -83,7 +69,6 @@ pub fn r603_3b_apnap_trigger_order(
         for trigger in held {
             queue.push(trigger);
         }
-        *pending = actions::PendingChoice(None);
     }
 }
 

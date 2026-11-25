@@ -66,10 +66,10 @@ pub fn add_state_based_systems(app: &mut App) {
             comprehensive_rules::r603_2_r603_6a_triggered_abilities::r603_2_r603_6a_triggered_abilities,
             comprehensive_rules::r603_6c_r700_4_leaves_the_battlefield::r603_6c_r700_4_leaves_the_battlefield,
             comprehensive_rules::r603_4_intervening_if::r603_4_intervening_if,
+            comprehensive_rules::r603_3b_apnap_trigger_order::r603_3b_apnap_trigger_order,
             comprehensive_rules::r603_3_triggers_on_stack::r603_3_triggers_on_stack,
             comprehensive_rules::r117_5_r704_3_state_based_actions::r117_5_r704_3_state_based_actions,
             comprehensive_rules::r800_4a_priority_of_a_player_who_left::r800_4a_priority_of_a_player_who_left,
-            comprehensive_rules::r603_3b_apnap_trigger_order::r603_3b_apnap_trigger_order,
         )
             .chain()
             .in_set(RuleSet::StateBased),

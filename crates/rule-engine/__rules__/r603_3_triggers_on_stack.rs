@@ -1,3 +1,4 @@
+use bevy::ecs::system::RunSystemOnce;
 use bevy::prelude::{Entity, World};
 
 use crate::actions;
@@ -65,12 +66,13 @@ pub fn r603_3_triggers_on_stack(world: &mut World) {
         let Some(first) = group.first() else {
             continue;
         };
-        *world.resource_mut::<actions::PendingChoice>() = actions::PendingChoice(Some(
-            actions::Choice::OrderTriggers(actions::OrderTriggersChoice {
+        world.write_message(actions::Ask(actions::Choice::OrderTriggers(
+            actions::OrderTriggersChoice {
                 player: first.controller,
                 triggers: group.iter().map(|trigger| trigger.source).collect(),
-            }),
-        ));
+            },
+        )));
+        let _ = world.run_system_once(actions::bevy_systems::show_asks::show_asks);
         let mut queue = world.resource_mut::<stack::TriggerQueue>();
         for trigger in group {
             queue.push(trigger);

@@ -40,6 +40,7 @@ impl Action {
             Self::ChooseMay(_) => Some(actions::Rejected::InvalidMay { player }),
             Self::ChooseDiscard(_) => Some(actions::Rejected::InvalidDiscard { player }),
             Self::ArrangeGraveyard(_) => Some(actions::Rejected::InvalidGraveyardOrder { player }),
+            Self::OrderTriggers(_) => Some(actions::Rejected::InvalidTriggerOrder { player }),
             _ => None,
         }
     }

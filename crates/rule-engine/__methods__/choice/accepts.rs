@@ -47,7 +47,15 @@ pub fn accepts(choice: &actions::Choice, answer: &actions::Action) -> bool {
             let received: BTreeSet<Entity> = answered.iter().copied().collect();
             received == expected && answered.len() == choice.cards.len()
         }
-        _ => false,
+        actions::Choice::OrderTriggers(choice) => {
+            let actions::Action::OrderTriggers(answered) = answer else {
+                return false;
+            };
+            let expected: BTreeSet<Entity> = choice.triggers.iter().copied().collect();
+            let received: BTreeSet<Entity> = answered.iter().copied().collect();
+            received == expected && answered.len() == choice.triggers.len()
+        }
+        actions::Choice::CombatDamage(_) => false,
     }
 }
 
