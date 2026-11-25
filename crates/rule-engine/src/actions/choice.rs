@@ -25,6 +25,9 @@ impl Choice {
 impl Choice {
     #[must_use]
     pub fn is_may_of(&self, event: rules::EventId) -> bool { matches!(self, Self::May(choice) if choice.event == event) }
+
+    #[must_use]
+    pub const fn is_found_by_a_state_based_check(&self) -> bool { matches!(self, Self::Legendary(_)) }
 }
 
 impl Choice {
@@ -38,6 +41,17 @@ impl Choice {
             Self::OrderTriggers(choice) => Some(choice.player),
             Self::ArrangeGraveyard(choice) => Some(choice.player),
             Self::Legendary(choice) => Some(choice.player),
+        }
+    }
+}
+
+impl Choice {
+    #[must_use]
+    pub const fn rejection(&self, player: players::PlayerId) -> Option<actions::Rejected> {
+        match self {
+            Self::May(_) => Some(actions::Rejected::InvalidMay { player }),
+            Self::Discard(_) => Some(actions::Rejected::InvalidDiscard { player }),
+            _ => None,
         }
     }
 }

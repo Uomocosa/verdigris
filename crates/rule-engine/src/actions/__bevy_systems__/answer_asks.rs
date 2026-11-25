@@ -15,16 +15,20 @@ pub fn answer_asks(
     queue.ingest(&mut asks, &players);
     pending.refresh(&queue, &players);
     for action in player_actions.read() {
-        let Some(rejection) = action.action.rejection(action.player) else {
+        if !action.action.answers_a_choice() {
             continue;
-        };
+        }
         let Some(choice) = (*pending).as_ref().cloned() else {
-            rejected.write(rejection);
+            if let Some(rejection) = action.action.rejection(action.player) {
+                rejected.write(rejection);
+            }
             continue;
         };
         let is_chooser = choice.player().is_none_or(|player| player == action.player);
         if !(is_chooser && choice.accepts(&action.action)) {
-            rejected.write(rejection);
+            if let Some(rejection) = choice.rejection(action.player) {
+                rejected.write(rejection);
+            }
             continue;
         }
         answered.write(actions::Answered {

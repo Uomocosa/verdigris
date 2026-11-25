@@ -1,3 +1,4 @@
+use atomic_delegate_macros::atomic_delegates;
 use bevy::prelude::Entity;
 
 use crate::actions;
@@ -26,6 +27,12 @@ pub enum Action {
     Concede,
 }
 
+#[atomic_delegates]
+impl Action {
+    #[must_use]
+    pub const fn answers_a_choice(&self) -> bool {}
+}
+
 impl Action {
     #[must_use]
     pub const fn rejection(&self, player: players::PlayerId) -> Option<actions::Rejected> {
@@ -39,6 +46,7 @@ impl Action {
 
 #[cfg(test)]
 mod tests {
+    use crate::BATTLEFIELD;
     use crate::HAND;
     use crate::actions;
     use crate::testing::*;
@@ -56,10 +64,19 @@ mod tests {
 
     #[test]
     fn only_shared_choices_carry_a_rejection() {
-        let (_, [p1, ..]) = MockGame::new([P1, P2]);
+        let (game, [p1, ..]) = MockGame::new([P1, P2]);
+        let legend = game.zone_entity(p1, BATTLEFIELD).unwrap();
         assert_eq!(
             actions::Action::ChooseDiscard(Vec::new()).rejection(p1.id),
             Some(actions::Rejected::InvalidDiscard { player: p1.id })
+        );
+        assert!(actions::Action::ChooseMay(Vec::new()).answers_a_choice());
+        assert!(actions::Action::ChooseDiscard(Vec::new()).answers_a_choice());
+        assert!(actions::Action::ChooseLegendary(legend).answers_a_choice());
+        assert!(!actions::Action::PassPriority.answers_a_choice());
+        assert_eq!(
+            actions::Action::ChooseLegendary(legend).rejection(p1.id),
+            None
         );
         assert_eq!(actions::Action::PassPriority.rejection(p1.id), None);
     }

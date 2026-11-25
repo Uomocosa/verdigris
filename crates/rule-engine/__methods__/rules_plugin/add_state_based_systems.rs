@@ -22,7 +22,7 @@ pub fn add_state_based_systems(app: &mut App) {
                     comprehensive_rules::r704_5f_zero_toughness::r704_5f_zero_toughness,
                     comprehensive_rules::r704_5g_lethal_damage::r704_5g_lethal_damage,
                     comprehensive_rules::r704_5h_deathtouch_damage::r704_5h_deathtouch_damage,
-                    comprehensive_rules::r704_5j_legend_rule::r704_5j_legend_rule,
+                    comprehensive_rules::r704_5j_legend_rule::r704_5j_legend_rule(),
                     Attempt::<events::Destroy>::resolved_by(
                         comprehensive_rules::r702_12b_indestructible::r702_12b_indestructible,
                     ),
@@ -92,7 +92,7 @@ mod tests {
         assert_eq!(app.get_schedule(Update).map(Schedule::systems_len), Some(7));
         assert_eq!(
             app.get_schedule(StateBasedActions).map(Schedule::systems_len),
-            Some(26)
+            Some(27)
         );
     }
 }

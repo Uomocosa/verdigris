@@ -10,7 +10,14 @@ pub struct AskQueue(pub Vec<actions::Ask>);
 impl AskQueue {
     pub(crate) fn ingest(&mut self, asks: &mut Messages<actions::Ask>, players: &players::Players) {
         let Self(queued) = self;
-        queued.extend(asks.drain());
+        for ask in asks.drain() {
+            let asked: &actions::Choice = &ask;
+            if asked.is_found_by_a_state_based_check() && queued.iter().any(|queued| queued == &ask)
+            {
+                continue;
+            }
+            queued.push(ask);
+        }
         queued.retain(|ask| ask.player().is_none_or(|player| players.is_still_in_the_game(player)));
     }
 }
