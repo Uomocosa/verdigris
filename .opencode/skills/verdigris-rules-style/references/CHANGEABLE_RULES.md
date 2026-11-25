@@ -138,6 +138,10 @@ asked, and the chosen event reaches the rule that owns it as its own `Resolve`.
 Several optional changes of one player may be grouped into one ask. `then` may name any event: a new
 template is one variant plus its `instantiate`, and the event's own rule performs it.
 
+**"You don't ..." / "players don't ..."** (Upwelling: "Players don't lose unspent mana as steps and
+phases end.") is `Change::Skip` on the event: `statics::all(PLAYER).dont_lose_unspent_mana()`. If the rule
+performs the outcome itself, make it an event first.
+
 **Text that points at cards** ("some cards / effects allow a player to ...") is a **hook**, not an
 event: the rule announces a `HookEvent` for each object into `HookQueue<E>`, and the card writes a
 change to that hook, for its own object — e.g.

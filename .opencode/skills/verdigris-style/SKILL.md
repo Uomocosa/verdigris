@@ -150,7 +150,8 @@ removes an ability (e.g. Jump: "Target creature gains flying until end of turn")
 
 **How to apply:** when a rule needs a characteristic (power/toughness, types, keywords,
 whether something is on the battlefield), read the derived component in the query filter,
-never the source component in the body.
+never the source component in the body. Type and keyword markers exist only for objects on the
+battlefield: a rule about a spell on the stack or a card elsewhere still reads `CardDefinition`.
 
 ```rust
 // Good

@@ -137,7 +137,7 @@ untaps.write(rules::Would(rules::Untap {
 }));
 ```
 
-Good — `crates/rule-engine/__rules__/r502_3_untap.rs:26`:
+Good — `crates/rule-engine/__rules__/r502_3_untap.rs:29`:
 
 ```rust
 use crate::Attempt;
@@ -152,7 +152,7 @@ How the linter will check it: flag `rules::Would` / `rules::Proceeds` (and any p
 
 ## VRDG012 no_choice_in_rules · WILL_BE_ENFORCED
 
-No `PendingChoice` / `Rejected` in a rule body (rules-style §12). The rules that still have them are exempt until refactored: `r117_3a_r117_3c_r117_3d_priority.rs`, `r117_5_r704_3_state_based_actions.rs`, `r119_4_r119_8_pay_life.rs`, `r305_1_r305_2_r305_3_play_land.rs`, `r305_6_basic_land_mana_ability.rs`, `r404_3_graveyard_order.rs`, `r506_2a_r507_1_r508_1b_defending_player.rs`, `r508_1a_r508_1k_declare_attackers.rs`, `r508_1m_r508_2a_r508_3a_attack_triggers.rs`, `r509_1a_r509_1g_r509_1h_r702_9b_r702_17b_declare_blockers.rs`, `r509_1i_r509_2a_r509_3a_r509_3c_blocker_triggers.rs`, `r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_r702_2c_r702_19b_r702_19d_combat_damage.rs`, `r601_2a_cast.rs`, `r601_2c_targets.rs`, `r601_2g_mana_abilities.rs`, `r601_2h_pay.rs`, `r603_3_triggers_on_stack.rs`, `r603_3b_apnap_trigger_order.rs`, `r605_3a_mana_abilities.rs`, `r701_9a_r701_9b_discard.rs`, `r704_5j_legend_rule.rs`.
+No `PendingChoice` / `Rejected` in a rule body (rules-style §12). The rules that still have them are exempt until refactored: `r117_3a_r117_3c_r117_3d_priority.rs`, `r117_5_r704_3_state_based_actions.rs`, `r119_4_r119_8_pay_life.rs`, `r305_1_r305_2_r305_3_play_land.rs`, `r305_6_basic_land_mana_ability.rs`, `r404_3_graveyard_order.rs`, `r507_1_choose_defending_player.rs`, `r508_1a_r508_1k_declare_attackers.rs`, `r508_1m_r508_2a_r508_3a_attack_triggers.rs`, `r509_1a_r509_1g_r509_1h_r702_9b_r702_17b_declare_blockers.rs`, `r509_1i_r509_2a_r509_3a_r509_3c_blocker_triggers.rs`, `r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_r702_2c_r702_19b_r702_19d_combat_damage.rs`, `r601_2a_cast.rs`, `r601_2c_targets.rs`, `r601_2g_mana_abilities.rs`, `r601_2h_pay.rs`, `r603_3_triggers_on_stack.rs`, `r603_3b_apnap_trigger_order.rs`, `r605_3a_mana_abilities.rs`, `r701_9a_r701_9b_discard.rs`, `r704_5j_legend_rule.rs`.
 
 Bad — `crates/rule-engine/__rules__/r701_9a_r701_9b_discard.rs:19`:
 
@@ -161,7 +161,7 @@ mut rejected: MessageWriter<actions::Rejected>,
 mut pending: ResMut<actions::PendingChoice>,
 ```
 
-Good — `crates/rule-engine/__rules__/r502_3_untap.rs:14-32` (the rule announces; the card or shared ask carries the choice):
+Good — `crates/rule-engine/__rules__/r502_3_untap.rs:15-35` (the rule announces; the card or shared ask carries the choice):
 
 ```rust
 pub fn r502_3_untap() -> ScheduleConfigs<ScheduleSystem> {
@@ -170,12 +170,14 @@ pub fn r502_3_untap() -> ScheduleConfigs<ScheduleSystem> {
 
 fn untap(
     mut untaps: MessageWriter<Attempt<events::Untap>>,
-    turn: Res<turns::Turn>,
+    game: Game,
     tapped: Query<(Entity, &cards::Owner), With<cards::Tapped>>,
 ) {
-    let turn = turn.into_inner();
-    for (entity, owner) in tapped.iter() {
-        if **owner == turn.active {
+    let Some(active_player) = game.active_player() else {
+        return;
+    };
+    for (entity, owner) in &tapped {
+        if **owner == active_player.id {
             untaps.write(Attempt(events::Untap {
                 permanent: entity,
                 controller: **owner,

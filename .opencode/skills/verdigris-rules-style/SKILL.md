@@ -127,13 +127,19 @@ Only the system that performs an event writes its result; every other rule sends
 | `Won` / `Lost` | `r104_2_win_the_game` / `r104_3_lose_the_game` |
 | `GameIsADraw` / `LeftTheGame` | `r104_4a_draw` / `r104_5_leaves_the_game` |
 | gaining, losing or paying life | `r119_3_life_loss`, through `GainLife` / `LoseLife` |
-| `Turn`, `Priority` | `GameMut` (§8) |
+| losing unspent mana | `r106_4_lose_unspent_mana`, through `LoseUnspentMana` |
+| `Turn`, `Priority`, `UpcomingSteps` | `GameMut` (§8) |
 
 **Why:** a trigger or a replacement hooks in at one place, and no path forgets a side effect
 (such as `StateBasedActionsPerformed`).
 
 Some older rules do not follow this yet: destroy, counter, discard, mill and finished spells still
 insert `InZone(graveyard)` themselves instead of sending `PutIntoGraveyard`. Don't copy them.
+
+Before replacing a direct write with an event, check WHEN the event is performed:
+`PutIntoGraveyard` is resolved only in the state-based pass, after `RuleSet::Resolution`. A rule that
+others in the same set rely on (608.2b must take the spell off the stack before 608.2c reads it)
+can't just send the event; plan the ordering too.
 
 ## 7. Players in turn order
 
@@ -215,7 +221,12 @@ compiles, it named a case.
 
 One file per CR rule. The `pub fn` named after the file is the rule's system or, if the sentence needs
 several, it returns them `.chain()`ed; those systems are private in the same file. A different CR rule
-is a different file: 502.3 announces the untap, 701.26b says what untapping does. An old combined `rA_rB_..` file is split when it is refactored.
+is a different file: 502.3 announces the untap, 701.26b says what untapping does. An old combined `rA_rB_..` file is split when it is refactored; an id whose sentence only conditions or repeats
+the other gets no file, its text moves under `# See also` and the file is renamed. A quote nothing
+implements is dropped. Moving an existing test to the file that now owns its behaviour is not a new test.
+
+A sentence that says WHEN and a sentence that says WHAT HAPPENS are two rules, even when an old file holds
+both: 500.4 announces that pools empty, 106.4 performs the loss.
 
 ## 12. Who gives the choice
 
@@ -360,6 +371,24 @@ pub fn r103_6_opening_hand_actions() -> ScheduleConfigs<ScheduleSystem> {
 }
 ```
 
+A run condition only changes the shape. FIRST ask what the body does: if a card could change it
+(§10: "you don't lose ...", "can't", "instead"), it is an event, and a moment that performs the outcome
+itself is still wrong.
+
+```rust
+// Bad: tidy, but no card can keep its mana
+pub fn r106_4_mana_empties() -> ScheduleConfigs<ScheduleSystem> {
+    empty_mana_pools.run_if(on_message::<turns::StepStarted>) // sets every pool to EMPTY
+}
+
+// Good: r500_4_mana_pools_empty announces; r106_4_lose_unspent_mana performs
+for player in players.still_in_the_game() {
+    losses.write(Attempt(events::LoseUnspentMana(player.id)));
+}
+```
+
+A moment system may take read-only `SystemParam`s. It runs once per frame, however many messages came.
+
 A message compared with ONE fixed value is a moment too: `.run_if(turns::Step::Draw.begins())`
 (Good: `r504_1_draw_step`; Bad: `if **step != turns::Step::X { continue; }`).
 Only a rule that uses the varying data reads the message. One flat loop with one write
@@ -367,7 +396,16 @@ Only a rule that uses the varying data reads the message. One flat loop with one
 
 **Why:** the order can be read and checked in one place, next to the CR words that give it.
 
-## 17. A CR rule that skips a step changes NextStep
+## 17. The steps of a turn are a list; a CR rule that skips a step changes NextStep
+
+`turns::UpcomingSteps` holds the steps still to come this turn. `r500_2` proposes its first one; only
+`r500_3` and the skip rules still name the step they go to. Adding a step inserts it into the list (500.9); `begin_step` drops the steps
+it passes over. `Game` can't hold the list (clippy's 256-byte limit), so `r500_2` reads it as a `Res`.
+
+```rust
+// 510.4 "the phase gets a second combat damage step"
+game.add_step_after_this_one(turns::Step::SecondCombatDamage);
+```
 
 `AllPlayersPassed -> r500_2 writes NextStep -> skip rules (r103_8a, r508_8) change it ->
 r500_1 begins it -> StepStarted`. Never edit `StepStarted` (614.10: a started step can no
@@ -417,6 +455,8 @@ and r500_1 in `add_step_end_systems`. Not yet through it: `r500_3` (untap to upk
 | a rule that polls state every frame to announce something | read the message of that moment, §10 |
 | `if **step != X { continue }` | §16 |
 | a write to `StepStarted` outside `r500_1`/`r500_3` | §17 |
+| a `match` from a step to the step after it, or a resource that says an extra step is due | §17 |
+| a moment whose body writes an outcome a card could change | §16, §10 |
 
 ## Adding rules here
 
