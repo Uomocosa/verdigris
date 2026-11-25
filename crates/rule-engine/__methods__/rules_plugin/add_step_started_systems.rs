@@ -10,7 +10,7 @@ pub fn add_step_started_systems(app: &mut App) {
         Update,
         (
             comprehensive_rules::r106_4_mana_empties::r106_4_mana_empties,
-            comprehensive_rules::r103_8a_r504_1_draw_step::r103_8a_r504_1_draw_step,
+            comprehensive_rules::r504_1_draw_step::r504_1_draw_step(),
         )
             .chain()
             .in_set(RuleSet::StepStarted),

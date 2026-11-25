@@ -1,7 +1,7 @@
 pub mod r103_6_opening_hand_actions;
 pub mod r103_6a_begin_the_game_on_the_battlefield;
 pub mod r103_8_first_turn;
-pub mod r103_8a_r504_1_draw_step;
+pub mod r103_8a_skip_first_draw_step;
 pub mod r104_1_game_ends;
 pub mod r104_2_win_the_game;
 pub mod r104_2a_wins_when_opponents_left;
@@ -30,6 +30,7 @@ pub mod r500_1_steps_proceed_in_order;
 pub mod r500_2_step_ends;
 pub mod r500_3_r503_1_step_without_priority_ends;
 pub mod r502_3_untap;
+pub mod r504_1_draw_step;
 pub mod r506_1_r510_4_r702_4b_r702_7b_combat_damage_steps;
 pub mod r506_2a_r507_1_r508_1b_defending_player;
 pub mod r506_4_r511_3_remove_from_combat;

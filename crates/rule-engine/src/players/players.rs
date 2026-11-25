@@ -36,6 +36,9 @@ impl Players<'_, '_> {
     pub fn has_anyone_won(&self) -> bool { !self.winners.is_empty() }
 
     #[must_use]
+    pub fn is_two_player_game(&self) -> bool { self.in_turn_order().len() == 2 }
+
+    #[must_use]
     pub fn in_turn_order(&self) -> Vec<players::PlayerId> { self.turn_order.iter().flat_map(|order| order.iter().copied()).collect() }
 }
 
@@ -68,6 +71,7 @@ mod tests {
             .run_system_once(move |players: Players| {
                 assert!(!players.is_still_in_the_game(p2.id));
                 assert!(!players.has_anyone_won());
+                assert!(!players.is_two_player_game());
             })
             .unwrap();
         Ok(())

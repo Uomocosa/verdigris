@@ -21,6 +21,9 @@ impl Game<'_, '_> {
     pub fn is_over(&self) -> bool { self.players.has_anyone_won() || self.is_a_draw() }
 
     #[must_use]
+    pub fn is_first_turn(&self) -> bool { self.turn.single().is_ok_and(|turn| turn.number == 1) }
+
+    #[must_use]
     pub fn step(&self) -> Option<turns::Step> { self.turn.single().ok().map(|turn| turn.step) }
 }
 
@@ -59,6 +62,7 @@ mod tests {
             .run_system_once(move |answers: Game| {
                 assert_eq!(answers.active_player().map(|player| player.id), Some(p1.id));
                 assert_eq!(answers.step(), Some(turns::Step::PrecombatMain));
+                assert!(answers.is_first_turn());
                 assert_eq!(
                     answers.priority_holder().map(|player| player.id),
                     Some(p1.id)
