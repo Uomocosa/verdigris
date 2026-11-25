@@ -57,10 +57,7 @@ pub fn answer_asks(
         *pending = actions::PendingChoice(None);
     }
     pending.refresh(&queue, &players);
-    if !pending.blocks_priority()
-        && state.priority.holder.is_none()
-        && let Some(suspended) = state.suspended_priority_holder.take()
-    {
-        state.priority.holder = Some(suspended);
+    if !pending.blocks_priority() {
+        state.resume_priority();
     }
 }

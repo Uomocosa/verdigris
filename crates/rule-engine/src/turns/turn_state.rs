@@ -10,8 +10,8 @@ use crate::turns;
 pub struct TurnState {
     pub turn: turns::Turn,
     pub priority: turns::Priority,
-    pub(crate) suspended_priority_holder: Option<players::PlayerId>,
     pub(crate) upcoming_steps: VecDeque<turns::Step>,
+    suspended_priority_holder: Option<players::PlayerId>,
 }
 
 impl From<turns::Turn> for TurnState {
@@ -60,6 +60,20 @@ impl TurnState {
     }
 }
 
+impl TurnState {
+    pub(crate) const fn suspend_priority(&mut self) {
+        if let Some(holder) = self.priority.holder.take() {
+            self.suspended_priority_holder = Some(holder);
+        }
+    }
+
+    pub(crate) const fn resume_priority(&mut self) {
+        if self.priority.holder.is_none() {
+            self.priority.holder = self.suspended_priority_holder.take();
+        }
+    }
+}
+
 const PHASES_IN_ORDER: [turns::Phase; 5] = [
     turns::Phase::Beginning,
     turns::Phase::PrecombatMain,
@@ -98,5 +112,25 @@ mod tests {
         let unchanged = state.upcoming_steps.clone();
         state.begin_step(turns::Step::SecondCombatDamage);
         assert_eq!(state.upcoming_steps, unchanged);
+    }
+
+    #[test]
+    fn suspended_priority_returns_to_the_latest_holder() {
+        let mut state = TurnState::from(turns::Turn {
+            number: 1,
+            active: players::PlayerId(Entity::PLACEHOLDER),
+            step: turns::Step::Untap,
+        });
+        let first = players::PlayerId(Entity::PLACEHOLDER);
+        let second = players::PlayerId(Entity::from_raw_u32(1).unwrap());
+        state.priority.holder = Some(first);
+        state.suspend_priority();
+        assert_eq!(state.priority.holder, None);
+        state.suspend_priority();
+        state.priority.holder = Some(second);
+        state.suspend_priority();
+        state.resume_priority();
+        assert_eq!(state.priority.holder, Some(second));
+        assert_eq!(state.suspended_priority_holder, None);
     }
 }

@@ -13,7 +13,7 @@ pub fn show_asks(
 ) {
     queue.ingest(&mut asks, &players);
     pending.refresh(&queue, &players);
-    if pending.blocks_priority() && state.suspended_priority_holder.is_none() {
-        state.suspended_priority_holder = state.priority.holder.take();
+    if pending.blocks_priority() {
+        state.suspend_priority();
     }
 }

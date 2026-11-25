@@ -71,9 +71,7 @@ impl Choice {
 #[rustfmt::skip]
 impl Choice {
     #[must_use]
-    pub(crate) fn blocks_priority(&self) -> bool {
-        !matches!(self, Self::Target(_)) && !self.is_may_of(rules::EventId("103.6"))
-    }
+    pub(crate) const fn blocks_priority(&self) -> bool { !matches!(self, Self::Target(_)) }
 }
 
 #[cfg(test)]

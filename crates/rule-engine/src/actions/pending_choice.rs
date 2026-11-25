@@ -17,13 +17,11 @@ impl PendingChoice {
             *pending = actions::Choice::first_queued(queue);
         }
     }
-}
 
-#[rustfmt::skip]
-impl PendingChoice {
     #[must_use]
     pub(crate) fn blocks_priority(&self) -> bool {
-        self.as_ref().is_some_and(actions::Choice::blocks_priority)
+        let Self(pending) = self;
+        pending.as_ref().is_some_and(actions::Choice::blocks_priority)
     }
 }
 
