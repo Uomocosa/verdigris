@@ -1,6 +1,6 @@
 use atomic_delegate_macros::atomic_delegates;
 use bevy::ecs::system::SystemParam;
-use bevy::prelude::{Query, With};
+use bevy::prelude::{Entity, Query, With};
 
 use crate::cards;
 use crate::players;
@@ -38,6 +38,9 @@ impl Players<'_, '_> {
 
     #[must_use]
     pub fn in_turn_order(&self) -> Vec<players::PlayerId> { self.turn_order.iter().flat_map(|order| order.iter().copied()).collect() }
+
+    #[must_use]
+    pub fn as_player(&self, entity: Entity) -> Option<players::PlayerId> { self.statuses.contains(entity).then_some(players::PlayerId(entity)) }
 }
 
 #[atomic_delegates]
@@ -58,6 +61,7 @@ impl<'w, 's> Players<'w, 's> {
 #[cfg(test)]
 mod tests {
     use bevy::ecs::system::RunSystemOnce;
+    use bevy::prelude::Entity;
 
     use crate::testing::*;
 
@@ -73,6 +77,8 @@ mod tests {
                 assert!(!players.is_still_in_the_game(p2.id));
                 assert!(!players.has_anyone_won());
                 assert!(!players.is_two_player_game());
+                assert_eq!(players.as_player(*p1), Some(p1.id));
+                assert_eq!(players.as_player(Entity::PLACEHOLDER), None);
             })
             .unwrap();
         Ok(())
