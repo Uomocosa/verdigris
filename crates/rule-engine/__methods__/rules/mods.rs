@@ -88,7 +88,7 @@ mod tests {
                 assert!(
                     mods(&answers, *spider).contains(&effects::Modification::Rule(
                         rules::RuleChange {
-                            target: rules::Target::Restriction(keywords::Flying::FLYING_BLOCKERS),
+                            target: rules::Target::Restriction(keywords::flying::BLOCKERS),
                             change: rules::Change::AsThough {
                                 holder: events::DeclareBlocker::BLOCKER.into(),
                             },

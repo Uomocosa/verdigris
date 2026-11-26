@@ -13,7 +13,7 @@ pub const TEST_EAGER_WALL: testing::Card = testing::Card {
         card! {
             cards::creature("Test Eager Wall", cost![1, W], pt!(0, 4));
             keywords::defender(),
-            statics::this().as_though(keywords::Defender::CANT_ATTACK, events::DeclareAttacker::ATTACKER),
+            statics::this().as_though(keywords::defender::CANT_ATTACK, events::DeclareAttacker::ATTACKER),
         }
     },
 };

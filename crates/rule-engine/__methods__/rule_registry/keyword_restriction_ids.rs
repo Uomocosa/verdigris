@@ -6,19 +6,19 @@ use crate::rules;
 
 pub fn keyword_restriction_ids() -> HashSet<rules::RestrictionId> {
     [
-        keywords::Deathtouch::abilities(),
-        keywords::Defender::abilities(),
-        keywords::DoubleStrike::abilities(),
-        keywords::FirstStrike::abilities(),
-        keywords::Flying::abilities(),
-        keywords::Haste::abilities(),
-        keywords::Hexproof::abilities(),
-        keywords::Indestructible::abilities(),
-        keywords::Infect::abilities(),
-        keywords::Lifelink::abilities(),
-        keywords::Reach::abilities(),
-        keywords::Trample::abilities(),
-        keywords::Vigilance::abilities(),
+        keywords::deathtouch().abilities(),
+        keywords::defender().abilities(),
+        keywords::double_strike().abilities(),
+        keywords::first_strike().abilities(),
+        keywords::flying().abilities(),
+        keywords::haste().abilities(),
+        keywords::hexproof().abilities(),
+        keywords::indestructible().abilities(),
+        keywords::infect().abilities(),
+        keywords::lifelink().abilities(),
+        keywords::reach().abilities(),
+        keywords::trample().abilities(),
+        keywords::vigilance().abilities(),
     ]
     .into_iter()
     .flatten()
@@ -42,10 +42,10 @@ mod tests {
     #[test]
     fn test_usage() {
         let ids = keyword_restriction_ids();
-        assert!(ids.contains(&keywords::Flying::FLYING_BLOCKERS));
-        assert!(ids.contains(&keywords::Defender::CANT_ATTACK));
-        assert!(ids.contains(&keywords::Hexproof::CANT_BE_TARGETED));
-        assert!(ids.contains(&keywords::Indestructible::CANT_BE_DESTROYED));
+        assert!(ids.contains(&keywords::flying::BLOCKERS));
+        assert!(ids.contains(&keywords::defender::CANT_ATTACK));
+        assert!(ids.contains(&keywords::hexproof::CANT_BE_TARGETED));
+        assert!(ids.contains(&keywords::indestructible::CANT_BE_DESTROYED));
         assert!(
             ids.contains(&rules::RestrictionId("702.3b/defender")),
             "keyword ids carry the moved event restriction ids: {ids:?}"

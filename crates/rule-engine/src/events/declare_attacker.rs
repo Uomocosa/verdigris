@@ -84,19 +84,19 @@ mod tests {
     fn restriction_rule_numbers_occur_in_comprehensive_rules() {
         const RULES_TEXT: &str = include_str!("../../../../docs/MagicCompRules-20250919.txt");
         let keyword_restrictions = [
-            keywords::Deathtouch::abilities(),
-            keywords::Defender::abilities(),
-            keywords::DoubleStrike::abilities(),
-            keywords::FirstStrike::abilities(),
-            keywords::Flying::abilities(),
-            keywords::Haste::abilities(),
-            keywords::Hexproof::abilities(),
-            keywords::Indestructible::abilities(),
-            keywords::Infect::abilities(),
-            keywords::Lifelink::abilities(),
-            keywords::Reach::abilities(),
-            keywords::Trample::abilities(),
-            keywords::Vigilance::abilities(),
+            keywords::deathtouch().abilities(),
+            keywords::defender().abilities(),
+            keywords::double_strike().abilities(),
+            keywords::first_strike().abilities(),
+            keywords::flying().abilities(),
+            keywords::haste().abilities(),
+            keywords::hexproof().abilities(),
+            keywords::indestructible().abilities(),
+            keywords::infect().abilities(),
+            keywords::lifelink().abilities(),
+            keywords::reach().abilities(),
+            keywords::trample().abilities(),
+            keywords::vigilance().abilities(),
         ]
         .into_iter()
         .flatten()

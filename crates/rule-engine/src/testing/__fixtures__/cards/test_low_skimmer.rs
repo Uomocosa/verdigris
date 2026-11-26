@@ -13,7 +13,7 @@ pub const TEST_LOW_SKIMMER: testing::Card = testing::Card {
         card! {
             cards::creature("Test Low Skimmer", cost![1, U], pt!(1, 1));
             keywords::flying(),
-            statics::this().as_though(keywords::Flying::FLYING_BLOCKERS, events::DeclareBlocker::ATTACKER),
+            statics::this().as_though(keywords::flying::BLOCKERS, events::DeclareBlocker::ATTACKER),
         }
     },
 };
