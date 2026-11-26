@@ -194,6 +194,7 @@ mod tests {
                 (testing::GRIZZLY_BEARS.definition)(),
                 zones::InZone(battlefield),
                 cards::Owner(players[0]),
+                cards::Controller(players[0]),
                 damage::Damage(0),
             ))
             .id();

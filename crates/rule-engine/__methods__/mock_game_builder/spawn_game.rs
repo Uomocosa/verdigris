@@ -65,6 +65,7 @@ pub fn spawn_game(
                 definition,
                 zones::InZone(battlefield),
                 cards::Owner(*player),
+                cards::Controller(*player),
                 damage::Damage(0),
             ));
         }

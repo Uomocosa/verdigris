@@ -21,11 +21,16 @@ pub fn r110_1_enter_battlefield(
             continue;
         };
         if event.summoning_sick {
-            commands
-                .entity(event.permanent)
-                .insert((zones::InZone(battlefield), cards::SummoningSick));
+            commands.entity(event.permanent).insert((
+                zones::InZone(battlefield),
+                cards::Controller(event.controller),
+                cards::SummoningSick,
+            ));
         } else {
-            commands.entity(event.permanent).insert(zones::InZone(battlefield));
+            commands.entity(event.permanent).insert((
+                zones::InZone(battlefield),
+                cards::Controller(event.controller),
+            ));
         }
         entered.write(Did(**event));
     }

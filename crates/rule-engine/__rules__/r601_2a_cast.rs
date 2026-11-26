@@ -2,6 +2,7 @@ use crate::STACK;
 use bevy::prelude::{Commands, MessageReader, MessageWriter};
 
 use crate::actions;
+use crate::cards;
 use crate::events;
 use crate::rules;
 use crate::zones;
@@ -53,7 +54,7 @@ pub fn r601_2a_cast(
             rejected.write(actions::Rejected::CannotCast { spell });
             continue;
         };
-        commands.entity(spell).insert(zones::InZone(stack));
+        commands.entity(spell).insert((zones::InZone(stack), cards::Controller(action.player)));
     }
 }
 

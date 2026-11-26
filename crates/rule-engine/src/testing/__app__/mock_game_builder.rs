@@ -73,6 +73,7 @@ impl MockGameBuilder {
                 definition,
                 zones::InZone(battlefield),
                 cards::Owner(player),
+                cards::Controller(player),
                 damage::Damage(0),
                 cards::Tapped,
             ));

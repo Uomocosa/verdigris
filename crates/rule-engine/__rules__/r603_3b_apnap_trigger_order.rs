@@ -57,6 +57,7 @@ pub fn r603_3b_apnap_trigger_order(
                 commands.spawn((
                     zones::InZone(stack),
                     cards::Owner(trigger.controller),
+                    cards::Controller(trigger.controller),
                     stack::TriggeredAbilityOnStack {
                         source: trigger.source,
                         controller: trigger.controller,

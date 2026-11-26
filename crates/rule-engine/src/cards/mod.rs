@@ -33,6 +33,9 @@ pub use characteristics::Characteristics;
 mod cost;
 pub use cost::Cost;
 
+mod controller;
+pub use controller::Controller;
+
 mod creature;
 pub use creature::Creature;
 

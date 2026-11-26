@@ -32,6 +32,7 @@ pub fn r701_7a_create_tokens(
                     request.token.definition(),
                     zones::InZone(staging),
                     cards::Owner(request.controller),
+                    cards::Controller(request.controller),
                     damage::Damage(0),
                     cards::Token,
                 ))
