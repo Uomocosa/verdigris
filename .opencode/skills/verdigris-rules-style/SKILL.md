@@ -49,7 +49,8 @@ rule body does the writing (the one exception is `GameMut`, §8).
 
 A question about one player is a method on the player handle `players::PlayerView`. Rules get a
 handle from a named question (`players.still_in_the_game()`, `game.active_player()`,
-`game.priority_holder()`), never from an id: `Players::view` is not for rules.
+`game.priority_holder()`), never from an id: `Players::view` is not for rules. For the players an event happens to, ask
+`players.affected_by(event)` (still in the game, in turn order; `Event::affected` says who, `r701_9b`).
 
 ```rust
 // Bad — who is this, and why is it passed?
@@ -109,7 +110,7 @@ CR rule behind it stays (800.4a: `if holder.is_still_in_the_game() { return; }`)
 A field or parameter that is always a player is a `PlayerId`, never an `Entity`. A value that can be
 a player or a permanent (a damage recipient, a target, `Context::subject`) stays an `Entity`. Never
 wrap an `Entity` in `PlayerId(..)` just to make it compile. To ask whether such an `Entity` is a player, use
-`players.as_player(entity)` (`r120_3a_damage_to_a_player`).
+`players.as_player(entity)`; with an event, `players.affected_by(event)`.
 
 ## 11. One CR rule, one file; a general sentence names no case
 
