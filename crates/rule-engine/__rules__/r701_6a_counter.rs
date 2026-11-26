@@ -4,7 +4,6 @@ use bevy::prelude::{MessageReader, MessageWriter, Query};
 
 use crate::Attempt;
 use crate::Resolve;
-use crate::cards;
 use crate::zones;
 
 /// 701.6a To counter a spell or ability means to cancel it, removing it from the stack. It doesn’t
@@ -12,21 +11,18 @@ use crate::zones;
 pub fn r701_6a_counter(
     mut countered: MessageReader<Resolve<events::Counter>>,
     mut moves_to_graveyard: MessageWriter<Attempt<events::PutIntoGraveyard>>,
-    spells: Query<(&cards::Owner, &zones::InZone)>,
+    spells: Query<&zones::InZone>,
     zones: zones::ZoneLookup,
 ) {
     for event in countered.read() {
         let spell = event.spell;
-        let Ok((owner, in_zone)) = spells.get(spell) else {
+        let Ok(in_zone) = spells.get(spell) else {
             continue;
         };
         if !zones.contains(STACK, **in_zone) {
             continue;
         }
-        moves_to_graveyard.write(Attempt(events::PutIntoGraveyard {
-            object: spell,
-            owner: **owner,
-        }));
+        moves_to_graveyard.write(Attempt(events::PutIntoGraveyard { object: spell }));
     }
 }
 

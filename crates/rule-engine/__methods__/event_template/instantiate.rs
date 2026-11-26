@@ -91,7 +91,6 @@ pub fn instantiate<E: Event>(
         }
         rules::EventTemplate::Exile { what } => rules::AnyEvent::Exile(events::Exile {
             object: object(what),
-            owner: fallback,
         }),
     }
 }
@@ -138,10 +137,7 @@ mod tests {
                         &happened,
                         &answers,
                     ),
-                    rules::AnyEvent::Exile(events::Exile {
-                        object: player,
-                        owner: players::PlayerId(player),
-                    })
+                    rules::AnyEvent::Exile(events::Exile { object: player })
                 );
             })
             .unwrap();

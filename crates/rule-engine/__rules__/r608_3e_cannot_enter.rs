@@ -13,17 +13,12 @@ use crate::zones;
 pub fn r608_3e_cannot_enter(
     mut resolutions: MessageReader<stack::Resolution>,
     mut graveyards: MessageWriter<Attempt<events::PutIntoGraveyard>>,
-    cards: Query<(
-        &cards::CardDefinition,
-        &cards::Controller,
-        &cards::Owner,
-        &zones::InZone,
-    )>,
+    cards: Query<(&cards::CardDefinition, &cards::Controller, &zones::InZone)>,
     answers: rules::Rules,
 ) {
     for resolution in resolutions.read() {
         let spell = **resolution;
-        let Ok((definition, controller, owner, in_zone)) = cards.get(spell) else {
+        let Ok((definition, controller, in_zone)) = cards.get(spell) else {
             continue;
         };
         if !answers.zones.contains(STACK, **in_zone) {
@@ -43,10 +38,7 @@ pub fn r608_3e_cannot_enter(
             controller: **controller,
             summoning_sick: true,
         }) {
-            graveyards.write(Attempt(events::PutIntoGraveyard {
-                object: spell,
-                owner: **owner,
-            }));
+            graveyards.write(Attempt(events::PutIntoGraveyard { object: spell }));
         }
     }
 }

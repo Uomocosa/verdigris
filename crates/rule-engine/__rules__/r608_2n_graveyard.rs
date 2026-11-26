@@ -15,7 +15,7 @@ pub fn r608_2n_graveyard(
     mut graveyards: MessageWriter<Attempt<events::PutIntoGraveyard>>,
     mut commands: Commands,
     abilities: Query<&zones::InZone, With<stack::TriggeredAbilityOnStack>>,
-    spells: Query<(&cards::CardDefinition, &cards::Owner, &zones::InZone)>,
+    spells: Query<(&cards::CardDefinition, &zones::InZone)>,
     zones: zones::ZoneLookup,
 ) {
     for resolution in resolutions.read() {
@@ -26,7 +26,7 @@ pub fn r608_2n_graveyard(
             }
             continue;
         }
-        let Ok((definition, owner, in_zone)) = spells.get(spell) else {
+        let Ok((definition, in_zone)) = spells.get(spell) else {
             continue;
         };
         if !zones.contains(STACK, **in_zone) {
@@ -41,10 +41,7 @@ pub fn r608_2n_graveyard(
         if !is_instant_or_sorcery {
             continue;
         }
-        graveyards.write(Attempt(events::PutIntoGraveyard {
-            object: spell,
-            owner: **owner,
-        }));
+        graveyards.write(Attempt(events::PutIntoGraveyard { object: spell }));
     }
 }
 

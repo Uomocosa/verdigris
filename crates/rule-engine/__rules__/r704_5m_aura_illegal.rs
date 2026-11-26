@@ -10,21 +10,18 @@ use crate::zones;
 /// player, that Aura is put into its owner’s graveyard.
 pub fn r704_5m_aura_illegal(
     mut burials: MessageWriter<Attempt<events::PutIntoGraveyard>>,
-    auras: Query<(Entity, &cards::Owner, &cards::Enchanting), With<cards::OnBattlefield>>,
+    auras: Query<(Entity, &cards::Enchanting), With<cards::OnBattlefield>>,
     enchanted_zones: Query<&zones::InZone>,
     zones: zones::ZoneLookup,
 ) {
-    for (aura, owner, enchanted) in auras.iter() {
+    for (aura, enchanted) in auras.iter() {
         let Ok(enchanted_zone) = enchanted_zones.get(**enchanted) else {
             continue;
         };
         if zones.contains(BATTLEFIELD, **enchanted_zone) {
             continue;
         }
-        burials.write(Attempt(events::PutIntoGraveyard {
-            object: aura,
-            owner: **owner,
-        }));
+        burials.write(Attempt(events::PutIntoGraveyard { object: aura }));
     }
 }
 

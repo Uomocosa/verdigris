@@ -210,12 +210,8 @@ fn request_exile(
 ) {
     let source =
         chosen_target.or_else(|| lookups.abilities.get(spell).ok().map(|ability| ability.source));
-    let owner = source.and_then(|target| lookups.owners.get(target).ok());
-    if let Some((target, owner)) = source.zip(owner) {
-        exiles.write(Attempt(events::Exile {
-            object: target,
-            owner: **owner,
-        }));
+    if let Some(target) = source {
+        exiles.write(Attempt(events::Exile { object: target }));
     }
 }
 

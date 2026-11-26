@@ -33,10 +33,7 @@ pub fn r701_17a_mill(
             })
             .unwrap_or_default();
         for card in milled_from_top {
-            moves_to_graveyard.write(Attempt(events::PutIntoGraveyard {
-                object: card,
-                owner: mill.player,
-            }));
+            moves_to_graveyard.write(Attempt(events::PutIntoGraveyard { object: card }));
         }
     }
 }

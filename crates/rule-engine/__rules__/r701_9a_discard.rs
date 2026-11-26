@@ -14,7 +14,6 @@ pub fn r701_9a_discard(
     for discard in discards.read() {
         graveyards.write(Attempt(events::PutIntoGraveyard {
             object: discard.card,
-            owner: discard.player,
         }));
         did_discard.write(Did(**discard));
     }

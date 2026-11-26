@@ -1,8 +1,6 @@
 use bevy::prelude::Entity;
 use verdigris_event_derive::EventArgs;
 
-use crate::players;
-
 use crate::rules;
 use crate::rules::traits::event::Event;
 
@@ -10,8 +8,6 @@ use crate::rules::traits::event::Event;
 pub struct PutIntoGraveyard {
     #[arg]
     pub object: Entity,
-    #[arg]
-    pub owner: players::PlayerId,
 }
 
 impl Event for PutIntoGraveyard {
@@ -27,29 +23,20 @@ mod tests {
     use crate::rules::traits::event_args::EventArgs;
 
     use super::PutIntoGraveyard;
-    use crate::players;
 
     #[test]
     fn test_usage() {
         let object = Entity::PLACEHOLDER;
-        let owner = players::PlayerId(Entity::from_raw_u32(1).unwrap());
-        let event = PutIntoGraveyard { object, owner };
+        let event = PutIntoGraveyard { object };
         assert_eq!(
             event.arg(PutIntoGraveyard::OBJECT),
             Some(rules::ArgValue::Entity(object))
-        );
-        assert_eq!(
-            event.arg(PutIntoGraveyard::OWNER),
-            Some(rules::ArgValue::Player(owner))
         );
         assert_eq!(
             PutIntoGraveyard::ID,
             rules::EventId("404.1/put-into-graveyard")
         );
         assert_eq!(PutIntoGraveyard::restrictions(), Vec::new());
-        assert_eq!(
-            PutIntoGraveyard::args(),
-            &[PutIntoGraveyard::OBJECT, PutIntoGraveyard::OWNER,]
-        );
+        assert_eq!(PutIntoGraveyard::args(), &[PutIntoGraveyard::OBJECT,]);
     }
 }

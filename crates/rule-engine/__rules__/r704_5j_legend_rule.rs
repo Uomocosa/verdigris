@@ -56,7 +56,7 @@ fn put_the_rest_into_graveyards(
     mut answers: MessageReader<actions::Answered>,
     mut burials: MessageWriter<Attempt<events::PutIntoGraveyard>>,
     mut performed: ResMut<StateBasedActionsPerformed>,
-    permanents: Query<&cards::Owner, With<cards::OnBattlefield>>,
+    permanents: Query<Entity, With<cards::OnBattlefield>>,
 ) {
     for answered in answers.read() {
         let actions::Choice::Legendary(choice) = &answered.choice else {
@@ -66,13 +66,10 @@ fn put_the_rest_into_graveyards(
             continue;
         };
         for other in choice.legal.iter().copied().filter(|other| other != chosen) {
-            let Ok(owner) = permanents.get(other) else {
+            if permanents.get(other).is_err() {
                 continue;
-            };
-            burials.write(Attempt(events::PutIntoGraveyard {
-                object: other,
-                owner: **owner,
-            }));
+            }
+            burials.write(Attempt(events::PutIntoGraveyard { object: other }));
         }
         **performed = true;
     }

@@ -8,14 +8,11 @@ use crate::cards;
 /// can’t replace this event.
 pub fn r704_5f_zero_toughness(
     mut burials: MessageWriter<Attempt<events::PutIntoGraveyard>>,
-    cards: Query<(Entity, &cards::EffectivePT, &cards::Owner), With<cards::OnBattlefield>>,
+    cards: Query<(Entity, &cards::EffectivePT), With<cards::OnBattlefield>>,
 ) {
-    for (creature, effective, owner) in cards.iter() {
+    for (creature, effective) in cards.iter() {
         if effective.toughness <= 0 {
-            burials.write(Attempt(events::PutIntoGraveyard {
-                object: creature,
-                owner: **owner,
-            }));
+            burials.write(Attempt(events::PutIntoGraveyard { object: creature }));
         }
     }
 }

@@ -15,15 +15,14 @@ use crate::cards;
 pub fn r701_8a_destroy(
     mut destructions: MessageReader<Resolve<events::Destroy>>,
     mut moves_to_graveyard: MessageWriter<Attempt<events::PutIntoGraveyard>>,
-    permanents: Query<&cards::Owner, With<cards::OnBattlefield>>,
+    permanents: Query<(), With<cards::OnBattlefield>>,
 ) {
     for destruction in destructions.read() {
-        let Ok(owner) = permanents.get(destruction.permanent) else {
+        if permanents.get(destruction.permanent).is_err() {
             continue;
-        };
+        }
         moves_to_graveyard.write(Attempt(events::PutIntoGraveyard {
             object: destruction.permanent,
-            owner: **owner,
         }));
     }
 }

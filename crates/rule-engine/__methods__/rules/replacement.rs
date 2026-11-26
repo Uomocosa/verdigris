@@ -1,27 +1,37 @@
+use bevy::prelude::Entity;
+
 use crate::rules;
 use crate::rules::traits::event::Event;
 
 pub fn replacement<E: Event>(answers: &rules::Rules, event: &E) -> Option<rules::Then> {
-    E::args()
-        .iter()
-        .filter_map(|id| {
-            event.arg(*id).and_then(|value| match value {
+    let mut visited: Vec<(rules::ArgRef, Entity)> = Vec::new();
+    for id in E::args() {
+        for reference in [
+            rules::ArgRef::Arg(*id),
+            rules::ArgRef::ControllerOf(*id),
+            rules::ArgRef::OwnerOf(*id),
+        ] {
+            let Some(entity) = answers.resolve(reference, event).and_then(|value| match value {
                 rules::ArgValue::Entity(entity) => Some(entity),
                 rules::ArgValue::Player(player) => Some(*player),
-                _ => None,
-            })
-        })
-        .find_map(|entity| {
-            answers.changes(entity, rules::Target::event::<E>()).into_iter().find_map(|change| {
-                match change {
-                    rules::Change::Instead { when, then } => {
-                        let bound = when.bind(event);
-                        answers.eval(&bound, event, None).then_some(then)
-                    }
-                    _ => None,
+                rules::ArgValue::Entities(_) | rules::ArgValue::Amount(_) => None,
+            }) else {
+                continue;
+            };
+            if visited.contains(&(reference, entity)) {
+                continue;
+            }
+            visited.push((reference, entity));
+            for change in answers.changes(entity, rules::Target::event::<E>()) {
+                if let rules::Change::Instead { when, then } = change
+                    && answers.eval(&when.bind(event), event, None)
+                {
+                    return Some(then);
                 }
-            })
-        })
+            }
+        }
+    }
+    None
 }
 
 #[cfg(test)]

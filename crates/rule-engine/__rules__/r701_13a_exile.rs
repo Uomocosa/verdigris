@@ -1,9 +1,10 @@
 use crate::events;
-use bevy::prelude::{Commands, MessageReader, ResMut};
+use bevy::prelude::{Commands, MessageReader, Query, ResMut};
 
 use crate::EXILE;
 use crate::Resolve;
 use crate::StateBasedActionsPerformed;
+use crate::cards;
 use crate::zones;
 
 /// 701.13a To exile an object, move it to the exile zone from wherever it is. See rule 406, “Exile.”
@@ -11,10 +12,14 @@ pub fn r701_13a_exile(
     mut exiles: MessageReader<Resolve<events::Exile>>,
     mut commands: Commands,
     mut state_based_actions_performed: ResMut<StateBasedActionsPerformed>,
+    owners: Query<&cards::Owner>,
     zones: zones::ZoneLookup,
 ) {
     for event in exiles.read() {
-        let Some(exile) = zones.find(EXILE, Some(event.owner)) else {
+        let Ok(owner) = owners.get(event.object) else {
+            continue;
+        };
+        let Some(exile) = zones.find(EXILE, Some(**owner)) else {
             continue;
         };
         commands.entity(event.object).insert(zones::InZone(exile));

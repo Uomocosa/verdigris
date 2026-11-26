@@ -1,9 +1,10 @@
 use crate::events;
-use bevy::prelude::{Commands, MessageReader, ResMut};
+use bevy::prelude::{Commands, MessageReader, Query, ResMut};
 
 use crate::GRAVEYARD;
 use crate::Resolve;
 use crate::StateBasedActionsPerformed;
+use crate::cards;
 use crate::zones;
 
 /// 404.1. A player’s graveyard is their discard pile. Any object that’s countered, discarded,
@@ -13,10 +14,14 @@ pub fn r404_1_put_into_graveyard(
     mut proceeds: MessageReader<Resolve<events::PutIntoGraveyard>>,
     mut commands: Commands,
     mut state_based_actions_performed: ResMut<StateBasedActionsPerformed>,
+    owners: Query<&cards::Owner>,
     zones: zones::ZoneLookup,
 ) {
     for event in proceeds.read() {
-        let Some(graveyard) = zones.find(GRAVEYARD, Some(event.owner)) else {
+        let Ok(owner) = owners.get(event.object) else {
+            continue;
+        };
+        let Some(graveyard) = zones.find(GRAVEYARD, Some(**owner)) else {
             continue;
         };
         commands.entity(event.object).insert(zones::InZone(graveyard));
