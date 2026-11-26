@@ -7,10 +7,12 @@ use crate::players;
 pub struct TurnOrder(Vec<players::PlayerId>);
 
 impl TurnOrder {
-    #[must_use]
-    pub fn next_after(&self, player: players::PlayerId) -> Option<players::PlayerId> {
-        let position = self.iter().position(|candidate| *candidate == player)?;
-        self.iter().cycle().nth(position.saturating_add(1)).copied()
+    pub fn starting_from(
+        &self,
+        first: players::PlayerId,
+    ) -> impl Iterator<Item = players::PlayerId> + '_ {
+        let start = self.iter().position(|player| *player == first).unwrap_or(0);
+        self.iter().copied().cycle().skip(start).take(self.len())
     }
 }
 
@@ -26,8 +28,17 @@ mod tests {
         let (first, second, third, fourth, outsider) = (p1.id, p2.id, p3.id, p4.id, p5.id);
         let order = TurnOrder::from(vec![first, second, third, fourth]);
 
-        assert_eq!(order.next_after(first), Some(second));
-        assert_eq!(order.next_after(fourth), Some(first));
-        assert_eq!(order.next_after(outsider), None);
+        assert_eq!(
+            order.starting_from(first).collect::<Vec<_>>(),
+            [first, second, third, fourth]
+        );
+        assert_eq!(
+            order.starting_from(fourth).collect::<Vec<_>>(),
+            [fourth, first, second, third]
+        );
+        assert_eq!(
+            order.starting_from(outsider).collect::<Vec<_>>(),
+            [first, second, third, fourth]
+        );
     }
 }

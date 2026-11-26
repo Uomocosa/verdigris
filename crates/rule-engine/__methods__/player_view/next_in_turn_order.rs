@@ -3,14 +3,14 @@ use crate::players;
 pub fn next_in_turn_order<'w, 's>(
     view: &players::PlayerView<'w, 's>,
 ) -> Option<players::PlayerView<'w, 's>> {
-    let order = view.players.in_turn_order();
-    let start = order.iter().position(|candidate| *candidate == view.id)?;
-    for candidate in order.iter().cycle().skip(start.saturating_add(1)).take(order.len()) {
-        if view.players.is_still_in_the_game(*candidate) {
-            return Some(view.players.view(*candidate));
-        }
-    }
-    None
+    let Ok(order) = view.players.turn_order.single_inner() else {
+        return None;
+    };
+    order
+        .starting_from(view.id)
+        .skip(1)
+        .find(|candidate| view.players.is_still_in_the_game(*candidate))
+        .map(|id| view.players.view(id))
 }
 
 #[cfg(test)]

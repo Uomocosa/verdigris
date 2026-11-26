@@ -1,11 +1,11 @@
 use bevy::ecs::system::RunSystemOnce;
 use bevy::prelude::{Entity, World};
 
+use crate::Game;
 use crate::actions;
 use crate::cards;
 use crate::players;
 use crate::stack;
-use crate::turns;
 use crate::zones;
 
 /// 603.3. Once an ability has triggered, its controller puts it on the stack as an object that’s
@@ -37,9 +37,9 @@ pub fn r603_3_triggers_on_stack(world: &mut World) {
     if pending.is_empty() {
         return;
     }
-    let active = world.resource::<turns::TurnState>().turn.active;
-    let turn_order = world.resource::<turns::TurnOrder>().clone();
-    let apnap = players_in_apnap_order(active, &turn_order);
+    let Ok(apnap) = world.run_system_once(|game: Game| game.players_in_apnap_order()) else {
+        return;
+    };
     pending.sort_by_key(|trigger| apnap_position(&apnap, trigger.controller));
     let mut groups: Vec<Vec<stack::PendingTrigger>> = Vec::new();
     for trigger in pending {
@@ -84,22 +84,6 @@ pub fn r603_3_triggers_on_stack(world: &mut World) {
         }
         return;
     }
-}
-
-fn players_in_apnap_order(
-    active: players::PlayerId,
-    turn_order: &turns::TurnOrder,
-) -> Vec<players::PlayerId> {
-    let mut order = vec![active];
-    let mut current = active;
-    while let Some(next) = turn_order.next_after(current) {
-        if next == active {
-            break;
-        }
-        order.push(next);
-        current = next;
-    }
-    order
 }
 
 fn apnap_position(order: &[players::PlayerId], player: players::PlayerId) -> usize {

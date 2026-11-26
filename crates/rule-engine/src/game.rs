@@ -45,6 +45,20 @@ impl Game<'_, '_> {
             None
         }
     }
+
+    #[must_use]
+    pub fn players_in_apnap_order(&self) -> Vec<players::PlayerId> {
+        let Some(active) = self.active_player() else {
+            return Vec::new();
+        };
+        let Ok(order) = self.players.turn_order.single_inner() else {
+            return Vec::new();
+        };
+        order
+            .starting_from(active.id)
+            .filter(|candidate| self.players.is_still_in_the_game(*candidate))
+            .collect()
+    }
 }
 
 #[cfg(test)]
