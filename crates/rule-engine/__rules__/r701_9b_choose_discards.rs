@@ -22,9 +22,7 @@ fn ask_which_cards(
     players: players::Players,
 ) {
     for discard in discards.read() {
-        let Some(affected) =
-            players.still_in_the_game().into_iter().find(|view| view.id == discard.player)
-        else {
+        let Some(affected) = players.affected_by(&**discard).into_iter().next() else {
             continue;
         };
         let hand: Vec<Entity> = affected.hand().into_iter().map(|card| *card).collect();

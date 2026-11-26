@@ -15,16 +15,16 @@ pub fn r120_3b_infect_damage_to_a_player(
     infect_sources: Query<Has<cards::Infect>>,
 ) {
     for event in damage_dealt.read() {
-        let Some(player) = players.as_player(event.recipient) else {
-            continue;
-        };
         if !infect_sources.get(event.source).is_ok_and(|has_infect| has_infect) {
             continue;
         }
-        poison_given.write(Attempt(events::GivePoisonCounters {
-            player,
-            amount: event.amount,
-        }));
+        let affected_players = players.affected_by(&**event);
+        for player in affected_players {
+            poison_given.write(Attempt(events::GivePoisonCounters {
+                player: player.id,
+                amount: event.amount,
+            }));
+        }
     }
 }
 

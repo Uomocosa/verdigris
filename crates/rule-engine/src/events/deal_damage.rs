@@ -34,6 +34,9 @@ impl Event for DealDamage {
         }
     }
 
+    #[rustfmt::skip]
+    fn affected(&self) -> Vec<Entity> { vec![self.recipient] }
+
     #[atomic_delegate(DealDamage, Event)]
     fn clauses() -> Vec<rules::Clause> {}
 }

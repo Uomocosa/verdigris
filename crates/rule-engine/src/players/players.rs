@@ -4,6 +4,7 @@ use bevy::prelude::{Entity, Query, With};
 
 use crate::cards;
 use crate::players;
+use crate::rules;
 use crate::turns;
 use crate::zones;
 
@@ -47,6 +48,13 @@ impl Players<'_, '_> {
 impl Players<'_, '_> {
     #[must_use]
     pub fn still_in_the_game(&self) -> Vec<players::PlayerView<'_, '_>> {}
+
+    #[must_use]
+    pub fn affected_by(
+        &self,
+        event: &impl rules::traits::event::Event,
+    ) -> Vec<players::PlayerView<'_, '_>> {
+    }
 }
 
 #[rustfmt::skip]
