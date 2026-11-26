@@ -333,26 +333,29 @@ mod tests {
     fn trample_assigns_excess_damage_to_the_defending_player() -> TestResult {
         use crate::BATTLEFIELD;
         use crate::GRAVEYARD;
+        use crate::HAND;
 
         let (mut game, [p1, p2]) = MockGame::new([
-            P1.battlefield([GARRUKS_COMPANION]),
-            P2.battlefield([GRIZZLY_BEARS]),
+            P1.battlefield([GRIZZLY_BEARS]).hand([RUSH_OF_ADRENALINE]).mana_pool(mana![R]),
+            P2.battlefield([RAGING_GOBLIN]),
         ]);
-        let [companion] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GARRUKS_COMPANION)?;
-        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        let [rush] = game.player(p1).cards_in(HAND).exactly::<1>(RUSH_OF_ADRENALINE)?;
+        let [goblin] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(RAGING_GOBLIN)?;
+        game.play([
+            p1.cast(rush).targeting(bears).pass_priority(),
+            p2.pass_priority(),
+        ])?;
         game.play([
             p1.pass_to(turns::Step::DeclareAttackers),
             p2.pass_to(turns::Step::DeclareAttackers),
-            p1.declare_attackers([companion]),
+            p1.declare_attackers([bears]),
         ])?;
         game.play([
             p1.pass_to(turns::Step::DeclareBlockers),
             p2.pass_to(turns::Step::DeclareBlockers),
         ])?;
-        game.play([
-            p1.pass_priority(),
-            p2.declare_blockers([(bears, companion)]),
-        ])?;
+        game.play([p1.pass_priority(), p2.declare_blockers([(goblin, bears)])])?;
         game.play([
             p1.pass_to(turns::Step::CombatDamage),
             p2.pass_to(turns::Step::CombatDamage),
@@ -360,9 +363,9 @@ mod tests {
             p2.pass_priority(),
         ])?;
 
-        assert_eq!(game.life(p2), 19);
-        assert!(game.player(p2).cards_in(GRAVEYARD).has(bears));
-        assert!(game.player(p1).cards_in(GRAVEYARD).has(companion));
+        assert_eq!(game.life(p2), 17);
+        assert!(game.player(p2).cards_in(GRAVEYARD).has(goblin));
+        assert!(game.player(p1).cards_in(BATTLEFIELD).has(bears));
         Ok(())
     }
 
