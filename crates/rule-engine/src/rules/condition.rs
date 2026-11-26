@@ -6,7 +6,7 @@ use crate::turns;
 use crate::zones;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum Predicate {
+pub enum Condition {
     Has(rules::ComponentKey),
     PointsTo(rules::ComponentKey, rules::Role),
     Is(rules::Role),
@@ -26,12 +26,12 @@ pub enum Predicate {
 }
 
 #[rustfmt::skip]
-impl std::ops::Not for Predicate {
+impl std::ops::Not for Condition {
     type Output = Self;
     fn not(self) -> Self { Self::Not(Box::new(self)) }
 }
 
-impl std::ops::BitAnd for Predicate {
+impl std::ops::BitAnd for Condition {
     type Output = Self;
     fn bitand(self, rhs: Self) -> Self {
         let mut conjuncts = match self {
@@ -46,7 +46,7 @@ impl std::ops::BitAnd for Predicate {
     }
 }
 
-impl std::ops::BitOr for Predicate {
+impl std::ops::BitOr for Condition {
     type Output = Self;
     fn bitor(self, rhs: Self) -> Self {
         let mut disjuncts = match self {
@@ -62,7 +62,7 @@ impl std::ops::BitOr for Predicate {
 }
 
 #[atomic_delegates]
-impl Predicate {
+impl Condition {
     #[must_use]
     pub fn bind<E: rules::traits::event::Event>(&self, event: &E) -> Self {}
 }
@@ -71,12 +71,12 @@ impl Predicate {
 mod tests {
     use crate::rules;
 
-    use super::Predicate;
+    use super::Condition;
 
     #[test]
     fn test_usage() {
-        let tapped = Predicate::Has(rules::ComponentKey("tapped"));
-        let combined = tapped.clone() & Predicate::True;
-        assert_eq!(combined, Predicate::All(vec![tapped, Predicate::True]));
+        let tapped = Condition::Has(rules::ComponentKey("tapped"));
+        let combined = tapped.clone() & Condition::True;
+        assert_eq!(combined, Condition::All(vec![tapped, Condition::True]));
     }
 }

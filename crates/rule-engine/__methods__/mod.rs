@@ -13,6 +13,7 @@ pub mod cast_spell;
 pub mod characteristics;
 pub mod choice;
 pub mod combat_damage_choice;
+pub mod condition;
 pub mod deal_damage;
 pub mod declare_attacker;
 pub mod declare_blocker;
@@ -35,7 +36,6 @@ pub mod pass_budget;
 pub mod play_land;
 pub mod player_view;
 pub mod players;
-pub mod predicate;
 pub mod priority;
 #[cfg(feature = "testing")]
 pub mod restricted_rule;

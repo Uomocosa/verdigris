@@ -5,7 +5,7 @@ pub fn event_restrictions() -> Vec<rules::Restriction> {
     vec![testing::UNTAPPED.restriction(
         "must be untapped",
         rules::Role::Subject,
-        rules::Predicate::True,
+        rules::Condition::True,
     )]
 }
 
@@ -21,6 +21,6 @@ mod tests {
         let restrictions = event_restrictions();
         assert_eq!(restrictions.len(), 1);
         assert_eq!(restrictions[0].id, testing::UNTAPPED);
-        assert_eq!(restrictions[0].condition, rules::Predicate::True);
+        assert_eq!(restrictions[0].condition, rules::Condition::True);
     }
 }

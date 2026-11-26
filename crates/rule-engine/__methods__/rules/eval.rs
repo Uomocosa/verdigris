@@ -6,7 +6,7 @@ use crate::zones;
 
 pub fn eval(
     answers: &rules::Rules,
-    predicate: &rules::Predicate,
+    condition: &rules::Condition,
     subject: Entity,
     other: Option<Entity>,
     player: Option<Entity>,
@@ -16,8 +16,8 @@ pub fn eval(
         rules::Role::Other => other,
         rules::Role::Player => player,
     };
-    match predicate {
-        rules::Predicate::Has(key) => answers
+    match condition {
+        rules::Condition::Has(key) => answers
             .registry
             .single()
             .ok()
@@ -25,7 +25,7 @@ pub fn eval(
             .is_some_and(|component| {
                 answers.entities.get(subject).is_ok_and(|entity| entity.contains_id(component))
             }),
-        rules::Predicate::PointsTo(key, role) => target(role).is_some_and(|wanted| {
+        rules::Condition::PointsTo(key, role) => target(role).is_some_and(|wanted| {
             answers
                 .registry
                 .single()
@@ -39,12 +39,12 @@ pub fn eval(
                 })
                 .is_some_and(|found| found == wanted)
         }),
-        rules::Predicate::Is(role) => target(role) == Some(subject),
-        rules::Predicate::CardType(card) => answers
+        rules::Condition::Is(role) => target(role) == Some(subject),
+        rules::Condition::CardType(card) => answers
             .definitions
             .get(subject)
             .is_ok_and(|definition| definition.type_line.types.contains(card)),
-        rules::Predicate::Characteristic(characteristic, comparison, threshold) => answers
+        rules::Condition::Characteristic(characteristic, comparison, threshold) => answers
             .entities
             .get(subject)
             .ok()
@@ -60,7 +60,7 @@ pub fn eval(
                     rules::Comparison::EqualTo => value == *threshold,
                 }
             }),
-        rules::Predicate::Of(role, inner) => match role {
+        rules::Condition::Of(role, inner) => match role {
             rules::Role::Subject => eval(answers, inner, subject, other, player),
             rules::Role::Other => other
                 .is_some_and(|candidate| eval(answers, inner, candidate, Some(subject), player)),
@@ -68,15 +68,15 @@ pub fn eval(
                 player.is_some_and(|candidate| eval(answers, inner, candidate, other, player))
             }
         },
-        rules::Predicate::All(predicates) => {
-            predicates.iter().all(|inner| eval(answers, inner, subject, other, player))
+        rules::Condition::All(conditions) => {
+            conditions.iter().all(|inner| eval(answers, inner, subject, other, player))
         }
-        rules::Predicate::Any(predicates) => {
-            predicates.iter().any(|inner| eval(answers, inner, subject, other, player))
+        rules::Condition::Any(conditions) => {
+            conditions.iter().any(|inner| eval(answers, inner, subject, other, player))
         }
-        rules::Predicate::Not(inner) => !eval(answers, inner, subject, other, player),
-        rules::Predicate::True => true,
-        rules::Predicate::InZone(zone, role) => target(role).is_some_and(|holder| {
+        rules::Condition::Not(inner) => !eval(answers, inner, subject, other, player),
+        rules::Condition::True => true,
+        rules::Condition::InZone(zone, role) => target(role).is_some_and(|holder| {
             answers
                 .entities
                 .get(subject)
@@ -88,23 +88,23 @@ pub fn eval(
                     })
                 })
         }),
-        rules::Predicate::StepIs(step) => {
+        rules::Condition::StepIs(step) => {
             answers.state.single().is_ok_and(|state| state.turn.step == *step)
         }
-        rules::Predicate::StackEmpty => answers
+        rules::Condition::StackEmpty => answers
             .zones
             .find(zones::SharedZone::Stack, None)
             .is_none_or(|stack| !answers.in_zone.iter().any(|in_zone| **in_zone == stack)),
-        rules::Predicate::ActivePlayer(role) => target(role).is_some_and(|holder| {
+        rules::Condition::ActivePlayer(role) => target(role).is_some_and(|holder| {
             answers.state.single().is_ok_and(|state| *state.turn.active == holder)
         }),
-        rules::Predicate::HasPriority(role) => target(role).is_some_and(|holder| {
+        rules::Condition::HasPriority(role) => target(role).is_some_and(|holder| {
             answers
                 .state
                 .single()
                 .is_ok_and(|state| state.priority.holder.is_some_and(|id| *id == holder))
         }),
-        rules::Predicate::EventField(..) => false,
+        rules::Condition::EventField(..) => false,
     }
 }
 
@@ -231,7 +231,7 @@ mod tests {
     }
 
     #[test]
-    fn other_predicate_reads_the_other_entity() -> TestResult {
+    fn other_condition_reads_the_other_entity() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield([GRIZZLY_BEARS]),
             P2.battlefield([WIND_DRAKE]),
@@ -252,7 +252,7 @@ mod tests {
     }
 
     #[test]
-    fn other_predicate_without_other_is_false() -> TestResult {
+    fn other_condition_without_other_is_false() -> TestResult {
         let (mut game, [p1, _p2]) = MockGame::new([P1.battlefield([WIND_DRAKE]), P2]);
         let [drake] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(WIND_DRAKE)?;
         game.app.update();
@@ -353,7 +353,7 @@ mod tests {
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
                 let on_player =
-                    rules::Predicate::Of(rules::Role::Player, Box::new(rules::Predicate::True));
+                    rules::Condition::Of(rules::Role::Player, Box::new(rules::Condition::True));
                 assert!(eval(&answers, &on_player, *bears, None, Some(p1.into())));
                 assert!(!eval(&answers, &on_player, *bears, None, None));
             })
@@ -513,18 +513,18 @@ mod tests {
         let anded = tapped.clone() & flying.clone() & reach.clone();
         assert_eq!(
             anded,
-            rules::Predicate::All(vec![tapped.clone(), flying.clone(), reach.clone()])
+            rules::Condition::All(vec![tapped.clone(), flying.clone(), reach.clone()])
         );
         let ored = tapped.clone() | flying.clone() | reach.clone();
         assert_eq!(
             ored,
-            rules::Predicate::Any(vec![tapped.clone(), flying, reach.clone()])
+            rules::Condition::Any(vec![tapped.clone(), flying, reach.clone()])
         );
         let negated = !tapped.clone();
-        assert_eq!(negated, rules::Predicate::Not(Box::new(tapped.clone())));
+        assert_eq!(negated, rules::Condition::Not(Box::new(tapped.clone())));
         assert_eq!(
-            tapped.clone() & rules::Predicate::True,
-            rules::Predicate::All(vec![tapped, rules::Predicate::True])
+            tapped.clone() & rules::Condition::True,
+            rules::Condition::All(vec![tapped, rules::Condition::True])
         );
         assert_eq!(reach, rules::has::<cards::Reach>());
     }

@@ -13,7 +13,7 @@ impl RestrictionId {
         self,
         text: &'static str,
         role: rules::Role,
-        condition: rules::Predicate,
+        condition: rules::Condition,
     ) -> rules::Restriction {
     }
 }

@@ -18,7 +18,7 @@ pub const TEST_PLAYER_RESTRICTION: testing::Card = testing::Card {
                     target: rules::Target::event::<testing::TestRule>(),
                     change: rules::Change::OnlyIf {
                         role: rules::Role::Player,
-                        condition: !rules::Predicate::True,
+                        condition: !rules::Condition::True,
                     },
                 }),
             },

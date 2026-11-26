@@ -34,10 +34,10 @@ pub enum Role {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Change {
     AsThough,
-    Allow(rules::Predicate),
+    Allow(rules::Condition),
     OnlyIf {
         role: rules::Role,
-        condition: rules::Predicate,
+        condition: rules::Condition,
     },
     Cant {
         role: rules::Role,
@@ -50,11 +50,11 @@ pub enum Change {
     Decrease(u32),
     NoMaximum,
     Instead {
-        when: rules::Predicate,
+        when: rules::Condition,
         then: rules::Then,
     },
     Hook {
-        when: rules::Predicate,
+        when: rules::Condition,
         then: rules::Then,
     },
 }

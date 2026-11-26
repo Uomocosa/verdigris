@@ -6,7 +6,7 @@ use crate::statics;
 pub fn allow(
     all: statics::All,
     restriction: rules::RestrictionId,
-    alternative: rules::Predicate,
+    alternative: rules::Condition,
 ) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,

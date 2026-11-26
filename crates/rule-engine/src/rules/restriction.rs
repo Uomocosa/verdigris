@@ -7,7 +7,7 @@ pub struct Restriction {
     pub id: rules::RestrictionId,
     pub text: &'static str,
     pub role: rules::Role,
-    pub condition: rules::Predicate,
+    pub condition: rules::Condition,
     pub unwaivable: bool,
 }
 

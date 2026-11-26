@@ -1,12 +1,12 @@
 #[path = "__basic__/mod.rs"]
 mod basic;
 
-pub use basic::enums::{Amount, Change, Characteristic, Comparison, Field, Legality, Role, may};
-pub use basic::newtypes::{ComponentKey, EventId, RuleId};
-pub use basic::predicate_builders::{
+pub use basic::condition_builders::{
     active_player, at_least, at_most, card_type, equal_to, event_field, has, has_priority, in_zone,
     is, main_phase, other, points_to, stack_empty, step_is,
 };
+pub use basic::enums::{Amount, Change, Characteristic, Comparison, Field, Legality, Role, may};
+pub use basic::newtypes::{ComponentKey, EventId, RuleId};
 pub use basic::structs::RuleChange;
 pub use basic::type_aliases::TargetOf;
 
@@ -46,8 +46,8 @@ pub use limit::Limit;
 pub mod maximum_hand_size;
 pub use maximum_hand_size::MaximumHandSize;
 
-mod predicate;
-pub use predicate::Predicate;
+mod condition;
+pub use condition::Condition;
 
 mod predicate_registry;
 pub use predicate_registry::PredicateRegistry;

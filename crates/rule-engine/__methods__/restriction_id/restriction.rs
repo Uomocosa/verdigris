@@ -4,7 +4,7 @@ pub const fn restriction(
     restriction_id: rules::RestrictionId,
     text: &'static str,
     role: rules::Role,
-    condition: rules::Predicate,
+    condition: rules::Condition,
 ) -> rules::Restriction {
     rules::Restriction {
         id: restriction_id,

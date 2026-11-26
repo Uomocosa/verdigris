@@ -17,7 +17,7 @@ pub const LABORATORY_MANIAC: testing::Card = testing::Card {
                 .subtype(cards::CreatureType::Wizard.into());
             statics::you().instead(
                 events::DrawFromEmptyLibrary::ID,
-                rules::Predicate::True,
+                rules::Condition::True,
                 vec![rules::EventTemplate::WinGame {
                     who: rules::Role::Player,
                 }],

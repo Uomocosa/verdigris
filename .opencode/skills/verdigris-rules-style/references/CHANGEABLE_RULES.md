@@ -67,8 +67,8 @@ pub enum Target {
 pub enum Change {
     // permission (101.2: can't beats can; absolute restrictions can't be waived)
     AsThough,                                   // Restriction: treat as satisfied
-    Allow(rules::Predicate),                    // Restriction: satisfied if this holds instead
-    OnlyIf { role: rules::Role, condition: rules::Predicate }, // Event: veto unless it holds
+    Allow(rules::Condition),                    // Restriction: satisfied if this holds instead
+    OnlyIf { role: rules::Role, condition: rules::Condition }, // Event: veto unless it holds
     Cant { role: rules::Role },                   // Event: absolute veto for that role
     Must,                                       // Event: requirement (508.1d / 509.1c)
     Skip,                                       // Event: do not perform (untap, tap-attacker)
@@ -76,9 +76,9 @@ pub enum Change {
     // quantity
     Set(u32), Increase(u32), Decrease(u32), NoMaximum,
     // replacement (614)
-    Instead { when: rules::Predicate, then: rules::Then }, // Then::{Events(Vec<EventTemplate>), May(EventTemplate)}
+    Instead { when: rules::Condition, then: rules::Then }, // Then::{Events(Vec<EventTemplate>), May(EventTemplate)}
     // hook: ALL hooks of the subject apply (103.6: "some cards allow ...")
-    Hook { when: rules::Predicate, then: rules::Then },
+    Hook { when: rules::Condition, then: rules::Then },
 }
 
 pub struct RuleChange { pub target: Target, pub change: Change }
@@ -86,7 +86,7 @@ pub struct RuleChange { pub target: Target, pub change: Change }
 
 - `EventTemplate` describes a replacement event in data; `Amount::{Fixed(u32), FromEvent(Field)}`
   lets it copy a parameter of the replaced event ("that much life", "that many cards").
-- Predicates may read event parameters through `Field` (e.g. `Field::Amount`).
+- Conditions may read event parameters through `Field` (e.g. `Field::Amount`).
 
 ## 2. Nonsense is allowed, dangling is not
 

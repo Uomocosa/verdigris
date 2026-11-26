@@ -22,7 +22,7 @@ impl All {
     pub fn instead(
         self,
         event: rules::EventId,
-        when: rules::Predicate,
+        when: rules::Condition,
         then: impl Into<rules::Then>,
     ) -> abilities::Continuous {
     }
@@ -67,14 +67,14 @@ impl All {
     pub fn allow(
         self,
         restriction: rules::RestrictionId,
-        alternative: rules::Predicate,
+        alternative: rules::Condition,
     ) -> abilities::Continuous {
     }
 
     #[must_use]
     pub fn restriction<E: rules::traits::event::Event>(
         self,
-        requirement: rules::Predicate,
+        requirement: rules::Condition,
     ) -> abilities::Continuous {
     }
 

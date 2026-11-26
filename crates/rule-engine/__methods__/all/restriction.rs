@@ -6,7 +6,7 @@ use crate::statics;
 
 pub fn restriction<E: Event>(
     all: statics::All,
-    requirement: rules::Predicate,
+    requirement: rules::Condition,
 ) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
@@ -33,7 +33,7 @@ mod tests {
     #[test]
     fn test_usage() {
         let ability =
-            restriction::<testing::RestrictedRule>(statics::all(CREATURE), rules::Predicate::True);
+            restriction::<testing::RestrictedRule>(statics::all(CREATURE), rules::Condition::True);
         assert_eq!(ability.filter, CREATURE);
         assert_eq!(
             ability.modification,
@@ -41,7 +41,7 @@ mod tests {
                 target: rules::Target::event::<testing::RestrictedRule>(),
                 change: rules::Change::OnlyIf {
                     role: rules::Role::Subject,
-                    condition: rules::Predicate::True,
+                    condition: rules::Condition::True,
                 },
             })
         );

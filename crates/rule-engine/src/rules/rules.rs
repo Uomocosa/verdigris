@@ -28,7 +28,7 @@ impl Rules<'_, '_> {
     #[must_use]
     pub fn eval(
         &self,
-        predicate: &rules::Predicate,
+        condition: &rules::Condition,
         subject: Entity,
         other: Option<Entity>,
         player: Option<Entity>,
