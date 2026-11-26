@@ -1,6 +1,8 @@
-use crate::{GRAVEYARD, STACK};
-use bevy::prelude::{Commands, MessageReader, Query, With};
+use crate::events;
+use bevy::prelude::{Commands, MessageReader, MessageWriter, Query, With};
 
+use crate::Attempt;
+use crate::STACK;
 use crate::cards;
 use crate::stack;
 use crate::zones;
@@ -10,6 +12,7 @@ use crate::zones;
 /// stack and ceases to exist.
 pub fn r608_2n_graveyard(
     mut resolutions: MessageReader<stack::Resolution>,
+    mut graveyards: MessageWriter<Attempt<events::PutIntoGraveyard>>,
     mut commands: Commands,
     abilities: Query<&zones::InZone, With<stack::TriggeredAbilityOnStack>>,
     spells: Query<(&cards::CardDefinition, &cards::Owner, &zones::InZone)>,
@@ -38,9 +41,10 @@ pub fn r608_2n_graveyard(
         if !is_instant_or_sorcery {
             continue;
         }
-        if let Some(graveyard) = zones.find(GRAVEYARD, Some(**owner)) {
-            commands.entity(spell).insert(zones::InZone(graveyard));
-        }
+        graveyards.write(Attempt(events::PutIntoGraveyard {
+            object: spell,
+            owner: **owner,
+        }));
     }
 }
 
@@ -48,7 +52,7 @@ pub fn r608_2n_graveyard(
 mod tests {
     use crate::mana;
     use crate::testing::*;
-    use crate::{GRAVEYARD, HAND};
+    use crate::{EXILE, GRAVEYARD, HAND};
 
     #[test]
     fn resolved_instant_goes_to_graveyard() -> TestResult {
@@ -61,6 +65,22 @@ mod tests {
         ])?;
         assert!(game.player(p1).cards_in(GRAVEYARD).has(bolt));
         assert!(game.player(p1).cards_in(GRAVEYARD).has(LIGHTNING_BOLT));
+        Ok(())
+    }
+
+    #[test]
+    fn leyline_of_the_void_exiles_a_resolved_instant_instead_of_burying_it() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
+            P2.battlefield([LEYLINE_OF_THE_VOID]),
+        ]);
+        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
+        game.play([
+            p1.cast(bolt).targeting(p2).pass_priority(),
+            p2.pass_priority(),
+        ])?;
+        assert!(game.player(p1).cards_in(EXILE).has(bolt));
+        assert!(game.player(p1).cards_in(GRAVEYARD).has_no(bolt));
         Ok(())
     }
 }
