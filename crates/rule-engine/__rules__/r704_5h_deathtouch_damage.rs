@@ -14,7 +14,7 @@ pub fn r704_5h_deathtouch_damage(
     cards: Query<
         (
             Entity,
-            &cards::Owner,
+            &cards::Controller,
             &cards::EffectivePT,
             &damage::DealtByDeathtouch,
         ),
@@ -25,11 +25,11 @@ pub fn r704_5h_deathtouch_damage(
     for creature in marked.iter() {
         commands.entity(creature).remove::<damage::DealtByDeathtouch>();
     }
-    for (creature, owner, effective, _) in cards.iter() {
+    for (creature, controller, effective, _) in cards.iter() {
         if effective.toughness > 0 {
             destructions.write(Attempt(events::Destroy {
                 permanent: creature,
-                controller: **owner,
+                controller: **controller,
             }));
         }
     }

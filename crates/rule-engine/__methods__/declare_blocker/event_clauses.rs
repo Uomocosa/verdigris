@@ -12,7 +12,7 @@ pub fn event_clauses() -> Vec<rules::Clause> {
         events::declare_blocker::CONTROLS.clause(
             "creatures they control",
             rules::Role::Subject,
-            rules::points_to::<cards::Owner>(rules::Role::Player)
+            rules::points_to::<cards::Controller>(rules::Role::Player)
                 & rules::has::<cards::OnBattlefield>(),
         ),
         events::declare_blocker::UNTAPPED.clause(
@@ -46,7 +46,7 @@ mod tests {
         assert_eq!(clauses[1].key, rules::ClauseKey("509.1a/controls"));
         assert_eq!(
             clauses[1].condition,
-            rules::points_to::<cards::Owner>(rules::Role::Player)
+            rules::points_to::<cards::Controller>(rules::Role::Player)
                 & rules::has::<cards::OnBattlefield>()
         );
         assert_eq!(clauses[2].key, rules::ClauseKey("509.1a/untapped"));

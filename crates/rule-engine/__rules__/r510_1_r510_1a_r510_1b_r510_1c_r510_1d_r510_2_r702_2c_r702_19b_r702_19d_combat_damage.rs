@@ -21,7 +21,7 @@ type CombatLookups<'w, 's> = (
             Option<&'s cards::EffectivePT>,
         ),
     >,
-    Query<'w, 's, &'s cards::Owner>,
+    Query<'w, 's, &'s cards::Controller>,
 );
 
 /// 510.1. First, the active player announces how each attacking creature assigns its combat damage,
@@ -156,7 +156,7 @@ fn announce_combat_damage(
 fn deal_assigned_combat_damage(
     mut answers: MessageReader<actions::Answered>,
     mut dealt: MessageWriter<Attempt<events::DealDamage>>,
-    owners: Query<&cards::Owner>,
+    controllers: Query<&cards::Controller>,
 ) {
     for answered in answers.read() {
         let actions::Choice::CombatDamage(choice) = &answered.choice else {
@@ -167,7 +167,7 @@ fn deal_assigned_combat_damage(
         };
         if let Some(writes) = choice.assigned_damage(assignments) {
             for write in writes {
-                dealt.write(announce_damage(write, &owners));
+                dealt.write(announce_damage(write, &controllers));
             }
         }
     }
@@ -175,18 +175,21 @@ fn deal_assigned_combat_damage(
 
 fn announce_damage(
     assigned: damage::AssignedDamage,
-    owners: &Query<&cards::Owner>,
+    controllers: &Query<&cards::Controller>,
 ) -> Attempt<events::DealDamage> {
     Attempt(events::DealDamage {
         source: assigned.source,
         recipient: assigned.target,
         amount: assigned.amount,
-        controller: recipient_controller(owners, assigned.target),
+        controller: recipient_controller(controllers, assigned.target),
     })
 }
 
-fn recipient_controller(owners: &Query<&cards::Owner>, recipient: Entity) -> players::PlayerId {
-    owners.get(recipient).map_or(players::PlayerId(recipient), |owner| **owner)
+fn recipient_controller(
+    controllers: &Query<&cards::Controller>,
+    recipient: Entity,
+) -> players::PlayerId {
+    controllers.get(recipient).map_or(players::PlayerId(recipient), |controller| **controller)
 }
 
 #[cfg(test)]

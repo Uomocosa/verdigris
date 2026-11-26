@@ -11,14 +11,14 @@ use crate::cards;
 pub fn r702_15b_lifelink(
     mut damage_dealt: MessageReader<Resolve<events::DealDamage>>,
     mut life_gained: MessageWriter<Attempt<events::GainLife>>,
-    sources: Query<&cards::Owner, With<cards::Lifelink>>,
+    sources: Query<&cards::Controller, With<cards::Lifelink>>,
 ) {
     for event in damage_dealt.read() {
-        let Ok(owner) = sources.get(event.source) else {
+        let Ok(controller) = sources.get(event.source) else {
             continue;
         };
         life_gained.write(Attempt(events::GainLife {
-            player: **owner,
+            player: **controller,
             amount: event.amount,
         }));
     }

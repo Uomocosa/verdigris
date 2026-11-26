@@ -69,7 +69,7 @@ mod tests {
         assert_eq!(clauses[1].role, rules::Role::Subject);
         assert_eq!(
             clauses[1].condition,
-            rules::points_to::<cards::Owner>(rules::Role::Player)
+            rules::points_to::<cards::Controller>(rules::Role::Player)
                 & rules::has::<cards::OnBattlefield>()
         );
         assert_eq!(clauses[2].key, UNTAPPED.key);

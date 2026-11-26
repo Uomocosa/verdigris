@@ -8,25 +8,25 @@ use crate::players;
 use crate::turns;
 use crate::zones;
 
-type StaticSources<'w, 's, 'definition, 'owner, 'zone, 'enchanting> = Query<
+type StaticSources<'w, 's, 'definition, 'controller, 'zone, 'enchanting> = Query<
     'w,
     's,
     (
         Entity,
         &'definition cards::CardDefinition,
-        &'owner cards::Owner,
+        &'controller cards::Controller,
         &'zone zones::InZone,
         Option<&'enchanting cards::Enchanting>,
     ),
 >;
 
-type StaticCandidates<'w, 's, 'definition, 'owner, 'zone, 'attacking, 'token> = Query<
+type StaticCandidates<'w, 's, 'definition, 'controller, 'zone, 'attacking, 'token> = Query<
     'w,
     's,
     (
         Entity,
         &'definition cards::CardDefinition,
-        &'owner cards::Owner,
+        &'controller cards::Controller,
         &'zone zones::InZone,
         Option<&'attacking cards::Attacking>,
         Option<&'token cards::Token>,
@@ -59,7 +59,8 @@ pub fn r611_3a_static_effects(
         let Some(source) = effect.source else {
             continue;
         };
-        let Ok((_, source_definition, source_owner, source_zone, enchanting)) = sources.get(source)
+        let Ok((_, source_definition, source_controller, source_zone, enchanting)) =
+            sources.get(source)
         else {
             commands.entity(entity).despawn();
             continue;
@@ -75,7 +76,7 @@ pub fn r611_3a_static_effects(
                 effect,
                 source,
                 enchanted,
-                **source_owner,
+                **source_controller,
                 &candidates,
                 &zones,
                 &players,
@@ -85,7 +86,7 @@ pub fn r611_3a_static_effects(
             commands.entity(entity).despawn();
         }
     }
-    for (source, definition, owner, in_zone, enchanting) in sources.iter() {
+    for (source, definition, controller, in_zone, enchanting) in sources.iter() {
         let enchanted = enchanting.map(|entity| **entity);
         if definition.continuous_abilities().next().is_none() {
             continue;
@@ -101,7 +102,7 @@ pub fn r611_3a_static_effects(
                     source,
                     ability,
                     enchanted,
-                    **owner,
+                    **controller,
                     &candidates,
                     &zones,
                     &players,
@@ -113,7 +114,7 @@ pub fn r611_3a_static_effects(
                     source,
                     ability,
                     enchanted,
-                    **owner,
+                    **controller,
                     &players,
                     &applied,
                     stamp,
@@ -139,7 +140,7 @@ fn ability_still_applies(
     }
     match ability.filter.kind {
         effects::FilterKind::Creature => candidates.get(effect.affected).is_ok_and(
-            |(_, definition, owner, zone, attacking, token)| {
+            |(_, definition, candidate_controller, zone, attacking, token)| {
                 zones.contains(BATTLEFIELD, **zone)
                     && candidate_matches(
                         ability.filter,
@@ -147,7 +148,7 @@ fn ability_still_applies(
                         effect.affected,
                         enchanted,
                         controller,
-                        **owner,
+                        **candidate_controller,
                         attacking.is_some(),
                         token.is_some(),
                         definition,
@@ -179,7 +180,7 @@ fn spawn_creature_effects(
     applied: &Query<(Entity, &effects::ContinuousEffect)>,
     stamp: u64,
 ) {
-    for (candidate, definition, owner, zone, attacking, token) in candidates.iter() {
+    for (candidate, definition, candidate_controller, zone, attacking, token) in candidates.iter() {
         if !zones.contains(BATTLEFIELD, **zone) {
             continue;
         }
@@ -189,7 +190,7 @@ fn spawn_creature_effects(
             candidate,
             enchanted,
             controller,
-            **owner,
+            **candidate_controller,
             attacking.is_some(),
             token.is_some(),
             definition,
@@ -266,7 +267,7 @@ fn candidate_matches(
     candidate: Entity,
     enchanted: Option<Entity>,
     controller: players::PlayerId,
-    candidate_owner: players::PlayerId,
+    candidate_controller: players::PlayerId,
     is_attacking: bool,
     is_token: bool,
     definition: &cards::CardDefinition,
@@ -280,7 +281,7 @@ fn candidate_matches(
         _ => {}
     }
     if let Some(controller_ref) = filter.controlled_by
-        && !controller_ref.resolve(controller, players).contains(&candidate_owner)
+        && !controller_ref.resolve(controller, players).contains(&candidate_controller)
     {
         return false;
     }

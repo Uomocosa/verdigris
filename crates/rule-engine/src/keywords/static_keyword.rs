@@ -44,7 +44,7 @@ impl StaticKeyword {
                 target: rules::Target::Event(events::BecomeTarget::ID),
                 change: rules::Change::OnlyIf {
                     role: rules::Role::Subject,
-                    condition: rules::points_to::<cards::Owner>(rules::Role::Player),
+                    condition: rules::points_to::<cards::Controller>(rules::Role::Player),
                 },
             })],
             _ => Vec::new(),
@@ -86,7 +86,7 @@ mod tests {
                 target: rules::Target::Event(events::BecomeTarget::ID),
                 change: rules::Change::OnlyIf {
                     role: rules::Role::Subject,
-                    condition: rules::points_to::<cards::Owner>(rules::Role::Player),
+                    condition: rules::points_to::<cards::Controller>(rules::Role::Player),
                 },
             })]
         );
