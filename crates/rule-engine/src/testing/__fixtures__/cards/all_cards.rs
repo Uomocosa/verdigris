@@ -44,6 +44,7 @@ pub const ALL_CARDS: &[testing::Card] = &[
     testing::RAGING_GOBLIN,
     testing::RAISE_THE_ALARM,
     testing::SOLDIER_TOKEN,
+    testing::RANGERS_GUILE,
     testing::RELIQUARY_TOWER,
     testing::SCROLL_THIEF,
     testing::SIGN_IN_BLOOD,

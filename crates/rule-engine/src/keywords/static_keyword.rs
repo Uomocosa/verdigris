@@ -1,3 +1,4 @@
+use crate::cards;
 use crate::effects;
 use crate::events;
 use crate::rules;
@@ -39,6 +40,13 @@ impl StaticKeyword {
                     role: rules::Role::Subject,
                 },
             })],
+            Self::Hexproof => vec![effects::Modification::Rule(rules::RuleChange {
+                target: rules::Target::Event(events::BecomeTarget::ID),
+                change: rules::Change::OnlyIf {
+                    role: rules::Role::Subject,
+                    condition: rules::points_to::<cards::Owner>(rules::Role::Player),
+                },
+            })],
             _ => Vec::new(),
         }
     }
@@ -46,6 +54,7 @@ impl StaticKeyword {
 
 #[cfg(test)]
 mod tests {
+    use crate::cards;
     use crate::effects;
     use crate::events;
     use crate::keywords;
@@ -69,6 +78,16 @@ mod tests {
             vec![effects::Modification::Rule(rules::RuleChange {
                 target: rules::Target::Event(events::TapAttacker::ID),
                 change: rules::Change::Skip,
+            })]
+        );
+        assert_eq!(
+            keywords::StaticKeyword::Hexproof.keyword_modifications(),
+            vec![effects::Modification::Rule(rules::RuleChange {
+                target: rules::Target::Event(events::BecomeTarget::ID),
+                change: rules::Change::OnlyIf {
+                    role: rules::Role::Subject,
+                    condition: rules::points_to::<cards::Owner>(rules::Role::Player),
+                },
             })]
         );
     }

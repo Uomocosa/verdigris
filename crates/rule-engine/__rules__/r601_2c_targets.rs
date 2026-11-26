@@ -6,8 +6,9 @@ use std::collections::BTreeSet;
 use crate::actions;
 use crate::cards;
 use crate::effects;
-use crate::keywords;
+use crate::events;
 use crate::players;
+use crate::rules;
 use crate::stack;
 use crate::zones;
 use crate::{HAND, STACK};
@@ -44,7 +45,7 @@ fn ask_for_targets(
     mut rejected: MessageWriter<actions::Rejected>,
     mut asks: MessageWriter<actions::Ask>,
     mut commands: Commands,
-    players: Query<Entity, With<players::Player>>,
+    players: players::Players,
     cards: Query<(
         Entity,
         &cards::CardDefinition,
@@ -53,6 +54,7 @@ fn ask_for_targets(
     )>,
     battlefield: Query<Entity, With<cards::OnBattlefield>>,
     zones: zones::ZoneLookup,
+    answers: rules::Rules,
 ) {
     for action in actions.read() {
         let actions::Action::Cast(spell) = &action.action else {
@@ -82,6 +84,7 @@ fn ask_for_targets(
             &cards,
             &battlefield,
             &zones,
+            &answers,
         );
         if legal.is_empty() {
             rejected.write(actions::Rejected::NoLegalTargets { spell });
@@ -125,7 +128,7 @@ fn legal_targets(
     casting_spell: Entity,
     filter: effects::Filter,
     controller: players::PlayerId,
-    players: &Query<Entity, With<players::Player>>,
+    players: &players::Players,
     cards: &Query<(
         Entity,
         &cards::CardDefinition,
@@ -134,8 +137,10 @@ fn legal_targets(
     )>,
     battlefield: &Query<Entity, With<cards::OnBattlefield>>,
     zones: &zones::ZoneLookup,
+    answers: &rules::Rules,
 ) -> BTreeSet<Entity> {
-    let all_players: Vec<players::PlayerId> = players.iter().map(players::PlayerId).collect();
+    let all_players: Vec<players::PlayerId> =
+        players.still_in_the_game().iter().map(|view| view.id).collect();
     let allowed_controllers: Option<BTreeSet<players::PlayerId>> = filter
         .controlled_by
         .map(|player| player.resolve(controller, &all_players).into_iter().collect());
@@ -165,14 +170,20 @@ fn legal_targets(
             effects::FilterKind::Creature | effects::FilterKind::AnyTarget => {
                 filter.does_creature_match(definition)
                     && battlefield.contains(entity)
-                    && (**owner == controller
-                        || !definition.has_keyword(keywords::StaticKeyword::Hexproof))
+                    && answers.legal(&events::BecomeTarget {
+                        target: entity,
+                        spell: casting_spell,
+                        player: controller,
+                    })
             }
             effects::FilterKind::Enchantment => {
                 filter.does_enchantment_match(definition)
                     && battlefield.contains(entity)
-                    && (**owner == controller
-                        || !definition.has_keyword(keywords::StaticKeyword::Hexproof))
+                    && answers.legal(&events::BecomeTarget {
+                        target: entity,
+                        spell: casting_spell,
+                        player: controller,
+                    })
             }
             effects::FilterKind::Player => false,
         };
@@ -380,14 +391,24 @@ mod tests {
 
     #[test]
     fn an_opponent_cannot_target_a_creature_with_hexproof() -> TestResult {
-        let (mut game, [p1, ..]) = MockGame::new([
+        let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([DOOM_BLADE]).mana_pool(mana![1, B]),
-            P2.battlefield([GLADECOVER_SCOUT]),
+            P2.hand([RANGERS_GUILE])
+                .mana_pool(mana![G])
+                .battlefield([GLADECOVER_SCOUT, GRIZZLY_BEARS]),
         ]);
         let [blade] = game.player(p1).cards_in(HAND).exactly::<1>(DOOM_BLADE)?;
+        let [guile] = game.player(p2).cards_in(HAND).exactly::<1>(RANGERS_GUILE)?;
+        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+
+        game.play([
+            p1.pass_priority(),
+            p2.cast(guile).targeting(bears).pass_priority(),
+            p1.pass_priority(),
+        ])?;
+        assert!(game.player(p2).cards_in(BATTLEFIELD).has(bears));
 
         let err = game.play([p1.cast(blade)]).unwrap_err();
-
         assert_eq!(
             err.rejection(),
             Some(&actions::Rejected::NoLegalTargets {

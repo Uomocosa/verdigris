@@ -4,6 +4,9 @@ pub use cast_spell::CastSpell;
 mod add_phase;
 pub use add_phase::AddPhase;
 
+mod become_target;
+pub use become_target::BecomeTarget;
+
 mod begin_the_game_on_the_battlefield;
 pub use begin_the_game_on_the_battlefield::BeginTheGameOnTheBattlefield;
 
