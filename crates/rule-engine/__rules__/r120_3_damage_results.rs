@@ -7,13 +7,18 @@ use crate::Resolve;
 /// 120.3. Damage may have one or more of the following results, depending on whether the recipient
 /// of the damage is a player or permanent, the characteristics of the damage’s source, and the
 /// characteristics of the damage’s recipient (if it’s a permanent).
+///
+/// # See also
+///
+/// 120.8. If a source would deal 0 damage, it does not deal damage at all. That means abilities
+/// that trigger on damage being dealt won’t trigger. It also means that replacement effects that
+/// would increase the damage dealt by that source, or would have that source deal that damage to a
+/// different object or player, have no event to replace, so they have no effect.
 pub fn r120_3_damage_results(
     mut damage_dealt: MessageReader<Resolve<events::DealDamage>>,
     mut did_damage: MessageWriter<Did<events::DealDamage>>,
 ) {
-    did_damage.write_batch(
-        damage_dealt.read().filter(|dealt| dealt.amount != 0).map(|dealt| Did(**dealt)),
-    );
+    did_damage.write_batch(damage_dealt.read().map(|dealt| Did(**dealt)));
 }
 
 #[cfg(test)]

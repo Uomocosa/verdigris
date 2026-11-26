@@ -14,9 +14,6 @@ pub fn r702_15b_lifelink(
     sources: Query<&cards::Owner, With<cards::Lifelink>>,
 ) {
     for event in damage_dealt.read() {
-        if event.amount == 0 {
-            continue;
-        }
         let Ok(owner) = sources.get(event.source) else {
             continue;
         };

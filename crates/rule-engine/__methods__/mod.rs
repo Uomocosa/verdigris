@@ -14,6 +14,7 @@ pub mod choice;
 pub mod clause;
 pub mod clause_id;
 pub mod combat_damage_choice;
+pub mod deal_damage;
 pub mod declare_attacker;
 pub mod declare_blocker;
 pub mod effect;

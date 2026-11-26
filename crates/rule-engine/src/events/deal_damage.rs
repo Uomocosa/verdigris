@@ -1,9 +1,14 @@
+use atomic_delegate_macros::atomic_delegate;
 use bevy::prelude::Entity;
 
+use crate::events;
 use crate::players;
 
 use crate::rules;
 use crate::rules::traits::event::Event;
+
+pub const NONZERO_DAMAGE: rules::ClauseId<events::DealDamage> =
+    rules::ClauseId::new("120.8/nonzero");
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct DealDamage {
@@ -28,6 +33,9 @@ impl Event for DealDamage {
             rules::Field::Amount => Some(self.amount),
         }
     }
+
+    #[atomic_delegate(DealDamage, Event)]
+    fn clauses() -> Vec<rules::Clause> {}
 }
 
 #[cfg(test)]
@@ -56,7 +64,31 @@ mod tests {
         assert_eq!(event.other(), Some(source));
         assert_eq!(event.player(), controller);
         assert_eq!(DealDamage::ID, rules::EventId("120.3"));
-        assert_eq!(DealDamage::clauses(), Vec::new());
+        let clauses = DealDamage::clauses();
+        assert_eq!(clauses.len(), 1);
+        assert_eq!(clauses[0].key, super::NONZERO_DAMAGE.key);
+        assert_eq!(
+            clauses[0].text,
+            "If a source would deal 0 damage, it does not deal damage at all."
+        );
+        assert_eq!(clauses[0].role, rules::Role::Subject);
+        assert_eq!(
+            clauses[0].condition,
+            rules::event_field(rules::Field::Amount, rules::Comparison::AtLeast, 1)
+        );
         assert_eq!(event.field(rules::Field::Amount), Some(3));
+    }
+
+    #[test]
+    fn clause_texts_occur_verbatim_in_comprehensive_rules() {
+        const RULES_TEXT: &str = include_str!("../../../../docs/MagicCompRules-20250919.txt");
+        for clause in DealDamage::clauses() {
+            assert!(
+                RULES_TEXT.contains(clause.text),
+                "clause {:?} text not found verbatim in Comprehensive Rules: {:?}",
+                clause.key,
+                clause.text
+            );
+        }
     }
 }

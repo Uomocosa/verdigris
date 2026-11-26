@@ -29,7 +29,7 @@ pub fn legality<E: Event>(answers: &rules::Rules, event: &E) -> rules::Legality 
     let base = E::clauses()
         .iter()
         .filter(|clause| !waived(clause))
-        .all(|clause| answers.eval(&clause.condition, subject, other, Some(*player)));
+        .all(|clause| answers.eval(&clause.condition.bind(event), subject, other, Some(*player)));
     let vetoed = [
         (rules::Role::Subject, Some(subject)),
         (rules::Role::Other, other),
@@ -564,6 +564,28 @@ mod tests {
                     ),
                     rules::Legality::Legal
                 );
+            })
+            .unwrap();
+        Ok(())
+    }
+
+    #[test]
+    fn a_source_that_would_deal_zero_damage_deals_no_damage_at_all() -> TestResult {
+        let (mut game, [p1, _]) = MockGame::new([P1.battlefield([GRIZZLY_BEARS]), P2]);
+        let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        game.pass_priority();
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                let zero = events::DealDamage {
+                    source: *bears,
+                    recipient: *p1,
+                    amount: 0,
+                    controller: p1.id,
+                };
+                let one = events::DealDamage { amount: 1, ..zero };
+                assert_eq!(legality(&answers, &zero), rules::Legality::Illegal);
+                assert_eq!(legality(&answers, &one), rules::Legality::Legal);
             })
             .unwrap();
         Ok(())

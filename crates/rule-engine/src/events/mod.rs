@@ -16,7 +16,7 @@ pub use create_tokens::CreateTokens;
 mod counter;
 pub use counter::Counter;
 
-mod deal_damage;
+pub mod deal_damage;
 pub use deal_damage::DealDamage;
 
 mod destroy;

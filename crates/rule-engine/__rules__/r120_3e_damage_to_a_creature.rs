@@ -16,9 +16,6 @@ pub fn r120_3e_damage_to_a_creature(
     targets: Query<Option<&damage::Damage>>,
 ) {
     for event in damage_dealt.read() {
-        if event.amount == 0 {
-            continue;
-        }
         if players.as_player(event.recipient).is_some() {
             continue;
         }

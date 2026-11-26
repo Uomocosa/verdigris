@@ -15,9 +15,6 @@ pub fn r120_3a_damage_to_a_player(
     infect_sources: Query<Has<cards::Infect>>,
 ) {
     for event in damage_dealt.read() {
-        if event.amount == 0 {
-            continue;
-        }
         let Some(player) = players.as_player(event.recipient) else {
             continue;
         };
