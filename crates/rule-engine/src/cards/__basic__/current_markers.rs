@@ -7,7 +7,6 @@ use crate::cards;
 pub struct CurrentMarkers<'a> {
     pub on_battlefield: Has<cards::OnBattlefield>,
     pub effective: Option<&'a cards::EffectivePT>,
-    pub indestructible: Has<cards::Indestructible>,
     pub deathtouch: Has<cards::Deathtouch>,
     pub infect: Has<cards::Infect>,
     pub lifelink: Has<cards::Lifelink>,

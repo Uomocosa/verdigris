@@ -1,31 +1,30 @@
-use crate::GRAVEYARD;
 use crate::events;
-use bevy::prelude::{Commands, MessageReader, Query, ResMut, With, Without};
+use bevy::prelude::{MessageReader, MessageWriter, Query, With};
 
+use crate::Attempt;
 use crate::Resolve;
-use crate::StateBasedActionsPerformed;
 use crate::cards;
-use crate::zones;
 
+/// 701.8a To destroy a permanent, move it from the battlefield to its owner’s graveyard.
+///
+/// # See also
+///
 /// 702.12b A permanent with indestructible can’t be destroyed. Such permanents aren’t destroyed by
 /// lethal damage, and they ignore the state-based action that checks for lethal damage (see rule
 /// 704.5g).
-pub fn r702_12b_indestructible(
+pub fn r701_8a_destroy(
     mut destructions: MessageReader<Resolve<events::Destroy>>,
-    mut commands: Commands,
-    mut state_based_actions_performed: ResMut<StateBasedActionsPerformed>,
-    cards: Query<&cards::Owner, (With<cards::OnBattlefield>, Without<cards::Indestructible>)>,
-    zones: zones::ZoneLookup,
+    mut moves_to_graveyard: MessageWriter<Attempt<events::PutIntoGraveyard>>,
+    permanents: Query<&cards::Owner, With<cards::OnBattlefield>>,
 ) {
     for destruction in destructions.read() {
-        let permanent = destruction.permanent;
-        let Ok(owner) = cards.get(permanent) else {
+        let Ok(owner) = permanents.get(destruction.permanent) else {
             continue;
         };
-        if let Some(graveyard) = zones.find(GRAVEYARD, Some(**owner)) {
-            commands.entity(permanent).insert(zones::InZone(graveyard));
-            **state_based_actions_performed = true;
-        }
+        moves_to_graveyard.write(Attempt(events::PutIntoGraveyard {
+            object: destruction.permanent,
+            owner: **owner,
+        }));
     }
 }
 

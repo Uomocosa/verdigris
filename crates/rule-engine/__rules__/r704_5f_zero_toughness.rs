@@ -47,17 +47,21 @@ mod tests {
     #[test]
     fn a_cant_be_put_into_a_graveyard_effect_keeps_the_zero_toughness_creature() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
-            P1.hand([DISFIGURE]).mana_pool(mana![B]),
+            P1.hand([DISFIGURE, MURDER]).mana_pool(mana![1, B, B, B]),
             P2.battlefield([GRIZZLY_BEARS, TEST_NO_BURIALS]),
         ]);
         let [disfigure] = game.player(p1).cards_in(HAND).exactly::<1>(DISFIGURE)?;
+        let [murder] = game.player(p1).cards_in(HAND).exactly::<1>(MURDER)?;
         let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
         game.play([
             p1.cast(disfigure).targeting(bears).pass_priority(),
             p2.pass_priority(),
+            p1.cast(murder).targeting(bears).pass_priority(),
+            p2.pass_priority(),
         ])?;
         assert!(game.player(p2).cards_in(BATTLEFIELD).has(bears));
         assert!(game.player(p1).cards_in(GRAVEYARD).has(disfigure));
+        assert!(game.player(p1).cards_in(GRAVEYARD).has(murder));
         Ok(())
     }
 }

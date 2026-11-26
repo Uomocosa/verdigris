@@ -33,6 +33,12 @@ impl StaticKeyword {
                 target: rules::Target::Event(events::TapAttacker::ID),
                 change: rules::Change::Skip,
             })],
+            Self::Indestructible => vec![effects::Modification::Rule(rules::RuleChange {
+                target: rules::Target::Event(events::Destroy::ID),
+                change: rules::Change::Cant {
+                    role: rules::Role::Subject,
+                },
+            })],
             _ => Vec::new(),
         }
     }

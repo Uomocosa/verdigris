@@ -28,12 +28,6 @@ pub fn write_markers(
     };
     cards::Characteristics::sync_marker(
         entity,
-        desired(keywords::StaticKeyword::Indestructible),
-        current.indestructible,
-        cards::Indestructible,
-    );
-    cards::Characteristics::sync_marker(
-        entity,
         desired(keywords::StaticKeyword::Deathtouch),
         current.deathtouch,
         cards::Deathtouch,
@@ -207,7 +201,6 @@ mod tests {
                 (
                     world.get::<cards::OnBattlefield>(bears).is_some(),
                     world.get::<cards::EffectivePT>(bears).copied().map(|effective| *effective),
-                    world.get::<cards::Indestructible>(bears).is_some(),
                     world.get::<cards::Deathtouch>(bears).is_some(),
                     world.get::<cards::Infect>(bears).is_some(),
                     world.get::<cards::Lifelink>(bears).is_some(),
@@ -235,7 +228,6 @@ mod tests {
         app.world_mut().entity_mut(bears).remove::<(
             cards::OnBattlefield,
             cards::EffectivePT,
-            cards::Indestructible,
             cards::Deathtouch,
             cards::Infect,
             cards::Lifelink,

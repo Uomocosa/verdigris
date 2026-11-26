@@ -14,9 +14,6 @@ pub struct Token;
 pub struct EffectivePT(pub cards::PowerToughness);
 
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
-pub struct Indestructible;
-
-#[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Deathtouch;
 
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]

@@ -24,7 +24,7 @@ pub fn add_state_based_systems(app: &mut App) {
                     comprehensive_rules::r704_5h_deathtouch_damage::r704_5h_deathtouch_damage,
                     comprehensive_rules::r704_5j_legend_rule::r704_5j_legend_rule(),
                     Attempt::<events::Destroy>::resolved_by(
-                        comprehensive_rules::r702_12b_indestructible::r702_12b_indestructible,
+                        comprehensive_rules::r701_8a_destroy::r701_8a_destroy,
                     ),
                     comprehensive_rules::r704_5m_aura_illegal::r704_5m_aura_illegal,
                     Attempt::<events::PutIntoGraveyard>::resolved_by(

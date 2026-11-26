@@ -33,10 +33,8 @@ mod tests {
     #[test]
     fn an_effect_about_creatures_does_not_keep_an_aura() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
-            P1.hand([HOLY_STRENGTH]).mana_pool(mana![W]),
-            P2.hand([MURDER])
-                .mana_pool(mana![1, B, B])
-                .battlefield([GRIZZLY_BEARS, TEST_NO_BURIALS]),
+            P1.hand([HOLY_STRENGTH]).mana_pool(mana![W]).battlefield([TEST_NO_BURIALS]),
+            P2.hand([MURDER]).mana_pool(mana![1, B, B]).battlefield([GRIZZLY_BEARS]),
         ]);
         let [strength] = game.player(p1).cards_in(HAND).exactly::<1>(HOLY_STRENGTH)?;
         let [murder] = game.player(p2).cards_in(HAND).exactly::<1>(MURDER)?;
