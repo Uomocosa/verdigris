@@ -1503,6 +1503,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "verdigris-event-derive"
+version = "0.0.2"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.119",
+]
+
+[[package]]
 name = "verdigris-game"
 version = "0.0.2"
 
@@ -1534,6 +1543,7 @@ dependencies = [
  "bevy",
  "derive_more",
  "thiserror 2.0.21",
+ "verdigris-event-derive",
  "verdigris-rule-engine",
 ]
 

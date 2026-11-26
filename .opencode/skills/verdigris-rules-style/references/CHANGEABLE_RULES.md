@@ -144,6 +144,12 @@ template is one variant plus its `instantiate`, and the event's own rule perform
 phases end.") is `Change::Skip` on the event: `statics::all(PLAYER).dont_lose_unspent_mana()`. If the rule
 performs the outcome itself, make it an event first.
 
+**Named arguments (pilot).** An event may also derive `EventArgs` (`#[derive(EventArgs)]`, `crates/event-derive`),
+marking each named argument with `#[arg]`; the derive emits one `SCREAMING_SNAKE_CASE` const per field
+(`DealDamage::SOURCE`) plus `EventArgs::arg` (a value by id) and `EventArgs::args` (all ids). Roles
+(`Context::subject` / `other` / `player`) stay the mechanism the pipeline reads; nothing reads the
+named arguments yet, so adding them changes no behaviour.
+
 **Text that points at cards** ("some cards / effects allow a player to ...") is a **hook**, not an
 event: the rule announces a `HookEvent` for each object into `HookQueue<E>`, and the card writes a
 change to that hook, for its own object — e.g.

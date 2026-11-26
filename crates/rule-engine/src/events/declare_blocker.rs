@@ -1,5 +1,6 @@
 use atomic_delegate_macros::atomic_delegate;
 use bevy::prelude::Entity;
+use verdigris_event_derive::EventArgs;
 
 use crate::players;
 
@@ -10,10 +11,13 @@ pub const CREATURE: rules::RestrictionId = rules::RestrictionId("509.1a/creature
 pub const CONTROLS: rules::RestrictionId = rules::RestrictionId("509.1a/controls");
 pub const UNTAPPED: rules::RestrictionId = rules::RestrictionId("509.1a/untapped");
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EventArgs)]
 pub struct DeclareBlocker {
+    #[arg]
     pub blocker: Entity,
+    #[arg]
     pub attacker: Entity,
+    #[arg]
     pub player: players::PlayerId,
 }
 
@@ -35,10 +39,14 @@ impl Event for DeclareBlocker {
 mod tests {
     use std::collections::HashSet;
 
+    use bevy::prelude::Entity;
+
     use crate::cards;
     use crate::events;
+    use crate::players;
     use crate::rules;
     use crate::rules::traits::event::Event;
+    use crate::rules::traits::event_args::EventArgs;
 
     use super::CONTROLS;
     use super::CREATURE;
@@ -69,6 +77,23 @@ mod tests {
             "The chosen creatures must be untapped"
         );
         assert_eq!(restrictions[2].condition, !rules::has::<cards::Tapped>());
+        let event = DeclareBlocker {
+            blocker: Entity::PLACEHOLDER,
+            attacker: Entity::from_raw_u32(1).unwrap(),
+            player: players::PlayerId(Entity::from_raw_u32(2).unwrap()),
+        };
+        assert_eq!(
+            event.arg(DeclareBlocker::BLOCKER),
+            Some(rules::ArgValue::Entity(Entity::PLACEHOLDER))
+        );
+        assert_eq!(
+            DeclareBlocker::args(),
+            &[
+                DeclareBlocker::BLOCKER,
+                DeclareBlocker::ATTACKER,
+                DeclareBlocker::PLAYER,
+            ]
+        );
     }
 
     #[test]

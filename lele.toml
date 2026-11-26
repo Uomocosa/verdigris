@@ -17,6 +17,11 @@ require    = "honest"
 path   = "crates/rule-engine/__rules__"
 reason = "Holds only Comprehensive Rules Bevy systems, one file per rule; shared items live at the crate root."
 
+[[lele.project.entry_points]]
+file = "crates/event-derive/src/lib.rs"
+fn = "derive_event_args"
+reason = "proc-macro entry point"
+
 [honesty]
 declared_honest = []
 declared_dishonest = ["std::time::SystemTime::now", "std::time::Instant::now", "rand::thread_rng", "rand::random", "getrandom::getrandom", "std::fs::read", "std::fs::write", "std::env::var"]

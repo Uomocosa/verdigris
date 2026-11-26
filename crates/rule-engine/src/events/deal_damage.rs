@@ -1,5 +1,6 @@
 use atomic_delegate_macros::atomic_delegate;
 use bevy::prelude::Entity;
+use verdigris_event_derive::EventArgs;
 
 use crate::players;
 
@@ -8,11 +9,15 @@ use crate::rules::traits::event::Event;
 
 pub const NONZERO_DAMAGE: rules::RestrictionId = rules::RestrictionId("120.8/nonzero");
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EventArgs)]
 pub struct DealDamage {
+    #[arg]
     pub source: Entity,
+    #[arg]
     pub recipient: Entity,
+    #[arg]
     pub amount: u32,
+    #[arg]
     pub controller: players::PlayerId,
 }
 
@@ -46,6 +51,7 @@ mod tests {
     use crate::rules;
     use crate::rules::traits::context::Context;
     use crate::rules::traits::event::Event;
+    use crate::rules::traits::event_args::EventArgs;
 
     use super::DealDamage;
     use crate::players;
@@ -77,6 +83,23 @@ mod tests {
             rules::event_field(rules::Field::Amount, rules::Comparison::AtLeast, 1)
         );
         assert_eq!(event.field(rules::Field::Amount), Some(3));
+        assert_eq!(
+            event.arg(DealDamage::SOURCE),
+            Some(rules::ArgValue::Entity(source))
+        );
+        assert_eq!(
+            event.arg(DealDamage::AMOUNT),
+            Some(rules::ArgValue::Amount(3))
+        );
+        assert_eq!(
+            DealDamage::args(),
+            &[
+                DealDamage::SOURCE,
+                DealDamage::RECIPIENT,
+                DealDamage::AMOUNT,
+                DealDamage::CONTROLLER,
+            ]
+        );
     }
 
     #[test]

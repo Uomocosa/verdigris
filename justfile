@@ -31,12 +31,13 @@ check-crate CRATE:
     #!/usr/bin/env bash
     set -euo pipefail
     case "{{ CRATE }}" in
+        verdigris-event-derive) dir=crates/event-derive ;;
         verdigris-rule-engine) dir=crates/rule-engine ;;
         verdigris-parser) dir=crates/parser ;;
         verdigris-game) dir=crates/game ;;
         verdigris-lint) dir=crates/verdigris-lint ;;
         *)
-            echo "check-crate: unknown crate '{{ CRATE }}'; known: verdigris-rule-engine verdigris-parser verdigris-game verdigris-lint" >&2
+            echo "check-crate: unknown crate '{{ CRATE }}'; known: verdigris-event-derive verdigris-rule-engine verdigris-parser verdigris-game verdigris-lint" >&2
             exit 1
             ;;
     esac
@@ -59,6 +60,7 @@ clippy:
 lint:
     cargo run --quiet -p verdigris-lint -- --config lele.toml --sync-config --check crates/rule-engine
     cargo run --quiet -p verdigris-lint -- --config lele.toml crates/rule-engine
+    cargo run --quiet -p verdigris-lint -- --config lele.toml crates/event-derive
     cargo run --quiet -p verdigris-lint -- --config lele.toml crates/parser
     cargo run --quiet -p verdigris-lint -- --config lele.toml crates/game
     cargo run --quiet -p verdigris-lint -- --config lele.toml crates/verdigris-lint
