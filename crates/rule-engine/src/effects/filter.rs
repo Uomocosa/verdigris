@@ -16,6 +16,12 @@ pub struct Filter {
 #[atomic_delegates]
 impl Filter {
     #[must_use]
+    pub const fn player(who: effects::PlayerRef) -> Self {}
+}
+
+#[atomic_delegates]
+impl Filter {
+    #[must_use]
     pub fn controlled_by(self, player: effects::PlayerRef) -> Self {}
 
     #[must_use]

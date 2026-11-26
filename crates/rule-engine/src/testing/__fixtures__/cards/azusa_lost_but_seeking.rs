@@ -1,5 +1,3 @@
-use crate::PLAYER;
-use crate::YOU;
 use crate::card;
 use crate::cards;
 use crate::cost;
@@ -15,7 +13,7 @@ pub const AZUSA_LOST_BUT_SEEKING: testing::Card = testing::Card {
                 .supertype(cards::Supertype::Legendary)
                 .subtype(cards::CreatureType::Human.into())
                 .subtype(cards::CreatureType::Monk.into());
-            statics::all(PLAYER.controlled_by(YOU)).play_additional_lands(2),
+            statics::you().play_additional_lands(2),
         }
     },
 };

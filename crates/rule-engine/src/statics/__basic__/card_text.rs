@@ -8,6 +8,16 @@ pub const fn all(filter: effects::Filter) -> statics::All {
 }
 
 #[must_use]
+pub const fn you() -> statics::All {
+    statics::all(effects::Filter::player(effects::PlayerRef::You))
+}
+
+#[must_use]
+pub const fn each_opponent() -> statics::All {
+    statics::all(effects::Filter::player(effects::PlayerRef::Opponent))
+}
+
+#[must_use]
 pub const fn this() -> statics::All {
     statics::All(effects::Filter {
         kind: effects::FilterKind::Creature,

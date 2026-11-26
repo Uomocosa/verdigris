@@ -1,6 +1,3 @@
-use crate::OPPONENT;
-use crate::PLAYER;
-use crate::YOU;
 use crate::card;
 use crate::cards;
 use crate::cost;
@@ -16,8 +13,8 @@ pub const PLATINUM_ANGEL: testing::Card = testing::Card {
             cards::artifact_creature("Platinum Angel", cost![7], pt!(4, 4))
                 .subtype(cards::CreatureType::Angel.into());
             keywords::flying(),
-            statics::all(PLAYER.controlled_by(YOU)).cant_lose_the_game(),
-            statics::all(PLAYER.controlled_by(OPPONENT)).cant_win_the_game(),
+            statics::you().cant_lose_the_game(),
+            statics::each_opponent().cant_win_the_game(),
         }
     },
 };

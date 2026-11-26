@@ -1,5 +1,3 @@
-use crate::PLAYER;
-use crate::YOU;
 use crate::abilities;
 use crate::card;
 use crate::cards;
@@ -14,7 +12,7 @@ pub const LEYLINE_OF_SANCTITY: testing::Card = testing::Card {
         card! {
             cards::CardDefinition::from_enchantment("Leyline of Sanctity", cost![2, W, W]);
             abilities::begin_the_game_with_it_on_the_battlefield(),
-            statics::all(PLAYER.controlled_by(YOU)).gain(keywords::hexproof()),
+            statics::you().gain(keywords::hexproof()),
         }
     },
 };

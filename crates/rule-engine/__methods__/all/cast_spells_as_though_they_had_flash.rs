@@ -27,7 +27,7 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let ability = cast_spells_as_though_they_had_flash(statics::all(PLAYER.controlled_by(YOU)));
+        let ability = cast_spells_as_though_they_had_flash(statics::you());
         assert_eq!(ability.filter, PLAYER.controlled_by(YOU));
         assert_eq!(
             ability.modification,

@@ -1,5 +1,3 @@
-use crate::PLAYER;
-use crate::YOU;
 use crate::abilities;
 use crate::card;
 use crate::cards;
@@ -13,7 +11,7 @@ pub const LEYLINE_OF_ANTICIPATION: testing::Card = testing::Card {
         card! {
             cards::CardDefinition::from_enchantment("Leyline of Anticipation", cost![2, U, U]);
             abilities::begin_the_game_with_it_on_the_battlefield(),
-            statics::all(PLAYER.controlled_by(YOU)).cast_spells_as_though_they_had_flash(),
+            statics::you().cast_spells_as_though_they_had_flash(),
         }
     },
 };

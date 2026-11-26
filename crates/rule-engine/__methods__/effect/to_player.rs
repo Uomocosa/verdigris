@@ -1,9 +1,8 @@
-use crate::PLAYER;
 use crate::effects;
 
-pub fn to_player(effect: effects::Effect, player: effects::PlayerRef) -> effects::Effect {
+pub const fn to_player(effect: effects::Effect, player: effects::PlayerRef) -> effects::Effect {
     effects::Effect {
-        target: Some(effects::target(1, PLAYER.controlled_by(player))),
+        target: Some(effects::target(1, effects::Filter::player(player))),
         ..effect
     }
 }

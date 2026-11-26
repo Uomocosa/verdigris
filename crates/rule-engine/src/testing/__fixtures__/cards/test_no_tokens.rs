@@ -1,5 +1,3 @@
-use crate::PLAYER;
-use crate::YOU;
 use crate::card;
 use crate::cards;
 use crate::cost;
@@ -13,7 +11,7 @@ pub const TEST_NO_TOKENS: testing::Card = testing::Card {
     definition: || {
         card! {
             cards::CardDefinition::from_enchantment("Test No Tokens", cost![2]);
-            statics::all(PLAYER.controlled_by(YOU))
+            statics::you()
                 .cant::<events::EnterBattlefield>(rules::Role::Player),
         }
     },

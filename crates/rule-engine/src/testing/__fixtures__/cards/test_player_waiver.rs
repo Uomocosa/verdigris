@@ -1,5 +1,3 @@
-use crate::PLAYER;
-use crate::YOU;
 use crate::card;
 use crate::cards;
 use crate::cost;
@@ -11,7 +9,7 @@ pub const TEST_PLAYER_WAIVER: testing::Card = testing::Card {
     definition: || {
         card! {
             cards::CardDefinition::from_enchantment("Test Player Waiver", cost![2, U]);
-            statics::all(PLAYER.controlled_by(YOU)).as_though(testing::UNTAPPED),
+            statics::you().as_though(testing::UNTAPPED),
         }
     },
 };

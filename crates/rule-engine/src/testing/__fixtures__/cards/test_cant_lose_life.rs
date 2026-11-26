@@ -1,5 +1,3 @@
-use crate::PLAYER;
-use crate::YOU;
 use crate::card;
 use crate::cards;
 use crate::cost;
@@ -13,7 +11,7 @@ pub const TEST_CANT_LOSE_LIFE: testing::Card = testing::Card {
     definition: || {
         card! {
             cards::CardDefinition::from_enchantment("Test Can't Lose Life", cost![2]);
-            statics::all(PLAYER.controlled_by(YOU)).cant::<events::LoseLife>(rules::Role::Player),
+            statics::you().cant::<events::LoseLife>(rules::Role::Player),
         }
     },
 };

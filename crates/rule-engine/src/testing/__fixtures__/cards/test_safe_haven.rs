@@ -1,5 +1,4 @@
 use crate::CREATURE;
-use crate::PLAYER;
 use crate::YOU;
 use crate::card;
 use crate::cards;
@@ -15,7 +14,7 @@ pub const TEST_SAFE_HAVEN: testing::Card = testing::Card {
         card! {
             cards::CardDefinition::from_enchantment("Test Safe Haven", cost![2]);
             statics::all(CREATURE.controlled_by(YOU)).cant::<events::Destroy>(rules::Role::Subject),
-            statics::all(PLAYER.controlled_by(YOU)).cant::<events::Counter>(rules::Role::Player),
+            statics::you().cant::<events::Counter>(rules::Role::Player),
             statics::all(CREATURE.controlled_by(YOU)).cant::<events::DealDamage>(rules::Role::Subject),
         }
     },

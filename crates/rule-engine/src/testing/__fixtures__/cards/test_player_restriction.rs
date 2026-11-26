@@ -1,4 +1,3 @@
-use crate::PLAYER;
 use crate::YOU;
 use crate::abilities;
 use crate::card;
@@ -15,7 +14,7 @@ pub const TEST_PLAYER_RESTRICTION: testing::Card = testing::Card {
         card! {
             cards::CardDefinition::from_enchantment("Test Player Restriction", cost![2]);
             abilities::Continuous {
-                filter: PLAYER.controlled_by(YOU),
+                filter: effects::Filter::player(YOU),
                 modification: effects::Modification::Rule(rules::RuleChange {
                     target: rules::Target::Event(testing::TestRule::ID),
                     change: rules::Change::OnlyIf {

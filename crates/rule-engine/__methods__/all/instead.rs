@@ -36,7 +36,7 @@ mod tests {
     #[test]
     fn test_usage() {
         let ability = instead(
-            statics::all(PLAYER.controlled_by(YOU)),
+            statics::you(),
             events::DrawFromEmptyLibrary::ID,
             rules::Predicate::True,
             vec![rules::EventTemplate::WinGame {
