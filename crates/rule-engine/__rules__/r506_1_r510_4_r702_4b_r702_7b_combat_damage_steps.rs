@@ -1,8 +1,7 @@
-use bevy::prelude::{Entity, MessageReader, Query, ResMut, With};
+use bevy::prelude::{Entity, Has, MessageReader, Query, ResMut, With};
 
 use crate::GameMut;
 use crate::cards;
-use crate::keywords;
 use crate::turns;
 
 /// 506.1. The combat phase has five steps, which proceed in order: beginning of combat, declare
@@ -41,56 +40,65 @@ pub fn r506_1_r510_4_r702_4b_r702_7b_combat_damage_steps(
     mut step_started: MessageReader<turns::StepStarted>,
     mut game: GameMut,
     mut participants: ResMut<turns::CombatDamageParticipants>,
-    attackers: Query<(Entity, &cards::CardDefinition), With<cards::Attacking>>,
-    blockers: Query<(Entity, &cards::CardDefinition), With<cards::Blocking>>,
+    attackers: Query<
+        (Entity, Has<cards::FirstStrike>, Has<cards::DoubleStrike>),
+        With<cards::Attacking>,
+    >,
+    blockers: Query<
+        (Entity, Has<cards::FirstStrike>, Has<cards::DoubleStrike>),
+        With<cards::Blocking>,
+    >,
 ) {
-    let has_first_strike = |definition: &cards::CardDefinition| {
-        definition.has_keyword(keywords::StaticKeyword::FirstStrike)
-    };
-    let has_double_strike = |definition: &cards::CardDefinition| {
-        definition.has_keyword(keywords::StaticKeyword::DoubleStrike)
-    };
-    let does_assign_in_first_step = |definition: &cards::CardDefinition| {
-        has_first_strike(definition) || has_double_strike(definition)
-    };
-    let does_assign_in_second_step = |definition: &cards::CardDefinition| {
-        !has_first_strike(definition) || has_double_strike(definition)
-    };
+    let does_assign_in_first_step =
+        |first_strike: bool, double_strike: bool| first_strike || double_strike;
+    let does_assign_in_second_step =
+        |first_strike: bool, double_strike: bool| !first_strike || double_strike;
     for step in step_started.read() {
         match **step {
             turns::Step::CombatDamage => {
                 let does_any_have_first_or_double_strike = attackers
                     .iter()
                     .chain(blockers.iter())
-                    .any(|(_, definition)| does_assign_in_first_step(definition));
+                    .any(|(_, first_strike, double_strike)| {
+                        does_assign_in_first_step(first_strike, double_strike)
+                    });
                 if does_any_have_first_or_double_strike {
                     game.add_step_after_this_one(turns::Step::SecondCombatDamage);
                 }
-                let does_assign = |definition: &cards::CardDefinition| {
-                    !does_any_have_first_or_double_strike || does_assign_in_first_step(definition)
+                let does_assign = |first_strike: bool, double_strike: bool| {
+                    !does_any_have_first_or_double_strike
+                        || does_assign_in_first_step(first_strike, double_strike)
                 };
                 **participants = attackers
                     .iter()
-                    .filter(|(_, definition)| does_assign(definition))
-                    .map(|(entity, _)| entity)
+                    .filter(|(_, first_strike, double_strike)| {
+                        does_assign(*first_strike, *double_strike)
+                    })
+                    .map(|(entity, _, _)| entity)
                     .chain(
                         blockers
                             .iter()
-                            .filter(|(_, definition)| does_assign(definition))
-                            .map(|(entity, _)| entity),
+                            .filter(|(_, first_strike, double_strike)| {
+                                does_assign(*first_strike, *double_strike)
+                            })
+                            .map(|(entity, _, _)| entity),
                     )
                     .collect();
             }
             turns::Step::SecondCombatDamage => {
                 **participants = attackers
                     .iter()
-                    .filter(|(_, definition)| does_assign_in_second_step(definition))
-                    .map(|(entity, _)| entity)
+                    .filter(|(_, first_strike, double_strike)| {
+                        does_assign_in_second_step(*first_strike, *double_strike)
+                    })
+                    .map(|(entity, _, _)| entity)
                     .chain(
                         blockers
                             .iter()
-                            .filter(|(_, definition)| does_assign_in_second_step(definition))
-                            .map(|(entity, _)| entity),
+                            .filter(|(_, first_strike, double_strike)| {
+                                does_assign_in_second_step(*first_strike, *double_strike)
+                            })
+                            .map(|(entity, _, _)| entity),
                     )
                     .collect();
             }
@@ -101,6 +109,8 @@ pub fn r506_1_r510_4_r702_4b_r702_7b_combat_damage_steps(
 
 #[cfg(test)]
 mod tests {
+    use crate::HAND;
+    use crate::mana;
     use crate::testing::*;
     use crate::turns;
     use crate::{BATTLEFIELD, GRAVEYARD};
@@ -140,6 +150,55 @@ mod tests {
         assert!(game.player(p1).cards_in(GRAVEYARD).has(ace));
         assert!(game.player(p2).cards_in(GRAVEYARD).has(bears));
         assert_eq!(game.turn().step, turns::Step::EndOfCombat);
+        Ok(())
+    }
+
+    #[test]
+    fn a_creature_given_first_strike_by_an_instant_deals_damage_only_in_the_first_step()
+    -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.battlefield([GRIZZLY_BEARS, MOUNTAIN])
+                .hand([TEST_FIRST_STRIKE_GRANT])
+                .mana_pool(mana![R]),
+            P2.battlefield([GRIZZLY_BEARS]),
+        ]);
+        let [attacker] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        let [mountain] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(MOUNTAIN)?;
+        let [blocker] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        let [grant] = game.player(p1).cards_in(HAND).exactly::<1>(TEST_FIRST_STRIKE_GRANT)?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareAttackers),
+            p2.pass_to(turns::Step::DeclareAttackers),
+            p1.declare_attackers([attacker]),
+        ])?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareBlockers),
+            p2.pass_to(turns::Step::DeclareBlockers),
+            p1.pass_priority(),
+            p2.declare_blockers([(blocker, attacker)]),
+        ])?;
+        game.play([
+            p2.pass_priority(),
+            p1.activate_ability(mountain.ability()).cast(grant).targeting(attacker).pass_priority(),
+            p2.pass_priority(),
+        ])?;
+        game.play([
+            p1.pass_to(turns::Step::CombatDamage),
+            p2.pass_to(turns::Step::CombatDamage),
+            p1.pass_priority(),
+            p2.pass_priority(),
+        ])?;
+
+        assert_eq!(game.turn().step, turns::Step::SecondCombatDamage);
+        assert!(game.player(p2).cards_in(GRAVEYARD).has(blocker));
+        assert!(game.player(p1).cards_in(BATTLEFIELD).has(attacker));
+        assert_eq!(game.life(p2), 20);
+
+        game.play([p1.pass_priority(), p2.pass_priority()])?;
+
+        assert_eq!(game.turn().step, turns::Step::EndOfCombat);
+        assert!(game.player(p1).cards_in(BATTLEFIELD).has(attacker));
+        assert_eq!(game.life(p2), 20);
         Ok(())
     }
 }
