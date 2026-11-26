@@ -7,8 +7,8 @@ use crate::zones;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Condition {
-    Has(rules::ComponentKey),
-    PointsTo(rules::ComponentKey, rules::Role),
+    Has(rules::ComponentRef),
+    PointsTo(rules::ComponentRef, rules::Role),
     Is(rules::Role),
     CardType(cards::CardType),
     Characteristic(rules::Characteristic, rules::Comparison, i32),
@@ -69,13 +69,18 @@ impl Condition {
 
 #[cfg(test)]
 mod tests {
+    use crate::cards;
     use crate::rules;
 
     use super::Condition;
 
     #[test]
     fn test_usage() {
-        let tapped = Condition::Has(rules::ComponentKey("tapped"));
+        let tapped = rules::has::<cards::Tapped>();
+        assert_eq!(
+            tapped,
+            rules::Condition::Has(rules::ComponentRef::of::<cards::Tapped>())
+        );
         let combined = tapped.clone() & Condition::True;
         assert_eq!(combined, Condition::All(vec![tapped, Condition::True]));
     }

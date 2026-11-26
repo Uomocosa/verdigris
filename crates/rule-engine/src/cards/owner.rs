@@ -7,10 +7,6 @@ use crate::rules;
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Deref)]
 pub struct Owner(pub players::PlayerId);
 
-impl rules::traits::keyed_component::KeyedComponent for Owner {
-    const KEY: rules::ComponentKey = rules::ComponentKey("owner");
-}
-
 #[rustfmt::skip]
 impl rules::traits::entity_component::EntityComponent for Owner {
     fn target(&self) -> Entity { ***self }

@@ -172,7 +172,7 @@ rule from a keyword read to a rule change fixes granted keywords: red first, wit
 If a rule about the battlefield needs a marker that doesn't exist yet, add it to the layers in its
 own refactor commit, before the rule reads it: the struct in `cards/__basic__/components.rs` (+ re-export), a
 `Has<..>` field in `CurrentMarkers`, a `sync_marker` call in `write_markers`, and its line in that file's
-identity test; `PredicateRegistry` only if a rule asks through `rules::has`. If reading the marker fixes a bug,
+identity test. If reading the marker fixes a bug,
 switching the rule to it is the red-first fix commit (`r510_4`: markers, then first strike granted by an effect).
 
 A rule that grants an ability (§1, 305.6) supplies the data; the layers write the marker. No `__rules__`

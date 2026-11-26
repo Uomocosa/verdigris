@@ -14,7 +14,6 @@ pub struct Rules<'w, 's> {
     pub definitions: Query<'w, 's, &'static cards::CardDefinition>,
     pub effects: Query<'w, 's, &'static effects::ContinuousEffect>,
     pub entities: Query<'w, 's, EntityRef<'static>, Without<IsResource>>,
-    pub registry: Query<'w, 's, &'static rules::PredicateRegistry>,
     pub state: Query<'w, 's, &'static turns::TurnState>,
     pub zones: zones::ZoneLookup<'w, 's>,
     pub in_zone: Query<'w, 's, &'static zones::InZone>,

@@ -39,3 +39,30 @@ pub struct TriggeredEnters(pub abilities::TriggeredAbility);
 
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Deref)]
 pub struct TriggeredAtStep(pub abilities::TriggeredAbility);
+
+#[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Attacking;
+
+#[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Creature;
+
+#[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Defender;
+
+#[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Flying;
+
+#[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
+pub struct OnBattlefield;
+
+#[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Reach;
+
+#[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
+pub struct SummoningSick;
+
+#[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Tapped;
+
+#[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Vigilance;

@@ -17,26 +17,16 @@ pub fn eval(
         rules::Role::Player => player,
     };
     match condition {
-        rules::Condition::Has(key) => answers
-            .registry
-            .single()
-            .ok()
-            .and_then(|registry| registry.component_id(*key))
-            .is_some_and(|component| {
-                answers.entities.get(subject).is_ok_and(|entity| entity.contains_id(component))
-            }),
-        rules::Condition::PointsTo(key, role) => target(role).is_some_and(|wanted| {
+        rules::Condition::Has(component) => answers
+            .entities
+            .get(subject)
+            .is_ok_and(|entity| entity.contains_type_id(component.type_id)),
+        rules::Condition::PointsTo(component, role) => target(role).is_some_and(|wanted| {
             answers
-                .registry
-                .single()
+                .entities
+                .get(subject)
                 .ok()
-                .and_then(|registry| {
-                    answers
-                        .entities
-                        .get(subject)
-                        .ok()
-                        .and_then(|entity| registry.target_of(*key, entity))
-                })
+                .and_then(|entity| component.target.and_then(|read| read(&entity)))
                 .is_some_and(|found| found == wanted)
         }),
         rules::Condition::Is(role) => target(role) == Some(subject),

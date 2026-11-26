@@ -3,17 +3,15 @@ mod basic;
 
 pub use basic::card_text::{artifact_creature, creature, instant, land, sorcery};
 pub use basic::components::{
-    Blocked, Deathtouch, DoubleStrike, EffectivePT, FirstStrike, HadFirstStrikeAsDamageBegan,
-    Infect, Lifelink, Token, Trample, TriggeredAtStep, TriggeredEnters,
+    Attacking, Blocked, Creature, Deathtouch, Defender, DoubleStrike, EffectivePT, FirstStrike,
+    Flying, HadFirstStrikeAsDamageBegan, Infect, Lifelink, OnBattlefield, Reach, SummoningSick,
+    Tapped, Token, Trample, TriggeredAtStep, TriggeredEnters, Vigilance,
 };
 pub use basic::current_markers::{CurrentMarkers, CurrentMarkersItem};
 pub use basic::enums::{CardType, Color, CreatureType, EnchantmentType, ManaSymbol, Supertype};
 pub use basic::newtypes::{CardId, CardName};
 pub use basic::structs::PowerToughness;
 pub use basic::type_aliases::InCombat;
-
-mod attacking;
-pub use attacking::Attacking;
 
 mod blocking;
 pub use blocking::Blocking;
@@ -36,15 +34,6 @@ pub use cost::Cost;
 mod controller;
 pub use controller::Controller;
 
-mod creature;
-pub use creature::Creature;
-
-mod defender;
-pub use defender::Defender;
-
-mod flying;
-pub use flying::Flying;
-
 mod land_type;
 pub use land_type::LandType;
 
@@ -57,23 +46,8 @@ pub use mana_type::ManaType;
 mod owner;
 pub use owner::Owner;
 
-mod on_battlefield;
-pub use on_battlefield::OnBattlefield;
-
-mod reach;
-pub use reach::Reach;
-
 mod subtype;
 pub use subtype::Subtype;
 
-mod summoning_sick;
-pub use summoning_sick::SummoningSick;
-
-mod tapped;
-pub use tapped::Tapped;
-
 mod type_line;
 pub use type_line::TypeLine;
-
-mod vigilance;
-pub use vigilance::Vigilance;

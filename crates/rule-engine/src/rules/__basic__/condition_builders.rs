@@ -1,11 +1,13 @@
+use bevy::prelude::Component;
+
 use crate::cards;
 use crate::rules;
 use crate::turns;
 use crate::zones;
 
 #[must_use]
-pub const fn has<C: rules::traits::keyed_component::KeyedComponent>() -> rules::Condition {
-    rules::Condition::Has(C::KEY)
+pub fn has<C: Component>() -> rules::Condition {
+    rules::Condition::Has(rules::ComponentRef::of::<C>())
 }
 
 #[must_use]
@@ -34,10 +36,10 @@ pub fn other(condition: rules::Condition) -> rules::Condition {
 }
 
 #[must_use]
-pub const fn points_to<C: rules::traits::entity_component::EntityComponent>(
+pub fn points_to<C: rules::traits::entity_component::EntityComponent>(
     role: rules::Role,
 ) -> rules::Condition {
-    rules::Condition::PointsTo(C::KEY, role)
+    rules::Condition::PointsTo(rules::ComponentRef::relation::<C>(), role)
 }
 
 #[must_use]

@@ -6,9 +6,8 @@ pub use basic::condition_builders::{
     is, main_phase, other, points_to, stack_empty, step_is,
 };
 pub use basic::enums::{Amount, Change, Characteristic, Comparison, Field, Legality, Role, may};
-pub use basic::newtypes::{ComponentKey, EventId, RuleId};
+pub use basic::newtypes::{EventId, RuleId};
 pub use basic::structs::RuleChange;
-pub use basic::type_aliases::TargetOf;
 
 #[path = "__traits__/mod.rs"]
 pub mod traits;
@@ -46,11 +45,11 @@ pub use limit::Limit;
 pub mod maximum_hand_size;
 pub use maximum_hand_size::MaximumHandSize;
 
+mod component_ref;
+pub use component_ref::ComponentRef;
+
 mod condition;
 pub use condition::Condition;
-
-mod predicate_registry;
-pub use predicate_registry::PredicateRegistry;
 
 mod rules;
 pub use rules::Rules;

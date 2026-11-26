@@ -24,3 +24,6 @@ pub struct GameIsADraw;
 
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct AttemptedDrawFromEmptyLibrary;
+
+#[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Player;
