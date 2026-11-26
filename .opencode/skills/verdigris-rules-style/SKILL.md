@@ -150,8 +150,9 @@ outcome (`r120_3` writes `Did`, so a trigger on damage). A general file that onl
    settles §2: §2 is for questions several rules ask.
 3. **Moving the body into a helper is not a refactor.** If the helper still does the checks, the
    complexity only moved. Remove it: give it to an event's clauses, the pipeline or the shared choice.
-4. A new `SystemParam` holds `rules::Rules` (it already has definitions, zones, `in_zone`, entities) plus at most a
-   small query; `Rules` + `Players` is over clippy's 256-byte pass-by-value limit (`stack::Targeting`).
+4. A new `SystemParam` names each query it reads as its own field (`stack::Targeting`), and holds
+   `rules::Rules` only to ask `answers.legal(..)`; it never digs data out of `Rules`' queries.
+   SystemParams may pass up to 512 bytes (`clippy.toml`); a Bevy handle is moved once per system run.
 5. Repeated struct literals get a constructor that reads as the CR phrase
    (`LoseLife::by(player, amount)`; if the linter wants another name, its name wins).
 
