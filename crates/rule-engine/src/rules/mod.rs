@@ -6,7 +6,7 @@ pub use basic::condition_builders::{
     main_phase, points_to, stack_empty, step_is,
 };
 pub use basic::enums::{Amount, Change, Characteristic, Legality, may};
-pub use basic::newtypes::{EventId, RuleId};
+pub use basic::newtypes::{EventId, ResultId, RuleId};
 pub use basic::structs::RuleChange;
 pub use basic::type_aliases::{Definition, Restriction};
 

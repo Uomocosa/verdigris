@@ -4,6 +4,7 @@ use bevy::prelude::{App, IntoScheduleConfigs, Update};
 use crate::Attempt;
 use crate::RuleSet;
 use crate::comprehensive_rules;
+use crate::rules;
 
 pub fn add_resolution_systems(app: &mut App) {
     app.add_systems(
@@ -43,11 +44,12 @@ pub fn add_resolution_systems(app: &mut App) {
                     (
                         comprehensive_rules::r120_3_damage_results::r120_3_damage_results,
                         comprehensive_rules::r120_3a_damage_to_a_player::r120_3a_damage_to_a_player,
-                        comprehensive_rules::r120_3b_infect_damage_to_a_player::r120_3b_infect_damage_to_a_player,
                         comprehensive_rules::r120_3e_damage_to_a_creature::r120_3e_damage_to_a_creature,
                     )
                         .chain(),
-                    comprehensive_rules::r702_15b_lifelink::r702_15b_lifelink,
+                    rules::bevy_systems::resolution_hooks::resolution_hooks::<
+                        events::DealDamage,
+                    >,
                     (
                         comprehensive_rules::r614_1a_r616_1_replacement_effects::r614_1a_r616_1_replacement_effects::<
                             events::LoseLife,
@@ -115,7 +117,7 @@ mod tests {
 
         assert_eq!(
             app.get_schedule(Update).map(Schedule::systems_len),
-            Some(40)
+            Some(39)
         );
     }
 }

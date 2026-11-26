@@ -6,6 +6,7 @@ use crate::statics;
 pub fn instead(
     all: statics::All,
     event: rules::EventId,
+    holder: impl Into<rules::ArgRef>,
     when: rules::Condition,
     then: impl Into<rules::Then>,
 ) -> abilities::Continuous {
@@ -14,6 +15,7 @@ pub fn instead(
         modification: effects::Modification::Rule(rules::RuleChange {
             target: rules::Target::Event(event),
             change: rules::Change::Instead {
+                holder: holder.into(),
                 when,
                 then: then.into(),
             },
@@ -38,6 +40,7 @@ mod tests {
         let ability = instead(
             statics::you(),
             events::DrawFromEmptyLibrary::ID,
+            events::DrawFromEmptyLibrary::PLAYER,
             rules::Condition::True,
             vec![rules::EventTemplate::WinGame {
                 who: events::DrawFromEmptyLibrary::PLAYER.into(),
@@ -49,6 +52,7 @@ mod tests {
             effects::Modification::Rule(rules::RuleChange {
                 target: rules::Target::event::<events::DrawFromEmptyLibrary>(),
                 change: rules::Change::Instead {
+                    holder: events::DrawFromEmptyLibrary::PLAYER.into(),
                     when: rules::Condition::True,
                     then: rules::Then::Events(vec![rules::EventTemplate::WinGame {
                         who: events::DrawFromEmptyLibrary::PLAYER.into(),

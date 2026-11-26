@@ -31,7 +31,9 @@ pub fn holder_changes<E: Event>(
                 let held = match &change {
                     rules::Change::Restrict { holder, .. }
                     | rules::Change::AsThough { holder }
-                    | rules::Change::Allow { holder, .. } => *holder == reference,
+                    | rules::Change::Allow { holder, .. }
+                    | rules::Change::Instead { holder, .. }
+                    | rules::Change::Hook { holder, .. } => *holder == reference,
                     _ => false,
                 };
                 if held {

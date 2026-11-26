@@ -3,6 +3,7 @@ use crate::rules;
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Target {
     Event(rules::EventId),
+    Result(rules::ResultId),
     Restriction(rules::RestrictionId),
     Definition(rules::DefinitionId),
     Value(rules::RuleId),

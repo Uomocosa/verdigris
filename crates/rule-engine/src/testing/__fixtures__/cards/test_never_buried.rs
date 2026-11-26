@@ -15,6 +15,7 @@ pub const TEST_NEVER_BURIED: testing::Card = testing::Card {
             abilities::Replacement::Rule(rules::RuleChange {
                 target: rules::Target::event::<events::PutIntoGraveyard>(),
                 change: rules::Change::Instead {
+                    holder: events::PutIntoGraveyard::OBJECT.into(),
                     when: rules::Condition::True,
                     then: rules::Then::Events(Vec::new()),
                 },

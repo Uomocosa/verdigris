@@ -77,6 +77,13 @@ pub fn instantiate<E: Event>(
             player: holder(who),
             amount: amount(template_amount),
         }),
+        rules::EventTemplate::GivePoisonCounters {
+            who,
+            amount: template_amount,
+        } => rules::AnyEvent::GivePoisonCounters(events::GivePoisonCounters {
+            player: holder(who),
+            amount: amount(template_amount),
+        }),
         rules::EventTemplate::BeginTheGameOnTheBattlefield => {
             rules::AnyEvent::BeginTheGameOnTheBattlefield(events::BeginTheGameOnTheBattlefield {
                 card: E::args()

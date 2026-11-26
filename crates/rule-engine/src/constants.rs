@@ -1,5 +1,6 @@
 use crate::cards;
 use crate::effects;
+use crate::rules;
 use crate::turns;
 use crate::zones;
 
@@ -126,3 +127,5 @@ pub const THIS: effects::Target = effects::Target {
         object: Some(effects::ObjectRelation::ThisObject),
     },
 };
+
+pub const LOSES_LIFE: rules::ResultId = rules::ResultId("120.3a/loses-life");

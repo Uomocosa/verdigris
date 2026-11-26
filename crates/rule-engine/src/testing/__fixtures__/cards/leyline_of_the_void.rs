@@ -16,6 +16,7 @@ pub const LEYLINE_OF_THE_VOID: testing::Card = testing::Card {
             abilities::begin_the_game_with_it_on_the_battlefield(),
             statics::each_opponent().instead(
                 events::PutIntoGraveyard::ID,
+                events::PutIntoGraveyard::OBJECT.controller(),
                 rules::Condition::True,
                 vec![rules::EventTemplate::Exile { what: events::PutIntoGraveyard::OBJECT.into() }],
             ),

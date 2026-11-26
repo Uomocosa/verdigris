@@ -278,9 +278,5 @@ reason = "CR rule systems live in __rules__/ (one file per rule) instead of a do
 path = "crates/rule-engine/__rules__/r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_r702_2c_r702_19b_r702_19d_combat_damage.rs"
 reason = "temporary: migrated by J20/J21 (keywords-as-abilities)"
 
-[[lele.rules.verdigris.rule_implemented_once.exempt]]
-path = "crates/rule-engine/__rules__/r702_15b_lifelink.rs"
-reason = "temporary: migrated by J20/J21 (keywords-as-abilities)"
-
 # VRDG015 · In `__rules__/` and `__keywords__/` doc comments, no line is longer than 100 columns.
 [lele.rules.verdigris.rule_doc_width]

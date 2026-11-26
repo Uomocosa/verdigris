@@ -6,6 +6,7 @@ use crate::rules;
 
 pub struct RuleRegistry {
     pub(crate) events: HashSet<rules::EventId>,
+    pub(crate) results: HashSet<rules::ResultId>,
     pub(crate) restrictions: HashSet<rules::RestrictionId>,
     pub(crate) definitions: HashSet<rules::DefinitionId>,
     pub(crate) values: HashSet<rules::RuleId>,
@@ -23,6 +24,7 @@ impl RuleRegistry {
     pub fn resolves(&self, target: &rules::Target) -> bool {
         match target {
             rules::Target::Event(id) => self.events.contains(id),
+            rules::Target::Result(id) => self.results.contains(id),
             rules::Target::Restriction(key) => self.restrictions.contains(key),
             rules::Target::Definition(id) => self.definitions.contains(id),
             rules::Target::Value(id) => self.values.contains(id),

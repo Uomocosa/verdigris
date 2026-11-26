@@ -33,10 +33,12 @@ pub enum Change {
     Decrease(u32),
     NoMaximum,
     Instead {
+        holder: rules::ArgRef,
         when: rules::Condition,
         then: rules::Then,
     },
     Hook {
+        holder: rules::ArgRef,
         when: rules::Condition,
         then: rules::Then,
     },

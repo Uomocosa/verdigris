@@ -30,6 +30,10 @@ pub enum EventTemplate {
         who: rules::ArgRef,
         amount: rules::Amount,
     },
+    GivePoisonCounters {
+        who: rules::ArgRef,
+        amount: rules::Amount,
+    },
     Exile {
         what: rules::ArgRef,
     },

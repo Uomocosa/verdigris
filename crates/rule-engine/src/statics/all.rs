@@ -22,6 +22,7 @@ impl All {
     pub fn instead(
         self,
         event: rules::EventId,
+        holder: impl Into<rules::ArgRef>,
         when: rules::Condition,
         then: impl Into<rules::Then>,
     ) -> abilities::Continuous {

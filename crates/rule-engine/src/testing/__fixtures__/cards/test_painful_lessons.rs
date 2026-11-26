@@ -15,6 +15,7 @@ pub const TEST_PAINFUL_LESSONS: testing::Card = testing::Card {
             cards::CardDefinition::from_enchantment("Test Painful Lessons", cost![2, B]);
             statics::all(PLAYER).instead(
                 events::Draw::ID,
+                events::Draw::PLAYER,
                 events::Draw::AMOUNT.at_least(2),
                 vec![rules::EventTemplate::LoseLife {
                     who: events::Draw::PLAYER.into(),

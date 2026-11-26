@@ -43,6 +43,14 @@ impl Rules<'_, '_> {
     pub fn replacement<E: rules::traits::event::Event>(&self, event: &E) -> Option<rules::Then> {}
 
     #[must_use]
+    pub fn replaced<E: rules::traits::event::Event>(
+        &self,
+        result: rules::ResultId,
+        event: &E,
+    ) -> Option<rules::Then> {
+    }
+
+    #[must_use]
     pub fn hooks<E: rules::traits::event::Event>(&self, event: &E) -> Vec<rules::Then> {}
 
     #[must_use]

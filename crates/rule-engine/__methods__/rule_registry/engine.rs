@@ -1,5 +1,6 @@
 use std::collections::HashSet;
 
+use crate::LOSES_LIFE;
 use crate::events;
 use crate::rules;
 use crate::rules::traits::event::Event;
@@ -98,10 +99,12 @@ pub fn engine() -> rules::RuleRegistry {
     for id in rules::RuleRegistry::keyword_restriction_ids() {
         restrictions.insert(id);
     }
+    let results = HashSet::from([LOSES_LIFE]);
     let definitions = HashSet::from([rules::LETHAL_DAMAGE]);
     let values = HashSet::from([rules::LandPlays::ID, rules::MaximumHandSize::ID]);
     rules::RuleRegistry {
         events,
+        results,
         restrictions,
         definitions,
         values,
