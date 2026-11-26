@@ -4,13 +4,13 @@ use std::hash::Hash;
 
 use crate::keywords;
 
-pub trait Params: Any + Debug + Send + Sync {
+pub trait KeywordParams: Any + Debug + Send + Sync {
     fn as_any(&self) -> &dyn Any;
-    fn dyn_eq(&self, other: &dyn Params) -> bool;
+    fn dyn_eq(&self, other: &dyn KeywordParams) -> bool;
     fn dyn_hash(&self, state: &mut dyn std::hash::Hasher);
 }
 
-impl<T> Params for T
+impl<T> KeywordParams for T
 where
     T: Any + Debug + Eq + Hash + Send + Sync,
 {
@@ -18,7 +18,7 @@ where
         self
     }
 
-    fn dyn_eq(&self, other: &dyn Params) -> bool {
+    fn dyn_eq(&self, other: &dyn KeywordParams) -> bool {
         other.as_any().downcast_ref::<T>() == Some(self)
     }
 
@@ -35,13 +35,13 @@ mod tests {
 
     use crate::CREATURE;
     use crate::keywords;
-    use crate::keywords::traits::params::Params;
+    use crate::keywords::traits::keyword_params::KeywordParams;
 
     #[test]
     fn test_usage() {
-        let plain: &dyn Params = &();
+        let plain: &dyn KeywordParams = &();
         assert!(plain.dyn_eq(&()));
-        let filtered: &dyn Params = &keywords::EnchantFilter(CREATURE);
+        let filtered: &dyn KeywordParams = &keywords::EnchantFilter(CREATURE);
         assert!(filtered.dyn_eq(&keywords::EnchantFilter(CREATURE)));
         assert!(!plain.dyn_eq(filtered));
         let mut dynamic = DefaultHasher::new();

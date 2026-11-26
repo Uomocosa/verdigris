@@ -4,12 +4,12 @@ use atomic_delegate_macros::atomic_delegate;
 
 use crate::effects;
 use crate::keywords;
-use crate::keywords::traits::params::Params;
+use crate::keywords::traits::keyword_params::KeywordParams;
 
 #[derive(Clone)]
 pub struct Keyword {
     pub id: keywords::KeywordId,
-    pub(crate) params: Arc<dyn Params>,
+    pub(crate) params: Arc<dyn KeywordParams>,
     pub(crate) grants: Arc<dyn Fn() -> Vec<effects::Modification> + Send + Sync>,
 }
 
@@ -33,7 +33,7 @@ impl Keyword {
         abilities: fn(&P) -> Vec<effects::Modification>,
     ) -> Self
     where
-        P: Params + Clone,
+        P: KeywordParams + Clone,
     {
         Self {
             id,

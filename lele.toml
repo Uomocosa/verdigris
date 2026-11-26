@@ -32,11 +32,19 @@ comprehensive_rules = "docs/MagicCompRules-20250919.txt"
 # LELECORE001 · locked · One public (`pub` or `pub(crate)`) item per file, and the file is named after it (`guest.rs`…
 [lele.rules.lint.atomic_file]
 
+[[lele.rules.lint.atomic_file.exempt]]
+path = "crates/rule-engine/src/keywords/__traits__/keyword_params.rs"
+reason = "Trait file named after the trait (KeywordParams), not a method file of Keyword."
+
 # LELECORE002 · locked · File and folder names are snake_case.
 [lele.rules.lint.snake_case_files]
 
 # LELECORE003 · locked · A `<type>_<method>.rs` file must sit in the same folder as `<type>.rs`.
 [lele.rules.lint.method_file_co_location]
+
+[[lele.rules.lint.method_file_co_location.exempt]]
+path = "crates/rule-engine/src/keywords/__traits__/keyword_params.rs"
+reason = "Trait file named after the trait (KeywordParams), not a method file of Keyword."
 
 # LELECORE004 · locked · Unit tests live in the same file as the code (no `tests/` folders under `src/`, no…
 [lele.rules.lint.test_inline]
