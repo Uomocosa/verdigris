@@ -49,7 +49,13 @@ impl All {
     pub fn cant_lose_the_game(self) -> abilities::Continuous {}
 
     #[must_use]
-    pub fn cant<E: rules::traits::event::Event>(self, role: rules::Role) -> abilities::Continuous {}
+    pub fn cant<E: rules::traits::event::Event>(
+        self,
+        role: rules::Role,
+        id: rules::RestrictionId,
+        text: &'static str,
+    ) -> abilities::Continuous {
+    }
 
     #[must_use]
     pub fn cant_win_the_game(self) -> abilities::Continuous {}
@@ -74,6 +80,8 @@ impl All {
     #[must_use]
     pub fn restriction<E: rules::traits::event::Event>(
         self,
+        id: rules::RestrictionId,
+        text: &'static str,
         requirement: rules::Condition,
     ) -> abilities::Continuous {
     }

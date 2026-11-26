@@ -11,7 +11,11 @@ pub const TEST_RULE_RESTRICTION: testing::Card = testing::Card {
     definition: || {
         card! {
             cards::creature("Test Rule Restriction", cost![2], pt!(1, 1));
-            statics::this().restriction::<testing::RestrictedRule>(rules::at_least(rules::Characteristic::Power, 3)),
+            statics::this().restriction::<testing::RestrictedRule>(
+                rules::RestrictionId("test/test-rule-restriction"),
+                "attacks only with enough power",
+                rules::at_least(rules::Characteristic::Power, 3),
+            ),
         }
     },
 };

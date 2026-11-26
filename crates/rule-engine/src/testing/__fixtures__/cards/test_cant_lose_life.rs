@@ -11,7 +11,11 @@ pub const TEST_CANT_LOSE_LIFE: testing::Card = testing::Card {
     definition: || {
         card! {
             cards::CardDefinition::from_enchantment("Test Can't Lose Life", cost![2]);
-            statics::you().cant::<events::LoseLife>(rules::Role::Player),
+            statics::you().cant::<events::LoseLife>(
+                rules::Role::Player,
+                rules::RestrictionId("test/test-cant-lose-life"),
+                "can’t lose life",
+            ),
         }
     },
 };

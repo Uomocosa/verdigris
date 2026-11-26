@@ -6,15 +6,17 @@ use crate::statics;
 
 pub fn restriction<E: Event>(
     all: statics::All,
+    id: rules::RestrictionId,
+    text: &'static str,
     requirement: rules::Condition,
 ) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
         modification: effects::Modification::Rule(rules::RuleChange {
             target: rules::Target::event::<E>(),
-            change: rules::Change::OnlyIf {
-                role: rules::Role::Subject,
-                condition: requirement,
+            change: rules::Change::Restrict {
+                holder: rules::Role::Subject,
+                restriction: id.restriction(text, rules::Role::Subject, requirement),
             },
         }),
     }
@@ -32,16 +34,24 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let ability =
-            restriction::<testing::RestrictedRule>(statics::all(CREATURE), rules::Condition::True);
+        let ability = restriction::<testing::RestrictedRule>(
+            statics::all(CREATURE),
+            rules::RestrictionId("test/restriction"),
+            "attacks only with enough power",
+            rules::Condition::True,
+        );
         assert_eq!(ability.filter, CREATURE);
         assert_eq!(
             ability.modification,
             effects::Modification::Rule(rules::RuleChange {
                 target: rules::Target::event::<testing::RestrictedRule>(),
-                change: rules::Change::OnlyIf {
-                    role: rules::Role::Subject,
-                    condition: rules::Condition::True,
+                change: rules::Change::Restrict {
+                    holder: rules::Role::Subject,
+                    restriction: rules::RestrictionId("test/restriction").restriction(
+                        "attacks only with enough power",
+                        rules::Role::Subject,
+                        rules::Condition::True,
+                    ),
                 },
             })
         );

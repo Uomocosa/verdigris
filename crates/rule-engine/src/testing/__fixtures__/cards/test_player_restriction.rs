@@ -16,9 +16,13 @@ pub const TEST_PLAYER_RESTRICTION: testing::Card = testing::Card {
                 filter: effects::Filter::player(YOU),
                 modification: effects::Modification::Rule(rules::RuleChange {
                     target: rules::Target::event::<testing::TestRule>(),
-                    change: rules::Change::OnlyIf {
-                        role: rules::Role::Player,
-                        condition: !rules::Condition::True,
+                    change: rules::Change::Restrict {
+                        holder: rules::Role::Player,
+                        restriction: rules::RestrictionId("test/player-restriction").restriction(
+                            "plays only when true",
+                            rules::Role::Player,
+                            !rules::Condition::True,
+                        ),
                     },
                 }),
             },

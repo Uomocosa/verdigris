@@ -38,7 +38,7 @@ Two rules writing the same component is the same smell: make one event and one p
 
 Old direct writers left: `r608_2n` (finished spells) still inserts `InZone(graveyard)` itself; don't copy
 it. `r608_2b` must stay direct: 608.2c reads the stack in the same set. A direct write skips every
-`Cant` / `Instead` on the event, so converting one is a CR fix: red first, with a card that forbids the
+`Restrict` / `Instead` on the event, so converting one is a CR fix: red first, with a card that forbids the
 event in that zone (destroy, counter and mill each skipped "can't be put into a graveyard").
 
 `PutIntoGraveyard` is announced in any set and performed in the state-based pass of the same frame,

@@ -35,12 +35,9 @@ pub enum Role {
 pub enum Change {
     AsThough,
     Allow(rules::Condition),
-    OnlyIf {
-        role: rules::Role,
-        condition: rules::Condition,
-    },
-    Cant {
-        role: rules::Role,
+    Restrict {
+        holder: rules::Role,
+        restriction: rules::Restriction,
     },
     Must,
     Skip,

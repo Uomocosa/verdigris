@@ -2,7 +2,7 @@ use atomic_delegate_macros::atomic_delegates;
 
 use crate::rules;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Restriction {
     pub id: rules::RestrictionId,
     pub text: &'static str,

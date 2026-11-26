@@ -13,9 +13,21 @@ pub const TEST_SAFE_HAVEN: testing::Card = testing::Card {
     definition: || {
         card! {
             cards::CardDefinition::from_enchantment("Test Safe Haven", cost![2]);
-            statics::all(CREATURE.controlled_by(YOU)).cant::<events::Destroy>(rules::Role::Subject),
-            statics::you().cant::<events::Counter>(rules::Role::Player),
-            statics::all(CREATURE.controlled_by(YOU)).cant::<events::DealDamage>(rules::Role::Subject),
+            statics::all(CREATURE.controlled_by(YOU)).cant::<events::Destroy>(
+                rules::Role::Subject,
+                rules::RestrictionId("test/test-safe-haven"),
+                "can’t be destroyed",
+            ),
+            statics::you().cant::<events::Counter>(
+                rules::Role::Player,
+                rules::RestrictionId("test/test-safe-haven"),
+                "can’t be countered",
+            ),
+            statics::all(CREATURE.controlled_by(YOU)).cant::<events::DealDamage>(
+                rules::Role::Subject,
+                rules::RestrictionId("test/test-safe-haven"),
+                "can’t be dealt damage",
+            ),
         }
     },
 };

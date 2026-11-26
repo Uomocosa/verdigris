@@ -14,6 +14,8 @@ pub const TEST_FROZEN_RELIC: testing::Card = testing::Card {
         card! {
             cards::creature("Test Frozen Relic", cost![2], pt!(1, 1));
             statics::this().restriction::<events::Untap>(
+                rules::RestrictionId("test/test-frozen-relic"),
+                "untaps only during your untap step",
                 !(rules::step_is(UNTAP) & rules::active_player(rules::Role::Player)),
             ),
         }

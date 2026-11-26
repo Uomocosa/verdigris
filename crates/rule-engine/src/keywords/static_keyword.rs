@@ -4,6 +4,9 @@ use crate::events;
 use crate::players;
 use crate::rules;
 
+pub const INDESTRUCTIBLE: rules::RestrictionId = rules::RestrictionId("702.12b/indestructible");
+pub const HEXPROOF: rules::RestrictionId = rules::RestrictionId("702.11b/hexproof");
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum StaticKeyword {
     Enchant(effects::Filter),
@@ -36,16 +39,25 @@ impl StaticKeyword {
             })],
             Self::Indestructible => vec![effects::Modification::Rule(rules::RuleChange {
                 target: rules::Target::event::<events::Destroy>(),
-                change: rules::Change::Cant {
-                    role: rules::Role::Subject,
+                change: rules::Change::Restrict {
+                    holder: rules::Role::Subject,
+                    restriction: INDESTRUCTIBLE.restriction(
+                        "can’t be destroyed",
+                        rules::Role::Subject,
+                        !rules::Condition::True,
+                    ),
                 },
             })],
             Self::Hexproof => vec![effects::Modification::Rule(rules::RuleChange {
                 target: rules::Target::event::<events::BecomeTarget>(),
-                change: rules::Change::OnlyIf {
-                    role: rules::Role::Subject,
-                    condition: rules::points_to::<cards::Controller>(rules::Role::Player)
-                        | rules::is(rules::Role::Player),
+                change: rules::Change::Restrict {
+                    holder: rules::Role::Subject,
+                    restriction: HEXPROOF.restriction(
+                        "can’t be the target of spells or abilities your opponents control",
+                        rules::Role::Subject,
+                        rules::points_to::<cards::Controller>(rules::Role::Player)
+                            | rules::is(rules::Role::Player),
+                    ),
                 },
             })],
             Self::Trample => vec![effects::Modification::Rule(rules::RuleChange {
@@ -92,10 +104,14 @@ mod tests {
             keywords::StaticKeyword::Hexproof.keyword_modifications(),
             vec![effects::Modification::Rule(rules::RuleChange {
                 target: rules::Target::event::<events::BecomeTarget>(),
-                change: rules::Change::OnlyIf {
-                    role: rules::Role::Subject,
-                    condition: rules::points_to::<cards::Controller>(rules::Role::Player)
-                        | rules::is(rules::Role::Player),
+                change: rules::Change::Restrict {
+                    holder: rules::Role::Subject,
+                    restriction: keywords::HEXPROOF.restriction(
+                        "can’t be the target of spells or abilities your opponents control",
+                        rules::Role::Subject,
+                        rules::points_to::<cards::Controller>(rules::Role::Player)
+                            | rules::is(rules::Role::Player),
+                    ),
                 },
             })]
         );

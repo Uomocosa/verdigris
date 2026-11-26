@@ -5,12 +5,18 @@ use crate::rules;
 use crate::statics;
 
 pub fn cant_lose_the_game(all: statics::All) -> abilities::Continuous {
+    const ID: rules::RestrictionId = rules::RestrictionId("statics/cant-lose-the-game");
     abilities::Continuous {
         filter: *all,
         modification: effects::Modification::Rule(rules::RuleChange {
             target: rules::Target::event::<events::LoseGame>(),
-            change: rules::Change::Cant {
-                role: rules::Role::Player,
+            change: rules::Change::Restrict {
+                holder: rules::Role::Player,
+                restriction: ID.restriction(
+                    "can’t lose the game",
+                    rules::Role::Player,
+                    !rules::Condition::True,
+                ),
             },
         }),
     }
@@ -34,8 +40,13 @@ mod tests {
             ability.modification,
             effects::Modification::Rule(rules::RuleChange {
                 target: rules::Target::event::<events::LoseGame>(),
-                change: rules::Change::Cant {
-                    role: rules::Role::Player,
+                change: rules::Change::Restrict {
+                    holder: rules::Role::Player,
+                    restriction: rules::RestrictionId("statics/cant-lose-the-game").restriction(
+                        "can’t lose the game",
+                        rules::Role::Player,
+                        !rules::Condition::True,
+                    ),
                 },
             })
         );

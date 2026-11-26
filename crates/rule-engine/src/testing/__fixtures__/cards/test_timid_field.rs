@@ -13,7 +13,10 @@ pub const TEST_TIMID_FIELD: testing::Card = testing::Card {
         card! {
             cards::CardDefinition::from_enchantment("Test Timid Field", cost![1, W]);
             statics::all(CREATURE)
-                .restriction::<events::DeclareBlocker>(rules::at_least(
+                .restriction::<events::DeclareBlocker>(
+                    rules::RestrictionId("test/test-timid-field"),
+                    "blocks only with enough power",
+                    rules::at_least(
                     rules::Characteristic::Power,
                     3,
                 )),

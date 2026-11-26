@@ -7,4 +7,6 @@ pub use basic::card_text::{
 };
 
 mod static_keyword;
+pub use static_keyword::HEXPROOF;
+pub use static_keyword::INDESTRUCTIBLE;
 pub use static_keyword::StaticKeyword;

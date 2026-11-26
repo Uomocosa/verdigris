@@ -4,12 +4,20 @@ use crate::rules;
 use crate::rules::traits::event::Event;
 use crate::statics;
 
-pub fn cant<E: Event>(all: statics::All, role: rules::Role) -> abilities::Continuous {
+pub fn cant<E: Event>(
+    all: statics::All,
+    role: rules::Role,
+    id: rules::RestrictionId,
+    text: &'static str,
+) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
         modification: effects::Modification::Rule(rules::RuleChange {
             target: rules::Target::event::<E>(),
-            change: rules::Change::Cant { role },
+            change: rules::Change::Restrict {
+                holder: role,
+                restriction: id.restriction(text, role, !rules::Condition::True),
+            },
         }),
     }
 }
@@ -26,14 +34,24 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let ability = cant::<events::Draw>(statics::all(PLAYER), rules::Role::Player);
+        let ability = cant::<events::Draw>(
+            statics::all(PLAYER),
+            rules::Role::Player,
+            rules::RestrictionId("test/cant"),
+            "can’t draw",
+        );
         assert_eq!(ability.filter, PLAYER);
         assert_eq!(
             ability.modification,
             effects::Modification::Rule(rules::RuleChange {
                 target: rules::Target::event::<events::Draw>(),
-                change: rules::Change::Cant {
-                    role: rules::Role::Player,
+                change: rules::Change::Restrict {
+                    holder: rules::Role::Player,
+                    restriction: rules::RestrictionId("test/cant").restriction(
+                        "can’t draw",
+                        rules::Role::Player,
+                        !rules::Condition::True,
+                    ),
                 },
             })
         );

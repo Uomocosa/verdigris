@@ -26,33 +26,37 @@ pub fn legality<E: Event>(answers: &rules::Rules, event: &E) -> rules::Legality 
             )
         })
     };
-    let base =
-        E::restrictions().iter().filter(|restriction| !waived(restriction)).all(|restriction| {
-            answers.eval(
-                &restriction.condition.bind(event),
-                subject,
-                other,
-                Some(*player),
-            )
-        });
-    let vetoed = [
+    let added: Vec<rules::Restriction> = [
         (rules::Role::Subject, Some(subject)),
         (rules::Role::Other, other),
         (rules::Role::Player, Some(*player)),
     ]
     .into_iter()
     .filter_map(|(role, entity)| entity.map(|entity| (role, entity)))
-    .any(|(role, entity)| {
-        answers.changes(entity, rules::Target::event::<E>()).iter().any(|change| match change {
-            rules::Change::Cant { role: protected } if *protected == role => true,
-            rules::Change::OnlyIf {
-                role: required,
-                condition,
-            } if *required == role => !answers.eval(condition, subject, other, Some(*player)),
-            _ => false,
+    .flat_map(|(role, entity)| {
+        answers.changes(entity, rules::Target::event::<E>()).into_iter().filter_map(move |change| {
+            match change {
+                rules::Change::Restrict {
+                    holder,
+                    restriction,
+                } if holder == role => Some(restriction),
+                _ => None,
+            }
         })
-    });
-    if base && !vetoed && answers.performs(event) {
+    })
+    .collect();
+    let base_and_added_hold =
+        E::restrictions().into_iter().chain(added).filter(|restriction| !waived(restriction)).all(
+            |restriction| {
+                answers.eval(
+                    &restriction.condition.bind(event),
+                    subject,
+                    other,
+                    Some(*player),
+                )
+            },
+        );
+    if base_and_added_hold && answers.performs(event) {
         rules::Legality::Legal
     } else {
         rules::Legality::Illegal
