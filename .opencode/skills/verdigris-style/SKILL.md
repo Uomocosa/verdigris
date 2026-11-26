@@ -20,7 +20,7 @@ linter wins; when it conflicts with an AGENTS rule, stop and ask.
 
 Correctness to the CR comes first, over shortcuts and over "simpler for now". When the CR says
 where a behaviour comes from, the engine puts it there: if a rule grants an ability, the rule
-system grants it (305.6 gives a basic land "{T}: Add {G}" even if its text box is empty), and
+grants it, through the layers (§5) (305.6 gives a basic land "{T}: Add {G}" even if its text box is empty), and
 the card does not repeat it. Name things with the CR's own words (`ActivateManaAbility`, not
 `TapForMana`; supertype `Basic`, not a `basic_land` constructor).
 
@@ -156,8 +156,14 @@ removes an ability (e.g. Jump: "Target creature gains flying until end of turn")
 whether something is on the battlefield), read the derived component in the query filter,
 never the source component in the body. Type and keyword markers exist only for objects on the
 battlefield: a rule about a spell on the stack or a card elsewhere still reads `CardDefinition`.
-If a rule about the battlefield needs a marker that doesn't exist yet (first strike, hexproof), add it to the
-layers in the same refactor.
+If a rule about the battlefield needs a marker that doesn't exist yet (hexproof), add it to the layers in its
+own refactor commit, before the rule reads it: the struct in `cards/__basic__/components.rs` (+ re-export), a
+`Has<..>` field in `CurrentMarkers`, a `sync_marker` call in `write_markers`, and its line in that file's
+identity test; `PredicateRegistry` only if a rule asks through `rules::has`. If reading the marker fixes a bug,
+switching the rule to it is the red-first fix commit (`r510_4`: markers, then first strike granted by an effect).
+
+A rule that grants an ability (§1, 305.6) supplies the data; the layers write the marker. No `__rules__`
+system inserts a derived marker itself.
 
 ```rust
 // Good
