@@ -141,7 +141,6 @@ fn announce_combat_damage(
                 &lookups.p0(),
                 participants,
                 &mut needed,
-                markers.deathtouch,
             ) {
                 dealt.write(announce_damage(write, &lookups.p1()));
             }

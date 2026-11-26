@@ -39,6 +39,9 @@ pub use clause_id::ClauseId;
 pub mod land_plays;
 pub use land_plays::LandPlays;
 
+pub mod lethal_damage;
+pub use lethal_damage::LethalDamage;
+
 pub mod limit;
 pub use limit::Limit;
 

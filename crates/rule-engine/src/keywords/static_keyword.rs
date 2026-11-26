@@ -4,6 +4,7 @@ use crate::events;
 use crate::players;
 use crate::rules;
 use crate::rules::traits::event::Event;
+use crate::rules::traits::value_rule::ValueRule;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum StaticKeyword {
@@ -52,6 +53,10 @@ impl StaticKeyword {
             Self::Trample => vec![effects::Modification::Rule(rules::RuleChange {
                 target: rules::Target::Clause(events::assign_combat_damage::ONLY_BLOCKERS.key),
                 change: rules::Change::Allow(rules::has::<players::Player>()),
+            })],
+            Self::Deathtouch => vec![effects::Modification::Rule(rules::RuleChange {
+                target: rules::Target::Value(rules::LethalDamage::ID),
+                change: rules::Change::Set(1),
             })],
             _ => Vec::new(),
         }

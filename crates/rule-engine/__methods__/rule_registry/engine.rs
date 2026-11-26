@@ -82,7 +82,11 @@ pub fn engine() -> rules::RuleRegistry {
         );
         register(testing::TestStep::ID, testing::TestStep::clauses());
     }
-    let values = HashSet::from([rules::LandPlays::ID, rules::MaximumHandSize::ID]);
+    let values = HashSet::from([
+        rules::LandPlays::ID,
+        rules::LethalDamage::ID,
+        rules::MaximumHandSize::ID,
+    ]);
     rules::RuleRegistry {
         events,
         clauses,

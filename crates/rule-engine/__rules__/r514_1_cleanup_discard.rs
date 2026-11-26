@@ -23,7 +23,7 @@ fn discard_to_maximum_hand_size(
     let Some(active_player) = game.active_player() else {
         return;
     };
-    let maximum_hand_size = answers.value::<rules::MaximumHandSize>(active_player.id);
+    let maximum_hand_size = answers.value::<rules::MaximumHandSize>(*active_player.id);
     let excess = maximum_hand_size.excess(active_player.hand().len());
     if excess > 0 {
         discards.write(Attempt(events::Discard {
