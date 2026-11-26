@@ -7,3 +7,6 @@ pub use basic::structs::{PendingTrigger, ResolutionLookups};
 
 mod trigger_queue;
 pub use trigger_queue::TriggerQueue;
+
+mod targeting;
+pub use targeting::Targeting;

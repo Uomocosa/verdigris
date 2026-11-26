@@ -1,11 +1,7 @@
 use crate::{GRAVEYARD, STACK};
-use bevy::prelude::{Commands, Entity, MessageReader, Query, With};
+use bevy::prelude::{Commands, MessageReader, Query};
 
 use crate::cards;
-use crate::effects;
-use crate::events;
-use crate::players;
-use crate::rules;
 use crate::stack;
 use crate::zones;
 
@@ -32,10 +28,8 @@ pub fn r608_2b_illegal_targets(
         &zones::InZone,
         Option<&stack::ChosenTarget>,
     )>,
-    players: Query<Entity, With<players::Player>>,
-    battlefield: Query<Entity, With<cards::OnBattlefield>>,
     zones: zones::ZoneLookup,
-    answers: rules::Rules,
+    targeting: stack::Targeting,
 ) {
     for resolution in resolutions.read() {
         let spell = **resolution;
@@ -51,19 +45,9 @@ pub fn r608_2b_illegal_targets(
         let Some(requirement) = effect.target else {
             continue;
         };
-        let is_legal = chosen.map(|chosen| **chosen).is_some_and(|target| {
-            target_is_legal(
-                target,
-                spell,
-                **owner,
-                requirement,
-                &players,
-                &cards,
-                &battlefield,
-                &zones,
-                &answers,
-            )
-        });
+        let is_legal = chosen
+            .map(|chosen| **chosen)
+            .is_some_and(|target| targeting.is_legal_target(spell, requirement, **owner, target));
         if is_legal {
             continue;
         }
@@ -71,53 +55,6 @@ pub fn r608_2b_illegal_targets(
             commands.entity(spell).insert(zones::InZone(graveyard));
         }
     }
-}
-
-fn target_is_legal(
-    target: Entity,
-    spell: Entity,
-    controller: players::PlayerId,
-    requirement: effects::Target,
-    players: &Query<Entity, With<players::Player>>,
-    cards: &Query<(
-        &cards::CardDefinition,
-        &cards::Owner,
-        &zones::InZone,
-        Option<&stack::ChosenTarget>,
-    )>,
-    battlefield: &Query<Entity, With<cards::OnBattlefield>>,
-    zones: &zones::ZoneLookup,
-    answers: &rules::Rules,
-) -> bool {
-    let is_player = players.contains(target);
-    let creature_matches_filter = cards
-        .get(target)
-        .is_ok_and(|(definition, _, _, _)| requirement.filter.does_creature_match(definition))
-        && battlefield.contains(target);
-    let enchantment_matches_filter = cards
-        .get(target)
-        .is_ok_and(|(definition, _, _, _)| requirement.filter.does_enchantment_match(definition))
-        && battlefield.contains(target);
-    let matches_filter = match requirement.filter.kind {
-        effects::FilterKind::AnyTarget => is_player || creature_matches_filter,
-        effects::FilterKind::Player => is_player,
-        effects::FilterKind::Creature => creature_matches_filter,
-        effects::FilterKind::Enchantment => enchantment_matches_filter,
-        effects::FilterKind::Spell
-        | effects::FilterKind::CreatureSpell
-        | effects::FilterKind::NoncreatureSpell
-        | effects::FilterKind::InstantSpell => {
-            cards.get(target).is_ok_and(|(definition, _, in_zone, _)| {
-                zones.contains(STACK, **in_zone) && requirement.filter.does_spell_match(definition)
-            })
-        }
-    };
-    matches_filter
-        && answers.legal(&events::BecomeTarget {
-            target,
-            spell,
-            player: controller,
-        })
 }
 
 #[cfg(test)]

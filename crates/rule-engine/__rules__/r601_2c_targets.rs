@@ -1,14 +1,10 @@
 use bevy::ecs::schedule::{IntoScheduleConfigs, ScheduleConfigs};
 use bevy::ecs::system::ScheduleSystem;
-use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query, With};
-use std::collections::BTreeSet;
+use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query};
 
 use crate::actions;
 use crate::cards;
 use crate::effects;
-use crate::events;
-use crate::players;
-use crate::rules;
 use crate::stack;
 use crate::zones;
 use crate::{HAND, STACK};
@@ -45,16 +41,14 @@ fn ask_for_targets(
     mut rejected: MessageWriter<actions::Rejected>,
     mut asks: MessageWriter<actions::Ask>,
     mut commands: Commands,
-    players: players::Players,
     cards: Query<(
         Entity,
         &cards::CardDefinition,
         &cards::Owner,
         &zones::InZone,
     )>,
-    battlefield: Query<Entity, With<cards::OnBattlefield>>,
     zones: zones::ZoneLookup,
-    answers: rules::Rules,
+    targeting: stack::Targeting,
 ) {
     for action in actions.read() {
         let actions::Action::Cast(spell) = &action.action else {
@@ -76,16 +70,7 @@ fn ask_for_targets(
             commands.entity(spell).insert(stack::CastingStage::AwaitingPayment);
             continue;
         };
-        let legal = legal_targets(
-            spell,
-            target.filter,
-            controller,
-            &players,
-            &cards,
-            &battlefield,
-            &zones,
-            &answers,
-        );
+        let legal = targeting.legal_targets(spell, target, controller);
         if legal.is_empty() {
             rejected.write(actions::Rejected::NoLegalTargets { spell });
             if let Some(hand) = zones.find(HAND, Some(controller)) {
@@ -122,76 +107,6 @@ fn take_the_chosen_targets(mut answers: MessageReader<actions::Answered>, mut co
             stack::CastingStage::AwaitingPayment,
         ));
     }
-}
-
-fn legal_targets(
-    casting_spell: Entity,
-    filter: effects::Filter,
-    controller: players::PlayerId,
-    players: &players::Players,
-    cards: &Query<(
-        Entity,
-        &cards::CardDefinition,
-        &cards::Owner,
-        &zones::InZone,
-    )>,
-    battlefield: &Query<Entity, With<cards::OnBattlefield>>,
-    zones: &zones::ZoneLookup,
-    answers: &rules::Rules,
-) -> BTreeSet<Entity> {
-    let all_players: Vec<players::PlayerId> =
-        players.still_in_the_game().iter().map(|view| view.id).collect();
-    let allowed_controllers: Option<BTreeSet<players::PlayerId>> = filter
-        .controlled_by
-        .map(|player| player.resolve(controller, &all_players).into_iter().collect());
-    let mut legal = BTreeSet::new();
-    if matches!(
-        filter.kind,
-        effects::FilterKind::AnyTarget | effects::FilterKind::Player
-    ) {
-        legal.extend(all_players.iter().map(|player| **player));
-    }
-    for (entity, definition, owner, in_zone) in cards.iter() {
-        if entity == casting_spell {
-            continue;
-        }
-        if let Some(allowed) = &allowed_controllers
-            && !allowed.contains(&**owner)
-        {
-            continue;
-        }
-        let is_legal = match filter.kind {
-            effects::FilterKind::Spell
-            | effects::FilterKind::CreatureSpell
-            | effects::FilterKind::NoncreatureSpell
-            | effects::FilterKind::InstantSpell => {
-                zones.contains(STACK, **in_zone) && filter.does_spell_match(definition)
-            }
-            effects::FilterKind::Creature | effects::FilterKind::AnyTarget => {
-                filter.does_creature_match(definition)
-                    && battlefield.contains(entity)
-                    && answers.legal(&events::BecomeTarget {
-                        target: entity,
-                        spell: casting_spell,
-                        player: controller,
-                    })
-            }
-            effects::FilterKind::Enchantment => {
-                filter.does_enchantment_match(definition)
-                    && battlefield.contains(entity)
-                    && answers.legal(&events::BecomeTarget {
-                        target: entity,
-                        spell: casting_spell,
-                        player: controller,
-                    })
-            }
-            effects::FilterKind::Player => false,
-        };
-        if is_legal {
-            legal.insert(entity);
-        }
-    }
-    legal
 }
 
 #[cfg(test)]

@@ -44,6 +44,7 @@ pub mod rule_registry;
 pub mod rules;
 pub mod rules_plugin;
 pub mod step;
+pub mod targeting;
 #[cfg(feature = "testing")]
 pub mod test_card;
 #[cfg(feature = "testing")]
