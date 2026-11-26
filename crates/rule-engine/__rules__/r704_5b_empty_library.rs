@@ -17,7 +17,9 @@ pub fn r704_5b_empty_library(
     >,
 ) {
     for player in players.iter() {
-        losses.write(Attempt(events::LoseGame(players::PlayerId(player))));
+        losses.write(Attempt(events::LoseGame {
+            player: players::PlayerId(player),
+        }));
     }
 }
 

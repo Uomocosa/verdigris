@@ -37,7 +37,7 @@ mod tests {
         let card = cards::CardId(Entity::PLACEHOLDER);
         let mut queue = HookQueue::<events::OpeningHandAction>::default();
         assert!(queue.is_none());
-        queue.announce(vec![events::OpeningHandAction(card)]);
+        queue.announce(vec![events::OpeningHandAction { card }]);
         assert_eq!(queue.as_ref().map(Vec::len), Some(1));
     }
 }

@@ -42,7 +42,7 @@ mod tests {
         let card = cards::CardId(Entity::PLACEHOLDER);
         let player = players::PlayerId(Entity::from_raw_u32(1).unwrap());
         let hooked = Hooked {
-            hook: events::OpeningHandAction(card),
+            hook: events::OpeningHandAction { card },
             player,
         };
         assert_eq!(hooked.subject(), *card);

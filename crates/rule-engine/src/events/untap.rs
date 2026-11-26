@@ -1,13 +1,16 @@
 use bevy::prelude::Entity;
+use verdigris_event_derive::EventArgs;
 
 use crate::players;
 
 use crate::rules;
 use crate::rules::traits::event::Event;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EventArgs)]
 pub struct Untap {
+    #[arg]
     pub permanent: Entity,
+    #[arg]
     pub controller: players::PlayerId,
 }
 
@@ -29,6 +32,7 @@ mod tests {
     use crate::rules;
     use crate::rules::traits::context::Context;
     use crate::rules::traits::event::Event;
+    use crate::rules::traits::event_args::EventArgs;
 
     use super::Untap;
     use crate::players;
@@ -47,5 +51,6 @@ mod tests {
         assert_eq!(Untap::ID, rules::EventId("701.26b/untap"));
         assert_eq!(Untap::restrictions(), Vec::new());
         assert_eq!(event.field(rules::Field::Amount), None);
+        assert_eq!(Untap::args(), &[Untap::PERMANENT, Untap::CONTROLLER,]);
     }
 }

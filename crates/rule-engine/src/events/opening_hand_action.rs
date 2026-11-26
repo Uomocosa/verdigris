@@ -1,5 +1,5 @@
 use atomic_delegate_macros::atomic_delegate;
-use derive_more::Deref;
+use verdigris_event_derive::EventArgs;
 
 use crate::cards;
 use crate::rules;
@@ -7,15 +7,18 @@ use crate::rules::traits::hook_event::HookEvent;
 
 pub const FROM_OPENING_HAND: rules::RestrictionId = rules::RestrictionId("103.6/from-opening-hand");
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deref)]
-pub struct OpeningHandAction(pub cards::CardId);
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EventArgs)]
+pub struct OpeningHandAction {
+    #[arg]
+    pub card: cards::CardId,
+}
 
 #[rustfmt::skip]
 impl HookEvent for OpeningHandAction {
     const ID: rules::EventId = rules::EventId("103.6/opening-hand-action");
 
     fn card(&self) -> cards::CardId {
-        **self
+        self.card
     }
 
     #[atomic_delegate(OpeningHandAction, HookEvent)]
@@ -29,6 +32,7 @@ mod tests {
     use crate::HAND;
     use crate::cards;
     use crate::rules;
+    use crate::rules::traits::event_args::EventArgs;
     use crate::rules::traits::hook_event::HookEvent;
 
     use super::FROM_OPENING_HAND;
@@ -37,8 +41,7 @@ mod tests {
     #[test]
     fn test_usage() {
         let card = cards::CardId(Entity::PLACEHOLDER);
-        let event = OpeningHandAction(card);
-        assert_eq!(*event, card);
+        let event = OpeningHandAction { card };
         assert_eq!(event.card(), card);
         assert_eq!(
             OpeningHandAction::ID,
@@ -55,6 +58,7 @@ mod tests {
             restrictions[0].condition,
             rules::in_zone(HAND, rules::Role::Player)
         );
+        assert_eq!(OpeningHandAction::args(), &[OpeningHandAction::CARD]);
     }
 
     #[test]

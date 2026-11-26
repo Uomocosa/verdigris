@@ -72,6 +72,10 @@ reason = "A test card is only its printed definition; a test_usage would repeat 
 # LELECORE010 · locked · A struct with one field is a tuple newtype deriving `Deref`; two or more fields are named.
 [lele.rules.lint.single_field_newtype]
 
+[[lele.rules.lint.single_field_newtype.exempt]]
+path = "crates/rule-engine/src/events"
+reason = "Events name their arguments for #[derive(EventArgs)]; a single-argument event stays a named struct (WinGame { player })."
+
 # LELECORE011 · locked · No `#[allow(...)]`/`#[expect(...)]` unless whitelisted in `lele.toml` with the exact lint,…
 [lele.rules.lint.no_allow_attributes]
 

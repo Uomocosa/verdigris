@@ -1,14 +1,17 @@
 use atomic_delegate_macros::atomic_delegates;
 use bevy::prelude::Entity;
+use verdigris_event_derive::EventArgs;
 
 use crate::players;
 
 use crate::rules;
 use crate::rules::traits::event::Event;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EventArgs)]
 pub struct EnterBattlefield {
+    #[arg]
     pub permanent: Entity,
+    #[arg]
     pub controller: players::PlayerId,
     pub summoning_sick: bool,
 }
@@ -37,6 +40,7 @@ mod tests {
     use crate::rules;
     use crate::rules::traits::context::Context;
     use crate::rules::traits::event::Event;
+    use crate::rules::traits::event_args::EventArgs;
 
     use super::EnterBattlefield;
     use crate::players;
@@ -59,5 +63,9 @@ mod tests {
         );
         assert_eq!(EnterBattlefield::restrictions(), Vec::new());
         assert_eq!(event.field(rules::Field::Amount), None);
+        assert_eq!(
+            EnterBattlefield::args(),
+            &[EnterBattlefield::PERMANENT, EnterBattlefield::CONTROLLER,]
+        );
     }
 }

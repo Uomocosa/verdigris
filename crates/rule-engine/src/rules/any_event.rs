@@ -92,13 +92,13 @@ mod tests {
         game.app
             .world_mut()
             .run_system_once(move |mut commands: Commands| {
-                AnyEvent::WinGame(events::WinGame(player)).announce(&mut commands);
+                AnyEvent::WinGame(events::WinGame { player }).announce(&mut commands);
             })
             .unwrap();
         game.app
             .world_mut()
             .run_system_once(move |mut reader: MessageReader<Attempt<events::WinGame>>| {
-                assert!(reader.read().any(|attempt| **attempt == events::WinGame(player)));
+                assert!(reader.read().any(|attempt| **attempt == events::WinGame { player }));
             })
             .unwrap();
     }

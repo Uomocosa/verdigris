@@ -1,5 +1,6 @@
 use atomic_delegate_macros::atomic_delegate;
 use bevy::prelude::Entity;
+use verdigris_event_derive::EventArgs;
 
 use crate::players;
 
@@ -14,9 +15,11 @@ pub const EMPTY_STACK: rules::RestrictionId = rules::RestrictionId("305.1/empty-
 pub const OWNS: rules::RestrictionId = rules::RestrictionId("305.1/owns");
 pub const OWN_TURN: rules::RestrictionId = rules::RestrictionId("305.3/own-turn");
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EventArgs)]
 pub struct PlayLand {
+    #[arg]
     pub land: Entity,
+    #[arg]
     pub player: players::PlayerId,
 }
 
@@ -40,6 +43,7 @@ mod tests {
     use crate::cards;
     use crate::rules;
     use crate::rules::traits::event::Event;
+    use crate::rules::traits::event_args::EventArgs;
 
     use super::EMPTY_STACK;
     use super::FROM_HAND;
@@ -101,6 +105,7 @@ mod tests {
                 .filter(|restriction| restriction.id != OWN_TURN)
                 .all(|restriction| !restriction.unwaivable)
         );
+        assert_eq!(PlayLand::args(), &[PlayLand::LAND, PlayLand::PLAYER,]);
     }
 
     #[test]

@@ -1,12 +1,14 @@
 use bevy::prelude::Entity;
+use verdigris_event_derive::EventArgs;
 
 use crate::players;
 use crate::rules;
 use crate::rules::traits::event::Event;
 use crate::turns;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EventArgs)]
 pub struct AddPhase {
+    #[arg]
     pub player: players::PlayerId,
     pub phase: turns::Phase,
 }
@@ -30,6 +32,7 @@ mod tests {
     use crate::rules;
     use crate::rules::traits::context::Context;
     use crate::rules::traits::event::Event;
+    use crate::rules::traits::event_args::EventArgs;
     use crate::turns;
 
     use super::AddPhase;
@@ -47,5 +50,6 @@ mod tests {
         assert_eq!(AddPhase::ID, rules::EventId("500.8/add-phase"));
         assert_eq!(AddPhase::restrictions(), Vec::new());
         assert_eq!(event.phase, turns::Phase::Beginning);
+        assert_eq!(AddPhase::args(), &[AddPhase::PLAYER]);
     }
 }

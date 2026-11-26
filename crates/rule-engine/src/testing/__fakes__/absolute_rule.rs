@@ -1,14 +1,17 @@
 use atomic_delegate_macros::atomic_delegate;
 use bevy::prelude::Entity;
+use verdigris_event_derive::EventArgs;
 
 use crate::players;
 
 use crate::rules;
 use crate::rules::traits::event::Event;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EventArgs)]
 pub struct AbsoluteRule {
+    #[arg]
     pub attacker: Entity,
+    #[arg]
     pub player: players::PlayerId,
 }
 
@@ -30,6 +33,7 @@ impl Event for AbsoluteRule {
 mod tests {
     use crate::rules;
     use crate::rules::traits::event::Event;
+    use crate::rules::traits::event_args::EventArgs;
     use crate::testing;
 
     use super::AbsoluteRule;
@@ -41,5 +45,9 @@ mod tests {
         assert_eq!(restrictions.len(), 1);
         assert_eq!(restrictions[0].id, testing::UNTAPPED);
         assert!(restrictions[0].unwaivable);
+        assert_eq!(
+            AbsoluteRule::args(),
+            &[AbsoluteRule::ATTACKER, AbsoluteRule::PLAYER,]
+        );
     }
 }

@@ -18,7 +18,7 @@ fn mana_pools_empty(
     players: players::Players,
 ) {
     for player in players.still_in_the_game() {
-        losses.write(Attempt(events::LoseUnspentMana(player.id)));
+        losses.write(Attempt(events::LoseUnspentMana { player: player.id }));
     }
 }
 

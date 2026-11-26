@@ -15,7 +15,9 @@ pub fn r104_3a_concede(
     for action in actions.read() {
         if action.action == actions::Action::Concede && players.is_still_in_the_game(action.player)
         {
-            losses.write(Resolve(events::LoseGame(action.player)));
+            losses.write(Resolve(events::LoseGame {
+                player: action.player,
+            }));
         }
     }
 }

@@ -11,7 +11,9 @@ pub fn r704_5a_zero_life(
 ) {
     for (player, life) in players.iter() {
         if **life <= 0 {
-            losses.write(Attempt(events::LoseGame(players::PlayerId(player))));
+            losses.write(Attempt(events::LoseGame {
+                player: players::PlayerId(player),
+            }));
         }
     }
 }

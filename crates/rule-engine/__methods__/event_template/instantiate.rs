@@ -14,12 +14,12 @@ pub fn instantiate<E: Event>(template: &rules::EventTemplate, event: &E) -> rule
         rules::Amount::FromEvent(field) => event.field(*field).unwrap_or(0),
     };
     match template {
-        rules::EventTemplate::WinGame { who } => {
-            rules::AnyEvent::WinGame(events::WinGame(holder(who)))
-        }
-        rules::EventTemplate::LoseGame { who } => {
-            rules::AnyEvent::LoseGame(events::LoseGame(holder(who)))
-        }
+        rules::EventTemplate::WinGame { who } => rules::AnyEvent::WinGame(events::WinGame {
+            player: holder(who),
+        }),
+        rules::EventTemplate::LoseGame { who } => rules::AnyEvent::LoseGame(events::LoseGame {
+            player: holder(who),
+        }),
         rules::EventTemplate::Draw {
             who,
             amount: template_amount,
@@ -81,7 +81,9 @@ mod tests {
     #[test]
     fn test_usage() {
         let player = Entity::PLACEHOLDER;
-        let happened = events::DrawFromEmptyLibrary(players::PlayerId(player));
+        let happened = events::DrawFromEmptyLibrary {
+            player: players::PlayerId(player),
+        };
         assert_eq!(
             instantiate(
                 &rules::EventTemplate::WinGame {
@@ -89,7 +91,9 @@ mod tests {
                 },
                 &happened
             ),
-            rules::AnyEvent::WinGame(events::WinGame(players::PlayerId(player)))
+            rules::AnyEvent::WinGame(events::WinGame {
+                player: players::PlayerId(player)
+            })
         );
         assert_eq!(
             instantiate(

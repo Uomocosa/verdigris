@@ -59,6 +59,14 @@ impl Rules<'_, '_> {
         event: &E,
     ) -> bool {
     }
+
+    #[must_use]
+    pub fn resolve<E: rules::traits::event_args::EventArgs>(
+        &self,
+        reference: rules::ArgRef,
+        event: &E,
+    ) -> Option<rules::ArgValue> {
+    }
 }
 
 impl Rules<'_, '_> {
@@ -95,6 +103,7 @@ mod tests {
     use bevy::ecs::system::RunSystemOnce;
 
     use crate::BATTLEFIELD;
+    use crate::LIBRARY;
     use crate::events;
     use crate::rules;
     use crate::testing::*;
@@ -102,11 +111,24 @@ mod tests {
     #[test]
     fn test_usage() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
-            P1.battlefield([GRIZZLY_BEARS]),
+            P1.battlefield([GRIZZLY_BEARS]).library([GRIZZLY_BEARS]),
             P2.battlefield([FELIDAR_SOVEREIGN]),
         ]);
         let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
         let [sovereign] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(FELIDAR_SOVEREIGN)?;
+        let [library_bears] = game.player(p1).cards_in(LIBRARY).exactly::<1>(GRIZZLY_BEARS)?;
+        let damage = events::DealDamage {
+            source: *bears,
+            recipient: *p2.id,
+            amount: 3,
+            controller: p1.id,
+        };
+        let library_damage = events::DealDamage {
+            source: *library_bears,
+            recipient: *p2.id,
+            amount: 3,
+            controller: p1.id,
+        };
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
@@ -118,6 +140,22 @@ mod tests {
                     attacker: *sovereign,
                     player: p2.id,
                 }));
+                assert_eq!(
+                    answers.resolve(events::DealDamage::SOURCE.controller(), &damage),
+                    Some(rules::ArgValue::Player(p1.id))
+                );
+                assert_eq!(
+                    answers.resolve(events::DealDamage::RECIPIENT.controller(), &damage),
+                    Some(rules::ArgValue::Player(p2.id))
+                );
+                assert_eq!(
+                    answers.resolve(rules::ArgRef::Arg(events::DealDamage::AMOUNT), &damage),
+                    Some(rules::ArgValue::Amount(3))
+                );
+                assert_eq!(
+                    answers.resolve(events::DealDamage::SOURCE.controller(), &library_damage),
+                    Some(rules::ArgValue::Player(p1.id))
+                );
             })
             .unwrap();
         Ok(())

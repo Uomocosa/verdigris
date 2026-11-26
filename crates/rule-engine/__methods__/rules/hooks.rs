@@ -40,10 +40,10 @@ mod tests {
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
                 assert_eq!(
-                    hooks(&answers, &events::DrawFromEmptyLibrary(player)),
+                    hooks(&answers, &events::DrawFromEmptyLibrary { player }),
                     Vec::new()
                 );
-                assert_eq!(hooks(&answers, &events::LoseGame(player)), Vec::new());
+                assert_eq!(hooks(&answers, &events::LoseGame { player }), Vec::new());
             })
             .unwrap();
         Ok(())

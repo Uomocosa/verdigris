@@ -140,7 +140,7 @@ pub fn r608_2_r608_2c_resolve(
                 }
                 effects::EffectKind::WinTheGame => {
                     let winner = controller;
-                    player_effects.p4().write(Attempt(events::WinGame(winner)));
+                    player_effects.p4().write(Attempt(events::WinGame { player: winner }));
                 }
                 effects::EffectKind::AdditionalPhase(phase) => {
                     request_additional_phase(&mut player_effects.p5(), controller, phase);

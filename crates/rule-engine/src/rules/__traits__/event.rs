@@ -42,7 +42,7 @@ mod tests {
     #[test]
     fn test_usage() {
         let player = players::PlayerId(Entity::PLACEHOLDER);
-        let event = events::LoseGame(player);
+        let event = events::LoseGame { player };
         assert_eq!(event.player(), player);
         assert_eq!(event.affected(), vec![*player]);
         assert_eq!(events::LoseGame::ID, rules::EventId("104.3/lose-game"));

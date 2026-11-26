@@ -1,13 +1,16 @@
 use bevy::prelude::Entity;
+use verdigris_event_derive::EventArgs;
 
 use crate::players;
 
 use crate::rules;
 use crate::rules::traits::event::Event;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EventArgs)]
 pub struct Destroy {
+    #[arg]
     pub permanent: Entity,
+    #[arg]
     pub controller: players::PlayerId,
 }
 
@@ -29,6 +32,7 @@ mod tests {
     use crate::rules;
     use crate::rules::traits::context::Context;
     use crate::rules::traits::event::Event;
+    use crate::rules::traits::event_args::EventArgs;
 
     use super::Destroy;
     use crate::players;
@@ -47,5 +51,6 @@ mod tests {
         assert_eq!(Destroy::ID, rules::EventId("701.8a/destroy"));
         assert_eq!(Destroy::restrictions(), Vec::new());
         assert_eq!(event.field(rules::Field::Amount), None);
+        assert_eq!(Destroy::args(), &[Destroy::PERMANENT, Destroy::CONTROLLER,]);
     }
 }

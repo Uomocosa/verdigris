@@ -44,12 +44,12 @@ mod tests {
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
                 assert_eq!(
-                    replacement(&answers, &events::DrawFromEmptyLibrary(player)),
+                    replacement(&answers, &events::DrawFromEmptyLibrary { player }),
                     Some(rules::Then::Events(vec![rules::EventTemplate::WinGame {
                         who: rules::Role::Player,
                     }]))
                 );
-                assert_eq!(replacement(&answers, &events::LoseGame(player)), None);
+                assert_eq!(replacement(&answers, &events::LoseGame { player }), None);
             })
             .unwrap();
         Ok(())

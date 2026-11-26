@@ -1,13 +1,16 @@
 use bevy::prelude::Entity;
+use verdigris_event_derive::EventArgs;
 
 use crate::players;
 
 use crate::rules;
 use crate::rules::traits::event::Event;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EventArgs)]
 pub struct TestStep {
+    #[arg]
     pub permanent: Entity,
+    #[arg]
     pub controller: players::PlayerId,
 }
 
@@ -27,6 +30,7 @@ mod tests {
     use crate::rules;
     use crate::rules::traits::context::Context;
     use crate::rules::traits::event::Event;
+    use crate::rules::traits::event_args::EventArgs;
 
     use super::TestStep;
     use crate::players;
@@ -46,5 +50,9 @@ mod tests {
         assert_eq!(event.player(), controller);
         assert_eq!(TestStep::ID, rules::EventId("test/step"));
         assert_eq!(TestStep::restrictions(), Vec::new());
+        assert_eq!(
+            TestStep::args(),
+            &[TestStep::PERMANENT, TestStep::CONTROLLER,]
+        );
     }
 }

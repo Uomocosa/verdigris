@@ -43,7 +43,7 @@ pub fn r121_1_r121_2_draw(
             }
         }
         if u32::try_from(drawn_from_top.len()).unwrap_or(u32::MAX) < count {
-            attempted.write(Attempt(events::DrawFromEmptyLibrary(player)));
+            attempted.write(Attempt(events::DrawFromEmptyLibrary { player }));
         }
     }
 }

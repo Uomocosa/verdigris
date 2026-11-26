@@ -1,4 +1,5 @@
 use bevy::prelude::Entity;
+use verdigris_event_derive::EventArgs;
 
 use crate::players;
 
@@ -6,9 +7,11 @@ use crate::effects;
 use crate::rules;
 use crate::rules::traits::event::Event;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EventArgs)]
 pub struct CreateTokens {
+    #[arg]
     pub controller: players::PlayerId,
+    #[arg]
     pub amount: u32,
     pub token: effects::TokenDefinition,
 }
@@ -38,6 +41,7 @@ mod tests {
     use crate::rules;
     use crate::rules::traits::context::Context;
     use crate::rules::traits::event::Event;
+    use crate::rules::traits::event_args::EventArgs;
     use crate::testing;
 
     use super::CreateTokens;
@@ -57,5 +61,9 @@ mod tests {
         assert_eq!(CreateTokens::ID, rules::EventId("701.7a/create-tokens"));
         assert_eq!(CreateTokens::restrictions(), Vec::new());
         assert_eq!(event.field(rules::Field::Amount), Some(2));
+        assert_eq!(
+            CreateTokens::args(),
+            &[CreateTokens::CONTROLLER, CreateTokens::AMOUNT,]
+        );
     }
 }

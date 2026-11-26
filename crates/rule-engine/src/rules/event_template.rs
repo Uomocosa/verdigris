@@ -56,20 +56,26 @@ mod tests {
     #[test]
     fn test_usage() {
         let player = Entity::PLACEHOLDER;
-        let happened = events::DrawFromEmptyLibrary(players::PlayerId(player));
+        let happened = events::DrawFromEmptyLibrary {
+            player: players::PlayerId(player),
+        };
         let template = EventTemplate::WinGame {
             who: rules::Role::Player,
         };
         assert_eq!(
             template.instantiate(&happened),
-            rules::AnyEvent::WinGame(events::WinGame(players::PlayerId(player)))
+            rules::AnyEvent::WinGame(events::WinGame {
+                player: players::PlayerId(player)
+            })
         );
         assert_eq!(
             EventTemplate::LoseGame {
                 who: rules::Role::Subject,
             }
             .instantiate(&happened),
-            rules::AnyEvent::LoseGame(events::LoseGame(players::PlayerId(player)))
+            rules::AnyEvent::LoseGame(events::LoseGame {
+                player: players::PlayerId(player)
+            })
         );
     }
 }

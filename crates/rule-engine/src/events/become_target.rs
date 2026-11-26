@@ -1,14 +1,18 @@
 use bevy::prelude::Entity;
+use verdigris_event_derive::EventArgs;
 
 use crate::players;
 
 use crate::rules;
 use crate::rules::traits::event::Event;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EventArgs)]
 pub struct BecomeTarget {
+    #[arg]
     pub target: Entity,
+    #[arg]
     pub spell: Entity,
+    #[arg]
     pub player: players::PlayerId,
 }
 
@@ -31,6 +35,7 @@ mod tests {
     use crate::rules;
     use crate::rules::traits::context::Context;
     use crate::rules::traits::event::Event;
+    use crate::rules::traits::event_args::EventArgs;
 
     use super::BecomeTarget;
 
@@ -49,5 +54,13 @@ mod tests {
         assert_eq!(event.player(), player);
         assert_eq!(BecomeTarget::ID, rules::EventId("601.2c/become-target"));
         assert_eq!(BecomeTarget::restrictions(), Vec::new());
+        assert_eq!(
+            BecomeTarget::args(),
+            &[
+                BecomeTarget::TARGET,
+                BecomeTarget::SPELL,
+                BecomeTarget::PLAYER,
+            ]
+        );
     }
 }

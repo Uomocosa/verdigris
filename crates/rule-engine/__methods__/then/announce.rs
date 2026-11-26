@@ -45,7 +45,7 @@ mod tests {
     fn test_usage() {
         let (mut game, [p1, _]) = MockGame::new([P1, P2]);
         let player = p1.id;
-        let happened = events::DrawFromEmptyLibrary(player);
+        let happened = events::DrawFromEmptyLibrary { player };
         game.app
             .world_mut()
             .run_system_once(
@@ -70,7 +70,7 @@ mod tests {
             .run_system_once(
                 move |mut asks: MessageReader<May<events::DrawFromEmptyLibrary>>| {
                     assert!(asks.read().any(|ask| {
-                        ask.event == events::DrawFromEmptyLibrary(player)
+                        ask.event == events::DrawFromEmptyLibrary { player }
                             && ask.then
                                 == rules::EventTemplate::Mill {
                                     who: rules::Role::Player,

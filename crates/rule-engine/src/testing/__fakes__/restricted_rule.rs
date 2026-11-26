@@ -1,4 +1,5 @@
 use bevy::prelude::Entity;
+use verdigris_event_derive::EventArgs;
 
 use crate::players;
 
@@ -6,9 +7,11 @@ use crate::rules;
 use crate::rules::traits::event::Event;
 use crate::testing;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EventArgs)]
 pub struct RestrictedRule {
+    #[arg]
     pub attacker: Entity,
+    #[arg]
     pub player: players::PlayerId,
 }
 
@@ -31,6 +34,7 @@ impl Event for RestrictedRule {
 mod tests {
     use crate::rules;
     use crate::rules::traits::event::Event;
+    use crate::rules::traits::event_args::EventArgs;
     use crate::testing;
 
     use super::RestrictedRule;
@@ -42,5 +46,9 @@ mod tests {
         assert_eq!(restrictions.len(), 1);
         assert_eq!(restrictions[0].id, testing::UNTAPPED);
         assert_eq!(restrictions[0].condition, rules::Condition::True);
+        assert_eq!(
+            RestrictedRule::args(),
+            &[RestrictedRule::ATTACKER, RestrictedRule::PLAYER,]
+        );
     }
 }

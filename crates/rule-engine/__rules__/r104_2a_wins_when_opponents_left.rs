@@ -12,7 +12,7 @@ pub fn r104_2a_wins_when_opponents_left(
 ) {
     for player in players.still_in_the_game() {
         if player.have_all_opponents_left() {
-            wins.write(Resolve(events::WinGame(player.id)));
+            wins.write(Resolve(events::WinGame { player: player.id }));
         }
     }
 }

@@ -15,7 +15,9 @@ pub fn r704_5c_poison(
 ) {
     for (player, poison_counters) in poisoned.iter() {
         if **poison_counters >= 10 {
-            losses.write(Attempt(events::LoseGame(players::PlayerId(player))));
+            losses.write(Attempt(events::LoseGame {
+                player: players::PlayerId(player),
+            }));
         }
     }
 }

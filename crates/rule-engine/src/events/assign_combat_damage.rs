@@ -1,5 +1,6 @@
 use atomic_delegate_macros::atomic_delegate;
 use bevy::prelude::Entity;
+use verdigris_event_derive::EventArgs;
 
 use crate::players;
 
@@ -8,11 +9,15 @@ use crate::rules::traits::event::Event;
 
 pub const ONLY_BLOCKERS: rules::RestrictionId = rules::RestrictionId("510.1c/only-blockers");
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EventArgs)]
 pub struct AssignCombatDamage {
+    #[arg]
     pub target: Entity,
+    #[arg]
     pub source: Entity,
+    #[arg]
     pub amount: u32,
+    #[arg]
     pub player: players::PlayerId,
 }
 
@@ -45,6 +50,7 @@ mod tests {
     use crate::rules;
     use crate::rules::traits::context::Context;
     use crate::rules::traits::event::Event;
+    use crate::rules::traits::event_args::EventArgs;
 
     use super::AssignCombatDamage;
 
@@ -77,6 +83,15 @@ mod tests {
         assert_eq!(
             restrictions[0].condition,
             rules::points_to::<cards::Blocking>(rules::Role::Other)
+        );
+        assert_eq!(
+            AssignCombatDamage::args(),
+            &[
+                AssignCombatDamage::TARGET,
+                AssignCombatDamage::SOURCE,
+                AssignCombatDamage::AMOUNT,
+                AssignCombatDamage::PLAYER,
+            ]
         );
     }
 

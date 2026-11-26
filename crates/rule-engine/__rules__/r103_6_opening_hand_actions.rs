@@ -22,7 +22,7 @@ fn opening_hand_actions(
         .still_in_the_game()
         .iter()
         .flat_map(players::PlayerView::opening_hand)
-        .map(events::OpeningHandAction)
+        .map(|card| events::OpeningHandAction { card })
         .collect();
     hooks.announce(events_in_turn_order);
 }

@@ -43,7 +43,7 @@ mod tests {
     fn test_usage() {
         let (mut game, [p1, _]) = MockGame::new([P1, P2]);
         let player = p1.id;
-        let happened = events::DrawFromEmptyLibrary(player);
+        let happened = events::DrawFromEmptyLibrary { player };
         let then = Then::Events(vec![rules::EventTemplate::WinGame {
             who: rules::Role::Player,
         }]);
@@ -62,7 +62,7 @@ mod tests {
             .run_system_once(
                 move |mut attempts: MessageReader<Attempt<events::WinGame>>,
                       performed: Res<StateBasedActionsPerformed>| {
-                    assert!(attempts.read().any(|attempt| **attempt == events::WinGame(player)));
+                    assert!(attempts.read().any(|attempt| **attempt == events::WinGame { player }));
                     assert!(**performed);
                 },
             )

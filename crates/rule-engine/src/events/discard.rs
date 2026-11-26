@@ -1,12 +1,15 @@
 use bevy::prelude::Entity;
+use verdigris_event_derive::EventArgs;
 
 use crate::players;
 use crate::rules;
 use crate::rules::traits::event::Event;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EventArgs)]
 pub struct Discard {
+    #[arg]
     pub player: players::PlayerId,
+    #[arg]
     pub amount: u32,
 }
 
@@ -35,6 +38,7 @@ mod tests {
     use crate::rules;
     use crate::rules::traits::context::Context;
     use crate::rules::traits::event::Event;
+    use crate::rules::traits::event_args::EventArgs;
 
     use super::Discard;
 
@@ -48,5 +52,6 @@ mod tests {
         assert_eq!(Discard::ID, rules::EventId("701.9a/discard"));
         assert_eq!(Discard::restrictions(), Vec::new());
         assert_eq!(event.field(rules::Field::Amount), Some(2));
+        assert_eq!(Discard::args(), &[Discard::PLAYER, Discard::AMOUNT,]);
     }
 }

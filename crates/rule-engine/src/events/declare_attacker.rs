@@ -1,5 +1,6 @@
 use atomic_delegate_macros::atomic_delegate;
 use bevy::prelude::Entity;
+use verdigris_event_derive::EventArgs;
 
 use crate::players;
 
@@ -12,9 +13,11 @@ pub const UNTAPPED: rules::RestrictionId = rules::RestrictionId("508.1a/untapped
 pub const SUMMONING_SICK: rules::RestrictionId =
     rules::RestrictionId("508.1a/controlled-since-turn-began");
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EventArgs)]
 pub struct DeclareAttacker {
+    #[arg]
     pub attacker: Entity,
+    #[arg]
     pub player: players::PlayerId,
 }
 
@@ -40,6 +43,7 @@ mod tests {
     use crate::keywords;
     use crate::rules;
     use crate::rules::traits::event::Event;
+    use crate::rules::traits::event_args::EventArgs;
 
     use super::CONTROLS;
     use super::CREATURE;
@@ -78,6 +82,10 @@ mod tests {
         assert_eq!(
             restrictions[3].condition,
             !rules::has::<cards::SummoningSick>()
+        );
+        assert_eq!(
+            DeclareAttacker::args(),
+            &[DeclareAttacker::ATTACKER, DeclareAttacker::PLAYER,]
         );
     }
 

@@ -72,7 +72,9 @@ mod tests {
         assert_eq!(
             bind(
                 &missing,
-                &events::WinGame(players::PlayerId(Entity::PLACEHOLDER))
+                &events::WinGame {
+                    player: players::PlayerId(Entity::PLACEHOLDER)
+                }
             ),
             !rules::Condition::True
         );

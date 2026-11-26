@@ -1,16 +1,4 @@
-use bevy::prelude::Entity;
-use derive_more::From;
-
-use crate::players;
 use crate::rules;
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash, From)]
-pub enum ArgValue {
-    Entity(Entity),
-    Entities(Vec<Entity>),
-    Player(players::PlayerId),
-    Amount(u32),
-}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Characteristic {

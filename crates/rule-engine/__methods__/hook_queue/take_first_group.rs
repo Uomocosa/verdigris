@@ -35,9 +35,9 @@ mod tests {
         let second = cards::CardId(Entity::from_raw_u32(1).unwrap());
         let mut queue = rules::HookQueue::<events::OpeningHandAction>::default();
         queue.announce(vec![
-            events::OpeningHandAction(first),
-            events::OpeningHandAction(first),
-            events::OpeningHandAction(second),
+            events::OpeningHandAction { card: first },
+            events::OpeningHandAction { card: first },
+            events::OpeningHandAction { card: second },
         ]);
         let group = take_first_group(&mut queue, |current, next| current.card() == next.card());
         assert_eq!(group.len(), 2);
@@ -45,8 +45,8 @@ mod tests {
         assert_eq!(queue.as_ref().map(Vec::len), Some(1));
         let mut queue = rules::HookQueue::<events::OpeningHandAction>::default();
         queue.announce(vec![
-            events::OpeningHandAction(first),
-            events::OpeningHandAction(second),
+            events::OpeningHandAction { card: first },
+            events::OpeningHandAction { card: second },
         ]);
         let group = take_first_group(&mut queue, |_, _| false);
         assert_eq!(group.len(), 1);

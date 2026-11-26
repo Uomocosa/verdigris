@@ -1,5 +1,6 @@
 use atomic_delegate_macros::atomic_delegate;
 use bevy::prelude::Entity;
+use verdigris_event_derive::EventArgs;
 
 use crate::players;
 
@@ -12,9 +13,11 @@ pub const OWNS: rules::RestrictionId = rules::RestrictionId("601.2a/owns");
 pub const NOT_A_LAND: rules::RestrictionId = rules::RestrictionId("601.2a/not-a-land");
 pub const TIMING: rules::RestrictionId = rules::RestrictionId("601.2a/timing");
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EventArgs)]
 pub struct CastSpell {
+    #[arg]
     pub spell: Entity,
+    #[arg]
     pub player: players::PlayerId,
 }
 
@@ -38,6 +41,7 @@ mod tests {
     use crate::cards;
     use crate::rules;
     use crate::rules::traits::event::Event;
+    use crate::rules::traits::event_args::EventArgs;
 
     use super::CastSpell;
     use super::FROM_HAND;
@@ -94,6 +98,7 @@ mod tests {
                 .filter(|restriction| restriction.id != NOT_A_LAND)
                 .all(|restriction| !restriction.unwaivable)
         );
+        assert_eq!(CastSpell::args(), &[CastSpell::SPELL, CastSpell::PLAYER,]);
     }
 
     #[test]

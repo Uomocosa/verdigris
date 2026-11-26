@@ -1,12 +1,15 @@
 use bevy::prelude::Entity;
+use verdigris_event_derive::EventArgs;
 
 use crate::players;
 use crate::rules;
 use crate::rules::traits::event::Event;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EventArgs)]
 pub struct GivePoisonCounters {
+    #[arg]
     pub player: players::PlayerId,
+    #[arg]
     pub amount: u32,
 }
 
@@ -35,6 +38,7 @@ mod tests {
     use crate::rules;
     use crate::rules::traits::context::Context;
     use crate::rules::traits::event::Event;
+    use crate::rules::traits::event_args::EventArgs;
 
     use super::GivePoisonCounters;
 
@@ -51,5 +55,9 @@ mod tests {
         );
         assert_eq!(GivePoisonCounters::restrictions(), Vec::new());
         assert_eq!(event.field(rules::Field::Amount), Some(3));
+        assert_eq!(
+            GivePoisonCounters::args(),
+            &[GivePoisonCounters::PLAYER, GivePoisonCounters::AMOUNT,]
+        );
     }
 }
