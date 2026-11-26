@@ -14,7 +14,12 @@ pub fn r506_4_leaves_the_battlefield(
     left_the_battlefield: Query<Entity, (cards::InCombat, Without<cards::OnBattlefield>)>,
 ) {
     for permanent in &left_the_battlefield {
-        commands.entity(permanent).remove::<(cards::Attacking, cards::Blocking, cards::Blocked)>();
+        commands.entity(permanent).remove::<(
+            cards::Attacking,
+            cards::Blocking,
+            cards::Blocked,
+            cards::HadFirstStrikeAsDamageBegan,
+        )>();
     }
 }
 

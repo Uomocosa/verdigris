@@ -14,7 +14,12 @@ pub fn r511_3_end_of_combat_ends() -> ScheduleConfigs<ScheduleSystem> {
 
 fn remove_all_from_combat(mut commands: Commands, in_combat: Query<Entity, cards::InCombat>) {
     for permanent in &in_combat {
-        commands.entity(permanent).remove::<(cards::Attacking, cards::Blocking, cards::Blocked)>();
+        commands.entity(permanent).remove::<(
+            cards::Attacking,
+            cards::Blocking,
+            cards::Blocked,
+            cards::HadFirstStrikeAsDamageBegan,
+        )>();
     }
 }
 

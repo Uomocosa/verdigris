@@ -26,6 +26,9 @@ pub struct FirstStrike;
 pub struct DoubleStrike;
 
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
+pub struct HadFirstStrikeAsDamageBegan;
+
+#[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Lifelink;
 
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]

@@ -2,7 +2,7 @@ use std::collections::BTreeSet;
 
 use bevy::ecs::schedule::{IntoScheduleConfigs, ScheduleConfigs};
 use bevy::ecs::system::ScheduleSystem;
-use bevy::prelude::{Entity, Has, Query, ResMut};
+use bevy::prelude::{Commands, Entity, Has, Query, ResMut};
 
 use crate::GameMut;
 use crate::cards;
@@ -51,6 +51,7 @@ pub fn r510_4_combat_damage_steps() -> ScheduleConfigs<ScheduleSystem> {
 }
 
 fn the_first_combat_damage_step(
+    mut commands: Commands,
     mut game: GameMut,
     mut participants: ResMut<turns::CombatDamageParticipants>,
     combatants: Query<(Entity, Has<cards::FirstStrike>, Has<cards::DoubleStrike>), cards::InCombat>,
@@ -68,17 +69,27 @@ fn the_first_combat_damage_step(
     };
     if does_a_second_step_happen {
         game.add_step_after_this_one(turns::Step::SecondCombatDamage);
+        for entity in &with_first_or_double_strike {
+            commands.entity(*entity).insert(cards::HadFirstStrikeAsDamageBegan);
+        }
     }
     **participants = participants_this_step;
 }
 
 fn the_second_combat_damage_step(
     mut participants: ResMut<turns::CombatDamageParticipants>,
-    combatants: Query<(Entity, Has<cards::FirstStrike>, Has<cards::DoubleStrike>), cards::InCombat>,
+    combatants: Query<
+        (
+            Entity,
+            Has<cards::HadFirstStrikeAsDamageBegan>,
+            Has<cards::DoubleStrike>,
+        ),
+        cards::InCombat,
+    >,
 ) {
     let participants_this_step: BTreeSet<Entity> = combatants
         .iter()
-        .filter(|(_, first_strike, double_strike)| !*first_strike || *double_strike)
+        .filter(|(_, had_first_strike, double_strike)| !*had_first_strike || *double_strike)
         .map(|(entity, _, _)| entity)
         .collect();
     **participants = participants_this_step;
@@ -87,6 +98,7 @@ fn the_second_combat_damage_step(
 #[cfg(test)]
 mod tests {
     use crate::HAND;
+    use crate::cards;
     use crate::mana;
     use crate::testing::*;
     use crate::turns;
@@ -176,6 +188,122 @@ mod tests {
         assert_eq!(game.turn().step, turns::Step::EndOfCombat);
         assert!(game.player(p1).cards_in(BATTLEFIELD).has(attacker));
         assert_eq!(game.life(p2), 20);
+        Ok(())
+    }
+
+    #[test]
+    fn a_creature_given_first_strike_after_the_first_combat_damage_step_deals_damage_in_the_second()
+    -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.battlefield([FENCING_ACE, GRIZZLY_BEARS, MOUNTAIN]).hand([TEST_FIRST_STRIKE_GRANT]),
+            P2,
+        ]);
+        let [ace] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(FENCING_ACE)?;
+        let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        let [mountain] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(MOUNTAIN)?;
+        let [grant] = game.player(p1).cards_in(HAND).exactly::<1>(TEST_FIRST_STRIKE_GRANT)?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareAttackers),
+            p2.pass_to(turns::Step::DeclareAttackers),
+            p1.declare_attackers([ace, bears]),
+        ])?;
+        game.play([
+            p1.pass_to(turns::Step::CombatDamage),
+            p2.pass_to(turns::Step::CombatDamage),
+            p1.activate_ability(mountain.ability()).cast(grant).targeting(bears),
+        ])?;
+
+        assert_eq!(game.turn().step, turns::Step::CombatDamage);
+        assert_eq!(game.life(p2), 19);
+
+        game.play([
+            p1.pass_priority(),
+            p2.pass_priority(),
+            p1.pass_priority(),
+            p2.pass_priority(),
+        ])?;
+
+        assert_eq!(game.turn().step, turns::Step::SecondCombatDamage);
+        assert_eq!(game.life(p2), 19);
+
+        game.play([p1.pass_priority(), p2.pass_priority()])?;
+
+        assert_eq!(game.turn().step, turns::Step::EndOfCombat);
+        assert_eq!(game.life(p2), 16);
+        Ok(())
+    }
+
+    #[test]
+    fn a_creature_that_loses_first_strike_after_the_first_combat_damage_step_deals_no_damage_in_the_second()
+    -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.battlefield([TEST_FIRST_STRIKE_LORD, GRIZZLY_BEARS]),
+            P2.battlefield([TUNDRA]).hand([DEMYSTIFY]),
+        ]);
+        let [lord] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TEST_FIRST_STRIKE_LORD)?;
+        let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        let [tundra] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(TUNDRA)?;
+        let [demystify] = game.player(p2).cards_in(HAND).exactly::<1>(DEMYSTIFY)?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareAttackers),
+            p2.pass_to(turns::Step::DeclareAttackers),
+            p1.declare_attackers([bears]),
+        ])?;
+        game.play([
+            p1.pass_to(turns::Step::CombatDamage),
+            p2.pass_to(turns::Step::CombatDamage),
+            p1.pass_priority(),
+            p2.activate_ability(tundra.mana_ability(cards::ManaType::from(cards::Color::White)))
+                .cast(demystify)
+                .targeting(lord),
+        ])?;
+
+        assert_eq!(game.life(p2), 18);
+
+        game.play([
+            p2.pass_priority(),
+            p1.pass_priority(),
+            p1.pass_priority(),
+            p2.pass_priority(),
+        ])?;
+
+        assert_eq!(game.turn().step, turns::Step::SecondCombatDamage);
+        assert!(game.player(p1).cards_in(GRAVEYARD).has(lord));
+        assert_eq!(game.life(p2), 18);
+
+        game.play([p1.pass_priority(), p2.pass_priority()])?;
+
+        assert_eq!(game.turn().step, turns::Step::EndOfCombat);
+        assert_eq!(game.life(p2), 18);
+        Ok(())
+    }
+
+    #[test]
+    fn a_creature_without_first_or_double_strike_deals_damage_only_in_the_second_step() -> TestResult
+    {
+        let (mut game, [p1, p2]) =
+            MockGame::new([P1.battlefield([FENCING_ACE, GRIZZLY_BEARS]), P2]);
+        let [ace] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(FENCING_ACE)?;
+        let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareAttackers),
+            p2.pass_to(turns::Step::DeclareAttackers),
+            p1.declare_attackers([ace, bears]),
+        ])?;
+        game.play([
+            p1.pass_to(turns::Step::CombatDamage),
+            p2.pass_to(turns::Step::CombatDamage),
+            p1.pass_priority(),
+            p2.pass_priority(),
+        ])?;
+
+        assert_eq!(game.turn().step, turns::Step::SecondCombatDamage);
+        assert_eq!(game.life(p2), 19);
+
+        game.play([p1.pass_priority(), p2.pass_priority()])?;
+
+        assert_eq!(game.turn().step, turns::Step::EndOfCombat);
+        assert_eq!(game.life(p2), 16);
         Ok(())
     }
 }
