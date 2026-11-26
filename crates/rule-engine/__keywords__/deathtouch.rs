@@ -2,7 +2,7 @@ use crate::effects;
 use crate::keywords;
 use crate::rules;
 
-/// 702.2b A creature with toughness greater than 0 that’s been dealt damage by a source with deathtouch since the last time state-based actions were checked is destroyed as a state-based action. See rule 704.
+/// 702.2c Any nonzero amount of combat damage assigned to a creature by a source with deathtouch is considered to be lethal damage for the purposes of determining if a proposed combat damage assignment is valid, regardless of that creature’s toughness. See rules 510.1c–d.
 pub struct Deathtouch;
 
 impl Deathtouch {
@@ -16,8 +16,11 @@ impl Deathtouch {
     #[must_use]
     pub fn abilities() -> Vec<effects::Modification> {
         vec![effects::Modification::Rule(rules::RuleChange {
-            target: rules::Target::value::<rules::LethalDamage>(),
-            change: rules::Change::Set(1),
+            target: rules::Target::Definition(rules::LETHAL_DAMAGE),
+            change: rules::Change::Allow {
+                holder: rules::Role::Other,
+                when: rules::event_field(rules::Field::Amount, rules::Comparison::GreaterThan, 0),
+            },
         })]
     }
 }

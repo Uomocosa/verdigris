@@ -17,6 +17,7 @@ pub mod condition;
 pub mod deal_damage;
 pub mod declare_attacker;
 pub mod declare_blocker;
+pub mod definition_id;
 pub mod effect;
 pub mod enter_battlefield;
 pub mod event_template;
@@ -40,11 +41,11 @@ pub mod players;
 pub mod priority;
 #[cfg(feature = "testing")]
 pub mod restricted_rule;
-pub mod restriction;
 pub mod restriction_id;
 pub mod rule_registry;
 pub mod rules;
 pub mod rules_plugin;
+pub mod statement;
 pub mod step;
 pub mod targeting;
 #[cfg(feature = "testing")]

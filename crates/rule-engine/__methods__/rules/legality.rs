@@ -6,27 +6,11 @@ pub fn legality<E: Event>(answers: &rules::Rules, event: &E) -> rules::Legality 
     let other = event.other();
     let player = event.player();
     let waived = |restriction: &rules::Restriction| {
-        if restriction.unwaivable {
-            return false;
-        }
-        [
-            (rules::Role::Subject, Some(subject)),
-            (rules::Role::Other, other),
-            (rules::Role::Player, Some(*player)),
-        ]
-        .into_iter()
-        .filter_map(|(role, entity)| entity.map(|entity| (role, entity)))
-        .any(|(role, entity)| {
-            answers.changes(entity, rules::Target::Restriction(restriction.id)).iter().any(
-                |change| match change {
-                    rules::Change::AsThough { holder } => *holder == role,
-                    rules::Change::Allow { holder, when } => {
-                        *holder == role && answers.eval(when, subject, other, Some(*player))
-                    }
-                    _ => false,
-                },
-            )
-        })
+        answers.waived(
+            event,
+            rules::Target::Restriction(restriction.id),
+            restriction.unwaivable,
+        )
     };
     let added: Vec<rules::Restriction> = [
         (rules::Role::Subject, Some(subject)),

@@ -3,8 +3,8 @@ use atomic_delegate_macros::atomic_delegates;
 use crate::rules;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct Restriction {
-    pub id: rules::RestrictionId,
+pub struct Statement<Id> {
+    pub id: Id,
     pub text: &'static str,
     pub role: rules::Role,
     pub condition: rules::Condition,
@@ -12,7 +12,13 @@ pub struct Restriction {
 }
 
 #[atomic_delegates]
-impl Restriction {
+impl Statement<rules::DefinitionId> {
+    #[must_use]
+    pub fn lethal_damage() -> Self {}
+}
+
+#[atomic_delegates]
+impl<Id> Statement<Id> {
     #[must_use]
     pub fn unwaivable(self) -> Self {}
 }
@@ -22,21 +28,19 @@ mod tests {
     use crate::cards;
     use crate::rules;
 
-    use super::Restriction;
+    use super::Statement;
 
     #[test]
     fn test_usage() {
-        let restriction = rules::RestrictionId("509.1a/untapped").restriction(
+        let restriction: rules::Restriction = rules::RestrictionId("509.1a/untapped").restriction(
             "The chosen creatures must be untapped",
             rules::Role::Subject,
             !rules::has::<cards::Tapped>(),
         );
         assert_eq!(restriction.id, rules::RestrictionId("509.1a/untapped"));
         assert!(!restriction.unwaivable);
-        let made_unwaivable = Restriction {
-            unwaivable: true,
-            ..restriction
-        };
+        let made_unwaivable: Statement<rules::RestrictionId> = restriction.unwaivable();
         assert!(made_unwaivable.unwaivable);
+        assert_eq!(made_unwaivable.id, rules::RestrictionId("509.1a/untapped"));
     }
 }

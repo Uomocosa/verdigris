@@ -4,6 +4,7 @@ use crate::rules;
 pub enum Target {
     Event(rules::EventId),
     Restriction(rules::RestrictionId),
+    Definition(rules::DefinitionId),
     Value(rules::RuleId),
 }
 

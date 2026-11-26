@@ -1,9 +1,9 @@
 use crate::rules;
 
-pub fn unwaivable(restriction: rules::Restriction) -> rules::Restriction {
-    rules::Restriction {
+pub fn unwaivable<Id>(statement: rules::Statement<Id>) -> rules::Statement<Id> {
+    rules::Statement {
         unwaivable: true,
-        ..restriction
+        ..statement
     }
 }
 

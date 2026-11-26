@@ -51,6 +51,14 @@ impl Rules<'_, '_> {
 
     #[must_use]
     pub fn value<V: rules::traits::value_rule::ValueRule>(&self, entity: Entity) -> rules::Limit {}
+
+    #[must_use]
+    pub fn defines<E: rules::traits::event::Event>(
+        &self,
+        definition: &rules::Definition,
+        event: &E,
+    ) -> bool {
+    }
 }
 
 impl Rules<'_, '_> {
@@ -72,6 +80,14 @@ impl Rules<'_, '_> {
 #[atomic_delegates]
 impl Rules<'_, '_> {
     pub(crate) fn mods(&self, entity: Entity) -> Vec<effects::Modification> {}
+
+    pub(crate) fn waived<E: rules::traits::event::Event>(
+        &self,
+        event: &E,
+        target: rules::Target,
+        unwaivable: bool,
+    ) -> bool {
+    }
 }
 
 #[cfg(test)]

@@ -48,6 +48,8 @@ pub fn eval(
                     rules::Comparison::AtLeast => value >= *threshold,
                     rules::Comparison::AtMost => value <= *threshold,
                     rules::Comparison::EqualTo => value == *threshold,
+                    rules::Comparison::GreaterThan => value > *threshold,
+                    rules::Comparison::LessThan => value < *threshold,
                 }
             }),
         rules::Condition::Of(role, inner) => match role {
@@ -94,7 +96,8 @@ pub fn eval(
                 .single()
                 .is_ok_and(|state| state.priority.holder.is_some_and(|id| *id == holder))
         }),
-        rules::Condition::EventField(..) => false,
+        rules::Condition::EventField(..)
+        | rules::Condition::EventFieldAtLeastRemainingToughness(..) => false,
     }
 }
 

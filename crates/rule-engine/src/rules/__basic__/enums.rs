@@ -11,6 +11,8 @@ pub enum Comparison {
     AtLeast,
     AtMost,
     EqualTo,
+    GreaterThan,
+    LessThan,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

@@ -8,6 +8,7 @@ pub use basic::condition_builders::{
 pub use basic::enums::{Amount, Change, Characteristic, Comparison, Field, Legality, Role, may};
 pub use basic::newtypes::{EventId, RuleId};
 pub use basic::structs::RuleChange;
+pub use basic::type_aliases::{Definition, Restriction};
 
 #[path = "__traits__/mod.rs"]
 pub mod traits;
@@ -27,17 +28,17 @@ pub use hook_queue::HookQueue;
 mod hooked;
 pub use hooked::Hooked;
 
-mod restriction;
-pub use restriction::Restriction;
+mod statement;
+pub use statement::Statement;
+
+mod definition_id;
+pub use definition_id::{DefinitionId, LETHAL_DAMAGE};
 
 mod restriction_id;
 pub use restriction_id::RestrictionId;
 
 pub mod land_plays;
 pub use land_plays::LandPlays;
-
-pub mod lethal_damage;
-pub use lethal_damage::LethalDamage;
 
 pub mod limit;
 pub use limit::Limit;

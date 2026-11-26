@@ -25,28 +25,34 @@ pub fn assigned_blocked_damage(
     needed: &mut Vec<actions::RequiredCombatDamage>,
 ) -> Vec<damage::AssignedDamage> {
     let mut writes = Vec::new();
-    let lethal_cap = match answers.value::<rules::LethalDamage>(source) {
-        rules::Limit::At(maximum) => maximum,
-        rules::Limit::NoMaximum => u32::MAX,
-    };
     let mut blockers_of: Vec<(Entity, u32)> = Vec::new();
     for (blocker, blocking, marked, effective) in blockers.iter() {
         if **blocking != source {
             continue;
         }
-        let lethal = effective
-            .map(|power_toughness| **power_toughness)
+        let remaining = effective
             .map_or(0, |power_toughness| {
                 u32::try_from(power_toughness.toughness).unwrap_or_default()
             })
-            .saturating_sub(marked.map_or(0, |damage| **damage))
-            .min(lethal_cap);
+            .saturating_sub(marked.map_or(0, |damage| **damage));
+        let lethal = (1..=remaining)
+            .find(|amount| {
+                answers.defines(
+                    &rules::Definition::lethal_damage(),
+                    &events::AssignCombatDamage {
+                        target: blocker,
+                        source,
+                        amount: *amount,
+                        player: controller,
+                    },
+                )
+            })
+            .unwrap_or(1);
         blockers_of.push((blocker, lethal));
         if !participants.contains(&blocker) {
             continue;
         }
-        let Some(blocker_power_toughness) = effective.map(|power_toughness| **power_toughness)
-        else {
+        let Some(blocker_power_toughness) = effective.copied() else {
             continue;
         };
         if blocker_power_toughness.power <= 0 {
@@ -64,11 +70,13 @@ pub fn assigned_blocked_damage(
     if amount == 0 || !participants.contains(&source) {
         return writes;
     }
-    let may_assign_to_defending = answers.legal(&events::AssignCombatDamage {
+    let defender_probe = events::AssignCombatDamage {
         target: defending,
         source,
+        amount,
         player: controller,
-    });
+    };
+    let may_assign_to_defending = answers.legal(&defender_probe);
     match blockers_of.as_slice() {
         [(blocker, lethal)] => {
             let into_blocker = if may_assign_to_defending {
@@ -104,9 +112,7 @@ pub fn assigned_blocked_damage(
             let mut legal: BTreeSet<Entity> =
                 blockers_of.iter().map(|(blocker, _)| *blocker).collect();
             let trample_defender = may_assign_to_defending.then_some(defending);
-            if let Some(defender) = trample_defender {
-                legal.insert(defender);
-            }
+            legal.extend(trample_defender);
             needed.push(actions::RequiredCombatDamage {
                 source,
                 amount,

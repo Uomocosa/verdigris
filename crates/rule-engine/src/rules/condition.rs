@@ -23,6 +23,7 @@ pub enum Condition {
     ActivePlayer(rules::Role),
     HasPriority(rules::Role),
     EventField(rules::Field, rules::Comparison, u32),
+    EventFieldAtLeastRemainingToughness(rules::Field),
 }
 
 #[rustfmt::skip]

@@ -8,6 +8,8 @@ pub fn bind<E: Event>(condition: &rules::Condition, event: &E) -> rules::Conditi
                 rules::Comparison::AtLeast => value >= *threshold,
                 rules::Comparison::AtMost => value <= *threshold,
                 rules::Comparison::EqualTo => value == *threshold,
+                rules::Comparison::GreaterThan => value > *threshold,
+                rules::Comparison::LessThan => value < *threshold,
             });
             if holds {
                 rules::Condition::True

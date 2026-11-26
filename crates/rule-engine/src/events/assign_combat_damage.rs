@@ -12,6 +12,7 @@ pub const ONLY_BLOCKERS: rules::RestrictionId = rules::RestrictionId("510.1c/onl
 pub struct AssignCombatDamage {
     pub target: Entity,
     pub source: Entity,
+    pub amount: u32,
     pub player: players::PlayerId,
 }
 
@@ -24,6 +25,12 @@ impl rules::traits::context::Context for AssignCombatDamage {
 
 impl Event for AssignCombatDamage {
     const ID: rules::EventId = rules::EventId("510.1c/assign-combat-damage");
+
+    fn field(&self, field: rules::Field) -> Option<u32> {
+        match field {
+            rules::Field::Amount => Some(self.amount),
+        }
+    }
 
     #[atomic_delegate(AssignCombatDamage, Event)]
     fn restrictions() -> Vec<rules::Restriction> {}
@@ -49,6 +56,7 @@ mod tests {
         let event = AssignCombatDamage {
             target,
             source,
+            amount: 3,
             player,
         };
         assert_eq!(event.subject(), target);
@@ -58,6 +66,7 @@ mod tests {
             AssignCombatDamage::ID,
             rules::EventId("510.1c/assign-combat-damage")
         );
+        assert_eq!(event.field(rules::Field::Amount), Some(3));
         let restrictions = AssignCombatDamage::restrictions();
         assert_eq!(restrictions.len(), 1);
         assert_eq!(restrictions[0].id, super::ONLY_BLOCKERS);

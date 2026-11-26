@@ -166,8 +166,8 @@ A keyword that changes a rule needs no marker and is never named in a rule body:
 its keyword file's `abilities` (one file per keyword in `__keywords__/`), and `Rules::mods` reads current characteristics, so a granted keyword
 works too. Pick the change by what the CR sentence does: "can't" vetoes an event (`Restrict`: indestructible
 → `Destroy`, hexproof → `BecomeTarget`); "may … anyway" waives a restriction (`Allow`/`AsThough`: haste, trample →
-510.1c `ONLY_BLOCKERS`); "is considered N" sets a value rule (`Set`: deathtouch → `LethalDamage`). The rule asks
-`answers.legal(..)` / `answers.value::<V>(entity)`, never `has_keyword` or a `has_x: bool` parameter. Switching a
+510.1c `ONLY_BLOCKERS`); "is considered ..." widens a definition (`Allow` on a `Definition`: deathtouch → `LETHAL_DAMAGE`). The rule asks
+`answers.legal(..)` / `answers.defines(..)` / `answers.value::<V>(entity)`, never `has_keyword` or a `has_x: bool` parameter. Switching a
 rule from a keyword read to a rule change fixes granted keywords: red first, with a real card that grants it.
 If a rule about the battlefield needs a marker that doesn't exist yet, add it to the layers in its
 own refactor commit, before the rule reads it: the struct in `cards/__basic__/components.rs` (+ re-export), a

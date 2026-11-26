@@ -98,14 +98,12 @@ pub fn engine() -> rules::RuleRegistry {
     for id in rules::RuleRegistry::keyword_restriction_ids() {
         restrictions.insert(id);
     }
-    let values = HashSet::from([
-        rules::LandPlays::ID,
-        rules::LethalDamage::ID,
-        rules::MaximumHandSize::ID,
-    ]);
+    let definitions = HashSet::from([rules::LETHAL_DAMAGE]);
+    let values = HashSet::from([rules::LandPlays::ID, rules::MaximumHandSize::ID]);
     rules::RuleRegistry {
         events,
         restrictions,
+        definitions,
         values,
         duplicates,
     }
