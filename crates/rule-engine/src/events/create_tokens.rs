@@ -1,4 +1,3 @@
-use bevy::prelude::Entity;
 use verdigris_event_derive::EventArgs;
 
 use crate::players;
@@ -16,13 +15,6 @@ pub struct CreateTokens {
     pub token: effects::TokenDefinition,
 }
 
-#[rustfmt::skip]
-impl rules::traits::context::Context for CreateTokens {
-    fn subject(&self) -> Entity { *self.controller }
-    fn other(&self) -> Option<Entity> { None }
-    fn player(&self) -> players::PlayerId { self.controller }
-}
-
 impl Event for CreateTokens {
     const ID: rules::EventId = rules::EventId("701.7a/create-tokens");
 }
@@ -33,7 +25,6 @@ mod tests {
 
     use crate::effects;
     use crate::rules;
-    use crate::rules::traits::context::Context;
     use crate::rules::traits::event::Event;
     use crate::rules::traits::event_args::EventArgs;
     use crate::testing;
@@ -49,9 +40,14 @@ mod tests {
             amount: 2,
             token: effects::TokenDefinition::from(testing::SOLDIER_TOKEN.definition),
         };
-        assert_eq!(event.subject(), *controller);
-        assert_eq!(event.other(), None);
-        assert_eq!(event.player(), controller);
+        assert_eq!(
+            event.arg(CreateTokens::CONTROLLER),
+            Some(rules::ArgValue::Player(controller))
+        );
+        assert_eq!(
+            event.arg(CreateTokens::CONTROLLER),
+            Some(rules::ArgValue::Player(controller))
+        );
         assert_eq!(CreateTokens::ID, rules::EventId("701.7a/create-tokens"));
         assert_eq!(CreateTokens::restrictions(), Vec::new());
         assert_eq!(

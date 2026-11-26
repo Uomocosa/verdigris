@@ -23,13 +23,6 @@ pub struct PlayLand {
     pub player: players::PlayerId,
 }
 
-#[rustfmt::skip]
-impl rules::traits::context::Context for PlayLand {
-    fn subject(&self) -> Entity { self.land }
-    fn other(&self) -> Option<Entity> { None }
-    fn player(&self) -> players::PlayerId { self.player }
-}
-
 impl Event for PlayLand {
     const ID: rules::EventId = rules::EventId("305.1/play-land");
 

@@ -21,13 +21,6 @@ pub struct CastSpell {
     pub player: players::PlayerId,
 }
 
-#[rustfmt::skip]
-impl rules::traits::context::Context for CastSpell {
-    fn subject(&self) -> Entity { self.spell }
-    fn other(&self) -> Option<Entity> { None }
-    fn player(&self) -> players::PlayerId { self.player }
-}
-
 impl Event for CastSpell {
     const ID: rules::EventId = rules::EventId("601.2a/cast-spell");
 

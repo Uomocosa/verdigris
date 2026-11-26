@@ -1,3 +1,5 @@
+use bevy::prelude::Entity;
+
 use crate::events;
 use crate::players;
 use crate::rules;
@@ -8,18 +10,23 @@ pub fn instantiate<E: Event>(
     event: &E,
     answers: &rules::Rules,
 ) -> rules::AnyEvent {
+    let fallback = E::args()
+        .iter()
+        .find_map(|id| match event.arg(*id) {
+            Some(rules::ArgValue::Player(player)) => Some(player),
+            _ => None,
+        })
+        .unwrap_or(players::PlayerId(Entity::PLACEHOLDER));
     let holder = |who: &rules::ArgRef| match answers.resolve(*who, event) {
         Some(rules::ArgValue::Player(player)) => player,
         Some(rules::ArgValue::Entity(entity)) => players::PlayerId(entity),
-        Some(rules::ArgValue::Entities(_) | rules::ArgValue::Amount(_)) | None => event.player(),
+        Some(rules::ArgValue::Entities(_) | rules::ArgValue::Amount(_)) | None => fallback,
     };
     let object = |what: &rules::ArgRef| match answers.resolve(*what, event) {
         Some(rules::ArgValue::Entity(entity)) => entity,
         Some(rules::ArgValue::Player(player)) => *player,
-        Some(rules::ArgValue::Entities(entities)) => {
-            entities.first().copied().unwrap_or_else(|| *event.player())
-        }
-        Some(rules::ArgValue::Amount(_)) | None => *event.player(),
+        Some(rules::ArgValue::Entities(entities)) => entities.first().copied().unwrap_or(*fallback),
+        Some(rules::ArgValue::Amount(_)) | None => *fallback,
     };
     let amount = |amount: &rules::Amount| match amount {
         rules::Amount::Fixed(fixed) => *fixed,
@@ -72,13 +79,19 @@ pub fn instantiate<E: Event>(
         }),
         rules::EventTemplate::BeginTheGameOnTheBattlefield => {
             rules::AnyEvent::BeginTheGameOnTheBattlefield(events::BeginTheGameOnTheBattlefield {
-                card: event.subject(),
-                player: event.player(),
+                card: E::args()
+                    .iter()
+                    .find_map(|id| match event.arg(*id) {
+                        Some(rules::ArgValue::Entity(entity)) => Some(entity),
+                        _ => None,
+                    })
+                    .unwrap_or(Entity::PLACEHOLDER),
+                player: fallback,
             })
         }
         rules::EventTemplate::Exile { what } => rules::AnyEvent::Exile(events::Exile {
             object: object(what),
-            owner: event.player(),
+            owner: fallback,
         }),
     }
 }

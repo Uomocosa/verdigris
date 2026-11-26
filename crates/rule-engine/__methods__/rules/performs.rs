@@ -3,11 +3,20 @@ use crate::rules::traits::event::Event;
 
 pub fn performs<E: Event>(answers: &rules::Rules, event: &E) -> bool {
     let mut performs = true;
-    for change in answers.changes(event.subject(), rules::Target::event::<E>()) {
-        match change {
-            rules::Change::Skip => performs = false,
-            rules::Change::Perform => performs = true,
-            _ => {}
+    for id in E::args() {
+        let Some(entity) = event.arg(*id).and_then(|value| match value {
+            rules::ArgValue::Entity(entity) => Some(entity),
+            rules::ArgValue::Player(player) => Some(*player),
+            _ => None,
+        }) else {
+            continue;
+        };
+        for change in answers.changes(entity, rules::Target::event::<E>()) {
+            match change {
+                rules::Change::Skip => performs = false,
+                rules::Change::Perform => performs = true,
+                _ => {}
+            }
         }
     }
     performs

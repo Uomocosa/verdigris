@@ -22,13 +22,6 @@ impl EnterBattlefield {
     pub const fn from_controller(player: players::PlayerId, card: Entity) -> Self {}
 }
 
-#[rustfmt::skip]
-impl rules::traits::context::Context for EnterBattlefield {
-    fn subject(&self) -> Entity { self.permanent }
-    fn other(&self) -> Option<Entity> { None }
-    fn player(&self) -> players::PlayerId { self.controller }
-}
-
 impl Event for EnterBattlefield {
     const ID: rules::EventId = rules::EventId("110.1/enter-battlefield");
 }
@@ -38,7 +31,6 @@ mod tests {
     use bevy::prelude::Entity;
 
     use crate::rules;
-    use crate::rules::traits::context::Context;
     use crate::rules::traits::event::Event;
     use crate::rules::traits::event_args::EventArgs;
 
@@ -54,9 +46,14 @@ mod tests {
             controller,
             summoning_sick: true,
         };
-        assert_eq!(event.subject(), permanent);
-        assert_eq!(event.other(), None);
-        assert_eq!(event.player(), controller);
+        assert_eq!(
+            event.arg(EnterBattlefield::PERMANENT),
+            Some(rules::ArgValue::Entity(permanent))
+        );
+        assert_eq!(
+            event.arg(EnterBattlefield::CONTROLLER),
+            Some(rules::ArgValue::Player(controller))
+        );
         assert_eq!(
             EnterBattlefield::ID,
             rules::EventId("110.1/enter-battlefield")

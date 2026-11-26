@@ -16,13 +16,6 @@ pub struct BecomeTarget {
     pub player: players::PlayerId,
 }
 
-#[rustfmt::skip]
-impl rules::traits::context::Context for BecomeTarget {
-    fn subject(&self) -> Entity { self.target }
-    fn other(&self) -> Option<Entity> { Some(self.spell) }
-    fn player(&self) -> players::PlayerId { self.player }
-}
-
 impl Event for BecomeTarget {
     const ID: rules::EventId = rules::EventId("601.2c/become-target");
 }
@@ -33,7 +26,6 @@ mod tests {
 
     use crate::players;
     use crate::rules;
-    use crate::rules::traits::context::Context;
     use crate::rules::traits::event::Event;
     use crate::rules::traits::event_args::EventArgs;
 
@@ -49,9 +41,18 @@ mod tests {
             spell,
             player,
         };
-        assert_eq!(event.subject(), target);
-        assert_eq!(event.other(), Some(spell));
-        assert_eq!(event.player(), player);
+        assert_eq!(
+            event.arg(BecomeTarget::TARGET),
+            Some(rules::ArgValue::Entity(target))
+        );
+        assert_eq!(
+            event.arg(BecomeTarget::SPELL),
+            Some(rules::ArgValue::Entity(spell))
+        );
+        assert_eq!(
+            event.arg(BecomeTarget::PLAYER),
+            Some(rules::ArgValue::Player(player))
+        );
         assert_eq!(BecomeTarget::ID, rules::EventId("601.2c/become-target"));
         assert_eq!(BecomeTarget::restrictions(), Vec::new());
         assert_eq!(

@@ -21,13 +21,6 @@ pub struct AssignCombatDamage {
     pub player: players::PlayerId,
 }
 
-#[rustfmt::skip]
-impl rules::traits::context::Context for AssignCombatDamage {
-    fn subject(&self) -> Entity { self.target }
-    fn other(&self) -> Option<Entity> { Some(self.source) }
-    fn player(&self) -> players::PlayerId { self.player }
-}
-
 impl Event for AssignCombatDamage {
     const ID: rules::EventId = rules::EventId("510.1c/assign-combat-damage");
 
@@ -42,7 +35,6 @@ mod tests {
     use crate::cards;
     use crate::players;
     use crate::rules;
-    use crate::rules::traits::context::Context;
     use crate::rules::traits::event::Event;
     use crate::rules::traits::event_args::EventArgs;
 
@@ -59,9 +51,18 @@ mod tests {
             amount: 3,
             player,
         };
-        assert_eq!(event.subject(), target);
-        assert_eq!(event.other(), Some(source));
-        assert_eq!(event.player(), player);
+        assert_eq!(
+            event.arg(AssignCombatDamage::TARGET),
+            Some(rules::ArgValue::Entity(target))
+        );
+        assert_eq!(
+            event.arg(AssignCombatDamage::SOURCE),
+            Some(rules::ArgValue::Entity(source))
+        );
+        assert_eq!(
+            event.arg(AssignCombatDamage::PLAYER),
+            Some(rules::ArgValue::Player(player))
+        );
         assert_eq!(
             AssignCombatDamage::ID,
             rules::EventId("510.1c/assign-combat-damage")

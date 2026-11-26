@@ -41,8 +41,8 @@ folded in timestamp order from the rule's default.
 ## 1. Vocabulary (the types; names are decided)
 
 ```rust
-// rules/__traits__/event.rs : an Event IS its own context (subject / other / player).
-pub trait Event: Context + Clone + Send + Sync + 'static {
+// rules/__traits__/event.rs : an Event IS its named arguments.
+pub trait Event: EventArgs + Clone + Send + Sync + 'static {
     const ID: rules::EventId;                       // the CR rule number, e.g. "121.1"
     fn restrictions() -> Vec<rules::Restriction> { Vec::new() } // CR conditions; most events have none
 }
@@ -101,7 +101,7 @@ add an event, restriction or value rule, register it.
 
 **A new game action** (draw, cast, pay mana, attack, mill ...):
 1. A struct in `src/events/<cr_name>.rs` with the CR's words as its name and its parameters as
-   fields (`Draw { player, amount }`). `impl Event` with `ID` = CR number, `Context` for roles.
+   fields (`Draw { player, amount }`). `impl Event` with `ID` = CR number, named `#[arg]`s.
 2. If the CR lists conditions, write them as `restrictions()` with `RestrictionId` consts, text quoted
    VERBATIM from `docs/MagicCompRules-*.txt` (keep the verbatim test).
    A condition on the event's own numbers is a restriction too: `DealDamage::AMOUNT.at_least(..)`
@@ -128,7 +128,7 @@ Change::Instead { when: ALWAYS, then: Then::Events(vec![EventTemplate::Mill { ..
 ```
 
 ```
-Attempt<Draw> -> pipeline finds the change on the event's subject / player
+Attempt<Draw> -> pipeline finds the change on the event's entities
    Then::Events(vec![..])  -> announces Attempt<Mill>
    then: may(..)   -> May<Draw> (asks the event's player); yes -> Attempt<Mill>, no -> Resolve<Draw>
    no change       -> Resolve<Draw> (nothing reads it if the default is nothing)
@@ -144,11 +144,10 @@ template is one variant plus its `instantiate`, and the event's own rule perform
 phases end.") is `Change::Skip` on the event: `statics::all(PLAYER).dont_lose_unspent_mana()`. If the rule
 performs the outcome itself, make it an event first.
 
-**Named arguments (pilot).** An event may also derive `EventArgs` (`#[derive(EventArgs)]`, `crates/event-derive`),
+**Named arguments.** An event derives `EventArgs` (`#[derive(EventArgs)]`, `crates/event-derive`),
 marking each named argument with `#[arg]`; the derive emits one `SCREAMING_SNAKE_CASE` const per field
-(`DealDamage::SOURCE`) plus `EventArgs::arg` (a value by id) and `EventArgs::args` (all ids). Roles
-(`Context::subject` / `other` / `player`) stay the mechanism the pipeline reads; nothing reads the
-named arguments yet, so adding them changes no behaviour.
+(`DealDamage::SOURCE`) plus `EventArgs::arg` (a value by id) and `EventArgs::args` (all ids). The pipeline
+reads only the named arguments; there is no positional `subject` / `other` / `player`.
 
 **Text that points at cards** ("some cards / effects allow a player to ...") is a **hook**, not an
 event: the rule announces a `HookEvent` for each object into `HookQueue<E>`, and the card writes a
@@ -171,10 +170,10 @@ from the battlefield, that is a gap to close there, not a reason for a rule to l
 
 - Do look up changes with ONE helper (`Rules::changes(entity, target)`), never by matching
   `Modification` variants in each evaluator.
-- Do look a change up on the entity its `holder` names (subject, other, player), for waivers
-  of restrictions and for `Restrict` alike. `Restrict` names the role it protects in `holder` and vetoes only when the
-  carrying entity is the event's entity of that role. `Skip` / `Perform` fold
-  in timestamp order over the subject's changes for the event (latest wins, unlike `Restrict`).
+- Do look a change up on the entity its `holder` names (each named argument), for waivers
+  of restrictions and for `Restrict` alike. `Restrict` names the argument it protects in `holder` and vetoes only when the
+  carrying entity is the event's entity of that argument. `Skip` / `Perform` fold
+  in timestamp order over the changes on the event's entities for the event (latest wins, unlike `Restrict`).
 - Don't create an empty "rule" type only to hang a veto on: the event is the target.
 - Don't special-case a card in a `__rules__` system; express it as a `RuleChange`.
 - Keep the CR numbers as IDs and the verbatim-text tests.

@@ -14,13 +14,6 @@ pub struct TestStep {
     pub controller: players::PlayerId,
 }
 
-#[rustfmt::skip]
-impl rules::traits::context::Context for TestStep {
-    fn subject(&self) -> Entity { self.permanent }
-    fn other(&self) -> Option<Entity> { None }
-    fn player(&self) -> players::PlayerId { self.controller }
-}
-
 impl Event for TestStep {
     const ID: rules::EventId = rules::EventId("test/step");
 }
@@ -28,7 +21,6 @@ impl Event for TestStep {
 #[cfg(test)]
 mod tests {
     use crate::rules;
-    use crate::rules::traits::context::Context;
     use crate::rules::traits::event::Event;
     use crate::rules::traits::event_args::EventArgs;
 
@@ -45,9 +37,14 @@ mod tests {
             permanent,
             controller,
         };
-        assert_eq!(event.subject(), permanent);
-        assert_eq!(event.other(), None);
-        assert_eq!(event.player(), controller);
+        assert_eq!(
+            event.arg(TestStep::PERMANENT),
+            Some(rules::ArgValue::Entity(permanent))
+        );
+        assert_eq!(
+            event.arg(TestStep::CONTROLLER),
+            Some(rules::ArgValue::Player(controller))
+        );
         assert_eq!(TestStep::ID, rules::EventId("test/step"));
         assert_eq!(TestStep::restrictions(), Vec::new());
         assert_eq!(

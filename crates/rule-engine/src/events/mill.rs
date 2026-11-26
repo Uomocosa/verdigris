@@ -1,4 +1,3 @@
-use bevy::prelude::Entity;
 use verdigris_event_derive::EventArgs;
 
 use crate::players;
@@ -13,13 +12,6 @@ pub struct Mill {
     pub amount: u32,
 }
 
-#[rustfmt::skip]
-impl rules::traits::context::Context for Mill {
-    fn subject(&self) -> Entity { *self.player }
-    fn other(&self) -> Option<Entity> { None }
-    fn player(&self) -> players::PlayerId { self.player }
-}
-
 impl Event for Mill {
     const ID: rules::EventId = rules::EventId("701.17a/mill");
 }
@@ -30,7 +22,6 @@ mod tests {
 
     use crate::players;
     use crate::rules;
-    use crate::rules::traits::context::Context;
     use crate::rules::traits::event::Event;
     use crate::rules::traits::event_args::EventArgs;
 
@@ -40,9 +31,14 @@ mod tests {
     fn test_usage() {
         let player = players::PlayerId(Entity::PLACEHOLDER);
         let event = Mill { player, amount: 2 };
-        assert_eq!(event.subject(), *player);
-        assert_eq!(event.other(), None);
-        assert_eq!(event.player(), player);
+        assert_eq!(
+            event.arg(Mill::PLAYER),
+            Some(rules::ArgValue::Player(player))
+        );
+        assert_eq!(
+            event.arg(Mill::PLAYER),
+            Some(rules::ArgValue::Player(player))
+        );
         assert_eq!(Mill::ID, rules::EventId("701.17a/mill"));
         assert_eq!(Mill::restrictions(), Vec::new());
         assert_eq!(Mill::args(), &[Mill::PLAYER, Mill::AMOUNT,]);

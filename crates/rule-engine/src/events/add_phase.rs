@@ -1,4 +1,3 @@
-use bevy::prelude::Entity;
 use verdigris_event_derive::EventArgs;
 
 use crate::players;
@@ -13,13 +12,6 @@ pub struct AddPhase {
     pub phase: turns::Phase,
 }
 
-#[rustfmt::skip]
-impl rules::traits::context::Context for AddPhase {
-    fn subject(&self) -> Entity { *self.player }
-    fn other(&self) -> Option<Entity> { None }
-    fn player(&self) -> players::PlayerId { self.player }
-}
-
 impl Event for AddPhase {
     const ID: rules::EventId = rules::EventId("500.8/add-phase");
 }
@@ -30,7 +22,6 @@ mod tests {
 
     use crate::players;
     use crate::rules;
-    use crate::rules::traits::context::Context;
     use crate::rules::traits::event::Event;
     use crate::rules::traits::event_args::EventArgs;
     use crate::turns;
@@ -44,9 +35,14 @@ mod tests {
             player,
             phase: turns::Phase::Beginning,
         };
-        assert_eq!(event.subject(), *player);
-        assert_eq!(event.other(), None);
-        assert_eq!(event.player(), player);
+        assert_eq!(
+            event.arg(AddPhase::PLAYER),
+            Some(rules::ArgValue::Player(player))
+        );
+        assert_eq!(
+            event.arg(AddPhase::PLAYER),
+            Some(rules::ArgValue::Player(player))
+        );
         assert_eq!(AddPhase::ID, rules::EventId("500.8/add-phase"));
         assert_eq!(AddPhase::restrictions(), Vec::new());
         assert_eq!(event.phase, turns::Phase::Beginning);

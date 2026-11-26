@@ -14,13 +14,6 @@ pub struct Exile {
     pub owner: players::PlayerId,
 }
 
-#[rustfmt::skip]
-impl rules::traits::context::Context for Exile {
-    fn subject(&self) -> Entity { self.object }
-    fn other(&self) -> Option<Entity> { None }
-    fn player(&self) -> players::PlayerId { self.owner }
-}
-
 impl Event for Exile {
     const ID: rules::EventId = rules::EventId("701.13a/exile");
 }
@@ -30,7 +23,6 @@ mod tests {
     use bevy::prelude::Entity;
 
     use crate::rules;
-    use crate::rules::traits::context::Context;
     use crate::rules::traits::event::Event;
     use crate::rules::traits::event_args::EventArgs;
 
@@ -42,9 +34,14 @@ mod tests {
         let object = Entity::PLACEHOLDER;
         let owner = players::PlayerId(Entity::from_raw_u32(1).unwrap());
         let event = Exile { object, owner };
-        assert_eq!(event.subject(), object);
-        assert_eq!(event.other(), None);
-        assert_eq!(event.player(), owner);
+        assert_eq!(
+            event.arg(Exile::OBJECT),
+            Some(rules::ArgValue::Entity(object))
+        );
+        assert_eq!(
+            event.arg(Exile::OWNER),
+            Some(rules::ArgValue::Player(owner))
+        );
         assert_eq!(Exile::ID, rules::EventId("701.13a/exile"));
         assert_eq!(Exile::restrictions(), Vec::new());
         assert_eq!(Exile::args(), &[Exile::OBJECT, Exile::OWNER,]);

@@ -14,13 +14,6 @@ pub struct Untap {
     pub controller: players::PlayerId,
 }
 
-#[rustfmt::skip]
-impl rules::traits::context::Context for Untap {
-    fn subject(&self) -> Entity { self.permanent }
-    fn other(&self) -> Option<Entity> { None }
-    fn player(&self) -> players::PlayerId { self.controller }
-}
-
 impl Event for Untap {
     const ID: rules::EventId = rules::EventId("701.26b/untap");
 }
@@ -30,7 +23,6 @@ mod tests {
     use bevy::prelude::Entity;
 
     use crate::rules;
-    use crate::rules::traits::context::Context;
     use crate::rules::traits::event::Event;
     use crate::rules::traits::event_args::EventArgs;
 
@@ -45,9 +37,14 @@ mod tests {
             permanent,
             controller,
         };
-        assert_eq!(event.subject(), permanent);
-        assert_eq!(event.other(), None);
-        assert_eq!(event.player(), controller);
+        assert_eq!(
+            event.arg(Untap::PERMANENT),
+            Some(rules::ArgValue::Entity(permanent))
+        );
+        assert_eq!(
+            event.arg(Untap::CONTROLLER),
+            Some(rules::ArgValue::Player(controller))
+        );
         assert_eq!(Untap::ID, rules::EventId("701.26b/untap"));
         assert_eq!(Untap::restrictions(), Vec::new());
         assert_eq!(Untap::args(), &[Untap::PERMANENT, Untap::CONTROLLER,]);

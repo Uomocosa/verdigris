@@ -1,5 +1,3 @@
-use bevy::prelude::Entity;
-
 use crate::players;
 use crate::rules;
 use crate::rules::traits::hook_event::HookEvent;
@@ -8,13 +6,6 @@ use crate::rules::traits::hook_event::HookEvent;
 pub struct Hooked<E: HookEvent> {
     pub hook: E,
     pub player: players::PlayerId,
-}
-
-#[rustfmt::skip]
-impl<E: HookEvent> rules::traits::context::Context for Hooked<E> {
-    fn subject(&self) -> Entity { *self.hook.card() }
-    fn other(&self) -> Option<Entity> { None }
-    fn player(&self) -> players::PlayerId { self.player }
 }
 
 impl<E: HookEvent> rules::traits::event_args::EventArgs for Hooked<E> {
@@ -52,7 +43,6 @@ mod tests {
     use crate::events;
     use crate::players;
     use crate::rules;
-    use crate::rules::traits::context::Context;
     use crate::rules::traits::event::Event;
     use crate::rules::traits::event_args::EventArgs;
     use crate::rules::traits::hook_event::HookEvent;
@@ -67,9 +57,14 @@ mod tests {
             hook: events::OpeningHandAction { card },
             player,
         };
-        assert_eq!(hooked.subject(), *card);
-        assert_eq!(hooked.other(), None);
-        assert_eq!(hooked.player(), player);
+        assert_eq!(
+            hooked.arg(Hooked::<events::OpeningHandAction>::CARD),
+            Some(rules::ArgValue::Entity(*card))
+        );
+        assert_eq!(
+            hooked.arg(Hooked::<events::OpeningHandAction>::PLAYER),
+            Some(rules::ArgValue::Player(player))
+        );
         assert_eq!(
             hooked.arg(Hooked::<events::OpeningHandAction>::CARD),
             Some(rules::ArgValue::Entity(*card))

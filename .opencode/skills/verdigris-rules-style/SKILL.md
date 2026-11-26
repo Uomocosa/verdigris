@@ -108,7 +108,7 @@ CR rule behind it stays (800.4a: `if holder.is_still_in_the_game() { return; }`)
 ## 9. A player is a `players::PlayerId`
 
 A field or parameter that is always a player is a `PlayerId`, never an `Entity`. A value that can be
-a player or a permanent (a damage recipient, a target, `Context::subject`) stays an `Entity`. Never
+a player or a permanent (a damage recipient, a target) stays an `Entity`. Never
 wrap an `Entity` in `PlayerId(..)` just to make it compile. To ask whether such an `Entity` is a player, use
 `players.as_player(entity)`; with an event, `players.affected_by(event)`.
 

@@ -17,13 +17,6 @@ pub struct TestRule {
     pub player: players::PlayerId,
 }
 
-#[rustfmt::skip]
-impl rules::traits::context::Context for TestRule {
-    fn subject(&self) -> Entity { self.attacker }
-    fn other(&self) -> Option<Entity> { None }
-    fn player(&self) -> players::PlayerId { self.player }
-}
-
 impl Event for TestRule {
     const ID: rules::EventId = rules::EventId("test/legality");
 

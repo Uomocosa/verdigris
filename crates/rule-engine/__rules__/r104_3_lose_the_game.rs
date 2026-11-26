@@ -4,7 +4,6 @@ use bevy::prelude::{Commands, MessageReader, ResMut};
 use crate::Resolve;
 use crate::StateBasedActionsPerformed;
 use crate::players;
-use crate::rules::traits::context::Context;
 
 /// 104.3. There are several ways to lose the game.
 pub fn r104_3_lose_the_game(
@@ -14,10 +13,10 @@ pub fn r104_3_lose_the_game(
     players: players::Players,
 ) {
     for happened in proceeds.read() {
-        if !players.is_still_in_the_game(happened.player()) {
+        if !players.is_still_in_the_game(happened.player) {
             continue;
         }
-        commands.entity(*happened.player()).insert(players::Lost);
+        commands.entity(*happened.player).insert(players::Lost);
         **state_based_actions_performed = true;
     }
 }

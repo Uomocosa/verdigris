@@ -202,6 +202,14 @@ reason = "LELE019 matches by last segment: rules::Hooked::PLAYER (an event argum
 # LELETEST004 · No `#[cfg(test)]` in plain-data files (plain structs/enums, pure `mod.rs`/`lib.rs`, `constants.rs`).
 [lele.rules.lint.no_tests_in_plain_data]
 
+[[lele.rules.lint.no_tests_in_plain_data.exempt]]
+path = "crates/rule-engine/src/events"
+reason = "An event file defines the event's registry entry (ID, named #[arg]s, restrictions); its inline test pins that entry so a renamed ID or dropped argument fails at the event. The EventArgs derive generates the arg mapping, so the file holds no hand-written method body for the rule to count as behaviour."
+
+[[lele.rules.lint.no_tests_in_plain_data.exempt]]
+path = "crates/rule-engine/src/testing/__fakes__/test_step.rs"
+reason = "The TestStep fake's inline test pins its registry entry (ID, named #[arg]s) the same way event files do; the EventArgs derive generates the mapping, so the file holds no hand-written method body."
+
 # LELETEST005 · A `#[cfg(test)]` module holds only test fns (`#[test]`, `#[rstest]`, `#[tokio::test]`), `use` and…
 [lele.rules.lint.test_module_items]
 

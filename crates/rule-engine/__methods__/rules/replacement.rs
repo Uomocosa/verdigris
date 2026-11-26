@@ -2,23 +2,26 @@ use crate::rules;
 use crate::rules::traits::event::Event;
 
 pub fn replacement<E: Event>(answers: &rules::Rules, event: &E) -> Option<rules::Then> {
-    let affected = event.player();
-    let subject = event.subject();
-    let mut entities = vec![subject];
-    if *affected != subject {
-        entities.push(*affected);
-    }
-    entities.into_iter().find_map(|entity| {
-        answers.changes(entity, rules::Target::event::<E>()).into_iter().find_map(|change| {
-            match change {
-                rules::Change::Instead { when, then } => {
-                    let bound = when.bind(event);
-                    answers.eval(&bound, event, None).then_some(then)
-                }
+    E::args()
+        .iter()
+        .filter_map(|id| {
+            event.arg(*id).and_then(|value| match value {
+                rules::ArgValue::Entity(entity) => Some(entity),
+                rules::ArgValue::Player(player) => Some(*player),
                 _ => None,
-            }
+            })
         })
-    })
+        .find_map(|entity| {
+            answers.changes(entity, rules::Target::event::<E>()).into_iter().find_map(|change| {
+                match change {
+                    rules::Change::Instead { when, then } => {
+                        let bound = when.bind(event);
+                        answers.eval(&bound, event, None).then_some(then)
+                    }
+                    _ => None,
+                }
+            })
+        })
 }
 
 #[cfg(test)]

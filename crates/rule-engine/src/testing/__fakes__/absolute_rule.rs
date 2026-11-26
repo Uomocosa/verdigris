@@ -15,13 +15,6 @@ pub struct AbsoluteRule {
     pub player: players::PlayerId,
 }
 
-#[rustfmt::skip]
-impl rules::traits::context::Context for AbsoluteRule {
-    fn subject(&self) -> Entity { self.attacker }
-    fn other(&self) -> Option<Entity> { None }
-    fn player(&self) -> players::PlayerId { self.player }
-}
-
 impl Event for AbsoluteRule {
     const ID: rules::EventId = rules::EventId("test/absolute");
 

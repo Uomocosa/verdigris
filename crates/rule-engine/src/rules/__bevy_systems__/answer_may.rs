@@ -37,7 +37,16 @@ pub fn answer_may<E: Event>(
             .collect();
         for (option, is_accepted) in decisions {
             let Some(index) = pending.iter().position(|ask| {
-                ask.event.player() == choice.player && ask.event.subject() == *option
+                E::args()
+                    .iter()
+                    .find_map(|id| match ask.event.arg(*id) {
+                        Some(rules::ArgValue::Player(player)) => Some(player),
+                        _ => None,
+                    })
+                    .is_some_and(|player| player == choice.player)
+                    && E::args()
+                        .iter()
+                        .any(|id| ask.event.arg(*id) == Some(rules::ArgValue::Entity(*option)))
             }) else {
                 continue;
             };

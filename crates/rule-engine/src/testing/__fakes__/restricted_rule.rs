@@ -16,13 +16,6 @@ pub struct RestrictedRule {
 }
 
 #[rustfmt::skip]
-impl rules::traits::context::Context for RestrictedRule {
-    fn subject(&self) -> Entity { self.attacker }
-    fn other(&self) -> Option<Entity> { None }
-    fn player(&self) -> players::PlayerId { self.player }
-}
-
-#[rustfmt::skip]
 impl Event for RestrictedRule {
     const ID: rules::EventId = rules::EventId("test/restriction");
     fn restrictions() -> Vec<rules::Restriction> {

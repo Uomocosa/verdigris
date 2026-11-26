@@ -3,7 +3,6 @@ use bevy::prelude::{MessageReader, Query};
 use crate::Resolve;
 use crate::cards;
 use crate::events;
-use crate::rules::traits::context::Context;
 
 /// 106.4. When an effect instructs a player to add mana, that mana goes into a player’s mana pool.
 /// From there, it can be used to pay costs immediately, or it can stay in the player’s mana pool as
@@ -15,7 +14,7 @@ pub fn r106_4_lose_unspent_mana(
     mut pools: Query<&mut cards::ManaPool>,
 ) {
     for loss in losses.read() {
-        if let Ok(mut pool) = pools.get_mut(*loss.player()) {
+        if let Ok(mut pool) = pools.get_mut(*loss.player) {
             *pool = cards::ManaPool::EMPTY;
         }
     }

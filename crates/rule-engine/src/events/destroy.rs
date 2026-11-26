@@ -14,13 +14,6 @@ pub struct Destroy {
     pub controller: players::PlayerId,
 }
 
-#[rustfmt::skip]
-impl rules::traits::context::Context for Destroy {
-    fn subject(&self) -> Entity { self.permanent }
-    fn other(&self) -> Option<Entity> { None }
-    fn player(&self) -> players::PlayerId { self.controller }
-}
-
 impl Event for Destroy {
     const ID: rules::EventId = rules::EventId("701.8a/destroy");
 }
@@ -30,7 +23,6 @@ mod tests {
     use bevy::prelude::Entity;
 
     use crate::rules;
-    use crate::rules::traits::context::Context;
     use crate::rules::traits::event::Event;
     use crate::rules::traits::event_args::EventArgs;
 
@@ -45,9 +37,14 @@ mod tests {
             permanent,
             controller,
         };
-        assert_eq!(event.subject(), permanent);
-        assert_eq!(event.other(), None);
-        assert_eq!(event.player(), controller);
+        assert_eq!(
+            event.arg(Destroy::PERMANENT),
+            Some(rules::ArgValue::Entity(permanent))
+        );
+        assert_eq!(
+            event.arg(Destroy::CONTROLLER),
+            Some(rules::ArgValue::Player(controller))
+        );
         assert_eq!(Destroy::ID, rules::EventId("701.8a/destroy"));
         assert_eq!(Destroy::restrictions(), Vec::new());
         assert_eq!(Destroy::args(), &[Destroy::PERMANENT, Destroy::CONTROLLER,]);

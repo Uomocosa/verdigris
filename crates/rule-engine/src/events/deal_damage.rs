@@ -21,13 +21,6 @@ pub struct DealDamage {
     pub controller: players::PlayerId,
 }
 
-#[rustfmt::skip]
-impl rules::traits::context::Context for DealDamage {
-    fn subject(&self) -> Entity { self.recipient }
-    fn other(&self) -> Option<Entity> { Some(self.source) }
-    fn player(&self) -> players::PlayerId { self.controller }
-}
-
 impl Event for DealDamage {
     const ID: rules::EventId = rules::EventId("120.3/deal-damage");
 
@@ -43,7 +36,6 @@ mod tests {
     use bevy::prelude::Entity;
 
     use crate::rules;
-    use crate::rules::traits::context::Context;
     use crate::rules::traits::event::Event;
     use crate::rules::traits::event_args::EventArgs;
 
@@ -61,9 +53,14 @@ mod tests {
             amount: 3,
             controller,
         };
-        assert_eq!(event.subject(), recipient);
-        assert_eq!(event.other(), Some(source));
-        assert_eq!(event.player(), controller);
+        assert_eq!(
+            event.arg(DealDamage::RECIPIENT),
+            Some(rules::ArgValue::Entity(recipient))
+        );
+        assert_eq!(
+            event.arg(DealDamage::CONTROLLER),
+            Some(rules::ArgValue::Player(controller))
+        );
         assert_eq!(DealDamage::ID, rules::EventId("120.3/deal-damage"));
         let restrictions = DealDamage::restrictions();
         assert_eq!(restrictions.len(), 1);

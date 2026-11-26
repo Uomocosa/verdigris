@@ -21,13 +21,6 @@ pub struct DeclareBlocker {
     pub player: players::PlayerId,
 }
 
-#[rustfmt::skip]
-impl rules::traits::context::Context for DeclareBlocker {
-    fn subject(&self) -> Entity { self.blocker }
-    fn other(&self) -> Option<Entity> { Some(self.attacker) }
-    fn player(&self) -> players::PlayerId { self.player }
-}
-
 impl Event for DeclareBlocker {
     const ID: rules::EventId = rules::EventId("509.1a/declare-blocker");
 

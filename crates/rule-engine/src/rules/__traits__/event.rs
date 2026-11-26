@@ -5,10 +5,9 @@ use crate::Did;
 use crate::May;
 use crate::Resolve;
 use crate::rules;
-use crate::rules::traits::context::Context;
 use crate::rules::traits::event_args::EventArgs;
 
-pub trait Event: Context + EventArgs + Clone + Send + Sync + 'static {
+pub trait Event: EventArgs + Clone + Send + Sync + 'static {
     const ID: rules::EventId;
     #[must_use]
     fn restrictions() -> Vec<rules::Restriction> {
@@ -16,7 +15,13 @@ pub trait Event: Context + EventArgs + Clone + Send + Sync + 'static {
     }
     #[must_use]
     fn affected(&self) -> Vec<Entity> {
-        vec![*self.player()]
+        Self::args()
+            .iter()
+            .filter_map(|id| match self.arg(*id) {
+                Some(rules::ArgValue::Player(player)) => Some(*player),
+                _ => None,
+            })
+            .collect()
     }
     fn register(app: &mut App) {
         app.add_message::<Attempt<Self>>()
@@ -33,14 +38,17 @@ mod tests {
     use crate::events;
     use crate::players;
     use crate::rules;
-    use crate::rules::traits::context::Context;
     use crate::rules::traits::event::Event;
+    use crate::rules::traits::event_args::EventArgs;
 
     #[test]
     fn test_usage() {
         let player = players::PlayerId(Entity::PLACEHOLDER);
         let event = events::LoseGame { player };
-        assert_eq!(event.player(), player);
+        assert_eq!(
+            event.arg(events::LoseGame::PLAYER),
+            Some(rules::ArgValue::Player(player))
+        );
         assert_eq!(event.affected(), vec![*player]);
         assert_eq!(events::LoseGame::ID, rules::EventId("104.3/lose-game"));
     }

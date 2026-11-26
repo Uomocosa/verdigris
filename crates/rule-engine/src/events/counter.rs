@@ -14,13 +14,6 @@ pub struct Counter {
     pub controller: players::PlayerId,
 }
 
-#[rustfmt::skip]
-impl rules::traits::context::Context for Counter {
-    fn subject(&self) -> Entity { self.spell }
-    fn other(&self) -> Option<Entity> { None }
-    fn player(&self) -> players::PlayerId { self.controller }
-}
-
 impl Event for Counter {
     const ID: rules::EventId = rules::EventId("701.6a/counter");
 }
@@ -30,7 +23,6 @@ mod tests {
     use bevy::prelude::Entity;
 
     use crate::rules;
-    use crate::rules::traits::context::Context;
     use crate::rules::traits::event::Event;
     use crate::rules::traits::event_args::EventArgs;
 
@@ -42,9 +34,14 @@ mod tests {
         let spell = Entity::PLACEHOLDER;
         let controller = players::PlayerId(Entity::from_raw_u32(1).unwrap());
         let event = Counter { spell, controller };
-        assert_eq!(event.subject(), spell);
-        assert_eq!(event.other(), None);
-        assert_eq!(event.player(), controller);
+        assert_eq!(
+            event.arg(Counter::SPELL),
+            Some(rules::ArgValue::Entity(spell))
+        );
+        assert_eq!(
+            event.arg(Counter::CONTROLLER),
+            Some(rules::ArgValue::Player(controller))
+        );
         assert_eq!(Counter::ID, rules::EventId("701.6a/counter"));
         assert_eq!(Counter::restrictions(), Vec::new());
         assert_eq!(Counter::args(), &[Counter::SPELL, Counter::CONTROLLER,]);

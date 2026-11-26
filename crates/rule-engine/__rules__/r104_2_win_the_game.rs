@@ -4,7 +4,6 @@ use bevy::prelude::{Commands, MessageReader, ResMut};
 use crate::Resolve;
 use crate::StateBasedActionsPerformed;
 use crate::players;
-use crate::rules::traits::context::Context;
 
 /// 104.2. There are several ways to win the game.
 pub fn r104_2_win_the_game(
@@ -13,7 +12,7 @@ pub fn r104_2_win_the_game(
     mut state_based_actions_performed: ResMut<StateBasedActionsPerformed>,
 ) {
     for happened in proceeds.read() {
-        commands.entity(*happened.player()).insert(players::Won);
+        commands.entity(*happened.player).insert(players::Won);
         **state_based_actions_performed = true;
     }
 }
