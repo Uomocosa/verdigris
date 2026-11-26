@@ -112,6 +112,10 @@ a player or a permanent (a damage recipient, a target, `Context::subject`) stays
 wrap an `Entity` in `PlayerId(..)` just to make it compile. To ask whether such an `Entity` is a player, use
 `players.as_player(entity)`; with an event, `players.affected_by(event)`.
 
+Owner and controller are different players (108.3, 108.4): "you control", who casts, who blocks, a trigger's
+controller and hexproof read `cards::Controller`; whose hand, library or graveyard a card goes to reads
+`cards::Owner`. An ability on the stack has a controller and no owner.
+
 ## 11. One CR rule, one file; a general sentence names no case
 
 Asking, checking an answer, and performing are different jobs, so they are different systems. When a
@@ -146,7 +150,9 @@ outcome (`r120_3` writes `Did`, so a trigger on damage). A general file that onl
    settles §2: §2 is for questions several rules ask.
 3. **Moving the body into a helper is not a refactor.** If the helper still does the checks, the
    complexity only moved. Remove it: give it to an event's clauses, the pipeline or the shared choice.
-4. Repeated struct literals get a constructor that reads as the CR phrase
+4. A new `SystemParam` holds `rules::Rules` (it already has definitions, zones, `in_zone`, entities) plus at most a
+   small query; `Rules` + `Players` is over clippy's 256-byte pass-by-value limit (`stack::Targeting`).
+5. Repeated struct literals get a constructor that reads as the CR phrase
    (`LoseLife::by(player, amount)`; if the linter wants another name, its name wins).
 
 A missing engine part is not a reason to keep a rule complicated. Name the part, say what else it

@@ -76,7 +76,8 @@ actions with no `pass_to` (`activate_ability(..).cast(..).targeting(..)`) are fi
 
 Raw `game.act(..)` stays only in tests that check the engine rejects an action
 (`game.last_rejection()`). A legal action has a verb (`p1.concede()`); if one is missing, add it in
-`src/testing/__app__/` instead of using `act`. Only a card that did not exist at setup (a token) is looked up
+`src/testing/__app__/` instead of using `act`. No raw `game.app.update()` either: a battlefield static applies
+after the first `pass_priority` step, and a full pass rotation also ends the step (pools empty). Only a card that did not exist at setup (a token) is looked up
 later, right after the step that creates it; an end-state check uses `.has(card)`.
 
 **Why:** the reader learns what is on the table before reading what happens to it, and a
