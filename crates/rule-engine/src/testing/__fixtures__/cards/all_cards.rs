@@ -33,6 +33,7 @@ pub const ALL_CARDS: &[testing::Card] = &[
     testing::JUMP,
     testing::LABORATORY_MANIAC,
     testing::LEYLINE_OF_ANTICIPATION,
+    testing::LEYLINE_OF_SANCTITY,
     testing::LIGHTNING_BOLT,
     testing::MASTER_OF_THE_FEAST,
     testing::MIND_ROT,

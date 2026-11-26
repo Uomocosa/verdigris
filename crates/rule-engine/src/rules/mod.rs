@@ -7,7 +7,7 @@ pub use basic::enums::{
 pub use basic::newtypes::{ClauseKey, ComponentKey, EventId, RuleId};
 pub use basic::predicate_builders::{
     active_player, at_least, at_most, card_type, equal_to, event_field, has, has_priority, in_zone,
-    main_phase, other, points_to, stack_empty, step_is,
+    is, main_phase, other, points_to, stack_empty, step_is,
 };
 pub use basic::structs::RuleChange;
 pub use basic::type_aliases::TargetOf;

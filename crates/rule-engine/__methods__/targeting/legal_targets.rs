@@ -16,7 +16,11 @@ pub fn legal_targets(
         requirement.filter.kind,
         effects::FilterKind::AnyTarget | effects::FilterKind::Player
     ) {
-        legal.extend(targeting.players.iter());
+        for player in targeting.players.iter() {
+            if targeting.is_legal_target(spell, requirement, controller, player) {
+                legal.insert(player);
+            }
+        }
     }
     for entity in targeting.answers.entities.iter() {
         let candidate = entity.id();

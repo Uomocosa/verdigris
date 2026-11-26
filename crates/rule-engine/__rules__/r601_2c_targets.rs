@@ -352,4 +352,33 @@ mod tests {
         assert!(game.player(p1).cards_in(GRAVEYARD).has(blade));
         Ok(())
     }
+
+    #[test]
+    fn an_opponent_cannot_target_a_player_with_hexproof() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
+            P2.battlefield([LEYLINE_OF_SANCTITY]),
+        ]);
+        let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
+        game.play([p1.pass_priority(), p2.pass_priority()])?;
+        game.play([p1.cast(bolt)])?;
+        assert_eq!(game.target_choice(), Some(pick(1).from([*p1])));
+        Ok(())
+    }
+
+    #[test]
+    fn a_controller_can_target_themself_with_hexproof() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1,
+            P2.battlefield([LEYLINE_OF_SANCTITY]).hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
+        ]);
+        let [bolt] = game.player(p2).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
+        game.play([
+            p1.pass_priority(),
+            p2.cast(bolt).targeting(p2).end_turn(),
+            p1.end_turn(),
+        ])?;
+        assert_eq!(game.life(p2), 17);
+        Ok(())
+    }
 }

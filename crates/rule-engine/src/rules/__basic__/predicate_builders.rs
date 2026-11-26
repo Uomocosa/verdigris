@@ -41,6 +41,11 @@ pub const fn points_to<C: rules::traits::entity_component::EntityComponent>(
 }
 
 #[must_use]
+pub const fn is(role: rules::Role) -> rules::Predicate {
+    rules::Predicate::Is(role)
+}
+
+#[must_use]
 pub const fn in_zone(zone: zones::Zone, role: rules::Role) -> rules::Predicate {
     rules::Predicate::InZone(zone, role)
 }

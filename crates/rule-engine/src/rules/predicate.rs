@@ -9,6 +9,7 @@ use crate::zones;
 pub enum Predicate {
     Has(rules::ComponentKey),
     PointsTo(rules::ComponentKey, rules::Role),
+    Is(rules::Role),
     CardType(cards::CardType),
     Characteristic(rules::Characteristic, rules::Comparison, i32),
     Of(rules::Role, Box<Self>),

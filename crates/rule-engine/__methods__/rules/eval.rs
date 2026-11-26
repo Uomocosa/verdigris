@@ -39,6 +39,7 @@ pub fn eval(
                 })
                 .is_some_and(|found| found == wanted)
         }),
+        rules::Predicate::Is(role) => target(role) == Some(subject),
         rules::Predicate::CardType(card) => answers
             .definitions
             .get(subject)
