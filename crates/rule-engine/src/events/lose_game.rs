@@ -39,6 +39,6 @@ mod tests {
         assert_eq!(event.other(), None);
         assert_eq!(event.player(), player);
         assert_eq!(LoseGame::ID, rules::EventId("104.3/lose-game"));
-        assert_eq!(LoseGame::clauses(), Vec::new());
+        assert_eq!(LoseGame::restrictions(), Vec::new());
     }
 }

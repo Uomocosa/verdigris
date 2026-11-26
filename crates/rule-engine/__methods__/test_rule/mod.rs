@@ -1,2 +1,2 @@
-mod event_clauses;
-pub use event_clauses::event_clauses;
+mod event_restrictions;
+pub use event_restrictions::event_restrictions;

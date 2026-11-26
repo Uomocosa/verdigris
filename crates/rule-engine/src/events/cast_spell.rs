@@ -3,16 +3,14 @@ use bevy::prelude::Entity;
 
 use crate::players;
 
-use crate::events;
 use crate::rules;
 use crate::rules::traits::event::Event;
 
-pub const PRIORITY: rules::ClauseId<events::CastSpell> = rules::ClauseId::new("601.2a/priority");
-pub const FROM_HAND: rules::ClauseId<events::CastSpell> = rules::ClauseId::new("601.2a/from-hand");
-pub const OWNS: rules::ClauseId<events::CastSpell> = rules::ClauseId::new("601.2a/owns");
-pub const NOT_A_LAND: rules::ClauseId<events::CastSpell> =
-    rules::ClauseId::new("601.2a/not-a-land");
-pub const TIMING: rules::ClauseId<events::CastSpell> = rules::ClauseId::new("601.2a/timing");
+pub const PRIORITY: rules::RestrictionId = rules::RestrictionId("601.2a/priority");
+pub const FROM_HAND: rules::RestrictionId = rules::RestrictionId("601.2a/from-hand");
+pub const OWNS: rules::RestrictionId = rules::RestrictionId("601.2a/owns");
+pub const NOT_A_LAND: rules::RestrictionId = rules::RestrictionId("601.2a/not-a-land");
+pub const TIMING: rules::RestrictionId = rules::RestrictionId("601.2a/timing");
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct CastSpell {
@@ -31,7 +29,7 @@ impl Event for CastSpell {
     const ID: rules::EventId = rules::EventId("601.2a/cast-spell");
 
     #[atomic_delegate(CastSpell, Event)]
-    fn clauses() -> Vec<rules::Clause> {}
+    fn restrictions() -> Vec<rules::Restriction> {}
 }
 
 #[cfg(test)]
@@ -51,67 +49,67 @@ mod tests {
     #[test]
     fn test_usage() {
         assert_eq!(CastSpell::ID, rules::EventId("601.2a/cast-spell"));
-        let clauses = CastSpell::clauses();
-        assert_eq!(clauses.len(), 5);
-        assert_eq!(clauses[0].key, PRIORITY.key);
-        assert_eq!(clauses[0].text, "A player who has priority");
-        assert_eq!(clauses[0].role, rules::Role::Player);
+        let restrictions = CastSpell::restrictions();
+        assert_eq!(restrictions.len(), 5);
+        assert_eq!(restrictions[0].id, PRIORITY);
+        assert_eq!(restrictions[0].text, "A player who has priority");
+        assert_eq!(restrictions[0].role, rules::Role::Player);
         assert_eq!(
-            clauses[0].condition,
+            restrictions[0].condition,
             rules::has_priority(rules::Role::Player)
         );
-        assert_eq!(clauses[1].key, FROM_HAND.key);
-        assert_eq!(clauses[1].text, "from their hand");
-        assert_eq!(clauses[1].role, rules::Role::Player);
+        assert_eq!(restrictions[1].id, FROM_HAND);
+        assert_eq!(restrictions[1].text, "from their hand");
+        assert_eq!(restrictions[1].role, rules::Role::Player);
         assert_eq!(
-            clauses[1].condition,
+            restrictions[1].condition,
             rules::in_zone(HAND, rules::Role::Player)
         );
-        assert_eq!(clauses[2].key, OWNS.key);
-        assert_eq!(clauses[2].text, "their hand");
-        assert_eq!(clauses[2].role, rules::Role::Player);
+        assert_eq!(restrictions[2].id, OWNS);
+        assert_eq!(restrictions[2].text, "their hand");
+        assert_eq!(restrictions[2].role, rules::Role::Player);
         assert_eq!(
-            clauses[2].condition,
+            restrictions[2].condition,
             rules::points_to::<cards::Owner>(rules::Role::Player)
         );
-        assert_eq!(clauses[3].key, NOT_A_LAND.key);
-        assert_eq!(clauses[3].text, "It can’t be cast as a spell.");
-        assert_eq!(clauses[3].role, rules::Role::Subject);
+        assert_eq!(restrictions[3].id, NOT_A_LAND);
+        assert_eq!(restrictions[3].text, "It can’t be cast as a spell.");
+        assert_eq!(restrictions[3].role, rules::Role::Subject);
         assert_eq!(
-            clauses[3].condition,
+            restrictions[3].condition,
             !rules::card_type(cards::CardType::Land)
         );
-        assert!(clauses[3].absolute);
-        assert_eq!(clauses[4].key, TIMING.key);
+        assert!(restrictions[3].unwaivable);
+        assert_eq!(restrictions[4].id, TIMING);
         assert_eq!(
-            clauses[4].text,
+            restrictions[4].text,
             "during a main phase of their turn when the stack is empty"
         );
-        assert_eq!(clauses[4].role, rules::Role::Player);
+        assert_eq!(restrictions[4].role, rules::Role::Player);
         assert_eq!(
-            clauses[4].condition,
+            restrictions[4].condition,
             rules::card_type(cards::CardType::Instant)
                 | (rules::main_phase()
                     & rules::stack_empty()
                     & rules::active_player(rules::Role::Player))
         );
         assert!(
-            CastSpell::clauses()
+            CastSpell::restrictions()
                 .iter()
-                .filter(|clause| clause.key != NOT_A_LAND.key)
-                .all(|clause| !clause.absolute)
+                .filter(|restriction| restriction.id != NOT_A_LAND)
+                .all(|restriction| !restriction.unwaivable)
         );
     }
 
     #[test]
-    fn clause_texts_occur_verbatim_in_comprehensive_rules() {
+    fn restriction_texts_occur_verbatim_in_comprehensive_rules() {
         const RULES_TEXT: &str = include_str!("../../../../docs/MagicCompRules-20250919.txt");
-        for clause in CastSpell::clauses() {
+        for restriction in CastSpell::restrictions() {
             assert!(
-                RULES_TEXT.contains(clause.text),
-                "clause {:?} text not found verbatim in Comprehensive Rules: {:?}",
-                clause.key,
-                clause.text
+                RULES_TEXT.contains(restriction.text),
+                "restriction {:?} text not found verbatim in Comprehensive Rules: {:?}",
+                restriction.id,
+                restriction.text
             );
         }
     }

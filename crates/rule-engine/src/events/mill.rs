@@ -46,7 +46,7 @@ mod tests {
         assert_eq!(event.other(), None);
         assert_eq!(event.player(), player);
         assert_eq!(Mill::ID, rules::EventId("701.17a/mill"));
-        assert_eq!(Mill::clauses(), Vec::new());
+        assert_eq!(Mill::restrictions(), Vec::new());
         assert_eq!(event.field(rules::Field::Amount), Some(2));
     }
 }

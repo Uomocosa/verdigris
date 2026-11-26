@@ -6,7 +6,7 @@ use crate::players;
 use crate::rules;
 use crate::rules::traits::event::Event;
 
-pub const UNTAPPED: rules::ClauseId<TestRule> = rules::ClauseId::new("test/untapped");
+pub const UNTAPPED: rules::RestrictionId = rules::RestrictionId("test/untapped");
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct TestRule {
@@ -25,7 +25,7 @@ impl Event for TestRule {
     const ID: rules::EventId = rules::EventId("test/legality");
 
     #[atomic_delegate(TestRule, Event)]
-    fn clauses() -> Vec<rules::Clause> {}
+    fn restrictions() -> Vec<rules::Restriction> {}
 }
 
 #[cfg(test)]
@@ -39,8 +39,8 @@ mod tests {
     #[test]
     fn test_usage() {
         assert_eq!(TestRule::ID, rules::EventId("test/legality"));
-        let clauses = TestRule::clauses();
-        assert_eq!(clauses.len(), 1);
-        assert_eq!(clauses[0].key, UNTAPPED.key);
+        let restrictions = TestRule::restrictions();
+        assert_eq!(restrictions.len(), 1);
+        assert_eq!(restrictions[0].id, UNTAPPED);
     }
 }

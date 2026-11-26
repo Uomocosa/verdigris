@@ -23,7 +23,7 @@ impl Event for RestrictedRule {
     const ID: rules::EventId = rules::EventId("test/restriction");
 
     #[atomic_delegate(RestrictedRule, Event)]
-    fn clauses() -> Vec<rules::Clause> {}
+    fn restrictions() -> Vec<rules::Restriction> {}
 }
 
 #[cfg(test)]
@@ -37,8 +37,8 @@ mod tests {
     #[test]
     fn test_usage() {
         assert_eq!(RestrictedRule::ID, rules::EventId("test/restriction"));
-        let clauses = RestrictedRule::clauses();
-        assert_eq!(clauses.len(), 1);
-        assert_eq!(clauses[0].key, testing::UNTAPPED.key);
+        let restrictions = RestrictedRule::restrictions();
+        assert_eq!(restrictions.len(), 1);
+        assert_eq!(restrictions[0].id, testing::UNTAPPED);
     }
 }

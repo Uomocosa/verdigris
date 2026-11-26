@@ -46,7 +46,7 @@ mod tests {
         assert_eq!(event.other(), None);
         assert_eq!(event.player(), player);
         assert_eq!(Draw::ID, rules::EventId("121.1/draw"));
-        assert_eq!(Draw::clauses(), Vec::new());
+        assert_eq!(Draw::restrictions(), Vec::new());
         assert_eq!(event.field(rules::Field::Amount), Some(2));
     }
 }

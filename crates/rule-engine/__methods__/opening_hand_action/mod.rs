@@ -1,2 +1,2 @@
-mod hook_event_clauses;
-pub use hook_event_clauses::hook_event_clauses;
+mod hook_event_restrictions;
+pub use hook_event_restrictions::hook_event_restrictions;

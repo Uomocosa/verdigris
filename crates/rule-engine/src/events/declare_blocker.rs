@@ -3,17 +3,13 @@ use bevy::prelude::Entity;
 
 use crate::players;
 
-use crate::events;
 use crate::rules;
 use crate::rules::traits::event::Event;
 
-pub const CREATURE: rules::ClauseId<events::DeclareBlocker> =
-    rules::ClauseId::new("509.1a/creature");
-pub const CONTROLS: rules::ClauseId<events::DeclareBlocker> =
-    rules::ClauseId::new("509.1a/controls");
-pub const UNTAPPED: rules::ClauseId<events::DeclareBlocker> =
-    rules::ClauseId::new("509.1a/untapped");
-pub const FLYING: rules::ClauseId<events::DeclareBlocker> = rules::ClauseId::new("702.9b/flying");
+pub const CREATURE: rules::RestrictionId = rules::RestrictionId("509.1a/creature");
+pub const CONTROLS: rules::RestrictionId = rules::RestrictionId("509.1a/controls");
+pub const UNTAPPED: rules::RestrictionId = rules::RestrictionId("509.1a/untapped");
+pub const FLYING: rules::RestrictionId = rules::RestrictionId("702.9b/flying");
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct DeclareBlocker {
@@ -33,7 +29,7 @@ impl Event for DeclareBlocker {
     const ID: rules::EventId = rules::EventId("509.1a/declare-blocker");
 
     #[atomic_delegate(DeclareBlocker, Event)]
-    fn clauses() -> Vec<rules::Clause> {}
+    fn restrictions() -> Vec<rules::Restriction> {}
 }
 
 #[cfg(test)]
@@ -54,31 +50,34 @@ mod tests {
     #[test]
     fn test_usage() {
         assert_eq!(DeclareBlocker::ID, rules::EventId("509.1a/declare-blocker"));
-        let clauses = DeclareBlocker::clauses();
-        assert_eq!(clauses.len(), 4);
-        assert_eq!(clauses[0].key, CREATURE.key);
+        let restrictions = DeclareBlocker::restrictions();
+        assert_eq!(restrictions.len(), 4);
+        assert_eq!(restrictions[0].id, CREATURE);
         assert_eq!(
-            clauses[0].text,
+            restrictions[0].text,
             "The defending player chooses which creatures they control"
         );
-        assert_eq!(clauses[0].role, rules::Role::Subject);
-        assert_eq!(clauses[0].condition, rules::has::<cards::Creature>());
-        assert_eq!(clauses[1].key, CONTROLS.key);
-        assert_eq!(clauses[1].text, "creatures they control");
-        assert_eq!(clauses[1].role, rules::Role::Subject);
+        assert_eq!(restrictions[0].role, rules::Role::Subject);
+        assert_eq!(restrictions[0].condition, rules::has::<cards::Creature>());
+        assert_eq!(restrictions[1].id, CONTROLS);
+        assert_eq!(restrictions[1].text, "creatures they control");
+        assert_eq!(restrictions[1].role, rules::Role::Subject);
         assert_eq!(
-            clauses[1].condition,
+            restrictions[1].condition,
             rules::points_to::<cards::Controller>(rules::Role::Player)
                 & rules::has::<cards::OnBattlefield>()
         );
-        assert_eq!(clauses[2].key, UNTAPPED.key);
-        assert_eq!(clauses[2].text, "The chosen creatures must be untapped");
-        assert_eq!(clauses[2].role, rules::Role::Subject);
-        assert_eq!(clauses[2].condition, !rules::has::<cards::Tapped>());
-        assert_eq!(clauses[3].key, FLYING.key);
-        assert_eq!(clauses[3].role, rules::Role::Other);
+        assert_eq!(restrictions[2].id, UNTAPPED);
         assert_eq!(
-            clauses[3].condition,
+            restrictions[2].text,
+            "The chosen creatures must be untapped"
+        );
+        assert_eq!(restrictions[2].role, rules::Role::Subject);
+        assert_eq!(restrictions[2].condition, !rules::has::<cards::Tapped>());
+        assert_eq!(restrictions[3].id, FLYING);
+        assert_eq!(restrictions[3].role, rules::Role::Other);
+        assert_eq!(
+            restrictions[3].condition,
             !rules::other(rules::has::<cards::Flying>())
                 | rules::has::<cards::Flying>()
                 | rules::has::<cards::Reach>()
@@ -86,15 +85,16 @@ mod tests {
     }
 
     #[test]
-    fn clause_keys_are_unique_across_declare_rules() {
+    fn restriction_ids_are_unique_across_declare_rules() {
         let mut seen = HashSet::new();
-        for clause in
-            DeclareBlocker::clauses().into_iter().chain(events::DeclareAttacker::clauses())
+        for restriction in DeclareBlocker::restrictions()
+            .into_iter()
+            .chain(events::DeclareAttacker::restrictions())
         {
             assert!(
-                seen.insert(clause.key),
-                "duplicate clause key: {:?}",
-                clause.key
+                seen.insert(restriction.id),
+                "duplicate restriction id: {:?}",
+                restriction.id
             );
         }
     }

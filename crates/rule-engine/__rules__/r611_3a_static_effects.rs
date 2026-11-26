@@ -575,7 +575,7 @@ mod tests {
                 assert!(
                     answers.mods(controller).contains(&effects::Modification::Rule(
                         rules::RuleChange {
-                            target: rules::Target::Clause(testing::UNTAPPED.key),
+                            target: rules::Target::Restriction(testing::UNTAPPED),
                             change: rules::Change::AsThough,
                         },
                     ))
@@ -583,7 +583,7 @@ mod tests {
                 assert!(
                     !answers.mods(opponent).contains(&effects::Modification::Rule(
                         rules::RuleChange {
-                            target: rules::Target::Clause(testing::UNTAPPED.key),
+                            target: rules::Target::Restriction(testing::UNTAPPED),
                             change: rules::Change::AsThough,
                         },
                     ))
@@ -598,7 +598,7 @@ mod tests {
                 assert!(
                     !answers.mods(controller).contains(&effects::Modification::Rule(
                         rules::RuleChange {
-                            target: rules::Target::Clause(testing::UNTAPPED.key),
+                            target: rules::Target::Restriction(testing::UNTAPPED),
                             change: rules::Change::AsThough,
                         },
                     ))

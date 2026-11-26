@@ -47,7 +47,7 @@ mod tests {
     }
 
     #[test]
-    fn a_permanent_without_an_enters_tapped_clause_enters_untapped() -> TestResult {
+    fn a_permanent_without_an_enters_tapped_restriction_enters_untapped() -> TestResult {
         let (mut game, [p1, ..]) = MockGame::new([P1.hand([FOREST]), P2]);
         let [forest] = game.player(p1).cards_in(HAND).exactly::<1>(FOREST)?;
 

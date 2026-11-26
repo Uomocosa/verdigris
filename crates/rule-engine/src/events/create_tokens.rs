@@ -55,7 +55,7 @@ mod tests {
         assert_eq!(event.other(), None);
         assert_eq!(event.player(), controller);
         assert_eq!(CreateTokens::ID, rules::EventId("701.7a/create-tokens"));
-        assert_eq!(CreateTokens::clauses(), Vec::new());
+        assert_eq!(CreateTokens::restrictions(), Vec::new());
         assert_eq!(event.field(rules::Field::Amount), Some(2));
     }
 }

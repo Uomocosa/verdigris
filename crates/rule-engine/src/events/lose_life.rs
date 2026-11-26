@@ -46,7 +46,7 @@ mod tests {
         assert_eq!(event.other(), None);
         assert_eq!(event.player(), player);
         assert_eq!(LoseLife::ID, rules::EventId("119.3/lose-life"));
-        assert_eq!(LoseLife::clauses(), Vec::new());
+        assert_eq!(LoseLife::restrictions(), Vec::new());
         assert_eq!(event.field(rules::Field::Amount), Some(2));
     }
 }

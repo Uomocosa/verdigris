@@ -57,7 +57,7 @@ mod tests {
                     modifications,
                     [
                         effects::Modification::Rule(rules::RuleChange {
-                            target: rules::Target::Clause(UNTAPPED.key),
+                            target: rules::Target::Restriction(UNTAPPED),
                             change: rules::Change::AsThough,
                         }),
                         effects::Modification::Rule(rules::RuleChange {
@@ -86,7 +86,7 @@ mod tests {
                 assert!(
                     !mods(&answers, *spider).contains(&effects::Modification::Rule(
                         rules::RuleChange {
-                            target: rules::Target::Clause(events::declare_blocker::FLYING.key),
+                            target: rules::Target::Restriction(events::declare_blocker::FLYING),
                             change: rules::Change::AsThough,
                         }
                     ))

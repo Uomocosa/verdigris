@@ -45,6 +45,6 @@ mod tests {
         assert_eq!(event.other(), None);
         assert_eq!(event.player(), controller);
         assert_eq!(TestStep::ID, rules::EventId("test/step"));
-        assert_eq!(TestStep::clauses(), Vec::new());
+        assert_eq!(TestStep::restrictions(), Vec::new());
     }
 }

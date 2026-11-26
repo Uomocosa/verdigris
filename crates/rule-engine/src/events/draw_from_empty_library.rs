@@ -42,6 +42,6 @@ mod tests {
             DrawFromEmptyLibrary::ID,
             rules::EventId("121.4/draw-from-empty-library")
         );
-        assert_eq!(DrawFromEmptyLibrary::clauses(), Vec::new());
+        assert_eq!(DrawFromEmptyLibrary::restrictions(), Vec::new());
     }
 }

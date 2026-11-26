@@ -5,31 +5,36 @@ pub fn legality<E: Event>(answers: &rules::Rules, event: &E) -> rules::Legality 
     let subject = event.subject();
     let other = event.other();
     let player = event.player();
-    let waived = |clause: &rules::Clause| {
-        if clause.absolute {
+    let waived = |restriction: &rules::Restriction| {
+        if restriction.unwaivable {
             return false;
         }
-        let entity = match clause.role {
+        let entity = match restriction.role {
             rules::Role::Subject => Some(subject),
             rules::Role::Other => other,
             rules::Role::Player => Some(*player),
         };
         entity.is_some_and(|entity| {
-            answers.changes(entity, rules::Target::Clause(clause.key)).iter().any(|change| {
-                match change {
+            answers.changes(entity, rules::Target::Restriction(restriction.id)).iter().any(
+                |change| match change {
                     rules::Change::AsThough => true,
                     rules::Change::Allow(alternative) => {
                         answers.eval(alternative, subject, other, Some(*player))
                     }
                     _ => false,
-                }
-            })
+                },
+            )
         })
     };
-    let base = E::clauses()
-        .iter()
-        .filter(|clause| !waived(clause))
-        .all(|clause| answers.eval(&clause.condition.bind(event), subject, other, Some(*player)));
+    let base =
+        E::restrictions().iter().filter(|restriction| !waived(restriction)).all(|restriction| {
+            answers.eval(
+                &restriction.condition.bind(event),
+                subject,
+                other,
+                Some(*player),
+            )
+        });
     let vetoed = [
         (rules::Role::Subject, Some(subject)),
         (rules::Role::Other, other),
@@ -91,7 +96,7 @@ mod tests {
     }
 
     #[test]
-    fn a_tapped_creature_fails_an_untapped_clause() -> TestResult {
+    fn a_tapped_creature_fails_an_untapped_restriction() -> TestResult {
         let (mut game, [_, p2]) = MockGame::new([P1, P2.battlefield_tapped([GRIZZLY_BEARS])]);
         let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
         game.pass_priority();
@@ -114,7 +119,7 @@ mod tests {
     }
 
     #[test]
-    fn a_waived_clause_is_skipped_for_the_waiving_creature() -> TestResult {
+    fn a_waived_restriction_is_skipped_for_the_waiving_creature() -> TestResult {
         let (mut game, [p1, _]) = MockGame::new([P1.battlefield_tapped([TEST_RULE_WAIVER]), P2]);
         let [waiver] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TEST_RULE_WAIVER)?;
         game.pass_priority();
@@ -161,7 +166,7 @@ mod tests {
     }
 
     #[test]
-    fn an_allowance_satisfies_a_failing_clause_when_its_alternative_holds() -> TestResult {
+    fn an_allowance_satisfies_a_failing_restriction_when_its_alternative_holds() -> TestResult {
         let (mut game, [_, p2]) = MockGame::new([
             P1.battlefield([TEST_RULE_ALLOWANCE]),
             P2.battlefield_tapped([WIND_DRAKE]),
@@ -193,7 +198,7 @@ mod tests {
     }
 
     #[test]
-    fn an_allowance_leaves_a_failing_clause_when_its_alternative_fails() -> TestResult {
+    fn an_allowance_leaves_a_failing_restriction_when_its_alternative_fails() -> TestResult {
         let (mut game, [_, p2]) = MockGame::new([
             P1.battlefield([TEST_RULE_ALLOWANCE]),
             P2.battlefield_tapped([GRIZZLY_BEARS]),
@@ -225,7 +230,7 @@ mod tests {
     }
 
     #[test]
-    fn an_absolute_clause_is_not_satisfied_by_as_though() -> TestResult {
+    fn an_unwaivable_restriction_is_not_satisfied_by_as_though() -> TestResult {
         let (mut game, [p1, _]) = MockGame::new([P1.battlefield_tapped([TEST_RULE_WAIVER]), P2]);
         let [waiver] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TEST_RULE_WAIVER)?;
         game.pass_priority();

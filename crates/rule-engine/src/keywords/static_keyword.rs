@@ -27,7 +27,7 @@ impl StaticKeyword {
     pub fn keyword_modifications(self) -> Vec<effects::Modification> {
         match self {
             Self::Haste => vec![effects::Modification::Rule(rules::RuleChange {
-                target: rules::Target::Clause(events::declare_attacker::SUMMONING_SICK.key),
+                target: rules::Target::Restriction(events::declare_attacker::SUMMONING_SICK),
                 change: rules::Change::AsThough,
             })],
             Self::Vigilance => vec![effects::Modification::Rule(rules::RuleChange {
@@ -49,7 +49,7 @@ impl StaticKeyword {
                 },
             })],
             Self::Trample => vec![effects::Modification::Rule(rules::RuleChange {
-                target: rules::Target::Clause(events::assign_combat_damage::ONLY_BLOCKERS.key),
+                target: rules::Target::Restriction(events::assign_combat_damage::ONLY_BLOCKERS),
                 change: rules::Change::Allow(rules::has::<players::Player>()),
             })],
             Self::Deathtouch => vec![effects::Modification::Rule(rules::RuleChange {
@@ -77,7 +77,7 @@ mod tests {
         assert_eq!(
             StaticKeyword::Haste.keyword_modifications(),
             vec![effects::Modification::Rule(rules::RuleChange {
-                target: rules::Target::Clause(events::declare_attacker::SUMMONING_SICK.key),
+                target: rules::Target::Restriction(events::declare_attacker::SUMMONING_SICK),
                 change: rules::Change::AsThough,
             })]
         );

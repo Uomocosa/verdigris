@@ -42,6 +42,6 @@ mod tests {
             LoseUnspentMana::ID,
             rules::EventId("106.4/lose-unspent-mana")
         );
-        assert_eq!(LoseUnspentMana::clauses(), Vec::new());
+        assert_eq!(LoseUnspentMana::restrictions(), Vec::new());
     }
 }

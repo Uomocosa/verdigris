@@ -46,7 +46,7 @@ mod tests {
         assert_eq!(event.other(), None);
         assert_eq!(event.player(), player);
         assert_eq!(Discard::ID, rules::EventId("701.9a/discard"));
-        assert_eq!(Discard::clauses(), Vec::new());
+        assert_eq!(Discard::restrictions(), Vec::new());
         assert_eq!(event.field(rules::Field::Amount), Some(2));
     }
 }

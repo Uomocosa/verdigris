@@ -39,6 +39,6 @@ mod tests {
         assert_eq!(event.other(), None);
         assert_eq!(event.player(), player);
         assert_eq!(WinGame::ID, rules::EventId("104.2/win-game"));
-        assert_eq!(WinGame::clauses(), Vec::new());
+        assert_eq!(WinGame::restrictions(), Vec::new());
     }
 }

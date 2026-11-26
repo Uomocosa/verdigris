@@ -1,38 +1,37 @@
 use crate::rules;
 
-pub const fn clause<Ctx>(
-    clause_id: rules::ClauseId<Ctx>,
+pub const fn restriction(
+    restriction_id: rules::RestrictionId,
     text: &'static str,
     role: rules::Role,
     condition: rules::Predicate,
-) -> rules::Clause {
-    rules::Clause {
-        key: clause_id.key,
+) -> rules::Restriction {
+    rules::Restriction {
+        id: restriction_id,
         text,
         role,
         condition,
-        absolute: false,
+        unwaivable: false,
     }
 }
 
 #[cfg(test)]
 mod tests {
     use crate::cards;
-    use crate::events;
     use crate::rules;
 
-    use super::clause;
+    use super::restriction;
 
     #[test]
     fn test_usage() {
-        let id = rules::ClauseId::<events::DeclareBlocker>::new("509.1a/untapped");
-        let built = clause(
+        let id = rules::RestrictionId("509.1a/untapped");
+        let built = restriction(
             id,
             "The chosen creatures must be untapped",
             rules::Role::Subject,
             !rules::has::<cards::Tapped>(),
         );
-        assert_eq!(built.key, rules::ClauseKey("509.1a/untapped"));
+        assert_eq!(built.id, rules::RestrictionId("509.1a/untapped"));
         assert_eq!(built.text, "The chosen creatures must be untapped");
         assert_eq!(built.role, rules::Role::Subject);
         assert_eq!(built.condition, !rules::has::<cards::Tapped>());

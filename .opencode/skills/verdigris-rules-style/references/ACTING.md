@@ -140,8 +140,8 @@ holder, a step always exists), change the type: that is the refactor, not a foll
 leave the old state and compute the answer from A inside `Game`, `GameMut` or `Rules`: that is the same
 gate in three places.
 
-First look at what B already tests. If B has a condition on the concept (a `has_priority` clause, a
-step test, an empty-stack clause), make that condition false at the right moments and delete the gate;
+First look at what B already tests. If B has a condition on the concept (a `has_priority` restriction, a
+step test, an empty-stack restriction), make that condition false at the right moments and delete the gate;
 do not add a new "has X finished" fact, and do not carry the gate into an announcing or rejecting
 system.
 

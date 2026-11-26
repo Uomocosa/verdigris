@@ -3,31 +3,31 @@ use crate::cards;
 use crate::events;
 use crate::rules;
 
-pub fn event_clauses() -> Vec<rules::Clause> {
+pub fn event_restrictions() -> Vec<rules::Restriction> {
     vec![
-        events::cast_spell::PRIORITY.clause(
+        events::cast_spell::PRIORITY.restriction(
             "A player who has priority",
             rules::Role::Player,
             rules::has_priority(rules::Role::Player),
         ),
-        events::cast_spell::FROM_HAND.clause(
+        events::cast_spell::FROM_HAND.restriction(
             "from their hand",
             rules::Role::Player,
             rules::in_zone(HAND, rules::Role::Player),
         ),
-        events::cast_spell::OWNS.clause(
+        events::cast_spell::OWNS.restriction(
             "their hand",
             rules::Role::Player,
             rules::points_to::<cards::Owner>(rules::Role::Player),
         ),
         events::cast_spell::NOT_A_LAND
-            .clause(
+            .restriction(
                 "It can’t be cast as a spell.",
                 rules::Role::Subject,
                 !rules::card_type(cards::CardType::Land),
             )
-            .absolute(),
-        events::cast_spell::TIMING.clause(
+            .unwaivable(),
+        events::cast_spell::TIMING.restriction(
             "during a main phase of their turn when the stack is empty",
             rules::Role::Player,
             rules::card_type(cards::CardType::Instant)
@@ -44,36 +44,39 @@ mod tests {
     use crate::cards;
     use crate::rules;
 
-    use super::event_clauses;
+    use super::event_restrictions;
 
     #[test]
     fn test_usage() {
-        let clauses = event_clauses();
-        assert_eq!(clauses.len(), 5);
-        assert_eq!(clauses[0].key, rules::ClauseKey("601.2a/priority"));
+        let restrictions = event_restrictions();
+        assert_eq!(restrictions.len(), 5);
+        assert_eq!(restrictions[0].id, rules::RestrictionId("601.2a/priority"));
         assert_eq!(
-            clauses[0].condition,
+            restrictions[0].condition,
             rules::has_priority(rules::Role::Player)
         );
-        assert_eq!(clauses[1].key, rules::ClauseKey("601.2a/from-hand"));
+        assert_eq!(restrictions[1].id, rules::RestrictionId("601.2a/from-hand"));
         assert_eq!(
-            clauses[1].condition,
+            restrictions[1].condition,
             rules::in_zone(HAND, rules::Role::Player)
         );
-        assert_eq!(clauses[2].key, rules::ClauseKey("601.2a/owns"));
+        assert_eq!(restrictions[2].id, rules::RestrictionId("601.2a/owns"));
         assert_eq!(
-            clauses[2].condition,
+            restrictions[2].condition,
             rules::points_to::<cards::Owner>(rules::Role::Player)
         );
-        assert_eq!(clauses[3].key, rules::ClauseKey("601.2a/not-a-land"));
         assert_eq!(
-            clauses[3].condition,
+            restrictions[3].id,
+            rules::RestrictionId("601.2a/not-a-land")
+        );
+        assert_eq!(
+            restrictions[3].condition,
             !rules::card_type(cards::CardType::Land)
         );
-        assert!(clauses[3].absolute);
-        assert_eq!(clauses[4].key, rules::ClauseKey("601.2a/timing"));
+        assert!(restrictions[3].unwaivable);
+        assert_eq!(restrictions[4].id, rules::RestrictionId("601.2a/timing"));
         assert_eq!(
-            clauses[4].condition,
+            restrictions[4].condition,
             rules::card_type(cards::CardType::Instant)
                 | (rules::main_phase()
                     & rules::stack_empty()

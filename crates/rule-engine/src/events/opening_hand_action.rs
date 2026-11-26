@@ -2,12 +2,10 @@ use atomic_delegate_macros::atomic_delegate;
 use derive_more::Deref;
 
 use crate::cards;
-use crate::events;
 use crate::rules;
 use crate::rules::traits::hook_event::HookEvent;
 
-pub const FROM_OPENING_HAND: rules::ClauseId<events::OpeningHandAction> =
-    rules::ClauseId::new("103.6/from-opening-hand");
+pub const FROM_OPENING_HAND: rules::RestrictionId = rules::RestrictionId("103.6/from-opening-hand");
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deref)]
 pub struct OpeningHandAction(pub cards::CardId);
@@ -21,7 +19,7 @@ impl HookEvent for OpeningHandAction {
     }
 
     #[atomic_delegate(OpeningHandAction, HookEvent)]
-    fn clauses() -> Vec<rules::Clause> {}
+    fn restrictions() -> Vec<rules::Restriction> {}
 }
 
 #[cfg(test)]
@@ -46,29 +44,29 @@ mod tests {
             OpeningHandAction::ID,
             rules::EventId("103.6/opening-hand-action")
         );
-        let clauses = OpeningHandAction::clauses();
-        assert_eq!(clauses.len(), 1);
-        assert_eq!(clauses[0].key, FROM_OPENING_HAND.key);
+        let restrictions = OpeningHandAction::restrictions();
+        assert_eq!(restrictions.len(), 1);
+        assert_eq!(restrictions[0].id, FROM_OPENING_HAND);
         assert_eq!(
-            clauses[0].text,
+            restrictions[0].text,
             "Some cards allow a player to take actions with them from their opening hand."
         );
-        assert_eq!(clauses[0].role, rules::Role::Subject);
+        assert_eq!(restrictions[0].role, rules::Role::Subject);
         assert_eq!(
-            clauses[0].condition,
+            restrictions[0].condition,
             rules::in_zone(HAND, rules::Role::Player)
         );
     }
 
     #[test]
-    fn clause_texts_occur_verbatim_in_comprehensive_rules() {
+    fn restriction_texts_occur_verbatim_in_comprehensive_rules() {
         const RULES_TEXT: &str = include_str!("../../../../docs/MagicCompRules-20250919.txt");
-        for clause in OpeningHandAction::clauses() {
+        for restriction in OpeningHandAction::restrictions() {
             assert!(
-                RULES_TEXT.contains(clause.text),
-                "clause {:?} text not found verbatim in Comprehensive Rules: {:?}",
-                clause.key,
-                clause.text
+                RULES_TEXT.contains(restriction.text),
+                "restriction {:?} text not found verbatim in Comprehensive Rules: {:?}",
+                restriction.id,
+                restriction.text
             );
         }
     }

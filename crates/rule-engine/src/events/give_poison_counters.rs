@@ -49,7 +49,7 @@ mod tests {
             GivePoisonCounters::ID,
             rules::EventId("122.1/give-poison-counters")
         );
-        assert_eq!(GivePoisonCounters::clauses(), Vec::new());
+        assert_eq!(GivePoisonCounters::restrictions(), Vec::new());
         assert_eq!(event.field(rules::Field::Amount), Some(3));
     }
 }

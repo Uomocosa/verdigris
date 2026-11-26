@@ -3,15 +3,15 @@ use crate::effects;
 use crate::rules;
 use crate::statics;
 
-pub fn allow<Ctx>(
+pub fn allow(
     all: statics::All,
-    clause: rules::ClauseId<Ctx>,
+    restriction: rules::RestrictionId,
     alternative: rules::Predicate,
 ) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
         modification: effects::Modification::Rule(rules::RuleChange {
-            target: rules::Target::Clause(clause.key),
+            target: rules::Target::Restriction(restriction),
             change: rules::Change::Allow(alternative),
         }),
     }
@@ -22,7 +22,6 @@ mod tests {
     use crate::CREATURE;
     use crate::cards;
     use crate::effects;
-    use crate::events;
     use crate::rules;
     use crate::statics;
 
@@ -32,14 +31,14 @@ mod tests {
     fn test_usage() {
         let ability = allow(
             statics::all(CREATURE),
-            rules::ClauseId::<events::DeclareAttacker>::new("test/untapped"),
+            rules::RestrictionId("test/untapped"),
             rules::has::<cards::Flying>(),
         );
         assert_eq!(ability.filter, CREATURE);
         assert_eq!(
             ability.modification,
             effects::Modification::Rule(rules::RuleChange {
-                target: rules::Target::Clause(rules::ClauseKey("test/untapped")),
+                target: rules::Target::Restriction(rules::RestrictionId("test/untapped")),
                 change: rules::Change::Allow(rules::has::<cards::Flying>()),
             })
         );

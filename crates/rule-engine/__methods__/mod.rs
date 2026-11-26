@@ -12,8 +12,6 @@ pub mod cards_in_zone;
 pub mod cast_spell;
 pub mod characteristics;
 pub mod choice;
-pub mod clause;
-pub mod clause_id;
 pub mod combat_damage_choice;
 pub mod deal_damage;
 pub mod declare_attacker;
@@ -41,6 +39,8 @@ pub mod predicate;
 pub mod priority;
 #[cfg(feature = "testing")]
 pub mod restricted_rule;
+pub mod restriction;
+pub mod restriction_id;
 pub mod rule_registry;
 pub mod rules;
 pub mod rules_plugin;

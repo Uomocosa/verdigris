@@ -8,7 +8,7 @@ pub fn cast_spells_as_though_they_had_flash(all: statics::All) -> abilities::Con
     abilities::Continuous {
         filter: *all,
         modification: effects::Modification::Rule(rules::RuleChange {
-            target: rules::Target::Clause(events::cast_spell::TIMING.key),
+            target: rules::Target::Restriction(events::cast_spell::TIMING),
             change: rules::Change::AsThough,
         }),
     }
@@ -32,7 +32,7 @@ mod tests {
         assert_eq!(
             ability.modification,
             effects::Modification::Rule(rules::RuleChange {
-                target: rules::Target::Clause(events::cast_spell::TIMING.key),
+                target: rules::Target::Restriction(events::cast_spell::TIMING),
                 change: rules::Change::AsThough,
             })
         );

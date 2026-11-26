@@ -42,7 +42,7 @@ mod tests {
         assert_eq!(event.other(), None);
         assert_eq!(event.player(), controller);
         assert_eq!(Counter::ID, rules::EventId("701.6a/counter"));
-        assert_eq!(Counter::clauses(), Vec::new());
+        assert_eq!(Counter::restrictions(), Vec::new());
         assert_eq!(event.field(rules::Field::Amount), None);
     }
 }

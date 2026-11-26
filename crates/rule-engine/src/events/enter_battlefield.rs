@@ -57,7 +57,7 @@ mod tests {
             EnterBattlefield::ID,
             rules::EventId("110.1/enter-battlefield")
         );
-        assert_eq!(EnterBattlefield::clauses(), Vec::new());
+        assert_eq!(EnterBattlefield::restrictions(), Vec::new());
         assert_eq!(event.field(rules::Field::Amount), None);
     }
 }

@@ -6,7 +6,7 @@ use crate::rules;
 
 pub struct RuleRegistry {
     pub(crate) events: HashSet<rules::EventId>,
-    pub(crate) clauses: HashSet<rules::ClauseKey>,
+    pub(crate) restrictions: HashSet<rules::RestrictionId>,
     pub(crate) values: HashSet<rules::RuleId>,
     pub duplicates: Vec<rules::EventId>,
 }
@@ -22,7 +22,7 @@ impl RuleRegistry {
     pub fn resolves(&self, target: &rules::Target) -> bool {
         match target {
             rules::Target::Event(id) => self.events.contains(id),
-            rules::Target::Clause(key) => self.clauses.contains(key),
+            rules::Target::Restriction(key) => self.restrictions.contains(key),
             rules::Target::Value(id) => self.values.contains(id),
         }
     }
@@ -42,8 +42,8 @@ mod tests {
     fn test_usage() {
         let registry = rules::RuleRegistry::engine();
         assert!(registry.resolves(&rules::Target::event::<events::Draw>()));
-        assert!(registry.resolves(&rules::Target::Clause(
-            events::declare_attacker::SUMMONING_SICK.key
+        assert!(registry.resolves(&rules::Target::Restriction(
+            events::declare_attacker::SUMMONING_SICK
         )));
         assert!(registry.resolves(&rules::Target::value::<rules::MaximumHandSize>()));
         assert_eq!(registry.duplicates, Vec::<rules::EventId>::new());

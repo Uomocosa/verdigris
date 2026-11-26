@@ -124,7 +124,7 @@ general rule has lettered sub-rules (120.3: "damage may have one or more of the 
 each sub-rule has its own file that picks out its own case. Adding a sub-rule adds a file and edits
 no other rule. A sub-rule reads only its own event, never the general event's `Resolve` to build a list.
 
-A sub-rule that is only a condition ("a player can't ... unless") is a clause of the event and has no
+A sub-rule that is only a condition ("a player can't ... unless") is a restriction of the event and has no
 file; its text is quoted on the rule that owns the event.
 
 **How to check:** delete one sub-rule in your head. If the general system no longer makes sense or
@@ -149,7 +149,7 @@ outcome (`r120_3` writes `Did`, so a trigger on damage). A general file that onl
    the sentence's own work (grouping, comparing) stays in the body, written with general methods. This
    settles §2: §2 is for questions several rules ask.
 3. **Moving the body into a helper is not a refactor.** If the helper still does the checks, the
-   complexity only moved. Remove it: give it to an event's clauses, the pipeline or the shared choice.
+   complexity only moved. Remove it: give it to an event's restrictions, the pipeline or the shared choice.
 4. A new `SystemParam` names each query it reads as its own field (`stack::Targeting`), and holds
    `rules::Rules` only to ask `answers.legal(..)`; it never digs data out of `Rules`' queries.
    SystemParams may pass up to 512 bytes (`clippy.toml`); a Bevy handle is moved once per system run.
@@ -233,7 +233,7 @@ Only a rule that uses the varying data reads the message. One flat loop with one
 
 ## Checklist for a rule (or a plan for one)
 
-- Delete the body and read only the CR sentence: does each clause map to one line, and no line is left?
+- Delete the body and read only the CR sentence: does each restriction map to one line, and no line is left?
 - Is the choice the CR's or a card's (§12)? Is there a gate other rules still mention (§13)?
 - Is the data built first, under a name that says its order, and sent in one statement (§16)?
 - What does it do if no card in the game cares? That is the only thing it may perform itself.

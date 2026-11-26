@@ -10,7 +10,7 @@ use crate::rules::traits::context::Context;
 pub trait Event: Context + Clone + Send + Sync + 'static {
     const ID: rules::EventId;
     #[must_use]
-    fn clauses() -> Vec<rules::Clause> {
+    fn restrictions() -> Vec<rules::Restriction> {
         Vec::new()
     }
     #[must_use]

@@ -38,7 +38,7 @@ mod tests {
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
                 assert_eq!(
-                    changes(&answers, *waiver, rules::Target::Clause(UNTAPPED.key)),
+                    changes(&answers, *waiver, rules::Target::Restriction(UNTAPPED)),
                     vec![rules::Change::AsThough]
                 );
                 assert_eq!(
@@ -53,7 +53,7 @@ mod tests {
                     changes(
                         &answers,
                         Entity::from(p1),
-                        rules::Target::Clause(UNTAPPED.key)
+                        rules::Target::Restriction(UNTAPPED)
                     ),
                     Vec::new()
                 );

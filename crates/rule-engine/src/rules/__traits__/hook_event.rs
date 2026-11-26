@@ -10,7 +10,7 @@ pub trait HookEvent: Clone + Send + Sync + 'static {
     const ID: rules::EventId;
     fn card(&self) -> cards::CardId;
     #[must_use]
-    fn clauses() -> Vec<rules::Clause> {
+    fn restrictions() -> Vec<rules::Restriction> {
         Vec::new()
     }
     fn register(app: &mut App) {

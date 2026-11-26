@@ -3,11 +3,11 @@ use crate::effects;
 use crate::rules;
 use crate::statics;
 
-pub fn as_though<Ctx>(all: statics::All, clause: rules::ClauseId<Ctx>) -> abilities::Continuous {
+pub fn as_though(all: statics::All, restriction: rules::RestrictionId) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
         modification: effects::Modification::Rule(rules::RuleChange {
-            target: rules::Target::Clause(clause.key),
+            target: rules::Target::Restriction(restriction),
             change: rules::Change::AsThough,
         }),
     }
@@ -17,7 +17,6 @@ pub fn as_though<Ctx>(all: statics::All, clause: rules::ClauseId<Ctx>) -> abilit
 mod tests {
     use crate::CREATURE;
     use crate::effects;
-    use crate::events;
     use crate::rules;
     use crate::statics;
 
@@ -27,13 +26,13 @@ mod tests {
     fn test_usage() {
         let ability = as_though(
             statics::all(CREATURE),
-            rules::ClauseId::<events::DeclareAttacker>::new("test/untapped"),
+            rules::RestrictionId("test/untapped"),
         );
         assert_eq!(ability.filter, CREATURE);
         assert_eq!(
             ability.modification,
             effects::Modification::Rule(rules::RuleChange {
-                target: rules::Target::Clause(rules::ClauseKey("test/untapped")),
+                target: rules::Target::Restriction(rules::RestrictionId("test/untapped")),
                 change: rules::Change::AsThough,
             })
         );

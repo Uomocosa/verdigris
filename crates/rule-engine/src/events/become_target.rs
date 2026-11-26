@@ -48,6 +48,6 @@ mod tests {
         assert_eq!(event.other(), Some(spell));
         assert_eq!(event.player(), player);
         assert_eq!(BecomeTarget::ID, rules::EventId("601.2c/become-target"));
-        assert_eq!(BecomeTarget::clauses(), Vec::new());
+        assert_eq!(BecomeTarget::restrictions(), Vec::new());
     }
 }

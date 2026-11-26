@@ -9,7 +9,7 @@ game. So the engine has ONE shape for all of them. Every game action is an **Eve
 happens it is announced as `Attempt<E>` and passes through a fixed **pipeline**:
 
 ```
-Attempt<E> -> 1. Permission (may E happen?  clauses + AsThough / Allow / OnlyIf / Cant)
+Attempt<E> -> 1. Permission (may E happen?  restrictions + AsThough / Allow / OnlyIf / Cant)
           -> 2. Replacement (614: does E become other events? Instead / Modify)
 Resolve<E>                  (nothing can stop E any more; only the pipeline writes it, plus the
                            unstoppable rules listed in ACTING.md §5)
@@ -44,7 +44,7 @@ folded in timestamp order from the rule's default.
 // rules/__traits__/event.rs : an Event IS its own context (subject / other / player).
 pub trait Event: Context + Clone + Send + Sync + 'static {
     const ID: rules::EventId;                       // the CR rule number, e.g. "121.1"
-    fn clauses() -> Vec<rules::Clause> { Vec::new() } // CR conditions; most events have none
+    fn restrictions() -> Vec<rules::Restriction> { Vec::new() } // CR conditions; most events have none
 }
 
 // rules/__traits__/hook_event.rs : a hook IS its subject, the card that may act.
@@ -52,7 +52,7 @@ pub trait HookEvent: Clone + Send + Sync + 'static {
     const ID: rules::EventId;                        // the CR rule number, e.g. "103.6"
     fn card(&self) -> cards::CardId;                 // the card whose hook this is
     #[must_use]
-    fn clauses() -> Vec<rules::Clause> { Vec::new() } // CR conditions; most hooks have none
+    fn restrictions() -> Vec<rules::Restriction> { Vec::new() } // CR conditions; most hooks have none
 }
 
 // rules/__traits__/value_rule.rs (unchanged idea)
@@ -60,14 +60,14 @@ pub trait ValueRule: 'static { const ID: rules::RuleId; fn default() -> rules::L
 
 pub enum Target {
     Event(rules::EventId),   // the whole action: "can't lose the game", "instead of drawing"
-    Clause(rules::ClauseKey),// one CR condition: haste, flash, "play lands from graveyard"
+    Restriction(rules::RestrictionId),// one CR condition: haste, flash, "play lands from graveyard"
     Value(rules::RuleId),    // a quantity: hand size, land plays
 }
 
 pub enum Change {
-    // permission (101.2: can't beats can; absolute clauses can't be waived)
-    AsThough,                                   // Clause: treat as satisfied
-    Allow(rules::Predicate),                    // Clause: satisfied if this holds instead
+    // permission (101.2: can't beats can; absolute restrictions can't be waived)
+    AsThough,                                   // Restriction: treat as satisfied
+    Allow(rules::Predicate),                    // Restriction: satisfied if this holds instead
     OnlyIf { role: rules::Role, condition: rules::Predicate }, // Event: veto unless it holds
     Cant { role: rules::Role },                   // Event: absolute veto for that role
     Must,                                       // Event: requirement (508.1d / 509.1c)
@@ -91,27 +91,27 @@ pub struct RuleChange { pub target: Target, pub change: Change }
 ## 2. Nonsense is allowed, dangling is not
 
 The user decided: maximum flexibility. Any `Target` may be paired with any `Change`; a pair
-that means nothing (a `Set(3)` aimed at a clause) is a silent no-op, not a type error. Do NOT
+that means nothing (a `Set(3)` aimed at a restriction) is a silent no-op, not a type error. Do NOT
 add typed wrappers that forbid pairs.
 
-But a target must EXIST: every `EventId`, `ClauseKey` and value `RuleId` a card names must be
+But a target must EXIST: every `EventId`, `RestrictionId` and value `RuleId` a card names must be
 registered. A registry test walks every fixture card and fails on a dangling target. When you
-add an event, clause or value rule, register it.
+add an event, restriction or value rule, register it.
 
 ## 3. How to add things
 
 **A new game action** (draw, cast, pay mana, attack, mill ...):
 1. A struct in `src/events/<cr_name>.rs` with the CR's words as its name and its parameters as
    fields (`Draw { player, amount }`). `impl Event` with `ID` = CR number, `Context` for roles.
-2. If the CR lists conditions, write them as `clauses()` with `ClauseId` consts, text quoted
+2. If the CR lists conditions, write them as `restrictions()` with `RestrictionId` consts, text quoted
    VERBATIM from `docs/MagicCompRules-*.txt` (keep the verbatim test).
-   A condition on the event's own numbers is a clause too: `rules::event_field(rules::Field::Amount, ..)`
+   A condition on the event's own numbers is a restriction too: `rules::event_field(rules::Field::Amount, ..)`
    (120.8 `events::deal_damage::NONZERO_DAMAGE`). The same `if event.amount == 0` in several rules is
-   such a clause.
+   such a restriction.
 3. The `__rules__` system that owns the action writes `Attempt<E>` instead of acting directly; the pipeline decides; the owning system reads `Resolve<E>` and performs only what comes out.
 4. Register the event (section 2).
 
-**A card that changes a rule**: pick the target (whole event, one clause, or a value) and the
+**A card that changes a rule**: pick the target (whole event, one restriction, or a value) and the
 change; if the target event is missing, add it (above). Add one `statics::all(...)` builder in `src/statics/all.rs` + `__methods__/all/` if no
 existing builder fits. Prefer reusing `as_though`, `allow`, `restriction`, `instead`.
 
@@ -166,7 +166,7 @@ from the battlefield, that is a gap to close there, not a reason for a rule to l
 
 - Do look up changes with ONE helper (`Rules::changes(entity, target)`), never by matching
   `Modification` variants in each evaluator.
-- Do look a change up on the entity its `Role` names (subject, other, player), for clauses and
+- Do look a change up on the entity its `Role` names (subject, other, player), for restrictions and
   for `OnlyIf` alike. `Cant` names the role it protects and vetoes only when the carrying
   entity is the event's entity of that role (exactly like `OnlyIf`). `Skip` / `Perform` fold
   in timestamp order over the subject's changes for the event (latest wins, unlike `Cant`).

@@ -1,14 +1,12 @@
 use atomic_delegate_macros::atomic_delegate;
 use bevy::prelude::Entity;
 
-use crate::events;
 use crate::players;
 
 use crate::rules;
 use crate::rules::traits::event::Event;
 
-pub const ONLY_BLOCKERS: rules::ClauseId<events::AssignCombatDamage> =
-    rules::ClauseId::new("510.1c/only-blockers");
+pub const ONLY_BLOCKERS: rules::RestrictionId = rules::RestrictionId("510.1c/only-blockers");
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct AssignCombatDamage {
@@ -28,7 +26,7 @@ impl Event for AssignCombatDamage {
     const ID: rules::EventId = rules::EventId("510.1c/assign-combat-damage");
 
     #[atomic_delegate(AssignCombatDamage, Event)]
-    fn clauses() -> Vec<rules::Clause> {}
+    fn restrictions() -> Vec<rules::Restriction> {}
 }
 
 #[cfg(test)]
@@ -60,29 +58,29 @@ mod tests {
             AssignCombatDamage::ID,
             rules::EventId("510.1c/assign-combat-damage")
         );
-        let clauses = AssignCombatDamage::clauses();
-        assert_eq!(clauses.len(), 1);
-        assert_eq!(clauses[0].key, super::ONLY_BLOCKERS.key);
+        let restrictions = AssignCombatDamage::restrictions();
+        assert_eq!(restrictions.len(), 1);
+        assert_eq!(restrictions[0].id, super::ONLY_BLOCKERS);
         assert_eq!(
-            clauses[0].text,
+            restrictions[0].text,
             "A blocked creature assigns its combat damage to the creatures blocking it"
         );
-        assert_eq!(clauses[0].role, rules::Role::Other);
+        assert_eq!(restrictions[0].role, rules::Role::Other);
         assert_eq!(
-            clauses[0].condition,
+            restrictions[0].condition,
             rules::points_to::<cards::Blocking>(rules::Role::Other)
         );
     }
 
     #[test]
-    fn clause_texts_occur_verbatim_in_comprehensive_rules() {
+    fn restriction_texts_occur_verbatim_in_comprehensive_rules() {
         const RULES_TEXT: &str = include_str!("../../../../docs/MagicCompRules-20250919.txt");
-        for clause in AssignCombatDamage::clauses() {
+        for restriction in AssignCombatDamage::restrictions() {
             assert!(
-                RULES_TEXT.contains(clause.text),
-                "clause {:?} text not found verbatim in Comprehensive Rules: {:?}",
-                clause.key,
-                clause.text
+                RULES_TEXT.contains(restriction.text),
+                "restriction {:?} text not found verbatim in Comprehensive Rules: {:?}",
+                restriction.id,
+                restriction.text
             );
         }
     }

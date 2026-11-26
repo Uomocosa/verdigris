@@ -2,7 +2,7 @@
 mod basic;
 
 pub use basic::enums::{Amount, Change, Characteristic, Comparison, Field, Legality, Role, may};
-pub use basic::newtypes::{ClauseKey, ComponentKey, EventId, RuleId};
+pub use basic::newtypes::{ComponentKey, EventId, RuleId};
 pub use basic::predicate_builders::{
     active_player, at_least, at_most, card_type, equal_to, event_field, has, has_priority, in_zone,
     is, main_phase, other, points_to, stack_empty, step_is,
@@ -28,11 +28,11 @@ pub use hook_queue::HookQueue;
 mod hooked;
 pub use hooked::Hooked;
 
-mod clause;
-pub use clause::Clause;
+mod restriction;
+pub use restriction::Restriction;
 
-mod clause_id;
-pub use clause_id::ClauseId;
+mod restriction_id;
+pub use restriction_id::RestrictionId;
 
 pub mod land_plays;
 pub use land_plays::LandPlays;

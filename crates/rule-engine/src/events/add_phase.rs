@@ -45,7 +45,7 @@ mod tests {
         assert_eq!(event.other(), None);
         assert_eq!(event.player(), player);
         assert_eq!(AddPhase::ID, rules::EventId("500.8/add-phase"));
-        assert_eq!(AddPhase::clauses(), Vec::new());
+        assert_eq!(AddPhase::restrictions(), Vec::new());
         assert_eq!(event.phase, turns::Phase::Beginning);
     }
 }

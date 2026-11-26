@@ -23,7 +23,7 @@ impl Event for AbsoluteRule {
     const ID: rules::EventId = rules::EventId("test/absolute");
 
     #[atomic_delegate(AbsoluteRule, Event)]
-    fn clauses() -> Vec<rules::Clause> {}
+    fn restrictions() -> Vec<rules::Restriction> {}
 }
 
 #[cfg(test)]
@@ -37,9 +37,9 @@ mod tests {
     #[test]
     fn test_usage() {
         assert_eq!(AbsoluteRule::ID, rules::EventId("test/absolute"));
-        let clauses = AbsoluteRule::clauses();
-        assert_eq!(clauses.len(), 1);
-        assert_eq!(clauses[0].key, testing::UNTAPPED.key);
-        assert!(clauses[0].absolute);
+        let restrictions = AbsoluteRule::restrictions();
+        assert_eq!(restrictions.len(), 1);
+        assert_eq!(restrictions[0].id, testing::UNTAPPED);
+        assert!(restrictions[0].unwaivable);
     }
 }
