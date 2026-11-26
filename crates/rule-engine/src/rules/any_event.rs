@@ -13,6 +13,7 @@ pub enum AnyEvent {
     Discard(events::Discard),
     GainLife(events::GainLife),
     Mill(events::Mill),
+    Exile(events::Exile),
     CreateTokens(events::CreateTokens),
     Destroy(events::Destroy),
     Counter(events::Counter),
@@ -46,6 +47,9 @@ impl AnyEvent {
                 commands.write_message(Attempt(happened));
             }
             Self::Mill(happened) => {
+                commands.write_message(Attempt(happened));
+            }
+            Self::Exile(happened) => {
                 commands.write_message(Attempt(happened));
             }
             Self::CreateTokens(happened) => {

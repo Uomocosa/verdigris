@@ -31,6 +31,9 @@ pub enum EventTemplate {
         who: rules::Role,
         amount: rules::Amount,
     },
+    Exile {
+        what: rules::Role,
+    },
     BeginTheGameOnTheBattlefield,
 }
 

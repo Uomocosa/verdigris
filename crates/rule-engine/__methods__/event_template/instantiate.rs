@@ -61,6 +61,10 @@ pub fn instantiate<E: Event>(template: &rules::EventTemplate, event: &E) -> rule
                 player: event.player(),
             })
         }
+        rules::EventTemplate::Exile { what } => rules::AnyEvent::Exile(events::Exile {
+            object: *holder(what),
+            owner: event.player(),
+        }),
     }
 }
 
@@ -86,6 +90,18 @@ mod tests {
                 &happened
             ),
             rules::AnyEvent::WinGame(events::WinGame(players::PlayerId(player)))
+        );
+        assert_eq!(
+            instantiate(
+                &rules::EventTemplate::Exile {
+                    what: rules::Role::Subject,
+                },
+                &happened
+            ),
+            rules::AnyEvent::Exile(events::Exile {
+                object: player,
+                owner: players::PlayerId(player),
+            })
         );
     }
 }
