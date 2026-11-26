@@ -9,7 +9,7 @@ description: Use before writing or reviewing a `__rules__` file or a rule test i
 
 ## VRDG001 rule_file_name · ENFORCED
 
-Every `.rs` file directly inside `__rules__/` (except `mod.rs`) is named `r<id>(_r<id>)*_<slug>.rs`. (AGENTS rule 1; rules-style §11.)
+Every `.rs` file directly inside `__rules__/` or `__keywords__/` (except `mod.rs`) is named `r<id>(_r<id>)*_<slug>.rs`. (AGENTS rule 1; rules-style §11.)
 
 ## VRDG002 rule_one_system · ENFORCED
 
@@ -21,7 +21,7 @@ How the linter will check it: require one `pub fn` named after the stem, whose b
 
 ## VRDG003 rule_doc_text · ENFORCED
 
-Every `__rules__/` system fn's doc comment quotes the Comprehensive Rules text it implements, exactly. (rules-style §1.)
+Every `__rules__/` system fn's and every `__keywords__/` file's public item's doc comment quotes the Comprehensive Rules text it implements, exactly: each id in the file name keeps its quote, cross-references go under `# See also`, rules the keyword restates go under `# Restates`, card reminder text under `# Reminder text`. (rules-style §1; CHANGEABLE_RULES.md §5.)
 
 ## VRDG004 rule_registered · ENFORCED
 
@@ -33,7 +33,7 @@ Every `__rules__/` file keeps a `#[cfg(test)] mod tests` with at least one `#[te
 
 ## VRDG006 rule_placement · ENFORCED
 
-Every rule system lives in `__rules__/`; no fn or file outside `__rules__/` is named like a rule. (AGENTS rule 1; rules-style §11.)
+Every rule system lives in `__rules__/` or `__keywords__/`; no fn or file outside them is named like a rule. (AGENTS rule 1; rules-style §11.)
 
 ## VRDG007 rule_comments · ENFORCED
 
@@ -206,3 +206,22 @@ mut dealt: MessageReader<Did<events::DealDamage>>,
 ```
 
 How the linter will check it: flag `MessageReader<Resolve<…>>` in a rule that does not own that event's default; triggers must read `Did<…>`.
+
+## VRDG014 rule_implemented_once · ENFORCED
+
+A Comprehensive Rules paragraph quoted by a `__keywords__/` file is implemented nowhere else: no `__rules__/` file name lists the same rule. A keyword file holds every rule that defines or restates its keyword (infect implements 120.3b under its `# Restates`; lifelink implements 120.3f); `__rules__/` holds only game rules and interactions. (CHANGEABLE_RULES.md §5.)
+
+Bad — a `__rules__/` file named after a rule a keyword file quotes:
+
+```
+__rules__/r120_3b_...rs          (quotes 120.3b, the infect sentence)
+__keywords__/r702_90b_infect.rs  (quotes 120.3b under `# Restates`)
+```
+
+Good — the keyword file implements it once; the `__rules__/` performer cites it without naming it (`__rules__/r120_3a_damage_to_a_player.rs` quotes 702.90b under `# See also`).
+
+How the linter checks it: collect the quoted implemented ids of every `__keywords__/` file and flag any `__rules__/` file name that lists one of them.
+
+## VRDG015 rule_doc_width · ENFORCED
+
+In `__rules__/` and `__keywords__/` doc comments, no line is longer than 100 columns. Wrap the quotation (one paragraph per rule) so every `///` line fits; keep the quoted text verbatim (VRDG003 joins wrapped lines with a single space). (CHANGEABLE_RULES.md §5.)

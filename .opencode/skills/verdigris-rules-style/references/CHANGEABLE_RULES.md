@@ -59,28 +59,34 @@ pub trait HookEvent: Clone + Send + Sync + 'static {
 pub trait ValueRule: 'static { const ID: rules::RuleId; fn default() -> rules::Limit; }
 
 pub enum Target {
-    Event(rules::EventId),   // the whole action: "can't lose the game", "instead of drawing"
-    Restriction(rules::RestrictionId),// one CR condition: haste, flash, "play lands from graveyard"
-    Value(rules::RuleId),    // a quantity: hand size, land plays
+    Event(rules::EventId),          // the whole action: "can't lose the game", "instead of drawing"
+    Result(rules::ResultId),        // one named result of an event: 120.3a LOSES_LIFE
+    Restriction(rules::RestrictionId), // one CR condition: haste, flash, "play lands from graveyard"
+    Definition(rules::DefinitionId),   // one defined term: LETHAL_DAMAGE
+    Value(rules::RuleId),           // a quantity: hand size, land plays
 }
 
 pub enum Change {
-    // permission (101.2: can't beats can; absolute restrictions can't be waived)
-    AsThough,                                   // Restriction: treat as satisfied
-    Allow(rules::Condition),                    // Restriction: satisfied if this holds instead
-    Restrict { holder: rules::Role, restriction: rules::Restriction }, // Event: named veto for that role
+    // permission (101.2: can't beats can; unwaivable restrictions can't be waived)
+    AsThough { holder: rules::ArgRef },                  // Restriction: treat as satisfied
+    Allow { holder: rules::ArgRef, when: rules::Condition }, // Restriction/Definition: satisfied if this holds instead
+    Restrict { holder: rules::ArgRef, restriction: rules::Restriction }, // Event: named veto for that holder
     Must,                                       // Event: requirement (508.1d / 509.1c)
     Skip,                                       // Event: do not perform (untap, tap-attacker)
     Perform,                                    // Event: do perform (overrides Skip)
     // quantity
     Set(u32), Increase(u32), Decrease(u32), NoMaximum,
-    // replacement (614)
-    Instead { when: rules::Condition, then: rules::Then }, // Then::{Events(Vec<EventTemplate>), May(EventTemplate)}
-    // hook: ALL hooks of the subject apply (103.6: "some cards allow ...")
-    Hook { when: rules::Condition, then: rules::Then },
+    // replacement (614): one named result becomes other events
+    Instead { holder: rules::ArgRef, when: rules::Condition, then: rules::Then }, // Then::{Events(Vec<EventTemplate>), May(EventTemplate)}
+    // hook: an additional result alongside the default (lifelink)
+    Hook { holder: rules::ArgRef, when: rules::Condition, then: rules::Then },
 }
 
 pub struct RuleChange { pub target: Target, pub change: Change }
+
+// statements: one verbatim CR sentence; ids cite the rule ("509.1a/untapped", "702.9b/blockers")
+pub type Restriction = rules::Statement<rules::RestrictionId>;
+pub type Definition = rules::Statement<rules::DefinitionId>;
 ```
 
 - `EventTemplate` describes a replacement event in data; `Amount::{Fixed(u32), FromArg(ArgId)}`
@@ -123,9 +129,9 @@ and announces the event only on a yes. Never an implicit default, never a questi
 
 ```rust
 // "If you would draw a card, you may mill a card instead." The rule that announces Draw is untouched.
-Change::Instead { when: ALWAYS, then: may(EventTemplate::Mill { .. }) }
+Change::Instead { holder: events::Draw::PLAYER.into(), when: ALWAYS, then: may(EventTemplate::Mill { .. }) }
 // the same without a choice: "If you would draw a card, mill a card instead."
-Change::Instead { when: ALWAYS, then: Then::Events(vec![EventTemplate::Mill { .. }]) }
+Change::Instead { holder: events::Draw::PLAYER.into(), when: ALWAYS, then: Then::Events(vec![EventTemplate::Mill { .. }]) }
 ```
 
 ```
@@ -156,9 +162,8 @@ change to that hook, for its own object — e.g.
 `abilities::opening_hand_action(may(EventTemplate::BeginTheGameOnTheBattlefield))`. Nothing is asked
 for an object without a change. An `Instead` aimed at a hook is a silent no-op (§2): `Rules::hooks`
 reads only `Change::Hook`. At most one `may` hook per card and event (guard test in `rule_registry.rs`).
-A hook on permanents needs a controller, which the engine doesn't have yet (`Hooked` uses
-`cards::Owner`), so 502.1 phasing waits for it. "At the beginning of ..." is a triggered ability,
-never a hook.
+A hook names its player explicitly (`Hooked<E> { hook, player }`, `src/rules/hooked.rs`). "At the
+beginning of ..." is a triggered ability, never a hook.
 
 **Skipping a step**: a CR rule changes `turns::NextStep` (`TURNS.md` §17). No card skips a step
 yet; the first one makes `NextStep` go through the pipeline.
@@ -178,3 +183,129 @@ from the battlefield, that is a gap to close there, not a reason for a rule to l
 - Don't create an empty "rule" type only to hang a veto on: the event is the target.
 - Don't special-case a card in a `__rules__` system; express it as a `RuleChange`.
 - Keep the CR numbers as IDs and the rule-number tests.
+
+## 5. Writing a keyword or a rule change
+
+One section, one shape. Every example below compiles against the current code; paths are relative
+to `crates/rule-engine/`.
+
+**An event names its arguments.** `#[derive(EventArgs)]` (`crates/event-derive`) with `#[arg]` on
+each field emits one `SCREAMING_SNAKE_CASE` const per field plus `EventArgs::arg` / `args`; the
+pipeline reads only named arguments. No derived controllers or owners are stored on the event
+(`src/events/deal_damage.rs`):
+
+```rust
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EventArgs)]
+pub struct DealDamage {
+    #[arg]
+    pub source: Entity,
+    #[arg]
+    pub recipient: Entity,
+    #[arg]
+    pub amount: u32,
+}
+```
+
+**`X.controller()` / `X.owner()` are derived, never stored.** `ArgId::controller()` and
+`ArgId::owner()` build an `ArgRef` (`src/rules/arg_ref.rs`); `Rules::resolve` derives the player
+from the card's `Controller` / `Owner` component at rule time (`src/rules/rules.rs`):
+
+```rust
+answers.resolve(events::DealDamage::SOURCE.controller(), &damage) // Some(ArgValue::Player(p1.id))
+```
+
+**A restriction names whom it asks about.** Conditions say whom they ask about with `.of(...)`
+(`src/rules/condition.rs`); amounts read an argument with `E::AMOUNT.greater_than(0)` etc.
+(`src/rules/arg_id.rs`). From `src/events/declare_blocker.rs`:
+
+```rust
+rules::has::<cards::Creature>().of(DeclareBlocker::BLOCKER)
+DealDamage::AMOUNT.at_least(1) // the 120.8 nonzero restriction, events::deal_damage::NONZERO_DAMAGE
+```
+
+**A restriction vetoes one holder; a waiver names the same holder.** `Change::Restrict { holder,
+restriction }` vetoes only when the carrying entity plays the `holder` argument; `AsThough {
+holder }` / `Allow { holder, when }` waive it for that holder. Holders are `ArgRef`s built from the
+event's own consts. "Can't" beats "can" (101.2); permissions are OR'd, so restating one is harmless.
+Flying (`__keywords__/r702_9b_flying.rs`) restricts the attacker; reach
+(`__keywords__/r702_17b_reach.rs`) waives the same restriction for the blocker:
+
+```rust
+// flying: "can't be blocked except by creatures with flying and/or reach" (702.9b)
+rules::Change::Restrict {
+    holder: events::DeclareBlocker::ATTACKER.into(),
+    restriction: BLOCKERS.restriction(
+        (rules::has::<cards::Flying>() | rules::has::<cards::Reach>())
+            .of(events::DeclareBlocker::BLOCKER),
+    ),
+}
+// reach: waives flying's restriction (702.17b repeats 702.9b verbatim)
+rules::Change::AsThough { holder: events::DeclareBlocker::BLOCKER.into() }
+// defender: "can't attack" (702.3b)
+rules::Change::Restrict {
+    holder: events::DeclareAttacker::ATTACKER.into(),
+    restriction: CANT_ATTACK.restriction(!rules::Condition::True),
+}
+```
+
+**A named result is replaced with `Instead`, extended with `Hook`.** `ResultId` names one result of
+an event (`LOSES_LIFE`, `src/constants.rs`). The performing rule asks `Rules::replaced` and announces
+the winner's `Then` instead of its default (`__rules__/r120_3a_damage_to_a_player.rs`). Infect
+(`__keywords__/r702_90b_infect.rs`) replaces the result; lifelink
+(`__keywords__/r702_15b_lifelink.rs`) adds one with `Hook`:
+
+```rust
+// infect (702.90b) replaces 120.3a LOSES_LIFE with poison counters
+rules::Change::Instead {
+    holder: events::DealDamage::SOURCE.into(),
+    when: rules::Condition::True,
+    then: rules::Then::Events(vec![rules::EventTemplate::GivePoisonCounters {
+        who: events::DealDamage::RECIPIENT.into(),
+        amount: rules::Amount::FromArg(events::DealDamage::AMOUNT),
+    }]),
+}
+// lifelink (702.15b) adds "that much life" alongside the damage
+rules::Change::Hook {
+    holder: events::DealDamage::SOURCE.into(),
+    when: rules::Condition::True,
+    then: rules::Then::Events(vec![rules::EventTemplate::GainLife {
+        who: events::DealDamage::SOURCE.controller(),
+        amount: rules::Amount::FromArg(events::DealDamage::AMOUNT),
+    }]),
+}
+```
+
+**A definition is widened with `Allow`.** `DefinitionId` names a defined term (`LETHAL_DAMAGE`,
+`src/rules/definition_id.rs`); a rule asks `Rules::defines` and the keyword widens it. Deathtouch
+(`__keywords__/r702_2c_deathtouch.rs`): any nonzero amount counts as lethal:
+
+```rust
+rules::RuleChange {
+    target: rules::Target::Definition(rules::LETHAL_DAMAGE),
+    change: rules::Change::Allow {
+        holder: events::AssignCombatDamage::SOURCE.into(),
+        when: events::AssignCombatDamage::AMOUNT.greater_than(0),
+    },
+}
+```
+
+**A keyword = marker (id) + abilities, one file per keyword.** `__keywords__/r702_9b_flying.rs`: the
+`pub fn` is named after the file stem, `pub const ID` is the marker, owned restriction ids
+(`BLOCKERS`) live next to it, and the private `abilities()` returns the `RuleChange`s. Plain
+keywords use `Keyword::from_plain(ID, abilities)`; parameterised ones use `Keyword::from_with`
+(`src/keywords/keyword.rs`). Card text calls the alias (`keywords::flying()`, re-exported from
+`src/keywords/__basic__/card_text.rs`); the file's own consts are reached as
+`keywords::flying::BLOCKERS` (`src/keywords/mod.rs` re-exports each file `pub(crate)`).
+
+The doc comment quotes the CR rule verbatim, wrapped at 100 columns (VRDG015), one paragraph per
+rule. `# Restates` lists CR rules elsewhere that restate the keyword (702.17b for reach, 120.3b for
+infect, 120.3f for lifelink); `# Reminder text` quotes the card reminder text ("This creature can
+block creatures with flying."). Rules a keyword only conditions or repeats get no `__rules__` file:
+their text lives under the keyword's `# Restates`, and a `__rules__` file that performed them is
+deleted (VRDG014).
+
+**Literal mapping.** Each keyword maps ITS OWN text; no shortcut folds one keyword's text into
+another (reach does not grant "can block flyers" — it waives flying's restriction, because 702.17b
+says what 702.9b says). An EFFECT restated by the CR in two places is implemented once — in the
+keyword file (decided: option A): 120.3b lives under infect's `# Restates`, 120.3f under lifelink's,
+and `r702_15b` / `r120_3b` rule files were deleted.
