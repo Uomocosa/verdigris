@@ -1,9 +1,10 @@
 use crate::events;
-use bevy::prelude::{Commands, Entity, MessageReader, Query};
+use bevy::prelude::{Entity, MessageReader, MessageWriter, Query};
 
+use crate::Attempt;
+use crate::LIBRARY;
 use crate::Resolve;
 use crate::zones;
-use crate::{GRAVEYARD, LIBRARY};
 
 /// 701.17a For a player to mill a number of cards, that player puts that many cards from the top
 /// of their library into their graveyard.
@@ -14,15 +15,12 @@ use crate::{GRAVEYARD, LIBRARY};
 /// number of cards greater than the number of cards in their library.
 pub fn r701_17a_r701_17b_mill(
     mut mills: MessageReader<Resolve<events::Mill>>,
-    mut commands: Commands,
+    mut moves_to_graveyard: MessageWriter<Attempt<events::PutIntoGraveyard>>,
     zones: zones::ZoneLookup,
     zone_contents: Query<&zones::ZoneContents>,
 ) {
     for mill in mills.read() {
         let Some(library) = zones.find(LIBRARY, Some(mill.player)) else {
-            continue;
-        };
-        let Some(graveyard) = zones.find(GRAVEYARD, Some(mill.player)) else {
             continue;
         };
         let milled_from_top: Vec<Entity> = zone_contents
@@ -33,7 +31,10 @@ pub fn r701_17a_r701_17b_mill(
             })
             .unwrap_or_default();
         for card in milled_from_top {
-            commands.entity(card).insert(zones::InZone(graveyard));
+            moves_to_graveyard.write(Attempt(events::PutIntoGraveyard {
+                object: card,
+                owner: mill.player,
+            }));
         }
     }
 }
@@ -99,6 +100,25 @@ mod tests {
         assert_eq!(game.player(p2).cards_in(LIBRARY).count(), 0);
         assert!(game.player(p2).cards_in(GRAVEYARD).has(GRIZZLY_BEARS));
         assert!(game.player(p2).cards_in(GRAVEYARD).has(FOREST));
+        Ok(())
+    }
+
+    #[test]
+    fn a_milled_card_that_is_never_buried_stays_in_its_owners_library() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.hand([TOME_SCOUR]).mana_pool(mana![U]),
+            P2.library([TEST_NEVER_BURIED]),
+        ]);
+        let [tome_scour] = game.player(p1).cards_in(HAND).exactly::<1>(TOME_SCOUR)?;
+        let [never_buried] = game.player(p2).cards_in(LIBRARY).exactly::<1>(TEST_NEVER_BURIED)?;
+
+        game.play([
+            p1.cast(tome_scour).targeting(p2).pass_priority(),
+            p2.pass_priority(),
+        ])?;
+
+        assert!(game.player(p2).cards_in(LIBRARY).has(never_buried));
+        assert!(game.player(p2).cards_in(GRAVEYARD).has_no(never_buried));
         Ok(())
     }
 }
