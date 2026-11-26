@@ -24,6 +24,7 @@ pub fn r608_2b_illegal_targets(
     mut commands: Commands,
     cards: Query<(
         &cards::CardDefinition,
+        &cards::Controller,
         &cards::Owner,
         &zones::InZone,
         Option<&stack::ChosenTarget>,
@@ -33,7 +34,7 @@ pub fn r608_2b_illegal_targets(
 ) {
     for resolution in resolutions.read() {
         let spell = **resolution;
-        let Ok((definition, owner, in_zone, chosen)) = cards.get(spell) else {
+        let Ok((definition, controller, owner, in_zone, chosen)) = cards.get(spell) else {
             continue;
         };
         if !zones.contains(STACK, **in_zone) {
@@ -45,9 +46,9 @@ pub fn r608_2b_illegal_targets(
         let Some(requirement) = effect.target else {
             continue;
         };
-        let is_legal = chosen
-            .map(|chosen| **chosen)
-            .is_some_and(|target| targeting.is_legal_target(spell, requirement, **owner, target));
+        let is_legal = chosen.map(|chosen| **chosen).is_some_and(|target| {
+            targeting.is_legal_target(spell, requirement, **controller, target)
+        });
         if is_legal {
             continue;
         }

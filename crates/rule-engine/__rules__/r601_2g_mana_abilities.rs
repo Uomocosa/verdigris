@@ -16,6 +16,7 @@ pub fn r601_2g_mana_abilities(
     casting: Query<(
         Entity,
         &stack::CastingStage,
+        &cards::Controller,
         &cards::Owner,
         &cards::CardDefinition,
     )>,
@@ -29,8 +30,8 @@ pub fn r601_2g_mana_abilities(
         if !is_mana_activation && !is_pass {
             continue;
         }
-        for (spell, stage, owner, definition) in casting.iter() {
-            if *stage != stack::CastingStage::AwaitingPayment || **owner != action.player {
+        for (spell, stage, controller, owner, definition) in casting.iter() {
+            if *stage != stack::CastingStage::AwaitingPayment || **controller != action.player {
                 continue;
             }
             if is_mana_activation {

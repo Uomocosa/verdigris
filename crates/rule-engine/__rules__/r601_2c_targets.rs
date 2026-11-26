@@ -44,6 +44,7 @@ fn ask_for_targets(
     cards: Query<(
         Entity,
         &cards::CardDefinition,
+        &cards::Controller,
         &cards::Owner,
         &zones::InZone,
     )>,
@@ -55,13 +56,13 @@ fn ask_for_targets(
             continue;
         };
         let spell = *spell;
-        let Ok((_, definition, owner, in_zone)) = cards.get(spell) else {
+        let Ok((_, definition, controller, owner, in_zone)) = cards.get(spell) else {
             continue;
         };
         if !zones.contains(STACK, **in_zone) {
             continue;
         }
-        let controller = **owner;
+        let controller = **controller;
         let target = definition
             .spell_ability()
             .and_then(|effect| effect.target)
@@ -73,7 +74,7 @@ fn ask_for_targets(
         let legal = targeting.legal_targets(spell, target, controller);
         if legal.is_empty() {
             rejected.write(actions::Rejected::NoLegalTargets { spell });
-            if let Some(hand) = zones.find(HAND, Some(controller)) {
+            if let Some(hand) = zones.find(HAND, Some(**owner)) {
                 commands.entity(spell).insert(zones::InZone(hand));
             }
             commands.entity(spell).remove::<stack::CastingStage>();

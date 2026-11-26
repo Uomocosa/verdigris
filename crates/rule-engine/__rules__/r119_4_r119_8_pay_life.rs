@@ -33,6 +33,7 @@ pub fn r119_4_r119_8_pay_life(
     cards: Query<(
         Entity,
         &cards::CardDefinition,
+        &cards::Controller,
         &cards::Owner,
         &stack::CastingStage,
     )>,
@@ -41,25 +42,25 @@ pub fn r119_4_r119_8_pay_life(
     zones: zones::ZoneLookup,
     answers: rules::Rules,
 ) {
-    for (spell, definition, owner, stage) in cards.iter() {
+    for (spell, definition, controller, owner, stage) in cards.iter() {
         if *stage != stack::CastingStage::AwaitingPayment {
             continue;
         }
         if definition.cost.phyrexian.is_none() {
             continue;
         }
-        let Ok(pool) = pools.get(***owner) else {
+        let Ok(pool) = pools.get(***controller) else {
             continue;
         };
         let mut affordable = *pool;
         if affordable.pay(definition.cost) {
             continue;
         }
-        let Ok(life) = lives.get(***owner) else {
+        let Ok(life) = lives.get(***controller) else {
             continue;
         };
         let payment = events::LoseLife {
-            player: **owner,
+            player: **controller,
             amount: 2,
         };
         if **life < 2 || !answers.legal(&payment) {

@@ -25,15 +25,20 @@ pub fn is_legal_target(
         targeting.players.iter().map(players::PlayerId).collect();
     let candidate = targeting.answers.entities.get(target).ok();
     let definition = candidate.as_ref().and_then(EntityRef::get::<cards::CardDefinition>);
-    let owner = candidate.as_ref().and_then(EntityRef::get::<cards::Owner>);
+    let candidate_controller = candidate.as_ref().and_then(|candidate| {
+        candidate
+            .get::<cards::Controller>()
+            .map(|controller| **controller)
+            .or_else(|| candidate.get::<cards::Owner>().map(|owner| **owner))
+    });
     let in_zone = candidate.as_ref().and_then(EntityRef::get::<zones::InZone>);
     let on_battlefield =
         candidate.as_ref().is_some_and(|entity| entity.get::<cards::OnBattlefield>().is_some());
     if let Some(allowed) = filter
         .controlled_by
         .map(|player| player.resolve(controller, &all_players).into_iter().collect::<BTreeSet<_>>())
-        && let Some(owner) = owner
-        && !allowed.contains(&**owner)
+        && let Some(candidate_controller) = candidate_controller
+        && !allowed.contains(&candidate_controller)
     {
         return false;
     }

@@ -27,6 +27,7 @@ pub fn r608_3a_permanent_enters(
     mut commands: Commands,
     cards: Query<(
         &cards::CardDefinition,
+        &cards::Controller,
         &cards::Owner,
         &zones::InZone,
         Option<&stack::ChosenTarget>,
@@ -36,7 +37,7 @@ pub fn r608_3a_permanent_enters(
 ) {
     for resolution in resolutions.read() {
         let spell = **resolution;
-        let Ok((definition, owner, in_zone, chosen)) = cards.get(spell) else {
+        let Ok((definition, controller, owner, in_zone, chosen)) = cards.get(spell) else {
             continue;
         };
         if !zones.contains(STACK, **in_zone) {
@@ -54,7 +55,7 @@ pub fn r608_3a_permanent_enters(
         if let Some(enchant_filter) = definition.enchant() {
             let is_legal = chosen.is_some_and(|chosen| {
                 let target = **chosen;
-                let still_matches = cards.get(target).is_ok_and(|(definition, _, _, _)| {
+                let still_matches = cards.get(target).is_ok_and(|(definition, _, _, _, _)| {
                     enchant_filter.does_creature_match(definition)
                 });
                 still_matches && battlefield.contains(target)
@@ -72,7 +73,7 @@ pub fn r608_3a_permanent_enters(
         if zones.find(BATTLEFIELD, Some(**owner)).is_some() {
             entering.write(Attempt(events::EnterBattlefield {
                 permanent: spell,
-                controller: **owner,
+                controller: **controller,
                 summoning_sick: true,
             }));
         }
