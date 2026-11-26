@@ -1,16 +1,30 @@
 use atomic_delegate_macros::atomic_delegates;
 use bevy::ecs::system::SystemParam;
-use bevy::prelude::{Entity, Query};
+use bevy::prelude::{Entity, Query, With};
 use std::collections::BTreeSet;
 
+use crate::cards;
 use crate::effects;
 use crate::players;
 use crate::rules;
+use crate::zones;
 
 #[derive(SystemParam, Clone, Copy)]
 pub struct Targeting<'w, 's> {
-    pub(crate) answers: rules::Rules<'w, 's>,
     pub(crate) players: Query<'w, 's, Entity, players::StillInTheGame>,
+    pub(crate) cards: Query<
+        'w,
+        's,
+        (
+            Entity,
+            &'static cards::CardDefinition,
+            &'static cards::Controller,
+            &'static zones::InZone,
+        ),
+    >,
+    pub(crate) battlefield: Query<'w, 's, (), With<cards::OnBattlefield>>,
+    pub(crate) zones: zones::ZoneLookup<'w, 's>,
+    pub(crate) answers: rules::Rules<'w, 's>,
 }
 
 #[atomic_delegates]

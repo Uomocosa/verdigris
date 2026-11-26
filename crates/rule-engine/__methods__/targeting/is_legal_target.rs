@@ -1,14 +1,11 @@
 use bevy::prelude::Entity;
-use bevy::prelude::EntityRef;
 use std::collections::BTreeSet;
 
 use crate::STACK;
-use crate::cards;
 use crate::effects;
 use crate::events;
 use crate::players;
 use crate::stack;
-use crate::zones;
 
 pub fn is_legal_target(
     targeting: &stack::Targeting,
@@ -23,17 +20,11 @@ pub fn is_legal_target(
     let filter = requirement.filter;
     let all_players: Vec<players::PlayerId> =
         targeting.players.iter().map(players::PlayerId).collect();
-    let candidate = targeting.answers.entities.get(target).ok();
-    let definition = candidate.as_ref().and_then(EntityRef::get::<cards::CardDefinition>);
-    let candidate_controller = candidate.as_ref().and_then(|candidate| {
-        candidate
-            .get::<cards::Controller>()
-            .map(|controller| **controller)
-            .or_else(|| candidate.get::<cards::Owner>().map(|owner| **owner))
-    });
-    let in_zone = candidate.as_ref().and_then(EntityRef::get::<zones::InZone>);
-    let on_battlefield =
-        candidate.as_ref().is_some_and(|entity| entity.get::<cards::OnBattlefield>().is_some());
+    let candidate = targeting.cards.get(target).ok();
+    let definition = candidate.map(|(_, definition, _, _)| definition);
+    let candidate_controller = candidate.map(|(_, _, candidate, _)| **candidate);
+    let in_zone = candidate.map(|(_, _, _, in_zone)| in_zone);
+    let on_battlefield = targeting.battlefield.contains(target);
     if let Some(allowed) = filter
         .controlled_by
         .map(|player| player.resolve(controller, &all_players).into_iter().collect::<BTreeSet<_>>())
@@ -59,7 +50,7 @@ pub fn is_legal_target(
         | effects::FilterKind::NoncreatureSpell
         | effects::FilterKind::InstantSpell => {
             definition.is_some_and(|definition| filter.does_spell_match(definition))
-                && in_zone.is_some_and(|in_zone| targeting.answers.zones.contains(STACK, **in_zone))
+                && in_zone.is_some_and(|in_zone| targeting.zones.contains(STACK, **in_zone))
         }
     };
     matches_filter

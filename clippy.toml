@@ -4,3 +4,4 @@ allow-panic-in-tests = true
 allow-indexing-slicing-in-tests = true
 too-many-arguments-threshold = 10
 allowed-wildcard-imports = ["testing"]
+pass-by-value-size-limit = 512

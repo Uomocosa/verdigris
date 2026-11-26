@@ -7,7 +7,7 @@ use crate::turns;
 #[derive(SystemParam, Clone, Copy)]
 pub struct Game<'w, 's> {
     players: players::Players<'w, 's>,
-    state: Query<'w, 's, &'static turns::TurnState>,
+    turn_state: Query<'w, 's, &'static turns::TurnState>,
 }
 
 #[rustfmt::skip]
@@ -22,7 +22,7 @@ impl Game<'_, '_> {
 impl Game<'_, '_> {
     #[must_use]
     pub fn turn(&self) -> turns::TurnView<'_> {
-        let Ok(state) = self.state.single_inner() else {
+        let Ok(state) = self.turn_state.single_inner() else {
             return turns::TurnView(None);
         };
         turns::TurnView(Some(state))
@@ -32,13 +32,13 @@ impl Game<'_, '_> {
 impl Game<'_, '_> {
     #[must_use]
     pub fn priority_holder(&self) -> Option<players::PlayerView<'_, '_>> {
-        let holder = self.state.single_inner().ok()?.priority.holder?;
+        let holder = self.turn_state.single_inner().ok()?.priority.holder?;
         Some(self.players.view(holder))
     }
 
     #[must_use]
     pub fn active_player(&self) -> Option<players::PlayerView<'_, '_>> {
-        let active = self.state.single_inner().ok()?.turn.active;
+        let active = self.turn_state.single_inner().ok()?.turn.active;
         if self.players.is_still_in_the_game(active) {
             Some(self.players.view(active))
         } else {

@@ -22,8 +22,7 @@ pub fn legal_targets(
             }
         }
     }
-    for entity in targeting.answers.entities.iter() {
-        let candidate = entity.id();
+    for (candidate, ..) in targeting.cards.iter() {
         if targeting.is_legal_target(spell, requirement, controller, candidate) {
             legal.insert(candidate);
         }

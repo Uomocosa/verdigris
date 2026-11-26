@@ -8,28 +8,28 @@ use crate::turns;
 #[derive(SystemParam)]
 pub struct GameMut<'w, 's> {
     pub(crate) players: players::Players<'w, 's>,
-    pub(crate) state: ResMut<'w, turns::TurnState>,
+    pub(crate) turn_state: ResMut<'w, turns::TurnState>,
 }
 
 #[rustfmt::skip]
 impl<'w, 's> GameMut<'w, 's> {
     #[must_use]
-    pub fn step(&self) -> turns::Step { self.state.turn.step }
+    pub fn step(&self) -> turns::Step { self.turn_state.turn.step }
 
     #[must_use]
     pub fn priority_holder(&self) -> Option<players::PlayerView<'w, 's>> {
-        self.state.priority.holder.map(|holder| self.players.view(holder))
+        self.turn_state.priority.holder.map(|holder| self.players.view(holder))
     }
 
-    pub fn give_priority_to(&mut self, player: players::PlayerId) { self.state.priority.give_to(player); }
+    pub fn give_priority_to(&mut self, player: players::PlayerId) { self.turn_state.priority.give_to(player); }
 
-    pub fn pass_priority_to(&mut self, next: players::PlayerId) { self.state.priority.pass_to(next); }
+    pub fn pass_priority_to(&mut self, next: players::PlayerId) { self.turn_state.priority.pass_to(next); }
 
-    pub fn add_step_after_this_one(&mut self, step: turns::Step) { self.state.add_step_after_this_one(step); }
+    pub fn add_step_after_this_one(&mut self, step: turns::Step) { self.turn_state.add_step_after_this_one(step); }
 
-    pub fn add_phase_after_this_one(&mut self, phase: turns::Phase) { self.state.add_phase_after_this_one(phase); }
+    pub fn add_phase_after_this_one(&mut self, phase: turns::Phase) { self.turn_state.add_phase_after_this_one(phase); }
 
-    pub fn begin_step(&mut self, step: turns::Step) { self.state.begin_step(step); }
+    pub fn begin_step(&mut self, step: turns::Step) { self.turn_state.begin_step(step); }
 }
 
 impl GameMut<'_, '_> {
@@ -37,15 +37,15 @@ impl GameMut<'_, '_> {
     pub fn have_all_players_passed_in_succession(&self) -> bool {
         let still_in_the_game = self.players.still_in_the_game();
         !still_in_the_game.is_empty()
-            && still_in_the_game.iter().all(|player| self.state.priority.has_passed(player.id))
+            && still_in_the_game.iter().all(|player| self.turn_state.priority.has_passed(player.id))
     }
 
     pub fn give_priority_to_active_player(&mut self) {
-        let active = self.state.turn.active;
+        let active = self.turn_state.turn.active;
         if self.players.is_still_in_the_game(active) {
-            self.state.priority.give_to(active);
+            self.turn_state.priority.give_to(active);
         } else if let Some(next) = self.players.view(active).next_in_turn_order() {
-            self.state.priority.give_to(next.id);
+            self.turn_state.priority.give_to(next.id);
         }
     }
 }
