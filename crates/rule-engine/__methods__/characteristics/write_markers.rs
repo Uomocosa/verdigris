@@ -40,6 +40,18 @@ pub fn write_markers(
     );
     cards::Characteristics::sync_marker(
         entity,
+        desired(keywords::StaticKeyword::FirstStrike),
+        current.first_strike,
+        cards::FirstStrike,
+    );
+    cards::Characteristics::sync_marker(
+        entity,
+        desired(keywords::StaticKeyword::DoubleStrike),
+        current.double_strike,
+        cards::DoubleStrike,
+    );
+    cards::Characteristics::sync_marker(
+        entity,
         desired(keywords::StaticKeyword::Lifelink),
         current.lifelink,
         cards::Lifelink,
@@ -203,6 +215,8 @@ mod tests {
                     world.get::<cards::EffectivePT>(bears).copied().map(|effective| *effective),
                     world.get::<cards::Deathtouch>(bears).is_some(),
                     world.get::<cards::Infect>(bears).is_some(),
+                    world.get::<cards::FirstStrike>(bears).is_some(),
+                    world.get::<cards::DoubleStrike>(bears).is_some(),
                     world.get::<cards::Lifelink>(bears).is_some(),
                     world.get::<cards::Trample>(bears).is_some(),
                 ),
@@ -230,6 +244,8 @@ mod tests {
             cards::EffectivePT,
             cards::Deathtouch,
             cards::Infect,
+            cards::FirstStrike,
+            cards::DoubleStrike,
             cards::Lifelink,
             cards::Trample,
             cards::Flying,

@@ -20,6 +20,12 @@ pub struct Deathtouch;
 pub struct Infect;
 
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
+pub struct FirstStrike;
+
+#[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
+pub struct DoubleStrike;
+
+#[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Lifelink;
 
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
