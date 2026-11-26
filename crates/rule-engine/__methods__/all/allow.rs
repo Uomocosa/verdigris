@@ -7,12 +7,16 @@ pub fn allow(
     all: statics::All,
     restriction: rules::RestrictionId,
     alternative: rules::Condition,
+    holder: rules::Role,
 ) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
         modification: effects::Modification::Rule(rules::RuleChange {
             target: rules::Target::Restriction(restriction),
-            change: rules::Change::Allow(alternative),
+            change: rules::Change::Allow {
+                holder,
+                when: alternative,
+            },
         }),
     }
 }
@@ -33,13 +37,17 @@ mod tests {
             statics::all(CREATURE),
             rules::RestrictionId("test/untapped"),
             rules::has::<cards::Flying>(),
+            rules::Role::Subject,
         );
         assert_eq!(ability.filter, CREATURE);
         assert_eq!(
             ability.modification,
             effects::Modification::Rule(rules::RuleChange {
                 target: rules::Target::Restriction(rules::RestrictionId("test/untapped")),
-                change: rules::Change::Allow(rules::has::<cards::Flying>()),
+                change: rules::Change::Allow {
+                    holder: rules::Role::Subject,
+                    when: rules::has::<cards::Flying>(),
+                },
             })
         );
     }

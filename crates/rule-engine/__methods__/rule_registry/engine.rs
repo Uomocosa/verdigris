@@ -95,6 +95,9 @@ pub fn engine() -> rules::RuleRegistry {
         );
         register(testing::TestStep::ID, testing::TestStep::restrictions());
     }
+    for id in rules::RuleRegistry::keyword_restriction_ids() {
+        restrictions.insert(id);
+    }
     let values = HashSet::from([
         rules::LandPlays::ID,
         rules::LethalDamage::ID,

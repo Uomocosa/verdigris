@@ -11,7 +11,6 @@ pub const CONTROLS: rules::RestrictionId = rules::RestrictionId("508.1a/controls
 pub const UNTAPPED: rules::RestrictionId = rules::RestrictionId("508.1a/untapped");
 pub const SUMMONING_SICK: rules::RestrictionId =
     rules::RestrictionId("508.1a/controlled-since-turn-began");
-pub const DEFENDER: rules::RestrictionId = rules::RestrictionId("702.3b/defender");
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct DeclareAttacker {
@@ -36,13 +35,14 @@ impl Event for DeclareAttacker {
 #[cfg(test)]
 mod tests {
     use crate::cards;
+    use crate::effects;
     use crate::events;
+    use crate::keywords;
     use crate::rules;
     use crate::rules::traits::event::Event;
 
     use super::CONTROLS;
     use super::CREATURE;
-    use super::DEFENDER;
     use super::DeclareAttacker;
     use super::SUMMONING_SICK;
     use super::UNTAPPED;
@@ -54,7 +54,7 @@ mod tests {
             rules::EventId("508.1a/declare-attacker")
         );
         let restrictions = DeclareAttacker::restrictions();
-        assert_eq!(restrictions.len(), 5);
+        assert_eq!(restrictions.len(), 4);
         assert_eq!(restrictions[0].id, CREATURE);
         assert_eq!(
             restrictions[0].text,
@@ -83,21 +83,39 @@ mod tests {
             restrictions[3].condition,
             !rules::has::<cards::SummoningSick>()
         );
-        assert_eq!(restrictions[4].id, DEFENDER);
-        assert_eq!(
-            restrictions[4].text,
-            "A creature with defender can’t attack."
-        );
-        assert_eq!(restrictions[4].role, rules::Role::Subject);
-        assert_eq!(restrictions[4].condition, !rules::has::<cards::Defender>());
     }
 
     #[test]
     fn restriction_texts_occur_verbatim_in_comprehensive_rules() {
         const RULES_TEXT: &str = include_str!("../../../../docs/MagicCompRules-20250919.txt");
+        let keyword_restrictions = [
+            keywords::Deathtouch::abilities(),
+            keywords::Defender::abilities(),
+            keywords::DoubleStrike::abilities(),
+            keywords::FirstStrike::abilities(),
+            keywords::Flying::abilities(),
+            keywords::Haste::abilities(),
+            keywords::Hexproof::abilities(),
+            keywords::Indestructible::abilities(),
+            keywords::Infect::abilities(),
+            keywords::Lifelink::abilities(),
+            keywords::Reach::abilities(),
+            keywords::Trample::abilities(),
+            keywords::Vigilance::abilities(),
+        ]
+        .into_iter()
+        .flatten()
+        .filter_map(|modification| match modification {
+            effects::Modification::Rule(change) => match change.change {
+                rules::Change::Restrict { restriction, .. } => Some(restriction),
+                _ => None,
+            },
+            effects::Modification::Characteristic(_) => None,
+        });
         for restriction in events::DeclareBlocker::restrictions()
             .into_iter()
             .chain(DeclareAttacker::restrictions())
+            .chain(keyword_restrictions)
         {
             assert!(
                 RULES_TEXT.contains(restriction.text),

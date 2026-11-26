@@ -37,7 +37,7 @@ mod tests {
 
     use crate::BATTLEFIELD;
     use crate::effects;
-    use crate::events;
+    use crate::keywords;
     use crate::rules;
     use crate::testing::*;
 
@@ -57,7 +57,9 @@ mod tests {
                     [
                         effects::Modification::Rule(rules::RuleChange {
                             target: rules::Target::Restriction(UNTAPPED),
-                            change: rules::Change::AsThough,
+                            change: rules::Change::AsThough {
+                                holder: rules::Role::Subject,
+                            },
                         }),
                         effects::Modification::Rule(rules::RuleChange {
                             target: rules::Target::event::<TestRule>(),
@@ -75,7 +77,7 @@ mod tests {
     }
 
     #[test]
-    fn reach_grants_no_keyword_change() -> TestResult {
+    fn reach_waives_flying_blockers_for_itself() -> TestResult {
         let (mut game, [_, p2]) = MockGame::new([P1, P2.battlefield([GIANT_SPIDER])]);
         let [spider] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GIANT_SPIDER)?;
         game.pass_priority();
@@ -83,10 +85,12 @@ mod tests {
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
                 assert!(
-                    !mods(&answers, *spider).contains(&effects::Modification::Rule(
+                    mods(&answers, *spider).contains(&effects::Modification::Rule(
                         rules::RuleChange {
-                            target: rules::Target::Restriction(events::declare_blocker::FLYING),
-                            change: rules::Change::AsThough,
+                            target: rules::Target::Restriction(keywords::Flying::FLYING_BLOCKERS),
+                            change: rules::Change::AsThough {
+                                holder: rules::Role::Subject,
+                            },
                         }
                     ))
                 );

@@ -9,7 +9,9 @@ pub fn attack_as_though_it_had_haste(all: statics::All) -> abilities::Continuous
         filter: *all,
         modification: effects::Modification::Rule(rules::RuleChange {
             target: rules::Target::Restriction(events::declare_attacker::SUMMONING_SICK),
-            change: rules::Change::AsThough,
+            change: rules::Change::AsThough {
+                holder: rules::Role::Subject,
+            },
         }),
     }
 }
@@ -32,7 +34,9 @@ mod tests {
             ability.modification,
             effects::Modification::Rule(rules::RuleChange {
                 target: rules::Target::Restriction(events::declare_attacker::SUMMONING_SICK),
-                change: rules::Change::AsThough,
+                change: rules::Change::AsThough {
+                    holder: rules::Role::Subject,
+                },
             })
         );
     }

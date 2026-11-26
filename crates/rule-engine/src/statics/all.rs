@@ -67,13 +67,19 @@ impl All {
     pub fn tap_when_attacking(self) -> abilities::Continuous {}
 
     #[must_use]
-    pub fn as_though(self, restriction: rules::RestrictionId) -> abilities::Continuous {}
+    pub fn as_though(
+        self,
+        restriction: rules::RestrictionId,
+        holder: rules::Role,
+    ) -> abilities::Continuous {
+    }
 
     #[must_use]
     pub fn allow(
         self,
         restriction: rules::RestrictionId,
         alternative: rules::Condition,
+        holder: rules::Role,
     ) -> abilities::Continuous {
     }
 

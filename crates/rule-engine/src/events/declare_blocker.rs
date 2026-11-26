@@ -9,7 +9,6 @@ use crate::rules::traits::event::Event;
 pub const CREATURE: rules::RestrictionId = rules::RestrictionId("509.1a/creature");
 pub const CONTROLS: rules::RestrictionId = rules::RestrictionId("509.1a/controls");
 pub const UNTAPPED: rules::RestrictionId = rules::RestrictionId("509.1a/untapped");
-pub const FLYING: rules::RestrictionId = rules::RestrictionId("702.9b/flying");
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct DeclareBlocker {
@@ -44,14 +43,13 @@ mod tests {
     use super::CONTROLS;
     use super::CREATURE;
     use super::DeclareBlocker;
-    use super::FLYING;
     use super::UNTAPPED;
 
     #[test]
     fn test_usage() {
         assert_eq!(DeclareBlocker::ID, rules::EventId("509.1a/declare-blocker"));
         let restrictions = DeclareBlocker::restrictions();
-        assert_eq!(restrictions.len(), 4);
+        assert_eq!(restrictions.len(), 3);
         assert_eq!(restrictions[0].id, CREATURE);
         assert_eq!(
             restrictions[0].text,
@@ -74,14 +72,6 @@ mod tests {
         );
         assert_eq!(restrictions[2].role, rules::Role::Subject);
         assert_eq!(restrictions[2].condition, !rules::has::<cards::Tapped>());
-        assert_eq!(restrictions[3].id, FLYING);
-        assert_eq!(restrictions[3].role, rules::Role::Other);
-        assert_eq!(
-            restrictions[3].condition,
-            !rules::other(rules::has::<cards::Flying>())
-                | rules::has::<cards::Flying>()
-                | rules::has::<cards::Reach>()
-        );
     }
 
     #[test]

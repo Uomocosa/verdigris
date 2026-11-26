@@ -63,6 +63,7 @@ pub const ALL_CARDS: &[testing::Card] = &[
     testing::TEST_EAGER_WALL,
     testing::TEST_FIRST_STRIKE_GRANT,
     testing::TEST_FIRST_STRIKE_LORD,
+    testing::TEST_FLYING_REACH,
     testing::TEST_FROZEN_RELIC,
     testing::TEST_GROUNDING_MIST,
     testing::TEST_HASTY_BANNER,

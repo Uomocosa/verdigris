@@ -20,13 +20,6 @@ pub fn event_restrictions() -> Vec<rules::Restriction> {
             rules::Role::Subject,
             !rules::has::<cards::Tapped>(),
         ),
-        events::declare_blocker::FLYING.restriction(
-            "can’t be blocked except by creatures with flying and/or reach",
-            rules::Role::Other,
-            !rules::other(rules::has::<cards::Flying>())
-                | rules::has::<cards::Flying>()
-                | rules::has::<cards::Reach>(),
-        ),
     ]
 }
 
@@ -40,7 +33,7 @@ mod tests {
     #[test]
     fn test_usage() {
         let restrictions = event_restrictions();
-        assert_eq!(restrictions.len(), 4);
+        assert_eq!(restrictions.len(), 3);
         assert_eq!(restrictions[0].id, rules::RestrictionId("509.1a/creature"));
         assert_eq!(restrictions[0].condition, rules::has::<cards::Creature>());
         assert_eq!(restrictions[1].id, rules::RestrictionId("509.1a/controls"));
@@ -51,12 +44,5 @@ mod tests {
         );
         assert_eq!(restrictions[2].id, rules::RestrictionId("509.1a/untapped"));
         assert_eq!(restrictions[2].condition, !rules::has::<cards::Tapped>());
-        assert_eq!(restrictions[3].id, rules::RestrictionId("702.9b/flying"));
-        assert_eq!(
-            restrictions[3].condition,
-            !rules::other(rules::has::<cards::Flying>())
-                | rules::has::<cards::Flying>()
-                | rules::has::<cards::Reach>()
-        );
     }
 }

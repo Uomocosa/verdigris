@@ -576,7 +576,9 @@ mod tests {
                     answers.mods(controller).contains(&effects::Modification::Rule(
                         rules::RuleChange {
                             target: rules::Target::Restriction(testing::UNTAPPED),
-                            change: rules::Change::AsThough,
+                            change: rules::Change::AsThough {
+                                holder: rules::Role::Subject,
+                            },
                         },
                     ))
                 );
@@ -584,7 +586,9 @@ mod tests {
                     !answers.mods(opponent).contains(&effects::Modification::Rule(
                         rules::RuleChange {
                             target: rules::Target::Restriction(testing::UNTAPPED),
-                            change: rules::Change::AsThough,
+                            change: rules::Change::AsThough {
+                                holder: rules::Role::Subject,
+                            },
                         },
                     ))
                 );
@@ -599,7 +603,9 @@ mod tests {
                     !answers.mods(controller).contains(&effects::Modification::Rule(
                         rules::RuleChange {
                             target: rules::Target::Restriction(testing::UNTAPPED),
-                            change: rules::Change::AsThough,
+                            change: rules::Change::AsThough {
+                                holder: rules::Role::Subject,
+                            },
                         },
                     ))
                 );

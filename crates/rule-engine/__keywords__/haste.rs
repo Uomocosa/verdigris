@@ -18,7 +18,9 @@ impl Haste {
     pub fn abilities() -> Vec<effects::Modification> {
         vec![effects::Modification::Rule(rules::RuleChange {
             target: rules::Target::Restriction(events::declare_attacker::SUMMONING_SICK),
-            change: rules::Change::AsThough,
+            change: rules::Change::AsThough {
+                holder: rules::Role::Subject,
+            },
         })]
     }
 }
@@ -39,7 +41,9 @@ mod tests {
             Haste::abilities(),
             vec![effects::Modification::Rule(rules::RuleChange {
                 target: rules::Target::Restriction(events::declare_attacker::SUMMONING_SICK),
-                change: rules::Change::AsThough,
+                change: rules::Change::AsThough {
+                    holder: rules::Role::Subject,
+                },
             })]
         );
     }

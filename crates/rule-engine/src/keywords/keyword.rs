@@ -80,7 +80,7 @@ mod tests {
     fn test_usage() {
         let keyword = keywords::flying();
         assert_eq!(keyword.id, keywords::Flying::ID);
-        assert_eq!(keyword.abilities(), Vec::new());
+        assert_eq!(keyword.abilities(), keywords::Flying::abilities());
         assert_eq!(keyword.params::<()>(), Some(&()));
         let enchanted = keywords::enchant(CREATURE);
         assert_eq!(enchanted.id, keywords::Enchant::ID);

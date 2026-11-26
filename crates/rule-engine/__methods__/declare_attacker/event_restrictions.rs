@@ -25,11 +25,6 @@ pub fn event_restrictions() -> Vec<rules::Restriction> {
             rules::Role::Subject,
             !rules::has::<cards::SummoningSick>(),
         ),
-        events::declare_attacker::DEFENDER.restriction(
-            "A creature with defender can’t attack.",
-            rules::Role::Subject,
-            !rules::has::<cards::Defender>(),
-        ),
     ]
 }
 
@@ -43,7 +38,7 @@ mod tests {
     #[test]
     fn test_usage() {
         let restrictions = event_restrictions();
-        assert_eq!(restrictions.len(), 5);
+        assert_eq!(restrictions.len(), 4);
         assert_eq!(restrictions[0].id, rules::RestrictionId("508.1a/creature"));
         assert_eq!(restrictions[0].condition, rules::has::<cards::Creature>());
         assert_eq!(restrictions[1].id, rules::RestrictionId("508.1a/controls"));
@@ -62,7 +57,5 @@ mod tests {
             restrictions[3].condition,
             !rules::has::<cards::SummoningSick>()
         );
-        assert_eq!(restrictions[4].id, rules::RestrictionId("702.3b/defender"));
-        assert_eq!(restrictions[4].condition, !rules::has::<cards::Defender>());
     }
 }

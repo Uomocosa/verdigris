@@ -9,17 +9,19 @@ pub fn legality<E: Event>(answers: &rules::Rules, event: &E) -> rules::Legality 
         if restriction.unwaivable {
             return false;
         }
-        let entity = match restriction.role {
-            rules::Role::Subject => Some(subject),
-            rules::Role::Other => other,
-            rules::Role::Player => Some(*player),
-        };
-        entity.is_some_and(|entity| {
+        [
+            (rules::Role::Subject, Some(subject)),
+            (rules::Role::Other, other),
+            (rules::Role::Player, Some(*player)),
+        ]
+        .into_iter()
+        .filter_map(|(role, entity)| entity.map(|entity| (role, entity)))
+        .any(|(role, entity)| {
             answers.changes(entity, rules::Target::Restriction(restriction.id)).iter().any(
                 |change| match change {
-                    rules::Change::AsThough => true,
-                    rules::Change::Allow(alternative) => {
-                        answers.eval(alternative, subject, other, Some(*player))
+                    rules::Change::AsThough { holder } => *holder == role,
+                    rules::Change::Allow { holder, when } => {
+                        *holder == role && answers.eval(when, subject, other, Some(*player))
                     }
                     _ => false,
                 },

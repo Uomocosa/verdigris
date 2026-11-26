@@ -39,7 +39,9 @@ mod tests {
             .run_system_once(move |answers: rules::Rules| {
                 assert_eq!(
                     changes(&answers, *waiver, rules::Target::Restriction(UNTAPPED)),
-                    vec![rules::Change::AsThough]
+                    vec![rules::Change::AsThough {
+                        holder: rules::Role::Subject
+                    }]
                 );
                 assert_eq!(
                     changes(&answers, *waiver, rules::Target::event::<TestStep>()),

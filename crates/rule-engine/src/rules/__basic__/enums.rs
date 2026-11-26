@@ -33,8 +33,13 @@ pub enum Role {
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Change {
-    AsThough,
-    Allow(rules::Condition),
+    AsThough {
+        holder: rules::Role,
+    },
+    Allow {
+        holder: rules::Role,
+        when: rules::Condition,
+    },
     Restrict {
         holder: rules::Role,
         restriction: rules::Restriction,

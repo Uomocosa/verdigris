@@ -225,6 +225,35 @@ mod tests {
             Some(&actions::Rejected::CannotBlock { assignments })
         );
         assert!(!game.is_blocking(bears));
+
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.battlefield([TEST_FLYING_REACH]),
+            P2.battlefield([GRIZZLY_BEARS]),
+        ]);
+        let [skimmer] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TEST_FLYING_REACH)?;
+        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareAttackers),
+            p2.pass_to(turns::Step::DeclareAttackers),
+            p1.declare_attackers([skimmer]),
+        ])?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareBlockers),
+            p2.pass_to(turns::Step::DeclareBlockers),
+        ])?;
+        game.play([p1.pass_priority()])?;
+        let assignments = vec![actions::BlockAssignment {
+            blocker: bears.into(),
+            attacker: skimmer.into(),
+        }];
+
+        game.act(p2, actions::Action::DeclareBlockers(assignments.clone()));
+
+        assert_eq!(
+            game.last_rejection(),
+            Some(&actions::Rejected::CannotBlock { assignments })
+        );
+        assert!(!game.is_blocking(bears));
         Ok(())
     }
 

@@ -10,7 +10,10 @@ pub fn play_lands_from(all: statics::All, zone: zones::Zone) -> abilities::Conti
         filter: *all,
         modification: effects::Modification::Rule(rules::RuleChange {
             target: rules::Target::Restriction(events::play_land::FROM_HAND),
-            change: rules::Change::Allow(rules::in_zone(zone, rules::Role::Player)),
+            change: rules::Change::Allow {
+                holder: rules::Role::Player,
+                when: rules::in_zone(zone, rules::Role::Player),
+            },
         }),
     }
 }
@@ -33,7 +36,10 @@ mod tests {
             ability.modification,
             effects::Modification::Rule(rules::RuleChange {
                 target: rules::Target::Restriction(rules::RestrictionId("305.1/from-hand")),
-                change: rules::Change::Allow(rules::in_zone(GRAVEYARD, rules::Role::Player)),
+                change: rules::Change::Allow {
+                    holder: rules::Role::Player,
+                    when: rules::in_zone(GRAVEYARD, rules::Role::Player),
+                },
             })
         );
     }

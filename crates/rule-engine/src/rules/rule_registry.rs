@@ -28,6 +28,12 @@ impl RuleRegistry {
     }
 }
 
+#[atomic_delegates]
+impl RuleRegistry {
+    #[must_use]
+    pub(crate) fn keyword_restriction_ids() -> HashSet<rules::RestrictionId> {}
+}
+
 #[cfg(test)]
 mod tests {
     use std::collections::HashMap;
