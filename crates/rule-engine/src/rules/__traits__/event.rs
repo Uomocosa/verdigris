@@ -15,10 +15,6 @@ pub trait Event: Context + EventArgs + Clone + Send + Sync + 'static {
         Vec::new()
     }
     #[must_use]
-    fn field(&self, _field: rules::Field) -> Option<u32> {
-        None
-    }
-    #[must_use]
     fn affected(&self) -> Vec<Entity> {
         vec![*self.player()]
     }

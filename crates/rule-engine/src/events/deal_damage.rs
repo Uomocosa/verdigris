@@ -31,12 +31,6 @@ impl rules::traits::context::Context for DealDamage {
 impl Event for DealDamage {
     const ID: rules::EventId = rules::EventId("120.3/deal-damage");
 
-    fn field(&self, field: rules::Field) -> Option<u32> {
-        match field {
-            rules::Field::Amount => Some(self.amount),
-        }
-    }
-
     #[rustfmt::skip]
     fn affected(&self) -> Vec<Entity> { vec![self.recipient] }
 
@@ -78,11 +72,7 @@ mod tests {
             restrictions[0].text,
             "If a source would deal 0 damage, it does not deal damage at all."
         );
-        assert_eq!(
-            restrictions[0].condition,
-            rules::event_field(rules::Field::Amount, rules::Comparison::AtLeast, 1)
-        );
-        assert_eq!(event.field(rules::Field::Amount), Some(3));
+        assert_eq!(restrictions[0].condition, DealDamage::AMOUNT.at_least(1));
         assert_eq!(
             event.arg(DealDamage::SOURCE),
             Some(rules::ArgValue::Entity(source))

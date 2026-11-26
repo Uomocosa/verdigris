@@ -16,6 +16,10 @@ pub fn eval<E: EventArgs>(
         Some(rules::ArgValue::Player(player)) => Some(*player),
         Some(rules::ArgValue::Entities(_) | rules::ArgValue::Amount(_)) | None => None,
     };
+    let amount = |id: &rules::ArgId| match event.arg(*id) {
+        Some(rules::ArgValue::Amount(found)) => Some(found),
+        _ => None,
+    };
     match condition {
         rules::Condition::Has(component) => viewpoint.is_some_and(|subject| {
             answers
@@ -48,17 +52,13 @@ pub fn eval<E: EventArgs>(
                     .ok()
                     .and_then(|entity| entity.get::<cards::EffectivePT>())
                     .is_some_and(|effective| {
-                        let value = match characteristic {
-                            rules::Characteristic::Power => effective.power,
-                            rules::Characteristic::Toughness => effective.toughness,
-                        };
-                        match comparison {
-                            rules::Comparison::AtLeast => value >= *threshold,
-                            rules::Comparison::AtMost => value <= *threshold,
-                            rules::Comparison::EqualTo => value == *threshold,
-                            rules::Comparison::GreaterThan => value > *threshold,
-                            rules::Comparison::LessThan => value < *threshold,
-                        }
+                        comparison.holds(
+                            &match characteristic {
+                                rules::Characteristic::Power => effective.power,
+                                rules::Characteristic::Toughness => effective.toughness,
+                            },
+                            threshold,
+                        )
                     })
             }),
         rules::Condition::Of(reference, inner) => {
@@ -102,8 +102,12 @@ pub fn eval<E: EventArgs>(
                 .single()
                 .is_ok_and(|state| state.priority.holder.is_some_and(|id| *id == holder))
         }),
-        rules::Condition::EventField(..)
-        | rules::Condition::EventFieldAtLeastRemainingToughness(..) => false,
+        rules::Condition::ArgAmount(id, comparison, threshold) => {
+            amount(id).is_some_and(|value| comparison.holds(&value, threshold))
+        }
+        rules::Condition::ArgAtLeastRemainingToughness(id) => viewpoint.is_some_and(|subject| {
+            amount(id).is_some_and(|found| found >= answers.remaining_toughness(subject))
+        }),
     }
 }
 

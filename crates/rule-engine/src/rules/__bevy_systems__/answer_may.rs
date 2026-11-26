@@ -64,7 +64,7 @@ pub fn answer_may<E: Event>(
             break;
         }
         accepted.remove(0);
-        ask.then.instantiate(&ask.event).announce(&mut commands);
+        ask.then.instantiate(&ask.event, &answers).announce(&mut commands);
         break;
     }
 }

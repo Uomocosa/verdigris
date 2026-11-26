@@ -7,30 +7,9 @@ pub enum Characteristic {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum Comparison {
-    AtLeast,
-    AtMost,
-    EqualTo,
-    GreaterThan,
-    LessThan,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum Field {
-    Amount,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Amount {
     Fixed(u32),
-    FromEvent(Field),
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum Role {
-    Subject,
-    Other,
-    Player,
+    FromArg(rules::ArgId),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

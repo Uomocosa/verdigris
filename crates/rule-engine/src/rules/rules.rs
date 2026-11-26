@@ -88,6 +88,8 @@ impl Rules<'_, '_> {
 impl Rules<'_, '_> {
     pub(crate) fn mods(&self, entity: Entity) -> Vec<effects::Modification> {}
 
+    pub(crate) fn remaining_toughness(&self, subject: Entity) -> u32 {}
+
     pub(crate) fn waived<E: rules::traits::event::Event>(
         &self,
         event: &E,

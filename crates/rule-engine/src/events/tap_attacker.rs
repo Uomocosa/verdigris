@@ -47,7 +47,6 @@ mod tests {
         assert_eq!(event.player(), player);
         assert_eq!(TapAttacker::ID, rules::EventId("508.1f/tap-attacker"));
         assert_eq!(TapAttacker::restrictions(), Vec::new());
-        assert_eq!(event.field(rules::Field::Amount), None);
         assert_eq!(
             TapAttacker::args(),
             &[TapAttacker::ATTACKER, TapAttacker::PLAYER,]

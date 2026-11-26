@@ -50,7 +50,6 @@ mod tests {
         assert_eq!(event.player(), controller);
         assert_eq!(Tap::ID, rules::EventId("701.26a/tap"));
         assert_eq!(Tap::restrictions(), Vec::new());
-        assert_eq!(event.field(rules::Field::Amount), None);
         assert_eq!(Tap::args(), &[Tap::PERMANENT, Tap::CONTROLLER,]);
     }
 }

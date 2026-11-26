@@ -47,7 +47,6 @@ mod tests {
         assert_eq!(event.player(), controller);
         assert_eq!(Counter::ID, rules::EventId("701.6a/counter"));
         assert_eq!(Counter::restrictions(), Vec::new());
-        assert_eq!(event.field(rules::Field::Amount), None);
         assert_eq!(Counter::args(), &[Counter::SPELL, Counter::CONTROLLER,]);
     }
 }

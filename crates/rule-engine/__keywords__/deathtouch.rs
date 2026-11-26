@@ -20,7 +20,7 @@ impl Deathtouch {
             target: rules::Target::Definition(rules::LETHAL_DAMAGE),
             change: rules::Change::Allow {
                 holder: events::AssignCombatDamage::SOURCE,
-                when: rules::event_field(rules::Field::Amount, rules::Comparison::GreaterThan, 0),
+                when: events::AssignCombatDamage::AMOUNT.greater_than(0),
             },
         })]
     }

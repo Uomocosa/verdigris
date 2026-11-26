@@ -2,16 +2,19 @@
 mod basic;
 
 pub use basic::condition_builders::{
-    active_player, at_least, at_most, card_type, equal_to, event_field, has, has_priority, in_zone,
-    is, main_phase, points_to, stack_empty, step_is,
+    active_player, at_least, at_most, card_type, equal_to, has, has_priority, in_zone, is,
+    main_phase, points_to, stack_empty, step_is,
 };
-pub use basic::enums::{Amount, Change, Characteristic, Comparison, Field, Legality, Role, may};
+pub use basic::enums::{Amount, Change, Characteristic, Legality, may};
 pub use basic::newtypes::{EventId, RuleId};
 pub use basic::structs::RuleChange;
 pub use basic::type_aliases::{Definition, Restriction};
 
 mod arg_id;
 pub use arg_id::ArgId;
+
+mod comparison;
+pub use comparison::Comparison;
 
 mod arg_ref;
 pub use arg_ref::ArgRef;

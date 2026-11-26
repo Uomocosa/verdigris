@@ -50,7 +50,6 @@ mod tests {
         assert_eq!(event.player(), controller);
         assert_eq!(Destroy::ID, rules::EventId("701.8a/destroy"));
         assert_eq!(Destroy::restrictions(), Vec::new());
-        assert_eq!(event.field(rules::Field::Amount), None);
         assert_eq!(Destroy::args(), &[Destroy::PERMANENT, Destroy::CONTROLLER,]);
     }
 }

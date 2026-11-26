@@ -1,38 +1,37 @@
 use atomic_delegate_macros::atomic_delegates;
 
 use crate::rules;
-use crate::rules::traits::event::Event;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum EventTemplate {
     WinGame {
-        who: rules::Role,
+        who: rules::ArgRef,
     },
     LoseGame {
-        who: rules::Role,
+        who: rules::ArgRef,
     },
     Draw {
-        who: rules::Role,
+        who: rules::ArgRef,
         amount: rules::Amount,
     },
     LoseLife {
-        who: rules::Role,
+        who: rules::ArgRef,
         amount: rules::Amount,
     },
     Discard {
-        who: rules::Role,
+        who: rules::ArgRef,
         amount: rules::Amount,
     },
     GainLife {
-        who: rules::Role,
+        who: rules::ArgRef,
         amount: rules::Amount,
     },
     Mill {
-        who: rules::Role,
+        who: rules::ArgRef,
         amount: rules::Amount,
     },
     Exile {
-        what: rules::Role,
+        what: rules::ArgRef,
     },
     BeginTheGameOnTheBattlefield,
 }
@@ -40,7 +39,12 @@ pub enum EventTemplate {
 #[atomic_delegates]
 impl EventTemplate {
     #[must_use]
-    pub fn instantiate<E: Event>(&self, event: &E) -> rules::AnyEvent {}
+    pub fn instantiate<E: rules::traits::event::Event>(
+        &self,
+        event: &E,
+        answers: &rules::Rules,
+    ) -> rules::AnyEvent {
+    }
 }
 
 #[cfg(test)]
@@ -55,27 +59,39 @@ mod tests {
 
     #[test]
     fn test_usage() {
+        use bevy::ecs::system::RunSystemOnce;
+
+        use crate::testing::MockGame;
+        use crate::testing::P1;
+        use crate::testing::P2;
+
         let player = Entity::PLACEHOLDER;
         let happened = events::DrawFromEmptyLibrary {
             player: players::PlayerId(player),
         };
         let template = EventTemplate::WinGame {
-            who: rules::Role::Player,
+            who: events::DrawFromEmptyLibrary::PLAYER.into(),
         };
-        assert_eq!(
-            template.instantiate(&happened),
-            rules::AnyEvent::WinGame(events::WinGame {
-                player: players::PlayerId(player)
+        let (mut game, _) = MockGame::new([P1, P2]);
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                assert_eq!(
+                    template.instantiate(&happened, &answers),
+                    rules::AnyEvent::WinGame(events::WinGame {
+                        player: players::PlayerId(player)
+                    })
+                );
+                assert_eq!(
+                    EventTemplate::LoseGame {
+                        who: events::DrawFromEmptyLibrary::PLAYER.into(),
+                    }
+                    .instantiate(&happened, &answers),
+                    rules::AnyEvent::LoseGame(events::LoseGame {
+                        player: players::PlayerId(player)
+                    })
+                );
             })
-        );
-        assert_eq!(
-            EventTemplate::LoseGame {
-                who: rules::Role::Subject,
-            }
-            .instantiate(&happened),
-            rules::AnyEvent::LoseGame(events::LoseGame {
-                player: players::PlayerId(player)
-            })
-        );
+            .unwrap();
     }
 }

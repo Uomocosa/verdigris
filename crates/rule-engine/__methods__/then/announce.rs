@@ -8,6 +8,7 @@ use crate::rules::traits::event::Event;
 pub fn announce<E: Event>(
     then: rules::Then,
     event: &E,
+    answers: &rules::Rules,
     commands: &mut Commands,
     asks: &mut MessageWriter<May<E>>,
     state_based_actions_performed: &mut StateBasedActionsPerformed,
@@ -15,7 +16,7 @@ pub fn announce<E: Event>(
     match then {
         rules::Then::Events(then) => {
             for template in then {
-                template.instantiate(event).announce(commands);
+                template.instantiate(event, answers).announce(commands);
             }
             **state_based_actions_performed = true;
         }
@@ -51,13 +52,15 @@ mod tests {
             .run_system_once(
                 move |mut commands: Commands,
                       mut asks: MessageWriter<May<events::DrawFromEmptyLibrary>>,
-                      mut performed: ResMut<StateBasedActionsPerformed>| {
+                      mut performed: ResMut<StateBasedActionsPerformed>,
+                      answers: rules::Rules| {
                     announce(
                         rules::may(rules::EventTemplate::Mill {
-                            who: rules::Role::Player,
+                            who: rules::Hooked::<events::OpeningHandAction>::PLAYER.into(),
                             amount: rules::Amount::Fixed(1),
                         }),
                         &happened,
+                        &answers,
                         &mut commands,
                         &mut asks,
                         &mut performed,
@@ -73,7 +76,7 @@ mod tests {
                         ask.event == events::DrawFromEmptyLibrary { player }
                             && ask.then
                                 == rules::EventTemplate::Mill {
-                                    who: rules::Role::Player,
+                                    who: rules::Hooked::<events::OpeningHandAction>::PLAYER.into(),
                                     amount: rules::Amount::Fixed(1),
                                 }
                     }));

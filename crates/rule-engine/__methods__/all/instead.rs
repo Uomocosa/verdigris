@@ -40,7 +40,7 @@ mod tests {
             events::DrawFromEmptyLibrary::ID,
             rules::Condition::True,
             vec![rules::EventTemplate::WinGame {
-                who: rules::Role::Player,
+                who: events::DrawFromEmptyLibrary::PLAYER.into(),
             }],
         );
         assert_eq!(ability.filter, PLAYER.controlled_by(YOU));
@@ -51,7 +51,7 @@ mod tests {
                 change: rules::Change::Instead {
                     when: rules::Condition::True,
                     then: rules::Then::Events(vec![rules::EventTemplate::WinGame {
-                        who: rules::Role::Player,
+                        who: events::DrawFromEmptyLibrary::PLAYER.into(),
                     }]),
                 },
             })

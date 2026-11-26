@@ -49,7 +49,6 @@ mod tests {
             rules::EventId("103.6a/begin-the-game-on-the-battlefield")
         );
         assert_eq!(BeginTheGameOnTheBattlefield::restrictions(), Vec::new());
-        assert_eq!(event.field(rules::Field::Amount), None);
         assert_eq!(
             BeginTheGameOnTheBattlefield::args(),
             &[

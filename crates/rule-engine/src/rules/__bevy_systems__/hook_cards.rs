@@ -79,6 +79,7 @@ pub fn hook_cards<E: HookEvent>(
         for (hooked, then) in thens_of_the_first_player {
             then.announce(
                 &hooked,
+                &answers,
                 &mut commands,
                 &mut asks,
                 &mut state_based_actions_performed,

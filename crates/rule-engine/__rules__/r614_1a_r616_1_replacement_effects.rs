@@ -37,6 +37,7 @@ pub fn r614_1a_r616_1_replacement_effects<E: Event>(
             Some(then) => {
                 then.announce(
                     event,
+                    &answers,
                     &mut commands,
                     &mut asks,
                     &mut state_based_actions_performed,

@@ -50,7 +50,6 @@ mod tests {
             rules::EventId("404.1/put-into-graveyard")
         );
         assert_eq!(PutIntoGraveyard::restrictions(), Vec::new());
-        assert_eq!(event.field(rules::Field::Amount), None);
         assert_eq!(
             PutIntoGraveyard::args(),
             &[PutIntoGraveyard::OBJECT, PutIntoGraveyard::OWNER,]

@@ -22,12 +22,6 @@ impl rules::traits::context::Context for LoseLife {
 
 impl Event for LoseLife {
     const ID: rules::EventId = rules::EventId("119.3/lose-life");
-
-    fn field(&self, field: rules::Field) -> Option<u32> {
-        match field {
-            rules::Field::Amount => Some(self.amount),
-        }
-    }
 }
 
 #[cfg(test)]
@@ -51,7 +45,6 @@ mod tests {
         assert_eq!(event.player(), player);
         assert_eq!(LoseLife::ID, rules::EventId("119.3/lose-life"));
         assert_eq!(LoseLife::restrictions(), Vec::new());
-        assert_eq!(event.field(rules::Field::Amount), Some(2));
         assert_eq!(LoseLife::args(), &[LoseLife::PLAYER, LoseLife::AMOUNT,]);
     }
 }

@@ -1,5 +1,3 @@
-use crate::cards;
-use crate::damage;
 use crate::rules;
 use crate::rules::traits::event::Event;
 
@@ -8,38 +6,7 @@ pub fn defines<E: Event>(
     definition: &rules::Definition,
     event: &E,
 ) -> bool {
-    let holds = match &definition.condition {
-        rules::Condition::Of(reference, inner) => match inner.as_ref() {
-            rules::Condition::EventFieldAtLeastRemainingToughness(field) => {
-                let viewpoint = match answers.resolve(*reference, event) {
-                    Some(rules::ArgValue::Entity(entity)) => Some(entity),
-                    Some(rules::ArgValue::Player(player)) => Some(*player),
-                    Some(rules::ArgValue::Entities(_) | rules::ArgValue::Amount(_)) | None => None,
-                };
-                viewpoint.is_some_and(|subject| {
-                    let remaining = answers
-                        .entities
-                        .get(subject)
-                        .ok()
-                        .and_then(|entity| entity.get::<cards::EffectivePT>())
-                        .map_or(0, |effective| {
-                            u32::try_from(effective.toughness).unwrap_or_default()
-                        })
-                        .saturating_sub(
-                            answers
-                                .entities
-                                .get(subject)
-                                .ok()
-                                .and_then(|entity| entity.get::<damage::Damage>())
-                                .map_or(0, |marked| **marked),
-                        );
-                    event.field(*field).is_some_and(|amount| amount >= remaining)
-                })
-            }
-            _ => answers.eval(&definition.condition.bind(event), event, None),
-        },
-        condition => answers.eval(&condition.bind(event), event, None),
-    };
+    let holds = answers.eval(&definition.condition.bind(event), event, None);
     holds
         || answers.waived(
             event,
@@ -56,6 +23,8 @@ mod tests {
     use crate::events;
     use crate::rules;
     use crate::testing::*;
+
+    use super::defines;
 
     #[test]
     fn test_usage() -> TestResult {
@@ -84,9 +53,21 @@ mod tests {
                     amount: 2,
                     ..one_from_plain
                 };
-                assert!(answers.defines(&rules::Definition::lethal_damage(), &one_from_rats));
-                assert!(!answers.defines(&rules::Definition::lethal_damage(), &one_from_plain));
-                assert!(answers.defines(&rules::Definition::lethal_damage(), &two_from_plain));
+                assert!(defines(
+                    &answers,
+                    &rules::Definition::lethal_damage(),
+                    &one_from_rats
+                ));
+                assert!(!defines(
+                    &answers,
+                    &rules::Definition::lethal_damage(),
+                    &one_from_plain
+                ));
+                assert!(defines(
+                    &answers,
+                    &rules::Definition::lethal_damage(),
+                    &two_from_plain
+                ));
             })
             .unwrap();
         Ok(())

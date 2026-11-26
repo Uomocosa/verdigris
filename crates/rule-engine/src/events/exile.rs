@@ -47,7 +47,6 @@ mod tests {
         assert_eq!(event.player(), owner);
         assert_eq!(Exile::ID, rules::EventId("701.13a/exile"));
         assert_eq!(Exile::restrictions(), Vec::new());
-        assert_eq!(event.field(rules::Field::Amount), None);
         assert_eq!(Exile::args(), &[Exile::OBJECT, Exile::OWNER,]);
     }
 }

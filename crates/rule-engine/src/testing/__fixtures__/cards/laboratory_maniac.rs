@@ -19,7 +19,7 @@ pub const LABORATORY_MANIAC: testing::Card = testing::Card {
                 events::DrawFromEmptyLibrary::ID,
                 rules::Condition::True,
                 vec![rules::EventTemplate::WinGame {
-                    who: rules::Role::Player,
+                    who: events::DrawFromEmptyLibrary::PLAYER.into(),
                 }],
             ),
         }

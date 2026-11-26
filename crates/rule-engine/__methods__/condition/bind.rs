@@ -1,16 +1,16 @@
 use crate::rules;
-use crate::rules::traits::event::Event;
+use crate::rules::traits::event_args::EventArgs;
 
-pub fn bind<E: Event>(condition: &rules::Condition, event: &E) -> rules::Condition {
+pub fn bind<E: EventArgs>(condition: &rules::Condition, event: &E) -> rules::Condition {
     match condition {
-        rules::Condition::EventField(field, comparison, threshold) => {
-            let holds = event.field(*field).is_some_and(|value| match comparison {
-                rules::Comparison::AtLeast => value >= *threshold,
-                rules::Comparison::AtMost => value <= *threshold,
-                rules::Comparison::EqualTo => value == *threshold,
-                rules::Comparison::GreaterThan => value > *threshold,
-                rules::Comparison::LessThan => value < *threshold,
-            });
+        rules::Condition::ArgAmount(id, comparison, threshold) => {
+            let holds = event
+                .arg(*id)
+                .and_then(|value| match value {
+                    rules::ArgValue::Amount(found) => Some(found),
+                    _ => None,
+                })
+                .is_some_and(|value| comparison.holds(&value, threshold));
             if holds {
                 rules::Condition::True
             } else {
@@ -47,7 +47,7 @@ mod tests {
             player: players::PlayerId(Entity::PLACEHOLDER),
             amount: 2,
         };
-        let at_least_two = rules::event_field(rules::Field::Amount, rules::Comparison::AtLeast, 2);
+        let at_least_two = events::Draw::AMOUNT.at_least(2);
         assert_eq!(bind(&at_least_two, &draw_two), rules::Condition::True);
     }
 
@@ -57,24 +57,23 @@ mod tests {
             player: players::PlayerId(Entity::PLACEHOLDER),
             amount: 2,
         };
-        let at_least_three =
-            rules::event_field(rules::Field::Amount, rules::Comparison::AtLeast, 3);
+        let at_least_three = events::Draw::AMOUNT.at_least(3);
         assert_eq!(bind(&at_least_three, &draw_two), !rules::Condition::True);
         let nested = rules::Condition::All(vec![
-            rules::event_field(rules::Field::Amount, rules::Comparison::AtLeast, 2),
+            events::Draw::AMOUNT.at_least(2),
             rules::Condition::True,
         ]);
         assert_eq!(
             bind(&nested, &draw_two),
             rules::Condition::All(vec![rules::Condition::True, rules::Condition::True])
         );
-        let missing = rules::event_field(rules::Field::Amount, rules::Comparison::AtLeast, 1);
+        let missing = events::Draw::AMOUNT.at_least(1);
         assert_eq!(
             bind(
                 &missing,
                 &events::WinGame {
                     player: players::PlayerId(Entity::PLACEHOLDER)
-                }
+                },
             ),
             !rules::Condition::True
         );

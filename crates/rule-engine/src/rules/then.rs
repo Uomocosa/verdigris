@@ -18,6 +18,7 @@ impl Then {
     pub fn announce<E: Event>(
         self,
         event: &E,
+        answers: &rules::Rules,
         commands: &mut Commands,
         asks: &mut MessageWriter<May<E>>,
         state_based_actions_performed: &mut StateBasedActionsPerformed,
@@ -45,15 +46,22 @@ mod tests {
         let player = p1.id;
         let happened = events::DrawFromEmptyLibrary { player };
         let then = Then::Events(vec![rules::EventTemplate::WinGame {
-            who: rules::Role::Player,
+            who: events::DrawFromEmptyLibrary::PLAYER.into(),
         }]);
         game.app
             .world_mut()
             .run_system_once(
                 move |mut commands: Commands,
                       mut asks: MessageWriter<May<events::DrawFromEmptyLibrary>>,
-                      mut performed: ResMut<StateBasedActionsPerformed>| {
-                    then.clone().announce(&happened, &mut commands, &mut asks, &mut performed);
+                      mut performed: ResMut<StateBasedActionsPerformed>,
+                      answers: rules::Rules| {
+                    then.clone().announce(
+                        &happened,
+                        &answers,
+                        &mut commands,
+                        &mut asks,
+                        &mut performed,
+                    );
                 },
             )
             .unwrap();

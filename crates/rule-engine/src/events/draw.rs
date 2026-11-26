@@ -22,12 +22,6 @@ impl rules::traits::context::Context for Draw {
 
 impl Event for Draw {
     const ID: rules::EventId = rules::EventId("121.1/draw");
-
-    fn field(&self, field: rules::Field) -> Option<u32> {
-        match field {
-            rules::Field::Amount => Some(self.amount),
-        }
-    }
 }
 
 #[cfg(test)]
@@ -51,7 +45,6 @@ mod tests {
         assert_eq!(event.player(), player);
         assert_eq!(Draw::ID, rules::EventId("121.1/draw"));
         assert_eq!(Draw::restrictions(), Vec::new());
-        assert_eq!(event.field(rules::Field::Amount), Some(2));
         assert_eq!(Draw::args(), &[Draw::PLAYER, Draw::AMOUNT,]);
     }
 }

@@ -4,7 +4,7 @@ use crate::rules;
 pub fn lethal_damage() -> rules::Definition {
     rules::LETHAL_DAMAGE.definition(
         "An amount of damage greater than or equal to a creature's toughness.",
-        rules::Condition::EventFieldAtLeastRemainingToughness(rules::Field::Amount)
+        rules::Condition::ArgAtLeastRemainingToughness(events::AssignCombatDamage::AMOUNT)
             .of(events::AssignCombatDamage::TARGET),
     )
 }
@@ -27,7 +27,7 @@ mod tests {
         );
         assert_eq!(
             definition.condition,
-            rules::Condition::EventFieldAtLeastRemainingToughness(rules::Field::Amount)
+            rules::Condition::ArgAtLeastRemainingToughness(events::AssignCombatDamage::AMOUNT)
                 .of(events::AssignCombatDamage::TARGET)
         );
     }

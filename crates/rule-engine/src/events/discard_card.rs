@@ -46,7 +46,6 @@ mod tests {
         assert_eq!(event.player(), player);
         assert_eq!(DiscardCard::ID, rules::EventId("701.9a/discard-card"));
         assert_eq!(DiscardCard::restrictions(), Vec::new());
-        assert_eq!(event.field(rules::Field::Amount), None);
         assert_eq!(
             DiscardCard::args(),
             &[DiscardCard::CARD, DiscardCard::PLAYER,]

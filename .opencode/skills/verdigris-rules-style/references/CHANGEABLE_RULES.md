@@ -83,9 +83,9 @@ pub enum Change {
 pub struct RuleChange { pub target: Target, pub change: Change }
 ```
 
-- `EventTemplate` describes a replacement event in data; `Amount::{Fixed(u32), FromEvent(Field)}`
+- `EventTemplate` describes a replacement event in data; `Amount::{Fixed(u32), FromArg(ArgId)}`
   lets it copy a parameter of the replaced event ("that much life", "that many cards").
-- Conditions may read event parameters through `Field` (e.g. `Field::Amount`).
+- Conditions may read event parameters through `ArgId` (e.g. `DealDamage::AMOUNT.at_least(1)`).
 
 ## 2. Nonsense is allowed, dangling is not
 
@@ -104,7 +104,7 @@ add an event, restriction or value rule, register it.
    fields (`Draw { player, amount }`). `impl Event` with `ID` = CR number, `Context` for roles.
 2. If the CR lists conditions, write them as `restrictions()` with `RestrictionId` consts, text quoted
    VERBATIM from `docs/MagicCompRules-*.txt` (keep the verbatim test).
-   A condition on the event's own numbers is a restriction too: `rules::event_field(rules::Field::Amount, ..)`
+   A condition on the event's own numbers is a restriction too: `DealDamage::AMOUNT.at_least(..)`
    (120.8 `events::deal_damage::NONZERO_DAMAGE`). The same `if event.amount == 0` in several rules is
    such a restriction.
 3. The `__rules__` system that owns the action writes `Attempt<E>` instead of acting directly; the pipeline decides; the owning system reads `Resolve<E>` and performs only what comes out.

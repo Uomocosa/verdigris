@@ -22,8 +22,8 @@ pub enum Condition {
     StackEmpty,
     ActivePlayer(rules::ArgRef),
     HasPriority(rules::ArgRef),
-    EventField(rules::Field, rules::Comparison, u32),
-    EventFieldAtLeastRemainingToughness(rules::Field),
+    ArgAmount(rules::ArgId, rules::Comparison, u32),
+    ArgAtLeastRemainingToughness(rules::ArgId),
 }
 
 #[rustfmt::skip]
@@ -65,7 +65,7 @@ impl std::ops::BitOr for Condition {
 #[atomic_delegates]
 impl Condition {
     #[must_use]
-    pub fn bind<E: rules::traits::event::Event>(&self, event: &E) -> Self {}
+    pub fn bind<E: rules::traits::event_args::EventArgs>(&self, event: &E) -> Self {}
 }
 
 #[rustfmt::skip]

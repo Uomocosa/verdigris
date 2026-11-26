@@ -74,12 +74,3 @@ pub fn active_player(role: impl Into<rules::ArgRef>) -> rules::Condition {
 pub fn has_priority(role: impl Into<rules::ArgRef>) -> rules::Condition {
     rules::Condition::HasPriority(role.into())
 }
-
-#[must_use]
-pub const fn event_field(
-    field: rules::Field,
-    comparison: rules::Comparison,
-    threshold: u32,
-) -> rules::Condition {
-    rules::Condition::EventField(field, comparison, threshold)
-}

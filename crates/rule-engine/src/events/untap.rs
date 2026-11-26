@@ -50,7 +50,6 @@ mod tests {
         assert_eq!(event.player(), controller);
         assert_eq!(Untap::ID, rules::EventId("701.26b/untap"));
         assert_eq!(Untap::restrictions(), Vec::new());
-        assert_eq!(event.field(rules::Field::Amount), None);
         assert_eq!(Untap::args(), &[Untap::PERMANENT, Untap::CONTROLLER,]);
     }
 }

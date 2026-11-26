@@ -22,12 +22,6 @@ impl rules::traits::context::Context for Discard {
 
 impl Event for Discard {
     const ID: rules::EventId = rules::EventId("701.9a/discard");
-
-    fn field(&self, field: rules::Field) -> Option<u32> {
-        match field {
-            rules::Field::Amount => Some(self.amount),
-        }
-    }
 }
 
 #[cfg(test)]
@@ -51,7 +45,6 @@ mod tests {
         assert_eq!(event.player(), player);
         assert_eq!(Discard::ID, rules::EventId("701.9a/discard"));
         assert_eq!(Discard::restrictions(), Vec::new());
-        assert_eq!(event.field(rules::Field::Amount), Some(2));
         assert_eq!(Discard::args(), &[Discard::PLAYER, Discard::AMOUNT,]);
     }
 }
