@@ -1,15 +1,13 @@
-use bevy::prelude::{Entity, Has, MessageReader, Query, ResMut, With};
+use std::collections::BTreeSet;
+
+use bevy::ecs::schedule::{IntoScheduleConfigs, ScheduleConfigs};
+use bevy::ecs::system::ScheduleSystem;
+use bevy::prelude::{Entity, Has, Query, ResMut};
 
 use crate::GameMut;
 use crate::cards;
 use crate::turns;
 
-/// 506.1. The combat phase has five steps, which proceed in order: beginning of combat, declare
-/// attackers, declare blockers, combat damage, and end of combat. The declare blockers and combat
-/// damage steps are skipped if no creatures are declared as attackers or put onto the battlefield
-/// attacking (see rule 508.8). There are two combat damage steps if any attacking or blocking
-/// creature has first strike (see rule 702.7) or double strike (see rule 702.4).
-///
 /// 510.4. If at least one attacking or blocking creature has first strike (see rule 702.7) or
 /// double strike (see rule 702.4) as the combat damage step begins, the only creatures that assign
 /// combat damage in that step are those with first strike or double strike. After that step,
@@ -18,6 +16,14 @@ use crate::turns;
 /// blockers that had neither first strike nor double strike as the first combat damage step began,
 /// as well as the remaining attackers and blockers that currently have double strike. After that
 /// step, the phase proceeds to the end of combat step.
+///
+/// # See also
+///
+/// 506.1. The combat phase has five steps, which proceed in order: beginning of combat, declare
+/// attackers, declare blockers, combat damage, and end of combat. The declare blockers and combat
+/// damage steps are skipped if no creatures are declared as attackers or put onto the battlefield
+/// attacking (see rule 508.8). There are two combat damage steps if any attacking or blocking
+/// creature has first strike (see rule 702.7) or double strike (see rule 702.4).
 ///
 /// 702.4b If at least one attacking or blocking creature has first strike (see rule 702.7) or
 /// double strike as the combat damage step begins, the only creatures that assign combat damage in
@@ -36,75 +42,46 @@ use crate::turns;
 /// first strike nor double strike as the first combat damage step began, as well as the remaining
 /// attackers and blockers that currently have double strike. After that step, the phase proceeds
 /// to the end of combat step.
-pub fn r506_1_r510_4_r702_4b_r702_7b_combat_damage_steps(
-    mut step_started: MessageReader<turns::StepStarted>,
+pub fn r510_4_combat_damage_steps() -> ScheduleConfigs<ScheduleSystem> {
+    (
+        the_first_combat_damage_step.run_if(turns::Step::CombatDamage.begins()),
+        the_second_combat_damage_step.run_if(turns::Step::SecondCombatDamage.begins()),
+    )
+        .chain()
+}
+
+fn the_first_combat_damage_step(
     mut game: GameMut,
     mut participants: ResMut<turns::CombatDamageParticipants>,
-    attackers: Query<
-        (Entity, Has<cards::FirstStrike>, Has<cards::DoubleStrike>),
-        With<cards::Attacking>,
-    >,
-    blockers: Query<
-        (Entity, Has<cards::FirstStrike>, Has<cards::DoubleStrike>),
-        With<cards::Blocking>,
-    >,
+    combatants: Query<(Entity, Has<cards::FirstStrike>, Has<cards::DoubleStrike>), cards::InCombat>,
 ) {
-    let does_assign_in_first_step =
-        |first_strike: bool, double_strike: bool| first_strike || double_strike;
-    let does_assign_in_second_step =
-        |first_strike: bool, double_strike: bool| !first_strike || double_strike;
-    for step in step_started.read() {
-        match **step {
-            turns::Step::CombatDamage => {
-                let does_any_have_first_or_double_strike = attackers
-                    .iter()
-                    .chain(blockers.iter())
-                    .any(|(_, first_strike, double_strike)| {
-                        does_assign_in_first_step(first_strike, double_strike)
-                    });
-                if does_any_have_first_or_double_strike {
-                    game.add_step_after_this_one(turns::Step::SecondCombatDamage);
-                }
-                let does_assign = |first_strike: bool, double_strike: bool| {
-                    !does_any_have_first_or_double_strike
-                        || does_assign_in_first_step(first_strike, double_strike)
-                };
-                **participants = attackers
-                    .iter()
-                    .filter(|(_, first_strike, double_strike)| {
-                        does_assign(*first_strike, *double_strike)
-                    })
-                    .map(|(entity, _, _)| entity)
-                    .chain(
-                        blockers
-                            .iter()
-                            .filter(|(_, first_strike, double_strike)| {
-                                does_assign(*first_strike, *double_strike)
-                            })
-                            .map(|(entity, _, _)| entity),
-                    )
-                    .collect();
-            }
-            turns::Step::SecondCombatDamage => {
-                **participants = attackers
-                    .iter()
-                    .filter(|(_, first_strike, double_strike)| {
-                        does_assign_in_second_step(*first_strike, *double_strike)
-                    })
-                    .map(|(entity, _, _)| entity)
-                    .chain(
-                        blockers
-                            .iter()
-                            .filter(|(_, first_strike, double_strike)| {
-                                does_assign_in_second_step(*first_strike, *double_strike)
-                            })
-                            .map(|(entity, _, _)| entity),
-                    )
-                    .collect();
-            }
-            _ => {}
-        }
+    let with_first_or_double_strike: Vec<Entity> = combatants
+        .iter()
+        .filter(|(_, first_strike, double_strike)| *first_strike || *double_strike)
+        .map(|(entity, _, _)| entity)
+        .collect();
+    let does_a_second_step_happen = !with_first_or_double_strike.is_empty();
+    let participants_this_step: BTreeSet<Entity> = if does_a_second_step_happen {
+        with_first_or_double_strike.iter().copied().collect()
+    } else {
+        combatants.iter().map(|(entity, _, _)| entity).collect()
+    };
+    if does_a_second_step_happen {
+        game.add_step_after_this_one(turns::Step::SecondCombatDamage);
     }
+    **participants = participants_this_step;
+}
+
+fn the_second_combat_damage_step(
+    mut participants: ResMut<turns::CombatDamageParticipants>,
+    combatants: Query<(Entity, Has<cards::FirstStrike>, Has<cards::DoubleStrike>), cards::InCombat>,
+) {
+    let participants_this_step: BTreeSet<Entity> = combatants
+        .iter()
+        .filter(|(_, first_strike, double_strike)| !*first_strike || *double_strike)
+        .map(|(entity, _, _)| entity)
+        .collect();
+    **participants = participants_this_step;
 }
 
 #[cfg(test)]
