@@ -77,7 +77,9 @@ actions with no `pass_to` (`activate_ability(..).cast(..).targeting(..)`) are fi
 Raw `game.act(..)` stays only in tests that check the engine rejects an action
 (`game.last_rejection()`). A legal action has a verb (`p1.concede()`); if one is missing, add it in
 `src/testing/__app__/` instead of using `act`. No raw `game.app.update()` either: a battlefield static applies
-after the first `pass_priority` step, and a full pass rotation also ends the step (pools empty). Only a card that did not exist at setup (a token) is looked up
+after the first `pass_priority` step, a full pass rotation also ends the step (pools empty), and
+`p.pass_to(STEP)` reaches a later step. Answering a hook (`ChooseMay`, 103.6) is a legal action too: it
+has no verb yet, so the next test that needs it adds `choose_may` there. Only a card that did not exist at setup (a token) is looked up
 later, right after the step that creates it; an end-state check uses `.has(card)`.
 
 **Why:** the reader learns what is on the table before reading what happens to it, and a
@@ -160,9 +162,14 @@ removes an ability (e.g. Jump: "Target creature gains flying until end of turn")
 whether something is on the battlefield), read the derived component in the query filter,
 never the source component in the body. Type and keyword markers exist only for objects on the
 battlefield: a rule about a spell on the stack or a card elsewhere still reads `CardDefinition`.
-A keyword that only says "can't" needs no marker: it is a rule change in `keyword_modifications` (rules-style
-§11; hexproof vetoes `BecomeTarget`), and `Rules::mods` reads current characteristics, so a granted keyword
-works too. If a rule about the battlefield needs a marker that doesn't exist yet, add it to the layers in its
+A keyword that changes a rule needs no marker and is never named in a rule body: it is a rule change in
+`StaticKeyword::keyword_modifications`, and `Rules::mods` reads current characteristics, so a granted keyword
+works too. Pick the change by what the CR sentence does: "can't" vetoes an event (`Cant`/`OnlyIf`: indestructible
+→ `Destroy`, hexproof → `BecomeTarget`); "may … anyway" waives a clause (`Allow`/`AsThough`: haste, trample →
+510.1c `ONLY_BLOCKERS`); "is considered N" sets a value rule (`Set`: deathtouch → `LethalDamage`). The rule asks
+`answers.legal(..)` / `answers.value::<V>(entity)`, never `has_keyword` or a `has_x: bool` parameter. Switching a
+rule from a keyword read to a rule change fixes granted keywords: red first, with a real card that grants it.
+If a rule about the battlefield needs a marker that doesn't exist yet, add it to the layers in its
 own refactor commit, before the rule reads it: the struct in `cards/__basic__/components.rs` (+ re-export), a
 `Has<..>` field in `CurrentMarkers`, a `sync_marker` call in `write_markers`, and its line in that file's
 identity test; `PredicateRegistry` only if a rule asks through `rules::has`. If reading the marker fixes a bug,
