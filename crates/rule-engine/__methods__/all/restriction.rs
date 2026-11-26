@@ -6,7 +6,7 @@ use crate::statics;
 
 pub fn restriction<E: Event>(
     all: statics::All,
-    holder: rules::ArgId,
+    holder: impl Into<rules::ArgRef>,
     id: rules::RestrictionId,
     text: &'static str,
     requirement: rules::Condition,
@@ -16,7 +16,7 @@ pub fn restriction<E: Event>(
         modification: effects::Modification::Rule(rules::RuleChange {
             target: rules::Target::event::<E>(),
             change: rules::Change::Restrict {
-                holder,
+                holder: holder.into(),
                 restriction: id.restriction(text, requirement),
             },
         }),
@@ -48,7 +48,7 @@ mod tests {
             effects::Modification::Rule(rules::RuleChange {
                 target: rules::Target::event::<testing::RestrictedRule>(),
                 change: rules::Change::Restrict {
-                    holder: testing::RestrictedRule::ATTACKER,
+                    holder: testing::RestrictedRule::ATTACKER.into(),
                     restriction: rules::RestrictionId("test/restriction")
                         .restriction("attacks only with enough power", rules::Condition::True,),
                 },

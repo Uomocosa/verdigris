@@ -6,13 +6,15 @@ use crate::statics;
 pub fn as_though(
     all: statics::All,
     restriction: rules::RestrictionId,
-    holder: rules::ArgId,
+    holder: impl Into<rules::ArgRef>,
 ) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
         modification: effects::Modification::Rule(rules::RuleChange {
             target: rules::Target::Restriction(restriction),
-            change: rules::Change::AsThough { holder },
+            change: rules::Change::AsThough {
+                holder: holder.into(),
+            },
         }),
     }
 }
@@ -40,7 +42,7 @@ mod tests {
             effects::Modification::Rule(rules::RuleChange {
                 target: rules::Target::Restriction(rules::RestrictionId("test/untapped")),
                 change: rules::Change::AsThough {
-                    holder: testing::TestRule::ATTACKER,
+                    holder: testing::TestRule::ATTACKER.into(),
                 },
             })
         );

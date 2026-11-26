@@ -6,7 +6,6 @@ use crate::actions;
 use crate::cards;
 use crate::damage;
 use crate::events;
-use crate::players;
 use crate::rules;
 
 pub fn assigned_blocked_damage(
@@ -14,7 +13,6 @@ pub fn assigned_blocked_damage(
     source: Entity,
     amount: u32,
     defending: Entity,
-    controller: players::PlayerId,
     blockers: &Query<(
         Entity,
         &cards::Blocking,
@@ -43,7 +41,6 @@ pub fn assigned_blocked_damage(
                         target: blocker,
                         source,
                         amount: *amount,
-                        player: controller,
                     },
                 )
             })
@@ -74,7 +71,6 @@ pub fn assigned_blocked_damage(
         target: defending,
         source,
         amount,
-        player: controller,
     };
     let may_assign_to_defending = answers.legal(&defender_probe);
     match blockers_of.as_slice() {
@@ -185,7 +181,6 @@ mod tests {
                         source,
                         3,
                         defending,
-                        p1.id,
                         &blockers,
                         &participants,
                         &mut needed,
@@ -268,7 +263,6 @@ mod tests {
                         source,
                         3,
                         defending,
-                        p1.id,
                         &blockers,
                         &participants,
                         &mut needed,

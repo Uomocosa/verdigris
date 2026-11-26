@@ -9,25 +9,12 @@ pub fn legality<E: Event>(answers: &rules::Rules, event: &E) -> rules::Legality 
             restriction.unwaivable,
         )
     };
-    let added: Vec<rules::Restriction> = E::args()
-        .iter()
-        .filter_map(|id| {
-            event.arg(*id).and_then(|value| match value {
-                rules::ArgValue::Entity(entity) => Some((*id, entity)),
-                rules::ArgValue::Player(player) => Some((*id, *player)),
-                _ => None,
-            })
-        })
-        .flat_map(|(id, entity)| {
-            answers.changes(entity, rules::Target::event::<E>()).into_iter().filter_map(
-                move |change| match change {
-                    rules::Change::Restrict {
-                        holder,
-                        restriction,
-                    } if holder == id => Some(restriction),
-                    _ => None,
-                },
-            )
+    let added: Vec<rules::Restriction> = answers
+        .holder_changes(event, rules::Target::event::<E>())
+        .into_iter()
+        .filter_map(|change| match change {
+            rules::Change::Restrict { restriction, .. } => Some(restriction),
+            _ => None,
         })
         .collect();
     let base_and_added_hold = E::restrictions()
@@ -413,8 +400,7 @@ mod tests {
                     legality::<events::Destroy>(
                         &answers,
                         &events::Destroy {
-                            permanent: *protected,
-                            controller: p1.id,
+                            permanent: *protected
                         }
                     ),
                     rules::Legality::Illegal
@@ -423,8 +409,7 @@ mod tests {
                     legality::<events::Destroy>(
                         &answers,
                         &events::Destroy {
-                            permanent: *exposed,
-                            controller: p2.id,
+                            permanent: *exposed
                         }
                     ),
                     rules::Legality::Legal
@@ -441,28 +426,17 @@ mod tests {
             P2.battlefield([GRIZZLY_BEARS]),
         ]);
         let [protected] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        let [exposed] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
         game.pass_priority();
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
                 assert_eq!(
-                    legality::<events::Counter>(
-                        &answers,
-                        &events::Counter {
-                            spell: *protected,
-                            controller: p1.id,
-                        }
-                    ),
+                    legality::<events::Counter>(&answers, &events::Counter { spell: *protected }),
                     rules::Legality::Illegal
                 );
                 assert_eq!(
-                    legality::<events::Counter>(
-                        &answers,
-                        &events::Counter {
-                            spell: *protected,
-                            controller: p2.id,
-                        }
-                    ),
+                    legality::<events::Counter>(&answers, &events::Counter { spell: *exposed }),
                     rules::Legality::Legal
                 );
             })
@@ -527,7 +501,6 @@ mod tests {
                             source: *exposed,
                             recipient: *protected,
                             amount: 3,
-                            controller: p1.id,
                         }
                     ),
                     rules::Legality::Illegal
@@ -539,7 +512,6 @@ mod tests {
                             source: *exposed,
                             recipient: *exposed,
                             amount: 3,
-                            controller: p2.id,
                         }
                     ),
                     rules::Legality::Legal
@@ -551,7 +523,6 @@ mod tests {
                             source: *protected,
                             recipient: *exposed,
                             amount: 3,
-                            controller: p2.id,
                         }
                     ),
                     rules::Legality::Legal
@@ -573,7 +544,6 @@ mod tests {
                     source: *bears,
                     recipient: *p1,
                     amount: 0,
-                    controller: p1.id,
                 };
                 let one = events::DealDamage { amount: 1, ..zero };
                 assert_eq!(legality(&answers, &zero), rules::Legality::Illegal);

@@ -86,6 +86,13 @@ impl Rules<'_, '_> {
 
 #[atomic_delegates]
 impl Rules<'_, '_> {
+    pub(crate) fn holder_changes<E: rules::traits::event::Event>(
+        &self,
+        event: &E,
+        target: rules::Target,
+    ) -> Vec<rules::Change> {
+    }
+
     pub(crate) fn mods(&self, entity: Entity) -> Vec<effects::Modification> {}
 
     pub(crate) fn remaining_toughness(&self, subject: Entity) -> u32 {}
@@ -122,24 +129,18 @@ mod tests {
             source: *bears,
             recipient: *p2.id,
             amount: 3,
-            controller: p1.id,
         };
         let library_damage = events::DealDamage {
             source: *library_bears,
             recipient: *p2.id,
             amount: 3,
-            controller: p1.id,
         };
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
-                assert!(answers.performs(&events::TapAttacker {
-                    attacker: *bears,
-                    player: p1.id,
-                }));
+                assert!(answers.performs(&events::TapAttacker { attacker: *bears }));
                 assert!(!answers.performs(&events::TapAttacker {
                     attacker: *sovereign,
-                    player: p2.id,
                 }));
                 assert_eq!(
                     answers.resolve(events::DealDamage::SOURCE.controller(), &damage),

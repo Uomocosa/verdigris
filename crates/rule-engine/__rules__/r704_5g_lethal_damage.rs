@@ -10,17 +10,9 @@ use crate::damage;
 /// lethal damage and is destroyed. Regeneration can replace this event.
 pub fn r704_5g_lethal_damage(
     mut destructions: MessageWriter<Attempt<events::Destroy>>,
-    cards: Query<
-        (
-            Entity,
-            &cards::Controller,
-            &cards::EffectivePT,
-            &damage::Damage,
-        ),
-        With<cards::OnBattlefield>,
-    >,
+    cards: Query<(Entity, &cards::EffectivePT, &damage::Damage), With<cards::OnBattlefield>>,
 ) {
-    for (creature, controller, effective, damage) in cards.iter() {
+    for (creature, effective, damage) in cards.iter() {
         let marked = damage::Damage::signed_amount(**damage);
         let is_lethal = effective.toughness > 0 && marked > 0 && marked >= effective.toughness;
         if !is_lethal {
@@ -28,7 +20,6 @@ pub fn r704_5g_lethal_damage(
         }
         destructions.write(Attempt(events::Destroy {
             permanent: creature,
-            controller: **controller,
         }));
     }
 }

@@ -10,24 +10,11 @@ pub fn waived<E: Event>(
     if unwaivable {
         return false;
     }
-    E::args()
-        .iter()
-        .filter_map(|id| {
-            event.arg(*id).and_then(|value| match value {
-                rules::ArgValue::Entity(entity) => Some((*id, entity)),
-                rules::ArgValue::Player(player) => Some((*id, *player)),
-                _ => None,
-            })
-        })
-        .any(|(id, entity)| {
-            answers.changes(entity, target).iter().any(|change| match change {
-                rules::Change::AsThough { holder } => *holder == id,
-                rules::Change::Allow { holder, when } => {
-                    *holder == id && answers.eval(&when.bind(event), event, None)
-                }
-                _ => false,
-            })
-        })
+    answers.holder_changes(event, target).iter().any(|change| match change {
+        rules::Change::AsThough { .. } => true,
+        rules::Change::Allow { when, .. } => answers.eval(&when.bind(event), event, None),
+        _ => false,
+    })
 }
 
 #[cfg(test)]

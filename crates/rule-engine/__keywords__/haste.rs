@@ -19,7 +19,7 @@ impl Haste {
         vec![effects::Modification::Rule(rules::RuleChange {
             target: rules::Target::Restriction(events::declare_attacker::SUMMONING_SICK),
             change: rules::Change::AsThough {
-                holder: events::DeclareAttacker::ATTACKER,
+                holder: events::DeclareAttacker::ATTACKER.into(),
             },
         })]
     }
@@ -42,7 +42,7 @@ mod tests {
             vec![effects::Modification::Rule(rules::RuleChange {
                 target: rules::Target::Restriction(events::declare_attacker::SUMMONING_SICK),
                 change: rules::Change::AsThough {
-                    holder: events::DeclareAttacker::ATTACKER,
+                    holder: events::DeclareAttacker::ATTACKER.into(),
                 },
             })]
         );

@@ -1,8 +1,6 @@
 use bevy::prelude::Entity;
 use verdigris_event_derive::EventArgs;
 
-use crate::players;
-
 use crate::rules;
 use crate::rules::traits::event::Event;
 
@@ -10,8 +8,6 @@ use crate::rules::traits::event::Event;
 pub struct Destroy {
     #[arg]
     pub permanent: Entity,
-    #[arg]
-    pub controller: players::PlayerId,
 }
 
 impl Event for Destroy {
@@ -27,26 +23,17 @@ mod tests {
     use crate::rules::traits::event_args::EventArgs;
 
     use super::Destroy;
-    use crate::players;
 
     #[test]
     fn test_usage() {
         let permanent = Entity::PLACEHOLDER;
-        let controller = players::PlayerId(Entity::from_raw_u32(1).unwrap());
-        let event = Destroy {
-            permanent,
-            controller,
-        };
+        let event = Destroy { permanent };
         assert_eq!(
             event.arg(Destroy::PERMANENT),
             Some(rules::ArgValue::Entity(permanent))
         );
-        assert_eq!(
-            event.arg(Destroy::CONTROLLER),
-            Some(rules::ArgValue::Player(controller))
-        );
         assert_eq!(Destroy::ID, rules::EventId("701.8a/destroy"));
         assert_eq!(Destroy::restrictions(), Vec::new());
-        assert_eq!(Destroy::args(), &[Destroy::PERMANENT, Destroy::CONTROLLER,]);
+        assert_eq!(Destroy::args(), &[Destroy::PERMANENT,]);
     }
 }

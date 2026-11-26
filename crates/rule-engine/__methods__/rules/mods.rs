@@ -59,7 +59,7 @@ mod tests {
                         effects::Modification::Rule(rules::RuleChange {
                             target: rules::Target::Restriction(UNTAPPED),
                             change: rules::Change::AsThough {
-                                holder: TestRule::ATTACKER,
+                                holder: TestRule::ATTACKER.into(),
                             },
                         }),
                         effects::Modification::Rule(rules::RuleChange {
@@ -90,7 +90,7 @@ mod tests {
                         rules::RuleChange {
                             target: rules::Target::Restriction(keywords::Flying::FLYING_BLOCKERS),
                             change: rules::Change::AsThough {
-                                holder: events::DeclareBlocker::BLOCKER,
+                                holder: events::DeclareBlocker::BLOCKER.into(),
                             },
                         }
                     ))

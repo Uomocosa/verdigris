@@ -48,7 +48,6 @@ mod tests {
                     source: Entity::PLACEHOLDER,
                     recipient: *p2,
                     amount: 1,
-                    controller: p1.id,
                 };
                 assert!(affected_by(&all, &damage).is_empty());
             })

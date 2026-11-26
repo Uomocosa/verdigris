@@ -12,12 +12,7 @@ pub fn r704_5h_deathtouch_damage(
     mut destructions: MessageWriter<Attempt<events::Destroy>>,
     mut commands: Commands,
     cards: Query<
-        (
-            Entity,
-            &cards::Controller,
-            &cards::EffectivePT,
-            &damage::DealtByDeathtouch,
-        ),
+        (Entity, &cards::EffectivePT, &damage::DealtByDeathtouch),
         With<cards::OnBattlefield>,
     >,
     marked: Query<Entity, With<damage::DealtByDeathtouch>>,
@@ -25,11 +20,10 @@ pub fn r704_5h_deathtouch_damage(
     for creature in marked.iter() {
         commands.entity(creature).remove::<damage::DealtByDeathtouch>();
     }
-    for (creature, controller, effective, _) in cards.iter() {
+    for (creature, effective, _) in cards.iter() {
         if effective.toughness > 0 {
             destructions.write(Attempt(events::Destroy {
                 permanent: creature,
-                controller: **controller,
             }));
         }
     }

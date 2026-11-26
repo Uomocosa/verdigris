@@ -15,14 +15,14 @@ pub enum Amount {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Change {
     AsThough {
-        holder: rules::ArgId,
+        holder: rules::ArgRef,
     },
     Allow {
-        holder: rules::ArgId,
+        holder: rules::ArgRef,
         when: rules::Condition,
     },
     Restrict {
-        holder: rules::ArgId,
+        holder: rules::ArgRef,
         restriction: rules::Restriction,
     },
     Must,

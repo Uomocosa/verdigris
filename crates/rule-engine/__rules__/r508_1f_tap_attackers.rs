@@ -18,14 +18,11 @@ pub fn r508_1f_tap_attackers() -> ScheduleConfigs<ScheduleSystem> {
 }
 
 fn attempt_to_tap_attackers(
-    attackers: Query<(Entity, &cards::Controller), Added<cards::Attacking>>,
+    attackers: Query<Entity, Added<cards::Attacking>>,
     mut taps: MessageWriter<Attempt<events::TapAttacker>>,
 ) {
-    for (attacker, controller) in attackers.iter() {
-        taps.write(Attempt(events::TapAttacker {
-            attacker,
-            player: **controller,
-        }));
+    for attacker in attackers.iter() {
+        taps.write(Attempt(events::TapAttacker { attacker }));
     }
 }
 
@@ -36,7 +33,6 @@ fn tap_attacker(
     for attacker in attackers.read() {
         taps.write(Attempt(events::Tap {
             permanent: attacker.attacker,
-            controller: attacker.player,
         }));
     }
 }

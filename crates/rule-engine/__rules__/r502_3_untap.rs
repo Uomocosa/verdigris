@@ -26,10 +26,7 @@ fn untap(
     };
     for (entity, controller) in &tapped {
         if **controller == active_player.id {
-            untaps.write(Attempt(events::Untap {
-                permanent: entity,
-                controller: **controller,
-            }));
+            untaps.write(Attempt(events::Untap { permanent: entity }));
         }
     }
 }

@@ -26,19 +26,15 @@ mod tests {
     use bevy::prelude::Entity;
 
     use crate::events;
-    use crate::players;
 
     use super::Attempt;
 
     #[test]
     fn test_usage() {
-        let controller = players::PlayerId(Entity::from_raw_u32(1).unwrap());
         let untap = events::Untap {
             permanent: Entity::PLACEHOLDER,
-            controller,
         };
         let attempt = Attempt(untap);
         assert_eq!(attempt.permanent, Entity::PLACEHOLDER);
-        assert_eq!(attempt.controller, controller);
     }
 }

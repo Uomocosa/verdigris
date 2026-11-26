@@ -10,7 +10,7 @@ pub fn attack_as_though_it_had_haste(all: statics::All) -> abilities::Continuous
         modification: effects::Modification::Rule(rules::RuleChange {
             target: rules::Target::Restriction(events::declare_attacker::SUMMONING_SICK),
             change: rules::Change::AsThough {
-                holder: events::DeclareAttacker::ATTACKER,
+                holder: events::DeclareAttacker::ATTACKER.into(),
             },
         }),
     }
@@ -35,7 +35,7 @@ mod tests {
             effects::Modification::Rule(rules::RuleChange {
                 target: rules::Target::Restriction(events::declare_attacker::SUMMONING_SICK),
                 change: rules::Change::AsThough {
-                    holder: events::DeclareAttacker::ATTACKER,
+                    holder: events::DeclareAttacker::ATTACKER.into(),
                 },
             })
         );

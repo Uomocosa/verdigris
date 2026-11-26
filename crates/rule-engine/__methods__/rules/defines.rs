@@ -43,7 +43,6 @@ mod tests {
                     target: *bears,
                     source: *rats,
                     amount: 1,
-                    player: p1.id,
                 };
                 let one_from_plain = events::AssignCombatDamage {
                     source: *plain,

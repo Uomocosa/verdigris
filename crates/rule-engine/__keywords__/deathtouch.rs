@@ -19,7 +19,7 @@ impl Deathtouch {
         vec![effects::Modification::Rule(rules::RuleChange {
             target: rules::Target::Definition(rules::LETHAL_DAMAGE),
             change: rules::Change::Allow {
-                holder: events::AssignCombatDamage::SOURCE,
+                holder: events::AssignCombatDamage::SOURCE.into(),
                 when: events::AssignCombatDamage::AMOUNT.greater_than(0),
             },
         })]

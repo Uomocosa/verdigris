@@ -2,8 +2,6 @@ use atomic_delegate_macros::atomic_delegate;
 use bevy::prelude::Entity;
 use verdigris_event_derive::EventArgs;
 
-use crate::players;
-
 use crate::rules;
 use crate::rules::traits::event::Event;
 
@@ -17,8 +15,6 @@ pub struct DealDamage {
     pub recipient: Entity,
     #[arg]
     pub amount: u32,
-    #[arg]
-    pub controller: players::PlayerId,
 }
 
 impl Event for DealDamage {
@@ -40,26 +36,19 @@ mod tests {
     use crate::rules::traits::event_args::EventArgs;
 
     use super::DealDamage;
-    use crate::players;
 
     #[test]
     fn test_usage() {
         let source = Entity::PLACEHOLDER;
         let recipient = Entity::from_raw_u32(1).unwrap();
-        let controller = players::PlayerId(Entity::from_raw_u32(2).unwrap());
         let event = DealDamage {
             source,
             recipient,
             amount: 3,
-            controller,
         };
         assert_eq!(
             event.arg(DealDamage::RECIPIENT),
             Some(rules::ArgValue::Entity(recipient))
-        );
-        assert_eq!(
-            event.arg(DealDamage::CONTROLLER),
-            Some(rules::ArgValue::Player(controller))
         );
         assert_eq!(DealDamage::ID, rules::EventId("120.3/deal-damage"));
         let restrictions = DealDamage::restrictions();
@@ -84,7 +73,6 @@ mod tests {
                 DealDamage::SOURCE,
                 DealDamage::RECIPIENT,
                 DealDamage::AMOUNT,
-                DealDamage::CONTROLLER,
             ]
         );
     }

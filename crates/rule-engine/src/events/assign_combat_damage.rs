@@ -2,8 +2,6 @@ use atomic_delegate_macros::atomic_delegate;
 use bevy::prelude::Entity;
 use verdigris_event_derive::EventArgs;
 
-use crate::players;
-
 use crate::rules;
 use crate::rules::traits::event::Event;
 
@@ -17,8 +15,6 @@ pub struct AssignCombatDamage {
     pub source: Entity,
     #[arg]
     pub amount: u32,
-    #[arg]
-    pub player: players::PlayerId,
 }
 
 impl Event for AssignCombatDamage {
@@ -33,7 +29,6 @@ mod tests {
     use bevy::prelude::Entity;
 
     use crate::cards;
-    use crate::players;
     use crate::rules;
     use crate::rules::traits::event::Event;
     use crate::rules::traits::event_args::EventArgs;
@@ -44,12 +39,10 @@ mod tests {
     fn test_usage() {
         let target = Entity::from_raw_u32(1).unwrap();
         let source = Entity::PLACEHOLDER;
-        let player = players::PlayerId(Entity::from_raw_u32(2).unwrap());
         let event = AssignCombatDamage {
             target,
             source,
             amount: 3,
-            player,
         };
         assert_eq!(
             event.arg(AssignCombatDamage::TARGET),
@@ -58,10 +51,6 @@ mod tests {
         assert_eq!(
             event.arg(AssignCombatDamage::SOURCE),
             Some(rules::ArgValue::Entity(source))
-        );
-        assert_eq!(
-            event.arg(AssignCombatDamage::PLAYER),
-            Some(rules::ArgValue::Player(player))
         );
         assert_eq!(
             AssignCombatDamage::ID,
@@ -85,7 +74,6 @@ mod tests {
                 AssignCombatDamage::TARGET,
                 AssignCombatDamage::SOURCE,
                 AssignCombatDamage::AMOUNT,
-                AssignCombatDamage::PLAYER,
             ]
         );
     }

@@ -21,7 +21,7 @@ impl Indestructible {
         vec![effects::Modification::Rule(rules::RuleChange {
             target: rules::Target::event::<events::Destroy>(),
             change: rules::Change::Restrict {
-                holder: events::Destroy::PERMANENT,
+                holder: events::Destroy::PERMANENT.into(),
                 restriction: Self::CANT_BE_DESTROYED
                     .restriction("can’t be destroyed", !rules::Condition::True),
             },

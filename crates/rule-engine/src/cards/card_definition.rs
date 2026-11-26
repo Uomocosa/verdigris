@@ -9,7 +9,6 @@ use crate::cards;
 use crate::damage;
 use crate::effects;
 use crate::keywords;
-use crate::players;
 use crate::rules;
 #[cfg(feature = "testing")]
 use crate::testing;
@@ -147,7 +146,6 @@ impl CardDefinition {
         source: Entity,
         amount: u32,
         defending: Entity,
-        controller: players::PlayerId,
         blockers: &Query<(
             Entity,
             &cards::Blocking,

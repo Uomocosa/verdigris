@@ -1,8 +1,6 @@
 use bevy::prelude::Entity;
 use verdigris_event_derive::EventArgs;
 
-use crate::players;
-
 use crate::rules;
 use crate::rules::traits::event::Event;
 
@@ -10,8 +8,6 @@ use crate::rules::traits::event::Event;
 pub struct Counter {
     #[arg]
     pub spell: Entity,
-    #[arg]
-    pub controller: players::PlayerId,
 }
 
 impl Event for Counter {
@@ -27,23 +23,17 @@ mod tests {
     use crate::rules::traits::event_args::EventArgs;
 
     use super::Counter;
-    use crate::players;
 
     #[test]
     fn test_usage() {
         let spell = Entity::PLACEHOLDER;
-        let controller = players::PlayerId(Entity::from_raw_u32(1).unwrap());
-        let event = Counter { spell, controller };
+        let event = Counter { spell };
         assert_eq!(
             event.arg(Counter::SPELL),
             Some(rules::ArgValue::Entity(spell))
         );
-        assert_eq!(
-            event.arg(Counter::CONTROLLER),
-            Some(rules::ArgValue::Player(controller))
-        );
         assert_eq!(Counter::ID, rules::EventId("701.6a/counter"));
         assert_eq!(Counter::restrictions(), Vec::new());
-        assert_eq!(Counter::args(), &[Counter::SPELL, Counter::CONTROLLER,]);
+        assert_eq!(Counter::args(), &[Counter::SPELL,]);
     }
 }

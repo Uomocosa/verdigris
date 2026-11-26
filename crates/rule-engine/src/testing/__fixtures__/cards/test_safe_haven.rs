@@ -19,7 +19,7 @@ pub const TEST_SAFE_HAVEN: testing::Card = testing::Card {
                 "can’t be destroyed",
             ),
             statics::you().cant::<events::Counter>(
-                events::Counter::CONTROLLER,
+                events::Counter::SPELL.controller(),
                 rules::RestrictionId("test/test-safe-haven"),
                 "can’t be countered",
             ),

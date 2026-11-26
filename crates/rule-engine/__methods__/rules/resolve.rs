@@ -52,7 +52,6 @@ mod tests {
             source: *bears,
             recipient: *p1.id,
             amount: 2,
-            controller: p1.id,
         };
         game.app
             .world_mut()

@@ -57,12 +57,10 @@ mod tests {
     fn deal_damage_affects_its_recipient_only() {
         let source = Entity::from_raw_u32(1).unwrap();
         let recipient = Entity::from_raw_u32(2).unwrap();
-        let controller = players::PlayerId(Entity::from_raw_u32(3).unwrap());
         let event = events::DealDamage {
             source,
             recipient,
             amount: 1,
-            controller,
         };
         assert_eq!(event.affected(), vec![recipient]);
     }

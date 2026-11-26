@@ -1,7 +1,7 @@
 use crate::events;
 use bevy::ecs::schedule::{IntoScheduleConfigs, ScheduleConfigs, SystemCondition};
 use bevy::ecs::system::ScheduleSystem;
-use bevy::prelude::{Entity, MessageReader, MessageWriter, ParamSet, Query, Res, With};
+use bevy::prelude::{Entity, MessageReader, MessageWriter, Query, Res, With};
 
 use crate::Attempt;
 use crate::actions;
@@ -10,20 +10,6 @@ use crate::damage;
 use crate::players;
 use crate::rules;
 use crate::turns;
-
-type CombatLookups<'w, 's> = (
-    Query<
-        'w,
-        's,
-        (
-            Entity,
-            &'s cards::Blocking,
-            Option<&'s damage::Damage>,
-            Option<&'s cards::EffectivePT>,
-        ),
-    >,
-    Query<'w, 's, &'s cards::Controller>,
-);
 
 /// 510.1. First, the active player announces how each attacking creature assigns its combat damage,
 /// then the defending player announces how each blocking creature assigns its combat damage. This
@@ -96,15 +82,15 @@ fn announce_combat_damage(
     mut asks: MessageWriter<actions::Ask>,
     mut dealt: MessageWriter<Attempt<events::DealDamage>>,
     attackers: Query<
-        (
-            Entity,
-            &cards::Controller,
-            Option<&cards::Blocked>,
-            cards::CurrentMarkers<'_>,
-        ),
+        (Entity, Option<&cards::Blocked>, cards::CurrentMarkers<'_>),
         With<cards::Attacking>,
     >,
-    mut lookups: ParamSet<CombatLookups<'_, '_>>,
+    lookups: Query<(
+        Entity,
+        &cards::Blocking,
+        Option<&damage::Damage>,
+        Option<&cards::EffectivePT>,
+    )>,
     answers: rules::Rules,
     defenders: Query<Entity, With<players::DefendingPlayer>>,
     state: Res<turns::TurnState>,
@@ -116,7 +102,7 @@ fn announce_combat_damage(
         return;
     };
     let mut needed: Vec<actions::RequiredCombatDamage> = Vec::new();
-    for (attacker, controller, blocked, markers) in attackers.iter() {
+    for (attacker, blocked, markers) in attackers.iter() {
         let Some(effective) = markers.effective else {
             continue;
         };
@@ -129,7 +115,6 @@ fn announce_combat_damage(
                 source: attacker,
                 recipient: defending,
                 amount,
-                controller: recipient_controller(&lookups.p1(), defending),
             }));
         } else {
             for write in cards::CardDefinition::assigned_blocked_damage(
@@ -137,12 +122,11 @@ fn announce_combat_damage(
                 attacker,
                 amount,
                 defending,
-                **controller,
-                &lookups.p0(),
+                &lookups,
                 participants,
                 &mut needed,
             ) {
-                dealt.write(announce_damage(write, &lookups.p1()));
+                dealt.write(announce_damage(write));
             }
         }
     }
@@ -159,7 +143,6 @@ fn announce_combat_damage(
 fn deal_assigned_combat_damage(
     mut answers: MessageReader<actions::Answered>,
     mut dealt: MessageWriter<Attempt<events::DealDamage>>,
-    controllers: Query<&cards::Controller>,
 ) {
     for answered in answers.read() {
         let actions::Choice::CombatDamage(choice) = &answered.choice else {
@@ -170,29 +153,18 @@ fn deal_assigned_combat_damage(
         };
         if let Some(writes) = choice.assigned_damage(assignments) {
             for write in writes {
-                dealt.write(announce_damage(write, &controllers));
+                dealt.write(announce_damage(write));
             }
         }
     }
 }
 
-fn announce_damage(
-    assigned: damage::AssignedDamage,
-    controllers: &Query<&cards::Controller>,
-) -> Attempt<events::DealDamage> {
+const fn announce_damage(assigned: damage::AssignedDamage) -> Attempt<events::DealDamage> {
     Attempt(events::DealDamage {
         source: assigned.source,
         recipient: assigned.target,
         amount: assigned.amount,
-        controller: recipient_controller(controllers, assigned.target),
     })
-}
-
-fn recipient_controller(
-    controllers: &Query<&cards::Controller>,
-    recipient: Entity,
-) -> players::PlayerId {
-    controllers.get(recipient).map_or(players::PlayerId(recipient), |controller| **controller)
 }
 
 #[cfg(test)]

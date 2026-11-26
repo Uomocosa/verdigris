@@ -40,7 +40,7 @@ mod tests {
                 assert_eq!(
                     changes(&answers, *waiver, rules::Target::Restriction(UNTAPPED)),
                     vec![rules::Change::AsThough {
-                        holder: TestRule::ATTACKER
+                        holder: TestRule::ATTACKER.into()
                     }]
                 );
                 assert_eq!(

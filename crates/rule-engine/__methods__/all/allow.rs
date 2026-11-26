@@ -7,14 +7,14 @@ pub fn allow(
     all: statics::All,
     restriction: rules::RestrictionId,
     alternative: rules::Condition,
-    holder: rules::ArgId,
+    holder: impl Into<rules::ArgRef>,
 ) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
         modification: effects::Modification::Rule(rules::RuleChange {
             target: rules::Target::Restriction(restriction),
             change: rules::Change::Allow {
-                holder,
+                holder: holder.into(),
                 when: alternative,
             },
         }),
@@ -46,7 +46,7 @@ mod tests {
             effects::Modification::Rule(rules::RuleChange {
                 target: rules::Target::Restriction(rules::RestrictionId("test/untapped")),
                 change: rules::Change::Allow {
-                    holder: testing::TestRule::ATTACKER,
+                    holder: testing::TestRule::ATTACKER.into(),
                     when: rules::has::<cards::Flying>().of(testing::TestRule::ATTACKER),
                 },
             })

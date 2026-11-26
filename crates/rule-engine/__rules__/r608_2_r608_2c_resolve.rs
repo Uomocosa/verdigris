@@ -70,31 +70,17 @@ pub fn r608_2_r608_2c_resolve(
         for kind in std::iter::once(effect.kind).chain(effect.follow_ups.into_iter().flatten()) {
             match kind {
                 effects::EffectKind::Damage(amount) => {
-                    request_damage(
-                        &mut damage_dealt,
-                        &lookups,
-                        spell,
-                        chosen_target,
-                        controller,
-                        amount,
-                    );
+                    request_damage(&mut damage_dealt, &lookups, spell, chosen_target, amount);
                 }
                 effects::EffectKind::Destroy => {
-                    request_destroy(&mut destructions, &lookups, battlefield_target, controller);
+                    request_destroy(&mut destructions, battlefield_target);
                 }
                 #[rustfmt::skip]
                 effects::EffectKind::Exile => {
                     request_exile(&mut exiles, &lookups, spell, chosen_target);
                 }
                 effects::EffectKind::Counter => {
-                    request_counter(
-                        &mut countered,
-                        &lookups,
-                        chosen_target,
-                        target_zone,
-                        &zones,
-                        controller,
-                    );
+                    request_counter(&mut countered, chosen_target, target_zone, &zones);
                 }
                 effects::EffectKind::CreateTokens { count, definition } => {
                     request_tokens(&mut effect_messages.p3(), controller, count, definition);
@@ -195,34 +181,24 @@ fn effect_of(lookups: &stack::ResolutionLookups<'_, '_>, spell: Entity) -> Optio
 
 fn request_destroy(
     destructions: &mut MessageWriter<Attempt<events::Destroy>>,
-    lookups: &stack::ResolutionLookups<'_, '_>,
     target: Option<Entity>,
-    controller: players::PlayerId,
 ) {
     if let Some(target) = target {
-        destructions.write(Attempt(events::Destroy {
-            permanent: target,
-            controller: permanent_controller(lookups, target, controller),
-        }));
+        destructions.write(Attempt(events::Destroy { permanent: target }));
     }
 }
 
 fn request_counter(
     countered: &mut MessageWriter<Attempt<events::Counter>>,
-    lookups: &stack::ResolutionLookups<'_, '_>,
     target: Option<Entity>,
     target_zone: Option<&zones::InZone>,
     zones: &zones::ZoneLookup,
-    controller: players::PlayerId,
 ) {
     let target_on_stack = target_zone.is_some_and(|zone| zones.contains(STACK, **zone));
     if let Some(target) = target
         && target_on_stack
     {
-        countered.write(Attempt(events::Counter {
-            spell: target,
-            controller: permanent_controller(lookups, target, controller),
-        }));
+        countered.write(Attempt(events::Counter { spell: target }));
     }
 }
 
@@ -286,7 +262,6 @@ fn request_damage(
     lookups: &stack::ResolutionLookups<'_, '_>,
     spell: Entity,
     target: Option<Entity>,
-    controller: players::PlayerId,
     amount: u32,
 ) {
     let Some(target) = target else {
@@ -302,19 +277,7 @@ fn request_damage(
         source: spell,
         recipient: target,
         amount,
-        controller: permanent_controller(lookups, target, controller),
     }));
-}
-
-fn permanent_controller(
-    lookups: &stack::ResolutionLookups<'_, '_>,
-    target: Entity,
-    fallback: players::PlayerId,
-) -> players::PlayerId {
-    if lookups.lives.get(target).is_ok() {
-        return players::PlayerId(target);
-    }
-    lookups.controllers.get(target).map_or(fallback, |controller| **controller)
 }
 
 fn request_draws(

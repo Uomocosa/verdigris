@@ -21,7 +21,7 @@ impl Reach {
         vec![effects::Modification::Rule(rules::RuleChange {
             target: rules::Target::Restriction(keywords::Flying::FLYING_BLOCKERS),
             change: rules::Change::AsThough {
-                holder: events::DeclareBlocker::BLOCKER,
+                holder: events::DeclareBlocker::BLOCKER.into(),
             },
         })]
     }
@@ -45,7 +45,7 @@ mod tests {
             vec![effects::Modification::Rule(rules::RuleChange {
                 target: rules::Target::Restriction(keywords::Flying::FLYING_BLOCKERS),
                 change: rules::Change::AsThough {
-                    holder: events::DeclareBlocker::BLOCKER,
+                    holder: events::DeclareBlocker::BLOCKER.into(),
                 },
             })]
         );

@@ -53,12 +53,7 @@ pub fn is_legal_target(
                 && in_zone.is_some_and(|in_zone| targeting.zones.contains(STACK, **in_zone))
         }
     };
-    matches_filter
-        && targeting.answers.legal(&events::BecomeTarget {
-            target,
-            spell,
-            player: controller,
-        })
+    matches_filter && targeting.answers.legal(&events::BecomeTarget { target, spell })
 }
 
 #[cfg(test)]
