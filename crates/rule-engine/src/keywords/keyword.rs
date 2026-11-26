@@ -27,7 +27,7 @@ impl Keyword {
     }
 
     #[must_use]
-    pub fn from_with<P>(
+    pub fn from_params<P>(
         id: keywords::KeywordId,
         params: P,
         abilities: fn(&P) -> Vec<effects::Modification>,

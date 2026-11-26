@@ -5,7 +5,7 @@ use crate::keywords;
 /// restricts what an Aura spell can target and what an Aura can enchant.
 #[must_use]
 pub fn r702_5a_enchant(filter: effects::Filter) -> keywords::Keyword {
-    keywords::Keyword::from_with(ID, keywords::EnchantFilter(filter), |_| Vec::new())
+    keywords::Keyword::from_params(ID, keywords::EnchantFilter(filter), |_| Vec::new())
 }
 
 pub const ID: keywords::KeywordId = keywords::KeywordId("702.5/enchant");

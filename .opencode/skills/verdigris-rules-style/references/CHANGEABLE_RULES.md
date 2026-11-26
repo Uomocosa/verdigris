@@ -292,7 +292,7 @@ rules::RuleChange {
 **A keyword = marker (id) + abilities, one file per keyword.** `__keywords__/r702_9b_flying.rs`: the
 `pub fn` is named after the file stem, `pub const ID` is the marker, owned restriction ids
 (`BLOCKERS`) live next to it, and the private `abilities()` returns the `RuleChange`s. Plain
-keywords use `Keyword::from_plain(ID, abilities)`; parameterised ones use `Keyword::from_with`
+keywords use `Keyword::from_plain(ID, abilities)`; parameterised ones use `Keyword::from_params`
 (`src/keywords/keyword.rs`). Card text calls the alias (`keywords::flying()`, re-exported from
 `src/keywords/__basic__/card_text.rs`); the file's own consts are reached as
 `keywords::flying::BLOCKERS` (`src/keywords/mod.rs` re-exports each file `pub(crate)`).
