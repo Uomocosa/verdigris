@@ -110,6 +110,9 @@ Cards in tests come from `testing` fixtures (`testing::GARRUKS_COMPANION`,
 `testing::GRIZZLY_BEARS`, …; call `(FIXTURE.definition)()` where a `CardDefinition` is
 needed), never `cards::creature(..)` built in a test (RATIONALE §20, SMELLS S11). A
 missing card gets a new fixture in `crates/rule-engine/src/testing/__fixtures__/`.
+A static ability of a permanent (`statics::all(..)`, `TEST_NO_BURIALS`) only reaches the battlefield; to
+change an event for a card on the stack or in a library, give that card its own replacement
+(`TEST_NEVER_BURIED`).
 
 ```rust
 // Good

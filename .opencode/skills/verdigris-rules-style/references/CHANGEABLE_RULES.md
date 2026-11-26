@@ -105,6 +105,9 @@ add an event, clause or value rule, register it.
    fields (`Draw { player, amount }`). `impl Event` with `ID` = CR number, `Context` for roles.
 2. If the CR lists conditions, write them as `clauses()` with `ClauseId` consts, text quoted
    VERBATIM from `docs/MagicCompRules-*.txt` (keep the verbatim test).
+   A condition on the event's own numbers is a clause too: `rules::event_field(rules::Field::Amount, ..)`
+   (120.8 `events::deal_damage::NONZERO_DAMAGE`). The same `if event.amount == 0` in several rules is
+   such a clause.
 3. The `__rules__` system that owns the action writes `Attempt<E>` instead of acting directly; the pipeline decides; the owning system reads `Resolve<E>` and performs only what comes out.
 4. Register the event (section 2).
 

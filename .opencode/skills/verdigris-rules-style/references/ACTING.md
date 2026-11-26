@@ -36,15 +36,14 @@ Only the system that performs an event writes its result; every other rule sends
 
 Two rules writing the same component is the same smell: make one event and one performer.
 
-Some older rules do not follow this yet: counter, mill and finished spells still insert
-`InZone(graveyard)` themselves instead of sending `PutIntoGraveyard`. Don't copy them. A direct
-write skips every `Cant` / `Instead` on the event, so converting one is usually a CR fix: red first
-(destroy skipped "can't be put into a graveyard" until `r701_8a_destroy` sent the event).
+Old direct writers left: `r608_2n` (finished spells) still inserts `InZone(graveyard)` itself; don't copy
+it. `r608_2b` must stay direct: 608.2c reads the stack in the same set. A direct write skips every
+`Cant` / `Instead` on the event, so converting one is a CR fix: red first, with a card that forbids the
+event in that zone (destroy, counter and mill each skipped "can't be put into a graveyard").
 
-Before replacing a direct write with an event, check WHEN the event is performed:
-`PutIntoGraveyard` is resolved only in the state-based pass, after `RuleSet::Resolution`. A rule that
-others in the same set rely on (608.2b must take the spell off the stack before 608.2c reads it)
-can't just send the event; plan the ordering too.
+`PutIntoGraveyard` is announced in any set and performed in the state-based pass of the same frame,
+before anyone gets priority. That is safe unless another system in the announcing set reads the zone
+afterwards; check that one case. Register a performer once: a second registration performs the event twice.
 
 ## 10. A rule is a hook point
 
