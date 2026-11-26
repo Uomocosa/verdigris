@@ -49,6 +49,9 @@ pub use gain_life::GainLife;
 mod give_poison_counters;
 pub use give_poison_counters::GivePoisonCounters;
 
+mod join_combat_damage_step;
+pub use join_combat_damage_step::JoinCombatDamageStep;
+
 mod lose_game;
 pub use lose_game::LoseGame;
 

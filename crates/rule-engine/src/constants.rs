@@ -129,3 +129,6 @@ pub const THIS: effects::Target = effects::Target {
 };
 
 pub const LOSES_LIFE: rules::ResultId = rules::ResultId("120.3a/loses-life");
+
+pub const FIRST_COMBAT_DAMAGE_STEP: rules::DefinitionId = rules::DefinitionId("510.4/first-step");
+pub const ASSIGNS_AGAIN: rules::DefinitionId = rules::DefinitionId("510.4/assigns-again");

@@ -1,5 +1,8 @@
+use crate::FIRST_COMBAT_DAMAGE_STEP;
 use crate::effects;
+use crate::events;
 use crate::keywords;
+use crate::rules;
 
 /// 702.7b If at least one attacking or blocking creature has first strike or double strike (see
 /// rule 702.4) as the combat damage step begins, the only creatures that assign combat damage in
@@ -16,8 +19,14 @@ pub fn r702_7b_first_strike() -> keywords::Keyword {
 
 pub const ID: keywords::KeywordId = keywords::KeywordId("702.7/first-strike");
 
-const fn abilities() -> Vec<effects::Modification> {
-    Vec::new()
+fn abilities() -> Vec<effects::Modification> {
+    vec![effects::Modification::Rule(rules::RuleChange {
+        target: rules::Target::Definition(FIRST_COMBAT_DAMAGE_STEP),
+        change: rules::Change::Allow {
+            holder: events::JoinCombatDamageStep::CREATURE.into(),
+            when: rules::Condition::True,
+        },
+    })]
 }
 
 #[cfg(test)]

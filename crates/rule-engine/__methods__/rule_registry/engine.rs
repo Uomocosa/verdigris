@@ -8,99 +8,97 @@ use crate::rules::traits::hook_event::HookEvent;
 use crate::rules::traits::value_rule::ValueRule;
 #[cfg(any(test, feature = "testing"))]
 use crate::testing;
+use crate::{ASSIGNS_AGAIN, FIRST_COMBAT_DAMAGE_STEP};
 
 pub fn engine() -> rules::RuleRegistry {
     let mut events = HashSet::<rules::EventId>::new();
     let mut restrictions = HashSet::<rules::RestrictionId>::new();
     let mut duplicates = Vec::<rules::EventId>::new();
-    let mut register = |id: rules::EventId, list: Vec<rules::Restriction>| {
-        if !events.insert(id) {
-            duplicates.push(id);
-        }
-        restrictions.extend(list.iter().map(|restriction| restriction.id));
-    };
-    register(events::AddPhase::ID, events::AddPhase::restrictions());
-    register(
+    let mut ids = vec![
+        events::AddPhase::ID,
         events::AssignCombatDamage::ID,
-        events::AssignCombatDamage::restrictions(),
-    );
-    register(
         events::BecomeTarget::ID,
-        events::BecomeTarget::restrictions(),
-    );
-    register(events::CastSpell::ID, events::CastSpell::restrictions());
-    register(events::Counter::ID, events::Counter::restrictions());
-    register(
+        events::CastSpell::ID,
+        events::Counter::ID,
         events::CreateTokens::ID,
-        events::CreateTokens::restrictions(),
-    );
-    register(events::DealDamage::ID, events::DealDamage::restrictions());
-    register(
+        events::DealDamage::ID,
         events::DeclareAttacker::ID,
-        events::DeclareAttacker::restrictions(),
-    );
-    register(
         events::DeclareAttackers::ID,
-        events::DeclareAttackers::restrictions(),
-    );
-    register(
         events::DeclareBlocker::ID,
-        events::DeclareBlocker::restrictions(),
-    );
-    register(events::Destroy::ID, events::Destroy::restrictions());
-    register(events::Discard::ID, events::Discard::restrictions());
-    register(events::DiscardCard::ID, events::DiscardCard::restrictions());
-    register(events::Draw::ID, events::Draw::restrictions());
-    register(
+        events::Destroy::ID,
+        events::Discard::ID,
+        events::DiscardCard::ID,
+        events::Draw::ID,
         events::DrawFromEmptyLibrary::ID,
-        events::DrawFromEmptyLibrary::restrictions(),
-    );
-    register(
         events::EnterBattlefield::ID,
-        events::EnterBattlefield::restrictions(),
-    );
-    register(events::Exile::ID, events::Exile::restrictions());
-    register(events::GainLife::ID, events::GainLife::restrictions());
-    register(events::LoseGame::ID, events::LoseGame::restrictions());
-    register(events::LoseLife::ID, events::LoseLife::restrictions());
-    register(
+        events::Exile::ID,
+        events::GainLife::ID,
+        events::JoinCombatDamageStep::ID,
+        events::LoseGame::ID,
+        events::LoseLife::ID,
         events::LoseUnspentMana::ID,
-        events::LoseUnspentMana::restrictions(),
-    );
-    register(events::Mill::ID, events::Mill::restrictions());
-    register(events::PlayLand::ID, events::PlayLand::restrictions());
-    register(
+        events::Mill::ID,
+        events::PlayLand::ID,
         events::PutIntoGraveyard::ID,
-        events::PutIntoGraveyard::restrictions(),
-    );
-    register(events::Tap::ID, events::Tap::restrictions());
-    register(events::TapAttacker::ID, events::TapAttacker::restrictions());
-    register(events::Untap::ID, events::Untap::restrictions());
-    register(events::WinGame::ID, events::WinGame::restrictions());
-    register(
+        events::Tap::ID,
+        events::TapAttacker::ID,
+        events::Untap::ID,
+        events::WinGame::ID,
         events::OpeningHandAction::ID,
-        events::OpeningHandAction::restrictions(),
-    );
-    register(
         events::BeginTheGameOnTheBattlefield::ID,
+    ];
+    let mut lists = vec![
+        events::AddPhase::restrictions(),
+        events::AssignCombatDamage::restrictions(),
+        events::BecomeTarget::restrictions(),
+        events::CastSpell::restrictions(),
+        events::Counter::restrictions(),
+        events::CreateTokens::restrictions(),
+        events::DealDamage::restrictions(),
+        events::DeclareAttacker::restrictions(),
+        events::DeclareAttackers::restrictions(),
+        events::DeclareBlocker::restrictions(),
+        events::Destroy::restrictions(),
+        events::Discard::restrictions(),
+        events::DiscardCard::restrictions(),
+        events::Draw::restrictions(),
+        events::DrawFromEmptyLibrary::restrictions(),
+        events::EnterBattlefield::restrictions(),
+        events::Exile::restrictions(),
+        events::GainLife::restrictions(),
+        events::JoinCombatDamageStep::restrictions(),
+        events::LoseGame::restrictions(),
+        events::LoseLife::restrictions(),
+        events::LoseUnspentMana::restrictions(),
+        events::Mill::restrictions(),
+        events::PlayLand::restrictions(),
+        events::PutIntoGraveyard::restrictions(),
+        events::Tap::restrictions(),
+        events::TapAttacker::restrictions(),
+        events::Untap::restrictions(),
+        events::WinGame::restrictions(),
+        events::OpeningHandAction::restrictions(),
         events::BeginTheGameOnTheBattlefield::restrictions(),
-    );
+    ];
     #[cfg(any(test, feature = "testing"))]
     {
-        register(testing::TestRule::ID, testing::TestRule::restrictions());
-        register(
-            testing::AbsoluteRule::ID,
-            testing::AbsoluteRule::restrictions(),
-        );
-        register(
-            testing::RestrictedRule::ID,
-            testing::RestrictedRule::restrictions(),
-        );
-        register(testing::TestStep::ID, testing::TestStep::restrictions());
+        ids.push(testing::TestRule::ID);
+        lists.push(testing::TestRule::restrictions());
+        ids.push(testing::AbsoluteRule::ID);
+        lists.push(testing::AbsoluteRule::restrictions());
+        ids.push(testing::RestrictedRule::ID);
+        lists.push(testing::RestrictedRule::restrictions());
+        ids.push(testing::TestStep::ID);
+        lists.push(testing::TestStep::restrictions());
+    }
+    for (id, list) in ids.into_iter().zip(lists) {
+        duplicates.extend((!events.insert(id)).then_some(id));
+        restrictions.extend(list.iter().map(|restriction| restriction.id));
     }
     restrictions.extend(rules::RuleRegistry::keyword_restriction_ids());
     let results = HashSet::from([LOSES_LIFE]);
-    let definitions = HashSet::from([rules::LETHAL_DAMAGE]);
+    let mut definitions = HashSet::from([rules::LETHAL_DAMAGE]);
+    definitions.extend([FIRST_COMBAT_DAMAGE_STEP, ASSIGNS_AGAIN]);
     let values = HashSet::from([rules::LandPlays::ID, rules::MaximumHandSize::ID]);
     rules::RuleRegistry {
         events,
