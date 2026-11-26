@@ -12,7 +12,7 @@ happens it is announced as `Attempt<E>` and passes through a fixed **pipeline**:
 Attempt<E> -> 1. Permission (may E happen?  clauses + AsThough / Allow / OnlyIf / Cant)
           -> 2. Replacement (614: does E become other events? Instead / Modify)
 Resolve<E>                  (nothing can stop E any more; only the pipeline writes it, plus the
-                           unstoppable rules listed in ../SKILL.md §5)
+                           unstoppable rules listed in ACTING.md §5)
           -> 3. Perform     (the CR's default result, in the __rules__ system that owns E,
                            which reads Resolve<E>; an event whose CR default is
                            "nothing" has no such system)
@@ -115,7 +115,7 @@ existing builder fits. Prefer reusing `as_though`, `allow`, `restriction`, `inst
 **Replacement order** (616): earliest timestamp first; a replacement applies at most once to an
 event (track applied effects on the event while it is re-announced). Player choice among
 replacements (616.1) is NOT implemented yet. An optional "you may ... instead" belongs to
-the change: `then: may(event)`. The pipeline asks through the shared ask / answer (`../SKILL.md` §12)
+the change: `then: may(event)`. The pipeline asks through the shared ask / answer (`ACTING.md` §12)
 and announces the event only on a yes. Never an implicit default, never a question in the rule.
 
 ```rust
@@ -152,7 +152,7 @@ A hook on permanents needs a controller, which the engine doesn't have yet (`Hoo
 `cards::Owner`), so 502.1 phasing waits for it. "At the beginning of ..." is a triggered ability,
 never a hook.
 
-**Skipping a step**: a CR rule changes `turns::NextStep` (SKILL.md §17). No card skips a step
+**Skipping a step**: a CR rule changes `turns::NextStep` (`TURNS.md` §17). No card skips a step
 yet; the first one makes `NextStep` go through the pipeline.
 
 **A card that works outside the battlefield** (611.3b "or the object generating it is in the

@@ -1,6 +1,6 @@
 ---
 name: verdigris-rules-style
-description: Use before adding, changing or reviewing ANY rule system, game action, card effect, static ability, replacement effect or rule-changing card in verdigris. Says how a __rules__ body reads (like the Comprehensive Rules sentence it quotes) and how it acts (Attempt / Resolve, one writer per outcome). Its references/CHANGEABLE_RULES.md defines the event pipeline and MUST be read. Read together with verdigris-style.
+description: Use before adding, changing or reviewing ANY rule system, game action, card effect, static ability, replacement effect or rule-changing card in verdigris. Says how a __rules__ body reads (like the Comprehensive Rules sentence it quotes) and how it acts (Attempt / Resolve, one writer per outcome). Its references/CHANGEABLE_RULES.md (event pipeline) and references/ACTING.md (what a rule writes) MUST be read; references/TURNS.md for turn, priority and step rules. Read together with verdigris-style.
 ---
 
 # verdigris-rules-style
@@ -8,7 +8,11 @@ description: Use before adding, changing or reviewing ANY rule system, game acti
 ## 0. MUST read first
 
 1. `references/CHANGEABLE_RULES.md`, **in full**: events, the pipeline, `RuleChange`.
-2. Load `verdigris-style` (it lists the other skills and files to load).
+2. `references/ACTING.md`, **in full**: what a rule writes and who performs it (§5, §6, §10, §12, §13).
+3. `references/TURNS.md` when the rule touches turn order, priority or steps (§7, §8, §17).
+4. Load `verdigris-style` (it lists the other skills and files to load). Tests (§15) are in its §6.
+
+Section numbers are the same in every file, so "rules-style §12" is in ACTING.md.
 
 The example all sections refer to is `crates/rule-engine/__rules__/r104_2a_wins_when_opponents_left.rs`:
 
@@ -67,8 +71,7 @@ let still_in_the_game: Vec<Entity> =
 players.still_in_the_game()
 ```
 
-Search the existing `SystemParam`s before adding a method. Add one only if it hides real work or
-several rules ask the same question (lele-syntax-rs SMELLS S5).
+Before adding a method, read §14.
 
 ## 3. A CR phrase in a query is a named filter
 
@@ -101,119 +104,11 @@ looks it up (`r110_1_enter_battlefield` finds the battlefield), the rule just wr
 No rule checks "is the game over": 104.1 (`r104_1_game_ends`) stops every `RuleSet`. A guard with a
 CR rule behind it stays (800.4a: `if holder.is_still_in_the_game() { return; }`).
 
-## 5. `Attempt` asks, `Resolve` doesn't
-
-`Resolve<E>` is about events; 608 (resolving) is about the stack.
-
-| Write | When |
-|---|---|
-| `Attempt(event)` | the default: cards may forbid or replace the event |
-| `Resolve(event)` | only when the CR says no effect can stop it |
-| `hooks.announce(events_in_turn_order)` | "some cards allow ..." (103.6): with no card, nothing happens |
-
-Besides the pipeline itself, the rules that write `Resolve` are 104.2a ("overrides all effects
-that would preclude that player from winning") and 104.3a (conceding, the exception named in
-101.1). A new one needs a CR quote as clear as those.
-
-Write `Resolve(..)` out in the rule body. Never wrap it in a helper (`declare_as_winner`): a card
-effect would reuse the helper and bypass cards like Platinum Angel.
-
-## 6. One writer per outcome
-
-Only the system that performs an event writes its result; every other rule sends it a message.
-
-| Outcome | Only writer |
-|---|---|
-| `Won` / `Lost` | `r104_2_win_the_game` / `r104_3_lose_the_game` |
-| `GameIsADraw` / `LeftTheGame` | `r104_4a_draw` / `r104_5_leaves_the_game` |
-| gaining, losing or paying life | `r119_3_life_loss`, through `GainLife` / `LoseLife` |
-| losing unspent mana | `r106_4_lose_unspent_mana`, through `LoseUnspentMana` |
-| `TurnState` (turn, priority, upcoming steps) | `GameMut` (§8) |
-
-**Why:** a trigger or a replacement hooks in at one place, and no path forgets a side effect
-(such as `StateBasedActionsPerformed`).
-
-Two rules writing the same component is the same smell: make one event and one performer.
-
-Some older rules do not follow this yet: counter, mill and finished spells still insert
-`InZone(graveyard)` themselves instead of sending `PutIntoGraveyard`. Don't copy them. A direct
-write skips every `Cant` / `Instead` on the event, so converting one is usually a CR fix: red first
-(destroy skipped "can't be put into a graveyard" until `r701_8a_destroy` sent the event).
-
-Before replacing a direct write with an event, check WHEN the event is performed:
-`PutIntoGraveyard` is resolved only in the state-based pass, after `RuleSet::Resolution`. A rule that
-others in the same set rely on (608.2b must take the spell off the stack before 608.2c reads it)
-can't just send the event; plan the ordering too.
-
-## 7. Players in turn order
-
-Bevy's query order is not turn order. Anything that loops over players, or returns them, goes
-through `players::Players`, which reads `turns::TurnOrder`. Turn order begins with the starting player,
-and `still_in_the_game()` skips players who left, so "each player in turn order" is one `for` over
-it: no `loop`, no `next_in_turn_order()` chain, no start / stop test.
-
-## 8. `Game` asks, `GameMut` moves the game
-
-`Game` is read-only and any rule can take it. Questions about the turn itself go through
-`game.turn()` (`game.turn().next_step()`). `GameMut` is the only writer of `turns::TurnState`; only the priority and turn-structure rules take it, and a system that takes it can't
-also take `Game` or `Rules`.
-
-```rust
-// 117.3d: "the next player in turn order receives priority"
-if let Some(next) = game.priority_holder().next_in_turn_order() {
-    game.pass_priority_to(next.id);
-}
-```
-
-`next_in_turn_order()` skips players who left. Cards don't override it: a card changes the answer,
-through the pipeline.
-
-Only `r500_1` begins a step from `NextStep`; a skip rule takes no `GameMut`.
-
-`Game`, `Players` and `Rules` are passed by value, and clippy refuses more than 256 bytes: one query is
-32. So data is grouped behind ONE query: a new turn value is a field of `TurnState`, a new player marker a
-`Has<..>` field of `players::Status` (never `&Component`: it conflicts with the systems that write it).
-Don't add a query per question.
-
 ## 9. A player is a `players::PlayerId`
 
 A field or parameter that is always a player is a `PlayerId`, never an `Entity`. A value that can be
 a player or a permanent (a damage recipient, a target, `Context::subject`) stays an `Entity`. Never
 wrap an `Entity` in `PlayerId(..)` just to make it compile.
-
-## 10. A rule is a hook point
-
-A rule says WHEN something would happen and to whom; cards decide WHAT is different. So the rule
-announces `Attempt(event)` and stops there. If no card reacts, the performing system does the CR's
-default, and **the default may be nothing at all** (then nothing reads `Resolve`).
-
-A rule never looks for cards that react: no query over abilities, no "does this card have ...", no
-list of candidates, no early return when the list is empty. Announce the event for every object or
-player the CR sentence names; the pipeline finds who reacts. Moving the search into a `SystemParam`, a
-method or a choice's "legal options" is the same search: what a card allows is written on the card as a
-change to the event (`CHANGEABLE_RULES.md` §3), so nobody needs the list.
-
-```rust
-// the upkeep step (503.1) has no turn-based actions. Bad: the rule knows which cards matter
-for card in permanents.iter().filter(|card| card.has_upkeep_effect()) { perform(card); }
-
-// Good: announce it; with no reacting card, nothing happens
-if let Some(active_player) = game.active_player() {
-    upkeeps.write(Attempt(events::BeginUpkeep(active_player.id)));
-}
-```
-
-The announcement happens once, at its moment: "once X is complete", "at the beginning of Y" is a message
-the rule reads, never a state it polls every frame. What happens after ("then the player takes their
-turn", "receives priority") is another sentence, so another rule.
-
-The event is about the object that can change it: one event per object when each object may change
-its own (the pipeline applies only the first matching `Instead` to an event).
-
-Rules that queue triggered abilities (603.2, 508.3a, 509.3a) look the ability up themselves today; this section
-doesn't cover that lookup. What happened they read from `Did<E>`, never from another rule's `Rejected` (§13).
-
-**Why:** a new card then needs no change in any rule.
 
 ## 11. One CR rule, one file; a general sentence names no case
 
@@ -233,78 +128,13 @@ One file per CR rule. The `pub fn` named after the file is the rule's system or,
 several, it returns them `.chain()`ed; those systems are private in the same file. A different CR rule
 is a different file: 502.3 announces the untap, 701.26b says what untapping does. An old combined `rA_rB_..` file is split when it is refactored; the file keeps the id that says what is performed. A keyword sentence that only says "can't" (702.12b indestructible) is a card-side change in `StaticKeyword::keyword_modifications`, like haste and vigilance, and its text goes under `# See also` of the performing rule; an id whose sentence only conditions or repeats
 the other gets no file, its text moves under `# See also` and the file is renamed. A quote nothing
-implements is dropped. Moving an existing test to the file that now owns its behaviour is not a new test.
+implements is dropped. Moving an existing test to the file that now owns its behaviour is not a new test. When a file is split, each
+sub-rule takes the existing test that shows its case; the general file keeps a test that shows its own
+outcome (`r120_3` writes `Did`, so a trigger on damage). A general file that only announces or writes
+`Did` is fine, however short.
 
 A sentence that says WHEN and a sentence that says WHAT HAPPENS are two rules, even when an old file holds
 both: 500.4 announces that pools empty, 106.4 performs the loss.
-
-## 12. Who gives the choice
-
-| The choice comes from | Who asks |
-|---|---|
-| a card or effect: "you may ..." on the card, or a CR sentence that only points at it ("some cards allow ...", "if an effect lets a player ...") | the card's change (`may` in `CHANGEABLE_RULES.md` §3); the rule is a hook point (§10) and has no `Ask` |
-| the CR sentence itself, with no card involved ("the player chooses one of them") | the rule writes `Ask(choice)` and reads `Answered` |
-
-Test: remove every card from the game. Does the CR sentence still make the player choose? If not, the
-choice isn't the rule's. Not every card gives a choice: another one may simply do something at that
-moment, and the same hook point must serve both.
-
-Asking, waiting and validating is ONE shared mechanism for the whole engine, not code in a rule: it
-shows one ask at a time, in the order they were asked (so a rule asks in turn order), drops an ask whose player left, checks
-player / legality / count / duplicates, and writes `Answered` or `Rejected`. The choice type alone
-says what a legal answer is. A rule body that needs a choice has no `PendingChoice` and no answer check.
-
-```rust
-// 701.9b in a rule: the CR asks ...
-asks.write(actions::Ask(actions::Choice::Discard(choice)));
-
-// ... and another private system of the same rule performs; only legal answers arrive here
-for answered in answers.read() {
-    let actions::Choice::Discard(choice) = &answered.choice else { continue };
-    ..
-}
-```
-
-`actions::Ask(Choice)` / `actions::Answered { choice, answer }`, shown and checked by `show_asks` /
-`answer_asks`. A new choice adds a `Choice` variant and one arm in `Choice::player`, `Choice::accepts`
-(what is legal) and the two `rejection`s; no rule checks an answer. Good: `r701_9b_choose_discards`,
-`r704_5j_legend_rule`, `r507_1_choose_defending_player`. A card's `may` uses the same mechanism.
-
-- An ask written in frame N is shown at the end of frame N and can be answered from frame N+1 (checked in
-  the Turn set, so every later set of that frame can read `Answered`).
-- The asking system must not write the same ask again in the frame of the answer from state the answer has
-  not changed yet. A rule that finds its situation again in every pass (a state-based check) performs first
-  and asks after (`r704_5j`); one that reacts to a change (`Changed<..>`) needs nothing.
-- While any choice but `Target` is open nobody has priority (`TurnState::suspend_priority`): a fact about
-  the holder, so no rule tests it. `Target` belongs to casting, the caster keeps priority.
-- In tests the choice is answered where it opens, with its verb (`discard`, `arrange_graveyard`,
-  `order_triggers`, `keep_legendary`, `assign_combat_damage`, `choose_defending_player`).
-
-Rules that read a `PlayerAction` (play, cast, attack) keep doing so for now: such a rule checks, writes its own
-`Rejected`, and then `Attempt(..)`, one event per declared object. Another rule performs it and writes `Did`
-(`r508_1a` / `r508_1k`, `r509_1a` / `r509_1g` / `r509_1h`).
-
-## 13. State another rule needs is a CR concept
-
-When rule A blocks rules B, C and D, they don't each test A's bookkeeping. Find the CR concept that
-already blocks them (usually priority, the step, or the stack) and make THAT true. While a spell
-resolves no player has priority (117.2e), so nobody can cast: one fact, zero guards.
-
-This holds from both sides. Refactoring A: remove the gate from B, C and D. Refactoring B: it must not
-mention A any more, so plan the change that makes the concept true, even though A is another file.
-Moving the test into a method (`game.x_is_complete()`) or into the shared part keeps the gate; it is
-removed only when no rule mentions A. If the concept's type can't say it yet (priority always has a
-holder, a step always exists), change the type: that is the refactor, not a follow-up. "It touches many call sites" is no reason to
-leave the old state and compute the answer from A inside `Game`, `GameMut` or `Rules`: that is the same
-gate in three places.
-
-First look at what B already tests. If B has a condition on the concept (a `has_priority` clause, a
-step test, an empty-stack clause), make that condition false at the right moments and delete the gate;
-do not add a new "has X finished" fact, and do not carry the gate into an announcing or rejecting
-system.
-
-A resource that exists only so other rules can ask "are we done yet?" is a smell, and so is a counter
-that stands for "everyone did it".
 
 ## 14. Reuse first; a method is general or it isn't a method
 
@@ -326,29 +156,6 @@ for skipping steps waits for the first card that skips a step). Moving an old ru
 of §5, §6, §10-§13
 is in scope of refactoring that rule. A plan applies them; "keep it smaller for now" is
 not a reason to skip one.
-
-## 15. Tests: make an existing one red
-
-Red first, then green, but reuse. In this order:
-1. an existing test of the rule, with one more assert or step;
-2. an existing test of a neighbouring rule that already reaches the situation;
-3. a new test, only if 1 and 2 can't show it. Say in the report which tests you checked.
-
-```rust
-// Good: the situation is already there, one step makes the test red
-    game.play([p1.declare_attackers([bears])])?;
-    assert!(game.is_attacking(bears));
-    assert!(game.is_tapped(bears));              // new: 508.1f
-
-// Bad: a second test that repeats the whole setup to check one more thing
-    #[test]
-    fn attacking_taps_the_creature() -> TestResult { /* same 10 lines */ }
-```
-
-RUN it red on the old code. A refactor adds no test: players see the same, and an assert on internal
-bookkeeping becomes one on what players see. A refactor that uncovers a CR bug becomes a fix:
-its own commit, red first. Commit only on the full suite
-(`cargo nextest run ... --no-fail-fast`): `just test` stops at the first failure.
 
 ## 16. Create the data first, then act on it
 
@@ -416,39 +223,6 @@ Only a rule that uses the varying data reads the message. One flat loop with one
 (104.2a, §0) is already clear and stays.
 
 **Why:** the order can be read and checked in one place, next to the CR words that give it.
-
-## 17. The steps of a turn are a list; a CR rule that skips a step changes NextStep
-
-`turns::TurnState` holds the steps still to come this turn. `r500_2` proposes `game.turn().next_step()`; only
-`r500_3` and `r508_8` still name the step they go to. Adding a step inserts it into the list (500.9), adding a phase
-is the event `AddPhase` (`r500_8`, 500.8); `begin_step` drops the steps it passes over. A turn can have several
-beginning or combat phases, so "the turn began" is `turns::TurnStarted`, never the untap step (302.6).
-
-```rust
-// 510.4 "the phase gets a second combat damage step"
-game.add_step_after_this_one(turns::Step::SecondCombatDamage);
-```
-
-`AllPlayersPassed -> r500_2 writes NextStep -> skip rules (r103_8a, r508_8) change it ->
-r500_1 begins it -> StepStarted`. Never edit `StepStarted` (614.10: a started step can no
-longer be skipped).
-
-```rust
-// Good — the step never started, and r500_2 names no case
-// crates/rule-engine/__rules__/r103_8a_skip_first_draw_step.rs:14
-for step in next_step.read() {
-    if **step == turns::Step::Draw
-        && game.turn().is_first_turn()
-        && players.is_two_player_game()
-        && let Some(step_after) = game.turn().step_after_next()
-    {
-        *step = turns::NextStep(step_after); // 500.11: past it, no destination named
-    }
-}
-```
-
-**Why:** the step never started, and `r500_2` names no case. Skip rules go between r500_2
-and r500_1 in `add_step_end_systems`. Not yet through it: `r500_3` (untap to upkeep, next turn).
 
 ## Checklist for a rule (or a plan for one)
 

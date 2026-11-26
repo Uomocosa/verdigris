@@ -179,6 +179,29 @@ if !definition.keywords().any(|keyword| keyword == keywords::StaticKeyword::Life
 - Reading a card that already left its zone through the live entity → fix: use LKI.
 - A rule reads derived components where layers may be stale → fix: recompute layers first or read sources.
 
+## 6. Tests: make an existing one red (rules-style §15)
+
+Red first, then green, but reuse. In this order:
+1. an existing test of the rule, with one more assert or step;
+2. an existing test of a neighbouring rule that already reaches the situation;
+3. a new test, only if 1 and 2 can't show it. Say in the report which tests you checked.
+
+```rust
+// Good: the situation is already there, one step makes the test red
+    game.play([p1.declare_attackers([bears])])?;
+    assert!(game.is_attacking(bears));
+    assert!(game.is_tapped(bears));              // new: 508.1f
+
+// Bad: a second test that repeats the whole setup to check one more thing
+    #[test]
+    fn attacking_taps_the_creature() -> TestResult { /* same 10 lines */ }
+```
+
+RUN it red on the old code. A refactor adds no test: players see the same, and an assert on internal
+bookkeeping becomes one on what players see. A refactor that uncovers a CR bug becomes a fix:
+its own commit, red first. Commit only on the full suite
+(`cargo nextest run ... --no-fail-fast`): `just test` stops at the first failure.
+
 ## Adding rules here
 
 Add a section per decision the user makes about how verdigris code should look: a one-line

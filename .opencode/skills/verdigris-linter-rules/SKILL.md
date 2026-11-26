@@ -13,7 +13,7 @@ Every `.rs` file directly inside `__rules__/` (except `mod.rs`) is named `r<id>(
 
 ## VRDG002 rule_one_system · ENFORCED
 
-Every `__rules__/` file holds exactly one `pub fn` Bevy system named after the file stem. (AGENTS rule 1; rules-style §11.)
+Every `__rules__/` file holds exactly one `pub fn` named after the file stem: the system itself, or a fn returning the `.chain()` of private systems in that file (the linter accepts both). (AGENTS rule 1; rules-style §11.)
 
 WILL_BE_ENFORCED wording: one file per CR rule; the `pub fn` named after the file is the rule's system or returns the `.chain()` of the private systems in the same file (`crates/rule-engine/__rules__/r508_1f_tap_attackers.rs:12`). The linter's logic already accepts this; only its text changes.
 
