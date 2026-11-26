@@ -6,7 +6,7 @@ use crate::statics;
 
 pub fn cant<E: Event>(
     all: statics::All,
-    role: rules::Role,
+    holder: rules::ArgId,
     id: rules::RestrictionId,
     text: &'static str,
 ) -> abilities::Continuous {
@@ -15,7 +15,7 @@ pub fn cant<E: Event>(
         modification: effects::Modification::Rule(rules::RuleChange {
             target: rules::Target::event::<E>(),
             change: rules::Change::Restrict {
-                holder: role,
+                holder,
                 restriction: id.restriction(text, !rules::Condition::True),
             },
         }),
@@ -36,7 +36,7 @@ mod tests {
     fn test_usage() {
         let ability = cant::<events::Draw>(
             statics::all(PLAYER),
-            rules::Role::Player,
+            events::Draw::PLAYER,
             rules::RestrictionId("test/cant"),
             "can’t draw",
         );
@@ -46,7 +46,7 @@ mod tests {
             effects::Modification::Rule(rules::RuleChange {
                 target: rules::Target::event::<events::Draw>(),
                 change: rules::Change::Restrict {
-                    holder: rules::Role::Player,
+                    holder: events::Draw::PLAYER,
                     restriction: rules::RestrictionId("test/cant")
                         .restriction("can’t draw", !rules::Condition::True,),
                 },

@@ -21,7 +21,7 @@ impl Flying {
         vec![effects::Modification::Rule(rules::RuleChange {
             target: rules::Target::event::<events::DeclareBlocker>(),
             change: rules::Change::Restrict {
-                holder: rules::Role::Other,
+                holder: events::DeclareBlocker::ATTACKER,
                 restriction: Self::FLYING_BLOCKERS.restriction(
                     "A creature with flying can’t be blocked except by creatures with flying and/or reach.",
                     rules::has::<cards::Flying>() | rules::has::<cards::Reach>(),
@@ -49,7 +49,7 @@ mod tests {
             vec![effects::Modification::Rule(rules::RuleChange {
                 target: rules::Target::event::<events::DeclareBlocker>(),
                 change: rules::Change::Restrict {
-                    holder: rules::Role::Other,
+                    holder: events::DeclareBlocker::ATTACKER,
                     restriction: Flying::FLYING_BLOCKERS.restriction(
                         "A creature with flying can’t be blocked except by creatures with flying and/or reach.",
                         rules::has::<cards::Flying>() | rules::has::<cards::Reach>(),

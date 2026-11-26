@@ -10,7 +10,7 @@ pub fn cast_spells_as_though_they_had_flash(all: statics::All) -> abilities::Con
         modification: effects::Modification::Rule(rules::RuleChange {
             target: rules::Target::Restriction(events::cast_spell::TIMING),
             change: rules::Change::AsThough {
-                holder: rules::Role::Player,
+                holder: events::CastSpell::PLAYER,
             },
         }),
     }
@@ -36,7 +36,7 @@ mod tests {
             effects::Modification::Rule(rules::RuleChange {
                 target: rules::Target::Restriction(events::cast_spell::TIMING),
                 change: rules::Change::AsThough {
-                    holder: rules::Role::Player,
+                    holder: events::CastSpell::PLAYER,
                 },
             })
         );

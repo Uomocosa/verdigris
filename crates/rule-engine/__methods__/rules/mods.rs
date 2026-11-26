@@ -37,6 +37,7 @@ mod tests {
 
     use crate::BATTLEFIELD;
     use crate::effects;
+    use crate::events;
     use crate::keywords;
     use crate::rules;
     use crate::testing::*;
@@ -58,7 +59,7 @@ mod tests {
                         effects::Modification::Rule(rules::RuleChange {
                             target: rules::Target::Restriction(UNTAPPED),
                             change: rules::Change::AsThough {
-                                holder: rules::Role::Subject,
+                                holder: TestRule::ATTACKER,
                             },
                         }),
                         effects::Modification::Rule(rules::RuleChange {
@@ -89,7 +90,7 @@ mod tests {
                         rules::RuleChange {
                             target: rules::Target::Restriction(keywords::Flying::FLYING_BLOCKERS),
                             change: rules::Change::AsThough {
-                                holder: rules::Role::Subject,
+                                holder: events::DeclareBlocker::BLOCKER,
                             },
                         }
                     ))

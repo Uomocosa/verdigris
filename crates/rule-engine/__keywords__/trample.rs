@@ -20,7 +20,7 @@ impl Trample {
         vec![effects::Modification::Rule(rules::RuleChange {
             target: rules::Target::Restriction(events::assign_combat_damage::ONLY_BLOCKERS),
             change: rules::Change::Allow {
-                holder: rules::Role::Other,
+                holder: events::AssignCombatDamage::SOURCE,
                 when: rules::has::<players::Player>(),
             },
         })]

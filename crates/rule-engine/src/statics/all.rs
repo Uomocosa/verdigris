@@ -51,7 +51,7 @@ impl All {
     #[must_use]
     pub fn cant<E: rules::traits::event::Event>(
         self,
-        role: rules::Role,
+        holder: rules::ArgId,
         id: rules::RestrictionId,
         text: &'static str,
     ) -> abilities::Continuous {
@@ -70,7 +70,7 @@ impl All {
     pub fn as_though(
         self,
         restriction: rules::RestrictionId,
-        holder: rules::Role,
+        holder: rules::ArgId,
     ) -> abilities::Continuous {
     }
 
@@ -79,13 +79,14 @@ impl All {
         self,
         restriction: rules::RestrictionId,
         alternative: rules::Condition,
-        holder: rules::Role,
+        holder: rules::ArgId,
     ) -> abilities::Continuous {
     }
 
     #[must_use]
     pub fn restriction<E: rules::traits::event::Event>(
         self,
+        holder: rules::ArgId,
         id: rules::RestrictionId,
         text: &'static str,
         requirement: rules::Condition,

@@ -1,4 +1,5 @@
 use crate::effects;
+use crate::events;
 use crate::keywords;
 use crate::rules;
 
@@ -18,7 +19,7 @@ impl Deathtouch {
         vec![effects::Modification::Rule(rules::RuleChange {
             target: rules::Target::Definition(rules::LETHAL_DAMAGE),
             change: rules::Change::Allow {
-                holder: rules::Role::Other,
+                holder: events::AssignCombatDamage::SOURCE,
                 when: rules::event_field(rules::Field::Amount, rules::Comparison::GreaterThan, 0),
             },
         })]

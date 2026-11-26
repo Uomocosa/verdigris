@@ -6,7 +6,7 @@ use crate::statics;
 pub fn as_though(
     all: statics::All,
     restriction: rules::RestrictionId,
-    holder: rules::Role,
+    holder: rules::ArgId,
 ) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
@@ -23,6 +23,7 @@ mod tests {
     use crate::effects;
     use crate::rules;
     use crate::statics;
+    use crate::testing;
 
     use super::as_though;
 
@@ -31,7 +32,7 @@ mod tests {
         let ability = as_though(
             statics::all(CREATURE),
             rules::RestrictionId("test/untapped"),
-            rules::Role::Subject,
+            testing::TestRule::ATTACKER,
         );
         assert_eq!(ability.filter, CREATURE);
         assert_eq!(
@@ -39,7 +40,7 @@ mod tests {
             effects::Modification::Rule(rules::RuleChange {
                 target: rules::Target::Restriction(rules::RestrictionId("test/untapped")),
                 change: rules::Change::AsThough {
-                    holder: rules::Role::Subject,
+                    holder: testing::TestRule::ATTACKER,
                 },
             })
         );

@@ -577,7 +577,7 @@ mod tests {
                         rules::RuleChange {
                             target: rules::Target::Restriction(testing::UNTAPPED),
                             change: rules::Change::AsThough {
-                                holder: rules::Role::Subject,
+                                holder: testing::TestRule::ATTACKER,
                             },
                         },
                     ))
@@ -587,7 +587,7 @@ mod tests {
                         rules::RuleChange {
                             target: rules::Target::Restriction(testing::UNTAPPED),
                             change: rules::Change::AsThough {
-                                holder: rules::Role::Subject,
+                                holder: testing::TestRule::ATTACKER,
                             },
                         },
                     ))
@@ -604,7 +604,7 @@ mod tests {
                         rules::RuleChange {
                             target: rules::Target::Restriction(testing::UNTAPPED),
                             change: rules::Change::AsThough {
-                                holder: rules::Role::Subject,
+                                holder: testing::TestRule::ATTACKER,
                             },
                         },
                     ))

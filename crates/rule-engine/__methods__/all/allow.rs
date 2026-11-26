@@ -7,7 +7,7 @@ pub fn allow(
     all: statics::All,
     restriction: rules::RestrictionId,
     alternative: rules::Condition,
-    holder: rules::Role,
+    holder: rules::ArgId,
 ) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
@@ -28,6 +28,7 @@ mod tests {
     use crate::effects;
     use crate::rules;
     use crate::statics;
+    use crate::testing;
 
     use super::allow;
 
@@ -37,7 +38,7 @@ mod tests {
             statics::all(CREATURE),
             rules::RestrictionId("test/untapped"),
             rules::has::<cards::Flying>(),
-            rules::Role::Subject,
+            testing::TestRule::ATTACKER,
         );
         assert_eq!(ability.filter, CREATURE);
         assert_eq!(
@@ -45,7 +46,7 @@ mod tests {
             effects::Modification::Rule(rules::RuleChange {
                 target: rules::Target::Restriction(rules::RestrictionId("test/untapped")),
                 change: rules::Change::Allow {
-                    holder: rules::Role::Subject,
+                    holder: testing::TestRule::ATTACKER,
                     when: rules::has::<cards::Flying>(),
                 },
             })

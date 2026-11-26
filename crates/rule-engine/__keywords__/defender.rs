@@ -20,7 +20,7 @@ impl Defender {
         vec![effects::Modification::Rule(rules::RuleChange {
             target: rules::Target::event::<events::DeclareAttacker>(),
             change: rules::Change::Restrict {
-                holder: rules::Role::Subject,
+                holder: events::DeclareAttacker::ATTACKER,
                 restriction: Self::CANT_ATTACK.restriction(
                     "A creature with defender can’t attack.",
                     !rules::Condition::True,
@@ -47,7 +47,7 @@ mod tests {
             vec![effects::Modification::Rule(rules::RuleChange {
                 target: rules::Target::event::<events::DeclareAttacker>(),
                 change: rules::Change::Restrict {
-                    holder: rules::Role::Subject,
+                    holder: events::DeclareAttacker::ATTACKER,
                     restriction: Defender::CANT_ATTACK.restriction(
                         "A creature with defender can’t attack.",
                         !rules::Condition::True,

@@ -17,7 +17,7 @@ pub const TEST_PLAYER_RESTRICTION: testing::Card = testing::Card {
                 modification: effects::Modification::Rule(rules::RuleChange {
                     target: rules::Target::event::<testing::TestRule>(),
                     change: rules::Change::Restrict {
-                        holder: rules::Role::Player,
+                        holder: testing::TestRule::PLAYER,
                         restriction: rules::RestrictionId("test/player-restriction").restriction(
                             "plays only when true",
                             !rules::Condition::True,

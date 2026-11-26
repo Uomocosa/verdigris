@@ -6,8 +6,9 @@ use crate::May;
 use crate::Resolve;
 use crate::rules;
 use crate::rules::traits::context::Context;
+use crate::rules::traits::event_args::EventArgs;
 
-pub trait Event: Context + Clone + Send + Sync + 'static {
+pub trait Event: Context + EventArgs + Clone + Send + Sync + 'static {
     const ID: rules::EventId;
     #[must_use]
     fn restrictions() -> Vec<rules::Restriction> {

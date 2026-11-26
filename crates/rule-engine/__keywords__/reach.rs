@@ -1,4 +1,5 @@
 use crate::effects;
+use crate::events;
 use crate::keywords;
 use crate::rules;
 
@@ -20,7 +21,7 @@ impl Reach {
         vec![effects::Modification::Rule(rules::RuleChange {
             target: rules::Target::Restriction(keywords::Flying::FLYING_BLOCKERS),
             change: rules::Change::AsThough {
-                holder: rules::Role::Subject,
+                holder: events::DeclareBlocker::BLOCKER,
             },
         })]
     }
@@ -29,6 +30,7 @@ impl Reach {
 #[cfg(test)]
 mod tests {
     use crate::effects;
+    use crate::events;
     use crate::keywords;
     use crate::rules;
 
@@ -43,7 +45,7 @@ mod tests {
             vec![effects::Modification::Rule(rules::RuleChange {
                 target: rules::Target::Restriction(keywords::Flying::FLYING_BLOCKERS),
                 change: rules::Change::AsThough {
-                    holder: rules::Role::Subject,
+                    holder: events::DeclareBlocker::BLOCKER,
                 },
             })]
         );

@@ -36,14 +36,14 @@ pub enum Role {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Change {
     AsThough {
-        holder: rules::Role,
+        holder: rules::ArgId,
     },
     Allow {
-        holder: rules::Role,
+        holder: rules::ArgId,
         when: rules::Condition,
     },
     Restrict {
-        holder: rules::Role,
+        holder: rules::ArgId,
         restriction: rules::Restriction,
     },
     Must,

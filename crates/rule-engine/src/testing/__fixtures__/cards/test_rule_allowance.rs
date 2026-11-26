@@ -14,7 +14,7 @@ pub const TEST_RULE_ALLOWANCE: testing::Card = testing::Card {
             statics::all(CREATURE).allow(
                 testing::UNTAPPED,
                 rules::has::<cards::Flying>(),
-                rules::Role::Subject,
+                testing::TestRule::ATTACKER,
             ),
         }
     },

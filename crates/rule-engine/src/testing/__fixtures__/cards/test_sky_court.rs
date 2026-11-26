@@ -13,6 +13,7 @@ pub const TEST_SKY_COURT: testing::Card = testing::Card {
         card! {
             cards::CardDefinition::from_enchantment("Test Sky Court", cost![2, U]);
             statics::all(CREATURE).restriction::<events::DeclareBlocker>(
+                events::DeclareBlocker::BLOCKER,
                 rules::RestrictionId("test/test-sky-court"),
                 "blocks only creatures with flying",
                 !rules::has::<cards::Flying>() | rules::other(rules::has::<cards::Flying>()),

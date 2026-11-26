@@ -14,7 +14,7 @@ pub const TEST_NO_BURIALS: testing::Card = testing::Card {
         card! {
             cards::CardDefinition::from_enchantment("Test No Burials", cost![2]);
             statics::all(CREATURE.controlled_by(YOU)).cant::<events::PutIntoGraveyard>(
-                rules::Role::Subject,
+                events::PutIntoGraveyard::OBJECT,
                 rules::RestrictionId("test/test-no-burials"),
                 "can’t be put into a graveyard",
             ),

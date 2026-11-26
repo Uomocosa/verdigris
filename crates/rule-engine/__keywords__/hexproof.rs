@@ -21,7 +21,7 @@ impl Hexproof {
         vec![effects::Modification::Rule(rules::RuleChange {
             target: rules::Target::event::<events::BecomeTarget>(),
             change: rules::Change::Restrict {
-                holder: rules::Role::Subject,
+                holder: events::BecomeTarget::TARGET,
                 restriction: Self::CANT_BE_TARGETED.restriction(
                     "can’t be the target of spells or abilities your opponents control",
                     rules::points_to::<cards::Controller>(rules::Role::Player)
@@ -50,7 +50,7 @@ mod tests {
             vec![effects::Modification::Rule(rules::RuleChange {
                 target: rules::Target::event::<events::BecomeTarget>(),
                 change: rules::Change::Restrict {
-                    holder: rules::Role::Subject,
+                    holder: events::BecomeTarget::TARGET,
                     restriction: Hexproof::CANT_BE_TARGETED.restriction(
                         "can’t be the target of spells or abilities your opponents control",
                         rules::points_to::<cards::Controller>(rules::Role::Player)

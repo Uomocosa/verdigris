@@ -12,25 +12,27 @@ pub fn legality<E: Event>(answers: &rules::Rules, event: &E) -> rules::Legality 
             restriction.unwaivable,
         )
     };
-    let added: Vec<rules::Restriction> = [
-        (rules::Role::Subject, Some(subject)),
-        (rules::Role::Other, other),
-        (rules::Role::Player, Some(*player)),
-    ]
-    .into_iter()
-    .filter_map(|(role, entity)| entity.map(|entity| (role, entity)))
-    .flat_map(|(role, entity)| {
-        answers.changes(entity, rules::Target::event::<E>()).into_iter().filter_map(move |change| {
-            match change {
-                rules::Change::Restrict {
-                    holder,
-                    restriction,
-                } if holder == role => Some(restriction),
+    let added: Vec<rules::Restriction> = E::args()
+        .iter()
+        .filter_map(|id| {
+            event.arg(*id).and_then(|value| match value {
+                rules::ArgValue::Entity(entity) => Some((*id, entity)),
+                rules::ArgValue::Player(player) => Some((*id, *player)),
                 _ => None,
-            }
+            })
         })
-    })
-    .collect();
+        .flat_map(|(id, entity)| {
+            answers.changes(entity, rules::Target::event::<E>()).into_iter().filter_map(
+                move |change| match change {
+                    rules::Change::Restrict {
+                        holder,
+                        restriction,
+                    } if holder == id => Some(restriction),
+                    _ => None,
+                },
+            )
+        })
+        .collect();
     let base_and_added_hold =
         E::restrictions().into_iter().chain(added).filter(|restriction| !waived(restriction)).all(
             |restriction| {

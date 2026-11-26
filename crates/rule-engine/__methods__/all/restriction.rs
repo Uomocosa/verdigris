@@ -6,6 +6,7 @@ use crate::statics;
 
 pub fn restriction<E: Event>(
     all: statics::All,
+    holder: rules::ArgId,
     id: rules::RestrictionId,
     text: &'static str,
     requirement: rules::Condition,
@@ -15,7 +16,7 @@ pub fn restriction<E: Event>(
         modification: effects::Modification::Rule(rules::RuleChange {
             target: rules::Target::event::<E>(),
             change: rules::Change::Restrict {
-                holder: rules::Role::Subject,
+                holder,
                 restriction: id.restriction(text, requirement),
             },
         }),
@@ -36,6 +37,7 @@ mod tests {
     fn test_usage() {
         let ability = restriction::<testing::RestrictedRule>(
             statics::all(CREATURE),
+            testing::RestrictedRule::ATTACKER,
             rules::RestrictionId("test/restriction"),
             "attacks only with enough power",
             rules::Condition::True,
@@ -46,7 +48,7 @@ mod tests {
             effects::Modification::Rule(rules::RuleChange {
                 target: rules::Target::event::<testing::RestrictedRule>(),
                 change: rules::Change::Restrict {
-                    holder: rules::Role::Subject,
+                    holder: testing::RestrictedRule::ATTACKER,
                     restriction: rules::RestrictionId("test/restriction")
                         .restriction("attacks only with enough power", rules::Condition::True,),
                 },

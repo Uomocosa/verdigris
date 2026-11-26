@@ -13,22 +13,24 @@ pub fn waived<E: Event>(
     let subject = event.subject();
     let other = event.other();
     let player = event.player();
-    [
-        (rules::Role::Subject, Some(subject)),
-        (rules::Role::Other, other),
-        (rules::Role::Player, Some(*player)),
-    ]
-    .into_iter()
-    .filter_map(|(role, entity)| entity.map(|entity| (role, entity)))
-    .any(|(role, entity)| {
-        answers.changes(entity, target).iter().any(|change| match change {
-            rules::Change::AsThough { holder } => *holder == role,
-            rules::Change::Allow { holder, when } => {
-                *holder == role && answers.eval(&when.bind(event), subject, other, Some(*player))
-            }
-            _ => false,
+    E::args()
+        .iter()
+        .filter_map(|id| {
+            event.arg(*id).and_then(|value| match value {
+                rules::ArgValue::Entity(entity) => Some((*id, entity)),
+                rules::ArgValue::Player(player) => Some((*id, *player)),
+                _ => None,
+            })
         })
-    })
+        .any(|(id, entity)| {
+            answers.changes(entity, target).iter().any(|change| match change {
+                rules::Change::AsThough { holder } => *holder == id,
+                rules::Change::Allow { holder, when } => {
+                    *holder == id && answers.eval(&when.bind(event), subject, other, Some(*player))
+                }
+                _ => false,
+            })
+        })
 }
 
 #[cfg(test)]
