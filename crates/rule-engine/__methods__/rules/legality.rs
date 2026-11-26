@@ -34,9 +34,9 @@ mod tests {
     use bevy::ecs::system::RunSystemOnce;
 
     use crate::BATTLEFIELD;
-    use crate::cards;
     use crate::effects;
     use crate::events;
+    use crate::keywords;
     use crate::rules;
     use crate::testing::*;
 
@@ -147,7 +147,7 @@ mod tests {
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
                 assert!(answers.eval(
-                    &rules::has::<cards::Flying>().of(TestRule::ATTACKER),
+                    &rules::has_keyword(keywords::flying::ID).of(TestRule::ATTACKER),
                     &TestRule {
                         attacker: *drake,
                         player: p2.id
@@ -181,7 +181,7 @@ mod tests {
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
                 assert!(!answers.eval(
-                    &rules::has::<cards::Flying>().of(TestRule::ATTACKER),
+                    &rules::has_keyword(keywords::flying::ID).of(TestRule::ATTACKER),
                     &TestRule {
                         attacker: *bears,
                         player: p2.id

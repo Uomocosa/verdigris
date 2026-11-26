@@ -1,4 +1,3 @@
-use crate::cards;
 use crate::effects;
 use crate::events;
 use crate::keywords;
@@ -21,8 +20,9 @@ fn abilities() -> Vec<effects::Modification> {
         change: rules::Change::Restrict {
             holder: events::DeclareBlocker::ATTACKER.into(),
             restriction: BLOCKERS.restriction(
-                (rules::has::<cards::Flying>() | rules::has::<cards::Reach>())
-                    .of(events::DeclareBlocker::BLOCKER),
+                (rules::has_keyword(keywords::flying::ID)
+                    | rules::has_keyword(keywords::reach::ID))
+                .of(events::DeclareBlocker::BLOCKER),
             ),
         },
     })]
@@ -30,9 +30,9 @@ fn abilities() -> Vec<effects::Modification> {
 
 #[cfg(test)]
 mod tests {
-    use crate::cards;
     use crate::effects;
     use crate::events;
+    use crate::keywords;
     use crate::rules;
 
     #[test]
@@ -46,8 +46,9 @@ mod tests {
                 change: rules::Change::Restrict {
                     holder: events::DeclareBlocker::ATTACKER.into(),
                     restriction: super::BLOCKERS.restriction(
-                        (rules::has::<cards::Flying>() | rules::has::<cards::Reach>())
-                            .of(events::DeclareBlocker::BLOCKER),
+                        (rules::has_keyword(keywords::flying::ID)
+                            | rules::has_keyword(keywords::reach::ID))
+                        .of(events::DeclareBlocker::BLOCKER),
                     ),
                 },
             })]

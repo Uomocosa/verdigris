@@ -58,7 +58,7 @@ mod tests {
     fn test_usage() {
         let tapped = ComponentRef::of::<cards::Tapped>();
         assert_eq!(tapped, ComponentRef::of::<cards::Tapped>());
-        assert_ne!(tapped, ComponentRef::of::<cards::Flying>());
+        assert_ne!(tapped, ComponentRef::of::<cards::Creature>());
         assert!(tapped.target.is_none());
         let owner = ComponentRef::relation::<cards::Owner>();
         assert!(owner.target.is_some());

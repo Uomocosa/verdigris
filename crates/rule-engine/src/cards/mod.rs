@@ -3,9 +3,8 @@ mod basic;
 
 pub use basic::card_text::{artifact_creature, creature, instant, land, sorcery};
 pub use basic::components::{
-    Attacking, Blocked, Creature, Deathtouch, Defender, DoubleStrike, EffectivePT, FirstStrike,
-    Flying, HadFirstStrikeAsDamageBegan, Infect, Lifelink, OnBattlefield, Reach, SummoningSick,
-    Tapped, Token, Trample, TriggeredAtStep, TriggeredEnters, Vigilance,
+    Attacking, Blocked, Creature, EffectivePT, HadFirstStrikeAsDamageBegan, OnBattlefield,
+    SummoningSick, Tapped, Token, TriggeredAtStep, TriggeredEnters,
 };
 pub use basic::current_markers::{CurrentMarkers, CurrentMarkersItem};
 pub use basic::enums::{CardType, Color, CreatureType, EnchantmentType, ManaSymbol, Supertype};

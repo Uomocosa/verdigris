@@ -333,12 +333,15 @@ fn already_applied(
 
 #[cfg(test)]
 mod tests {
+    use bevy::ecs::system::RunSystemOnce;
+
     use crate::BATTLEFIELD;
     use crate::HAND;
-    use crate::cards;
     use crate::effects;
     use crate::events;
+    use crate::keywords;
     use crate::mana;
+    use crate::rules;
     use crate::testing::*;
     use crate::turns;
 
@@ -355,13 +358,41 @@ mod tests {
         let [alarm] = game.player(p1).cards_in(HAND).exactly::<1>(RAISE_THE_ALARM)?;
         game.play([p1.cast(alarm).pass_priority(), p2.pass_priority()])?;
         assert_eq!(game.pt(bears), Some(crate::pt!(3, 3)));
-        assert!(game.has::<cards::Vigilance>(bears));
         assert_eq!(game.pt(foe), Some(crate::pt!(2, 2)));
-        assert!(!game.has::<cards::Vigilance>(foe));
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                assert!(
+                    answers
+                        .characteristics(*bears)
+                        .keywords
+                        .iter()
+                        .any(|keyword| keyword.id == keywords::vigilance::ID)
+                );
+                assert!(
+                    !answers
+                        .characteristics(*foe)
+                        .keywords
+                        .iter()
+                        .any(|keyword| keyword.id == keywords::vigilance::ID)
+                );
+            })
+            .unwrap();
         let soldiers = game.player(p1).cards_in(BATTLEFIELD).exactly::<2>(SOLDIER_TOKEN)?;
         for soldier in soldiers {
             assert_eq!(game.pt(soldier), Some(crate::pt!(1, 1)));
-            assert!(!game.has::<cards::Vigilance>(soldier));
+            game.app
+                .world_mut()
+                .run_system_once(move |answers: rules::Rules| {
+                    assert!(
+                        !answers
+                            .characteristics(*soldier)
+                            .keywords
+                            .iter()
+                            .any(|keyword| keyword.id == keywords::vigilance::ID)
+                    );
+                })
+                .unwrap();
         }
         game.play([
             p1.pass_to(turns::Step::DeclareAttackers),
@@ -382,7 +413,18 @@ mod tests {
         let [foe] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
         game.pass_priority();
         assert_eq!(game.pt(foe), Some(crate::pt!(2, 2)));
-        assert!(!game.has::<cards::Vigilance>(foe));
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                assert!(
+                    !answers
+                        .characteristics(*foe)
+                        .keywords
+                        .iter()
+                        .any(|keyword| keyword.id == keywords::vigilance::ID)
+                );
+            })
+            .unwrap();
         let affecting = game.with_query::<&effects::ContinuousEffect, usize>(|granted| {
             granted.iter().filter(|effect| effect.affected == foe).count()
         });
@@ -460,7 +502,18 @@ mod tests {
         ])?;
         assert!(game.is_attacking(sovereign));
         assert!(game.is_tapped(sovereign));
-        assert!(game.has::<cards::Vigilance>(sovereign));
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                assert!(
+                    answers
+                        .characteristics(*sovereign)
+                        .keywords
+                        .iter()
+                        .any(|keyword| keyword.id == keywords::vigilance::ID)
+                );
+            })
+            .unwrap();
         Ok(())
     }
 
@@ -472,7 +525,18 @@ mod tests {
         ]);
         let [sovereign] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(FELIDAR_SOVEREIGN)?;
         game.pass_priority();
-        assert!(!game.has::<cards::Vigilance>(sovereign));
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                assert!(
+                    !answers
+                        .characteristics(*sovereign)
+                        .keywords
+                        .iter()
+                        .any(|keyword| keyword.id == keywords::vigilance::ID)
+                );
+            })
+            .unwrap();
         game.play([
             p1.pass_to(turns::Step::DeclareAttackers),
             p2.pass_to(turns::Step::DeclareAttackers),
@@ -496,13 +560,35 @@ mod tests {
         let [demystify] = game.player(p1).cards_in(HAND).exactly::<1>(DEMYSTIFY)?;
         game.play([p1.cast(demystify).targeting(watching)])?;
         assert_eq!(game.pt(bears), Some(crate::pt!(3, 3)));
-        assert!(game.has::<cards::Vigilance>(bears));
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                assert!(
+                    answers
+                        .characteristics(*bears)
+                        .keywords
+                        .iter()
+                        .any(|keyword| keyword.id == keywords::vigilance::ID)
+                );
+            })
+            .unwrap();
 
         game.play([p1.pass_priority(), p2.pass_priority()])?;
 
         assert!(game.player(p1).cards_in(GRAVEYARD).has(watching));
         assert_eq!(game.pt(bears), Some(crate::pt!(2, 2)));
-        assert!(!game.has::<cards::Vigilance>(bears));
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                assert!(
+                    !answers
+                        .characteristics(*bears)
+                        .keywords
+                        .iter()
+                        .any(|keyword| keyword.id == keywords::vigilance::ID)
+                );
+            })
+            .unwrap();
         Ok(())
     }
 

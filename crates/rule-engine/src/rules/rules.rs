@@ -5,6 +5,7 @@ use bevy::prelude::{Entity, EntityRef, Query, Without};
 
 use crate::cards;
 use crate::effects;
+use crate::keywords;
 use crate::rules;
 use crate::turns;
 use crate::zones;
@@ -99,6 +100,49 @@ impl Rules<'_, '_> {
         event: &E,
         target: rules::Target,
     ) -> Vec<rules::Change> {
+    }
+
+    pub(crate) fn eval_has(
+        &self,
+        component: &rules::ComponentRef,
+        viewpoint: Option<Entity>,
+    ) -> bool {
+    }
+
+    pub(crate) fn eval_has_keyword(
+        &self,
+        id: keywords::KeywordId,
+        viewpoint: Option<Entity>,
+    ) -> bool {
+    }
+
+    pub(crate) fn eval_points_to<E: rules::traits::event_args::EventArgs>(
+        &self,
+        component: &rules::ComponentRef,
+        reference: rules::ArgRef,
+        event: &E,
+        viewpoint: Option<Entity>,
+    ) -> bool {
+    }
+
+    pub(crate) fn eval_card_type(&self, card: cards::CardType, viewpoint: Option<Entity>) -> bool {}
+
+    pub(crate) fn eval_characteristic(
+        &self,
+        characteristic: rules::Characteristic,
+        comparison: rules::Comparison,
+        threshold: i32,
+        viewpoint: Option<Entity>,
+    ) -> bool {
+    }
+
+    pub(crate) fn eval_in_zone<E: rules::traits::event_args::EventArgs>(
+        &self,
+        zone: zones::Zone,
+        reference: rules::ArgRef,
+        event: &E,
+        viewpoint: Option<Entity>,
+    ) -> bool {
     }
 
     pub(crate) fn mods(&self, entity: Entity) -> Vec<effects::Modification> {}

@@ -1,6 +1,5 @@
 use bevy::prelude::Entity;
 
-use crate::cards;
 use crate::rules;
 use crate::rules::traits::event_args::EventArgs;
 use crate::zones;
@@ -22,46 +21,16 @@ pub fn eval<E: EventArgs>(
         Some(_) | None => None,
     };
     match condition {
-        rules::Condition::Has(component) => viewpoint.is_some_and(|subject| {
-            answers
-                .entities
-                .get(subject)
-                .is_ok_and(|entity| entity.contains_type_id(component.type_id))
-        }),
-        rules::Condition::PointsTo(component, reference) => viewpoint.is_some_and(|subject| {
-            entity(reference).is_some_and(|wanted| {
-                answers
-                    .entities
-                    .get(subject)
-                    .ok()
-                    .and_then(|entity| component.target.and_then(|read| read(&entity)))
-                    .is_some_and(|found| found == wanted)
-            })
-        }),
+        rules::Condition::Has(component) => answers.eval_has(component, viewpoint),
+        rules::Condition::HasKeyword(id) => answers.eval_has_keyword(*id, viewpoint),
+        rules::Condition::PointsTo(component, reference) => {
+            answers.eval_points_to(component, *reference, event, viewpoint)
+        }
         rules::Condition::Is(reference) => entity(reference) == viewpoint,
-        rules::Condition::CardType(card) => viewpoint.is_some_and(|subject| {
-            answers
-                .definitions
-                .get(subject)
-                .is_ok_and(|definition| definition.type_line.types.contains(card))
-        }),
-        rules::Condition::Characteristic(characteristic, comparison, threshold) => viewpoint
-            .is_some_and(|subject| {
-                answers
-                    .entities
-                    .get(subject)
-                    .ok()
-                    .and_then(|entity| entity.get::<cards::EffectivePT>())
-                    .is_some_and(|effective| {
-                        comparison.holds(
-                            &match characteristic {
-                                rules::Characteristic::Power => effective.power,
-                                rules::Characteristic::Toughness => effective.toughness,
-                            },
-                            threshold,
-                        )
-                    })
-            }),
+        rules::Condition::CardType(card) => answers.eval_card_type(*card, viewpoint),
+        rules::Condition::Characteristic(characteristic, comparison, threshold) => {
+            answers.eval_characteristic(*characteristic, *comparison, *threshold, viewpoint)
+        }
         rules::Condition::Of(reference, inner) => {
             entity(reference).is_some_and(|candidate| eval(answers, inner, event, Some(candidate)))
         }
@@ -73,20 +42,9 @@ pub fn eval<E: EventArgs>(
         }
         rules::Condition::Not(inner) => !eval(answers, inner, event, viewpoint),
         rules::Condition::True => true,
-        rules::Condition::InZone(zone, reference) => viewpoint.is_some_and(|subject| {
-            entity(reference).is_some_and(|holder| {
-                answers
-                    .entities
-                    .get(subject)
-                    .ok()
-                    .and_then(|entity| entity.get::<zones::InZone>())
-                    .is_some_and(|in_zone| {
-                        answers.zones.get(**in_zone).is_ok_and(|(_, found, owner)| {
-                            *found == *zone && owner.is_some_and(|owner| ***owner == holder)
-                        })
-                    })
-            })
-        }),
+        rules::Condition::InZone(zone, reference) => {
+            answers.eval_in_zone(*zone, *reference, event, viewpoint)
+        }
         rules::Condition::StepIs(step) => {
             answers.state.single().is_ok_and(|state| state.turn.step == *step)
         }
@@ -121,6 +79,7 @@ mod tests {
     use crate::HAND;
     use crate::cards;
     use crate::events;
+    use crate::keywords;
     use crate::mana;
     use crate::rules;
     use crate::testing::*;
@@ -185,7 +144,7 @@ mod tests {
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
                 let awake_and_airborne = (!rules::has::<cards::Tapped>()
-                    & rules::has::<cards::Flying>())
+                    & rules::has_keyword(keywords::flying::ID))
                 .of(TestRule::ATTACKER);
                 assert!(eval(&answers, &awake_and_airborne, &attack, None));
             })
@@ -206,7 +165,7 @@ mod tests {
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
                 let awake_and_airborne = (!rules::has::<cards::Tapped>()
-                    & rules::has::<cards::Flying>())
+                    & rules::has_keyword(keywords::flying::ID))
                 .of(TestRule::ATTACKER);
                 assert!(!eval(&answers, &awake_and_airborne, &attack, None));
             })
@@ -234,7 +193,7 @@ mod tests {
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
                 let tapped_or_flying = (rules::has::<cards::Tapped>()
-                    | rules::has::<cards::Flying>())
+                    | rules::has_keyword(keywords::flying::ID))
                 .of(TestRule::ATTACKER);
                 assert!(!eval(&answers, &tapped_or_flying, &rest, None));
                 assert!(eval(&answers, &tapped_or_flying, &tap, None));
@@ -292,7 +251,7 @@ mod tests {
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
                 let attacker_flies =
-                    rules::has::<cards::Flying>().of(events::DeclareBlocker::ATTACKER);
+                    rules::has_keyword(keywords::flying::ID).of(events::DeclareBlocker::ATTACKER);
                 assert!(eval(&answers, &attacker_flies, &bears_blocked, None));
                 assert!(!eval(&answers, &attacker_flies, &drake_blocked, None));
             })
@@ -312,7 +271,7 @@ mod tests {
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
-                let missing = rules::has::<cards::Flying>().of(rules::ArgId("missing"));
+                let missing = rules::has_keyword(keywords::flying::ID).of(rules::ArgId("missing"));
                 assert!(!eval(&answers, &missing, &attack, None));
             })
             .unwrap();
@@ -602,8 +561,8 @@ mod tests {
     #[test]
     fn operators_flatten_nested_combinators() {
         let tapped = rules::has::<cards::Tapped>();
-        let flying = rules::has::<cards::Flying>();
-        let reach = rules::has::<cards::Reach>();
+        let flying = rules::has_keyword(keywords::flying::ID);
+        let reach = rules::has_keyword(keywords::reach::ID);
         let anded = tapped.clone() & flying.clone() & reach.clone();
         assert_eq!(
             anded,
@@ -620,6 +579,6 @@ mod tests {
             tapped.clone() & rules::Condition::True,
             rules::Condition::All(vec![tapped, rules::Condition::True])
         );
-        assert_eq!(reach, rules::has::<cards::Reach>());
+        assert_eq!(reach, rules::has_keyword(keywords::reach::ID));
     }
 }

@@ -14,25 +14,7 @@ pub struct Token;
 pub struct EffectivePT(pub cards::PowerToughness);
 
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
-pub struct Deathtouch;
-
-#[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
-pub struct Infect;
-
-#[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
-pub struct FirstStrike;
-
-#[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
-pub struct DoubleStrike;
-
-#[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct HadFirstStrikeAsDamageBegan;
-
-#[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
-pub struct Lifelink;
-
-#[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
-pub struct Trample;
 
 #[derive(Component, Debug, Clone, PartialEq, Eq, Deref)]
 pub struct TriggeredEnters(pub abilities::TriggeredAbility);
@@ -47,22 +29,10 @@ pub struct Attacking;
 pub struct Creature;
 
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
-pub struct Defender;
-
-#[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
-pub struct Flying;
-
-#[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct OnBattlefield;
-
-#[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
-pub struct Reach;
 
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct SummoningSick;
 
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Tapped;
-
-#[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
-pub struct Vigilance;

@@ -50,10 +50,13 @@ pub fn r613_1_layers(
 
 #[cfg(test)]
 mod tests {
+    use bevy::ecs::system::RunSystemOnce;
+
     use crate::cards;
     use crate::effects;
     use crate::keywords;
     use crate::mana;
+    use crate::rules;
     use crate::testing::*;
     use crate::{BATTLEFIELD, GRAVEYARD, HAND};
 
@@ -83,7 +86,18 @@ mod tests {
             p1.cast(jump).targeting(bears).pass_priority(),
             p2.pass_priority(),
         ])?;
-        assert!(game.has::<cards::Flying>(bears));
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                assert!(
+                    answers
+                        .characteristics(*bears)
+                        .keywords
+                        .iter()
+                        .any(|keyword| keyword.id == keywords::flying::ID)
+                );
+            })
+            .unwrap();
         assert!(game.player(p1).cards_in(GRAVEYARD).has(jump));
         Ok(())
     }
@@ -116,7 +130,18 @@ mod tests {
                 .count()
         });
         assert_eq!(grants, 2);
-        assert!(game.has::<cards::Flying>(bears));
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                assert!(
+                    answers
+                        .characteristics(*bears)
+                        .keywords
+                        .iter()
+                        .any(|keyword| keyword.id == keywords::flying::ID)
+                );
+            })
+            .unwrap();
         Ok(())
     }
 
@@ -132,9 +157,31 @@ mod tests {
             p1.cast(jump).targeting(bears).pass_priority(),
             p2.pass_priority(),
         ])?;
-        assert!(game.has::<cards::Flying>(bears));
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                assert!(
+                    answers
+                        .characteristics(*bears)
+                        .keywords
+                        .iter()
+                        .any(|keyword| keyword.id == keywords::flying::ID)
+                );
+            })
+            .unwrap();
         game.play([p1.end_turn(), p2.end_turn()])?;
-        assert!(!game.has::<cards::Flying>(bears));
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                assert!(
+                    !answers
+                        .characteristics(*bears)
+                        .keywords
+                        .iter()
+                        .any(|keyword| keyword.id == keywords::flying::ID)
+                );
+            })
+            .unwrap();
         Ok(())
     }
 
@@ -160,7 +207,18 @@ mod tests {
         assert_eq!(timestamps.len(), 2);
         assert!(timestamps[0] < timestamps[1]);
         assert_eq!(game.pt(bears), Some(crate::pt!(5, 5)));
-        assert!(game.has::<cards::Flying>(bears));
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                assert!(
+                    answers
+                        .characteristics(*bears)
+                        .keywords
+                        .iter()
+                        .any(|keyword| keyword.id == keywords::flying::ID)
+                );
+            })
+            .unwrap();
         Ok(())
     }
 

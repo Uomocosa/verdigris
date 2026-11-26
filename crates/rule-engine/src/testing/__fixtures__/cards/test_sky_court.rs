@@ -3,6 +3,7 @@ use crate::card;
 use crate::cards;
 use crate::cost;
 use crate::events;
+use crate::keywords;
 use crate::rules;
 use crate::statics;
 use crate::testing;
@@ -15,8 +16,8 @@ pub const TEST_SKY_COURT: testing::Card = testing::Card {
             statics::all(CREATURE).restriction::<events::DeclareBlocker>(
                 events::DeclareBlocker::BLOCKER,
                 rules::RestrictionId("test/test-sky-court"),
-                (!rules::has::<cards::Flying>()).of(events::DeclareBlocker::BLOCKER)
-                    | rules::has::<cards::Flying>().of(events::DeclareBlocker::ATTACKER),
+                (!rules::has_keyword(keywords::flying::ID)).of(events::DeclareBlocker::BLOCKER)
+                    | rules::has_keyword(keywords::flying::ID).of(events::DeclareBlocker::ATTACKER),
             ),
         }
     },

@@ -138,10 +138,12 @@ gates `pub mod testing` on that feature (line ~11).
 
 Game objects have SOURCE components (written by actions/effects: `CardDefinition`, `InZone`,
 `Owner`, `Controller`, `Damage`, `Tapped`, `Counters`, `ContinuousEffect` entities) and
-DERIVED components (`EffectivePT`, type and keyword markers like `Flying`/`Lifelink`,
-`OnBattlefield`, `StaticAbilities`, `TriggeredAbilities`). Derived components are written
+DERIVED components (`EffectivePT`, type markers like `Creature`, `OnBattlefield`,
+`StaticAbilities`, `TriggeredAbilities`). Derived components are written
 only by the `r613_1_layers` system, `OnBattlefield` included. Rules filter on
-them with `With<>`/`Without<>` and never re-derive them.
+them with `With<>`/`Without<>` and never re-derive them. Keywords live only in
+characteristics: a condition asks `rules::has_keyword(..)`, a rule body asks
+`Rules::characteristics(..)`.
 
 Static abilities apply live (CR 611.3a); effects from a resolving spell are
 `ContinuousEffect` entities whose affected set is fixed at resolution (CR 611.2c).
@@ -160,14 +162,15 @@ removes an ability (e.g. Jump: "Target creature gains flying until end of turn")
 
 **How to apply:** when a rule needs a characteristic (power/toughness, types, keywords,
 whether something is on the battlefield), read the derived component in the query filter,
-never the source component in the body. Type and keyword markers exist only for objects on the
+never the source component in the body. Type markers exist only for objects on the
 battlefield: a rule about a spell on the stack or a card elsewhere still reads `CardDefinition`.
 A keyword that changes a rule needs no marker and is never named in a rule body: it is a rule change in
 its keyword file's `abilities` (one file per keyword in `__keywords__/`), and `Rules::mods` reads current characteristics, so a granted keyword
 works too. Pick the change by what the CR sentence does: "can't" vetoes an event (`Restrict`: indestructible
 → `Destroy`, hexproof → `BecomeTarget`); "may … anyway" waives a restriction (`Allow`/`AsThough`: haste, trample →
 510.1c `ONLY_BLOCKERS`); "is considered ..." widens a definition (`Allow` on a `Definition`: deathtouch → `LETHAL_DAMAGE`). The rule asks
-`answers.legal(..)` / `answers.defines(..)` / `answers.value::<V>(entity)`, never `has_keyword` or a `has_x: bool` parameter. Switching a
+`answers.legal(..)` / `answers.defines(..)` / `answers.value::<V>(entity)`, a keyword question
+travels as a `rules::has_keyword(..)` condition, never a `has_x: bool` parameter. Switching a
 rule from a keyword read to a rule change fixes granted keywords: red first, with a real card that grants it.
 If a rule about the battlefield needs a marker that doesn't exist yet, add it to the layers in its
 own refactor commit, before the rule reads it: the struct in `cards/__basic__/components.rs` (+ re-export), a
@@ -180,12 +183,12 @@ system inserts a derived marker itself.
 
 ```rust
 // Good
-sources: Query<&cards::Owner, With<cards::Lifelink>>,
+attackers: Query<(Entity, &cards::Controller), With<cards::Creature>>,
 
 // Bad
-sources: Query<(&cards::CardDefinition, &cards::Owner)>
+attackers: Query<(Entity, &cards::Controller, &cards::CardDefinition)>
 // ... in the body:
-if !definition.keywords().any(|keyword| keyword.id == keywords::Lifelink::ID) { continue; }
+if !definition.type_line.types.contains(&cards::CardType::Creature) { continue; }
 ```
 
 (The names above land in later phases; the example shows the target shape.)

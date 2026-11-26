@@ -1,6 +1,7 @@
 use atomic_delegate_macros::atomic_delegates;
 
 use crate::cards;
+use crate::keywords;
 use crate::rules;
 use crate::turns;
 use crate::zones;
@@ -8,6 +9,7 @@ use crate::zones;
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Condition {
     Has(rules::ComponentRef),
+    HasKeyword(keywords::KeywordId),
     PointsTo(rules::ComponentRef, rules::ArgRef),
     Is(rules::ArgRef),
     CardType(cards::CardType),

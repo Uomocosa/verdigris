@@ -235,7 +235,7 @@ Flying (`__keywords__/r702_9b_flying.rs`) restricts the attacker; reach
 rules::Change::Restrict {
     holder: events::DeclareBlocker::ATTACKER.into(),
     restriction: BLOCKERS.restriction(
-        (rules::has::<cards::Flying>() | rules::has::<cards::Reach>())
+        (rules::has_keyword(keywords::flying::ID) | rules::has_keyword(keywords::reach::ID))
             .of(events::DeclareBlocker::BLOCKER),
     ),
 }

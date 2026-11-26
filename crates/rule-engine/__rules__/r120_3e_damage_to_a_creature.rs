@@ -1,10 +1,11 @@
 use crate::events;
-use bevy::prelude::{Commands, Has, MessageReader, Query};
+use bevy::prelude::{Commands, MessageReader, Query};
 
 use crate::Resolve;
-use crate::cards;
 use crate::damage;
+use crate::keywords;
 use crate::players;
+use crate::rules;
 
 /// 120.3e Damage dealt to a creature by a source with neither wither nor infect causes that much
 /// damage to be marked on that creature.
@@ -12,7 +13,7 @@ pub fn r120_3e_damage_to_a_creature(
     mut damage_dealt: MessageReader<Resolve<events::DealDamage>>,
     mut commands: Commands,
     players: players::Players,
-    sources: Query<Has<cards::Deathtouch>>,
+    answers: rules::Rules,
     targets: Query<Option<&damage::Damage>>,
 ) {
     for event in damage_dealt.read() {
@@ -23,7 +24,11 @@ pub fn r120_3e_damage_to_a_creature(
         commands
             .entity(event.recipient)
             .insert(damage::Damage(marked.saturating_add(event.amount)));
-        if sources.get(event.source).is_ok_and(|has_deathtouch| has_deathtouch) {
+        if answers.eval(
+            &rules::has_keyword(keywords::deathtouch::ID).of(events::DealDamage::SOURCE),
+            &**event,
+            None,
+        ) {
             commands.entity(event.recipient).insert(damage::DealtByDeathtouch);
         }
     }

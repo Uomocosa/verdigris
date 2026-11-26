@@ -1,7 +1,6 @@
 use bevy::prelude::EntityCommands;
 
 use crate::cards;
-use crate::keywords;
 
 pub fn write_markers(
     characteristics: &cards::Characteristics,
@@ -23,69 +22,6 @@ pub fn write_markers(
             entity.remove::<cards::EffectivePT>();
         }
     }
-    let desired = |keyword: keywords::Keyword| {
-        characteristics.on_battlefield && characteristics.keywords.contains(&keyword)
-    };
-    cards::Characteristics::sync_marker(
-        entity,
-        desired(keywords::deathtouch()),
-        current.deathtouch,
-        cards::Deathtouch,
-    );
-    cards::Characteristics::sync_marker(
-        entity,
-        desired(keywords::infect()),
-        current.infect,
-        cards::Infect,
-    );
-    cards::Characteristics::sync_marker(
-        entity,
-        desired(keywords::first_strike()),
-        current.first_strike,
-        cards::FirstStrike,
-    );
-    cards::Characteristics::sync_marker(
-        entity,
-        desired(keywords::double_strike()),
-        current.double_strike,
-        cards::DoubleStrike,
-    );
-    cards::Characteristics::sync_marker(
-        entity,
-        desired(keywords::lifelink()),
-        current.lifelink,
-        cards::Lifelink,
-    );
-    cards::Characteristics::sync_marker(
-        entity,
-        desired(keywords::trample()),
-        current.trample,
-        cards::Trample,
-    );
-    cards::Characteristics::sync_marker(
-        entity,
-        desired(keywords::flying()),
-        current.flying,
-        cards::Flying,
-    );
-    cards::Characteristics::sync_marker(
-        entity,
-        desired(keywords::reach()),
-        current.reach,
-        cards::Reach,
-    );
-    cards::Characteristics::sync_marker(
-        entity,
-        desired(keywords::vigilance()),
-        current.vigilance,
-        cards::Vigilance,
-    );
-    cards::Characteristics::sync_marker(
-        entity,
-        desired(keywords::defender()),
-        current.defender,
-        cards::Defender,
-    );
     cards::Characteristics::sync_marker(
         entity,
         characteristics.on_battlefield
@@ -104,6 +40,7 @@ mod tests {
     use crate::RulesPlugin;
     use crate::cards;
     use crate::damage;
+    use crate::keywords;
     use crate::pt;
     use crate::testing;
     use crate::turns;
@@ -114,6 +51,7 @@ mod tests {
         let mut app = App::new();
         let bears = (testing::GRIZZLY_BEARS.definition)();
         let characteristics = cards::Characteristics::from_printed(&bears, true).with_effects(&[]);
+        assert_eq!(characteristics.keywords, Vec::new());
         let entity = app.world_mut().spawn(bears).id();
         app.add_systems(
             Update,
@@ -130,26 +68,13 @@ mod tests {
             world.get::<cards::EffectivePT>(entity).copied(),
             Some(cards::EffectivePT(pt!(2, 2)))
         );
-        assert!(world.get::<cards::Flying>(entity).is_none());
     }
 
     #[test]
-    fn defender_keyword_writes_the_defender_marker() {
-        let mut app = App::new();
+    fn defender_keyword_stays_in_characteristics() {
         let wall = (testing::WALL_OF_STONE.definition)();
         let characteristics = cards::Characteristics::from_printed(&wall, true).with_effects(&[]);
-        let entity = app.world_mut().spawn(wall).id();
-        app.add_systems(
-            Update,
-            move |mut commands: Commands, markers: Query<cards::CurrentMarkers<'_>>| {
-                let current = markers.get(entity).expect("test spawns the card");
-                characteristics.write_markers(&mut commands.entity(entity), current);
-            },
-        );
-        app.update();
-
-        let world = app.world();
-        assert!(world.get::<cards::Defender>(entity).is_some());
+        assert!(characteristics.keywords.contains(&keywords::defender()));
     }
 
     #[test]
@@ -211,30 +136,16 @@ mod tests {
         let snapshot = |app: &App| {
             let world = app.world();
             (
-                (
-                    world.get::<cards::OnBattlefield>(bears).is_some(),
-                    world.get::<cards::EffectivePT>(bears).copied().map(|effective| *effective),
-                    world.get::<cards::Deathtouch>(bears).is_some(),
-                    world.get::<cards::Infect>(bears).is_some(),
-                    world.get::<cards::FirstStrike>(bears).is_some(),
-                    world.get::<cards::DoubleStrike>(bears).is_some(),
-                    world.get::<cards::Lifelink>(bears).is_some(),
-                    world.get::<cards::Trample>(bears).is_some(),
-                ),
-                (
-                    world.get::<cards::Flying>(bears).is_some(),
-                    world.get::<cards::Reach>(bears).is_some(),
-                    world.get::<cards::Vigilance>(bears).is_some(),
-                    world.get::<cards::Defender>(bears).is_some(),
-                    world.get::<cards::Creature>(bears).is_some(),
-                    world.get::<cards::TriggeredEnters>(bears).is_some(),
-                    world.get::<cards::TriggeredAtStep>(bears).is_some(),
-                ),
+                world.get::<cards::OnBattlefield>(bears).is_some(),
+                world.get::<cards::EffectivePT>(bears).copied().map(|effective| *effective),
+                world.get::<cards::Creature>(bears).is_some(),
+                world.get::<cards::TriggeredEnters>(bears).is_some(),
+                world.get::<cards::TriggeredAtStep>(bears).is_some(),
             )
         };
         let before = snapshot(&app);
         assert_eq!(
-            before.0.1,
+            before.1,
             Some(cards::PowerToughness {
                 power: 2,
                 toughness: 2
@@ -243,16 +154,6 @@ mod tests {
         app.world_mut().entity_mut(bears).remove::<(
             cards::OnBattlefield,
             cards::EffectivePT,
-            cards::Deathtouch,
-            cards::Infect,
-            cards::FirstStrike,
-            cards::DoubleStrike,
-            cards::Lifelink,
-            cards::Trample,
-            cards::Flying,
-            cards::Reach,
-            cards::Vigilance,
-            cards::Defender,
             cards::Creature,
             cards::TriggeredEnters,
             cards::TriggeredAtStep,

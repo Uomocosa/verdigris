@@ -1,6 +1,7 @@
 use bevy::prelude::Component;
 
 use crate::cards;
+use crate::keywords;
 use crate::rules;
 use crate::turns;
 use crate::zones;
@@ -8,6 +9,11 @@ use crate::zones;
 #[must_use]
 pub fn has<C: Component>() -> rules::Condition {
     rules::Condition::Has(rules::ComponentRef::of::<C>())
+}
+
+#[must_use]
+pub const fn has_keyword(id: keywords::KeywordId) -> rules::Condition {
+    rules::Condition::HasKeyword(id)
 }
 
 #[must_use]

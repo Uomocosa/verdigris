@@ -24,8 +24,8 @@ pub fn allow(
 #[cfg(test)]
 mod tests {
     use crate::CREATURE;
-    use crate::cards;
     use crate::effects;
+    use crate::keywords;
     use crate::rules;
     use crate::statics;
     use crate::testing;
@@ -37,7 +37,7 @@ mod tests {
         let ability = allow(
             statics::all(CREATURE),
             rules::RestrictionId("test/untapped"),
-            rules::has::<cards::Flying>().of(testing::TestRule::ATTACKER),
+            rules::has_keyword(keywords::flying::ID).of(testing::TestRule::ATTACKER),
             testing::TestRule::ATTACKER,
         );
         assert_eq!(ability.filter, CREATURE);
@@ -47,7 +47,7 @@ mod tests {
                 target: rules::Target::Restriction(rules::RestrictionId("test/untapped")),
                 change: rules::Change::Allow {
                     holder: testing::TestRule::ATTACKER.into(),
-                    when: rules::has::<cards::Flying>().of(testing::TestRule::ATTACKER),
+                    when: rules::has_keyword(keywords::flying::ID).of(testing::TestRule::ATTACKER),
                 },
             })
         );
