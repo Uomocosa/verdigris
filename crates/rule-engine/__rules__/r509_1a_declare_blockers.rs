@@ -36,7 +36,7 @@ pub fn r509_1a_declare_blockers(
     mut rejected: MessageWriter<actions::Rejected>,
     mut declared: MessageWriter<Attempt<events::DeclareBlocker>>,
     game: Game,
-    blockers: Query<(Entity, &cards::Owner), With<cards::Creature>>,
+    blockers: Query<(Entity, &cards::Controller), With<cards::Creature>>,
     attacking: Query<Entity, With<cards::Attacking>>,
     answers: rules::Rules,
 ) {
@@ -64,8 +64,8 @@ pub fn r509_1a_declare_blockers(
         let blocks_one_creature = assignments.iter().all(|assignment| {
             assignments.iter().filter(|other| other.blocker == assignment.blocker).count() == 1
         });
-        let requirement_unmet = blockers.iter().any(|(entity, owner)| {
-            **owner == action.player
+        let requirement_unmet = blockers.iter().any(|(entity, controller)| {
+            **controller == action.player
                 && answers.required::<events::DeclareBlocker>(entity)
                 && !assignments.iter().any(|assignment| assignment.blocker == entity)
                 && attacking.iter().any(|attacker| {

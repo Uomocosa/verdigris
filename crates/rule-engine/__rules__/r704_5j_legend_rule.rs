@@ -24,25 +24,28 @@ pub fn r704_5j_legend_rule() -> ScheduleConfigs<ScheduleSystem> {
 
 fn ask_which_to_keep(
     mut asks: MessageWriter<actions::Ask>,
-    permanents: Query<(Entity, &cards::CardDefinition, &cards::Owner), With<cards::OnBattlefield>>,
+    permanents: Query<
+        (Entity, &cards::CardDefinition, &cards::Controller),
+        With<cards::OnBattlefield>,
+    >,
 ) {
     let mut legendary_by_owner_and_name: BTreeMap<(players::PlayerId, &str), Vec<Entity>> =
         BTreeMap::new();
-    for (entity, definition, owner) in permanents.iter() {
+    for (entity, definition, controller) in permanents.iter() {
         if definition.type_line.supertypes.contains(&cards::Supertype::Legendary) {
             legendary_by_owner_and_name
-                .entry((**owner, definition.name.as_str()))
+                .entry((**controller, definition.name.as_str()))
                 .or_default()
                 .push(entity);
         }
     }
-    for ((owner, _), entities) in legendary_by_owner_and_name {
+    for ((controller, _), entities) in legendary_by_owner_and_name {
         if entities.len() < 2 {
             continue;
         }
         asks.write(actions::Ask(actions::Choice::Legendary(
             actions::LegendaryChoice {
-                player: owner,
+                player: controller,
                 legal: entities.into_iter().collect(),
             },
         )));

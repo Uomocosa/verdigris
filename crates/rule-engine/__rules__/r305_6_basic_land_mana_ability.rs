@@ -44,7 +44,7 @@ pub fn r305_6_basic_land_mana_ability(
     permanents: Query<
         (
             &cards::CardDefinition,
-            &cards::Owner,
+            &cards::Controller,
             Option<&cards::Tapped>,
         ),
         With<cards::OnBattlefield>,
@@ -58,7 +58,7 @@ pub fn r305_6_basic_land_mana_ability(
         };
         let produces = *produces;
         let permanent = *source;
-        let Ok((definition, owner, tapped)) = permanents.get(permanent) else {
+        let Ok((definition, controller, tapped)) = permanents.get(permanent) else {
             rejected.write(actions::Rejected::CannotActivateManaAbility { permanent });
             continue;
         };
@@ -76,7 +76,7 @@ pub fn r305_6_basic_land_mana_ability(
             continue;
         };
         if state.priority.holder != Some(action.player)
-            || **owner != action.player
+            || **controller != action.player
             || tapped.is_some()
         {
             rejected.write(actions::Rejected::CannotActivateManaAbility { permanent });

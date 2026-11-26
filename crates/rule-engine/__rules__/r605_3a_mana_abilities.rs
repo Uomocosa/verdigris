@@ -16,7 +16,7 @@ pub fn r605_3a_mana_abilities(
     permanents: Query<
         (
             &cards::CardDefinition,
-            &cards::Owner,
+            &cards::Controller,
             Option<&cards::Tapped>,
         ),
         With<cards::OnBattlefield>,
@@ -30,7 +30,7 @@ pub fn r605_3a_mana_abilities(
         };
         let produces = *produces;
         let permanent = *source;
-        let Ok((definition, owner, tapped)) = permanents.get(permanent) else {
+        let Ok((definition, controller, tapped)) = permanents.get(permanent) else {
             continue;
         };
         let Some(ability) =
@@ -42,7 +42,7 @@ pub fn r605_3a_mana_abilities(
             continue;
         }
         if state.priority.holder != Some(action.player)
-            || **owner != action.player
+            || **controller != action.player
             || tapped.is_some()
         {
             rejected.write(actions::Rejected::CannotActivateManaAbility { permanent });

@@ -18,13 +18,13 @@ pub fn r508_1f_tap_attackers() -> ScheduleConfigs<ScheduleSystem> {
 }
 
 fn attempt_to_tap_attackers(
-    attackers: Query<(Entity, &cards::Owner), Added<cards::Attacking>>,
+    attackers: Query<(Entity, &cards::Controller), Added<cards::Attacking>>,
     mut taps: MessageWriter<Attempt<events::TapAttacker>>,
 ) {
-    for (attacker, owner) in attackers.iter() {
+    for (attacker, controller) in attackers.iter() {
         taps.write(Attempt(events::TapAttacker {
             attacker,
-            player: **owner,
+            player: **controller,
         }));
     }
 }

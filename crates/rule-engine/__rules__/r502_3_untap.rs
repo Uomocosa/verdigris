@@ -19,16 +19,16 @@ pub fn r502_3_untap() -> ScheduleConfigs<ScheduleSystem> {
 fn untap(
     mut untaps: MessageWriter<Attempt<events::Untap>>,
     game: Game,
-    tapped: Query<(Entity, &cards::Owner), With<cards::Tapped>>,
+    tapped: Query<(Entity, &cards::Controller), With<cards::Tapped>>,
 ) {
     let Some(active_player) = game.active_player() else {
         return;
     };
-    for (entity, owner) in &tapped {
-        if **owner == active_player.id {
+    for (entity, controller) in &tapped {
+        if **controller == active_player.id {
             untaps.write(Attempt(events::Untap {
                 permanent: entity,
-                controller: **owner,
+                controller: **controller,
             }));
         }
     }

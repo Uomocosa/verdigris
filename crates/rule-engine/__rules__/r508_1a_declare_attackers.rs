@@ -42,7 +42,7 @@ pub fn r508_1a_declare_attackers(
     mut rejected: MessageWriter<actions::Rejected>,
     mut declared: MessageWriter<Attempt<events::DeclareAttacker>>,
     game: Game,
-    candidates: Query<(Entity, &cards::Owner), With<cards::Creature>>,
+    candidates: Query<(Entity, &cards::Controller), With<cards::Creature>>,
     answers: rules::Rules,
 ) {
     for action in actions.read() {
@@ -64,8 +64,8 @@ pub fn r508_1a_declare_attackers(
                 player: action.player,
             })
         });
-        let requirement_unmet = candidates.iter().any(|(entity, owner)| {
-            **owner == action.player
+        let requirement_unmet = candidates.iter().any(|(entity, controller)| {
+            **controller == action.player
                 && answers.required::<events::DeclareAttacker>(entity)
                 && answers.legal::<events::DeclareAttacker>(&events::DeclareAttacker {
                     attacker: entity,

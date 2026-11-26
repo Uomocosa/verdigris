@@ -14,13 +14,13 @@ pub fn r302_6_summoning_sickness() -> ScheduleConfigs<ScheduleSystem> {
 fn remove_summoning_sickness(
     mut commands: Commands,
     game: Game,
-    sick: Query<(Entity, &cards::Owner), With<cards::SummoningSick>>,
+    sick: Query<(Entity, &cards::Controller), With<cards::SummoningSick>>,
 ) {
     let Some(active_player) = game.active_player() else {
         return;
     };
-    for (entity, owner) in &sick {
-        if **owner == active_player.id {
+    for (entity, controller) in &sick {
+        if **controller == active_player.id {
             commands.entity(entity).remove::<cards::SummoningSick>();
         }
     }
