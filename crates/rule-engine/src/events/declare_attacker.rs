@@ -54,15 +54,10 @@ mod tests {
         assert_eq!(restrictions.len(), 4);
         assert_eq!(restrictions[0].id, CREATURE);
         assert_eq!(
-            restrictions[0].text,
-            "The active player chooses which creatures that they control"
-        );
-        assert_eq!(
             restrictions[0].condition,
             rules::has::<cards::Creature>().of(DeclareAttacker::ATTACKER)
         );
         assert_eq!(restrictions[1].id, CONTROLS);
-        assert_eq!(restrictions[1].text, "creatures that they control");
         assert_eq!(
             restrictions[1].condition,
             (rules::points_to::<cards::Controller>(DeclareAttacker::PLAYER)
@@ -70,10 +65,6 @@ mod tests {
             .of(DeclareAttacker::ATTACKER)
         );
         assert_eq!(restrictions[2].id, UNTAPPED);
-        assert_eq!(
-            restrictions[2].text,
-            "The chosen creatures must be untapped"
-        );
         assert_eq!(
             restrictions[2].condition,
             (!rules::has::<cards::Tapped>()).of(DeclareAttacker::ATTACKER)
@@ -90,7 +81,7 @@ mod tests {
     }
 
     #[test]
-    fn restriction_texts_occur_verbatim_in_comprehensive_rules() {
+    fn restriction_rule_numbers_occur_in_comprehensive_rules() {
         const RULES_TEXT: &str = include_str!("../../../../docs/MagicCompRules-20250919.txt");
         let keyword_restrictions = [
             keywords::Deathtouch::abilities(),
@@ -121,11 +112,17 @@ mod tests {
             .chain(DeclareAttacker::restrictions())
             .chain(keyword_restrictions)
         {
+            let id: &str = *restriction.id;
+            if id.starts_with("test/") || id.starts_with("statics/") || id.starts_with("glossary/")
+            {
+                continue;
+            }
+            let (rule_number, _) = id.split_once('/').expect("restriction id cites its rule");
             assert!(
-                RULES_TEXT.contains(restriction.text),
-                "restriction {:?} text not found verbatim in Comprehensive Rules: {:?}",
+                RULES_TEXT.lines().any(|line| line.starts_with(&format!("{rule_number} "))
+                    || line.starts_with(&format!("{rule_number}."))),
+                "restriction {:?} rule number not found in Comprehensive Rules",
                 restriction.id,
-                restriction.text
             );
         }
     }

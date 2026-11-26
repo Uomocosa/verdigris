@@ -12,7 +12,7 @@ pub fn cant_lose_the_game(all: statics::All) -> abilities::Continuous {
             target: rules::Target::event::<events::LoseGame>(),
             change: rules::Change::Restrict {
                 holder: events::LoseGame::PLAYER.into(),
-                restriction: ID.restriction("can’t lose the game", !rules::Condition::True),
+                restriction: ID.restriction(!rules::Condition::True),
             },
         }),
     }
@@ -39,7 +39,7 @@ mod tests {
                 change: rules::Change::Restrict {
                     holder: events::LoseGame::PLAYER.into(),
                     restriction: rules::RestrictionId("statics/cant-lose-the-game")
-                        .restriction("can’t lose the game", !rules::Condition::True,),
+                        .restriction(!rules::Condition::True),
                 },
             })
         );

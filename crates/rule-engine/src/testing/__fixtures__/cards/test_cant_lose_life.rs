@@ -14,7 +14,6 @@ pub const TEST_CANT_LOSE_LIFE: testing::Card = testing::Card {
             statics::you().cant::<events::LoseLife>(
                 events::LoseLife::PLAYER,
                 rules::RestrictionId("test/test-cant-lose-life"),
-                "can’t lose life",
             ),
         }
     },

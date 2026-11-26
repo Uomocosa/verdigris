@@ -11,7 +11,7 @@ pub const LETHAL_DAMAGE: DefinitionId = DefinitionId("glossary/lethal-damage");
 #[atomic_delegates]
 impl DefinitionId {
     #[must_use]
-    pub fn definition(self, text: &'static str, condition: rules::Condition) -> rules::Definition {}
+    pub fn definition(self, condition: rules::Condition) -> rules::Definition {}
 }
 
 #[cfg(test)]
@@ -26,15 +26,8 @@ mod tests {
     fn test_usage() {
         let id = DefinitionId("glossary/lethal-damage");
         assert_eq!(LETHAL_DAMAGE, DefinitionId("glossary/lethal-damage"));
-        let built = id.definition(
-            "An amount of damage greater than or equal to a creature's toughness.",
-            !rules::has::<cards::Tapped>(),
-        );
+        let built = id.definition(!rules::has::<cards::Tapped>());
         assert_eq!(built.id, DefinitionId("glossary/lethal-damage"));
-        assert_eq!(
-            built.text,
-            "An amount of damage greater than or equal to a creature's toughness."
-        );
         assert_eq!(built.condition, !rules::has::<cards::Tapped>());
     }
 }

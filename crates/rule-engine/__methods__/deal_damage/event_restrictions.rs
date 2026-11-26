@@ -2,10 +2,7 @@ use crate::events;
 use crate::rules;
 
 pub fn event_restrictions() -> Vec<rules::Restriction> {
-    vec![events::deal_damage::NONZERO_DAMAGE.restriction(
-        "If a source would deal 0 damage, it does not deal damage at all.",
-        events::DealDamage::AMOUNT.at_least(1),
-    )]
+    vec![events::deal_damage::NONZERO_DAMAGE.restriction(events::DealDamage::AMOUNT.at_least(1))]
 }
 
 #[cfg(test)]

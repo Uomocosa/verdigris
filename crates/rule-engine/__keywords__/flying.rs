@@ -23,7 +23,6 @@ impl Flying {
             change: rules::Change::Restrict {
                 holder: events::DeclareBlocker::ATTACKER.into(),
                 restriction: Self::FLYING_BLOCKERS.restriction(
-                    "A creature with flying can’t be blocked except by creatures with flying and/or reach.",
                     (rules::has::<cards::Flying>() | rules::has::<cards::Reach>())
                         .of(events::DeclareBlocker::BLOCKER),
                 ),
@@ -52,7 +51,6 @@ mod tests {
                 change: rules::Change::Restrict {
                     holder: events::DeclareBlocker::ATTACKER.into(),
                     restriction: Flying::FLYING_BLOCKERS.restriction(
-                        "A creature with flying can’t be blocked except by creatures with flying and/or reach.",
                         (rules::has::<cards::Flying>() | rules::has::<cards::Reach>())
                             .of(events::DeclareBlocker::BLOCKER),
                     ),

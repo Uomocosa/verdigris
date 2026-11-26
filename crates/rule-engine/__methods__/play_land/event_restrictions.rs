@@ -5,30 +5,18 @@ use crate::rules;
 
 pub fn event_restrictions() -> Vec<rules::Restriction> {
     vec![
-        events::play_land::PRIORITY.restriction(
-            "A player who has priority",
-            rules::has_priority(events::PlayLand::PLAYER),
-        ),
-        events::play_land::LAND_CARD.restriction(
-            "a land card",
-            rules::card_type(cards::CardType::Land).of(events::PlayLand::LAND),
-        ),
-        events::play_land::FROM_HAND.restriction(
-            "from their hand",
-            rules::in_zone(HAND, events::PlayLand::PLAYER).of(events::PlayLand::LAND),
-        ),
-        events::play_land::MAIN_PHASE
-            .restriction("during a main phase of their turn", rules::main_phase()),
-        events::play_land::EMPTY_STACK.restriction("when the stack is empty", rules::stack_empty()),
+        events::play_land::PRIORITY.restriction(rules::has_priority(events::PlayLand::PLAYER)),
+        events::play_land::LAND_CARD
+            .restriction(rules::card_type(cards::CardType::Land).of(events::PlayLand::LAND)),
+        events::play_land::FROM_HAND
+            .restriction(rules::in_zone(HAND, events::PlayLand::PLAYER).of(events::PlayLand::LAND)),
+        events::play_land::MAIN_PHASE.restriction(rules::main_phase()),
+        events::play_land::EMPTY_STACK.restriction(rules::stack_empty()),
         events::play_land::OWNS.restriction(
-            "their hand",
             rules::points_to::<cards::Owner>(events::PlayLand::PLAYER).of(events::PlayLand::LAND),
         ),
         events::play_land::OWN_TURN
-            .restriction(
-                "A player can’t play a land, for any reason, if it isn’t their turn.",
-                rules::active_player(events::PlayLand::PLAYER),
-            )
+            .restriction(rules::active_player(events::PlayLand::PLAYER))
             .unwaivable(),
     ]
 }

@@ -15,7 +15,6 @@ pub const TEST_NO_TOKENS: testing::Card = testing::Card {
                 .cant::<events::EnterBattlefield>(
                     events::EnterBattlefield::CONTROLLER,
                     rules::RestrictionId("test/test-no-tokens"),
-                    "can’t enter the battlefield",
                 ),
         }
     },

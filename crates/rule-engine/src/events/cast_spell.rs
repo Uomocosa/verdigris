@@ -49,35 +49,27 @@ mod tests {
         let restrictions = CastSpell::restrictions();
         assert_eq!(restrictions.len(), 5);
         assert_eq!(restrictions[0].id, PRIORITY);
-        assert_eq!(restrictions[0].text, "A player who has priority");
         assert_eq!(
             restrictions[0].condition,
             rules::has_priority(CastSpell::PLAYER)
         );
         assert_eq!(restrictions[1].id, FROM_HAND);
-        assert_eq!(restrictions[1].text, "from their hand");
         assert_eq!(
             restrictions[1].condition,
             rules::in_zone(HAND, CastSpell::PLAYER).of(CastSpell::SPELL)
         );
         assert_eq!(restrictions[2].id, OWNS);
-        assert_eq!(restrictions[2].text, "their hand");
         assert_eq!(
             restrictions[2].condition,
             rules::points_to::<cards::Owner>(CastSpell::PLAYER).of(CastSpell::SPELL)
         );
         assert_eq!(restrictions[3].id, NOT_A_LAND);
-        assert_eq!(restrictions[3].text, "It can’t be cast as a spell.");
         assert_eq!(
             restrictions[3].condition,
             (!rules::card_type(cards::CardType::Land)).of(CastSpell::SPELL)
         );
         assert!(restrictions[3].unwaivable);
         assert_eq!(restrictions[4].id, TIMING);
-        assert_eq!(
-            restrictions[4].text,
-            "during a main phase of their turn when the stack is empty"
-        );
         assert_eq!(
             restrictions[4].condition,
             rules::card_type(cards::CardType::Instant).of(CastSpell::SPELL)
@@ -95,14 +87,20 @@ mod tests {
     }
 
     #[test]
-    fn restriction_texts_occur_verbatim_in_comprehensive_rules() {
+    fn restriction_rule_numbers_occur_in_comprehensive_rules() {
         const RULES_TEXT: &str = include_str!("../../../../docs/MagicCompRules-20250919.txt");
         for restriction in CastSpell::restrictions() {
+            let id: &str = *restriction.id;
+            if id.starts_with("test/") || id.starts_with("statics/") || id.starts_with("glossary/")
+            {
+                continue;
+            }
+            let (rule_number, _) = id.split_once('/').expect("restriction id cites its rule");
             assert!(
-                RULES_TEXT.contains(restriction.text),
-                "restriction {:?} text not found verbatim in Comprehensive Rules: {:?}",
+                RULES_TEXT.lines().any(|line| line.starts_with(&format!("{rule_number} "))
+                    || line.starts_with(&format!("{rule_number}."))),
+                "restriction {:?} rule number not found in Comprehensive Rules",
                 restriction.id,
-                restriction.text
             );
         }
     }

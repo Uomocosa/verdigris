@@ -16,7 +16,6 @@ pub const TEST_NO_BURIALS: testing::Card = testing::Card {
             statics::all(CREATURE.controlled_by(YOU)).cant::<events::PutIntoGraveyard>(
                 events::PutIntoGraveyard::OBJECT,
                 rules::RestrictionId("test/test-no-burials"),
-                "can’t be put into a graveyard",
             ),
         }
     },

@@ -5,10 +5,7 @@ use crate::testing;
 pub fn event_restrictions() -> Vec<rules::Restriction> {
     vec![
         testing::UNTAPPED
-            .restriction(
-                "must be untapped for any reason",
-                (!rules::has::<cards::Tapped>()).of(testing::AbsoluteRule::ATTACKER),
-            )
+            .restriction((!rules::has::<cards::Tapped>()).of(testing::AbsoluteRule::ATTACKER))
             .unwaivable(),
     ]
 }

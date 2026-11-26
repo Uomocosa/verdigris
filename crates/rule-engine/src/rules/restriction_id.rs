@@ -9,12 +9,7 @@ pub struct RestrictionId(pub &'static str);
 #[atomic_delegates]
 impl RestrictionId {
     #[must_use]
-    pub fn restriction(
-        self,
-        text: &'static str,
-        condition: rules::Condition,
-    ) -> rules::Restriction {
-    }
+    pub fn restriction(self, condition: rules::Condition) -> rules::Restriction {}
 }
 
 #[cfg(test)]
@@ -27,12 +22,8 @@ mod tests {
     #[test]
     fn test_usage() {
         let id = RestrictionId("509.1a/untapped");
-        let built = id.restriction(
-            "The chosen creatures must be untapped",
-            !rules::has::<cards::Tapped>(),
-        );
+        let built = id.restriction(!rules::has::<cards::Tapped>());
         assert_eq!(built.id, RestrictionId("509.1a/untapped"));
-        assert_eq!(built.text, "The chosen creatures must be untapped");
         assert_eq!(built.condition, !rules::has::<cards::Tapped>());
     }
 }

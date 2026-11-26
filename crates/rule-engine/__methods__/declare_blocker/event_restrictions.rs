@@ -4,20 +4,15 @@ use crate::rules;
 
 pub fn event_restrictions() -> Vec<rules::Restriction> {
     vec![
-        events::declare_blocker::CREATURE.restriction(
-            "The defending player chooses which creatures they control",
-            rules::has::<cards::Creature>().of(events::DeclareBlocker::BLOCKER),
-        ),
+        events::declare_blocker::CREATURE
+            .restriction(rules::has::<cards::Creature>().of(events::DeclareBlocker::BLOCKER)),
         events::declare_blocker::CONTROLS.restriction(
-            "creatures they control",
             (rules::points_to::<cards::Controller>(events::DeclareBlocker::PLAYER)
                 & rules::has::<cards::OnBattlefield>())
             .of(events::DeclareBlocker::BLOCKER),
         ),
-        events::declare_blocker::UNTAPPED.restriction(
-            "The chosen creatures must be untapped",
-            (!rules::has::<cards::Tapped>()).of(events::DeclareBlocker::BLOCKER),
-        ),
+        events::declare_blocker::UNTAPPED
+            .restriction((!rules::has::<cards::Tapped>()).of(events::DeclareBlocker::BLOCKER)),
     ]
 }
 

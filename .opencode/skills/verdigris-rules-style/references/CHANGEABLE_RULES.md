@@ -102,8 +102,9 @@ add an event, restriction or value rule, register it.
 **A new game action** (draw, cast, pay mana, attack, mill ...):
 1. A struct in `src/events/<cr_name>.rs` with the CR's words as its name and its parameters as
    fields (`Draw { player, amount }`). `impl Event` with `ID` = CR number, named `#[arg]`s.
-2. If the CR lists conditions, write them as `restrictions()` with `RestrictionId` consts, text quoted
-   VERBATIM from `docs/MagicCompRules-*.txt` (keep the verbatim test).
+2. If the CR lists conditions, write them as `restrictions()` with `RestrictionId` consts
+   (the id cites the rule, e.g. `RestrictionId("508.1a/controls")`; the doc comment on the
+   rule that performs the event quotes the sentence). No text is stored on the restriction.
    A condition on the event's own numbers is a restriction too: `DealDamage::AMOUNT.at_least(..)`
    (120.8 `events::deal_damage::NONZERO_DAMAGE`). The same `if event.amount == 0` in several rules is
    such a restriction.
@@ -176,4 +177,4 @@ from the battlefield, that is a gap to close there, not a reason for a rule to l
   in timestamp order over the changes on the event's entities for the event (latest wins, unlike `Restrict`).
 - Don't create an empty "rule" type only to hang a veto on: the event is the target.
 - Don't special-case a card in a `__rules__` system; express it as a `RuleChange`.
-- Keep the CR numbers as IDs and the verbatim-text tests.
+- Keep the CR numbers as IDs and the rule-number tests.

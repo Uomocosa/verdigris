@@ -53,40 +53,30 @@ mod tests {
         let restrictions = PlayLand::restrictions();
         assert_eq!(restrictions.len(), 7);
         assert_eq!(restrictions[0].id, PRIORITY);
-        assert_eq!(restrictions[0].text, "A player who has priority");
         assert_eq!(
             restrictions[0].condition,
             rules::has_priority(PlayLand::PLAYER)
         );
         assert_eq!(restrictions[1].id, LAND_CARD);
-        assert_eq!(restrictions[1].text, "a land card");
         assert_eq!(
             restrictions[1].condition,
             rules::card_type(cards::CardType::Land).of(PlayLand::LAND)
         );
         assert_eq!(restrictions[2].id, FROM_HAND);
-        assert_eq!(restrictions[2].text, "from their hand");
         assert_eq!(
             restrictions[2].condition,
             rules::in_zone(HAND, PlayLand::PLAYER).of(PlayLand::LAND)
         );
         assert_eq!(restrictions[3].id, MAIN_PHASE);
-        assert_eq!(restrictions[3].text, "during a main phase of their turn");
         assert_eq!(restrictions[3].condition, rules::main_phase());
         assert_eq!(restrictions[4].id, EMPTY_STACK);
-        assert_eq!(restrictions[4].text, "when the stack is empty");
         assert_eq!(restrictions[4].condition, rules::stack_empty());
         assert_eq!(restrictions[5].id, OWNS);
-        assert_eq!(restrictions[5].text, "their hand");
         assert_eq!(
             restrictions[5].condition,
             rules::points_to::<cards::Owner>(PlayLand::PLAYER).of(PlayLand::LAND)
         );
         assert_eq!(restrictions[6].id, OWN_TURN);
-        assert_eq!(
-            restrictions[6].text,
-            "A player can’t play a land, for any reason, if it isn’t their turn."
-        );
         assert_eq!(
             restrictions[6].condition,
             rules::active_player(PlayLand::PLAYER)
@@ -102,14 +92,20 @@ mod tests {
     }
 
     #[test]
-    fn restriction_texts_occur_verbatim_in_comprehensive_rules() {
+    fn restriction_rule_numbers_occur_in_comprehensive_rules() {
         const RULES_TEXT: &str = include_str!("../../../../docs/MagicCompRules-20250919.txt");
         for restriction in PlayLand::restrictions() {
+            let id: &str = *restriction.id;
+            if id.starts_with("test/") || id.starts_with("statics/") || id.starts_with("glossary/")
+            {
+                continue;
+            }
+            let (rule_number, _) = id.split_once('/').expect("restriction id cites its rule");
             assert!(
-                RULES_TEXT.contains(restriction.text),
-                "restriction {:?} text not found verbatim in Comprehensive Rules: {:?}",
+                RULES_TEXT.lines().any(|line| line.starts_with(&format!("{rule_number} "))
+                    || line.starts_with(&format!("{rule_number}."))),
+                "restriction {:?} rule number not found in Comprehensive Rules",
                 restriction.id,
-                restriction.text
             );
         }
     }

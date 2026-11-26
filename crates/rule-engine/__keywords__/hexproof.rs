@@ -23,7 +23,6 @@ impl Hexproof {
             change: rules::Change::Restrict {
                 holder: events::BecomeTarget::TARGET.into(),
                 restriction: Self::CANT_BE_TARGETED.restriction(
-                    "can’t be the target of spells or abilities your opponents control",
                     (rules::points_to::<cards::Controller>(
                         events::BecomeTarget::SPELL.controller(),
                     ) | rules::is(events::BecomeTarget::SPELL.controller()))
@@ -54,7 +53,6 @@ mod tests {
                 change: rules::Change::Restrict {
                     holder: events::BecomeTarget::TARGET.into(),
                     restriction: Hexproof::CANT_BE_TARGETED.restriction(
-                        "can’t be the target of spells or abilities your opponents control",
                         (rules::points_to::<cards::Controller>(
                             events::BecomeTarget::SPELL.controller()
                         ) | rules::is(events::BecomeTarget::SPELL.controller()))

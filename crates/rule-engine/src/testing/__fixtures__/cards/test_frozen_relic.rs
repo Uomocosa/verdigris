@@ -16,7 +16,6 @@ pub const TEST_FROZEN_RELIC: testing::Card = testing::Card {
             statics::this().restriction::<events::Untap>(
                 events::Untap::PERMANENT,
                 rules::RestrictionId("test/test-frozen-relic"),
-                "untaps only during your untap step",
                 !(rules::step_is(UNTAP) & rules::active_player(events::Untap::PERMANENT.controller())),
             ),
         }

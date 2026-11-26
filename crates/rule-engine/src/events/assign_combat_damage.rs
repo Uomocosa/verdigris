@@ -60,10 +60,6 @@ mod tests {
         assert_eq!(restrictions.len(), 1);
         assert_eq!(restrictions[0].id, super::ONLY_BLOCKERS);
         assert_eq!(
-            restrictions[0].text,
-            "A blocked creature assigns its combat damage to the creatures blocking it"
-        );
-        assert_eq!(
             restrictions[0].condition,
             rules::points_to::<cards::Blocking>(AssignCombatDamage::SOURCE)
                 .of(AssignCombatDamage::TARGET)
@@ -79,14 +75,20 @@ mod tests {
     }
 
     #[test]
-    fn restriction_texts_occur_verbatim_in_comprehensive_rules() {
+    fn restriction_rule_numbers_occur_in_comprehensive_rules() {
         const RULES_TEXT: &str = include_str!("../../../../docs/MagicCompRules-20250919.txt");
         for restriction in AssignCombatDamage::restrictions() {
+            let id: &str = *restriction.id;
+            if id.starts_with("test/") || id.starts_with("statics/") || id.starts_with("glossary/")
+            {
+                continue;
+            }
+            let (rule_number, _) = id.split_once('/').expect("restriction id cites its rule");
             assert!(
-                RULES_TEXT.contains(restriction.text),
-                "restriction {:?} text not found verbatim in Comprehensive Rules: {:?}",
+                RULES_TEXT.lines().any(|line| line.starts_with(&format!("{rule_number} "))
+                    || line.starts_with(&format!("{rule_number}."))),
+                "restriction {:?} rule number not found in Comprehensive Rules",
                 restriction.id,
-                restriction.text
             );
         }
     }

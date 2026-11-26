@@ -8,7 +8,6 @@ pub fn cant<E: Event>(
     all: statics::All,
     holder: impl Into<rules::ArgRef>,
     id: rules::RestrictionId,
-    text: &'static str,
 ) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
@@ -16,7 +15,7 @@ pub fn cant<E: Event>(
             target: rules::Target::event::<E>(),
             change: rules::Change::Restrict {
                 holder: holder.into(),
-                restriction: id.restriction(text, !rules::Condition::True),
+                restriction: id.restriction(!rules::Condition::True),
             },
         }),
     }
@@ -38,7 +37,6 @@ mod tests {
             statics::all(PLAYER),
             events::Draw::PLAYER,
             rules::RestrictionId("test/cant"),
-            "can’t draw",
         );
         assert_eq!(ability.filter, PLAYER);
         assert_eq!(
@@ -48,7 +46,7 @@ mod tests {
                 change: rules::Change::Restrict {
                     holder: events::Draw::PLAYER.into(),
                     restriction: rules::RestrictionId("test/cant")
-                        .restriction("can’t draw", !rules::Condition::True,),
+                        .restriction(!rules::Condition::True),
                 },
             })
         );

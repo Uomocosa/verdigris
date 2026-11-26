@@ -14,22 +14,18 @@ pub const TEST_CANT_DISCARD: testing::Card = testing::Card {
             statics::you().cant::<events::Discard>(
                 events::Discard::PLAYER,
                 rules::RestrictionId("test/test-cant-discard"),
-                "can’t discard",
             ),
             statics::you().cant::<events::GainLife>(
                 events::GainLife::PLAYER,
                 rules::RestrictionId("test/test-cant-discard"),
-                "can’t gain life",
             ),
             statics::you().cant::<events::Mill>(
                 events::Mill::PLAYER,
                 rules::RestrictionId("test/test-cant-discard"),
-                "can’t mill",
             ),
             statics::you().cant::<events::CreateTokens>(
                 events::CreateTokens::CONTROLLER,
                 rules::RestrictionId("test/test-cant-discard"),
-                "can’t create tokens",
             ),
         }
     },

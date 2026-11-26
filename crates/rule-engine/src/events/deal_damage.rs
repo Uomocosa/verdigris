@@ -54,10 +54,6 @@ mod tests {
         let restrictions = DealDamage::restrictions();
         assert_eq!(restrictions.len(), 1);
         assert_eq!(restrictions[0].id, super::NONZERO_DAMAGE);
-        assert_eq!(
-            restrictions[0].text,
-            "If a source would deal 0 damage, it does not deal damage at all."
-        );
         assert_eq!(restrictions[0].condition, DealDamage::AMOUNT.at_least(1));
         assert_eq!(
             event.arg(DealDamage::SOURCE),
@@ -78,14 +74,20 @@ mod tests {
     }
 
     #[test]
-    fn restriction_texts_occur_verbatim_in_comprehensive_rules() {
+    fn restriction_rule_numbers_occur_in_comprehensive_rules() {
         const RULES_TEXT: &str = include_str!("../../../../docs/MagicCompRules-20250919.txt");
         for restriction in DealDamage::restrictions() {
+            let id: &str = *restriction.id;
+            if id.starts_with("test/") || id.starts_with("statics/") || id.starts_with("glossary/")
+            {
+                continue;
+            }
+            let (rule_number, _) = id.split_once('/').expect("restriction id cites its rule");
             assert!(
-                RULES_TEXT.contains(restriction.text),
-                "restriction {:?} text not found verbatim in Comprehensive Rules: {:?}",
+                RULES_TEXT.lines().any(|line| line.starts_with(&format!("{rule_number} "))
+                    || line.starts_with(&format!("{rule_number}."))),
+                "restriction {:?} rule number not found in Comprehensive Rules",
                 restriction.id,
-                restriction.text
             );
         }
     }

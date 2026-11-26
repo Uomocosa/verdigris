@@ -21,10 +21,7 @@ impl Defender {
             target: rules::Target::event::<events::DeclareAttacker>(),
             change: rules::Change::Restrict {
                 holder: events::DeclareAttacker::ATTACKER.into(),
-                restriction: Self::CANT_ATTACK.restriction(
-                    "A creature with defender can’t attack.",
-                    !rules::Condition::True,
-                ),
+                restriction: Self::CANT_ATTACK.restriction(!rules::Condition::True),
             },
         })]
     }
@@ -48,10 +45,7 @@ mod tests {
                 target: rules::Target::event::<events::DeclareAttacker>(),
                 change: rules::Change::Restrict {
                     holder: events::DeclareAttacker::ATTACKER.into(),
-                    restriction: Defender::CANT_ATTACK.restriction(
-                        "A creature with defender can’t attack.",
-                        !rules::Condition::True,
-                    ),
+                    restriction: Defender::CANT_ATTACK.restriction(!rules::Condition::True,),
                 },
             })]
         );

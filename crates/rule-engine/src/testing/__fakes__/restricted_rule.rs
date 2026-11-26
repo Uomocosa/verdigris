@@ -19,7 +19,7 @@ pub struct RestrictedRule {
 impl Event for RestrictedRule {
     const ID: rules::EventId = rules::EventId("test/restriction");
     fn restrictions() -> Vec<rules::Restriction> {
-        vec![testing::UNTAPPED.restriction("must be untapped", rules::Condition::True)]
+        vec![testing::UNTAPPED.restriction(rules::Condition::True)]
     }
 }
 

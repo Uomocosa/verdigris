@@ -4,22 +4,16 @@ use crate::rules;
 
 pub fn event_restrictions() -> Vec<rules::Restriction> {
     vec![
-        events::declare_attacker::CREATURE.restriction(
-            "The active player chooses which creatures that they control",
-            rules::has::<cards::Creature>().of(events::DeclareAttacker::ATTACKER),
-        ),
+        events::declare_attacker::CREATURE
+            .restriction(rules::has::<cards::Creature>().of(events::DeclareAttacker::ATTACKER)),
         events::declare_attacker::CONTROLS.restriction(
-            "creatures that they control",
             (rules::points_to::<cards::Controller>(events::DeclareAttacker::PLAYER)
                 & rules::has::<cards::OnBattlefield>())
             .of(events::DeclareAttacker::ATTACKER),
         ),
-        events::declare_attacker::UNTAPPED.restriction(
-            "The chosen creatures must be untapped",
-            (!rules::has::<cards::Tapped>()).of(events::DeclareAttacker::ATTACKER),
-        ),
+        events::declare_attacker::UNTAPPED
+            .restriction((!rules::has::<cards::Tapped>()).of(events::DeclareAttacker::ATTACKER)),
         events::declare_attacker::SUMMONING_SICK.restriction(
-            "have been controlled by the active player continuously since the turn began",
             (!rules::has::<cards::SummoningSick>()).of(events::DeclareAttacker::ATTACKER),
         ),
     ]

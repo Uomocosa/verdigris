@@ -16,10 +16,8 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let restriction = rules::RestrictionId("509.1a/untapped").restriction(
-            "The chosen creatures must be untapped",
-            !rules::has::<cards::Tapped>(),
-        );
+        let restriction =
+            rules::RestrictionId("509.1a/untapped").restriction(!rules::has::<cards::Tapped>());
         assert!(!restriction.unwaivable);
         let made_unwaivable = unwaivable(restriction);
         assert!(made_unwaivable.unwaivable);

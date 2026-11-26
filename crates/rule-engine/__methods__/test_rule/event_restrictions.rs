@@ -3,10 +3,10 @@ use crate::rules;
 use crate::testing;
 
 pub fn event_restrictions() -> Vec<rules::Restriction> {
-    vec![testing::UNTAPPED.restriction(
-        "must be untapped",
-        (!rules::has::<cards::Tapped>()).of(testing::TestRule::ATTACKER),
-    )]
+    vec![
+        testing::UNTAPPED
+            .restriction((!rules::has::<cards::Tapped>()).of(testing::TestRule::ATTACKER)),
+    ]
 }
 
 #[cfg(test)]

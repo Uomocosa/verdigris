@@ -16,17 +16,14 @@ pub const TEST_SAFE_HAVEN: testing::Card = testing::Card {
             statics::all(CREATURE.controlled_by(YOU)).cant::<events::Destroy>(
                 events::Destroy::PERMANENT,
                 rules::RestrictionId("test/test-safe-haven"),
-                "can’t be destroyed",
             ),
             statics::you().cant::<events::Counter>(
                 events::Counter::SPELL.controller(),
                 rules::RestrictionId("test/test-safe-haven"),
-                "can’t be countered",
             ),
             statics::all(CREATURE.controlled_by(YOU)).cant::<events::DealDamage>(
                 events::DealDamage::RECIPIENT,
                 rules::RestrictionId("test/test-safe-haven"),
-                "can’t be dealt damage",
             ),
         }
     },

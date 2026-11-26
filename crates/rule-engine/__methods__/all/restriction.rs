@@ -8,7 +8,6 @@ pub fn restriction<E: Event>(
     all: statics::All,
     holder: impl Into<rules::ArgRef>,
     id: rules::RestrictionId,
-    text: &'static str,
     requirement: rules::Condition,
 ) -> abilities::Continuous {
     abilities::Continuous {
@@ -17,7 +16,7 @@ pub fn restriction<E: Event>(
             target: rules::Target::event::<E>(),
             change: rules::Change::Restrict {
                 holder: holder.into(),
-                restriction: id.restriction(text, requirement),
+                restriction: id.restriction(requirement),
             },
         }),
     }
@@ -39,7 +38,6 @@ mod tests {
             statics::all(CREATURE),
             testing::RestrictedRule::ATTACKER,
             rules::RestrictionId("test/restriction"),
-            "attacks only with enough power",
             rules::Condition::True,
         );
         assert_eq!(ability.filter, CREATURE);
@@ -50,7 +48,7 @@ mod tests {
                 change: rules::Change::Restrict {
                     holder: testing::RestrictedRule::ATTACKER.into(),
                     restriction: rules::RestrictionId("test/restriction")
-                        .restriction("attacks only with enough power", rules::Condition::True,),
+                        .restriction(rules::Condition::True),
                 },
             })
         );

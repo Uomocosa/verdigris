@@ -12,7 +12,7 @@ pub fn cant_win_the_game(all: statics::All) -> abilities::Continuous {
             target: rules::Target::event::<events::WinGame>(),
             change: rules::Change::Restrict {
                 holder: events::WinGame::PLAYER.into(),
-                restriction: ID.restriction("can’t win the game", !rules::Condition::True),
+                restriction: ID.restriction(!rules::Condition::True),
             },
         }),
     }
@@ -39,7 +39,7 @@ mod tests {
                 change: rules::Change::Restrict {
                     holder: events::WinGame::PLAYER.into(),
                     restriction: rules::RestrictionId("statics/cant-win-the-game")
-                        .restriction("can’t win the game", !rules::Condition::True,),
+                        .restriction(!rules::Condition::True),
                 },
             })
         );

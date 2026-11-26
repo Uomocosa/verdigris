@@ -5,7 +5,6 @@ use crate::rules;
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Statement<Id> {
     pub id: Id,
-    pub text: &'static str,
     pub condition: rules::Condition,
     pub unwaivable: bool,
 }
@@ -31,10 +30,8 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let restriction: rules::Restriction = rules::RestrictionId("509.1a/untapped").restriction(
-            "The chosen creatures must be untapped",
-            !rules::has::<cards::Tapped>(),
-        );
+        let restriction =
+            rules::RestrictionId("509.1a/untapped").restriction(!rules::has::<cards::Tapped>());
         assert_eq!(restriction.id, rules::RestrictionId("509.1a/untapped"));
         assert!(!restriction.unwaivable);
         let made_unwaivable: Statement<rules::RestrictionId> = restriction.unwaivable();

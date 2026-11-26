@@ -5,7 +5,6 @@ use crate::rules;
 pub fn event_restrictions() -> Vec<rules::Restriction> {
     vec![
         events::assign_combat_damage::ONLY_BLOCKERS.restriction(
-            "A blocked creature assigns its combat damage to the creatures blocking it",
             rules::points_to::<cards::Blocking>(events::AssignCombatDamage::SOURCE)
                 .of(events::AssignCombatDamage::TARGET),
         ),

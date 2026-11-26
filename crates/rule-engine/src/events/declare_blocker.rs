@@ -53,15 +53,10 @@ mod tests {
         assert_eq!(restrictions.len(), 3);
         assert_eq!(restrictions[0].id, CREATURE);
         assert_eq!(
-            restrictions[0].text,
-            "The defending player chooses which creatures they control"
-        );
-        assert_eq!(
             restrictions[0].condition,
             rules::has::<cards::Creature>().of(DeclareBlocker::BLOCKER)
         );
         assert_eq!(restrictions[1].id, CONTROLS);
-        assert_eq!(restrictions[1].text, "creatures they control");
         assert_eq!(
             restrictions[1].condition,
             (rules::points_to::<cards::Controller>(DeclareBlocker::PLAYER)
@@ -69,10 +64,6 @@ mod tests {
             .of(DeclareBlocker::BLOCKER)
         );
         assert_eq!(restrictions[2].id, UNTAPPED);
-        assert_eq!(
-            restrictions[2].text,
-            "The chosen creatures must be untapped"
-        );
         assert_eq!(
             restrictions[2].condition,
             (!rules::has::<cards::Tapped>()).of(DeclareBlocker::BLOCKER)

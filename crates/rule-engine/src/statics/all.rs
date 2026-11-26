@@ -53,7 +53,6 @@ impl All {
         self,
         holder: impl Into<rules::ArgRef>,
         id: rules::RestrictionId,
-        text: &'static str,
     ) -> abilities::Continuous {
     }
 
@@ -88,7 +87,6 @@ impl All {
         self,
         holder: impl Into<rules::ArgRef>,
         id: rules::RestrictionId,
-        text: &'static str,
         requirement: rules::Condition,
     ) -> abilities::Continuous {
     }

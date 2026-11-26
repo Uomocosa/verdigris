@@ -5,27 +5,18 @@ use crate::rules;
 
 pub fn event_restrictions() -> Vec<rules::Restriction> {
     vec![
-        events::cast_spell::PRIORITY.restriction(
-            "A player who has priority",
-            rules::has_priority(events::CastSpell::PLAYER),
-        ),
+        events::cast_spell::PRIORITY.restriction(rules::has_priority(events::CastSpell::PLAYER)),
         events::cast_spell::FROM_HAND.restriction(
-            "from their hand",
             rules::in_zone(HAND, events::CastSpell::PLAYER).of(events::CastSpell::SPELL),
         ),
         events::cast_spell::OWNS.restriction(
-            "their hand",
             rules::points_to::<cards::Owner>(events::CastSpell::PLAYER)
                 .of(events::CastSpell::SPELL),
         ),
         events::cast_spell::NOT_A_LAND
-            .restriction(
-                "It can’t be cast as a spell.",
-                (!rules::card_type(cards::CardType::Land)).of(events::CastSpell::SPELL),
-            )
+            .restriction((!rules::card_type(cards::CardType::Land)).of(events::CastSpell::SPELL))
             .unwaivable(),
         events::cast_spell::TIMING.restriction(
-            "during a main phase of their turn when the stack is empty",
             rules::card_type(cards::CardType::Instant).of(events::CastSpell::SPELL)
                 | (rules::main_phase()
                     & rules::stack_empty()

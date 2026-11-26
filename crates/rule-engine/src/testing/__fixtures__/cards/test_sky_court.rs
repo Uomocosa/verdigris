@@ -15,7 +15,6 @@ pub const TEST_SKY_COURT: testing::Card = testing::Card {
             statics::all(CREATURE).restriction::<events::DeclareBlocker>(
                 events::DeclareBlocker::BLOCKER,
                 rules::RestrictionId("test/test-sky-court"),
-                "blocks only creatures with flying",
                 (!rules::has::<cards::Flying>()).of(events::DeclareBlocker::BLOCKER)
                     | rules::has::<cards::Flying>().of(events::DeclareBlocker::ATTACKER),
             ),
