@@ -3,7 +3,7 @@ use crate::effects;
 use crate::keywords;
 use crate::statics;
 
-pub fn lose(all: statics::All, keyword: keywords::StaticKeyword) -> abilities::Continuous {
+pub fn lose(all: statics::All, keyword: keywords::Keyword) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
         modification: effects::Modification::Characteristic(effects::Layered::LoseKeyword(keyword)),
@@ -25,9 +25,9 @@ mod tests {
         assert_eq!(ability.filter, CREATURE);
         assert_eq!(
             ability.modification,
-            effects::Modification::Characteristic(effects::Layered::LoseKeyword(
-                keywords::StaticKeyword::Flying
-            ))
+            effects::Modification::Characteristic(
+                effects::Layered::LoseKeyword(keywords::flying())
+            )
         );
     }
 }

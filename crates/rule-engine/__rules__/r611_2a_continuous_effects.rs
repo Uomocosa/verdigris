@@ -43,7 +43,7 @@ pub fn r611_2a_continuous_effects(
             affected: grant.target,
             source: None,
             modification: effects::Modification::Characteristic(effects::Layered::GainKeyword(
-                grant.keyword,
+                grant.keyword.clone(),
             )),
             until: effects::Duration::UntilEndOfTurn,
             timestamp: timestamp.advance(),

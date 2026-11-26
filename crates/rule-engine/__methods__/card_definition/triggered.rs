@@ -28,7 +28,10 @@ mod tests {
             effect: effects::gain_life(1).to_player(YOU),
         };
         assert_eq!(
-            triggered(definition, ability).triggered_abilities().copied().collect::<Vec<_>>(),
+            triggered(definition, ability.clone())
+                .triggered_abilities()
+                .cloned()
+                .collect::<Vec<_>>(),
             [ability]
         );
     }

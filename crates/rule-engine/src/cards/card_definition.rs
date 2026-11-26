@@ -84,7 +84,7 @@ impl CardDefinition {
 
     pub fn continuous_abilities(&self) -> impl Iterator<Item = &abilities::Continuous> {}
 
-    pub fn keywords(&self) -> impl Iterator<Item = keywords::StaticKeyword> + '_ {}
+    pub fn keywords(&self) -> impl Iterator<Item = keywords::Keyword> + '_ {}
 
     #[must_use]
     pub fn has_mana_ability(&self) -> bool {}
@@ -99,7 +99,7 @@ impl CardDefinition {
 #[rustfmt::skip]
 impl CardDefinition {
     #[must_use]
-    pub fn has_keyword(&self, keyword: keywords::StaticKeyword) -> bool { self.keywords().any(|candidate| candidate == keyword) }
+    pub fn has_keyword(&self, keyword: &keywords::Keyword) -> bool { self.keywords().any(|candidate| candidate == *keyword) }
 
     #[must_use]
     pub fn at(self, trigger: impl Into<abilities::Trigger>, effect: effects::Effect) -> Self { self.whenever(trigger, effect) }
@@ -113,7 +113,7 @@ impl CardDefinition {
 
 impl CardDefinition {
     #[must_use]
-    pub fn keyword(mut self, keyword: keywords::StaticKeyword) -> Self {
+    pub fn keyword(mut self, keyword: keywords::Keyword) -> Self {
         self.text.push(abilities::Ability::from(keyword));
         self
     }
@@ -180,7 +180,7 @@ mod tests {
             .keyword(keywords::indestructible());
         assert_eq!(
             myr.keywords().collect::<Vec<_>>(),
-            vec![keywords::StaticKeyword::Indestructible]
+            vec![keywords::indestructible()]
         );
         let spell = cards::instant("Murder", cards::Cost::default()).spell(effects::destroy());
         assert_eq!(spell.spell_ability(), Some(&effects::destroy()));
@@ -195,7 +195,7 @@ mod tests {
         };
         assert_eq!(
             definition.keywords().collect::<Vec<_>>(),
-            vec![keywords::StaticKeyword::Vigilance]
+            vec![keywords::vigilance()]
         );
         assert_eq!(definition.triggered_abilities().count(), 0);
         let continuous = definition.continuous_abilities().collect::<Vec<_>>();
@@ -203,7 +203,7 @@ mod tests {
         assert_eq!(
             continuous[0].modification,
             effects::Modification::Characteristic(effects::Layered::GainKeyword(
-                keywords::StaticKeyword::Vigilance
+                keywords::vigilance()
             ))
         );
     }

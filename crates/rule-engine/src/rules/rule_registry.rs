@@ -63,7 +63,7 @@ mod tests {
                             modifications.push(continuous.modification.clone());
                         }
                         abilities::StaticAbility::Keyword(keyword) => {
-                            modifications.extend(keyword.keyword_modifications());
+                            modifications.extend(keyword.abilities());
                         }
                         abilities::StaticAbility::Replacement(replacement) => {
                             if let abilities::Replacement::Rule(change) = replacement {
@@ -99,7 +99,7 @@ mod tests {
                             modifications.push(continuous.modification.clone());
                         }
                         abilities::StaticAbility::Keyword(keyword) => {
-                            modifications.extend(keyword.keyword_modifications());
+                            modifications.extend(keyword.abilities());
                         }
                         abilities::StaticAbility::Replacement(replacement) => {
                             if let abilities::Replacement::Rule(change) = replacement {

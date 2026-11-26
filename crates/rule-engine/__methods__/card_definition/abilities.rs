@@ -34,16 +34,16 @@ mod tests {
             definition,
             [
                 abilities::Ability::from(keywords::vigilance()),
-                abilities::Ability::from(triggered),
+                abilities::Ability::from(triggered.clone()),
                 abilities::Ability::from(static_ability.clone()),
             ],
         );
         assert_eq!(
             definition.keywords().collect::<Vec<_>>(),
-            vec![keywords::StaticKeyword::Vigilance]
+            vec![keywords::vigilance()]
         );
         assert_eq!(
-            definition.triggered_abilities().copied().collect::<Vec<_>>(),
+            definition.triggered_abilities().cloned().collect::<Vec<_>>(),
             [triggered]
         );
         assert_eq!(

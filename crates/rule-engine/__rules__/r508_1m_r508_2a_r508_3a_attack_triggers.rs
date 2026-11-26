@@ -33,7 +33,7 @@ pub fn r508_1m_r508_2a_r508_3a_attack_triggers(
             queue.push(stack::PendingTrigger {
                 source: declared.attacker,
                 controller: **controller,
-                ability: *ability,
+                ability: ability.clone(),
             });
         }
     }

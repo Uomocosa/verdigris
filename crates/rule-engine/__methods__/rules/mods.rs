@@ -2,7 +2,6 @@ use bevy::prelude::Entity;
 
 use crate::abilities;
 use crate::effects;
-use crate::keywords;
 use crate::rules;
 
 pub fn mods(answers: &rules::Rules, entity: Entity) -> Vec<effects::Modification> {
@@ -10,7 +9,7 @@ pub fn mods(answers: &rules::Rules, entity: Entity) -> Vec<effects::Modification
         .characteristics(entity)
         .keywords
         .into_iter()
-        .flat_map(keywords::StaticKeyword::keyword_modifications)
+        .flat_map(|keyword| keyword.abilities())
         .collect();
     modifications.extend(
         answers

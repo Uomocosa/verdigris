@@ -45,7 +45,7 @@ pub fn r509_1i_r509_2a_r509_3a_r509_3c_blocker_triggers(
                 queue.push(stack::PendingTrigger {
                     source: declared.blocker,
                     controller: **controller,
-                    ability: *ability,
+                    ability: ability.clone(),
                 });
             }
         }
@@ -59,7 +59,7 @@ pub fn r509_1i_r509_2a_r509_3a_r509_3c_blocker_triggers(
                 queue.push(stack::PendingTrigger {
                     source: declared.attacker,
                     controller: **controller,
-                    ability: *ability,
+                    ability: ability.clone(),
                 });
             }
         }

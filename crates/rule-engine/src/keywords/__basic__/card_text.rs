@@ -2,71 +2,71 @@ use crate::effects;
 use crate::keywords;
 
 #[must_use]
-pub const fn enchant(filter: effects::Filter) -> keywords::StaticKeyword {
-    keywords::StaticKeyword::Enchant(filter)
+pub fn enchant(filter: effects::Filter) -> keywords::Keyword {
+    keywords::Enchant::keyword(filter)
 }
 
 #[must_use]
-pub const fn indestructible() -> keywords::StaticKeyword {
-    keywords::StaticKeyword::Indestructible
+pub fn indestructible() -> keywords::Keyword {
+    keywords::Indestructible::keyword()
 }
 
 #[must_use]
-pub const fn deathtouch() -> keywords::StaticKeyword {
-    keywords::StaticKeyword::Deathtouch
+pub fn deathtouch() -> keywords::Keyword {
+    keywords::Deathtouch::keyword()
 }
 
 #[must_use]
-pub const fn lifelink() -> keywords::StaticKeyword {
-    keywords::StaticKeyword::Lifelink
+pub fn lifelink() -> keywords::Keyword {
+    keywords::Lifelink::keyword()
 }
 
 #[must_use]
-pub const fn trample() -> keywords::StaticKeyword {
-    keywords::StaticKeyword::Trample
+pub fn trample() -> keywords::Keyword {
+    keywords::Trample::keyword()
 }
 
 #[must_use]
-pub const fn flying() -> keywords::StaticKeyword {
-    keywords::StaticKeyword::Flying
+pub fn flying() -> keywords::Keyword {
+    keywords::Flying::keyword()
 }
 
 #[must_use]
-pub const fn reach() -> keywords::StaticKeyword {
-    keywords::StaticKeyword::Reach
+pub fn reach() -> keywords::Keyword {
+    keywords::Reach::keyword()
 }
 
 #[must_use]
-pub const fn vigilance() -> keywords::StaticKeyword {
-    keywords::StaticKeyword::Vigilance
+pub fn vigilance() -> keywords::Keyword {
+    keywords::Vigilance::keyword()
 }
 
 #[must_use]
-pub const fn defender() -> keywords::StaticKeyword {
-    keywords::StaticKeyword::Defender
+pub fn defender() -> keywords::Keyword {
+    keywords::Defender::keyword()
 }
 
 #[must_use]
-pub const fn haste() -> keywords::StaticKeyword {
-    keywords::StaticKeyword::Haste
+pub fn haste() -> keywords::Keyword {
+    keywords::Haste::keyword()
 }
 
 #[must_use]
-pub const fn hexproof() -> keywords::StaticKeyword {
-    keywords::StaticKeyword::Hexproof
+pub fn hexproof() -> keywords::Keyword {
+    keywords::Hexproof::keyword()
 }
 
 #[must_use]
-pub const fn first_strike() -> keywords::StaticKeyword {
-    keywords::StaticKeyword::FirstStrike
+pub fn first_strike() -> keywords::Keyword {
+    keywords::FirstStrike::keyword()
 }
 
 #[must_use]
-pub const fn double_strike() -> keywords::StaticKeyword {
-    keywords::StaticKeyword::DoubleStrike
+pub fn double_strike() -> keywords::Keyword {
+    keywords::DoubleStrike::keyword()
 }
 
 #[must_use]
-pub const fn infect() -> keywords::StaticKeyword {
-    keywords::StaticKeyword::Infect
+pub fn infect() -> keywords::Keyword {
+    keywords::Infect::keyword()
 }

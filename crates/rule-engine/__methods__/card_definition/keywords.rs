@@ -4,9 +4,11 @@ use crate::keywords;
 
 pub fn keywords(
     definition: &cards::CardDefinition,
-) -> impl Iterator<Item = keywords::StaticKeyword> + '_ {
+) -> impl Iterator<Item = keywords::Keyword> + '_ {
     definition.text.iter().filter_map(|ability| match ability {
-        abilities::Ability::Static(abilities::StaticAbility::Keyword(keyword)) => Some(*keyword),
+        abilities::Ability::Static(abilities::StaticAbility::Keyword(keyword)) => {
+            Some(keyword.clone())
+        }
         _ => None,
     })
 }
@@ -26,7 +28,7 @@ mod tests {
             cards::creature("Grizzly Bears", cost![1, G], pt!(2, 2)).keyword(keywords::flying());
         assert_eq!(
             definition_keywords(&definition).collect::<Vec<_>>(),
-            vec![keywords::StaticKeyword::Flying]
+            vec![keywords::flying()]
         );
     }
 }

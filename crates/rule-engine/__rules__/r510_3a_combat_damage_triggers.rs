@@ -33,7 +33,7 @@ pub fn r510_3a_combat_damage_triggers(
             queue.push(stack::PendingTrigger {
                 source: event.source,
                 controller: **controller,
-                ability: *ability,
+                ability: ability.clone(),
             });
         }
     }

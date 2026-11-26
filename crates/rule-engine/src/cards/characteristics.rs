@@ -11,7 +11,7 @@ pub struct Characteristics {
     pub on_battlefield: bool,
     pub types: Vec<cards::CardType>,
     pub power_toughness: Option<cards::PowerToughness>,
-    pub keywords: Vec<keywords::StaticKeyword>,
+    pub keywords: Vec<keywords::Keyword>,
     pub triggered_abilities: Vec<abilities::TriggeredAbility>,
 }
 

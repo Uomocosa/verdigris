@@ -43,9 +43,7 @@ mod tests {
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
                 assert!(
-                    !characteristics(&answers, *bears)
-                        .keywords
-                        .contains(&keywords::StaticKeyword::Vigilance)
+                    !characteristics(&answers, *bears).keywords.contains(&keywords::vigilance())
                 );
             })
             .unwrap();

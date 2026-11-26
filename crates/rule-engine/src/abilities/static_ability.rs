@@ -3,13 +3,13 @@ use crate::keywords;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum StaticAbility {
-    Keyword(keywords::StaticKeyword),
+    Keyword(keywords::Keyword),
     Continuous(abilities::Continuous),
     Replacement(abilities::Replacement),
 }
 
-impl From<keywords::StaticKeyword> for StaticAbility {
-    fn from(keyword: keywords::StaticKeyword) -> Self {
+impl From<keywords::Keyword> for StaticAbility {
+    fn from(keyword: keywords::Keyword) -> Self {
         Self::Keyword(keyword)
     }
 }

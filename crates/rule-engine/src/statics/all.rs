@@ -13,7 +13,7 @@ pub struct All(pub effects::Filter);
 #[atomic_delegates]
 impl All {
     #[must_use]
-    pub fn gain(self, keyword: keywords::StaticKeyword) -> abilities::Continuous {}
+    pub fn gain(self, keyword: keywords::Keyword) -> abilities::Continuous {}
 
     #[must_use]
     pub fn get_pt(self, power: i32, toughness: i32) -> abilities::Continuous {}
@@ -28,7 +28,7 @@ impl All {
     }
 
     #[must_use]
-    pub fn lose(self, keyword: keywords::StaticKeyword) -> abilities::Continuous {}
+    pub fn lose(self, keyword: keywords::Keyword) -> abilities::Continuous {}
 
     #[must_use]
     pub fn attack_as_though_it_had_haste(self) -> abilities::Continuous {}

@@ -34,10 +34,10 @@ pub struct Lifelink;
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Trample;
 
-#[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Deref)]
+#[derive(Component, Debug, Clone, PartialEq, Eq, Deref)]
 pub struct TriggeredEnters(pub abilities::TriggeredAbility);
 
-#[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Deref)]
+#[derive(Component, Debug, Clone, PartialEq, Eq, Deref)]
 pub struct TriggeredAtStep(pub abilities::TriggeredAbility);
 
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]

@@ -12,8 +12,8 @@ pub enum Ability {
     Activated(abilities::ActivatedAbility),
 }
 
-impl From<keywords::StaticKeyword> for Ability {
-    fn from(keyword: keywords::StaticKeyword) -> Self {
+impl From<keywords::Keyword> for Ability {
+    fn from(keyword: keywords::Keyword) -> Self {
         Self::Static(abilities::StaticAbility::Keyword(keyword))
     }
 }

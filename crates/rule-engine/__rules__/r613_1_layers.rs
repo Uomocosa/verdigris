@@ -110,7 +110,7 @@ mod tests {
                     effect.affected == bears
                         && effect.modification
                             == effects::Modification::Characteristic(effects::Layered::GainKeyword(
-                                keywords::StaticKeyword::Flying,
+                                keywords::flying(),
                             ))
                 })
                 .count()

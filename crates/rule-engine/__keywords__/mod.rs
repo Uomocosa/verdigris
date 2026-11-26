@@ -1,0 +1,14 @@
+pub mod deathtouch;
+pub mod defender;
+pub mod double_strike;
+pub mod enchant;
+pub mod first_strike;
+pub mod flying;
+pub mod haste;
+pub mod hexproof;
+pub mod indestructible;
+pub mod infect;
+pub mod lifelink;
+pub mod reach;
+pub mod trample;
+pub mod vigilance;

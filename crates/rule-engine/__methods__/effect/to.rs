@@ -1,6 +1,6 @@
 use crate::effects;
 
-pub const fn to(effect: effects::Effect, target: effects::Target) -> effects::Effect {
+pub fn to(effect: effects::Effect, target: effects::Target) -> effects::Effect {
     effects::Effect {
         target: Some(target),
         ..effect

@@ -2,7 +2,7 @@ use atomic_delegate_macros::atomic_delegates;
 
 use crate::effects;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Effect {
     pub kind: effects::EffectKind,
     pub follow_ups: [Option<effects::EffectKind>; 4],
@@ -20,7 +20,7 @@ impl Effect {
 
 impl Effect {
     #[must_use]
-    pub const fn and(self, next: Self) -> Self {
+    pub fn and(self, next: Self) -> Self {
         let Self {
             kind,
             follow_ups,
@@ -48,14 +48,18 @@ impl Effect {
                 target,
             },
             _ => {
-                Self::assert_chain_has_room(self);
-                self
+                Self::assert_chain_has_room(&follow_ups);
+                Self {
+                    kind,
+                    follow_ups,
+                    target,
+                }
             }
         }
     }
 
-    pub(crate) const fn assert_chain_has_room(self) {
-        let is_full = matches!(self.follow_ups, [Some(_), Some(_), Some(_), Some(_)]);
+    pub(crate) fn assert_chain_has_room(follow_ups: &[Option<effects::EffectKind>; 4]) {
+        let is_full = matches!(follow_ups, [Some(_), Some(_), Some(_), Some(_)]);
         assert!(
             !is_full,
             "an Effect chain holds at most 4 follow-up effects"

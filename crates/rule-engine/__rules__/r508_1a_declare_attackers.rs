@@ -337,10 +337,7 @@ mod tests {
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
                 assert!(
-                    !answers
-                        .characteristics(corpse.into())
-                        .keywords
-                        .contains(&keywords::StaticKeyword::Haste)
+                    !answers.characteristics(corpse.into()).keywords.contains(&keywords::haste())
                 );
             })
             .unwrap();

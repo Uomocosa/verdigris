@@ -23,66 +23,66 @@ pub fn write_markers(
             entity.remove::<cards::EffectivePT>();
         }
     }
-    let desired = |keyword: keywords::StaticKeyword| {
+    let desired = |keyword: keywords::Keyword| {
         characteristics.on_battlefield && characteristics.keywords.contains(&keyword)
     };
     cards::Characteristics::sync_marker(
         entity,
-        desired(keywords::StaticKeyword::Deathtouch),
+        desired(keywords::deathtouch()),
         current.deathtouch,
         cards::Deathtouch,
     );
     cards::Characteristics::sync_marker(
         entity,
-        desired(keywords::StaticKeyword::Infect),
+        desired(keywords::infect()),
         current.infect,
         cards::Infect,
     );
     cards::Characteristics::sync_marker(
         entity,
-        desired(keywords::StaticKeyword::FirstStrike),
+        desired(keywords::first_strike()),
         current.first_strike,
         cards::FirstStrike,
     );
     cards::Characteristics::sync_marker(
         entity,
-        desired(keywords::StaticKeyword::DoubleStrike),
+        desired(keywords::double_strike()),
         current.double_strike,
         cards::DoubleStrike,
     );
     cards::Characteristics::sync_marker(
         entity,
-        desired(keywords::StaticKeyword::Lifelink),
+        desired(keywords::lifelink()),
         current.lifelink,
         cards::Lifelink,
     );
     cards::Characteristics::sync_marker(
         entity,
-        desired(keywords::StaticKeyword::Trample),
+        desired(keywords::trample()),
         current.trample,
         cards::Trample,
     );
     cards::Characteristics::sync_marker(
         entity,
-        desired(keywords::StaticKeyword::Flying),
+        desired(keywords::flying()),
         current.flying,
         cards::Flying,
     );
     cards::Characteristics::sync_marker(
         entity,
-        desired(keywords::StaticKeyword::Reach),
+        desired(keywords::reach()),
         current.reach,
         cards::Reach,
     );
     cards::Characteristics::sync_marker(
         entity,
-        desired(keywords::StaticKeyword::Vigilance),
+        desired(keywords::vigilance()),
         current.vigilance,
         cards::Vigilance,
     );
     cards::Characteristics::sync_marker(
         entity,
-        desired(keywords::StaticKeyword::Defender),
+        desired(keywords::defender()),
         current.defender,
         cards::Defender,
     );

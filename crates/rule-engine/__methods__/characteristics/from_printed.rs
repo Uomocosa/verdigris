@@ -9,7 +9,7 @@ pub fn from_printed(
         types: definition.type_line.types.clone(),
         power_toughness: definition.power_toughness,
         keywords: definition.keywords().collect(),
-        triggered_abilities: definition.triggered_abilities().copied().collect(),
+        triggered_abilities: definition.triggered_abilities().cloned().collect(),
     }
 }
 

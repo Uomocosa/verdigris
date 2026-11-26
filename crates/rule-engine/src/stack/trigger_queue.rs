@@ -50,7 +50,7 @@ mod tests {
         };
         let mut queue = TriggerQueue::default();
         assert!(queue.is_empty());
-        queue.push(trigger);
+        queue.push(trigger.clone());
         assert!(!queue.is_empty());
         assert_eq!(queue.take_pending(), [trigger]);
         assert!(queue.is_empty());

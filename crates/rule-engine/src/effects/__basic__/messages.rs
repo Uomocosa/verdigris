@@ -9,8 +9,8 @@ pub struct PowerToughnessModified {
     pub toughness: i32,
 }
 
-#[derive(Message, Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Message, Debug, Clone, PartialEq, Eq)]
 pub struct KeywordGranted {
     pub target: Entity,
-    pub keyword: keywords::StaticKeyword,
+    pub keyword: keywords::Keyword,
 }

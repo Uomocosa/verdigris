@@ -15,13 +15,13 @@ pub fn write_triggered_markers(
             match ability.event {
                 abilities::TriggerEvent::Enters(_) => {
                     if desired_enters.is_none() {
-                        desired_enters = Some(cards::TriggeredEnters(*ability));
+                        desired_enters = Some(cards::TriggeredEnters(ability.clone()));
                     }
                 }
                 abilities::TriggerEvent::BeginningOfStep(_, _)
                 | abilities::TriggerEvent::BeginningOfNextCleanup => {
                     if desired_at_step.is_none() {
-                        desired_at_step = Some(cards::TriggeredAtStep(*ability));
+                        desired_at_step = Some(cards::TriggeredAtStep(ability.clone()));
                     }
                 }
                 abilities::TriggerEvent::Dies

@@ -25,6 +25,7 @@ pub mod expected_targets;
 pub mod filter;
 pub mod game_mut;
 pub mod hook_queue;
+pub mod keyword;
 pub mod mana_pool;
 #[cfg(feature = "testing")]
 pub mod mock_game;

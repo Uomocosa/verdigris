@@ -14,7 +14,7 @@ pub enum CastingStage {
     AwaitingPayment,
 }
 
-#[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Component, Debug, Clone, PartialEq, Eq)]
 pub struct TriggeredAbilityOnStack {
     pub source: Entity,
     pub controller: players::PlayerId,

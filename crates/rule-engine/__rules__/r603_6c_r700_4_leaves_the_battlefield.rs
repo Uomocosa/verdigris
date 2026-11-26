@@ -36,7 +36,7 @@ pub fn r603_6c_r700_4_leaves_the_battlefield(
             queue.push(stack::PendingTrigger {
                 source,
                 controller: **controller,
-                ability: *ability,
+                ability: ability.clone(),
             });
         }
     }

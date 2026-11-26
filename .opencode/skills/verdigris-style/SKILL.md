@@ -163,7 +163,7 @@ whether something is on the battlefield), read the derived component in the quer
 never the source component in the body. Type and keyword markers exist only for objects on the
 battlefield: a rule about a spell on the stack or a card elsewhere still reads `CardDefinition`.
 A keyword that changes a rule needs no marker and is never named in a rule body: it is a rule change in
-`StaticKeyword::keyword_modifications`, and `Rules::mods` reads current characteristics, so a granted keyword
+its keyword file's `abilities` (one file per keyword in `__keywords__/`), and `Rules::mods` reads current characteristics, so a granted keyword
 works too. Pick the change by what the CR sentence does: "can't" vetoes an event (`Restrict`: indestructible
 → `Destroy`, hexproof → `BecomeTarget`); "may … anyway" waives a restriction (`Allow`/`AsThough`: haste, trample →
 510.1c `ONLY_BLOCKERS`); "is considered N" sets a value rule (`Set`: deathtouch → `LethalDamage`). The rule asks
@@ -185,7 +185,7 @@ sources: Query<&cards::Owner, With<cards::Lifelink>>,
 // Bad
 sources: Query<(&cards::CardDefinition, &cards::Owner)>
 // ... in the body:
-if !definition.keywords().any(|keyword| keyword == keywords::StaticKeyword::Lifelink) { continue; }
+if !definition.keywords().any(|keyword| keyword.id == keywords::Lifelink::ID) { continue; }
 ```
 
 (The names above land in later phases; the example shows the target shape.)

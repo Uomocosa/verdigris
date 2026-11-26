@@ -44,7 +44,7 @@ pub fn r603_2_r603_6a_triggered_abilities(
             if source == permanent {
                 continue;
             }
-            let ability = **enters;
+            let ability = (**enters).clone();
             if !matches!(
                 ability.event,
                 abilities::TriggerEvent::Enters(cards::ObjectFilter::AnotherCreature)

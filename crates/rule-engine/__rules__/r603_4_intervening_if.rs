@@ -59,7 +59,7 @@ pub fn r603_4_intervening_if(
             if !triggered {
                 continue;
             }
-            let ability = **at_step;
+            let ability = (**at_step).clone();
             if let Some(condition) = ability.intervening_if
                 && !condition.holds(controller, &lives)
             {

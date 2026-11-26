@@ -63,10 +63,10 @@ pub fn r608_2_r608_2c_resolve(
         let controller =
             lookups.abilities.get(spell).map_or(**controller, |ability| ability.controller);
         let chosen_target = lookups.chosen_targets.get(spell).ok().map(|chosen| **chosen);
-        let player_targets = player_targets_for(&lookups, chosen_target, effect, controller);
+        let player_targets = player_targets_for(&lookups, chosen_target, &effect, controller);
         let target_zone = chosen_target.and_then(|target| lookups.in_zone.get(target).ok());
         let battlefield_target =
-            battlefield_target_for(&lookups, chosen_target, target_zone, spell, effect, &zones);
+            battlefield_target_for(&lookups, chosen_target, target_zone, spell, &effect, &zones);
         for kind in std::iter::once(effect.kind).chain(effect.follow_ups.into_iter().flatten()) {
             match kind {
                 effects::EffectKind::Damage(amount) => {
@@ -155,7 +155,7 @@ fn battlefield_target_for(
     chosen_target: Option<Entity>,
     target_zone: Option<&zones::InZone>,
     spell: Entity,
-    effect: effects::Effect,
+    effect: &effects::Effect,
     zones: &zones::ZoneLookup,
 ) -> Option<Entity> {
     chosen_target
@@ -166,7 +166,7 @@ fn battlefield_target_for(
 fn self_target_on_battlefield(
     lookups: &stack::ResolutionLookups<'_, '_>,
     spell: Entity,
-    effect: effects::Effect,
+    effect: &effects::Effect,
     zones: &zones::ZoneLookup,
 ) -> Option<Entity> {
     if !effect
@@ -189,8 +189,8 @@ fn effect_of(lookups: &stack::ResolutionLookups<'_, '_>, spell: Entity) -> Optio
         .definitions
         .get(spell)
         .ok()
-        .and_then(|definition| definition.spell_ability().copied())
-        .or_else(|| lookups.abilities.get(spell).ok().map(|ability| ability.effect))
+        .and_then(|definition| definition.spell_ability().cloned())
+        .or_else(|| lookups.abilities.get(spell).ok().map(|ability| ability.effect.clone()))
 }
 
 fn request_destroy(
@@ -261,7 +261,7 @@ fn request_modify_power_toughness(
 fn request_gain_keyword(
     effect_messages: &mut ParamSet<EffectMessageWriters<'_, '_, '_, '_>>,
     target: Option<Entity>,
-    keyword: keywords::StaticKeyword,
+    keyword: keywords::Keyword,
 ) {
     if let Some(target) = target {
         effect_messages.p1().write(effects::KeywordGranted { target, keyword });
@@ -420,7 +420,7 @@ fn players_or_fallback(
 fn player_targets_for(
     lookups: &stack::ResolutionLookups<'_, '_>,
     chosen_target: Option<Entity>,
-    effect: effects::Effect,
+    effect: &effects::Effect,
     controller: players::PlayerId,
 ) -> Vec<players::PlayerId> {
     chosen_target.filter(|target| lookups.lives.get(*target).is_ok()).map_or_else(
@@ -431,7 +431,7 @@ fn player_targets_for(
 
 fn resolve_player_targets(
     lookups: &stack::ResolutionLookups<'_, '_>,
-    effect: effects::Effect,
+    effect: &effects::Effect,
     controller: players::PlayerId,
 ) -> Vec<players::PlayerId> {
     let Some(player) = effect.target.and_then(|target| target.filter.controlled_by) else {

@@ -7,7 +7,7 @@ use crate::players;
 use crate::stack;
 use crate::zones;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PendingTrigger {
     pub source: Entity,
     pub controller: players::PlayerId,

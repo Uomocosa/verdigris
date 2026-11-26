@@ -47,7 +47,7 @@ impl MockGame {
     pub fn has<C: Component>(&self, entity: impl Into<Entity>) -> bool { self.app.world().get::<C>(entity.into()).is_some() }
 
     #[must_use]
-    pub fn get<C: Component + Copy>(&self, entity: impl Into<Entity>) -> Option<C> { self.app.world().get::<C>(entity.into()).copied() }
+    pub fn get<C: Component + Clone>(&self, entity: impl Into<Entity>) -> Option<C> { self.app.world().get::<C>(entity.into()).cloned() }
 
     #[must_use]
     pub fn is_attacking(&self, card: impl Into<Entity>) -> bool { self.app.world().get::<cards::Attacking>(card.into()).is_some() }

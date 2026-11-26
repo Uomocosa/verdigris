@@ -3,7 +3,7 @@ use crate::keywords;
 use crate::rules;
 use crate::turns;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum EffectKind {
     Damage(u32),
     Destroy,
@@ -23,7 +23,7 @@ pub enum EffectKind {
         power: i32,
         toughness: i32,
     },
-    GainKeyword(keywords::StaticKeyword),
+    GainKeyword(keywords::Keyword),
     AdditionalPhase(turns::Phase),
     WinTheGame,
 }
@@ -46,11 +46,11 @@ pub enum ObjectRelation {
     EnchantedObject,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Layered {
     ModifyPT { power: i32, toughness: i32 },
-    GainKeyword(keywords::StaticKeyword),
-    LoseKeyword(keywords::StaticKeyword),
+    GainKeyword(keywords::Keyword),
+    LoseKeyword(keywords::Keyword),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

@@ -29,9 +29,9 @@ mod tests {
             effects::gain_life(1).to_player(YOU),
         );
         let definition =
-            cards::creature("Grizzly Bears", cost![1, G], pt!(2, 2)).triggered(ability);
+            cards::creature("Grizzly Bears", cost![1, G], pt!(2, 2)).triggered(ability.clone());
         assert_eq!(
-            triggered_abilities(&definition).copied().collect::<Vec<_>>(),
+            triggered_abilities(&definition).cloned().collect::<Vec<_>>(),
             [ability]
         );
     }
