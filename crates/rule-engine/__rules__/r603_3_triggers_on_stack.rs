@@ -115,7 +115,6 @@ fn spawn_trigger(world: &mut World, trigger: stack::PendingTrigger) {
     };
     world.spawn((
         zones::InZone(stack),
-        cards::Owner(trigger.controller),
         cards::Controller(trigger.controller),
         stack::TriggeredAbilityOnStack {
             source: trigger.source,

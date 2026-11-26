@@ -1,5 +1,5 @@
 use crate::{GRAVEYARD, STACK};
-use bevy::prelude::{Commands, MessageReader, Query};
+use bevy::prelude::{Commands, MessageReader, Query, With};
 
 use crate::cards;
 use crate::stack;
@@ -11,29 +11,24 @@ use crate::zones;
 pub fn r608_2n_graveyard(
     mut resolutions: MessageReader<stack::Resolution>,
     mut commands: Commands,
-    cards: Query<(
-        Option<&cards::CardDefinition>,
-        Option<&stack::TriggeredAbilityOnStack>,
-        &cards::Owner,
-        &zones::InZone,
-    )>,
+    abilities: Query<&zones::InZone, With<stack::TriggeredAbilityOnStack>>,
+    spells: Query<(&cards::CardDefinition, &cards::Owner, &zones::InZone)>,
     zones: zones::ZoneLookup,
 ) {
     for resolution in resolutions.read() {
         let spell = **resolution;
-        let Ok((definition, ability, owner, in_zone)) = cards.get(spell) else {
+        if let Ok(in_zone) = abilities.get(spell) {
+            if zones.contains(STACK, **in_zone) {
+                commands.entity(spell).despawn();
+            }
+            continue;
+        }
+        let Ok((definition, owner, in_zone)) = spells.get(spell) else {
             continue;
         };
         if !zones.contains(STACK, **in_zone) {
             continue;
         }
-        if ability.is_some() {
-            commands.entity(spell).despawn();
-            continue;
-        }
-        let Some(definition) = definition else {
-            continue;
-        };
         let is_instant_or_sorcery = definition.type_line.types.iter().any(|card_type| {
             matches!(
                 card_type,

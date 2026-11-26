@@ -29,17 +29,17 @@ fn ask_which_to_keep(
         With<cards::OnBattlefield>,
     >,
 ) {
-    let mut legendary_by_owner_and_name: BTreeMap<(players::PlayerId, &str), Vec<Entity>> =
+    let mut legendary_by_controller_and_name: BTreeMap<(players::PlayerId, &str), Vec<Entity>> =
         BTreeMap::new();
     for (entity, definition, controller) in permanents.iter() {
         if definition.type_line.supertypes.contains(&cards::Supertype::Legendary) {
-            legendary_by_owner_and_name
+            legendary_by_controller_and_name
                 .entry((**controller, definition.name.as_str()))
                 .or_default()
                 .push(entity);
         }
     }
-    for ((controller, _), entities) in legendary_by_owner_and_name {
+    for ((controller, _), entities) in legendary_by_controller_and_name {
         if entities.len() < 2 {
             continue;
         }
