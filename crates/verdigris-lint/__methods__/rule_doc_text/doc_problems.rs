@@ -1,6 +1,7 @@
 use std::collections::BTreeMap;
 use std::collections::BTreeSet;
 
+use crate::constants;
 use crate::rules;
 
 const SNIPPET_BEFORE_CHARS: usize = 25;
@@ -40,7 +41,8 @@ pub fn doc_problems(texts: &BTreeMap<String, String>, ids: &[String], doc: &str)
     for paragraph in &paragraphs {
         if let Some(title) = paragraph.strip_prefix('#') {
             implemented_open = false;
-            references_open = title.trim_start_matches('#').trim() == "See also";
+            references_open = [constants::SEE_ALSO_HEADING, constants::RESTATES_HEADING]
+                .contains(&title.trim_start_matches('#').trim());
             continue;
         }
         if !implemented_open && !references_open {
@@ -244,6 +246,47 @@ mod tests {
         assert!(problems[0].contains("character 162"));
         assert!(problems[0].contains("doesn\u{2019}t"));
         assert!(problems[0].contains("doesn't"));
+    }
+
+    #[test]
+    fn restates_text_is_checked_but_not_in_the_id_set() {
+        let texts = BTreeMap::from([
+            (
+                String::from("702_9b"),
+                String::from("702.9b A creature with flying."),
+            ),
+            (
+                String::from("702_9a"),
+                String::from("702.9a Flying is an evasion ability."),
+            ),
+        ]);
+        let problems = doc_problems(
+            &texts,
+            &[String::from("702_9b")],
+            "702.9b A creature with flying.\n\n# Restates\n\n702.9a Flying is an evasion ability.\n",
+        );
+        assert_eq!(problems, Vec::<String>::new());
+    }
+
+    #[test]
+    fn restates_mismatch_is_a_problem() {
+        let texts = BTreeMap::from([
+            (
+                String::from("702_9b"),
+                String::from("702.9b A creature with flying."),
+            ),
+            (
+                String::from("702_9a"),
+                String::from("702.9a Flying is an evasion ability."),
+            ),
+        ]);
+        let problems = doc_problems(
+            &texts,
+            &[String::from("702_9b")],
+            "702.9b A creature with flying.\n\n# Restates\n\n702.9a Flying is totally different.\n",
+        );
+        assert_eq!(problems.len(), 1);
+        assert!(problems[0].contains("702_9a"));
     }
 
     #[test]

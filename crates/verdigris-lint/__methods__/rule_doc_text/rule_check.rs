@@ -1,13 +1,13 @@
 use std::path::Path;
 
 use lele_lint::EntryKind;
-use lele_lint::ItemMarker;
 use lele_lint::Project;
 use lele_lint::RuleViolation;
 use lele_lint::config;
 
 use crate::constants;
 use crate::rules;
+use crate::verdigris_linter::VerdigrisLinter;
 
 pub fn rule_check(
     _self: &rules::rule_doc_text::RuleDocText,
@@ -26,11 +26,15 @@ pub fn rule_check(
         }
     };
     let mut violations = Vec::new();
-    for entry in &project.entries {
+    let keyword_files = VerdigrisLinter::keyword_files(project);
+    for entry in project.entries.iter().chain(keyword_files.iter()) {
         if entry.kind != EntryKind::File {
             continue;
         }
-        if entry.relative_path.parent() != Some(Path::new(constants::RULES_ROOT)) {
+        if entry.relative_path.parent().is_none_or(|parent| {
+            parent != Path::new(constants::RULES_ROOT)
+                && parent != Path::new(constants::KEYWORDS_ROOT)
+        }) {
             continue;
         }
         let is_source = entry.relative_path.extension().is_some_and(|extension| extension == "rs");
@@ -46,40 +50,24 @@ pub fn rule_check(
         let Ok(parsed) = rules::rule_file_stem::RuleFileStem::try_from(stem) else {
             continue;
         };
-        let Some(file) = project.parsed_files.get(&entry.relative_path) else {
+        let is_keywords = entry.relative_path.parent() == Some(Path::new(constants::KEYWORDS_ROOT));
+        let doc = if is_keywords {
+            let Ok(content) = std::fs::read_to_string(&entry.absolute_path) else {
+                continue;
+            };
+            let Ok(parsed) = syn::parse_str::<syn::File>(content.as_str()) else {
+                continue;
+            };
+            rules::rule_doc_text::RuleDocText::public_item_doc(&parsed)
+        } else {
+            let Some(file) = project.parsed_files.get(&entry.relative_path) else {
+                continue;
+            };
+            rules::rule_doc_text::RuleDocText::system_fn_doc(file, stem)
+        };
+        let Some(doc) = doc else {
             continue;
         };
-        let mut doc = String::new();
-        let mut found = false;
-        for item in &file.items {
-            if let syn::Item::Fn(system) = item {
-                if system.attrs.iter().any(|attr| ItemMarker(attr).is_cfg_test()) {
-                    continue;
-                }
-                if matches!(system.vis, syn::Visibility::Inherited) {
-                    continue;
-                }
-                if system.sig.ident != stem {
-                    continue;
-                }
-                found = true;
-                for attr in &system.attrs {
-                    if !attr.path().is_ident("doc") {
-                        continue;
-                    }
-                    if let syn::Meta::NameValue(value) = &attr.meta
-                        && let syn::Expr::Lit(literal) = &value.value
-                        && let syn::Lit::Str(text) = &literal.lit
-                    {
-                        doc.push_str(text.value().as_str());
-                        doc.push('\n');
-                    }
-                }
-            }
-        }
-        if !found {
-            continue;
-        }
         for problem in rules::rule_doc_text::RuleDocText::doc_problems(
             &loaded.texts,
             &parsed.ids,
@@ -210,6 +198,91 @@ mod tests {
             PathBuf::from("__rules__/helpers.rs"),
             syn::parse_str("/// 117.4. If all players pass.\npub fn helpers() {}").unwrap(),
         );
+        let violations = rule_check(&rules::rule_doc_text::RuleDocText, &project);
+        assert_eq!(violations.len(), 0);
+    }
+
+    #[test]
+    fn keyword_file_with_matching_doc_is_clean() {
+        let dir = tempfile::tempdir().unwrap();
+        std::fs::write(
+            dir.path().join("lele.toml"),
+            "[verdigris.lint]\ncomprehensive_rules = \"rules.txt\"\n",
+        )
+        .unwrap();
+        std::fs::write(
+            dir.path().join("rules.txt"),
+            "702.9a Flying is an evasion ability.\n702.9b A creature with flying.\n",
+        )
+        .unwrap();
+        std::fs::create_dir_all(dir.path().join("__keywords__")).unwrap();
+        std::fs::write(
+            dir.path().join("__keywords__").join("r702_9b_flying.rs"),
+            "/// 702.9b A creature with flying.\n///\n/// # Restates\n///\n/// 702.9a Flying is an evasion ability.\npub struct Flying;\n",
+        )
+        .unwrap();
+        let project = Project {
+            root: dir.path().to_path_buf(),
+            config_dir: dir.path().to_path_buf(),
+            ..Project::default()
+        };
+        let violations = rule_check(&rules::rule_doc_text::RuleDocText, &project);
+        assert_eq!(violations.len(), 0);
+    }
+
+    #[test]
+    fn keyword_restates_mismatch_is_a_violation() {
+        let dir = tempfile::tempdir().unwrap();
+        std::fs::write(
+            dir.path().join("lele.toml"),
+            "[verdigris.lint]\ncomprehensive_rules = \"rules.txt\"\n",
+        )
+        .unwrap();
+        std::fs::write(
+            dir.path().join("rules.txt"),
+            "702.9a Flying is an evasion ability.\n702.9b A creature with flying.\n",
+        )
+        .unwrap();
+        std::fs::create_dir_all(dir.path().join("__keywords__")).unwrap();
+        std::fs::write(
+            dir.path().join("__keywords__").join("r702_9b_flying.rs"),
+            "/// 702.9b A creature with flying.\n///\n/// # Restates\n///\n/// 702.9a Flying is totally different.\npub struct Flying;\n",
+        )
+        .unwrap();
+        let project = Project {
+            root: dir.path().to_path_buf(),
+            config_dir: dir.path().to_path_buf(),
+            ..Project::default()
+        };
+        let violations = rule_check(&rules::rule_doc_text::RuleDocText, &project);
+        assert_eq!(violations.len(), 1);
+        assert_eq!(violations[0].code, "VRDG003");
+    }
+
+    #[test]
+    fn keyword_files_failing_vrdg001_are_skipped() {
+        let dir = tempfile::tempdir().unwrap();
+        std::fs::write(
+            dir.path().join("lele.toml"),
+            "[verdigris.lint]\ncomprehensive_rules = \"rules.txt\"\n",
+        )
+        .unwrap();
+        std::fs::write(
+            dir.path().join("rules.txt"),
+            "702.9b A creature with flying.\n",
+        )
+        .unwrap();
+        std::fs::create_dir_all(dir.path().join("__keywords__")).unwrap();
+        std::fs::write(
+            dir.path().join("__keywords__").join("flying.rs"),
+            "/// 702.9b A creature with flying.\npub struct Flying;\n",
+        )
+        .unwrap();
+        let project = Project {
+            root: dir.path().to_path_buf(),
+            config_dir: dir.path().to_path_buf(),
+            ..Project::default()
+        };
         let violations = rule_check(&rules::rule_doc_text::RuleDocText, &project);
         assert_eq!(violations.len(), 0);
     }

@@ -1,8 +1,10 @@
 pub mod comprehensive_rules;
 pub mod rule_comments;
 pub mod rule_doc_text;
+pub mod rule_doc_width;
 pub mod rule_file_name;
 pub mod rule_file_stem;
+pub mod rule_implemented_once;
 pub mod rule_one_system;
 pub mod rule_placement;
 pub mod rule_registered;

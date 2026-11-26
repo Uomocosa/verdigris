@@ -6,17 +6,22 @@ use lele_lint::RuleViolation;
 
 use crate::constants;
 use crate::rules;
+use crate::verdigris_linter::VerdigrisLinter;
 
 pub fn rule_check(
     _self: &rules::rule_file_name::RuleFileName,
     project: &Project,
 ) -> Vec<RuleViolation> {
     let mut violations = Vec::new();
-    for entry in &project.entries {
+    let keyword_files = VerdigrisLinter::keyword_files(project);
+    for entry in project.entries.iter().chain(keyword_files.iter()) {
         if entry.kind != EntryKind::File {
             continue;
         }
-        if entry.relative_path.parent() != Some(Path::new(constants::RULES_ROOT)) {
+        if entry.relative_path.parent().is_none_or(|parent| {
+            parent != Path::new(constants::RULES_ROOT)
+                && parent != Path::new(constants::KEYWORDS_ROOT)
+        }) {
             continue;
         }
         let is_source = entry.relative_path.extension().is_some_and(|extension| extension == "rs");
@@ -124,6 +129,43 @@ mod tests {
                 rules::rule_file_name::RuleFileName::CODE
             );
         }
+    }
+
+    #[test]
+    fn keyword_files_follow_the_same_grammar() {
+        let root = tempfile::tempdir().unwrap();
+        std::fs::create_dir_all(root.path().join("__keywords__")).unwrap();
+        std::fs::write(
+            root.path().join("__keywords__").join("r702_9b_flying.rs"),
+            "pub struct Flying;\n",
+        )
+        .unwrap();
+        let project = Project {
+            root: root.path().to_path_buf(),
+            ..Project::default()
+        };
+        assert_eq!(
+            rule_check(&rules::rule_file_name::RuleFileName, &project).len(),
+            0
+        );
+    }
+
+    #[test]
+    fn legacy_keyword_files_are_violations() {
+        let root = tempfile::tempdir().unwrap();
+        std::fs::create_dir_all(root.path().join("__keywords__")).unwrap();
+        std::fs::write(
+            root.path().join("__keywords__").join("flying.rs"),
+            "pub struct Flying;\n",
+        )
+        .unwrap();
+        let project = Project {
+            root: root.path().to_path_buf(),
+            ..Project::default()
+        };
+        let violations = rule_check(&rules::rule_file_name::RuleFileName, &project);
+        assert_eq!(violations.len(), 1);
+        assert!(violations[0].message.contains("flying"));
     }
 
     #[test]

@@ -14,8 +14,8 @@ impl RuleFileName {
     pub const CODE: &'static str = "VRDG001";
     pub const DOC: RuleDoc = RuleDoc {
         category: Category::Layout,
-        summary: "Every `.rs` file directly inside `__rules__/` (except `mod.rs`) is named `r<id>(_r<id>)*_<slug>.rs`.",
-        why: "The file name maps each Bevy system to the Comprehensive Rules sections it enforces; a shared grammar lets later checks tie the file name to its rule text and keeps the `__rules__/` listing scannable.",
+        summary: "Every `.rs` file directly inside `__rules__/` or `__keywords__/` (except `mod.rs`) is named `r<id>(_r<id>)*_<slug>.rs`.",
+        why: "The file name maps each file to the Comprehensive Rules sections it enforces; a shared grammar lets later checks tie the file name to its rule text and keeps the `__rules__/` and `__keywords__/` listings scannable.",
         fix: "Rename the file to `r<id>(_r<id>)*_<slug>.rs`, where each `id` is `<digits>_<digits><lowercase letters>` (e.g. `117_4`, `608_2b`) and `slug` is snake_case that does not start with `r<digit>` (e.g. `r117_4_priority.rs`).",
         bad: rule_examples!("rule_file_name/bad"),
         good: rule_examples!("rule_file_name/good"),

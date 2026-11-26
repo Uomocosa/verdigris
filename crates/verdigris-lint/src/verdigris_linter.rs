@@ -24,6 +24,11 @@ impl VerdigrisLinter {
     pub fn include_rules_root(project: &mut Project) -> Result<(), lele_lint::Error> {}
 }
 
+#[atomic_delegates]
+impl VerdigrisLinter {
+    pub(crate) fn keyword_files(project: &Project) -> Vec<lele_lint::Entry> {}
+}
+
 #[cfg(test)]
 mod tests {
     use super::VerdigrisLinter;
@@ -41,5 +46,7 @@ mod tests {
         assert!(linter.rules.iter().any(|rule| rule.code() == "VRDG005"));
         assert!(linter.rules.iter().any(|rule| rule.code() == "VRDG006"));
         assert!(linter.rules.iter().any(|rule| rule.code() == "VRDG007"));
+        assert!(linter.rules.iter().any(|rule| rule.code() == "VRDG014"));
+        assert!(linter.rules.iter().any(|rule| rule.code() == "VRDG015"));
     }
 }

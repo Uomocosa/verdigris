@@ -250,13 +250,69 @@ reason = "CR rule systems live in __rules__/ (one file per rule) instead of a do
 # LELEBEVYTEST001 · No `#[cfg(test)]` in a file under a `__bevy_systems__/` (or `bevy_systems/`) folder, except a test…
 [lele.rules.bevy.no_tests_in_systems]
 
-# VRDG001 · Every `.rs` file directly inside `__rules__/` (except `mod.rs`) is named `r<id>(_r<id>)*_<slug>.rs`.
+# VRDG001 · Every `.rs` file directly inside `__rules__/` or `__keywords__/` (except `mod.rs`) is named…
 [lele.rules.verdigris.rule_file_name]
+
+[[lele.rules.verdigris.rule_file_name.exempt]]
+path = "crates/rule-engine/__keywords__/deathtouch.rs"
+reason = "temporary: migrated by J20/J21 (keywords-as-abilities)"
+
+[[lele.rules.verdigris.rule_file_name.exempt]]
+path = "crates/rule-engine/__keywords__/defender.rs"
+reason = "temporary: migrated by J20/J21 (keywords-as-abilities)"
+
+[[lele.rules.verdigris.rule_file_name.exempt]]
+path = "crates/rule-engine/__keywords__/double_strike.rs"
+reason = "temporary: migrated by J20/J21 (keywords-as-abilities)"
+
+[[lele.rules.verdigris.rule_file_name.exempt]]
+path = "crates/rule-engine/__keywords__/enchant.rs"
+reason = "temporary: migrated by J20/J21 (keywords-as-abilities)"
+
+[[lele.rules.verdigris.rule_file_name.exempt]]
+path = "crates/rule-engine/__keywords__/first_strike.rs"
+reason = "temporary: migrated by J20/J21 (keywords-as-abilities)"
+
+[[lele.rules.verdigris.rule_file_name.exempt]]
+path = "crates/rule-engine/__keywords__/flying.rs"
+reason = "temporary: migrated by J20/J21 (keywords-as-abilities)"
+
+[[lele.rules.verdigris.rule_file_name.exempt]]
+path = "crates/rule-engine/__keywords__/haste.rs"
+reason = "temporary: migrated by J20/J21 (keywords-as-abilities)"
+
+[[lele.rules.verdigris.rule_file_name.exempt]]
+path = "crates/rule-engine/__keywords__/hexproof.rs"
+reason = "temporary: migrated by J20/J21 (keywords-as-abilities)"
+
+[[lele.rules.verdigris.rule_file_name.exempt]]
+path = "crates/rule-engine/__keywords__/indestructible.rs"
+reason = "temporary: migrated by J20/J21 (keywords-as-abilities)"
+
+[[lele.rules.verdigris.rule_file_name.exempt]]
+path = "crates/rule-engine/__keywords__/infect.rs"
+reason = "temporary: migrated by J20/J21 (keywords-as-abilities)"
+
+[[lele.rules.verdigris.rule_file_name.exempt]]
+path = "crates/rule-engine/__keywords__/lifelink.rs"
+reason = "temporary: migrated by J20/J21 (keywords-as-abilities)"
+
+[[lele.rules.verdigris.rule_file_name.exempt]]
+path = "crates/rule-engine/__keywords__/reach.rs"
+reason = "temporary: migrated by J20/J21 (keywords-as-abilities)"
+
+[[lele.rules.verdigris.rule_file_name.exempt]]
+path = "crates/rule-engine/__keywords__/trample.rs"
+reason = "temporary: migrated by J20/J21 (keywords-as-abilities)"
+
+[[lele.rules.verdigris.rule_file_name.exempt]]
+path = "crates/rule-engine/__keywords__/vigilance.rs"
+reason = "temporary: migrated by J20/J21 (keywords-as-abilities)"
 
 # VRDG002 · Every `__rules__/` file holds exactly one `pub fn` Bevy system named after the file stem.
 [lele.rules.verdigris.rule_one_system]
 
-# VRDG003 · Every `__rules__/` system fn's doc comment quotes the Comprehensive Rules text it implements,…
+# VRDG003 · Every `__rules__/` system fn's and every `__keywords__/` file's public item's doc comment quotes…
 [lele.rules.verdigris.rule_doc_text]
 
 # VRDG004 · Every `__rules__/` system is declared in `__rules__/mod.rs` and registered on the app outside…
@@ -265,8 +321,126 @@ reason = "CR rule systems live in __rules__/ (one file per rule) instead of a do
 # VRDG005 · Every `__rules__/` file keeps a `#[cfg(test)] mod tests` with at least one `#[test]` fn, named for…
 [lele.rules.verdigris.rule_tests]
 
-# VRDG006 · Every rule system lives in `__rules__/`; no fn or file outside `__rules__/` is named like a rule.
+# VRDG006 · Every rule system lives in `__rules__/` or `__keywords__/`; no fn or file outside them is named…
 [lele.rules.verdigris.rule_placement]
 
 # VRDG007 · Every `__rules__/` file holds only its system fn's doc comment; every other comment is a violation.
 [lele.rules.verdigris.rule_comments]
+
+# VRDG014 · A Comprehensive Rules paragraph quoted by a `__keywords__/` file is implemented nowhere else: no…
+[lele.rules.verdigris.rule_implemented_once]
+
+[[lele.rules.verdigris.rule_implemented_once.exempt]]
+path = "crates/rule-engine/__rules__/r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_r702_2c_r702_19b_r702_19d_combat_damage.rs"
+reason = "temporary: migrated by J20/J21 (keywords-as-abilities)"
+
+[[lele.rules.verdigris.rule_implemented_once.exempt]]
+path = "crates/rule-engine/__rules__/r702_15b_lifelink.rs"
+reason = "temporary: migrated by J20/J21 (keywords-as-abilities)"
+
+# VRDG015 · In `__rules__/` and `__keywords__/` doc comments, no line is longer than 100 columns.
+[lele.rules.verdigris.rule_doc_width]
+
+[[lele.rules.verdigris.rule_doc_width.exempt]]
+path = "crates/rule-engine/__keywords__/deathtouch.rs"
+reason = "temporary: migrated by J20/J21 (keywords-as-abilities)"
+
+[[lele.rules.verdigris.rule_doc_width.exempt]]
+path = "crates/rule-engine/__keywords__/double_strike.rs"
+reason = "temporary: migrated by J20/J21 (keywords-as-abilities)"
+
+[[lele.rules.verdigris.rule_doc_width.exempt]]
+path = "crates/rule-engine/__keywords__/enchant.rs"
+reason = "temporary: migrated by J20/J21 (keywords-as-abilities)"
+
+[[lele.rules.verdigris.rule_doc_width.exempt]]
+path = "crates/rule-engine/__keywords__/first_strike.rs"
+reason = "temporary: migrated by J20/J21 (keywords-as-abilities)"
+
+[[lele.rules.verdigris.rule_doc_width.exempt]]
+path = "crates/rule-engine/__keywords__/flying.rs"
+reason = "temporary: migrated by J20/J21 (keywords-as-abilities)"
+
+[[lele.rules.verdigris.rule_doc_width.exempt]]
+path = "crates/rule-engine/__keywords__/hexproof.rs"
+reason = "temporary: migrated by J20/J21 (keywords-as-abilities)"
+
+[[lele.rules.verdigris.rule_doc_width.exempt]]
+path = "crates/rule-engine/__keywords__/indestructible.rs"
+reason = "temporary: migrated by J20/J21 (keywords-as-abilities)"
+
+[[lele.rules.verdigris.rule_doc_width.exempt]]
+path = "crates/rule-engine/__keywords__/infect.rs"
+reason = "temporary: migrated by J20/J21 (keywords-as-abilities)"
+
+[[lele.rules.verdigris.rule_doc_width.exempt]]
+path = "crates/rule-engine/__keywords__/lifelink.rs"
+reason = "temporary: migrated by J20/J21 (keywords-as-abilities)"
+
+[[lele.rules.verdigris.rule_doc_width.exempt]]
+path = "crates/rule-engine/__keywords__/reach.rs"
+reason = "temporary: migrated by J20/J21 (keywords-as-abilities)"
+
+[[lele.rules.verdigris.rule_doc_width.exempt]]
+path = "crates/rule-engine/__keywords__/trample.rs"
+reason = "temporary: migrated by J20/J21 (keywords-as-abilities)"
+
+[[lele.rules.verdigris.rule_doc_width.exempt]]
+path = "crates/rule-engine/__rules__/r104_1_game_ends.rs"
+reason = "temporary: migrated by J20/J21 (keywords-as-abilities)"
+
+[[lele.rules.verdigris.rule_doc_width.exempt]]
+path = "crates/rule-engine/__rules__/r104_2a_wins_when_opponents_left.rs"
+reason = "temporary: migrated by J20/J21 (keywords-as-abilities)"
+
+[[lele.rules.verdigris.rule_doc_width.exempt]]
+path = "crates/rule-engine/__rules__/r117_5_r704_3_state_based_actions.rs"
+reason = "temporary: migrated by J20/J21 (keywords-as-abilities)"
+
+[[lele.rules.verdigris.rule_doc_width.exempt]]
+path = "crates/rule-engine/__rules__/r119_4_r119_8_pay_life.rs"
+reason = "temporary: migrated by J20/J21 (keywords-as-abilities)"
+
+[[lele.rules.verdigris.rule_doc_width.exempt]]
+path = "crates/rule-engine/__rules__/r121_4_draw_from_empty_library.rs"
+reason = "temporary: migrated by J20/J21 (keywords-as-abilities)"
+
+[[lele.rules.verdigris.rule_doc_width.exempt]]
+path = "crates/rule-engine/__rules__/r302_6_summoning_sickness.rs"
+reason = "temporary: migrated by J20/J21 (keywords-as-abilities)"
+
+[[lele.rules.verdigris.rule_doc_width.exempt]]
+path = "crates/rule-engine/__rules__/r500_8_add_phases.rs"
+reason = "temporary: migrated by J20/J21 (keywords-as-abilities)"
+
+[[lele.rules.verdigris.rule_doc_width.exempt]]
+path = "crates/rule-engine/__rules__/r509_1a_declare_blockers.rs"
+reason = "temporary: migrated by J20/J21 (keywords-as-abilities)"
+
+[[lele.rules.verdigris.rule_doc_width.exempt]]
+path = "crates/rule-engine/__rules__/r608_3a_permanent_enters.rs"
+reason = "temporary: migrated by J20/J21 (keywords-as-abilities)"
+
+[[lele.rules.verdigris.rule_doc_width.exempt]]
+path = "crates/rule-engine/__rules__/r611_3a_static_effects.rs"
+reason = "temporary: migrated by J20/J21 (keywords-as-abilities)"
+
+[[lele.rules.verdigris.rule_doc_width.exempt]]
+path = "crates/rule-engine/__rules__/r614_1a_r616_1_replacement_effects.rs"
+reason = "temporary: migrated by J20/J21 (keywords-as-abilities)"
+
+[[lele.rules.verdigris.rule_doc_width.exempt]]
+path = "crates/rule-engine/__rules__/r701_13a_exile.rs"
+reason = "temporary: migrated by J20/J21 (keywords-as-abilities)"
+
+[[lele.rules.verdigris.rule_doc_width.exempt]]
+path = "crates/rule-engine/__rules__/r701_26a_tap.rs"
+reason = "temporary: migrated by J20/J21 (keywords-as-abilities)"
+
+[[lele.rules.verdigris.rule_doc_width.exempt]]
+path = "crates/rule-engine/__rules__/r702_15b_lifelink.rs"
+reason = "temporary: migrated by J20/J21 (keywords-as-abilities)"
+
+[[lele.rules.verdigris.rule_doc_width.exempt]]
+path = "crates/rule-engine/__rules__/r704_5c_poison.rs"
+reason = "temporary: migrated by J20/J21 (keywords-as-abilities)"

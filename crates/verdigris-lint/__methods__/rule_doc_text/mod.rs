@@ -1,4 +1,10 @@
 mod doc_problems;
+mod public_item_doc;
+mod quoted_implemented_ids;
 mod rule_check;
+mod system_fn_doc;
 pub use doc_problems::doc_problems;
+pub use public_item_doc::public_item_doc;
+pub use quoted_implemented_ids::quoted_implemented_ids;
 pub use rule_check::rule_check;
+pub use system_fn_doc::system_fn_doc;

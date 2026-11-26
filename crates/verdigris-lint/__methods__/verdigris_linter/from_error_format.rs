@@ -20,6 +20,8 @@ pub fn from_error_format(error_format: ErrorFormat) -> VerdigrisLinter {
     rules::rule_tests::RuleTests::register(&mut verdigris_rules);
     rules::rule_placement::RulePlacement::register(&mut verdigris_rules);
     rules::rule_comments::RuleComments::register(&mut verdigris_rules);
+    rules::rule_implemented_once::RuleImplementedOnce::register(&mut verdigris_rules);
+    rules::rule_doc_width::RuleDocWidth::register(&mut verdigris_rules);
     linter.extend_rules(verdigris_rules);
     VerdigrisLinter(linter)
 }
@@ -40,5 +42,7 @@ mod tests {
         assert!(linter.rules.iter().any(|rule| rule.code() == "VRDG005"));
         assert!(linter.rules.iter().any(|rule| rule.code() == "VRDG006"));
         assert!(linter.rules.iter().any(|rule| rule.code() == "VRDG007"));
+        assert!(linter.rules.iter().any(|rule| rule.code() == "VRDG014"));
+        assert!(linter.rules.iter().any(|rule| rule.code() == "VRDG015"));
     }
 }

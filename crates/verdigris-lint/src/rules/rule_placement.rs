@@ -14,9 +14,9 @@ impl RulePlacement {
     pub const CODE: &'static str = "VRDG006";
     pub const DOC: RuleDoc = RuleDoc {
         category: Category::Layout,
-        summary: "Every rule system lives in `__rules__/`; no fn or file outside `__rules__/` is named like a rule.",
-        why: "Rule systems live one-per-file in `__rules__/` so the rule-to-file mapping stays complete; a rule-named fn or file anywhere else splits that mapping, and a reader can no longer find a rule's system by its name.",
-        fix: "Move the fn into `__rules__/<name>.rs` as its system, or rename it so it no longer parses as a rule name; move a rule-named file into `__rules__/`.",
+        summary: "Every rule system lives in `__rules__/` or `__keywords__/`; no fn or file outside them is named like a rule.",
+        why: "Rule systems live one-per-file in `__rules__/` and keyword systems in `__keywords__/` so the rule-to-file mapping stays complete; a rule-named fn or file anywhere else splits that mapping, and a reader can no longer find a rule's system by its name.",
+        fix: "Move the fn into `__rules__/<name>.rs` or `__keywords__/<name>.rs` as its system, or rename it so it no longer parses as a rule name; move a rule-named file into `__rules__/` or `__keywords__/`.",
         bad: rule_examples!("rule_placement/bad"),
         good: rule_examples!("rule_placement/good"),
     };

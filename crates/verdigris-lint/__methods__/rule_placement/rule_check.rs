@@ -33,7 +33,7 @@ pub fn rule_check(
         if relative.components().any(|component| {
             matches!(
                 component.as_os_str().to_str(),
-                Some("__rules__" | "rule_examples" | "tests")
+                Some("__rules__" | "__keywords__" | "rule_examples" | "tests")
             )
         }) {
             continue;
@@ -173,6 +173,24 @@ mod tests {
         assert_eq!(violations.len(), 1);
         assert!(violations[0].message.contains("r117_4_priority"));
         assert!(violations[0].message.contains("__rules__"));
+    }
+
+    #[test]
+    fn rule_named_file_inside_keywords_is_clean() {
+        let mut project = Project {
+            entries: vec![Entry {
+                relative_path: PathBuf::from("__keywords__/r702_9b_flying.rs"),
+                absolute_path: PathBuf::from("/crate/__keywords__/r702_9b_flying.rs"),
+                kind: EntryKind::File,
+            }],
+            ..Project::default()
+        };
+        project.parsed_files.insert(
+            PathBuf::from("__keywords__/r702_9b_flying.rs"),
+            syn::parse_str("pub fn r702_9b_flying() {}").unwrap(),
+        );
+        let violations = rule_check(&rules::rule_placement::RulePlacement, &project);
+        assert_eq!(violations.len(), 0);
     }
 
     #[test]
