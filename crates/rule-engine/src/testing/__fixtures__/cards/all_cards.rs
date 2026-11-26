@@ -63,6 +63,7 @@ pub const ALL_CARDS: &[testing::Card] = &[
     testing::TEST_LOW_SKIMMER,
     testing::TEST_LURE_OF_BATTLE,
     testing::TEST_MAY_PURGE,
+    testing::TEST_NEVER_BURIED,
     testing::TEST_NIGHT_OF_THE_HUNT,
     testing::TEST_NO_BURIALS,
     testing::TEST_NO_TOKENS,

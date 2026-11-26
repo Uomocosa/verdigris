@@ -1,7 +1,8 @@
+use crate::STACK;
 use crate::events;
-use crate::{GRAVEYARD, STACK};
-use bevy::prelude::{Commands, MessageReader, Query};
+use bevy::prelude::{MessageReader, MessageWriter, Query};
 
+use crate::Attempt;
 use crate::Resolve;
 use crate::cards;
 use crate::zones;
@@ -10,7 +11,7 @@ use crate::zones;
 /// resolve and none of its effects occur. A countered spell is put into its owner’s graveyard.
 pub fn r701_6a_counter(
     mut countered: MessageReader<Resolve<events::Counter>>,
-    mut commands: Commands,
+    mut moves_to_graveyard: MessageWriter<Attempt<events::PutIntoGraveyard>>,
     spells: Query<(&cards::Owner, &zones::InZone)>,
     zones: zones::ZoneLookup,
 ) {
@@ -22,9 +23,10 @@ pub fn r701_6a_counter(
         if !zones.contains(STACK, **in_zone) {
             continue;
         }
-        if let Some(graveyard) = zones.find(GRAVEYARD, Some(**owner)) {
-            commands.entity(spell).insert(zones::InZone(graveyard));
-        }
+        moves_to_graveyard.write(Attempt(events::PutIntoGraveyard {
+            object: spell,
+            owner: **owner,
+        }));
     }
 }
 
@@ -71,6 +73,26 @@ mod tests {
         ])?;
 
         assert!(game.player(p1).cards_in(GRAVEYARD).has(bears));
+        assert!(game.player(p2).cards_in(GRAVEYARD).has(scatter));
+        Ok(())
+    }
+
+    #[test]
+    fn a_countered_spell_that_is_never_buried_does_not_enter_its_owners_graveyard() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.hand([TEST_NEVER_BURIED]).mana_pool(mana![1, G]),
+            P2.hand([ESSENCE_SCATTER]).mana_pool(mana![1, U]),
+        ]);
+        let [spell] = game.player(p1).cards_in(HAND).exactly::<1>(TEST_NEVER_BURIED)?;
+        let [scatter] = game.player(p2).cards_in(HAND).exactly::<1>(ESSENCE_SCATTER)?;
+
+        game.play([
+            p1.cast(spell).pass_priority(),
+            p2.cast(scatter).targeting(spell).pass_priority(),
+            p1.pass_priority(),
+        ])?;
+
+        assert!(game.player(p1).cards_in(GRAVEYARD).has_no(spell));
         assert!(game.player(p2).cards_in(GRAVEYARD).has(scatter));
         Ok(())
     }
