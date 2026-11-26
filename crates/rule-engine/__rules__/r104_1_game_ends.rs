@@ -3,7 +3,8 @@ use bevy::prelude::Commands;
 use crate::Game;
 use crate::GameEnded;
 
-/// 104.1. A game ends immediately when a player wins, when the game is a draw, or when the game is restarted.
+/// 104.1. A game ends immediately when a player wins, when the game is a draw, or when the game is
+/// restarted.
 pub fn r104_1_game_ends(mut commands: Commands, game: Game) {
     if game.is_over() {
         commands.insert_resource(GameEnded);

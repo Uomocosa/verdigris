@@ -6,7 +6,11 @@ use crate::Game;
 use crate::cards;
 use crate::turns;
 
-/// 302.6. A creature’s activated ability with the tap symbol or the untap symbol in its activation cost can’t be activated unless the creature has been under its controller’s control continuously since their most recent turn began. A creature can’t attack unless it has been under its controller’s control continuously since their most recent turn began. This rule is informally called the “summoning sickness” rule.
+/// 302.6. A creature’s activated ability with the tap symbol or the untap symbol in its activation
+/// cost can’t be activated unless the creature has been under its controller’s control continuously
+/// since their most recent turn began. A creature can’t attack unless it has been under its
+/// controller’s control continuously since their most recent turn began. This rule is informally
+/// called the “summoning sickness” rule.
 pub fn r302_6_summoning_sickness() -> ScheduleConfigs<ScheduleSystem> {
     remove_summoning_sickness.run_if(on_message::<turns::TurnStarted>)
 }

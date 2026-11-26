@@ -8,10 +8,23 @@ use crate::actions;
 use crate::comprehensive_rules;
 use crate::stack;
 
-/// 117.5. Each time a player would get priority, the game first performs all applicable
-/// state-based actions as a single event (see rule 704, “State-Based Actions”), then repeats this process until no state-based actions are performed. Then triggered abilities are put on the stack (see rule 603, “Handling Triggered Abilities”). These steps repeat in order until no further state-based actions are performed and no abilities trigger. Then the player who would have received priority does so.
+/// 117.5. Each time a player would get priority, the game first performs all applicable state-based
+/// actions as a single event (see rule 704, “State-Based Actions”), then repeats this process until
+/// no state-based actions are performed. Then triggered abilities are put on the stack (see rule
+/// 603, “Handling Triggered Abilities”). These steps repeat in order until no further state-based
+/// actions are performed and no abilities trigger. Then the player who would have received priority
+/// does so.
 ///
-/// 704.3. Whenever a player would get priority (see rule 117, “Timing and Priority”), the game checks for any of the listed conditions for state-based actions, then performs all applicable state-based actions simultaneously as a single event. If any state-based actions are performed as a result of a check, the check is repeated; otherwise all triggered abilities that are waiting to be put on the stack are put on the stack, then the check is repeated. Once no more state-based actions have been performed as the result of a check and no triggered abilities are waiting to be put on the stack, the appropriate player gets priority. This process also occurs during the cleanup step (see rule 514), except that if no state-based actions are performed as the result of the step’s first check and no triggered abilities are waiting to be put on the stack, then no player gets priority and the step ends.
+/// 704.3. Whenever a player would get priority (see rule 117, “Timing and Priority”), the game
+/// checks for any of the listed conditions for state-based actions, then performs all applicable
+/// state-based actions simultaneously as a single event. If any state-based actions are performed
+/// as a result of a check, the check is repeated; otherwise all triggered abilities that are
+/// waiting to be put on the stack are put on the stack, then the check is repeated. Once no more
+/// state-based actions have been performed as the result of a check and no triggered abilities are
+/// waiting to be put on the stack, the appropriate player gets priority. This process also occurs
+/// during the cleanup step (see rule 514), except that if no state-based actions are performed as
+/// the result of the step’s first check and no triggered abilities are waiting to be put on the
+/// stack, then no player gets priority and the step ends.
 pub fn r117_5_r704_3_state_based_actions(world: &mut World) {
     for _ in 0..MAX_STATE_BASED_PASSES {
         **world.resource_mut::<StateBasedActionsPerformed>() = false;

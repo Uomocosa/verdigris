@@ -7,7 +7,8 @@ use crate::StateBasedActionsPerformed;
 use crate::cards;
 use crate::zones;
 
-/// 701.13a To exile an object, move it to the exile zone from wherever it is. See rule 406, “Exile.”
+/// 701.13a To exile an object, move it to the exile zone from wherever it is. See rule 406,
+/// “Exile.”
 pub fn r701_13a_exile(
     mut exiles: MessageReader<Resolve<events::Exile>>,
     mut commands: Commands,

@@ -4,11 +4,14 @@ use bevy::prelude::{Entity, MessageWriter, Query};
 use crate::Attempt;
 use crate::players;
 
-/// 704.5c If a player has ten or more poison counters, that player loses the game. Ignore this rule in Two-Headed Giant games; see rule 704.6b instead.
+/// 704.5c If a player has ten or more poison counters, that player loses the game. Ignore this rule
+/// in Two-Headed Giant games; see rule 704.6b instead.
 ///
 /// # See also
 ///
-/// 122.1f If a player has ten or more poison counters, that player loses the game as a state-based action. See rule 704. A player is “poisoned” if they have one or more poison counters. (See rule 810 for additional rules for Two-Headed Giant games.)
+/// 122.1f If a player has ten or more poison counters, that player loses the game as a state-based
+/// action. See rule 704. A player is “poisoned” if they have one or more poison counters. (See rule
+/// 810 for additional rules for Two-Headed Giant games.)
 pub fn r704_5c_poison(
     mut losses: MessageWriter<Attempt<events::LoseGame>>,
     poisoned: Query<(Entity, &players::PoisonCounters), players::StillInTheGame>,

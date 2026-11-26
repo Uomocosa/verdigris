@@ -7,13 +7,14 @@ use crate::StateBasedActionsPerformed;
 use crate::rules;
 use crate::rules::traits::event::Event;
 
-/// 614.1a Effects that use the word “instead” are replacement effects. Most replacement effects use the word “instead” to indicate what events will be replaced with other events.
+/// 614.1a Effects that use the word “instead” are replacement effects. Most replacement effects use
+/// the word “instead” to indicate what events will be replaced with other events.
 ///
 /// 616.1. If two or more replacement and/or prevention effects are attempting to modify the way an
 /// event affects an object or player, the affected object’s controller (or its owner if it has no
 /// controller) or the affected player chooses one to apply, following the steps listed below. If
-/// two or more players have to make these choices at the same time, choices are made in APNAP
-/// order (see rule 101.4).
+/// two or more players have to make these choices at the same time, choices are made in APNAP order
+/// (see rule 101.4).
 ///
 /// # Notes
 ///

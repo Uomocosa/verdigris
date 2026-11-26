@@ -15,15 +15,15 @@ use crate::turns;
 ///
 /// # See also
 ///
-/// 509.1c The defending player checks each creature they control to see whether it’s affected by any
-/// requirements (effects that say a creature must block, or that it must block if some condition is
-/// met). If the number of requirements that are being obeyed is fewer than the maximum possible
-/// number of requirements that could be obeyed without disobeying any restrictions, the declaration
-/// of blockers is illegal. If a creature can’t block unless a player pays a cost, that player is not
-/// required to pay that cost, even if blocking with that creature would increase the number of
-/// requirements being obeyed. If a requirement that says a creature blocks if able during a certain
-/// turn refers to a turn with multiple combat phases, the creature blocks if able during each declare
-/// blockers step in that turn.
+/// 509.1c The defending player checks each creature they control to see whether it’s affected by
+/// any requirements (effects that say a creature must block, or that it must block if some
+/// condition is met). If the number of requirements that are being obeyed is fewer than the maximum
+/// possible number of requirements that could be obeyed without disobeying any restrictions, the
+/// declaration of blockers is illegal. If a creature can’t block unless a player pays a cost, that
+/// player is not required to pay that cost, even if blocking with that creature would increase the
+/// number of requirements being obeyed. If a requirement that says a creature blocks if able during
+/// a certain turn refers to a turn with multiple combat phases, the creature blocks if able during
+/// each declare blockers step in that turn.
 ///
 /// 702.9b A creature with flying can’t be blocked except by creatures with flying and/or reach. A
 /// creature with flying can block a creature with or without flying. (See rule 509, “Declare

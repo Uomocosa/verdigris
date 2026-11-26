@@ -4,8 +4,9 @@ use bevy::prelude::MessageWriter;
 use crate::Resolve;
 use crate::players;
 
-/// 104.2a A player still in the game wins the game if that player’s opponents have all left the game. This
-/// happens immediately and overrides all effects that would preclude that player from winning the game.
+/// 104.2a A player still in the game wins the game if that player’s opponents have all left the
+/// game. This happens immediately and overrides all effects that would preclude that player from
+/// winning the game.
 pub fn r104_2a_wins_when_opponents_left(
     mut wins: MessageWriter<Resolve<events::WinGame>>,
     players: players::Players,

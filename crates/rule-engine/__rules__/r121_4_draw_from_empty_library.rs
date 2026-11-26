@@ -5,7 +5,8 @@ use crate::Resolve;
 use crate::StateBasedActionsPerformed;
 use crate::players;
 
-/// 121.4. A player who attempts to draw a card from a library with no cards in it loses the game the next time a player would receive priority. (This is a state-based action. See rule 704.)
+/// 121.4. A player who attempts to draw a card from a library with no cards in it loses the game
+/// the next time a player would receive priority. (This is a state-based action. See rule 704.)
 pub fn r121_4_draw_from_empty_library(
     mut proceeds: MessageReader<Resolve<events::DrawFromEmptyLibrary>>,
     mut commands: Commands,

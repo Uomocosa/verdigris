@@ -5,9 +5,9 @@ use crate::Attempt;
 use crate::Resolve;
 use crate::cards;
 
-/// 702.15b Damage dealt by a source with lifelink causes that source’s controller, or its owner if it
-/// has no controller, to gain that much life (in addition to any other results that damage causes).
-/// See rule 120.3.
+/// 702.15b Damage dealt by a source with lifelink causes that source’s controller, or its owner if
+/// it has no controller, to gain that much life (in addition to any other results that damage
+/// causes). See rule 120.3.
 pub fn r702_15b_lifelink(
     mut damage_dealt: MessageReader<Resolve<events::DealDamage>>,
     mut life_gained: MessageWriter<Attempt<events::GainLife>>,

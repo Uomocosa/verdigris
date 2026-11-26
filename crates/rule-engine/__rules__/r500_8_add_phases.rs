@@ -4,7 +4,9 @@ use crate::GameMut;
 use crate::Resolve;
 use crate::events;
 
-/// 500.8. Some effects can add phases to a turn. They do this by adding the phases directly after the specified phase. If multiple extra phases are created after the same phase, the most recently created phase will occur first.
+/// 500.8. Some effects can add phases to a turn. They do this by adding the phases directly after
+/// the specified phase. If multiple extra phases are created after the same phase, the most
+/// recently created phase will occur first.
 pub fn r500_8_add_phases(mut added: MessageReader<Resolve<events::AddPhase>>, mut game: GameMut) {
     for add in added.read() {
         game.add_phase_after_this_one(add.phase);

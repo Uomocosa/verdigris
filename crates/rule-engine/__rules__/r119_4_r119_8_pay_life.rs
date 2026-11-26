@@ -10,22 +10,28 @@ use crate::rules;
 use crate::stack;
 use crate::zones;
 
-/// 119.4. If a cost or effect allows a player to pay an amount of life greater than 0, the player may do so
-/// only if their life total is greater than or equal to the amount of the payment. If a player pays life, the
-/// payment is subtracted from their life total; in other words, the player loses that much life.
+/// 119.4. If a cost or effect allows a player to pay an amount of life greater than 0, the player
+/// may do so only if their life total is greater than or equal to the amount of the payment. If a
+/// player pays life, the payment is subtracted from their life total; in other words, the player
+/// loses that much life.
 ///
-/// 119.8. If an effect says that a player can’t lose life, that player can’t make an exchange such that the player’s life total would become lower; in that case, the exchange won’t happen. Similarly, if an effect redistributes life totals, a player can’t receive a new life total such that the player’s life total would become lower. In addition, a cost that involves having that player pay life can’t be paid.
+/// 119.8. If an effect says that a player can’t lose life, that player can’t make an exchange such
+/// that the player’s life total would become lower; in that case, the exchange won’t happen.
+/// Similarly, if an effect redistributes life totals, a player can’t receive a new life total such
+/// that the player’s life total would become lower. In addition, a cost that involves having that
+/// player pay life can’t be paid.
 ///
 /// # See also
 ///
-/// 118.3b Paying life is done by subtracting the indicated amount of life from a player’s life total. (Players
-/// can always pay 0 life.)
+/// 118.3b Paying life is done by subtracting the indicated amount of life from a player’s life
+/// total. (Players can always pay 0 life.)
 ///
-/// 107.4f Phyrexian mana symbols are colored mana symbols: {W/P} is white, {U/P} is blue, {B/P} is black,
-/// {R/P} is red, and {G/P} is green. A Phyrexian mana symbol represents a cost that can be paid either with one
-/// mana of its color or by paying 2 life. There are also ten hybrid Phyrexian mana symbols. A hybrid Phyrexian
-/// mana symbol represents a cost that can be paid with one mana of either of its component colors or by paying
-/// 2 life. A hybrid Phyrexian mana symbol is both of its component colors.
+/// 107.4f Phyrexian mana symbols are colored mana symbols: {W/P} is white, {U/P} is blue, {B/P} is
+/// black, {R/P} is red, and {G/P} is green. A Phyrexian mana symbol represents a cost that can be
+/// paid either with one mana of its color or by paying 2 life. There are also ten hybrid Phyrexian
+/// mana symbols. A hybrid Phyrexian mana symbol represents a cost that can be paid with one mana of
+/// either of its component colors or by paying 2 life. A hybrid Phyrexian mana symbol is both of
+/// its component colors.
 pub fn r119_4_r119_8_pay_life(
     mut rejected: MessageWriter<actions::Rejected>,
     mut life_lost: MessageWriter<Attempt<events::LoseLife>>,

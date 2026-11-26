@@ -19,8 +19,8 @@ use crate::zones;
 /// 608.3b If the object that’s resolving has a target, it checks whether the target is still legal,
 /// as described in 608.2b. If a spell with an illegal target is a bestowed Aura spell (see rule
 /// 702.103e) or a mutating creature spell (see rule 702.140b), it becomes a creature spell and will
-/// resolve as described in rule 608.3a. Otherwise, the spell doesn’t resolve. It is removed from the
-/// stack and put into its owner’s graveyard.
+/// resolve as described in rule 608.3a. Otherwise, the spell doesn’t resolve. It is removed from
+/// the stack and put into its owner’s graveyard.
 pub fn r608_3a_permanent_enters(
     mut resolutions: MessageReader<stack::Resolution>,
     mut entering: MessageWriter<Attempt<events::EnterBattlefield>>,

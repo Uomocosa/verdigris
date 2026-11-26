@@ -5,7 +5,8 @@ use crate::Did;
 use crate::Resolve;
 use crate::cards;
 
-/// 701.26a To tap a permanent, turn it sideways from an upright position. Only untapped permanents can be tapped.
+/// 701.26a To tap a permanent, turn it sideways from an upright position. Only untapped permanents
+/// can be tapped.
 pub fn r701_26a_tap(
     mut taps: MessageReader<Resolve<events::Tap>>,
     mut did_taps: MessageWriter<Did<events::Tap>>,
