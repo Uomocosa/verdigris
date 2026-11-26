@@ -5,13 +5,16 @@ use std::collections::BTreeSet;
 use crate::actions;
 use crate::cards;
 use crate::damage;
-use crate::keywords;
+use crate::events;
+use crate::players;
+use crate::rules;
 
 pub fn assigned_blocked_damage(
-    definition: &cards::CardDefinition,
+    answers: rules::Rules,
     source: Entity,
     amount: u32,
     defending: Entity,
+    controller: players::PlayerId,
     blockers: &Query<(
         Entity,
         &cards::Blocking,
@@ -62,9 +65,14 @@ pub fn assigned_blocked_damage(
     if amount == 0 || !participants.contains(&source) {
         return writes;
     }
+    let may_assign_to_defending = answers.legal(&events::AssignCombatDamage {
+        target: defending,
+        source,
+        player: controller,
+    });
     match blockers_of.as_slice() {
         [(blocker, lethal)] => {
-            let into_blocker = if definition.has_keyword(keywords::StaticKeyword::Trample) {
+            let into_blocker = if may_assign_to_defending {
                 amount.min(*lethal)
             } else {
                 amount
@@ -85,7 +93,7 @@ pub fn assigned_blocked_damage(
                 });
             }
         }
-        [] if definition.has_keyword(keywords::StaticKeyword::Trample) => {
+        [] if may_assign_to_defending => {
             writes.push(damage::AssignedDamage {
                 source,
                 target: defending,
@@ -96,8 +104,7 @@ pub fn assigned_blocked_damage(
         _ => {
             let mut legal: BTreeSet<Entity> =
                 blockers_of.iter().map(|(blocker, _)| *blocker).collect();
-            let trample_defender =
-                definition.has_keyword(keywords::StaticKeyword::Trample).then_some(defending);
+            let trample_defender = may_assign_to_defending.then_some(defending);
             if let Some(defender) = trample_defender {
                 legal.insert(defender);
             }
@@ -117,13 +124,15 @@ pub fn assigned_blocked_damage(
 mod tests {
     use std::collections::BTreeSet;
 
-    use bevy::prelude::Entity;
+    use bevy::ecs::system::RunSystemOnce;
+    use bevy::prelude::{Entity, Query};
 
     use crate::BATTLEFIELD;
     use crate::HAND;
     use crate::cards;
     use crate::damage;
     use crate::mana;
+    use crate::rules;
     use crate::testing::*;
     use crate::turns;
 
@@ -149,29 +158,38 @@ mod tests {
             p2.declare_blockers([(bears, companion)]),
         ])?;
 
-        let attacker = (GARRUKS_COMPANION.definition)();
         let source = Entity::from(companion);
         let defending = Entity::from(p2);
         let bears_blocking = Entity::from(bears);
         let participants = BTreeSet::from([source, bears_blocking]);
-        let mut needed = Vec::new();
 
-        let writes = game.with_query::<(
-            Entity,
-            &cards::Blocking,
-            Option<&damage::Damage>,
-            Option<&cards::EffectivePT>,
-        ), Vec<damage::AssignedDamage>>(|blockers| {
-            attacker.assigned_blocked_damage(
-                source,
-                3,
-                defending,
-                &blockers,
-                &participants,
-                &mut needed,
-                false,
+        let (writes, needed) = game
+            .app
+            .world_mut()
+            .run_system_once(
+                move |blockers: Query<(
+                    Entity,
+                    &cards::Blocking,
+                    Option<&damage::Damage>,
+                    Option<&cards::EffectivePT>,
+                )>,
+                      answers: rules::Rules| {
+                    let mut needed = Vec::new();
+                    let writes = cards::CardDefinition::assigned_blocked_damage(
+                        answers,
+                        source,
+                        3,
+                        defending,
+                        p1.id,
+                        &blockers,
+                        &participants,
+                        &mut needed,
+                        false,
+                    );
+                    (writes, needed)
+                },
             )
-        });
+            .unwrap();
 
         assert_eq!(
             writes,
@@ -224,29 +242,38 @@ mod tests {
             p2.declare_blockers([(spider, companion)]),
         ])?;
 
-        let attacker = (GARRUKS_COMPANION.definition)();
         let source = Entity::from(companion);
         let defending = Entity::from(p2);
         let spider_blocking = Entity::from(spider);
         let participants = BTreeSet::from([source, spider_blocking]);
-        let mut needed = Vec::new();
 
-        let writes = game.with_query::<(
-            Entity,
-            &cards::Blocking,
-            Option<&damage::Damage>,
-            Option<&cards::EffectivePT>,
-        ), Vec<damage::AssignedDamage>>(|blockers| {
-            attacker.assigned_blocked_damage(
-                source,
-                3,
-                defending,
-                &blockers,
-                &participants,
-                &mut needed,
-                true,
+        let (writes, needed) = game
+            .app
+            .world_mut()
+            .run_system_once(
+                move |blockers: Query<(
+                    Entity,
+                    &cards::Blocking,
+                    Option<&damage::Damage>,
+                    Option<&cards::EffectivePT>,
+                )>,
+                      answers: rules::Rules| {
+                    let mut needed = Vec::new();
+                    let writes = cards::CardDefinition::assigned_blocked_damage(
+                        answers,
+                        source,
+                        3,
+                        defending,
+                        p1.id,
+                        &blockers,
+                        &participants,
+                        &mut needed,
+                        true,
+                    );
+                    (writes, needed)
+                },
             )
-        });
+            .unwrap();
 
         assert_eq!(
             writes,

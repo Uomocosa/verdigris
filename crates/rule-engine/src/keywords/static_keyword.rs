@@ -1,6 +1,7 @@
 use crate::cards;
 use crate::effects;
 use crate::events;
+use crate::players;
 use crate::rules;
 use crate::rules::traits::event::Event;
 
@@ -47,6 +48,10 @@ impl StaticKeyword {
                     condition: rules::points_to::<cards::Controller>(rules::Role::Player)
                         | rules::is(rules::Role::Player),
                 },
+            })],
+            Self::Trample => vec![effects::Modification::Rule(rules::RuleChange {
+                target: rules::Target::Clause(events::assign_combat_damage::ONLY_BLOCKERS.key),
+                change: rules::Change::Allow(rules::has::<players::Player>()),
             })],
             _ => Vec::new(),
         }

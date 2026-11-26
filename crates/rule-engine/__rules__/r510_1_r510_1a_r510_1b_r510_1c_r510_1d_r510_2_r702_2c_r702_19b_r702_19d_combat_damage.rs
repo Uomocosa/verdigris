@@ -8,6 +8,7 @@ use crate::actions;
 use crate::cards;
 use crate::damage;
 use crate::players;
+use crate::rules;
 use crate::turns;
 
 type CombatLookups<'w, 's> = (
@@ -97,13 +98,14 @@ fn announce_combat_damage(
     attackers: Query<
         (
             Entity,
-            &cards::CardDefinition,
+            &cards::Controller,
             Option<&cards::Blocked>,
             cards::CurrentMarkers<'_>,
         ),
         With<cards::Attacking>,
     >,
     mut lookups: ParamSet<CombatLookups<'_, '_>>,
+    answers: rules::Rules,
     defenders: Query<Entity, With<players::DefendingPlayer>>,
     state: Res<turns::TurnState>,
     participants: Res<turns::CombatDamageParticipants>,
@@ -114,7 +116,7 @@ fn announce_combat_damage(
         return;
     };
     let mut needed: Vec<actions::RequiredCombatDamage> = Vec::new();
-    for (attacker, definition, blocked, markers) in attackers.iter() {
+    for (attacker, controller, blocked, markers) in attackers.iter() {
         let Some(effective) = markers.effective else {
             continue;
         };
@@ -130,10 +132,12 @@ fn announce_combat_damage(
                 controller: recipient_controller(&lookups.p1(), defending),
             }));
         } else {
-            for write in definition.assigned_blocked_damage(
+            for write in cards::CardDefinition::assigned_blocked_damage(
+                answers,
                 attacker,
                 amount,
                 defending,
+                **controller,
                 &lookups.p0(),
                 participants,
                 &mut needed,

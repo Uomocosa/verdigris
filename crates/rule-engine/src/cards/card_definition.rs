@@ -9,6 +9,8 @@ use crate::cards;
 use crate::damage;
 use crate::effects;
 use crate::keywords;
+use crate::players;
+use crate::rules;
 #[cfg(feature = "testing")]
 use crate::testing;
 
@@ -141,10 +143,11 @@ impl CardDefinition {
 impl CardDefinition {
     #[must_use]
     pub(crate) fn assigned_blocked_damage(
-        &self,
+        answers: rules::Rules,
         source: Entity,
         amount: u32,
         defending: Entity,
+        controller: players::PlayerId,
         blockers: &Query<(
             Entity,
             &cards::Blocking,

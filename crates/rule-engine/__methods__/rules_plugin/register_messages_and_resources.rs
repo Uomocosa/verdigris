@@ -5,6 +5,7 @@ use crate::actions;
 use crate::cards;
 use crate::effects;
 use crate::events;
+use crate::players;
 use crate::rules;
 use crate::rules::traits::event::Event;
 use crate::rules::traits::hook_event::HookEvent;
@@ -67,6 +68,7 @@ pub fn register_messages_and_resources(app: &mut App) {
         registry.register_predicate_component::<cards::Defender>(world);
         registry.register_predicate_component::<cards::SummoningSick>(world);
         registry.register_predicate_component::<cards::OnBattlefield>(world);
+        registry.register_predicate_component::<players::Player>(world);
         registry.register_entity_component::<cards::Owner>(world);
         registry.register_entity_component::<cards::Controller>(world);
         registry.register_entity_component::<cards::Blocking>(world);

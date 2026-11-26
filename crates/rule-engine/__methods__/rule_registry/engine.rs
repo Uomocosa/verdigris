@@ -18,6 +18,10 @@ pub fn engine() -> rules::RuleRegistry {
         }
     };
     register(events::AddPhase::ID, events::AddPhase::clauses());
+    register(
+        events::AssignCombatDamage::ID,
+        events::AssignCombatDamage::clauses(),
+    );
     register(events::BecomeTarget::ID, events::BecomeTarget::clauses());
     register(events::CastSpell::ID, events::CastSpell::clauses());
     register(events::Counter::ID, events::Counter::clauses());
