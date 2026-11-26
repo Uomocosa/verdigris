@@ -133,8 +133,12 @@ Only the system that performs an event writes its result; every other rule sends
 **Why:** a trigger or a replacement hooks in at one place, and no path forgets a side effect
 (such as `StateBasedActionsPerformed`).
 
-Some older rules do not follow this yet: destroy, counter, mill and finished spells still
-insert `InZone(graveyard)` themselves instead of sending `PutIntoGraveyard`. Don't copy them.
+Two rules writing the same component is the same smell: make one event and one performer.
+
+Some older rules do not follow this yet: counter, mill and finished spells still insert
+`InZone(graveyard)` themselves instead of sending `PutIntoGraveyard`. Don't copy them. A direct
+write skips every `Cant` / `Instead` on the event, so converting one is usually a CR fix: red first
+(destroy skipped "can't be put into a graveyard" until `r701_8a_destroy` sent the event).
 
 Before replacing a direct write with an event, check WHEN the event is performed:
 `PutIntoGraveyard` is resolved only in the state-based pass, after `RuleSet::Resolution`. A rule that
@@ -227,7 +231,7 @@ compiles, it named a case.
 
 One file per CR rule. The `pub fn` named after the file is the rule's system or, if the sentence needs
 several, it returns them `.chain()`ed; those systems are private in the same file. A different CR rule
-is a different file: 502.3 announces the untap, 701.26b says what untapping does. An old combined `rA_rB_..` file is split when it is refactored; an id whose sentence only conditions or repeats
+is a different file: 502.3 announces the untap, 701.26b says what untapping does. An old combined `rA_rB_..` file is split when it is refactored; the file keeps the id that says what is performed. A keyword sentence that only says "can't" (702.12b indestructible) is a card-side change in `StaticKeyword::keyword_modifications`, like haste and vigilance, and its text goes under `# See also` of the performing rule; an id whose sentence only conditions or repeats
 the other gets no file, its text moves under `# See also` and the file is renamed. A quote nothing
 implements is dropped. Moving an existing test to the file that now owns its behaviour is not a new test.
 
