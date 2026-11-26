@@ -43,6 +43,7 @@ pub fn r608_2_r608_2c_resolve(
     mut damage_dealt: MessageWriter<Attempt<events::DealDamage>>,
     mut destructions: MessageWriter<Attempt<events::Destroy>>,
     mut countered: MessageWriter<Attempt<events::Counter>>,
+    mut poison_counters: MessageWriter<Attempt<events::GivePoisonCounters>>,
     mut player_effects: ParamSet<PlayerEffectWriters<'_, '_, '_, '_, '_, '_>>,
     mut effect_messages: ParamSet<EffectMessageWriters<'_, '_, '_, '_>>,
     lookups: stack::ResolutionLookups<'_, '_>,
@@ -112,7 +113,7 @@ pub fn r608_2_r608_2c_resolve(
                     request_life_loss(&mut player_effects.p0(), &player_targets, amount);
                 }
                 effects::EffectKind::Poison(amount) => {
-                    request_poison(&mut commands, &lookups, &player_targets, amount);
+                    request_poison(&mut poison_counters, &player_targets, amount);
                 }
                 effects::EffectKind::GainLife(amount) => {
                     request_life_gain(
@@ -268,13 +269,15 @@ fn request_gain_keyword(
 }
 
 fn request_poison(
-    commands: &mut Commands,
-    lookups: &stack::ResolutionLookups<'_, '_>,
+    poison_counters: &mut MessageWriter<Attempt<events::GivePoisonCounters>>,
     players: &[players::PlayerId],
     amount: u32,
 ) {
     for player in players {
-        add_poison_counters(commands, lookups, *player, amount);
+        poison_counters.write(Attempt(events::GivePoisonCounters {
+            player: *player,
+            amount,
+        }));
     }
 }
 
@@ -437,17 +440,6 @@ fn resolve_player_targets(
     let players: Vec<players::PlayerId> =
         lookups.lives.iter().map(|(player, _)| players::PlayerId(player)).collect();
     player.resolve(controller, &players)
-}
-
-fn add_poison_counters(
-    commands: &mut Commands,
-    lookups: &stack::ResolutionLookups<'_, '_>,
-    player: players::PlayerId,
-    amount: u32,
-) {
-    let counters =
-        lookups.poison.get(*player).map_or(0, |counters| **counters).saturating_add(amount);
-    commands.entity(*player).insert(players::PoisonCounters(counters));
 }
 
 #[cfg(test)]

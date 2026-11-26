@@ -37,6 +37,9 @@ pub use enter_battlefield::EnterBattlefield;
 mod gain_life;
 pub use gain_life::GainLife;
 
+mod give_poison_counters;
+pub use give_poison_counters::GivePoisonCounters;
+
 mod lose_game;
 pub use lose_game::LoseGame;
 

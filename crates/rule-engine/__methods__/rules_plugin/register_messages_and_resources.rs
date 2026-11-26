@@ -27,6 +27,7 @@ pub fn register_messages_and_resources(app: &mut App) {
     events::Discard::register(app);
     events::DiscardCard::register(app);
     events::GainLife::register(app);
+    events::GivePoisonCounters::register(app);
     events::Mill::register(app);
     events::CreateTokens::register(app);
     events::Destroy::register(app);

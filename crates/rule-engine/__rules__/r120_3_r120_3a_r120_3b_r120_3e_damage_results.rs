@@ -24,9 +24,9 @@ pub fn r120_3_r120_3a_r120_3b_r120_3e_damage_results(
     mut damage_dealt: MessageReader<Resolve<events::DealDamage>>,
     mut did_damage: MessageWriter<Did<events::DealDamage>>,
     mut life_lost: MessageWriter<Attempt<events::LoseLife>>,
+    mut poison_counters: MessageWriter<Attempt<events::GivePoisonCounters>>,
     mut commands: Commands,
     lives: Query<&players::Life>,
-    mut poisoned: Query<&mut players::PoisonCounters>,
     sources: Query<Has<cards::Deathtouch>>,
     infect_sources: Query<Has<cards::Infect>>,
     targets: Query<Option<&damage::Damage>>,
@@ -37,11 +37,10 @@ pub fn r120_3_r120_3a_r120_3b_r120_3e_damage_results(
         }
         if lives.get(event.recipient).is_ok() {
             if infect_sources.get(event.source).is_ok_and(|has| has) {
-                if let Ok(mut counters) = poisoned.get_mut(event.recipient) {
-                    *counters = players::PoisonCounters((**counters).saturating_add(event.amount));
-                } else {
-                    commands.entity(event.recipient).insert(players::PoisonCounters(event.amount));
-                }
+                poison_counters.write(Attempt(events::GivePoisonCounters {
+                    player: players::PlayerId(event.recipient),
+                    amount: event.amount,
+                }));
             } else {
                 life_lost.write(Attempt(events::LoseLife {
                     player: players::PlayerId(event.recipient),

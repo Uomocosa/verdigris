@@ -20,6 +20,7 @@ pub mod r119_4_r119_8_pay_life;
 pub mod r120_3_r120_3a_r120_3b_r120_3e_damage_results;
 pub mod r121_1_r121_2_draw;
 pub mod r121_4_draw_from_empty_library;
+pub mod r122_1_give_poison_counters;
 pub mod r302_6_summoning_sickness;
 pub mod r305_1_r305_2_r305_3_play_land;
 pub mod r305_6_basic_land_mana_ability;

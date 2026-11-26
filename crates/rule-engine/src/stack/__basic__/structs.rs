@@ -22,5 +22,4 @@ pub struct ResolutionLookups<'w, 's> {
     pub owners: Query<'w, 's, &'static cards::Owner>,
     pub chosen_targets: Query<'w, 's, &'static stack::ChosenTarget>,
     pub lives: Query<'w, 's, (Entity, &'static players::Life)>,
-    pub poison: Query<'w, 's, &'static players::PoisonCounters>,
 }
