@@ -39,25 +39,6 @@ use crate::turns;
 /// action doesn’t use the stack. No player has the chance to cast spells or activate abilities
 /// between the time combat damage is assigned and the time it’s dealt.
 ///
-/// 702.19b The controller of an attacking creature with trample first assigns damage to the
-/// creature(s) blocking it. Once all those blocking creatures are assigned lethal damage, any
-/// excess damage is assigned as its controller chooses among those blocking creatures and the
-/// player, planeswalker, or battle the creature is attacking. When checking for assigned lethal
-/// damage, take into account damage already marked on the creature and damage from other creatures
-/// that’s being assigned during the same combat damage step, but not any abilities or effects that
-/// might change the amount of damage that’s actually dealt. The attacking creature’s controller
-/// need not assign lethal damage to all those blocking creatures but in that case can’t assign any
-/// damage to the player or planeswalker it’s attacking.
-///
-/// 702.19d If an attacking creature with trample or trample over planeswalkers is blocked, but
-/// there are no creatures blocking it when damage is assigned, its damage is assigned to the
-/// defending player and/or planeswalker as though all blocking creatures have been assigned lethal
-/// damage.
-///
-/// 702.2c Any nonzero amount of combat damage assigned to a creature by a source with deathtouch
-/// is considered to be lethal damage for the purposes of determining if a proposed combat damage
-/// assignment is valid, regardless of that creature’s toughness. See rules 510.1c–d.
-///
 /// # Notes
 ///
 /// Scope: unblocked creatures deal damage to the defending player (two-player games; planeswalker
@@ -67,7 +48,7 @@ use crate::turns;
 /// assigns damage to it. Trample: a single blocker is assigned lethal damage first (toughness minus
 /// damage already marked on it) and any excess goes to the defending player; a blocked attacker
 /// with no blockers left assigns all its damage to the defending player.
-pub fn r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_r702_2c_r702_19b_r702_19d_combat_damage()
+pub fn r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_combat_damage()
 -> ScheduleConfigs<ScheduleSystem> {
     (
         announce_combat_damage.run_if(

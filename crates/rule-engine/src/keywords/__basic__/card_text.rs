@@ -23,7 +23,7 @@ pub fn lifelink() -> keywords::Keyword {
 
 #[must_use]
 pub fn trample() -> keywords::Keyword {
-    keywords::trample::r702_19b_trample()
+    keywords::trample::r702_19b_r702_19d_trample()
 }
 
 #[must_use]

@@ -3,7 +3,7 @@ pub mod r702_11b_hexproof;
 pub mod r702_12b_indestructible;
 pub mod r702_15b_lifelink;
 pub mod r702_17b_reach;
-pub mod r702_19b_trample;
+pub mod r702_19b_r702_19d_trample;
 pub mod r702_20a_vigilance;
 pub mod r702_2c_deathtouch;
 pub mod r702_3a_defender;

@@ -24,7 +24,7 @@ pub(crate) use comprehensive_keywords::r702_11b_hexproof as hexproof;
 pub(crate) use comprehensive_keywords::r702_12b_indestructible as indestructible;
 pub(crate) use comprehensive_keywords::r702_15b_lifelink as lifelink;
 pub(crate) use comprehensive_keywords::r702_17b_reach as reach;
-pub(crate) use comprehensive_keywords::r702_19b_trample as trample;
+pub(crate) use comprehensive_keywords::r702_19b_r702_19d_trample as trample;
 pub(crate) use comprehensive_keywords::r702_20a_vigilance as vigilance;
 pub(crate) use comprehensive_keywords::r702_90b_infect as infect;
 

@@ -13,8 +13,13 @@ use crate::rules;
 /// might change the amount of damage that’s actually dealt. The attacking creature’s controller
 /// need not assign lethal damage to all those blocking creatures but in that case can’t assign any
 /// damage to the player or planeswalker it’s attacking.
+///
+/// 702.19d If an attacking creature with trample or trample over planeswalkers is blocked, but
+/// there are no creatures blocking it when damage is assigned, its damage is assigned to the
+/// defending player and/or planeswalker as though all blocking creatures have been assigned lethal
+/// damage.
 #[must_use]
-pub fn r702_19b_trample() -> keywords::Keyword {
+pub fn r702_19b_r702_19d_trample() -> keywords::Keyword {
     keywords::Keyword::from_plain(ID, abilities)
 }
 
@@ -34,7 +39,10 @@ fn abilities() -> Vec<effects::Modification> {
 mod tests {
     #[test]
     fn test_usage() {
-        assert_eq!(super::r702_19b_trample().id, super::ID);
-        assert_eq!(super::r702_19b_trample().abilities(), super::abilities());
+        assert_eq!(super::r702_19b_r702_19d_trample().id, super::ID);
+        assert_eq!(
+            super::r702_19b_r702_19d_trample().abilities(),
+            super::abilities()
+        );
     }
 }

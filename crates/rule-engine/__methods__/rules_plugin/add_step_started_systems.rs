@@ -50,7 +50,7 @@ pub fn add_step_started_systems(app: &mut App) {
         Update,
         (
             comprehensive_rules::r510_4_combat_damage_steps::r510_4_combat_damage_steps(),
-            comprehensive_rules::r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_r702_2c_r702_19b_r702_19d_combat_damage::r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_r702_2c_r702_19b_r702_19d_combat_damage(),
+            comprehensive_rules::r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_combat_damage::r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_combat_damage(),
         )
             .chain()
             .in_set(RuleSet::StepStarted),

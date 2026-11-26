@@ -48,7 +48,7 @@ pub mod r509_1a_declare_blockers;
 pub mod r509_1g_becomes_blocking;
 pub mod r509_1h_becomes_blocked;
 pub mod r509_1i_r509_2a_r509_3a_r509_3c_blocker_triggers;
-pub mod r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_r702_2c_r702_19b_r702_19d_combat_damage;
+pub mod r510_1_r510_1a_r510_1b_r510_1c_r510_1d_r510_2_combat_damage;
 pub mod r510_3a_combat_damage_triggers;
 pub mod r510_4_combat_damage_steps;
 pub mod r511_3_end_of_combat_ends;
