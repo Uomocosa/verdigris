@@ -3,7 +3,9 @@ use bevy::prelude::{Commands, Entity, MessageReader, Query, With};
 
 use crate::cards;
 use crate::effects;
+use crate::events;
 use crate::players;
+use crate::rules;
 use crate::stack;
 use crate::zones;
 
@@ -33,6 +35,7 @@ pub fn r608_2b_illegal_targets(
     players: Query<Entity, With<players::Player>>,
     battlefield: Query<Entity, With<cards::OnBattlefield>>,
     zones: zones::ZoneLookup,
+    answers: rules::Rules,
 ) {
     for resolution in resolutions.read() {
         let spell = **resolution;
@@ -49,7 +52,17 @@ pub fn r608_2b_illegal_targets(
             continue;
         };
         let is_legal = chosen.map(|chosen| **chosen).is_some_and(|target| {
-            target_is_legal(target, requirement, &players, &cards, &battlefield, &zones)
+            target_is_legal(
+                target,
+                spell,
+                **owner,
+                requirement,
+                &players,
+                &cards,
+                &battlefield,
+                &zones,
+                &answers,
+            )
         });
         if is_legal {
             continue;
@@ -62,6 +75,8 @@ pub fn r608_2b_illegal_targets(
 
 fn target_is_legal(
     target: Entity,
+    spell: Entity,
+    controller: players::PlayerId,
     requirement: effects::Target,
     players: &Query<Entity, With<players::Player>>,
     cards: &Query<(
@@ -72,6 +87,7 @@ fn target_is_legal(
     )>,
     battlefield: &Query<Entity, With<cards::OnBattlefield>>,
     zones: &zones::ZoneLookup,
+    answers: &rules::Rules,
 ) -> bool {
     let is_player = players.contains(target);
     let creature_matches_filter = cards
@@ -82,7 +98,7 @@ fn target_is_legal(
         .get(target)
         .is_ok_and(|(definition, _, _, _)| requirement.filter.does_enchantment_match(definition))
         && battlefield.contains(target);
-    match requirement.filter.kind {
+    let matches_filter = match requirement.filter.kind {
         effects::FilterKind::AnyTarget => is_player || creature_matches_filter,
         effects::FilterKind::Player => is_player,
         effects::FilterKind::Creature => creature_matches_filter,
@@ -95,7 +111,13 @@ fn target_is_legal(
                 zones.contains(STACK, **in_zone) && requirement.filter.does_spell_match(definition)
             })
         }
-    }
+    };
+    matches_filter
+        && answers.legal(&events::BecomeTarget {
+            target,
+            spell,
+            player: controller,
+        })
 }
 
 #[cfg(test)]
@@ -142,6 +164,27 @@ mod tests {
         game.play([p1.pass_priority(), p2.pass_priority()])?;
         assert!(game.player(p1).cards_in(GRAVEYARD).has(bolt));
         assert_eq!(game.life(p2), 20);
+        Ok(())
+    }
+
+    #[test]
+    fn spell_fizzles_when_its_target_gains_hexproof_in_response() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.hand([DOOM_BLADE]).mana_pool(mana![1, B]),
+            P2.hand([RANGERS_GUILE]).mana_pool(mana![G]).battlefield([GRIZZLY_BEARS]),
+        ]);
+        let [blade] = game.player(p1).cards_in(HAND).exactly::<1>(DOOM_BLADE)?;
+        let [guile] = game.player(p2).cards_in(HAND).exactly::<1>(RANGERS_GUILE)?;
+        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+
+        game.play([
+            p1.cast(blade).targeting(bears).pass_priority(),
+            p2.cast(guile).targeting(bears).pass_priority(),
+            p1.pass_priority(),
+        ])?;
+        game.play([p1.pass_priority(), p2.pass_priority()])?;
+        assert!(game.player(p2).cards_in(BATTLEFIELD).has(bears));
+        assert!(game.player(p1).cards_in(GRAVEYARD).has(blade));
         Ok(())
     }
 
