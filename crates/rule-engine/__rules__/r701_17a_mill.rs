@@ -9,11 +9,13 @@ use crate::zones;
 /// 701.17a For a player to mill a number of cards, that player puts that many cards from the top
 /// of their library into their graveyard.
 ///
+/// # See also
+///
 /// 701.17b A player can’t mill a number of cards greater than the number of cards in their library.
 /// If given the choice to do so, they can’t choose to take that action. If instructed to do so,
 /// they mill as many as possible. Similarly, the player can’t pay a cost that includes milling a
 /// number of cards greater than the number of cards in their library.
-pub fn r701_17a_r701_17b_mill(
+pub fn r701_17a_mill(
     mut mills: MessageReader<Resolve<events::Mill>>,
     mut moves_to_graveyard: MessageWriter<Attempt<events::PutIntoGraveyard>>,
     zones: zones::ZoneLookup,
