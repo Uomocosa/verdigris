@@ -76,6 +76,9 @@ pub use win_game::WinGame;
 pub mod declare_attacker;
 pub use declare_attacker::DeclareAttacker;
 
+pub mod declare_attackers;
+pub use declare_attackers::DeclareAttackers;
+
 pub mod play_land;
 pub use play_land::PlayLand;
 

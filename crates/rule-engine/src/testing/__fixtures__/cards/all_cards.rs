@@ -84,6 +84,7 @@ pub const ALL_CARDS: &[testing::Card] = &[
     testing::TEST_RULE_RESTRICTION,
     testing::TEST_RULE_WAIVER,
     testing::TEST_SAFE_HAVEN,
+    testing::TEST_SILENT_ARBITER,
     testing::TEST_SKY_COURT,
     testing::TEST_TAPPED_SENTRY,
     testing::TEST_TAUNTING_FIELD,

@@ -24,6 +24,7 @@ pub enum Condition {
     HasPriority(rules::ArgRef),
     ArgAmount(rules::ArgId, rules::Comparison, u32),
     ArgAtLeastRemainingToughness(rules::ArgId),
+    Count(rules::ArgId, rules::Comparison, u32),
 }
 
 #[rustfmt::skip]

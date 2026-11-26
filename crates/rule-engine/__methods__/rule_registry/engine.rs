@@ -17,9 +17,7 @@ pub fn engine() -> rules::RuleRegistry {
         if !events.insert(id) {
             duplicates.push(id);
         }
-        for restriction in list {
-            restrictions.insert(restriction.id);
-        }
+        restrictions.extend(list.iter().map(|restriction| restriction.id));
     };
     register(events::AddPhase::ID, events::AddPhase::restrictions());
     register(
@@ -40,6 +38,10 @@ pub fn engine() -> rules::RuleRegistry {
     register(
         events::DeclareAttacker::ID,
         events::DeclareAttacker::restrictions(),
+    );
+    register(
+        events::DeclareAttackers::ID,
+        events::DeclareAttackers::restrictions(),
     );
     register(
         events::DeclareBlocker::ID,
@@ -96,9 +98,7 @@ pub fn engine() -> rules::RuleRegistry {
         );
         register(testing::TestStep::ID, testing::TestStep::restrictions());
     }
-    for id in rules::RuleRegistry::keyword_restriction_ids() {
-        restrictions.insert(id);
-    }
+    restrictions.extend(rules::RuleRegistry::keyword_restriction_ids());
     let results = HashSet::from([LOSES_LIFE]);
     let definitions = HashSet::from([rules::LETHAL_DAMAGE]);
     let values = HashSet::from([rules::LandPlays::ID, rules::MaximumHandSize::ID]);

@@ -2,7 +2,7 @@
 mod basic;
 
 pub use basic::condition_builders::{
-    active_player, at_least, at_most, card_type, equal_to, has, has_priority, in_zone, is,
+    active_player, at_least, at_most, card_type, count, equal_to, has, has_priority, in_zone, is,
     main_phase, points_to, stack_empty, step_is,
 };
 pub use basic::enums::{Amount, Change, Characteristic, Legality, may};
@@ -63,6 +63,9 @@ pub use component_ref::ComponentRef;
 
 mod condition;
 pub use condition::Condition;
+
+mod count;
+pub use count::Count;
 
 mod rules;
 pub use rules::Rules;

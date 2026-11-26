@@ -74,3 +74,8 @@ pub fn active_player(role: impl Into<rules::ArgRef>) -> rules::Condition {
 pub fn has_priority(role: impl Into<rules::ArgRef>) -> rules::Condition {
     rules::Condition::HasPriority(role.into())
 }
+
+#[must_use]
+pub const fn count(id: rules::ArgId) -> rules::Count {
+    rules::Count(id)
+}

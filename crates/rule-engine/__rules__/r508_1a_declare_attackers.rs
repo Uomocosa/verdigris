@@ -79,6 +79,15 @@ pub fn r508_1a_declare_attackers(
             });
             continue;
         }
+        if !answers.legal(&events::DeclareAttackers {
+            attackers: attackers.clone(),
+            player: action.player,
+        }) {
+            rejected.write(actions::Rejected::CannotAttack {
+                attackers: attackers.clone(),
+            });
+            continue;
+        }
         for attacker in attackers {
             declared.write(Attempt(events::DeclareAttacker {
                 attacker: *attacker,
@@ -427,6 +436,38 @@ mod tests {
         ])?;
 
         assert!(game.is_attacking(wall));
+        Ok(())
+    }
+
+    #[test]
+    fn silent_arbiter_limits_the_whole_declaration_to_one_attacker() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.battlefield([GRIZZLY_BEARS, GRIZZLY_BEARS]),
+            P2.battlefield([TEST_SILENT_ARBITER]),
+        ]);
+        let [bears_1, bears_2] =
+            game.player(p1).cards_in(BATTLEFIELD).exactly::<2>(GRIZZLY_BEARS)?;
+        game.play([
+            p1.pass_to(turns::Step::DeclareAttackers),
+            p2.pass_to(turns::Step::DeclareAttackers),
+        ])?;
+
+        game.act(
+            p1,
+            actions::Action::DeclareAttackers(vec![bears_1.into(), bears_2.into()]),
+        );
+        assert_eq!(
+            game.last_rejection(),
+            Some(&actions::Rejected::CannotAttack {
+                attackers: vec![bears_1.into(), bears_2.into()]
+            })
+        );
+        assert!(!game.is_attacking(bears_1));
+        assert!(!game.is_attacking(bears_2));
+
+        game.play([p1.declare_attackers([bears_1])])?;
+        assert!(game.is_attacking(bears_1));
+        assert!(!game.is_attacking(bears_2));
         Ok(())
     }
 }

@@ -3,11 +3,13 @@ use crate::rules::traits::event_args::EventArgs;
 
 pub fn bind<E: EventArgs>(condition: &rules::Condition, event: &E) -> rules::Condition {
     match condition {
-        rules::Condition::ArgAmount(id, comparison, threshold) => {
+        rules::Condition::ArgAmount(id, comparison, threshold)
+        | rules::Condition::Count(id, comparison, threshold) => {
             let holds = event
                 .arg(*id)
                 .and_then(|value| match value {
                     rules::ArgValue::Amount(found) => Some(found),
+                    rules::ArgValue::Entities(found) => found.len().try_into().ok(),
                     _ => None,
                 })
                 .is_some_and(|value| comparison.holds(&value, threshold));

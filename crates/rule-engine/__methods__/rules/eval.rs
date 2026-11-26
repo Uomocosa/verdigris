@@ -18,7 +18,8 @@ pub fn eval<E: EventArgs>(
     };
     let amount = |id: &rules::ArgId| match event.arg(*id) {
         Some(rules::ArgValue::Amount(found)) => Some(found),
-        _ => None,
+        Some(rules::ArgValue::Entities(found)) => found.len().try_into().ok(),
+        Some(_) | None => None,
     };
     match condition {
         rules::Condition::Has(component) => viewpoint.is_some_and(|subject| {
@@ -102,7 +103,8 @@ pub fn eval<E: EventArgs>(
                 .single()
                 .is_ok_and(|state| state.priority.holder.is_some_and(|id| *id == holder))
         }),
-        rules::Condition::ArgAmount(id, comparison, threshold) => {
+        rules::Condition::ArgAmount(id, comparison, threshold)
+        | rules::Condition::Count(id, comparison, threshold) => {
             amount(id).is_some_and(|value| comparison.holds(&value, threshold))
         }
         rules::Condition::ArgAtLeastRemainingToughness(id) => viewpoint.is_some_and(|subject| {
