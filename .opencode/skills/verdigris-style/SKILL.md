@@ -110,6 +110,9 @@ Cards in tests come from `testing` fixtures (`testing::GARRUKS_COMPANION`,
 `testing::GRIZZLY_BEARS`, …; call `(FIXTURE.definition)()` where a `CardDefinition` is
 needed), never `cards::creature(..)` built in a test (RATIONALE §20, SMELLS S11). A
 missing card gets a new fixture in `crates/rule-engine/src/testing/__fixtures__/`.
+A new fixture is a real card whenever the engine can express its whole printed text (Ranger's Guile, not
+`TEST_HEXPROOF_GRANT`). `TEST_*` cards are placeholders until enough rules exist for a real card; never add one
+when a real card fits.
 A static ability of a permanent (`statics::all(..)`, `TEST_NO_BURIALS`) only reaches the battlefield; to
 change an event for a card on the stack or in a library, give that card its own replacement
 (`TEST_NEVER_BURIED`).
@@ -156,7 +159,9 @@ removes an ability (e.g. Jump: "Target creature gains flying until end of turn")
 whether something is on the battlefield), read the derived component in the query filter,
 never the source component in the body. Type and keyword markers exist only for objects on the
 battlefield: a rule about a spell on the stack or a card elsewhere still reads `CardDefinition`.
-If a rule about the battlefield needs a marker that doesn't exist yet (hexproof), add it to the layers in its
+A keyword that only says "can't" needs no marker: it is a rule change in `keyword_modifications` (rules-style
+§11; hexproof vetoes `BecomeTarget`), and `Rules::mods` reads current characteristics, so a granted keyword
+works too. If a rule about the battlefield needs a marker that doesn't exist yet, add it to the layers in its
 own refactor commit, before the rule reads it: the struct in `cards/__basic__/components.rs` (+ re-export), a
 `Has<..>` field in `CurrentMarkers`, a `sync_marker` call in `write_markers`, and its line in that file's
 identity test; `PredicateRegistry` only if a rule asks through `rules::has`. If reading the marker fixes a bug,

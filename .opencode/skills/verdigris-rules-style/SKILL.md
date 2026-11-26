@@ -128,16 +128,13 @@ compiles, it named a case.
 
 One file per CR rule. The `pub fn` named after the file is the rule's system or, if the sentence needs
 several, it returns them `.chain()`ed; those systems are private in the same file. A different CR rule
-is a different file: 502.3 announces the untap, 701.26b says what untapping does. An old combined `rA_rB_..` file is split when it is refactored; the file keeps the id that says what is performed. A keyword sentence that only says "can't" (702.12b indestructible) is a card-side change in `StaticKeyword::keyword_modifications`, like haste and vigilance, and its text goes under `# See also` of the performing rule; an id whose sentence only conditions or repeats
-the other gets no file, its text moves under `# See also` and the file is renamed. Every id in the file name keeps
+is a different file: 502.3 announces the untap, 701.26b says what untapping does. An old combined `rA_rB_..` file is split when it is refactored; the file keeps the id that says what is performed. A sentence that says WHEN and one that says WHAT HAPPENS are two rules (500.4 announces that pools empty, 106.4 performs the loss); an id with no performer of its own (510.2 "dealt simultaneously") goes under `# See also` of the rule that performs it. A keyword sentence that only says "can't" (702.12b indestructible) is a card-side change in `StaticKeyword::keyword_modifications`, like haste and vigilance, and its text goes under `# See also` of the performing rule; an id whose sentence only conditions or repeats
+the other gets no file, its text moves under `# See also` and the file is renamed. Text under `# See also` is quoted word for word like the main quote, with no explanation added. Every id in the file name keeps
 its quote (the linter checks it); to drop an id, rename the file. Ids that quote the same sentence (510.4,
 702.4b, 702.7b) keep the one in the rule that performs it, the others go under `# See also`. Moving an existing test to the file that now owns its behaviour is not a new test. When a file is split, each
 sub-rule takes the existing test that shows its case; the general file keeps a test that shows its own
 outcome (`r120_3` writes `Did`, so a trigger on damage). A general file that only announces or writes
 `Did` is fine, however short.
-
-A sentence that says WHEN and a sentence that says WHAT HAPPENS are two rules, even when an old file holds
-both: 500.4 announces that pools empty, 106.4 performs the loss.
 
 ## 14. Reuse first; a method is general or it isn't a method
 
