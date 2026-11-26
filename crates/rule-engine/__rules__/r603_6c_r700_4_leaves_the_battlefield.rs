@@ -19,11 +19,11 @@ use crate::zones;
 pub fn r603_6c_r700_4_leaves_the_battlefield(
     mut left: RemovedComponents<cards::OnBattlefield>,
     mut queue: ResMut<stack::TriggerQueue>,
-    cards: Query<(&cards::CardDefinition, &cards::Owner, &zones::InZone)>,
+    cards: Query<(&cards::CardDefinition, &cards::Controller, &zones::InZone)>,
     zones: zones::ZoneLookup,
 ) {
     for source in left.read() {
-        let Ok((definition, owner, in_zone)) = cards.get(source) else {
+        let Ok((definition, controller, in_zone)) = cards.get(source) else {
             continue;
         };
         if !zones.contains(GRAVEYARD, **in_zone) {
@@ -35,7 +35,7 @@ pub fn r603_6c_r700_4_leaves_the_battlefield(
             }
             queue.push(stack::PendingTrigger {
                 source,
-                controller: **owner,
+                controller: **controller,
                 ability: *ability,
             });
         }

@@ -27,7 +27,10 @@ pub fn r603_2_r603_6a_triggered_abilities(
     mut entered: MessageReader<Did<events::EnterBattlefield>>,
     mut queue: ResMut<stack::TriggerQueue>,
     entered_cards: Query<&cards::CardDefinition>,
-    sources: Query<(Entity, &cards::Owner, &cards::TriggeredEnters), With<cards::OnBattlefield>>,
+    sources: Query<
+        (Entity, &cards::Controller, &cards::TriggeredEnters),
+        With<cards::OnBattlefield>,
+    >,
 ) {
     for event in entered.read() {
         let permanent = event.permanent;
@@ -37,7 +40,7 @@ pub fn r603_2_r603_6a_triggered_abilities(
         if !definition.type_line.types.contains(&cards::CardType::Creature) {
             continue;
         }
-        for (source, owner, enters) in sources.iter() {
+        for (source, controller, enters) in sources.iter() {
             if source == permanent {
                 continue;
             }
@@ -50,7 +53,7 @@ pub fn r603_2_r603_6a_triggered_abilities(
             }
             queue.push(stack::PendingTrigger {
                 source,
-                controller: **owner,
+                controller: **controller,
                 ability,
             });
         }

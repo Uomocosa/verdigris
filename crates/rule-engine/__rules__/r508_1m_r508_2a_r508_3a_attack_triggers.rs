@@ -20,10 +20,10 @@ use crate::stack;
 pub fn r508_1m_r508_2a_r508_3a_attack_triggers(
     mut declared: MessageReader<Did<events::DeclareAttacker>>,
     mut queue: ResMut<stack::TriggerQueue>,
-    attackers: Query<(&cards::CardDefinition, &cards::Owner)>,
+    attackers: Query<(&cards::CardDefinition, &cards::Controller)>,
 ) {
     for declared in declared.read() {
-        let Ok((definition, owner)) = attackers.get(declared.attacker) else {
+        let Ok((definition, controller)) = attackers.get(declared.attacker) else {
             continue;
         };
         for ability in definition.triggered_abilities() {
@@ -32,7 +32,7 @@ pub fn r508_1m_r508_2a_r508_3a_attack_triggers(
             }
             queue.push(stack::PendingTrigger {
                 source: declared.attacker,
-                controller: **owner,
+                controller: **controller,
                 ability: *ability,
             });
         }

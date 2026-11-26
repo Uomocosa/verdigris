@@ -27,14 +27,17 @@ use crate::turns;
 pub fn r603_4_intervening_if(
     mut steps: MessageReader<turns::StepStarted>,
     mut queue: ResMut<stack::TriggerQueue>,
-    sources: Query<(Entity, &cards::Owner, &cards::TriggeredAtStep), With<cards::OnBattlefield>>,
+    sources: Query<
+        (Entity, &cards::Controller, &cards::TriggeredAtStep),
+        With<cards::OnBattlefield>,
+    >,
     lives: Query<(Entity, &players::Life)>,
     state: Res<turns::TurnState>,
 ) {
     let state = state.into_inner();
     for step in steps.read() {
-        for (source, owner, at_step) in sources.iter() {
-            let controller = **owner;
+        for (source, controller, at_step) in sources.iter() {
+            let controller = **controller;
             let triggered = match at_step.event {
                 abilities::TriggerEvent::BeginningOfStep(expected, who) => {
                     **step == expected && {

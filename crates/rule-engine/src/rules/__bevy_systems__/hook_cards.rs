@@ -9,6 +9,7 @@ use crate::rules::traits::hook_event::HookEvent;
 
 pub fn hook_cards<E: HookEvent>(
     mut queue: ResMut<rules::HookQueue<E>>,
+    controllers: Query<&cards::Controller>,
     owners: Query<&cards::Owner>,
     mut commands: Commands,
     mut asks: MessageWriter<May<rules::Hooked<E>>>,
@@ -35,18 +36,30 @@ pub fn hook_cards<E: HookEvent>(
         }
         let hooks_of_the_first_player: Vec<rules::Hooked<E>> = queue
             .take_first_group(|first, next| {
-                match (owners.get(*first.card()), owners.get(*next.card())) {
-                    (Ok(first_owner), Ok(next_owner)) => **first_owner == **next_owner,
+                match (
+                    controllers
+                        .get(*first.card())
+                        .ok()
+                        .map(|controller| **controller)
+                        .or_else(|| owners.get(*first.card()).ok().map(|owner| **owner)),
+                    controllers
+                        .get(*next.card())
+                        .ok()
+                        .map(|controller| **controller)
+                        .or_else(|| owners.get(*next.card()).ok().map(|owner| **owner)),
+                ) {
+                    (Some(first_player), Some(next_player)) => first_player == next_player,
                     _ => false,
                 }
             })
             .into_iter()
             .filter_map(|hook| {
-                let owner = owners.get(*hook.card()).ok()?;
-                let hooked = rules::Hooked {
-                    hook,
-                    player: **owner,
-                };
+                let player = controllers
+                    .get(*hook.card())
+                    .ok()
+                    .map(|controller| **controller)
+                    .or_else(|| owners.get(*hook.card()).ok().map(|owner| **owner))?;
+                let hooked = rules::Hooked { hook, player };
                 answers.legal(&hooked).then_some(hooked)
             })
             .collect();

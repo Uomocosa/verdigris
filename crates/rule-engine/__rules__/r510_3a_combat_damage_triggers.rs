@@ -13,14 +13,14 @@ use crate::stack;
 pub fn r510_3a_combat_damage_triggers(
     mut dealt: MessageReader<Did<events::DealDamage>>,
     mut queue: ResMut<stack::TriggerQueue>,
-    sources: Query<(&cards::CardDefinition, &cards::Owner), With<cards::Attacking>>,
+    sources: Query<(&cards::CardDefinition, &cards::Controller), With<cards::Attacking>>,
     targets: Query<&players::Life>,
 ) {
     for event in dealt.read() {
         if targets.get(event.recipient).is_err() {
             continue;
         }
-        let Ok((definition, owner)) = sources.get(event.source) else {
+        let Ok((definition, controller)) = sources.get(event.source) else {
             continue;
         };
         for ability in definition.triggered_abilities() {
@@ -32,7 +32,7 @@ pub fn r510_3a_combat_damage_triggers(
             }
             queue.push(stack::PendingTrigger {
                 source: event.source,
-                controller: **owner,
+                controller: **controller,
                 ability: *ability,
             });
         }

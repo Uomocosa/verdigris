@@ -57,10 +57,11 @@ pub fn r608_2_r608_2c_resolve(
         let Some(effect) = effect_of(&lookups, spell) else {
             continue;
         };
-        let Ok(owner) = lookups.owners.get(spell) else {
+        let Ok(controller) = lookups.controllers.get(spell) else {
             continue;
         };
-        let controller = lookups.abilities.get(spell).map_or(**owner, |ability| ability.controller);
+        let controller =
+            lookups.abilities.get(spell).map_or(**controller, |ability| ability.controller);
         let chosen_target = lookups.chosen_targets.get(spell).ok().map(|chosen| **chosen);
         let player_targets = player_targets_for(&lookups, chosen_target, effect, controller);
         let target_zone = chosen_target.and_then(|target| lookups.in_zone.get(target).ok());
@@ -99,7 +100,7 @@ pub fn r608_2_r608_2c_resolve(
                     request_tokens(&mut effect_messages.p3(), controller, count, definition);
                 }
                 effects::EffectKind::Draw(count) => {
-                    request_draws(&mut player_effects.p3(), &player_targets, **owner, count);
+                    request_draws(&mut player_effects.p3(), &player_targets, controller, count);
                 }
                 effects::EffectKind::Mill(count) => {
                     request_mills(
@@ -314,7 +315,7 @@ fn permanent_controller(
     if lookups.lives.get(target).is_ok() {
         return players::PlayerId(target);
     }
-    lookups.owners.get(target).map_or(fallback, |owner| **owner)
+    lookups.controllers.get(target).map_or(fallback, |controller| **controller)
 }
 
 fn request_draws(
