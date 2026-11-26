@@ -47,6 +47,7 @@ pub fn engine() -> rules::RuleRegistry {
         events::EnterBattlefield::ID,
         events::EnterBattlefield::clauses(),
     );
+    register(events::Exile::ID, events::Exile::clauses());
     register(events::GainLife::ID, events::GainLife::clauses());
     register(events::LoseGame::ID, events::LoseGame::clauses());
     register(events::LoseLife::ID, events::LoseLife::clauses());

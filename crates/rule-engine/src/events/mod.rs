@@ -40,6 +40,9 @@ pub use draw::Draw;
 mod enter_battlefield;
 pub use enter_battlefield::EnterBattlefield;
 
+mod exile;
+pub use exile::Exile;
+
 mod gain_life;
 pub use gain_life::GainLife;
 

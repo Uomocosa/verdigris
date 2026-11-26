@@ -30,6 +30,9 @@ pub fn add_state_based_systems(app: &mut App) {
                     Attempt::<events::PutIntoGraveyard>::resolved_by(
                         comprehensive_rules::r404_1_put_into_graveyard::r404_1_put_into_graveyard,
                     ),
+                    Attempt::<events::Exile>::resolved_by(
+                        comprehensive_rules::r701_13a_exile::r701_13a_exile,
+                    ),
                     comprehensive_rules::r704_5d_token_outside_battlefield::r704_5d_token_outside_battlefield,
                     comprehensive_rules::r704_5a_zero_life::r704_5a_zero_life,
                     comprehensive_rules::r704_5b_empty_library::r704_5b_empty_library,
@@ -92,7 +95,7 @@ mod tests {
         assert_eq!(app.get_schedule(Update).map(Schedule::systems_len), Some(7));
         assert_eq!(
             app.get_schedule(StateBasedActions).map(Schedule::systems_len),
-            Some(27)
+            Some(29)
         );
     }
 }

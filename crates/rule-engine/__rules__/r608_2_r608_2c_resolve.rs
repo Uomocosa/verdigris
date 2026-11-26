@@ -1,6 +1,6 @@
 use crate::events;
-use crate::{BATTLEFIELD, EXILE, STACK};
-use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, ParamSet};
+use crate::{BATTLEFIELD, STACK};
+use bevy::prelude::{Entity, MessageReader, MessageWriter, ParamSet};
 
 use crate::Attempt;
 use crate::effects;
@@ -38,11 +38,11 @@ type PlayerEffectWriters<'a, 'b, 'c, 'd, 'e, 'f> = (
 /// owner’s library instead of into its owner’s graveyard.”) Don’t just apply effects step by step
 /// without thinking in these cases—read the whole text and apply the rules of English to the text.
 pub fn r608_2_r608_2c_resolve(
-    mut commands: Commands,
     mut resolutions: MessageReader<stack::Resolution>,
     mut damage_dealt: MessageWriter<Attempt<events::DealDamage>>,
     mut destructions: MessageWriter<Attempt<events::Destroy>>,
     mut countered: MessageWriter<Attempt<events::Counter>>,
+    mut exiles: MessageWriter<Attempt<events::Exile>>,
     mut poison_counters: MessageWriter<Attempt<events::GivePoisonCounters>>,
     mut player_effects: ParamSet<PlayerEffectWriters<'_, '_, '_, '_, '_, '_>>,
     mut effect_messages: ParamSet<EffectMessageWriters<'_, '_, '_, '_>>,
@@ -84,7 +84,7 @@ pub fn r608_2_r608_2c_resolve(
                 }
                 #[rustfmt::skip]
                 effects::EffectKind::Exile => {
-                    request_exile(&mut commands, &lookups, &zones, spell, chosen_target);
+                    request_exile(&mut exiles, &lookups, spell, chosen_target);
                 }
                 effects::EffectKind::Counter => {
                     request_counter(
@@ -227,20 +227,19 @@ fn request_counter(
 }
 
 fn request_exile(
-    commands: &mut Commands,
+    exiles: &mut MessageWriter<Attempt<events::Exile>>,
     lookups: &stack::ResolutionLookups<'_, '_>,
-    zones: &zones::ZoneLookup,
     spell: Entity,
     chosen_target: Option<Entity>,
 ) {
     let source =
         chosen_target.or_else(|| lookups.abilities.get(spell).ok().map(|ability| ability.source));
-    let exile = source
-        .and_then(|target| lookups.owners.get(target).ok())
-        .and_then(|owner| zones.find(EXILE, Some(**owner)))
-        .zip(source);
-    if let Some((exile, target)) = exile {
-        commands.entity(target).insert(zones::InZone(exile));
+    let owner = source.and_then(|target| lookups.owners.get(target).ok());
+    if let Some((target, owner)) = source.zip(owner) {
+        exiles.write(Attempt(events::Exile {
+            object: target,
+            owner: **owner,
+        }));
     }
 }
 

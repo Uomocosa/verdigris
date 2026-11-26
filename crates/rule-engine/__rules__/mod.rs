@@ -76,6 +76,7 @@ pub mod r611_2a_continuous_effects;
 pub mod r611_3a_static_effects;
 pub mod r613_1_layers;
 pub mod r614_1a_r616_1_replacement_effects;
+pub mod r701_13a_exile;
 pub mod r701_17a_mill;
 pub mod r701_26a_tap;
 pub mod r701_26b_untap;
