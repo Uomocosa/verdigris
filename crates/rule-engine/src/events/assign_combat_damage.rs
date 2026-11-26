@@ -74,7 +74,6 @@ mod tests {
             restrictions[0].text,
             "A blocked creature assigns its combat damage to the creatures blocking it"
         );
-        assert_eq!(restrictions[0].role, rules::Role::Other);
         assert_eq!(
             restrictions[0].condition,
             rules::points_to::<cards::Blocking>(rules::Role::Other)

@@ -24,7 +24,6 @@ impl Flying {
                 holder: rules::Role::Other,
                 restriction: Self::FLYING_BLOCKERS.restriction(
                     "A creature with flying can’t be blocked except by creatures with flying and/or reach.",
-                    rules::Role::Subject,
                     rules::has::<cards::Flying>() | rules::has::<cards::Reach>(),
                 ),
             },
@@ -53,7 +52,6 @@ mod tests {
                     holder: rules::Role::Other,
                     restriction: Flying::FLYING_BLOCKERS.restriction(
                         "A creature with flying can’t be blocked except by creatures with flying and/or reach.",
-                        rules::Role::Subject,
                         rules::has::<cards::Flying>() | rules::has::<cards::Reach>(),
                     ),
                 },

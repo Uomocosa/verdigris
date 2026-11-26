@@ -3,13 +3,11 @@ use crate::rules;
 pub const fn restriction(
     restriction_id: rules::RestrictionId,
     text: &'static str,
-    role: rules::Role,
     condition: rules::Condition,
 ) -> rules::Restriction {
     rules::Restriction {
         id: restriction_id,
         text,
-        role,
         condition,
         unwaivable: false,
     }
@@ -28,12 +26,10 @@ mod tests {
         let built = restriction(
             id,
             "The chosen creatures must be untapped",
-            rules::Role::Subject,
             !rules::has::<cards::Tapped>(),
         );
         assert_eq!(built.id, rules::RestrictionId("509.1a/untapped"));
         assert_eq!(built.text, "The chosen creatures must be untapped");
-        assert_eq!(built.role, rules::Role::Subject);
         assert_eq!(built.condition, !rules::has::<cards::Tapped>());
     }
 }

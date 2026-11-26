@@ -20,7 +20,6 @@ pub const TEST_PLAYER_RESTRICTION: testing::Card = testing::Card {
                         holder: rules::Role::Player,
                         restriction: rules::RestrictionId("test/player-restriction").restriction(
                             "plays only when true",
-                            rules::Role::Player,
                             !rules::Condition::True,
                         ),
                     },

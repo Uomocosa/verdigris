@@ -1,10 +1,11 @@
-use atomic_delegate_macros::atomic_delegate;
 use bevy::prelude::Entity;
 
+use crate::cards;
 use crate::players;
 
 use crate::rules;
 use crate::rules::traits::event::Event;
+use crate::testing;
 
 pub const UNTAPPED: rules::RestrictionId = rules::RestrictionId("test/untapped");
 
@@ -21,15 +22,17 @@ impl rules::traits::context::Context for TestRule {
     fn player(&self) -> players::PlayerId { self.player }
 }
 
+#[rustfmt::skip]
 impl Event for TestRule {
     const ID: rules::EventId = rules::EventId("test/legality");
-
-    #[atomic_delegate(TestRule, Event)]
-    fn restrictions() -> Vec<rules::Restriction> {}
+    fn restrictions() -> Vec<rules::Restriction> {
+        vec![testing::UNTAPPED.restriction("must be untapped", !rules::has::<cards::Tapped>())]
+    }
 }
 
 #[cfg(test)]
 mod tests {
+    use crate::cards;
     use crate::rules;
     use crate::rules::traits::event::Event;
 
@@ -42,5 +45,6 @@ mod tests {
         let restrictions = TestRule::restrictions();
         assert_eq!(restrictions.len(), 1);
         assert_eq!(restrictions[0].id, UNTAPPED);
+        assert_eq!(restrictions[0].condition, !rules::has::<cards::Tapped>());
     }
 }

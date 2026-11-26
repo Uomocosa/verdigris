@@ -165,8 +165,8 @@ from the battlefield, that is a gap to close there, not a reason for a rule to l
 
 - Do look up changes with ONE helper (`Rules::changes(entity, target)`), never by matching
   `Modification` variants in each evaluator.
-- Do look a change up on the entity its `Role` names (subject, other, player), for restrictions and
-  for `Restrict` alike. `Restrict` names the role it protects in `holder` and vetoes only when the
+- Do look a change up on the entity its `holder` names (subject, other, player), for waivers
+  of restrictions and for `Restrict` alike. `Restrict` names the role it protects in `holder` and vetoes only when the
   carrying entity is the event's entity of that role. `Skip` / `Perform` fold
   in timestamp order over the subject's changes for the event (latest wins, unlike `Restrict`).
 - Don't create an empty "rule" type only to hang a veto on: the event is the target.

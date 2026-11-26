@@ -24,7 +24,6 @@ impl Hexproof {
                 holder: rules::Role::Subject,
                 restriction: Self::CANT_BE_TARGETED.restriction(
                     "can’t be the target of spells or abilities your opponents control",
-                    rules::Role::Subject,
                     rules::points_to::<cards::Controller>(rules::Role::Player)
                         | rules::is(rules::Role::Player),
                 ),
@@ -54,7 +53,6 @@ mod tests {
                     holder: rules::Role::Subject,
                     restriction: Hexproof::CANT_BE_TARGETED.restriction(
                         "can’t be the target of spells or abilities your opponents control",
-                        rules::Role::Subject,
                         rules::points_to::<cards::Controller>(rules::Role::Player)
                             | rules::is(rules::Role::Player),
                     ),

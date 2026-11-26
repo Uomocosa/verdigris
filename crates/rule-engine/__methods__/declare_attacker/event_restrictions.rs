@@ -6,23 +6,19 @@ pub fn event_restrictions() -> Vec<rules::Restriction> {
     vec![
         events::declare_attacker::CREATURE.restriction(
             "The active player chooses which creatures that they control",
-            rules::Role::Subject,
             rules::has::<cards::Creature>(),
         ),
         events::declare_attacker::CONTROLS.restriction(
             "creatures that they control",
-            rules::Role::Subject,
             rules::points_to::<cards::Controller>(rules::Role::Player)
                 & rules::has::<cards::OnBattlefield>(),
         ),
         events::declare_attacker::UNTAPPED.restriction(
             "The chosen creatures must be untapped",
-            rules::Role::Subject,
             !rules::has::<cards::Tapped>(),
         ),
         events::declare_attacker::SUMMONING_SICK.restriction(
             "have been controlled by the active player continuously since the turn began",
-            rules::Role::Subject,
             !rules::has::<cards::SummoningSick>(),
         ),
     ]

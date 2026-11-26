@@ -3,7 +3,6 @@ use crate::rules;
 pub fn lethal_damage() -> rules::Definition {
     rules::LETHAL_DAMAGE.definition(
         "An amount of damage greater than or equal to a creature's toughness.",
-        rules::Role::Other,
         rules::Condition::EventFieldAtLeastRemainingToughness(rules::Field::Amount),
     )
 }
@@ -23,7 +22,6 @@ mod tests {
             definition.text,
             "An amount of damage greater than or equal to a creature's toughness."
         );
-        assert_eq!(definition.role, rules::Role::Other);
         assert_eq!(
             definition.condition,
             rules::Condition::EventFieldAtLeastRemainingToughness(rules::Field::Amount)

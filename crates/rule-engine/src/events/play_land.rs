@@ -57,36 +57,30 @@ mod tests {
         assert_eq!(restrictions.len(), 7);
         assert_eq!(restrictions[0].id, PRIORITY);
         assert_eq!(restrictions[0].text, "A player who has priority");
-        assert_eq!(restrictions[0].role, rules::Role::Player);
         assert_eq!(
             restrictions[0].condition,
             rules::has_priority(rules::Role::Player)
         );
         assert_eq!(restrictions[1].id, LAND_CARD);
         assert_eq!(restrictions[1].text, "a land card");
-        assert_eq!(restrictions[1].role, rules::Role::Subject);
         assert_eq!(
             restrictions[1].condition,
             rules::card_type(cards::CardType::Land)
         );
         assert_eq!(restrictions[2].id, FROM_HAND);
         assert_eq!(restrictions[2].text, "from their hand");
-        assert_eq!(restrictions[2].role, rules::Role::Player);
         assert_eq!(
             restrictions[2].condition,
             rules::in_zone(HAND, rules::Role::Player)
         );
         assert_eq!(restrictions[3].id, MAIN_PHASE);
         assert_eq!(restrictions[3].text, "during a main phase of their turn");
-        assert_eq!(restrictions[3].role, rules::Role::Player);
         assert_eq!(restrictions[3].condition, rules::main_phase());
         assert_eq!(restrictions[4].id, EMPTY_STACK);
         assert_eq!(restrictions[4].text, "when the stack is empty");
-        assert_eq!(restrictions[4].role, rules::Role::Player);
         assert_eq!(restrictions[4].condition, rules::stack_empty());
         assert_eq!(restrictions[5].id, OWNS);
         assert_eq!(restrictions[5].text, "their hand");
-        assert_eq!(restrictions[5].role, rules::Role::Subject);
         assert_eq!(
             restrictions[5].condition,
             rules::points_to::<cards::Owner>(rules::Role::Player)
@@ -96,7 +90,6 @@ mod tests {
             restrictions[6].text,
             "A player can’t play a land, for any reason, if it isn’t their turn."
         );
-        assert_eq!(restrictions[6].role, rules::Role::Player);
         assert_eq!(
             restrictions[6].condition,
             rules::active_player(rules::Role::Player)

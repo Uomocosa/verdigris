@@ -6,18 +6,15 @@ pub fn event_restrictions() -> Vec<rules::Restriction> {
     vec![
         events::declare_blocker::CREATURE.restriction(
             "The defending player chooses which creatures they control",
-            rules::Role::Subject,
             rules::has::<cards::Creature>(),
         ),
         events::declare_blocker::CONTROLS.restriction(
             "creatures they control",
-            rules::Role::Subject,
             rules::points_to::<cards::Controller>(rules::Role::Player)
                 & rules::has::<cards::OnBattlefield>(),
         ),
         events::declare_blocker::UNTAPPED.restriction(
             "The chosen creatures must be untapped",
-            rules::Role::Subject,
             !rules::has::<cards::Tapped>(),
         ),
     ]

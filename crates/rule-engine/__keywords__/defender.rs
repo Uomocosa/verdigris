@@ -23,7 +23,6 @@ impl Defender {
                 holder: rules::Role::Subject,
                 restriction: Self::CANT_ATTACK.restriction(
                     "A creature with defender can’t attack.",
-                    rules::Role::Subject,
                     !rules::Condition::True,
                 ),
             },
@@ -51,7 +50,6 @@ mod tests {
                     holder: rules::Role::Subject,
                     restriction: Defender::CANT_ATTACK.restriction(
                         "A creature with defender can’t attack.",
-                        rules::Role::Subject,
                         !rules::Condition::True,
                     ),
                 },

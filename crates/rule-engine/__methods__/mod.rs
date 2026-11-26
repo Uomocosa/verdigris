@@ -39,8 +39,6 @@ pub mod play_land;
 pub mod player_view;
 pub mod players;
 pub mod priority;
-#[cfg(feature = "testing")]
-pub mod restricted_rule;
 pub mod restriction_id;
 pub mod rule_registry;
 pub mod rules;
@@ -52,8 +50,6 @@ pub mod targeting;
 pub mod test_card;
 #[cfg(feature = "testing")]
 pub mod test_player_actions;
-#[cfg(feature = "testing")]
-pub mod test_rule;
 pub mod then;
 pub mod trigger_event;
 pub mod turn_state;

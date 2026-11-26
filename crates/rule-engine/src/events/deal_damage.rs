@@ -72,7 +72,6 @@ mod tests {
             restrictions[0].text,
             "If a source would deal 0 damage, it does not deal damage at all."
         );
-        assert_eq!(restrictions[0].role, rules::Role::Subject);
         assert_eq!(
             restrictions[0].condition,
             rules::event_field(rules::Field::Amount, rules::Comparison::AtLeast, 1)

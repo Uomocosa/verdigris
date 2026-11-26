@@ -53,28 +53,24 @@ mod tests {
         assert_eq!(restrictions.len(), 5);
         assert_eq!(restrictions[0].id, PRIORITY);
         assert_eq!(restrictions[0].text, "A player who has priority");
-        assert_eq!(restrictions[0].role, rules::Role::Player);
         assert_eq!(
             restrictions[0].condition,
             rules::has_priority(rules::Role::Player)
         );
         assert_eq!(restrictions[1].id, FROM_HAND);
         assert_eq!(restrictions[1].text, "from their hand");
-        assert_eq!(restrictions[1].role, rules::Role::Player);
         assert_eq!(
             restrictions[1].condition,
             rules::in_zone(HAND, rules::Role::Player)
         );
         assert_eq!(restrictions[2].id, OWNS);
         assert_eq!(restrictions[2].text, "their hand");
-        assert_eq!(restrictions[2].role, rules::Role::Player);
         assert_eq!(
             restrictions[2].condition,
             rules::points_to::<cards::Owner>(rules::Role::Player)
         );
         assert_eq!(restrictions[3].id, NOT_A_LAND);
         assert_eq!(restrictions[3].text, "It can’t be cast as a spell.");
-        assert_eq!(restrictions[3].role, rules::Role::Subject);
         assert_eq!(
             restrictions[3].condition,
             !rules::card_type(cards::CardType::Land)
@@ -85,7 +81,6 @@ mod tests {
             restrictions[4].text,
             "during a main phase of their turn when the stack is empty"
         );
-        assert_eq!(restrictions[4].role, rules::Role::Player);
         assert_eq!(
             restrictions[4].condition,
             rules::card_type(cards::CardType::Instant)

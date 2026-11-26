@@ -7,29 +7,22 @@ pub fn event_restrictions() -> Vec<rules::Restriction> {
     vec![
         events::cast_spell::PRIORITY.restriction(
             "A player who has priority",
-            rules::Role::Player,
             rules::has_priority(rules::Role::Player),
         ),
-        events::cast_spell::FROM_HAND.restriction(
-            "from their hand",
-            rules::Role::Player,
-            rules::in_zone(HAND, rules::Role::Player),
-        ),
+        events::cast_spell::FROM_HAND
+            .restriction("from their hand", rules::in_zone(HAND, rules::Role::Player)),
         events::cast_spell::OWNS.restriction(
             "their hand",
-            rules::Role::Player,
             rules::points_to::<cards::Owner>(rules::Role::Player),
         ),
         events::cast_spell::NOT_A_LAND
             .restriction(
                 "It can’t be cast as a spell.",
-                rules::Role::Subject,
                 !rules::card_type(cards::CardType::Land),
             )
             .unwaivable(),
         events::cast_spell::TIMING.restriction(
             "during a main phase of their turn when the stack is empty",
-            rules::Role::Player,
             rules::card_type(cards::CardType::Instant)
                 | (rules::main_phase()
                     & rules::stack_empty()

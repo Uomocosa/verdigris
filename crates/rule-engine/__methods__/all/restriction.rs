@@ -16,7 +16,7 @@ pub fn restriction<E: Event>(
             target: rules::Target::event::<E>(),
             change: rules::Change::Restrict {
                 holder: rules::Role::Subject,
-                restriction: id.restriction(text, rules::Role::Subject, requirement),
+                restriction: id.restriction(text, requirement),
             },
         }),
     }
@@ -47,11 +47,8 @@ mod tests {
                 target: rules::Target::event::<testing::RestrictedRule>(),
                 change: rules::Change::Restrict {
                     holder: rules::Role::Subject,
-                    restriction: rules::RestrictionId("test/restriction").restriction(
-                        "attacks only with enough power",
-                        rules::Role::Subject,
-                        rules::Condition::True,
-                    ),
+                    restriction: rules::RestrictionId("test/restriction")
+                        .restriction("attacks only with enough power", rules::Condition::True,),
                 },
             })
         );

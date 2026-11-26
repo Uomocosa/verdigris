@@ -51,7 +51,6 @@ mod tests {
             restrictions[0].text,
             "Some cards allow a player to take actions with them from their opening hand."
         );
-        assert_eq!(restrictions[0].role, rules::Role::Subject);
         assert_eq!(
             restrictions[0].condition,
             rules::in_zone(HAND, rules::Role::Player)

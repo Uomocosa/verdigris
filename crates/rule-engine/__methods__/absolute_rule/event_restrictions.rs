@@ -7,7 +7,6 @@ pub fn event_restrictions() -> Vec<rules::Restriction> {
         testing::UNTAPPED
             .restriction(
                 "must be untapped for any reason",
-                rules::Role::Subject,
                 !rules::has::<cards::Tapped>(),
             )
             .unwaivable(),

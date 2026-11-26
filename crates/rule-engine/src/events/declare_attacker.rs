@@ -60,11 +60,9 @@ mod tests {
             restrictions[0].text,
             "The active player chooses which creatures that they control"
         );
-        assert_eq!(restrictions[0].role, rules::Role::Subject);
         assert_eq!(restrictions[0].condition, rules::has::<cards::Creature>());
         assert_eq!(restrictions[1].id, CONTROLS);
         assert_eq!(restrictions[1].text, "creatures that they control");
-        assert_eq!(restrictions[1].role, rules::Role::Subject);
         assert_eq!(
             restrictions[1].condition,
             rules::points_to::<cards::Controller>(rules::Role::Player)
@@ -75,10 +73,8 @@ mod tests {
             restrictions[2].text,
             "The chosen creatures must be untapped"
         );
-        assert_eq!(restrictions[2].role, rules::Role::Subject);
         assert_eq!(restrictions[2].condition, !rules::has::<cards::Tapped>());
         assert_eq!(restrictions[3].id, SUMMONING_SICK);
-        assert_eq!(restrictions[3].role, rules::Role::Subject);
         assert_eq!(
             restrictions[3].condition,
             !rules::has::<cards::SummoningSick>()

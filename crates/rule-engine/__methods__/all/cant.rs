@@ -16,7 +16,7 @@ pub fn cant<E: Event>(
             target: rules::Target::event::<E>(),
             change: rules::Change::Restrict {
                 holder: role,
-                restriction: id.restriction(text, role, !rules::Condition::True),
+                restriction: id.restriction(text, !rules::Condition::True),
             },
         }),
     }
@@ -47,11 +47,8 @@ mod tests {
                 target: rules::Target::event::<events::Draw>(),
                 change: rules::Change::Restrict {
                     holder: rules::Role::Player,
-                    restriction: rules::RestrictionId("test/cant").restriction(
-                        "can’t draw",
-                        rules::Role::Player,
-                        !rules::Condition::True,
-                    ),
+                    restriction: rules::RestrictionId("test/cant")
+                        .restriction("can’t draw", !rules::Condition::True,),
                 },
             })
         );

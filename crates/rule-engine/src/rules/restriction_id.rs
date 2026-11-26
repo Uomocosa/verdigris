@@ -12,7 +12,6 @@ impl RestrictionId {
     pub fn restriction(
         self,
         text: &'static str,
-        role: rules::Role,
         condition: rules::Condition,
     ) -> rules::Restriction {
     }
@@ -30,12 +29,10 @@ mod tests {
         let id = RestrictionId("509.1a/untapped");
         let built = id.restriction(
             "The chosen creatures must be untapped",
-            rules::Role::Subject,
             !rules::has::<cards::Tapped>(),
         );
         assert_eq!(built.id, RestrictionId("509.1a/untapped"));
         assert_eq!(built.text, "The chosen creatures must be untapped");
-        assert_eq!(built.role, rules::Role::Subject);
         assert_eq!(built.condition, !rules::has::<cards::Tapped>());
     }
 }
