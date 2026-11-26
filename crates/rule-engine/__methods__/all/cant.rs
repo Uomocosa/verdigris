@@ -8,7 +8,7 @@ pub fn cant<E: Event>(all: statics::All, role: rules::Role) -> abilities::Contin
     abilities::Continuous {
         filter: *all,
         modification: effects::Modification::Rule(rules::RuleChange {
-            target: rules::Target::Event(E::ID),
+            target: rules::Target::event::<E>(),
             change: rules::Change::Cant { role },
         }),
     }
@@ -20,7 +20,6 @@ mod tests {
     use crate::effects;
     use crate::events;
     use crate::rules;
-    use crate::rules::traits::event::Event;
     use crate::statics;
 
     use super::cant;
@@ -32,7 +31,7 @@ mod tests {
         assert_eq!(
             ability.modification,
             effects::Modification::Rule(rules::RuleChange {
-                target: rules::Target::Event(events::Draw::ID),
+                target: rules::Target::event::<events::Draw>(),
                 change: rules::Change::Cant {
                     role: rules::Role::Player,
                 },

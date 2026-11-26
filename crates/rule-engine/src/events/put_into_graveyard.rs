@@ -19,7 +19,7 @@ impl rules::traits::context::Context for PutIntoGraveyard {
 }
 
 impl Event for PutIntoGraveyard {
-    const ID: rules::EventId = rules::EventId("404.1");
+    const ID: rules::EventId = rules::EventId("404.1/put-into-graveyard");
 }
 
 #[cfg(test)]
@@ -41,7 +41,10 @@ mod tests {
         assert_eq!(event.subject(), object);
         assert_eq!(event.other(), None);
         assert_eq!(event.player(), owner);
-        assert_eq!(PutIntoGraveyard::ID, rules::EventId("404.1"));
+        assert_eq!(
+            PutIntoGraveyard::ID,
+            rules::EventId("404.1/put-into-graveyard")
+        );
         assert_eq!(PutIntoGraveyard::clauses(), Vec::new());
         assert_eq!(event.field(rules::Field::Amount), None);
     }

@@ -20,7 +20,7 @@ impl rules::traits::context::Context for BecomeTarget {
 }
 
 impl Event for BecomeTarget {
-    const ID: rules::EventId = rules::EventId("601.2c");
+    const ID: rules::EventId = rules::EventId("601.2c/become-target");
 }
 
 #[cfg(test)]
@@ -47,7 +47,7 @@ mod tests {
         assert_eq!(event.subject(), target);
         assert_eq!(event.other(), Some(spell));
         assert_eq!(event.player(), player);
-        assert_eq!(BecomeTarget::ID, rules::EventId("601.2c"));
+        assert_eq!(BecomeTarget::ID, rules::EventId("601.2c/become-target"));
         assert_eq!(BecomeTarget::clauses(), Vec::new());
     }
 }

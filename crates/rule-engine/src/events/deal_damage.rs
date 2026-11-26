@@ -26,7 +26,7 @@ impl rules::traits::context::Context for DealDamage {
 }
 
 impl Event for DealDamage {
-    const ID: rules::EventId = rules::EventId("120.3");
+    const ID: rules::EventId = rules::EventId("120.3/deal-damage");
 
     fn field(&self, field: rules::Field) -> Option<u32> {
         match field {
@@ -66,7 +66,7 @@ mod tests {
         assert_eq!(event.subject(), recipient);
         assert_eq!(event.other(), Some(source));
         assert_eq!(event.player(), controller);
-        assert_eq!(DealDamage::ID, rules::EventId("120.3"));
+        assert_eq!(DealDamage::ID, rules::EventId("120.3/deal-damage"));
         let clauses = DealDamage::clauses();
         assert_eq!(clauses.len(), 1);
         assert_eq!(clauses[0].key, super::NONZERO_DAMAGE.key);

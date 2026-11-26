@@ -18,7 +18,7 @@ impl rules::traits::context::Context for GivePoisonCounters {
 }
 
 impl Event for GivePoisonCounters {
-    const ID: rules::EventId = rules::EventId("122.1");
+    const ID: rules::EventId = rules::EventId("122.1/give-poison-counters");
 
     fn field(&self, field: rules::Field) -> Option<u32> {
         match field {
@@ -45,7 +45,10 @@ mod tests {
         assert_eq!(event.subject(), *player);
         assert_eq!(event.other(), None);
         assert_eq!(event.player(), player);
-        assert_eq!(GivePoisonCounters::ID, rules::EventId("122.1"));
+        assert_eq!(
+            GivePoisonCounters::ID,
+            rules::EventId("122.1/give-poison-counters")
+        );
         assert_eq!(GivePoisonCounters::clauses(), Vec::new());
         assert_eq!(event.field(rules::Field::Amount), Some(3));
     }

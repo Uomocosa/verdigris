@@ -1,9 +1,7 @@
 #[path = "__basic__/mod.rs"]
 mod basic;
 
-pub use basic::enums::{
-    Amount, Change, Characteristic, Comparison, Field, Legality, Role, Target, may,
-};
+pub use basic::enums::{Amount, Change, Characteristic, Comparison, Field, Legality, Role, may};
 pub use basic::newtypes::{ClauseKey, ComponentKey, EventId, RuleId};
 pub use basic::predicate_builders::{
     active_player, at_least, at_most, card_type, equal_to, event_field, has, has_priority, in_zone,
@@ -59,6 +57,9 @@ pub use rules::Rules;
 
 mod rule_registry;
 pub use rule_registry::RuleRegistry;
+
+mod target;
+pub use target::Target;
 
 mod then;
 pub use then::Then;

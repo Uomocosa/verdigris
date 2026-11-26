@@ -18,7 +18,7 @@ impl rules::traits::context::Context for BeginTheGameOnTheBattlefield {
 }
 
 impl Event for BeginTheGameOnTheBattlefield {
-    const ID: rules::EventId = rules::EventId("103.6a");
+    const ID: rules::EventId = rules::EventId("103.6a/begin-the-game-on-the-battlefield");
 }
 
 #[cfg(test)]
@@ -40,7 +40,10 @@ mod tests {
         assert_eq!(event.subject(), card);
         assert_eq!(event.other(), None);
         assert_eq!(event.player(), player);
-        assert_eq!(BeginTheGameOnTheBattlefield::ID, rules::EventId("103.6a"));
+        assert_eq!(
+            BeginTheGameOnTheBattlefield::ID,
+            rules::EventId("103.6a/begin-the-game-on-the-battlefield")
+        );
         assert_eq!(BeginTheGameOnTheBattlefield::clauses(), Vec::new());
         assert_eq!(event.field(rules::Field::Amount), None);
     }

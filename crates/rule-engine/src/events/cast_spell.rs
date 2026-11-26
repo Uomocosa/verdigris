@@ -28,7 +28,7 @@ impl rules::traits::context::Context for CastSpell {
 }
 
 impl Event for CastSpell {
-    const ID: rules::EventId = rules::EventId("601.2a");
+    const ID: rules::EventId = rules::EventId("601.2a/cast-spell");
 
     #[atomic_delegate(CastSpell, Event)]
     fn clauses() -> Vec<rules::Clause> {}
@@ -50,7 +50,7 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        assert_eq!(CastSpell::ID, rules::EventId("601.2a"));
+        assert_eq!(CastSpell::ID, rules::EventId("601.2a/cast-spell"));
         let clauses = CastSpell::clauses();
         assert_eq!(clauses.len(), 5);
         assert_eq!(clauses[0].key, PRIORITY.key);

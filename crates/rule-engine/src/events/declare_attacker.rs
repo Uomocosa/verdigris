@@ -32,7 +32,7 @@ impl rules::traits::context::Context for DeclareAttacker {
 }
 
 impl Event for DeclareAttacker {
-    const ID: rules::EventId = rules::EventId("508.1a");
+    const ID: rules::EventId = rules::EventId("508.1a/declare-attacker");
 
     #[atomic_delegate(DeclareAttacker, Event)]
     fn clauses() -> Vec<rules::Clause> {}
@@ -54,7 +54,10 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        assert_eq!(DeclareAttacker::ID, rules::EventId("508.1a"));
+        assert_eq!(
+            DeclareAttacker::ID,
+            rules::EventId("508.1a/declare-attacker")
+        );
         let clauses = DeclareAttacker::clauses();
         assert_eq!(clauses.len(), 5);
         assert_eq!(clauses[0].key, CREATURE.key);

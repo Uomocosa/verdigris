@@ -17,7 +17,7 @@ impl rules::traits::context::Context for LoseGame {
 
 #[rustfmt::skip]
 impl Event for LoseGame {
-    const ID: rules::EventId = rules::EventId("104.3");
+    const ID: rules::EventId = rules::EventId("104.3/lose-game");
 }
 
 #[cfg(test)]
@@ -38,7 +38,7 @@ mod tests {
         assert_eq!(event.subject(), *player);
         assert_eq!(event.other(), None);
         assert_eq!(event.player(), player);
-        assert_eq!(LoseGame::ID, rules::EventId("104.3"));
+        assert_eq!(LoseGame::ID, rules::EventId("104.3/lose-game"));
         assert_eq!(LoseGame::clauses(), Vec::new());
     }
 }

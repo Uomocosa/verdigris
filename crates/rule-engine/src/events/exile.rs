@@ -19,7 +19,7 @@ impl rules::traits::context::Context for Exile {
 }
 
 impl Event for Exile {
-    const ID: rules::EventId = rules::EventId("701.13a");
+    const ID: rules::EventId = rules::EventId("701.13a/exile");
 }
 
 #[cfg(test)]
@@ -41,7 +41,7 @@ mod tests {
         assert_eq!(event.subject(), object);
         assert_eq!(event.other(), None);
         assert_eq!(event.player(), owner);
-        assert_eq!(Exile::ID, rules::EventId("701.13a"));
+        assert_eq!(Exile::ID, rules::EventId("701.13a/exile"));
         assert_eq!(Exile::clauses(), Vec::new());
         assert_eq!(event.field(rules::Field::Amount), None);
     }

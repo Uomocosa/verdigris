@@ -34,7 +34,6 @@ pub fn mods(answers: &rules::Rules, entity: Entity) -> Vec<effects::Modification
 
 #[cfg(test)]
 mod tests {
-    use crate::rules::traits::event::Event;
     use bevy::ecs::system::RunSystemOnce;
 
     use crate::BATTLEFIELD;
@@ -62,11 +61,11 @@ mod tests {
                             change: rules::Change::AsThough,
                         }),
                         effects::Modification::Rule(rules::RuleChange {
-                            target: rules::Target::Event(TestRule::ID),
+                            target: rules::Target::event::<TestRule>(),
                             change: rules::Change::Must,
                         }),
                         effects::Modification::Rule(rules::RuleChange {
-                            target: rules::Target::Event(TestStep::ID),
+                            target: rules::Target::event::<TestStep>(),
                             change: rules::Change::Skip,
                         }),
                     ]

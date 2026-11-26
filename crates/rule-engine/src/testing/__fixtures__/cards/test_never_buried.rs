@@ -5,7 +5,6 @@ use crate::cost;
 use crate::events;
 use crate::pt;
 use crate::rules;
-use crate::rules::traits::event::Event;
 use crate::testing;
 
 pub const TEST_NEVER_BURIED: testing::Card = testing::Card {
@@ -14,7 +13,7 @@ pub const TEST_NEVER_BURIED: testing::Card = testing::Card {
         card! {
             cards::creature("Test Never Buried", cost![1, G], pt!(2, 2));
             abilities::Replacement::Rule(rules::RuleChange {
-                target: rules::Target::Event(events::PutIntoGraveyard::ID),
+                target: rules::Target::event::<events::PutIntoGraveyard>(),
                 change: rules::Change::Instead {
                     when: rules::Predicate::True,
                     then: rules::Then::Events(Vec::new()),

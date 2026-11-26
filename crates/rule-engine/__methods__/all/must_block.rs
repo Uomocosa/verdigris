@@ -2,14 +2,13 @@ use crate::abilities;
 use crate::effects;
 use crate::events;
 use crate::rules;
-use crate::rules::traits::event::Event;
 use crate::statics;
 
 pub fn must_block(all: statics::All) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
         modification: effects::Modification::Rule(rules::RuleChange {
-            target: rules::Target::Event(events::DeclareBlocker::ID),
+            target: rules::Target::event::<events::DeclareBlocker>(),
             change: rules::Change::Must,
         }),
     }
@@ -33,10 +32,13 @@ mod tests {
         assert_eq!(
             ability.modification,
             effects::Modification::Rule(rules::RuleChange {
-                target: rules::Target::Event(events::DeclareBlocker::ID),
+                target: rules::Target::event::<events::DeclareBlocker>(),
                 change: rules::Change::Must,
             })
         );
-        assert_eq!(events::DeclareBlocker::ID, rules::EventId("509.1a"));
+        assert_eq!(
+            events::DeclareBlocker::ID,
+            rules::EventId("509.1a/declare-blocker")
+        );
     }
 }

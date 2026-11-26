@@ -19,7 +19,7 @@ impl rules::traits::context::Context for Untap {
 }
 
 impl Event for Untap {
-    const ID: rules::EventId = rules::EventId("701.26b");
+    const ID: rules::EventId = rules::EventId("701.26b/untap");
 }
 
 #[cfg(test)]
@@ -44,7 +44,7 @@ mod tests {
         assert_eq!(event.subject(), permanent);
         assert_eq!(event.other(), None);
         assert_eq!(event.player(), controller);
-        assert_eq!(Untap::ID, rules::EventId("701.26b"));
+        assert_eq!(Untap::ID, rules::EventId("701.26b/untap"));
         assert_eq!(Untap::clauses(), Vec::new());
         assert_eq!(event.field(rules::Field::Amount), None);
     }

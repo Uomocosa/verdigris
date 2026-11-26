@@ -6,7 +6,7 @@ pub fn hooks<E: Event>(answers: &rules::Rules, event: &E) -> Vec<rules::Then> {
     let other = event.other();
     let affected = event.player();
     answers
-        .changes(subject, rules::Target::Event(E::ID))
+        .changes(subject, rules::Target::event::<E>())
         .into_iter()
         .filter_map(|change| match change {
             rules::Change::Hook { when, then } => {

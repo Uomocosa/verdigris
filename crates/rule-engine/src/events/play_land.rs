@@ -30,7 +30,7 @@ impl rules::traits::context::Context for PlayLand {
 }
 
 impl Event for PlayLand {
-    const ID: rules::EventId = rules::EventId("305.1");
+    const ID: rules::EventId = rules::EventId("305.1/play-land");
 
     #[atomic_delegate(PlayLand, Event)]
     fn clauses() -> Vec<rules::Clause> {}
@@ -54,7 +54,7 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        assert_eq!(PlayLand::ID, rules::EventId("305.1"));
+        assert_eq!(PlayLand::ID, rules::EventId("305.1/play-land"));
         let clauses = PlayLand::clauses();
         assert_eq!(clauses.len(), 7);
         assert_eq!(clauses[0].key, PRIORITY.key);

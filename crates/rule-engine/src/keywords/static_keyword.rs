@@ -3,8 +3,6 @@ use crate::effects;
 use crate::events;
 use crate::players;
 use crate::rules;
-use crate::rules::traits::event::Event;
-use crate::rules::traits::value_rule::ValueRule;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum StaticKeyword {
@@ -33,17 +31,17 @@ impl StaticKeyword {
                 change: rules::Change::AsThough,
             })],
             Self::Vigilance => vec![effects::Modification::Rule(rules::RuleChange {
-                target: rules::Target::Event(events::TapAttacker::ID),
+                target: rules::Target::event::<events::TapAttacker>(),
                 change: rules::Change::Skip,
             })],
             Self::Indestructible => vec![effects::Modification::Rule(rules::RuleChange {
-                target: rules::Target::Event(events::Destroy::ID),
+                target: rules::Target::event::<events::Destroy>(),
                 change: rules::Change::Cant {
                     role: rules::Role::Subject,
                 },
             })],
             Self::Hexproof => vec![effects::Modification::Rule(rules::RuleChange {
-                target: rules::Target::Event(events::BecomeTarget::ID),
+                target: rules::Target::event::<events::BecomeTarget>(),
                 change: rules::Change::OnlyIf {
                     role: rules::Role::Subject,
                     condition: rules::points_to::<cards::Controller>(rules::Role::Player)
@@ -55,7 +53,7 @@ impl StaticKeyword {
                 change: rules::Change::Allow(rules::has::<players::Player>()),
             })],
             Self::Deathtouch => vec![effects::Modification::Rule(rules::RuleChange {
-                target: rules::Target::Value(rules::LethalDamage::ID),
+                target: rules::Target::value::<rules::LethalDamage>(),
                 change: rules::Change::Set(1),
             })],
             _ => Vec::new(),
@@ -70,7 +68,6 @@ mod tests {
     use crate::events;
     use crate::keywords;
     use crate::rules;
-    use crate::rules::traits::event::Event;
 
     use super::StaticKeyword;
 
@@ -87,14 +84,14 @@ mod tests {
         assert_eq!(
             keywords::StaticKeyword::Vigilance.keyword_modifications(),
             vec![effects::Modification::Rule(rules::RuleChange {
-                target: rules::Target::Event(events::TapAttacker::ID),
+                target: rules::Target::event::<events::TapAttacker>(),
                 change: rules::Change::Skip,
             })]
         );
         assert_eq!(
             keywords::StaticKeyword::Hexproof.keyword_modifications(),
             vec![effects::Modification::Rule(rules::RuleChange {
-                target: rules::Target::Event(events::BecomeTarget::ID),
+                target: rules::Target::event::<events::BecomeTarget>(),
                 change: rules::Change::OnlyIf {
                     role: rules::Role::Subject,
                     condition: rules::points_to::<cards::Controller>(rules::Role::Player)

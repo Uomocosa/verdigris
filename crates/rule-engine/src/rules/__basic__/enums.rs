@@ -31,13 +31,6 @@ pub enum Role {
     Player,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum Target {
-    Event(rules::EventId),
-    Clause(rules::ClauseKey),
-    Value(rules::RuleId),
-}
-
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Change {
     AsThough,

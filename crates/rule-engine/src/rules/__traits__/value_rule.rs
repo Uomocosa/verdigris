@@ -12,9 +12,12 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        assert_eq!(rules::MaximumHandSize::ID, rules::RuleId("402.2"));
+        assert_eq!(
+            rules::MaximumHandSize::ID,
+            rules::RuleId("402.2/maximum-hand-size")
+        );
         assert_eq!(rules::MaximumHandSize::default(), rules::Limit::At(7));
-        assert_eq!(rules::LandPlays::ID, rules::RuleId("305.2"));
+        assert_eq!(rules::LandPlays::ID, rules::RuleId("305.2/land-plays"));
         assert_eq!(rules::LandPlays::default(), rules::Limit::At(1));
     }
 }

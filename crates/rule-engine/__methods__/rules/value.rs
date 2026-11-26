@@ -7,7 +7,7 @@ pub fn value<V: rules::traits::value_rule::ValueRule>(
     entity: Entity,
 ) -> rules::Limit {
     let mut limit = V::default();
-    for change in answers.changes(entity, rules::Target::Value(V::ID)) {
+    for change in answers.changes(entity, rules::Target::value::<V>()) {
         limit = match change {
             rules::Change::Set(count) => rules::Limit::At(count),
             rules::Change::Increase(count) => match limit {

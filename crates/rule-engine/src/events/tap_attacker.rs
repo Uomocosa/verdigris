@@ -19,7 +19,7 @@ impl rules::traits::context::Context for TapAttacker {
 }
 
 impl Event for TapAttacker {
-    const ID: rules::EventId = rules::EventId("508.1f");
+    const ID: rules::EventId = rules::EventId("508.1f/tap-attacker");
 }
 
 #[cfg(test)]
@@ -41,7 +41,7 @@ mod tests {
         assert_eq!(event.subject(), attacker);
         assert_eq!(event.other(), None);
         assert_eq!(event.player(), player);
-        assert_eq!(TapAttacker::ID, rules::EventId("508.1f"));
+        assert_eq!(TapAttacker::ID, rules::EventId("508.1f/tap-attacker"));
         assert_eq!(TapAttacker::clauses(), Vec::new());
         assert_eq!(event.field(rules::Field::Amount), None);
     }

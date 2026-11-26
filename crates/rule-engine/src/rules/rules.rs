@@ -66,7 +66,7 @@ impl Rules<'_, '_> {
 impl Rules<'_, '_> {
     #[must_use]
     pub fn required<E: rules::traits::event::Event>(&self, entity: Entity) -> bool {
-        self.changes(entity, rules::Target::Event(E::ID)).contains(&rules::Change::Must)
+        self.changes(entity, rules::Target::event::<E>()).contains(&rules::Change::Must)
     }
 }
 

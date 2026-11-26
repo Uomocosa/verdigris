@@ -19,7 +19,7 @@ impl rules::traits::context::Context for Destroy {
 }
 
 impl Event for Destroy {
-    const ID: rules::EventId = rules::EventId("701.8a");
+    const ID: rules::EventId = rules::EventId("701.8a/destroy");
 }
 
 #[cfg(test)]
@@ -44,7 +44,7 @@ mod tests {
         assert_eq!(event.subject(), permanent);
         assert_eq!(event.other(), None);
         assert_eq!(event.player(), controller);
-        assert_eq!(Destroy::ID, rules::EventId("701.8a"));
+        assert_eq!(Destroy::ID, rules::EventId("701.8a/destroy"));
         assert_eq!(Destroy::clauses(), Vec::new());
         assert_eq!(event.field(rules::Field::Amount), None);
     }

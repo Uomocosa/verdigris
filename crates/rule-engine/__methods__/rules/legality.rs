@@ -38,7 +38,7 @@ pub fn legality<E: Event>(answers: &rules::Rules, event: &E) -> rules::Legality 
     .into_iter()
     .filter_map(|(role, entity)| entity.map(|entity| (role, entity)))
     .any(|(role, entity)| {
-        answers.changes(entity, rules::Target::Event(E::ID)).iter().any(|change| match change {
+        answers.changes(entity, rules::Target::event::<E>()).iter().any(|change| match change {
             rules::Change::Cant { role: protected } if *protected == role => true,
             rules::Change::OnlyIf {
                 role: required,

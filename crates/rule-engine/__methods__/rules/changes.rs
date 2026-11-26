@@ -20,7 +20,6 @@ pub fn changes(
 
 #[cfg(test)]
 mod tests {
-    use crate::rules::traits::event::Event;
     use bevy::ecs::system::RunSystemOnce;
     use bevy::prelude::Entity;
 
@@ -43,11 +42,11 @@ mod tests {
                     vec![rules::Change::AsThough]
                 );
                 assert_eq!(
-                    changes(&answers, *waiver, rules::Target::Event(TestStep::ID)),
+                    changes(&answers, *waiver, rules::Target::event::<TestStep>()),
                     vec![rules::Change::Skip]
                 );
                 assert_eq!(
-                    changes(&answers, *waiver, rules::Target::Event(TestRule::ID)),
+                    changes(&answers, *waiver, rules::Target::event::<TestRule>()),
                     vec![rules::Change::Must]
                 );
                 assert_eq!(

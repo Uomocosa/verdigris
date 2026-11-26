@@ -11,8 +11,11 @@ use crate::testing;
 pub fn engine() -> rules::RuleRegistry {
     let mut events = HashSet::<rules::EventId>::new();
     let mut clauses = HashSet::<rules::ClauseKey>::new();
+    let mut duplicates = Vec::<rules::EventId>::new();
     let mut register = |id: rules::EventId, list: Vec<rules::Clause>| {
-        events.insert(id);
+        if !events.insert(id) {
+            duplicates.push(id);
+        }
         for clause in list {
             clauses.insert(clause.key);
         }
@@ -92,6 +95,7 @@ pub fn engine() -> rules::RuleRegistry {
         events,
         clauses,
         values,
+        duplicates,
     }
 }
 
@@ -110,6 +114,6 @@ mod tests {
         assert!(registry.events.contains(&events::Draw::ID));
         assert!(registry.clauses.contains(&events::declare_attacker::SUMMONING_SICK.key));
         assert!(registry.values.contains(&rules::LandPlays::ID));
-        assert_eq!(events::Draw::ID, rules::EventId("121.1"));
+        assert_eq!(events::Draw::ID, rules::EventId("121.1/draw"));
     }
 }

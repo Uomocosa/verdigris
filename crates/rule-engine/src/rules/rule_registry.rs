@@ -8,6 +8,7 @@ pub struct RuleRegistry {
     pub(crate) events: HashSet<rules::EventId>,
     pub(crate) clauses: HashSet<rules::ClauseKey>,
     pub(crate) values: HashSet<rules::RuleId>,
+    pub duplicates: Vec<rules::EventId>,
 }
 
 #[atomic_delegates]
@@ -35,19 +36,18 @@ mod tests {
     use crate::effects;
     use crate::events;
     use crate::rules;
-    use crate::rules::traits::event::Event;
-    use crate::rules::traits::value_rule::ValueRule;
     use crate::testing;
 
     #[test]
     fn test_usage() {
         let registry = rules::RuleRegistry::engine();
-        assert!(registry.resolves(&rules::Target::Event(events::Draw::ID)));
+        assert!(registry.resolves(&rules::Target::event::<events::Draw>()));
         assert!(registry.resolves(&rules::Target::Clause(
             events::declare_attacker::SUMMONING_SICK.key
         )));
-        assert!(registry.resolves(&rules::Target::Value(rules::MaximumHandSize::ID)));
-        assert!(!registry.resolves(&rules::Target::Event(rules::EventId("999.9"))));
+        assert!(registry.resolves(&rules::Target::value::<rules::MaximumHandSize>()));
+        assert_eq!(registry.duplicates, Vec::<rules::EventId>::new());
+        assert!(!registry.resolves(&rules::Target::event::<events::GivePoisonCounters>()));
     }
 
     #[test]

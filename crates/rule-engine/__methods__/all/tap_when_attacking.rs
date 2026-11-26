@@ -2,14 +2,13 @@ use crate::abilities;
 use crate::effects;
 use crate::events;
 use crate::rules;
-use crate::rules::traits::event::Event;
 use crate::statics;
 
 pub fn tap_when_attacking(all: statics::All) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
         modification: effects::Modification::Rule(rules::RuleChange {
-            target: rules::Target::Event(events::TapAttacker::ID),
+            target: rules::Target::event::<events::TapAttacker>(),
             change: rules::Change::Perform,
         }),
     }
@@ -21,7 +20,6 @@ mod tests {
     use crate::effects;
     use crate::events;
     use crate::rules;
-    use crate::rules::traits::event::Event;
     use crate::statics;
 
     use super::tap_when_attacking;
@@ -33,7 +31,7 @@ mod tests {
         assert_eq!(
             ability.modification,
             effects::Modification::Rule(rules::RuleChange {
-                target: rules::Target::Event(events::TapAttacker::ID),
+                target: rules::Target::event::<events::TapAttacker>(),
                 change: rules::Change::Perform,
             }),
         );

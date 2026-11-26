@@ -47,7 +47,7 @@ mod tests {
         assert_eq!(
             ability.modification,
             effects::Modification::Rule(rules::RuleChange {
-                target: rules::Target::Event(events::DrawFromEmptyLibrary::ID),
+                target: rules::Target::event::<events::DrawFromEmptyLibrary>(),
                 change: rules::Change::Instead {
                     when: rules::Predicate::True,
                     then: rules::Then::Events(vec![rules::EventTemplate::WinGame {

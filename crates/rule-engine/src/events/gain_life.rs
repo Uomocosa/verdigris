@@ -18,7 +18,7 @@ impl rules::traits::context::Context for GainLife {
 }
 
 impl Event for GainLife {
-    const ID: rules::EventId = rules::EventId("119.3/gain");
+    const ID: rules::EventId = rules::EventId("119.3/gain-life");
 
     fn field(&self, field: rules::Field) -> Option<u32> {
         match field {
@@ -45,7 +45,7 @@ mod tests {
         assert_eq!(event.subject(), *player);
         assert_eq!(event.other(), None);
         assert_eq!(event.player(), player);
-        assert_eq!(GainLife::ID, rules::EventId("119.3/gain"));
+        assert_eq!(GainLife::ID, rules::EventId("119.3/gain-life"));
         assert_eq!(GainLife::clauses(), Vec::new());
         assert_eq!(event.field(rules::Field::Amount), Some(2));
     }

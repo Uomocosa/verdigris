@@ -25,7 +25,7 @@ impl rules::traits::context::Context for AssignCombatDamage {
 }
 
 impl Event for AssignCombatDamage {
-    const ID: rules::EventId = rules::EventId("510.1c");
+    const ID: rules::EventId = rules::EventId("510.1c/assign-combat-damage");
 
     #[atomic_delegate(AssignCombatDamage, Event)]
     fn clauses() -> Vec<rules::Clause> {}
@@ -56,7 +56,10 @@ mod tests {
         assert_eq!(event.subject(), target);
         assert_eq!(event.other(), Some(source));
         assert_eq!(event.player(), player);
-        assert_eq!(AssignCombatDamage::ID, rules::EventId("510.1c"));
+        assert_eq!(
+            AssignCombatDamage::ID,
+            rules::EventId("510.1c/assign-combat-damage")
+        );
         let clauses = AssignCombatDamage::clauses();
         assert_eq!(clauses.len(), 1);
         assert_eq!(clauses[0].key, super::ONLY_BLOCKERS.key);

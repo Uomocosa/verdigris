@@ -19,7 +19,7 @@ impl rules::traits::context::Context for AddPhase {
 }
 
 impl Event for AddPhase {
-    const ID: rules::EventId = rules::EventId("500.8");
+    const ID: rules::EventId = rules::EventId("500.8/add-phase");
 }
 
 #[cfg(test)]
@@ -44,7 +44,7 @@ mod tests {
         assert_eq!(event.subject(), *player);
         assert_eq!(event.other(), None);
         assert_eq!(event.player(), player);
-        assert_eq!(AddPhase::ID, rules::EventId("500.8"));
+        assert_eq!(AddPhase::ID, rules::EventId("500.8/add-phase"));
         assert_eq!(AddPhase::clauses(), Vec::new());
         assert_eq!(event.phase, turns::Phase::Beginning);
     }

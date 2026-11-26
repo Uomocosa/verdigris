@@ -5,7 +5,6 @@ use crate::cards;
 use crate::cost;
 use crate::effects;
 use crate::rules;
-use crate::rules::traits::event::Event;
 use crate::testing;
 
 pub const TEST_PLAYER_RESTRICTION: testing::Card = testing::Card {
@@ -16,7 +15,7 @@ pub const TEST_PLAYER_RESTRICTION: testing::Card = testing::Card {
             abilities::Continuous {
                 filter: effects::Filter::player(YOU),
                 modification: effects::Modification::Rule(rules::RuleChange {
-                    target: rules::Target::Event(testing::TestRule::ID),
+                    target: rules::Target::event::<testing::TestRule>(),
                     change: rules::Change::OnlyIf {
                         role: rules::Role::Player,
                         condition: !rules::Predicate::True,

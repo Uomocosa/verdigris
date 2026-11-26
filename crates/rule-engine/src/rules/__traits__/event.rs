@@ -45,7 +45,7 @@ mod tests {
         let event = events::LoseGame(player);
         assert_eq!(event.player(), player);
         assert_eq!(event.affected(), vec![*player]);
-        assert_eq!(events::LoseGame::ID, rules::EventId("104.3"));
+        assert_eq!(events::LoseGame::ID, rules::EventId("104.3/lose-game"));
     }
 
     #[test]

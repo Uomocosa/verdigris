@@ -21,7 +21,7 @@ impl rules::traits::context::Context for CreateTokens {
 }
 
 impl Event for CreateTokens {
-    const ID: rules::EventId = rules::EventId("701.7a");
+    const ID: rules::EventId = rules::EventId("701.7a/create-tokens");
 
     fn field(&self, field: rules::Field) -> Option<u32> {
         match field {
@@ -54,7 +54,7 @@ mod tests {
         assert_eq!(event.subject(), *controller);
         assert_eq!(event.other(), None);
         assert_eq!(event.player(), controller);
-        assert_eq!(CreateTokens::ID, rules::EventId("701.7a"));
+        assert_eq!(CreateTokens::ID, rules::EventId("701.7a/create-tokens"));
         assert_eq!(CreateTokens::clauses(), Vec::new());
         assert_eq!(event.field(rules::Field::Amount), Some(2));
     }

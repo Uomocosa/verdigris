@@ -2,14 +2,13 @@ use crate::abilities;
 use crate::effects;
 use crate::events;
 use crate::rules;
-use crate::rules::traits::event::Event;
 use crate::statics;
 
 pub fn dont_lose_unspent_mana(all: statics::All) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
         modification: effects::Modification::Rule(rules::RuleChange {
-            target: rules::Target::Event(events::LoseUnspentMana::ID),
+            target: rules::Target::event::<events::LoseUnspentMana>(),
             change: rules::Change::Skip,
         }),
     }
@@ -21,7 +20,6 @@ mod tests {
     use crate::effects;
     use crate::events;
     use crate::rules;
-    use crate::rules::traits::event::Event;
     use crate::statics;
 
     use super::dont_lose_unspent_mana;
@@ -33,7 +31,7 @@ mod tests {
         assert_eq!(
             ability.modification,
             effects::Modification::Rule(rules::RuleChange {
-                target: rules::Target::Event(events::LoseUnspentMana::ID),
+                target: rules::Target::event::<events::LoseUnspentMana>(),
                 change: rules::Change::Skip,
             }),
         );

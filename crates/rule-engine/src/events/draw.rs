@@ -18,7 +18,7 @@ impl rules::traits::context::Context for Draw {
 }
 
 impl Event for Draw {
-    const ID: rules::EventId = rules::EventId("121.1");
+    const ID: rules::EventId = rules::EventId("121.1/draw");
 
     fn field(&self, field: rules::Field) -> Option<u32> {
         match field {
@@ -45,7 +45,7 @@ mod tests {
         assert_eq!(event.subject(), *player);
         assert_eq!(event.other(), None);
         assert_eq!(event.player(), player);
-        assert_eq!(Draw::ID, rules::EventId("121.1"));
+        assert_eq!(Draw::ID, rules::EventId("121.1/draw"));
         assert_eq!(Draw::clauses(), Vec::new());
         assert_eq!(event.field(rules::Field::Amount), Some(2));
     }

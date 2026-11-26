@@ -14,7 +14,7 @@ pub struct OpeningHandAction(pub cards::CardId);
 
 #[rustfmt::skip]
 impl HookEvent for OpeningHandAction {
-    const ID: rules::EventId = rules::EventId("103.6");
+    const ID: rules::EventId = rules::EventId("103.6/opening-hand-action");
 
     fn card(&self) -> cards::CardId {
         **self
@@ -42,7 +42,10 @@ mod tests {
         let event = OpeningHandAction(card);
         assert_eq!(*event, card);
         assert_eq!(event.card(), card);
-        assert_eq!(OpeningHandAction::ID, rules::EventId("103.6"));
+        assert_eq!(
+            OpeningHandAction::ID,
+            rules::EventId("103.6/opening-hand-action")
+        );
         let clauses = OpeningHandAction::clauses();
         assert_eq!(clauses.len(), 1);
         assert_eq!(clauses[0].key, FROM_OPENING_HAND.key);

@@ -18,7 +18,7 @@ impl rules::traits::context::Context for Mill {
 }
 
 impl Event for Mill {
-    const ID: rules::EventId = rules::EventId("701.17a");
+    const ID: rules::EventId = rules::EventId("701.17a/mill");
 
     fn field(&self, field: rules::Field) -> Option<u32> {
         match field {
@@ -45,7 +45,7 @@ mod tests {
         assert_eq!(event.subject(), *player);
         assert_eq!(event.other(), None);
         assert_eq!(event.player(), player);
-        assert_eq!(Mill::ID, rules::EventId("701.17a"));
+        assert_eq!(Mill::ID, rules::EventId("701.17a/mill"));
         assert_eq!(Mill::clauses(), Vec::new());
         assert_eq!(event.field(rules::Field::Amount), Some(2));
     }

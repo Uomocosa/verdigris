@@ -17,7 +17,7 @@ impl rules::traits::context::Context for LoseUnspentMana {
 
 #[rustfmt::skip]
 impl Event for LoseUnspentMana {
-    const ID: rules::EventId = rules::EventId("106.4");
+    const ID: rules::EventId = rules::EventId("106.4/lose-unspent-mana");
 }
 
 #[cfg(test)]
@@ -38,7 +38,10 @@ mod tests {
         assert_eq!(event.subject(), *player);
         assert_eq!(event.other(), None);
         assert_eq!(event.player(), player);
-        assert_eq!(LoseUnspentMana::ID, rules::EventId("106.4"));
+        assert_eq!(
+            LoseUnspentMana::ID,
+            rules::EventId("106.4/lose-unspent-mana")
+        );
         assert_eq!(LoseUnspentMana::clauses(), Vec::new());
     }
 }

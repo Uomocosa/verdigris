@@ -18,7 +18,7 @@ impl rules::traits::context::Context for DiscardCard {
 }
 
 impl Event for DiscardCard {
-    const ID: rules::EventId = rules::EventId("701.9a");
+    const ID: rules::EventId = rules::EventId("701.9a/discard-card");
 }
 
 #[cfg(test)]
@@ -40,7 +40,7 @@ mod tests {
         assert_eq!(event.subject(), card);
         assert_eq!(event.other(), None);
         assert_eq!(event.player(), player);
-        assert_eq!(DiscardCard::ID, rules::EventId("701.9a"));
+        assert_eq!(DiscardCard::ID, rules::EventId("701.9a/discard-card"));
         assert_eq!(DiscardCard::clauses(), Vec::new());
         assert_eq!(event.field(rules::Field::Amount), None);
     }

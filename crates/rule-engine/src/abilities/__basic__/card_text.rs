@@ -3,7 +3,6 @@ use crate::cards;
 use crate::effects;
 use crate::events;
 use crate::rules;
-use crate::rules::traits::hook_event::HookEvent;
 
 #[must_use]
 pub fn whenever(
@@ -50,7 +49,7 @@ pub const fn tap_add(produces: cards::ManaType) -> abilities::ActivatedAbility {
 #[must_use]
 pub fn opening_hand_action(then: impl Into<rules::Then>) -> abilities::StaticAbility {
     abilities::StaticAbility::Replacement(abilities::Replacement::Rule(rules::RuleChange {
-        target: rules::Target::Event(events::OpeningHandAction::ID),
+        target: rules::Target::event::<rules::Hooked<events::OpeningHandAction>>(),
         change: rules::Change::Hook {
             when: rules::Predicate::True,
             then: then.into(),

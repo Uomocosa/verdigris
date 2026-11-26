@@ -17,7 +17,7 @@ impl rules::traits::context::Context for WinGame {
 
 #[rustfmt::skip]
 impl Event for WinGame {
-    const ID: rules::EventId = rules::EventId("104.2");
+    const ID: rules::EventId = rules::EventId("104.2/win-game");
 }
 
 #[cfg(test)]
@@ -38,7 +38,7 @@ mod tests {
         assert_eq!(event.subject(), *player);
         assert_eq!(event.other(), None);
         assert_eq!(event.player(), player);
-        assert_eq!(WinGame::ID, rules::EventId("104.2"));
+        assert_eq!(WinGame::ID, rules::EventId("104.2/win-game"));
         assert_eq!(WinGame::clauses(), Vec::new());
     }
 }

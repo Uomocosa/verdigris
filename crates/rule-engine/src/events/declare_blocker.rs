@@ -30,7 +30,7 @@ impl rules::traits::context::Context for DeclareBlocker {
 }
 
 impl Event for DeclareBlocker {
-    const ID: rules::EventId = rules::EventId("509.1a");
+    const ID: rules::EventId = rules::EventId("509.1a/declare-blocker");
 
     #[atomic_delegate(DeclareBlocker, Event)]
     fn clauses() -> Vec<rules::Clause> {}
@@ -53,7 +53,7 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        assert_eq!(DeclareBlocker::ID, rules::EventId("509.1a"));
+        assert_eq!(DeclareBlocker::ID, rules::EventId("509.1a/declare-blocker"));
         let clauses = DeclareBlocker::clauses();
         assert_eq!(clauses.len(), 4);
         assert_eq!(clauses[0].key, CREATURE.key);

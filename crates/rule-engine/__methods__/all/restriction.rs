@@ -11,7 +11,7 @@ pub fn restriction<E: Event>(
     abilities::Continuous {
         filter: *all,
         modification: effects::Modification::Rule(rules::RuleChange {
-            target: rules::Target::Event(E::ID),
+            target: rules::Target::event::<E>(),
             change: rules::Change::OnlyIf {
                 role: rules::Role::Subject,
                 condition: requirement,
@@ -38,7 +38,7 @@ mod tests {
         assert_eq!(
             ability.modification,
             effects::Modification::Rule(rules::RuleChange {
-                target: rules::Target::Event(rules::EventId("test/restriction")),
+                target: rules::Target::event::<testing::RestrictedRule>(),
                 change: rules::Change::OnlyIf {
                     role: rules::Role::Subject,
                     condition: rules::Predicate::True,

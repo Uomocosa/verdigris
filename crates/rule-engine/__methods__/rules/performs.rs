@@ -3,7 +3,7 @@ use crate::rules::traits::event::Event;
 
 pub fn performs<E: Event>(answers: &rules::Rules, event: &E) -> bool {
     let mut performs = true;
-    for change in answers.changes(event.subject(), rules::Target::Event(E::ID)) {
+    for change in answers.changes(event.subject(), rules::Target::event::<E>()) {
         match change {
             rules::Change::Skip => performs = false,
             rules::Change::Perform => performs = true,

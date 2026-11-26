@@ -1,14 +1,13 @@
 use crate::abilities;
 use crate::effects;
 use crate::rules;
-use crate::rules::traits::value_rule::ValueRule;
 use crate::statics;
 
 pub fn play_additional_lands(all: statics::All, count: u32) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
         modification: effects::Modification::Rule(rules::RuleChange {
-            target: rules::Target::Value(rules::LandPlays::ID),
+            target: rules::Target::value::<rules::LandPlays>(),
             change: rules::Change::Increase(count),
         }),
     }
@@ -19,7 +18,6 @@ mod tests {
     use crate::PLAYER;
     use crate::effects;
     use crate::rules;
-    use crate::rules::traits::value_rule::ValueRule;
     use crate::statics;
 
     use super::play_additional_lands;
@@ -31,7 +29,7 @@ mod tests {
         assert_eq!(
             ability.modification,
             effects::Modification::Rule(rules::RuleChange {
-                target: rules::Target::Value(rules::LandPlays::ID),
+                target: rules::Target::value::<rules::LandPlays>(),
                 change: rules::Change::Increase(2),
             })
         );

@@ -27,7 +27,7 @@ impl rules::traits::context::Context for EnterBattlefield {
 }
 
 impl Event for EnterBattlefield {
-    const ID: rules::EventId = rules::EventId("110.1");
+    const ID: rules::EventId = rules::EventId("110.1/enter-battlefield");
 }
 
 #[cfg(test)]
@@ -53,7 +53,10 @@ mod tests {
         assert_eq!(event.subject(), permanent);
         assert_eq!(event.other(), None);
         assert_eq!(event.player(), controller);
-        assert_eq!(EnterBattlefield::ID, rules::EventId("110.1"));
+        assert_eq!(
+            EnterBattlefield::ID,
+            rules::EventId("110.1/enter-battlefield")
+        );
         assert_eq!(EnterBattlefield::clauses(), Vec::new());
         assert_eq!(event.field(rules::Field::Amount), None);
     }

@@ -17,7 +17,7 @@ impl rules::traits::context::Context for DrawFromEmptyLibrary {
 
 #[rustfmt::skip]
 impl Event for DrawFromEmptyLibrary {
-    const ID: rules::EventId = rules::EventId("121.4");
+    const ID: rules::EventId = rules::EventId("121.4/draw-from-empty-library");
 }
 
 #[cfg(test)]
@@ -38,7 +38,10 @@ mod tests {
         assert_eq!(event.subject(), *player);
         assert_eq!(event.other(), None);
         assert_eq!(event.player(), player);
-        assert_eq!(DrawFromEmptyLibrary::ID, rules::EventId("121.4"));
+        assert_eq!(
+            DrawFromEmptyLibrary::ID,
+            rules::EventId("121.4/draw-from-empty-library")
+        );
         assert_eq!(DrawFromEmptyLibrary::clauses(), Vec::new());
     }
 }

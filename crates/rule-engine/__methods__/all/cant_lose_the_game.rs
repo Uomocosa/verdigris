@@ -2,14 +2,13 @@ use crate::abilities;
 use crate::effects;
 use crate::events;
 use crate::rules;
-use crate::rules::traits::event::Event;
 use crate::statics;
 
 pub fn cant_lose_the_game(all: statics::All) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
         modification: effects::Modification::Rule(rules::RuleChange {
-            target: rules::Target::Event(events::LoseGame::ID),
+            target: rules::Target::event::<events::LoseGame>(),
             change: rules::Change::Cant {
                 role: rules::Role::Player,
             },
@@ -21,6 +20,7 @@ pub fn cant_lose_the_game(all: statics::All) -> abilities::Continuous {
 mod tests {
     use crate::PLAYER;
     use crate::effects;
+    use crate::events;
     use crate::rules;
     use crate::statics;
 
@@ -33,7 +33,7 @@ mod tests {
         assert_eq!(
             ability.modification,
             effects::Modification::Rule(rules::RuleChange {
-                target: rules::Target::Event(rules::EventId("104.3")),
+                target: rules::Target::event::<events::LoseGame>(),
                 change: rules::Change::Cant {
                     role: rules::Role::Player,
                 },

@@ -50,7 +50,7 @@ mod tests {
         assert_eq!(hooked.player(), player);
         assert_eq!(
             Hooked::<events::OpeningHandAction>::ID,
-            rules::EventId("103.6")
+            rules::EventId("103.6/opening-hand-action")
         );
         assert_eq!(
             Hooked::<events::OpeningHandAction>::clauses(),

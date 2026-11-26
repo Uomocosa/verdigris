@@ -10,7 +10,7 @@ pub fn replacement<E: Event>(answers: &rules::Rules, event: &E) -> Option<rules:
         entities.push(*affected);
     }
     entities.into_iter().find_map(|entity| {
-        answers.changes(entity, rules::Target::Event(E::ID)).into_iter().find_map(|change| {
+        answers.changes(entity, rules::Target::event::<E>()).into_iter().find_map(|change| {
             match change {
                 rules::Change::Instead { when, then } => {
                     let bound = when.bind(event);

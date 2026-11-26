@@ -5,6 +5,6 @@ pub struct LandPlays;
 
 #[rustfmt::skip]
 impl ValueRule for LandPlays {
-    const ID: rules::RuleId = rules::RuleId("305.2");
+    const ID: rules::RuleId = rules::RuleId("305.2/land-plays");
     fn default() -> rules::Limit { rules::Limit::At(1) }
 }
