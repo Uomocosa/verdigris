@@ -9,6 +9,7 @@ pub mod cards;
 mod comprehensive_rules;
 pub mod damage;
 pub mod effects;
+#[path = "../__events__/mod.rs"]
 pub mod events;
 mod game;
 mod game_mut;

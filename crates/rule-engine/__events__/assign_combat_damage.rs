@@ -5,25 +5,22 @@ use verdigris_event_derive::EventArgs;
 use crate::rules;
 use crate::rules::traits::event::Event;
 
-pub const NONZERO_DAMAGE: rules::RestrictionId = rules::RestrictionId("120.8/nonzero");
+pub const ONLY_BLOCKERS: rules::RestrictionId = rules::RestrictionId("510.1c/only-blockers");
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EventArgs)]
-pub struct DealDamage {
+pub struct AssignCombatDamage {
+    #[arg]
+    pub target: Entity,
     #[arg]
     pub source: Entity,
-    #[arg]
-    pub recipient: Entity,
     #[arg]
     pub amount: u32,
 }
 
-impl Event for DealDamage {
-    const ID: rules::EventId = rules::EventId("120.3/deal-damage");
+impl Event for AssignCombatDamage {
+    const ID: rules::EventId = rules::EventId("510.1c/assign-combat-damage");
 
-    #[rustfmt::skip]
-    fn affected(&self) -> Vec<Entity> { vec![self.recipient] }
-
-    #[atomic_delegate(DealDamage, Event)]
+    #[atomic_delegate(AssignCombatDamage, Event)]
     fn restrictions() -> Vec<rules::Restriction> {}
 }
 
@@ -31,52 +28,56 @@ impl Event for DealDamage {
 mod tests {
     use bevy::prelude::Entity;
 
+    use crate::cards;
     use crate::rules;
     use crate::rules::traits::event::Event;
     use crate::rules::traits::event_args::EventArgs;
 
-    use super::DealDamage;
+    use super::AssignCombatDamage;
 
     #[test]
     fn test_usage() {
+        let target = Entity::from_raw_u32(1).unwrap();
         let source = Entity::PLACEHOLDER;
-        let recipient = Entity::from_raw_u32(1).unwrap();
-        let event = DealDamage {
+        let event = AssignCombatDamage {
+            target,
             source,
-            recipient,
             amount: 3,
         };
         assert_eq!(
-            event.arg(DealDamage::RECIPIENT),
-            Some(rules::ArgValue::Entity(recipient))
+            event.arg(AssignCombatDamage::TARGET),
+            Some(rules::ArgValue::Entity(target))
         );
-        assert_eq!(DealDamage::ID, rules::EventId("120.3/deal-damage"));
-        let restrictions = DealDamage::restrictions();
-        assert_eq!(restrictions.len(), 1);
-        assert_eq!(restrictions[0].id, super::NONZERO_DAMAGE);
-        assert_eq!(restrictions[0].condition, DealDamage::AMOUNT.at_least(1));
         assert_eq!(
-            event.arg(DealDamage::SOURCE),
+            event.arg(AssignCombatDamage::SOURCE),
             Some(rules::ArgValue::Entity(source))
         );
         assert_eq!(
-            event.arg(DealDamage::AMOUNT),
-            Some(rules::ArgValue::Amount(3))
+            AssignCombatDamage::ID,
+            rules::EventId("510.1c/assign-combat-damage")
+        );
+        let restrictions = AssignCombatDamage::restrictions();
+        assert_eq!(restrictions.len(), 1);
+        assert_eq!(restrictions[0].id, super::ONLY_BLOCKERS);
+        assert_eq!(
+            restrictions[0].condition,
+            rules::points_to::<cards::Blocking>(AssignCombatDamage::SOURCE)
+                .of(AssignCombatDamage::TARGET)
         );
         assert_eq!(
-            DealDamage::args(),
+            AssignCombatDamage::args(),
             &[
-                DealDamage::SOURCE,
-                DealDamage::RECIPIENT,
-                DealDamage::AMOUNT,
+                AssignCombatDamage::TARGET,
+                AssignCombatDamage::SOURCE,
+                AssignCombatDamage::AMOUNT,
             ]
         );
     }
 
     #[test]
     fn restriction_rule_numbers_occur_in_comprehensive_rules() {
-        const RULES_TEXT: &str = include_str!("../../../../docs/MagicCompRules-20250919.txt");
-        for restriction in DealDamage::restrictions() {
+        const RULES_TEXT: &str = include_str!("../../../docs/MagicCompRules-20250919.txt");
+        for restriction in AssignCombatDamage::restrictions() {
             let id: &str = *restriction.id;
             if id.starts_with("test/") || id.starts_with("statics/") || id.starts_with("glossary/")
             {

@@ -93,7 +93,7 @@ mod tests {
 
     #[test]
     fn restriction_rule_numbers_occur_in_comprehensive_rules() {
-        const RULES_TEXT: &str = include_str!("../../../../docs/MagicCompRules-20250919.txt");
+        const RULES_TEXT: &str = include_str!("../../../docs/MagicCompRules-20250919.txt");
         for restriction in PlayLand::restrictions() {
             let id: &str = *restriction.id;
             if id.starts_with("test/") || id.starts_with("statics/") || id.starts_with("glossary/")

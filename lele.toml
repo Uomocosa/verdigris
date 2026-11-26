@@ -80,10 +80,6 @@ reason = "A test card is only its printed definition; a test_usage would repeat 
 # LELECORE010 · locked · A struct with one field is a tuple newtype deriving `Deref`; two or more fields are named.
 [lele.rules.lint.single_field_newtype]
 
-[[lele.rules.lint.single_field_newtype.exempt]]
-path = "crates/rule-engine/src/events"
-reason = "Events name their arguments for #[derive(EventArgs)]; a single-argument event stays a named struct (WinGame { player })."
-
 # LELECORE011 · locked · No `#[allow(...)]`/`#[expect(...)]` unless whitelisted in `lele.toml` with the exact lint,…
 [lele.rules.lint.no_allow_attributes]
 
@@ -100,6 +96,42 @@ reason = "test-only: #[test] fns return Result<(), testing::TestError> so lookup
 
 # LELECORE014 · locked · Every `#[atomic_delegates]` shell has a body at `__methods__/<type>/<method>.rs` with…
 [lele.rules.lint.methods_layout]
+
+[[lele.rules.lint.methods_layout.exempt]]
+path = "crates/rule-engine/__methods__/assign_combat_damage"
+reason = "Events live in __events__/ (crate-root core folder like __rules__/); the rule assumes src/."
+
+[[lele.rules.lint.methods_layout.exempt]]
+path = "crates/rule-engine/__methods__/cast_spell"
+reason = "Events live in __events__/ (crate-root core folder like __rules__/); the rule assumes src/."
+
+[[lele.rules.lint.methods_layout.exempt]]
+path = "crates/rule-engine/__methods__/deal_damage"
+reason = "Events live in __events__/ (crate-root core folder like __rules__/); the rule assumes src/."
+
+[[lele.rules.lint.methods_layout.exempt]]
+path = "crates/rule-engine/__methods__/declare_attacker"
+reason = "Events live in __events__/ (crate-root core folder like __rules__/); the rule assumes src/."
+
+[[lele.rules.lint.methods_layout.exempt]]
+path = "crates/rule-engine/__methods__/declare_blocker"
+reason = "Events live in __events__/ (crate-root core folder like __rules__/); the rule assumes src/."
+
+[[lele.rules.lint.methods_layout.exempt]]
+path = "crates/rule-engine/__methods__/enter_battlefield"
+reason = "Events live in __events__/ (crate-root core folder like __rules__/); the rule assumes src/."
+
+[[lele.rules.lint.methods_layout.exempt]]
+path = "crates/rule-engine/__methods__/opening_hand_action"
+reason = "Events live in __events__/ (crate-root core folder like __rules__/); the rule assumes src/."
+
+[[lele.rules.lint.methods_layout.exempt]]
+path = "crates/rule-engine/__methods__/play_land"
+reason = "Events live in __events__/ (crate-root core folder like __rules__/); the rule assumes src/."
+
+[[lele.rules.lint.methods_layout.exempt]]
+path = "crates/rule-engine/__methods__/mod.rs"
+reason = "Events live in __events__/ (crate-root core folder like __rules__/); the rule assumes src/. The index keeps the eight event body dirs above so the event shells resolve; --sync-methods would drop them."
 
 # LELECORE015 · locked · No comments in `src/` or `__methods__/`, except `///` doc comments in `constants.rs` and a…
 [lele.rules.lint.no_comments]
@@ -209,10 +241,6 @@ reason = "LELE019 matches by last segment: rules::Hooked::PLAYER (an event argum
 
 # LELETEST004 · No `#[cfg(test)]` in plain-data files (plain structs/enums, pure `mod.rs`/`lib.rs`, `constants.rs`).
 [lele.rules.lint.no_tests_in_plain_data]
-
-[[lele.rules.lint.no_tests_in_plain_data.exempt]]
-path = "crates/rule-engine/src/events"
-reason = "An event file defines the event's registry entry (ID, named #[arg]s, restrictions); its inline test pins that entry so a renamed ID or dropped argument fails at the event. The EventArgs derive generates the arg mapping, so the file holds no hand-written method body for the rule to count as behaviour."
 
 [[lele.rules.lint.no_tests_in_plain_data.exempt]]
 path = "crates/rule-engine/src/testing/__fakes__/test_step.rs"

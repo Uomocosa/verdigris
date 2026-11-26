@@ -82,7 +82,7 @@ mod tests {
 
     #[test]
     fn restriction_rule_numbers_occur_in_comprehensive_rules() {
-        const RULES_TEXT: &str = include_str!("../../../../docs/MagicCompRules-20250919.txt");
+        const RULES_TEXT: &str = include_str!("../../../docs/MagicCompRules-20250919.txt");
         let keyword_restrictions = [
             keywords::deathtouch().abilities(),
             keywords::defender().abilities(),

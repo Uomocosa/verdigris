@@ -106,7 +106,7 @@ add an event, restriction or value rule, register it.
 ## 3. How to add things
 
 **A new game action** (draw, cast, pay mana, attack, mill ...):
-1. A struct in `src/events/<cr_name>.rs` with the CR's words as its name and its parameters as
+1. A struct in `__events__/<cr_name>.rs` with the CR's words as its name and its parameters as
    fields (`Draw { player, amount }`). `impl Event` with `ID` = CR number, named `#[arg]`s.
 2. If the CR lists conditions, write them as `restrictions()` with `RestrictionId` consts
    (the id cites the rule, e.g. `RestrictionId("508.1a/controls")`; the doc comment on the
@@ -192,7 +192,7 @@ to `crates/rule-engine/`.
 **An event names its arguments.** `#[derive(EventArgs)]` (`crates/event-derive`) with `#[arg]` on
 each field emits one `SCREAMING_SNAKE_CASE` const per field plus `EventArgs::arg` / `args`; the
 pipeline reads only named arguments. No derived controllers or owners are stored on the event
-(`src/events/deal_damage.rs`):
+(`__events__/deal_damage.rs`):
 
 ```rust
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EventArgs)]
@@ -216,7 +216,7 @@ answers.resolve(events::DealDamage::SOURCE.controller(), &damage) // Some(ArgVal
 
 **A restriction names whom it asks about.** Conditions say whom they ask about with `.of(...)`
 (`src/rules/condition.rs`); amounts read an argument with `E::AMOUNT.greater_than(0)` etc.
-(`src/rules/arg_id.rs`). From `src/events/declare_blocker.rs`:
+(`src/rules/arg_id.rs`). From `__events__/declare_blocker.rs`:
 
 ```rust
 rules::has::<cards::Creature>().of(DeclareBlocker::BLOCKER)
