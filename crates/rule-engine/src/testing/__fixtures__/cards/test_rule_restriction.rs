@@ -15,7 +15,8 @@ pub const TEST_RULE_RESTRICTION: testing::Card = testing::Card {
                 testing::RestrictedRule::ATTACKER,
                 rules::RestrictionId("test/test-rule-restriction"),
                 "attacks only with enough power",
-                rules::at_least(rules::Characteristic::Power, 3),
+                rules::at_least(rules::Characteristic::Power, 3)
+                    .of(testing::RestrictedRule::ATTACKER),
             ),
         }
     },

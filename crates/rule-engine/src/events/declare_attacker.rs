@@ -64,24 +64,31 @@ mod tests {
             restrictions[0].text,
             "The active player chooses which creatures that they control"
         );
-        assert_eq!(restrictions[0].condition, rules::has::<cards::Creature>());
+        assert_eq!(
+            restrictions[0].condition,
+            rules::has::<cards::Creature>().of(DeclareAttacker::ATTACKER)
+        );
         assert_eq!(restrictions[1].id, CONTROLS);
         assert_eq!(restrictions[1].text, "creatures that they control");
         assert_eq!(
             restrictions[1].condition,
-            rules::points_to::<cards::Controller>(rules::Role::Player)
-                & rules::has::<cards::OnBattlefield>()
+            (rules::points_to::<cards::Controller>(DeclareAttacker::PLAYER)
+                & rules::has::<cards::OnBattlefield>())
+            .of(DeclareAttacker::ATTACKER)
         );
         assert_eq!(restrictions[2].id, UNTAPPED);
         assert_eq!(
             restrictions[2].text,
             "The chosen creatures must be untapped"
         );
-        assert_eq!(restrictions[2].condition, !rules::has::<cards::Tapped>());
+        assert_eq!(
+            restrictions[2].condition,
+            (!rules::has::<cards::Tapped>()).of(DeclareAttacker::ATTACKER)
+        );
         assert_eq!(restrictions[3].id, SUMMONING_SICK);
         assert_eq!(
             restrictions[3].condition,
-            !rules::has::<cards::SummoningSick>()
+            (!rules::has::<cards::SummoningSick>()).of(DeclareAttacker::ATTACKER)
         );
         assert_eq!(
             DeclareAttacker::args(),

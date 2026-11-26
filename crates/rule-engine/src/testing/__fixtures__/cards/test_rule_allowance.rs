@@ -13,7 +13,7 @@ pub const TEST_RULE_ALLOWANCE: testing::Card = testing::Card {
             cards::CardDefinition::from_enchantment("Test Rule Allowance", cost![2, U]);
             statics::all(CREATURE).allow(
                 testing::UNTAPPED,
-                rules::has::<cards::Flying>(),
+                rules::has::<cards::Flying>().of(testing::TestRule::ATTACKER),
                 testing::TestRule::ATTACKER,
             ),
         }

@@ -37,7 +37,7 @@ mod tests {
         let ability = allow(
             statics::all(CREATURE),
             rules::RestrictionId("test/untapped"),
-            rules::has::<cards::Flying>(),
+            rules::has::<cards::Flying>().of(testing::TestRule::ATTACKER),
             testing::TestRule::ATTACKER,
         );
         assert_eq!(ability.filter, CREATURE);
@@ -47,7 +47,7 @@ mod tests {
                 target: rules::Target::Restriction(rules::RestrictionId("test/untapped")),
                 change: rules::Change::Allow {
                     holder: testing::TestRule::ATTACKER,
-                    when: rules::has::<cards::Flying>(),
+                    when: rules::has::<cards::Flying>().of(testing::TestRule::ATTACKER),
                 },
             })
         );

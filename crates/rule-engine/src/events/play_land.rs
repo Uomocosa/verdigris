@@ -63,19 +63,19 @@ mod tests {
         assert_eq!(restrictions[0].text, "A player who has priority");
         assert_eq!(
             restrictions[0].condition,
-            rules::has_priority(rules::Role::Player)
+            rules::has_priority(PlayLand::PLAYER)
         );
         assert_eq!(restrictions[1].id, LAND_CARD);
         assert_eq!(restrictions[1].text, "a land card");
         assert_eq!(
             restrictions[1].condition,
-            rules::card_type(cards::CardType::Land)
+            rules::card_type(cards::CardType::Land).of(PlayLand::LAND)
         );
         assert_eq!(restrictions[2].id, FROM_HAND);
         assert_eq!(restrictions[2].text, "from their hand");
         assert_eq!(
             restrictions[2].condition,
-            rules::in_zone(HAND, rules::Role::Player)
+            rules::in_zone(HAND, PlayLand::PLAYER).of(PlayLand::LAND)
         );
         assert_eq!(restrictions[3].id, MAIN_PHASE);
         assert_eq!(restrictions[3].text, "during a main phase of their turn");
@@ -87,7 +87,7 @@ mod tests {
         assert_eq!(restrictions[5].text, "their hand");
         assert_eq!(
             restrictions[5].condition,
-            rules::points_to::<cards::Owner>(rules::Role::Player)
+            rules::points_to::<cards::Owner>(PlayLand::PLAYER).of(PlayLand::LAND)
         );
         assert_eq!(restrictions[6].id, OWN_TURN);
         assert_eq!(
@@ -96,7 +96,7 @@ mod tests {
         );
         assert_eq!(
             restrictions[6].condition,
-            rules::active_player(rules::Role::Player)
+            rules::active_player(PlayLand::PLAYER)
         );
         assert!(restrictions[6].unwaivable);
         assert!(

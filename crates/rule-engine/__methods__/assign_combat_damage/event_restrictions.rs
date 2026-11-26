@@ -3,15 +3,19 @@ use crate::events;
 use crate::rules;
 
 pub fn event_restrictions() -> Vec<rules::Restriction> {
-    vec![events::assign_combat_damage::ONLY_BLOCKERS.restriction(
-        "A blocked creature assigns its combat damage to the creatures blocking it",
-        rules::points_to::<cards::Blocking>(rules::Role::Other),
-    )]
+    vec![
+        events::assign_combat_damage::ONLY_BLOCKERS.restriction(
+            "A blocked creature assigns its combat damage to the creatures blocking it",
+            rules::points_to::<cards::Blocking>(events::AssignCombatDamage::SOURCE)
+                .of(events::AssignCombatDamage::TARGET),
+        ),
+    ]
 }
 
 #[cfg(test)]
 mod tests {
     use crate::cards;
+    use crate::events;
     use crate::rules;
 
     use super::event_restrictions;
@@ -26,7 +30,8 @@ mod tests {
         );
         assert_eq!(
             restrictions[0].condition,
-            rules::points_to::<cards::Blocking>(rules::Role::Other)
+            rules::points_to::<cards::Blocking>(events::AssignCombatDamage::SOURCE)
+                .of(events::AssignCombatDamage::TARGET)
         );
     }
 }

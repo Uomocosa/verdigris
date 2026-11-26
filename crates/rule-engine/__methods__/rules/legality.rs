@@ -2,9 +2,6 @@ use crate::rules;
 use crate::rules::traits::event::Event;
 
 pub fn legality<E: Event>(answers: &rules::Rules, event: &E) -> rules::Legality {
-    let subject = event.subject();
-    let other = event.other();
-    let player = event.player();
     let waived = |restriction: &rules::Restriction| {
         answers.waived(
             event,
@@ -33,17 +30,11 @@ pub fn legality<E: Event>(answers: &rules::Rules, event: &E) -> rules::Legality 
             )
         })
         .collect();
-    let base_and_added_hold =
-        E::restrictions().into_iter().chain(added).filter(|restriction| !waived(restriction)).all(
-            |restriction| {
-                answers.eval(
-                    &restriction.condition.bind(event),
-                    subject,
-                    other,
-                    Some(*player),
-                )
-            },
-        );
+    let base_and_added_hold = E::restrictions()
+        .into_iter()
+        .chain(added)
+        .filter(|restriction| !waived(restriction))
+        .all(|restriction| answers.eval(&restriction.condition.bind(event), event, None));
     if base_and_added_hold && answers.performs(event) {
         rules::Legality::Legal
     } else {
@@ -169,10 +160,12 @@ mod tests {
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
                 assert!(answers.eval(
-                    &rules::has::<cards::Flying>(),
-                    *drake,
+                    &rules::has::<cards::Flying>().of(TestRule::ATTACKER),
+                    &TestRule {
+                        attacker: *drake,
+                        player: p2.id
+                    },
                     None,
-                    Some(p2.into())
                 ));
                 assert_eq!(
                     legality::<TestRule>(
@@ -201,10 +194,12 @@ mod tests {
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
                 assert!(!answers.eval(
-                    &rules::has::<cards::Flying>(),
-                    *bears,
+                    &rules::has::<cards::Flying>().of(TestRule::ATTACKER),
+                    &TestRule {
+                        attacker: *bears,
+                        player: p2.id
+                    },
                     None,
-                    Some(p2.into())
                 ));
                 assert_eq!(
                     legality::<TestRule>(

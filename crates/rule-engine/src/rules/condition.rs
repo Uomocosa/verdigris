@@ -8,20 +8,20 @@ use crate::zones;
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Condition {
     Has(rules::ComponentRef),
-    PointsTo(rules::ComponentRef, rules::Role),
-    Is(rules::Role),
+    PointsTo(rules::ComponentRef, rules::ArgRef),
+    Is(rules::ArgRef),
     CardType(cards::CardType),
     Characteristic(rules::Characteristic, rules::Comparison, i32),
-    Of(rules::Role, Box<Self>),
+    Of(rules::ArgRef, Box<Self>),
     All(Vec<Self>),
     Any(Vec<Self>),
     Not(Box<Self>),
     True,
-    InZone(zones::Zone, rules::Role),
+    InZone(zones::Zone, rules::ArgRef),
     StepIs(turns::Step),
     StackEmpty,
-    ActivePlayer(rules::Role),
-    HasPriority(rules::Role),
+    ActivePlayer(rules::ArgRef),
+    HasPriority(rules::ArgRef),
     EventField(rules::Field, rules::Comparison, u32),
     EventFieldAtLeastRemainingToughness(rules::Field),
 }
@@ -66,6 +66,12 @@ impl std::ops::BitOr for Condition {
 impl Condition {
     #[must_use]
     pub fn bind<E: rules::traits::event::Event>(&self, event: &E) -> Self {}
+}
+
+#[rustfmt::skip]
+impl Condition {
+    #[must_use]
+    pub fn of(self, who: impl Into<rules::ArgRef>) -> Self { Self::Of(who.into(), Box::new(self)) }
 }
 
 #[cfg(test)]

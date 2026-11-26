@@ -31,25 +31,20 @@ pub const fn equal_to(characteristic: rules::Characteristic, threshold: i32) -> 
 }
 
 #[must_use]
-pub fn other(condition: rules::Condition) -> rules::Condition {
-    rules::Condition::Of(rules::Role::Other, Box::new(condition))
-}
-
-#[must_use]
 pub fn points_to<C: rules::traits::entity_component::EntityComponent>(
-    role: rules::Role,
+    role: impl Into<rules::ArgRef>,
 ) -> rules::Condition {
-    rules::Condition::PointsTo(rules::ComponentRef::relation::<C>(), role)
+    rules::Condition::PointsTo(rules::ComponentRef::relation::<C>(), role.into())
 }
 
 #[must_use]
-pub const fn is(role: rules::Role) -> rules::Condition {
-    rules::Condition::Is(role)
+pub fn is(role: impl Into<rules::ArgRef>) -> rules::Condition {
+    rules::Condition::Is(role.into())
 }
 
 #[must_use]
-pub const fn in_zone(zone: zones::Zone, role: rules::Role) -> rules::Condition {
-    rules::Condition::InZone(zone, role)
+pub fn in_zone(zone: zones::Zone, role: impl Into<rules::ArgRef>) -> rules::Condition {
+    rules::Condition::InZone(zone, role.into())
 }
 
 #[must_use]
@@ -71,13 +66,13 @@ pub const fn stack_empty() -> rules::Condition {
 }
 
 #[must_use]
-pub const fn active_player(role: rules::Role) -> rules::Condition {
-    rules::Condition::ActivePlayer(role)
+pub fn active_player(role: impl Into<rules::ArgRef>) -> rules::Condition {
+    rules::Condition::ActivePlayer(role.into())
 }
 
 #[must_use]
-pub const fn has_priority(role: rules::Role) -> rules::Condition {
-    rules::Condition::HasPriority(role)
+pub fn has_priority(role: impl Into<rules::ArgRef>) -> rules::Condition {
+    rules::Condition::HasPriority(role.into())
 }
 
 #[must_use]

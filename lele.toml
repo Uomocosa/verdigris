@@ -147,6 +147,10 @@ reason = "A rule file holds exactly one pub fn Bevy system named after the CR ru
 # LELE019 · A constant lives in the nearest `constants.rs` (or `__basic__/constants.rs`) shared by all its…
 [lele.rules.lint.constants_placement]
 
+[[lele.rules.lint.constants_placement.exempt]]
+path = "crates/rule-engine/src/constants.rs"
+reason = "LELE019 matches by last segment: rules::Hooked::PLAYER (an event argument naming the hooked event's acting player, mirroring every concrete event's PLAYER argument) is a different item from the crate-wide PLAYER zone filter but counts as its only non-test user; the filter stays at the root because the card-definition DSL names it from every domain."
+
 # LELE020 · Behavior-free types (plain structs, enums, newtypes, aliases, ECS markers) go in the domain's…
 [lele.rules.lint.container_placement]
 

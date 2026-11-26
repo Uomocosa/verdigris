@@ -56,7 +56,8 @@ mod tests {
         );
         assert_eq!(
             restrictions[0].condition,
-            rules::in_zone(HAND, rules::Role::Player)
+            rules::in_zone(HAND, rules::Hooked::<super::OpeningHandAction>::PLAYER,)
+                .of(rules::Hooked::<super::OpeningHandAction>::CARD)
         );
         assert_eq!(OpeningHandAction::args(), &[OpeningHandAction::CARD]);
     }

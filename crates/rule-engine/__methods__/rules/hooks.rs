@@ -2,16 +2,13 @@ use crate::rules;
 use crate::rules::traits::event::Event;
 
 pub fn hooks<E: Event>(answers: &rules::Rules, event: &E) -> Vec<rules::Then> {
-    let subject = event.subject();
-    let other = event.other();
-    let affected = event.player();
     answers
-        .changes(subject, rules::Target::event::<E>())
+        .changes(event.subject(), rules::Target::event::<E>())
         .into_iter()
         .filter_map(|change| match change {
             rules::Change::Hook { when, then } => {
                 let bound = when.bind(event);
-                answers.eval(&bound, subject, other, Some(*affected)).then_some(then)
+                answers.eval(&bound, event, None).then_some(then)
             }
             _ => None,
         })

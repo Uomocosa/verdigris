@@ -63,20 +63,27 @@ mod tests {
             restrictions[0].text,
             "The defending player chooses which creatures they control"
         );
-        assert_eq!(restrictions[0].condition, rules::has::<cards::Creature>());
+        assert_eq!(
+            restrictions[0].condition,
+            rules::has::<cards::Creature>().of(DeclareBlocker::BLOCKER)
+        );
         assert_eq!(restrictions[1].id, CONTROLS);
         assert_eq!(restrictions[1].text, "creatures they control");
         assert_eq!(
             restrictions[1].condition,
-            rules::points_to::<cards::Controller>(rules::Role::Player)
-                & rules::has::<cards::OnBattlefield>()
+            (rules::points_to::<cards::Controller>(DeclareBlocker::PLAYER)
+                & rules::has::<cards::OnBattlefield>())
+            .of(DeclareBlocker::BLOCKER)
         );
         assert_eq!(restrictions[2].id, UNTAPPED);
         assert_eq!(
             restrictions[2].text,
             "The chosen creatures must be untapped"
         );
-        assert_eq!(restrictions[2].condition, !rules::has::<cards::Tapped>());
+        assert_eq!(
+            restrictions[2].condition,
+            (!rules::has::<cards::Tapped>()).of(DeclareBlocker::BLOCKER)
+        );
         let event = DeclareBlocker {
             blocker: Entity::PLACEHOLDER,
             attacker: Entity::from_raw_u32(1).unwrap(),

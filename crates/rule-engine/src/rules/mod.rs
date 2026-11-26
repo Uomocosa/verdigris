@@ -3,7 +3,7 @@ mod basic;
 
 pub use basic::condition_builders::{
     active_player, at_least, at_most, card_type, equal_to, event_field, has, has_priority, in_zone,
-    is, main_phase, other, points_to, stack_empty, step_is,
+    is, main_phase, points_to, stack_empty, step_is,
 };
 pub use basic::enums::{Amount, Change, Characteristic, Comparison, Field, Legality, Role, may};
 pub use basic::newtypes::{EventId, RuleId};

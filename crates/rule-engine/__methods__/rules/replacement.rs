@@ -4,7 +4,6 @@ use crate::rules::traits::event::Event;
 pub fn replacement<E: Event>(answers: &rules::Rules, event: &E) -> Option<rules::Then> {
     let affected = event.player();
     let subject = event.subject();
-    let other = event.other();
     let mut entities = vec![subject];
     if *affected != subject {
         entities.push(*affected);
@@ -14,7 +13,7 @@ pub fn replacement<E: Event>(answers: &rules::Rules, event: &E) -> Option<rules:
             match change {
                 rules::Change::Instead { when, then } => {
                     let bound = when.bind(event);
-                    answers.eval(&bound, subject, other, Some(*affected)).then_some(then)
+                    answers.eval(&bound, event, None).then_some(then)
                 }
                 _ => None,
             }

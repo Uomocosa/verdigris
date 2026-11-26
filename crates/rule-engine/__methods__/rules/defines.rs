@@ -8,30 +8,37 @@ pub fn defines<E: Event>(
     definition: &rules::Definition,
     event: &E,
 ) -> bool {
-    let subject = event.subject();
-    let other = event.other();
-    let player = event.player();
     let holds = match &definition.condition {
-        rules::Condition::EventFieldAtLeastRemainingToughness(field) => {
-            let remaining = answers
-                .entities
-                .get(subject)
-                .ok()
-                .and_then(|entity| entity.get::<cards::EffectivePT>())
-                .map_or(0, |effective| {
-                    u32::try_from(effective.toughness).unwrap_or_default()
-                })
-                .saturating_sub(
-                    answers
+        rules::Condition::Of(reference, inner) => match inner.as_ref() {
+            rules::Condition::EventFieldAtLeastRemainingToughness(field) => {
+                let viewpoint = match answers.resolve(*reference, event) {
+                    Some(rules::ArgValue::Entity(entity)) => Some(entity),
+                    Some(rules::ArgValue::Player(player)) => Some(*player),
+                    Some(rules::ArgValue::Entities(_) | rules::ArgValue::Amount(_)) | None => None,
+                };
+                viewpoint.is_some_and(|subject| {
+                    let remaining = answers
                         .entities
                         .get(subject)
                         .ok()
-                        .and_then(|entity| entity.get::<damage::Damage>())
-                        .map_or(0, |marked| **marked),
-                );
-            event.field(*field).is_some_and(|amount| amount >= remaining)
-        }
-        condition => answers.eval(&condition.bind(event), subject, other, Some(*player)),
+                        .and_then(|entity| entity.get::<cards::EffectivePT>())
+                        .map_or(0, |effective| {
+                            u32::try_from(effective.toughness).unwrap_or_default()
+                        })
+                        .saturating_sub(
+                            answers
+                                .entities
+                                .get(subject)
+                                .ok()
+                                .and_then(|entity| entity.get::<damage::Damage>())
+                                .map_or(0, |marked| **marked),
+                        );
+                    event.field(*field).is_some_and(|amount| amount >= remaining)
+                })
+            }
+            _ => answers.eval(&definition.condition.bind(event), event, None),
+        },
+        condition => answers.eval(&condition.bind(event), event, None),
     };
     holds
         || answers.waived(

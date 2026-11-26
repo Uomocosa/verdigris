@@ -17,10 +17,9 @@ pub const TEST_TIMID_FIELD: testing::Card = testing::Card {
                     events::DeclareBlocker::BLOCKER,
                     rules::RestrictionId("test/test-timid-field"),
                     "blocks only with enough power",
-                    rules::at_least(
-                    rules::Characteristic::Power,
-                    3,
-                )),
+                    rules::at_least(rules::Characteristic::Power, 3)
+                        .of(events::DeclareBlocker::BLOCKER),
+                )
         }
     },
 };

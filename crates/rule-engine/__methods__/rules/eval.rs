@@ -2,83 +2,89 @@ use bevy::prelude::Entity;
 
 use crate::cards;
 use crate::rules;
+use crate::rules::traits::event_args::EventArgs;
 use crate::zones;
 
-pub fn eval(
+pub fn eval<E: EventArgs>(
     answers: &rules::Rules,
     condition: &rules::Condition,
-    subject: Entity,
-    other: Option<Entity>,
-    player: Option<Entity>,
+    event: &E,
+    viewpoint: Option<Entity>,
 ) -> bool {
-    let target = |role: &rules::Role| match role {
-        rules::Role::Subject => Some(subject),
-        rules::Role::Other => other,
-        rules::Role::Player => player,
+    let entity = |reference: &rules::ArgRef| match answers.resolve(*reference, event) {
+        Some(rules::ArgValue::Entity(found)) => Some(found),
+        Some(rules::ArgValue::Player(player)) => Some(*player),
+        Some(rules::ArgValue::Entities(_) | rules::ArgValue::Amount(_)) | None => None,
     };
     match condition {
-        rules::Condition::Has(component) => answers
-            .entities
-            .get(subject)
-            .is_ok_and(|entity| entity.contains_type_id(component.type_id)),
-        rules::Condition::PointsTo(component, role) => target(role).is_some_and(|wanted| {
+        rules::Condition::Has(component) => viewpoint.is_some_and(|subject| {
             answers
                 .entities
                 .get(subject)
-                .ok()
-                .and_then(|entity| component.target.and_then(|read| read(&entity)))
-                .is_some_and(|found| found == wanted)
+                .is_ok_and(|entity| entity.contains_type_id(component.type_id))
         }),
-        rules::Condition::Is(role) => target(role) == Some(subject),
-        rules::Condition::CardType(card) => answers
-            .definitions
-            .get(subject)
-            .is_ok_and(|definition| definition.type_line.types.contains(card)),
-        rules::Condition::Characteristic(characteristic, comparison, threshold) => answers
-            .entities
-            .get(subject)
-            .ok()
-            .and_then(|entity| entity.get::<cards::EffectivePT>())
-            .is_some_and(|effective| {
-                let value = match characteristic {
-                    rules::Characteristic::Power => effective.power,
-                    rules::Characteristic::Toughness => effective.toughness,
-                };
-                match comparison {
-                    rules::Comparison::AtLeast => value >= *threshold,
-                    rules::Comparison::AtMost => value <= *threshold,
-                    rules::Comparison::EqualTo => value == *threshold,
-                    rules::Comparison::GreaterThan => value > *threshold,
-                    rules::Comparison::LessThan => value < *threshold,
-                }
+        rules::Condition::PointsTo(component, reference) => viewpoint.is_some_and(|subject| {
+            entity(reference).is_some_and(|wanted| {
+                answers
+                    .entities
+                    .get(subject)
+                    .ok()
+                    .and_then(|entity| component.target.and_then(|read| read(&entity)))
+                    .is_some_and(|found| found == wanted)
+            })
+        }),
+        rules::Condition::Is(reference) => entity(reference) == viewpoint,
+        rules::Condition::CardType(card) => viewpoint.is_some_and(|subject| {
+            answers
+                .definitions
+                .get(subject)
+                .is_ok_and(|definition| definition.type_line.types.contains(card))
+        }),
+        rules::Condition::Characteristic(characteristic, comparison, threshold) => viewpoint
+            .is_some_and(|subject| {
+                answers
+                    .entities
+                    .get(subject)
+                    .ok()
+                    .and_then(|entity| entity.get::<cards::EffectivePT>())
+                    .is_some_and(|effective| {
+                        let value = match characteristic {
+                            rules::Characteristic::Power => effective.power,
+                            rules::Characteristic::Toughness => effective.toughness,
+                        };
+                        match comparison {
+                            rules::Comparison::AtLeast => value >= *threshold,
+                            rules::Comparison::AtMost => value <= *threshold,
+                            rules::Comparison::EqualTo => value == *threshold,
+                            rules::Comparison::GreaterThan => value > *threshold,
+                            rules::Comparison::LessThan => value < *threshold,
+                        }
+                    })
             }),
-        rules::Condition::Of(role, inner) => match role {
-            rules::Role::Subject => eval(answers, inner, subject, other, player),
-            rules::Role::Other => other
-                .is_some_and(|candidate| eval(answers, inner, candidate, Some(subject), player)),
-            rules::Role::Player => {
-                player.is_some_and(|candidate| eval(answers, inner, candidate, other, player))
-            }
-        },
+        rules::Condition::Of(reference, inner) => {
+            entity(reference).is_some_and(|candidate| eval(answers, inner, event, Some(candidate)))
+        }
         rules::Condition::All(conditions) => {
-            conditions.iter().all(|inner| eval(answers, inner, subject, other, player))
+            conditions.iter().all(|inner| eval(answers, inner, event, viewpoint))
         }
         rules::Condition::Any(conditions) => {
-            conditions.iter().any(|inner| eval(answers, inner, subject, other, player))
+            conditions.iter().any(|inner| eval(answers, inner, event, viewpoint))
         }
-        rules::Condition::Not(inner) => !eval(answers, inner, subject, other, player),
+        rules::Condition::Not(inner) => !eval(answers, inner, event, viewpoint),
         rules::Condition::True => true,
-        rules::Condition::InZone(zone, role) => target(role).is_some_and(|holder| {
-            answers
-                .entities
-                .get(subject)
-                .ok()
-                .and_then(|entity| entity.get::<zones::InZone>())
-                .is_some_and(|in_zone| {
-                    answers.zones.get(**in_zone).is_ok_and(|(_, found, owner)| {
-                        *found == *zone && owner.is_some_and(|owner| ***owner == holder)
+        rules::Condition::InZone(zone, reference) => viewpoint.is_some_and(|subject| {
+            entity(reference).is_some_and(|holder| {
+                answers
+                    .entities
+                    .get(subject)
+                    .ok()
+                    .and_then(|entity| entity.get::<zones::InZone>())
+                    .is_some_and(|in_zone| {
+                        answers.zones.get(**in_zone).is_ok_and(|(_, found, owner)| {
+                            *found == *zone && owner.is_some_and(|owner| ***owner == holder)
+                        })
                     })
-                })
+            })
         }),
         rules::Condition::StepIs(step) => {
             answers.state.single().is_ok_and(|state| state.turn.step == *step)
@@ -87,10 +93,10 @@ pub fn eval(
             .zones
             .find(zones::SharedZone::Stack, None)
             .is_none_or(|stack| !answers.in_zone.iter().any(|in_zone| **in_zone == stack)),
-        rules::Condition::ActivePlayer(role) => target(role).is_some_and(|holder| {
+        rules::Condition::ActivePlayer(reference) => entity(reference).is_some_and(|holder| {
             answers.state.single().is_ok_and(|state| *state.turn.active == holder)
         }),
-        rules::Condition::HasPriority(role) => target(role).is_some_and(|holder| {
+        rules::Condition::HasPriority(reference) => entity(reference).is_some_and(|holder| {
             answers
                 .state
                 .single()
@@ -108,6 +114,7 @@ mod tests {
     use crate::BATTLEFIELD;
     use crate::HAND;
     use crate::cards;
+    use crate::events;
     use crate::mana;
     use crate::rules;
     use crate::testing::*;
@@ -119,15 +126,18 @@ mod tests {
     fn test_usage() -> TestResult {
         let (mut game, [_p1, p2]) = MockGame::new([P1, P2.battlefield_tapped([GRIZZLY_BEARS])]);
         let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        let tapped = TestRule {
+            attacker: *bears,
+            player: p2.id,
+        };
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
                 assert!(eval(
                     &answers,
-                    &rules::has::<cards::Tapped>(),
-                    *bears,
+                    &rules::has::<cards::Tapped>().of(TestRule::ATTACKER),
+                    &tapped,
                     None,
-                    None
                 ));
             })
             .unwrap();
@@ -138,15 +148,18 @@ mod tests {
     fn has_tapped_is_false_on_an_untapped_creature() -> TestResult {
         let (mut game, [p1, _p2]) = MockGame::new([P1.battlefield([GRIZZLY_BEARS]), P2]);
         let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        let attack = TestRule {
+            attacker: *bears,
+            player: p1.id,
+        };
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
                 assert!(!eval(
                     &answers,
-                    &rules::has::<cards::Tapped>(),
-                    *bears,
+                    &rules::has::<cards::Tapped>().of(TestRule::ATTACKER),
+                    &attack,
                     None,
-                    None
                 ));
             })
             .unwrap();
@@ -158,12 +171,17 @@ mod tests {
         let (mut game, [p1, _p2]) = MockGame::new([P1.battlefield([WIND_DRAKE]), P2]);
         let [drake] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(WIND_DRAKE)?;
         game.app.update();
+        let attack = TestRule {
+            attacker: *drake,
+            player: p1.id,
+        };
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
-                let awake_and_airborne =
-                    !rules::has::<cards::Tapped>() & rules::has::<cards::Flying>();
-                assert!(eval(&answers, &awake_and_airborne, *drake, None, None));
+                let awake_and_airborne = (!rules::has::<cards::Tapped>()
+                    & rules::has::<cards::Flying>())
+                .of(TestRule::ATTACKER);
+                assert!(eval(&answers, &awake_and_airborne, &attack, None));
             })
             .unwrap();
         Ok(())
@@ -174,12 +192,17 @@ mod tests {
         let (mut game, [_p1, p2]) = MockGame::new([P1, P2.battlefield_tapped([WIND_DRAKE])]);
         let [drake] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(WIND_DRAKE)?;
         game.app.update();
+        let attack = TestRule {
+            attacker: *drake,
+            player: p2.id,
+        };
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
-                let awake_and_airborne =
-                    !rules::has::<cards::Tapped>() & rules::has::<cards::Flying>();
-                assert!(!eval(&answers, &awake_and_airborne, *drake, None, None));
+                let awake_and_airborne = (!rules::has::<cards::Tapped>()
+                    & rules::has::<cards::Flying>())
+                .of(TestRule::ATTACKER);
+                assert!(!eval(&answers, &awake_and_airborne, &attack, None));
             })
             .unwrap();
         Ok(())
@@ -193,13 +216,22 @@ mod tests {
         ]);
         let [resting] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
         let [tapped] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        let rest = TestRule {
+            attacker: *resting,
+            player: p1.id,
+        };
+        let tap = TestRule {
+            attacker: *tapped,
+            player: p2.id,
+        };
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
-                let tapped_or_flying =
-                    rules::has::<cards::Tapped>() | rules::has::<cards::Flying>();
-                assert!(!eval(&answers, &tapped_or_flying, *resting, None, None));
-                assert!(eval(&answers, &tapped_or_flying, *tapped, None, None));
+                let tapped_or_flying = (rules::has::<cards::Tapped>()
+                    | rules::has::<cards::Flying>())
+                .of(TestRule::ATTACKER);
+                assert!(!eval(&answers, &tapped_or_flying, &rest, None));
+                assert!(eval(&answers, &tapped_or_flying, &tap, None));
             })
             .unwrap();
         Ok(())
@@ -212,12 +244,20 @@ mod tests {
         let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
         let [wolf] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(WATCHWOLF)?;
         game.app.update();
+        let small = TestRule {
+            attacker: *bears,
+            player: p1.id,
+        };
+        let big_attack = TestRule {
+            attacker: *wolf,
+            player: p2.id,
+        };
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
-                let big = rules::at_least(rules::Characteristic::Power, 3);
-                assert!(!eval(&answers, &big, *bears, None, None));
-                assert!(eval(&answers, &big, *wolf, None, None));
+                let big = rules::at_least(rules::Characteristic::Power, 3).of(TestRule::ATTACKER);
+                assert!(!eval(&answers, &big, &small, None));
+                assert!(eval(&answers, &big, &big_attack, None));
             })
             .unwrap();
         Ok(())
@@ -232,13 +272,23 @@ mod tests {
         let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
         let [drake] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(WIND_DRAKE)?;
         game.app.update();
+        let bears_blocked = events::DeclareBlocker {
+            blocker: *bears,
+            attacker: *drake,
+            player: p2.id,
+        };
+        let drake_blocked = events::DeclareBlocker {
+            blocker: *drake,
+            attacker: *bears,
+            player: p1.id,
+        };
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
-                let other_flies = rules::other(rules::has::<cards::Flying>());
-                assert!(!eval(&answers, &other_flies, *bears, None, None));
-                assert!(eval(&answers, &other_flies, *bears, Some(*drake), None));
-                assert!(!eval(&answers, &other_flies, *drake, Some(*bears), None));
+                let attacker_flies =
+                    rules::has::<cards::Flying>().of(events::DeclareBlocker::ATTACKER);
+                assert!(eval(&answers, &attacker_flies, &bears_blocked, None));
+                assert!(!eval(&answers, &attacker_flies, &drake_blocked, None));
             })
             .unwrap();
         Ok(())
@@ -249,11 +299,15 @@ mod tests {
         let (mut game, [p1, _p2]) = MockGame::new([P1.battlefield([WIND_DRAKE]), P2]);
         let [drake] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(WIND_DRAKE)?;
         game.app.update();
+        let attack = TestRule {
+            attacker: *drake,
+            player: p1.id,
+        };
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
-                let other_flies = rules::other(rules::has::<cards::Flying>());
-                assert!(!eval(&answers, &other_flies, *drake, None, None));
+                let missing = rules::has::<cards::Flying>().of(rules::ArgId("missing"));
+                assert!(!eval(&answers, &missing, &attack, None));
             })
             .unwrap();
         Ok(())
@@ -263,17 +317,16 @@ mod tests {
     fn points_to_owner_matches_the_ctx_player() -> TestResult {
         let (mut game, [p1, _p2]) = MockGame::new([P1.battlefield([GRIZZLY_BEARS]), P2]);
         let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        let attack = TestRule {
+            attacker: *bears,
+            player: p1.id,
+        };
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
-                let owned_by_player = rules::points_to::<cards::Owner>(rules::Role::Player);
-                assert!(eval(
-                    &answers,
-                    &owned_by_player,
-                    *bears,
-                    None,
-                    Some(p1.into())
-                ));
+                let owned_by_player =
+                    rules::points_to::<cards::Owner>(TestRule::PLAYER).of(TestRule::ATTACKER);
+                assert!(eval(&answers, &owned_by_player, &attack, None));
             })
             .unwrap();
         Ok(())
@@ -283,17 +336,16 @@ mod tests {
     fn points_to_owner_is_false_for_another_player() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([P1.battlefield([GRIZZLY_BEARS]), P2]);
         let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        let attack = TestRule {
+            attacker: *bears,
+            player: p2.id,
+        };
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
-                let owned_by_player = rules::points_to::<cards::Owner>(rules::Role::Player);
-                assert!(!eval(
-                    &answers,
-                    &owned_by_player,
-                    *bears,
-                    None,
-                    Some(p2.into())
-                ));
+                let owned_by_player =
+                    rules::points_to::<cards::Owner>(TestRule::PLAYER).of(TestRule::ATTACKER);
+                assert!(!eval(&answers, &owned_by_player, &attack, None));
             })
             .unwrap();
         Ok(())
@@ -303,17 +355,16 @@ mod tests {
     fn points_to_without_the_component_is_false() -> TestResult {
         let (mut game, [p1, _p2]) = MockGame::new([P1.battlefield([GRIZZLY_BEARS]), P2]);
         let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        let attack = TestRule {
+            attacker: *bears,
+            player: p1.id,
+        };
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
-                let blocking_player = rules::points_to::<cards::Blocking>(rules::Role::Player);
-                assert!(!eval(
-                    &answers,
-                    &blocking_player,
-                    *bears,
-                    None,
-                    Some(p1.into())
-                ));
+                let blocking_player =
+                    rules::points_to::<cards::Blocking>(TestRule::PLAYER).of(TestRule::ATTACKER);
+                assert!(!eval(&answers, &blocking_player, &attack, None));
             })
             .unwrap();
         Ok(())
@@ -324,15 +375,24 @@ mod tests {
         let (mut game, [p1, _p2]) = MockGame::new([P1.hand([FOREST, GRIZZLY_BEARS]), P2]);
         let [forest] = game.player(p1).cards_in(HAND).exactly::<1>(FOREST)?;
         let [bears] = game.player(p1).cards_in(HAND).exactly::<1>(GRIZZLY_BEARS)?;
+        let cast_forest = TestRule {
+            attacker: *forest,
+            player: p1.id,
+        };
+        let cast_bears = TestRule {
+            attacker: *bears,
+            player: p1.id,
+        };
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
-                let is_land = rules::card_type(cards::CardType::Land);
-                assert!(eval(&answers, &is_land, *forest, None, None));
-                assert!(!eval(&answers, &is_land, *bears, None, None));
-                let is_creature = rules::card_type(cards::CardType::Creature);
-                assert!(!eval(&answers, &is_creature, *forest, None, None));
-                assert!(eval(&answers, &is_creature, *bears, None, None));
+                let is_land = rules::card_type(cards::CardType::Land).of(TestRule::ATTACKER);
+                assert!(eval(&answers, &is_land, &cast_forest, None));
+                assert!(!eval(&answers, &is_land, &cast_bears, None));
+                let is_creature =
+                    rules::card_type(cards::CardType::Creature).of(TestRule::ATTACKER);
+                assert!(!eval(&answers, &is_creature, &cast_forest, None));
+                assert!(eval(&answers, &is_creature, &cast_bears, None));
             })
             .unwrap();
         Ok(())
@@ -342,13 +402,17 @@ mod tests {
     fn of_player_evaluates_on_the_player() -> TestResult {
         let (mut game, [p1, _p2]) = MockGame::new([P1.battlefield([GRIZZLY_BEARS]), P2]);
         let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        let attack = TestRule {
+            attacker: *bears,
+            player: p1.id,
+        };
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
-                let on_player =
-                    rules::Condition::Of(rules::Role::Player, Box::new(rules::Condition::True));
-                assert!(eval(&answers, &on_player, *bears, None, Some(p1.into())));
-                assert!(!eval(&answers, &on_player, *bears, None, None));
+                let on_player = rules::Condition::True.of(TestRule::PLAYER);
+                assert!(eval(&answers, &on_player, &attack, None));
+                let missing = rules::Condition::True.of(rules::ArgId("missing"));
+                assert!(!eval(&answers, &missing, &attack, None));
             })
             .unwrap();
         Ok(())
@@ -359,26 +423,23 @@ mod tests {
         let (mut game, [p1, p2]) =
             MockGame::new([P1.battlefield([GRIZZLY_BEARS]), P2.hand([GRIZZLY_BEARS])]);
         let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        let own = TestRule {
+            attacker: *bears,
+            player: p1.id,
+        };
+        let foreign = TestRule {
+            attacker: *bears,
+            player: p2.id,
+        };
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
-                let on_own_battlefield = rules::in_zone(BATTLEFIELD, rules::Role::Player);
-                assert!(eval(
-                    &answers,
-                    &on_own_battlefield,
-                    *bears,
-                    None,
-                    Some(p1.into())
-                ));
-                assert!(!eval(
-                    &answers,
-                    &on_own_battlefield,
-                    *bears,
-                    None,
-                    Some(p2.into())
-                ));
-                let in_own_hand = rules::in_zone(HAND, rules::Role::Player);
-                assert!(!eval(&answers, &in_own_hand, *bears, None, Some(p1.into())));
+                let on_own_battlefield =
+                    rules::in_zone(BATTLEFIELD, TestRule::PLAYER).of(TestRule::ATTACKER);
+                assert!(eval(&answers, &on_own_battlefield, &own, None));
+                assert!(!eval(&answers, &on_own_battlefield, &foreign, None));
+                let in_own_hand = rules::in_zone(HAND, TestRule::PLAYER).of(TestRule::ATTACKER);
+                assert!(!eval(&answers, &in_own_hand, &own, None));
             })
             .unwrap();
         Ok(())
@@ -390,22 +451,24 @@ mod tests {
             .turn(2, turns::Step::Upkeep)
             .players([P1.battlefield([GRIZZLY_BEARS]), P2]);
         let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        let attack = TestRule {
+            attacker: *bears,
+            player: p1.id,
+        };
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
                 assert!(eval(
                     &answers,
                     &rules::step_is(turns::Step::Upkeep),
-                    *bears,
+                    &attack,
                     None,
-                    None
                 ));
                 assert!(!eval(
                     &answers,
                     &rules::step_is(turns::Step::PrecombatMain),
-                    *bears,
+                    &attack,
                     None,
-                    None
                 ));
             })
             .unwrap();
@@ -416,21 +479,29 @@ mod tests {
     fn main_phase_holds_during_either_main_phase() -> TestResult {
         let (mut game, [p1, _p2]) = MockGame::new([P1.battlefield([GRIZZLY_BEARS]), P2]);
         let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        let attack = TestRule {
+            attacker: *bears,
+            player: p1.id,
+        };
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
-                assert!(eval(&answers, &rules::main_phase(), *bears, None, None));
+                assert!(eval(&answers, &rules::main_phase(), &attack, None));
             })
             .unwrap();
         let (mut upkeep, [q1, _q2]) = MockGame::builder()
             .turn(2, turns::Step::Upkeep)
             .players([P1.battlefield([GRIZZLY_BEARS]), P2]);
         let [resting] = upkeep.player(q1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        let upkeep_attack = TestRule {
+            attacker: *resting,
+            player: q1.id,
+        };
         upkeep
             .app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
-                assert!(!eval(&answers, &rules::main_phase(), *resting, None, None));
+                assert!(!eval(&answers, &rules::main_phase(), &upkeep_attack, None));
             })
             .unwrap();
         Ok(())
@@ -440,10 +511,14 @@ mod tests {
     fn stack_empty_holds_when_nothing_is_on_the_stack() -> TestResult {
         let (mut game, [p1, _p2]) = MockGame::new([P1.battlefield([GRIZZLY_BEARS]), P2]);
         let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        let attack = TestRule {
+            attacker: *bears,
+            player: p1.id,
+        };
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
-                assert!(eval(&answers, &rules::stack_empty(), *bears, None, None));
+                assert!(eval(&answers, &rules::stack_empty(), &attack, None));
             })
             .unwrap();
         Ok(())
@@ -458,10 +533,14 @@ mod tests {
         let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
         game.play([p1.cast(bolt).targeting(p2)])?;
         let [stacked] = game.stack().exactly::<1>(LIGHTNING_BOLT)?;
+        let cast = TestRule {
+            attacker: *stacked,
+            player: p1.id,
+        };
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
-                assert!(!eval(&answers, &rules::stack_empty(), *stacked, None, None));
+                assert!(!eval(&answers, &rules::stack_empty(), &cast, None));
             })
             .unwrap();
         Ok(())
@@ -471,12 +550,20 @@ mod tests {
     fn active_player_matches_the_turns_active_player() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([P1.battlefield([GRIZZLY_BEARS]), P2]);
         let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        let own = TestRule {
+            attacker: *bears,
+            player: p1.id,
+        };
+        let foreign = TestRule {
+            attacker: *bears,
+            player: p2.id,
+        };
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
-                let active = rules::active_player(rules::Role::Player);
-                assert!(eval(&answers, &active, *bears, None, Some(p1.into())));
-                assert!(!eval(&answers, &active, *bears, None, Some(p2.into())));
+                let active = rules::active_player(TestRule::PLAYER);
+                assert!(eval(&answers, &active, &own, None));
+                assert!(!eval(&answers, &active, &foreign, None));
             })
             .unwrap();
         Ok(())
@@ -487,12 +574,20 @@ mod tests {
         let (mut game, [p1, p2]) = MockGame::new([P1.battlefield([GRIZZLY_BEARS]), P2]);
         let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
         game.app.update();
+        let own = TestRule {
+            attacker: *bears,
+            player: p1.id,
+        };
+        let foreign = TestRule {
+            attacker: *bears,
+            player: p2.id,
+        };
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
-                let priority = rules::has_priority(rules::Role::Player);
-                assert!(eval(&answers, &priority, *bears, None, Some(p1.into())));
-                assert!(!eval(&answers, &priority, *bears, None, Some(p2.into())));
+                let priority = rules::has_priority(TestRule::PLAYER);
+                assert!(eval(&answers, &priority, &own, None));
+                assert!(!eval(&answers, &priority, &foreign, None));
             })
             .unwrap();
         Ok(())

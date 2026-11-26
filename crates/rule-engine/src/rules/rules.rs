@@ -25,12 +25,11 @@ impl Rules<'_, '_> {
     pub fn characteristics(&self, entity: Entity) -> cards::Characteristics {}
 
     #[must_use]
-    pub fn eval(
+    pub fn eval<E: rules::traits::event_args::EventArgs>(
         &self,
         condition: &rules::Condition,
-        subject: Entity,
-        other: Option<Entity>,
-        player: Option<Entity>,
+        event: &E,
+        viewpoint: Option<bevy::prelude::Entity>,
     ) -> bool {
     }
 

@@ -82,7 +82,8 @@ mod tests {
         );
         assert_eq!(
             restrictions[0].condition,
-            rules::points_to::<cards::Blocking>(rules::Role::Other)
+            rules::points_to::<cards::Blocking>(AssignCombatDamage::SOURCE)
+                .of(AssignCombatDamage::TARGET)
         );
         assert_eq!(
             AssignCombatDamage::args(),

@@ -1,12 +1,11 @@
+use atomic_delegate_macros::atomic_delegate;
 use bevy::prelude::Entity;
 use verdigris_event_derive::EventArgs;
 
-use crate::cards;
 use crate::players;
 
 use crate::rules;
 use crate::rules::traits::event::Event;
-use crate::testing;
 
 pub const UNTAPPED: rules::RestrictionId = rules::RestrictionId("test/untapped");
 
@@ -25,12 +24,11 @@ impl rules::traits::context::Context for TestRule {
     fn player(&self) -> players::PlayerId { self.player }
 }
 
-#[rustfmt::skip]
 impl Event for TestRule {
     const ID: rules::EventId = rules::EventId("test/legality");
-    fn restrictions() -> Vec<rules::Restriction> {
-        vec![testing::UNTAPPED.restriction("must be untapped", !rules::has::<cards::Tapped>())]
-    }
+
+    #[atomic_delegate(TestRule, Event)]
+    fn restrictions() -> Vec<rules::Restriction> {}
 }
 
 #[cfg(test)]
@@ -49,7 +47,10 @@ mod tests {
         let restrictions = TestRule::restrictions();
         assert_eq!(restrictions.len(), 1);
         assert_eq!(restrictions[0].id, UNTAPPED);
-        assert_eq!(restrictions[0].condition, !rules::has::<cards::Tapped>());
+        assert_eq!(
+            restrictions[0].condition,
+            (!rules::has::<cards::Tapped>()).of(TestRule::ATTACKER)
+        );
         assert_eq!(TestRule::args(), &[TestRule::ATTACKER, TestRule::PLAYER,]);
     }
 }

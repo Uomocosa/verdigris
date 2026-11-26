@@ -17,17 +17,25 @@ impl<E: HookEvent> rules::traits::context::Context for Hooked<E> {
     fn player(&self) -> players::PlayerId { self.player }
 }
 
-#[rustfmt::skip]
 impl<E: HookEvent> rules::traits::event_args::EventArgs for Hooked<E> {
     fn arg(&self, id: rules::ArgId) -> Option<rules::ArgValue> {
-        (id == Self::CARD).then_some(rules::ArgValue::from(self.hook.card()))
+        if id == Self::CARD {
+            Some(rules::ArgValue::from(self.hook.card()))
+        } else if id == Self::PLAYER {
+            Some(rules::ArgValue::Player(self.player))
+        } else {
+            None
+        }
     }
-    fn args() -> &'static [rules::ArgId] { &[Self::CARD] }
+
+    #[rustfmt::skip]
+    fn args() -> &'static [rules::ArgId] { &[Self::CARD, Self::PLAYER] }
 }
 
 #[rustfmt::skip]
 impl<E: HookEvent> Hooked<E> {
     pub const CARD: rules::ArgId = rules::ArgId("card");
+    pub const PLAYER: rules::ArgId = rules::ArgId("player");
 }
 
 #[rustfmt::skip]
@@ -67,8 +75,15 @@ mod tests {
             Some(rules::ArgValue::Entity(*card))
         );
         assert_eq!(
+            hooked.arg(Hooked::<events::OpeningHandAction>::PLAYER),
+            Some(rules::ArgValue::Player(player))
+        );
+        assert_eq!(
             Hooked::<events::OpeningHandAction>::args(),
-            &[Hooked::<events::OpeningHandAction>::CARD]
+            &[
+                Hooked::<events::OpeningHandAction>::CARD,
+                Hooked::<events::OpeningHandAction>::PLAYER,
+            ]
         );
         assert_eq!(
             Hooked::<events::OpeningHandAction>::ID,

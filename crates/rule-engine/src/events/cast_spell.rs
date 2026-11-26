@@ -59,25 +59,25 @@ mod tests {
         assert_eq!(restrictions[0].text, "A player who has priority");
         assert_eq!(
             restrictions[0].condition,
-            rules::has_priority(rules::Role::Player)
+            rules::has_priority(CastSpell::PLAYER)
         );
         assert_eq!(restrictions[1].id, FROM_HAND);
         assert_eq!(restrictions[1].text, "from their hand");
         assert_eq!(
             restrictions[1].condition,
-            rules::in_zone(HAND, rules::Role::Player)
+            rules::in_zone(HAND, CastSpell::PLAYER).of(CastSpell::SPELL)
         );
         assert_eq!(restrictions[2].id, OWNS);
         assert_eq!(restrictions[2].text, "their hand");
         assert_eq!(
             restrictions[2].condition,
-            rules::points_to::<cards::Owner>(rules::Role::Player)
+            rules::points_to::<cards::Owner>(CastSpell::PLAYER).of(CastSpell::SPELL)
         );
         assert_eq!(restrictions[3].id, NOT_A_LAND);
         assert_eq!(restrictions[3].text, "It can’t be cast as a spell.");
         assert_eq!(
             restrictions[3].condition,
-            !rules::card_type(cards::CardType::Land)
+            (!rules::card_type(cards::CardType::Land)).of(CastSpell::SPELL)
         );
         assert!(restrictions[3].unwaivable);
         assert_eq!(restrictions[4].id, TIMING);
@@ -87,10 +87,10 @@ mod tests {
         );
         assert_eq!(
             restrictions[4].condition,
-            rules::card_type(cards::CardType::Instant)
+            rules::card_type(cards::CardType::Instant).of(CastSpell::SPELL)
                 | (rules::main_phase()
                     & rules::stack_empty()
-                    & rules::active_player(rules::Role::Player))
+                    & rules::active_player(CastSpell::PLAYER))
         );
         assert!(
             CastSpell::restrictions()

@@ -10,9 +10,6 @@ pub fn waived<E: Event>(
     if unwaivable {
         return false;
     }
-    let subject = event.subject();
-    let other = event.other();
-    let player = event.player();
     E::args()
         .iter()
         .filter_map(|id| {
@@ -26,7 +23,7 @@ pub fn waived<E: Event>(
             answers.changes(entity, target).iter().any(|change| match change {
                 rules::Change::AsThough { holder } => *holder == id,
                 rules::Change::Allow { holder, when } => {
-                    *holder == id && answers.eval(&when.bind(event), subject, other, Some(*player))
+                    *holder == id && answers.eval(&when.bind(event), event, None)
                 }
                 _ => false,
             })

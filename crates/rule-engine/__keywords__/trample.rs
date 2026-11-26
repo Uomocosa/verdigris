@@ -21,7 +21,7 @@ impl Trample {
             target: rules::Target::Restriction(events::assign_combat_damage::ONLY_BLOCKERS),
             change: rules::Change::Allow {
                 holder: events::AssignCombatDamage::SOURCE,
-                when: rules::has::<players::Player>(),
+                when: rules::has::<players::Player>().of(events::AssignCombatDamage::TARGET),
             },
         })]
     }
