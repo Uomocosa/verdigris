@@ -15,7 +15,7 @@ pub const SCROLL_THIEF: testing::Card = testing::Card {
         card! {
             cards::creature("Scroll Thief", cost![2, U], pt!(1, 3));
             abilities::whenever(
-                THIS.deals_combat_damage().to(rules::a(PLAYER)),
+                THIS.deals(rules::COMBAT_DAMAGE).to(rules::a(PLAYER)),
                 effects::draw(1),
             ),
         }

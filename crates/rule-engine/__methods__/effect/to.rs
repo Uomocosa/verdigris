@@ -17,7 +17,12 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let effect = to(effects::damage(3), effects::target(1, ANY_TARGET));
+        let untargeted = effects::Effect {
+            kind: effects::EffectKind::Damage(3),
+            follow_ups: [None, None, None, None],
+            target: None,
+        };
+        let effect = to(untargeted, effects::target(1, ANY_TARGET));
         assert_eq!(effect.kind, effects::EffectKind::Damage(3));
         assert_eq!(effect.target, Some(effects::target(1, ANY_TARGET)));
     }

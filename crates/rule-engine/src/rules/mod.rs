@@ -2,8 +2,8 @@
 mod basic;
 
 pub use basic::condition_builders::{
-    a, active_player, an, card_type, cards_in_hand, cards_in_library, count, counters, each,
-    exactly, greater_than, has, has_keyword, has_priority, in_zone, is, less_than, life,
+    a, active_player, an, card_type, cards_in_hand, cards_in_library, count, counters, damage,
+    each, exactly, greater_than, has, has_keyword, has_priority, in_zone, is, less_than, life,
     main_phase, points_to, power, stack_empty, step_is, toughness,
 };
 pub use basic::enums::{Amount, Change, Legality, may};
@@ -71,6 +71,12 @@ pub use condition::Condition;
 
 mod count;
 pub use count::Count;
+
+mod damage;
+pub use damage::Damage;
+
+mod damage_filter;
+pub use damage_filter::{COMBAT_DAMAGE, DAMAGE, DamageFilter};
 
 mod characteristic;
 pub use characteristic::Characteristic;

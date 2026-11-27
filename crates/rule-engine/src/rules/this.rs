@@ -1,4 +1,5 @@
 use crate::abilities;
+use crate::rules::traits::dealt::Dealt;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct This;
@@ -16,7 +17,7 @@ impl This {
         abilities::TriggerEvent::BecomesBlocked
     }
     #[must_use]
-    pub fn deals_combat_damage(self) -> abilities::DealsDamage { abilities::DealsDamage::from(true) }
+    pub fn deals<D: Dealt>(self, dealt: D) -> D::Builder { dealt.build() }
 }
 
 #[cfg(test)]
@@ -37,7 +38,7 @@ mod tests {
             abilities::TriggerEvent::BecomesBlocked
         );
         assert_eq!(
-            This.deals_combat_damage().to(rules::a(PLAYER)),
+            This.deals(rules::COMBAT_DAMAGE).to(rules::a(PLAYER)),
             abilities::TriggerEvent::DealsDamage {
                 combat: true,
                 to: rules::Players::All,

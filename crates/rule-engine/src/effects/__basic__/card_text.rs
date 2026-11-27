@@ -3,15 +3,6 @@ use crate::keywords;
 use crate::turns;
 
 #[must_use]
-pub const fn damage(amount: u32) -> effects::Effect {
-    effects::Effect {
-        kind: effects::EffectKind::Damage(amount),
-        follow_ups: [None, None, None, None],
-        target: None,
-    }
-}
-
-#[must_use]
 pub const fn destroy() -> effects::Effect {
     effects::Effect {
         kind: effects::EffectKind::Destroy,

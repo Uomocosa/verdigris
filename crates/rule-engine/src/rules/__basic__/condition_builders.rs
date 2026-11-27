@@ -93,6 +93,11 @@ pub const fn counters(kind: counters::CounterId) -> rules::PlayerQuantity {
 }
 
 #[must_use]
+pub const fn damage(amount: u32) -> rules::Damage {
+    rules::Damage(amount)
+}
+
+#[must_use]
 pub const fn cards_in_hand() -> rules::PlayerQuantity {
     rules::PlayerQuantity::CardsInHand
 }

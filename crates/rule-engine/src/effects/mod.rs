@@ -2,8 +2,8 @@
 mod basic;
 
 pub use basic::card_text::{
-    additional_phase, counter, creates, damage, destroy, discard, draw, exile, gain_life, gains,
-    gets, lose_life, mills, poison, target, win_the_game,
+    additional_phase, counter, creates, destroy, discard, draw, exile, gain_life, gains, gets,
+    lose_life, mills, poison, target, win_the_game,
 };
 pub use basic::components::ContinuousEffect;
 pub use basic::enums::{Duration, EffectKind, FilterKind, Layered, Modification, ObjectRelation};
@@ -21,6 +21,9 @@ pub use timestamp::Timestamp;
 
 mod effect;
 pub use effect::Effect;
+
+mod deals_damage;
+pub use deals_damage::DealsDamage;
 
 mod filter;
 pub use filter::Filter;
