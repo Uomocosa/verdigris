@@ -31,6 +31,9 @@ pub fn eval<E: EventArgs>(
         rules::Condition::Characteristic(characteristic, comparison, threshold) => {
             answers.eval_characteristic(*characteristic, *comparison, *threshold, viewpoint)
         }
+        rules::Condition::PlayerValue(quantity, comparison, threshold) => {
+            answers.eval_player_value(*quantity, *comparison, *threshold, viewpoint)
+        }
         rules::Condition::Of(reference, inner) => {
             entity(reference).is_some_and(|candidate| eval(answers, inner, event, Some(candidate)))
         }
@@ -378,6 +381,36 @@ mod tests {
                 assert!(eval(&answers, &on_player, &attack, None));
                 let missing = rules::Condition::True.of(rules::ArgId("missing"));
                 assert!(!eval(&answers, &missing, &attack, None));
+                assert!(eval(
+                    &answers,
+                    &rules::life().at_least(20).of(TestRule::PLAYER),
+                    &attack,
+                    None
+                ));
+                assert!(!eval(
+                    &answers,
+                    &rules::life().at_least(21).of(TestRule::PLAYER),
+                    &attack,
+                    None
+                ));
+                assert!(eval(
+                    &answers,
+                    &rules::poison_counters().at_most(0).of(TestRule::PLAYER),
+                    &attack,
+                    None,
+                ));
+                assert!(eval(
+                    &answers,
+                    &rules::cards_in_hand().at_least(0).of(TestRule::PLAYER),
+                    &attack,
+                    None,
+                ));
+                assert!(!eval(
+                    &answers,
+                    &rules::cards_in_hand().at_least(1000).of(TestRule::PLAYER),
+                    &attack,
+                    None,
+                ));
             })
             .unwrap();
         Ok(())

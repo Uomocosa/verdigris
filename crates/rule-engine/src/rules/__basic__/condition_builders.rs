@@ -72,6 +72,26 @@ pub const fn stack_empty() -> rules::Condition {
 }
 
 #[must_use]
+pub const fn life() -> rules::PlayerQuantity {
+    rules::PlayerQuantity::Life
+}
+
+#[must_use]
+pub const fn poison_counters() -> rules::PlayerQuantity {
+    rules::PlayerQuantity::PoisonCounters
+}
+
+#[must_use]
+pub const fn cards_in_hand() -> rules::PlayerQuantity {
+    rules::PlayerQuantity::CardsInHand
+}
+
+#[must_use]
+pub const fn cards_in_library() -> rules::PlayerQuantity {
+    rules::PlayerQuantity::CardsInLibrary
+}
+
+#[must_use]
 pub fn active_player(role: impl Into<rules::ArgRef>) -> rules::Condition {
     rules::Condition::ActivePlayer(role.into())
 }

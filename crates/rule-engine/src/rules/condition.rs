@@ -14,6 +14,7 @@ pub enum Condition {
     Is(rules::ArgRef),
     CardType(cards::CardType),
     Characteristic(rules::Characteristic, rules::Comparison, i32),
+    PlayerValue(rules::PlayerQuantity, rules::Comparison, i32),
     Of(rules::ArgRef, Box<Self>),
     All(Vec<Self>),
     Any(Vec<Self>),

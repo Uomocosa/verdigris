@@ -136,6 +136,15 @@ impl Rules<'_, '_> {
     ) -> bool {
     }
 
+    pub(crate) fn eval_player_value(
+        &self,
+        quantity: rules::PlayerQuantity,
+        comparison: rules::Comparison,
+        threshold: i32,
+        viewpoint: Option<Entity>,
+    ) -> bool {
+    }
+
     pub(crate) fn eval_in_zone<E: rules::traits::event_args::EventArgs>(
         &self,
         zone: zones::Zone,
