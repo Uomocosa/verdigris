@@ -56,7 +56,10 @@ fn check_play(
             continue;
         };
         let card = *card;
-        if !answers.legal::<events::Play>(&events::Play { card }) {
+        if !answers.legal::<events::Play>(&events::Play {
+            card,
+            player: action.player,
+        }) {
             commands.entity(card).remove::<cards::Controller>();
             rejected.write(actions::Rejected::CannotPlay { card });
             continue;

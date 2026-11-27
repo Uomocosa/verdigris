@@ -11,7 +11,7 @@ pub fn cast_spells_as_though_they_had_flash(all: &statics::All) -> abilities::Co
         modification: effects::Modification::Rule(rules::RuleChange {
             target: rules::Target::Restriction(events::cast::TIMING),
             change: rules::Change::AsThough {
-                holder: events::Cast::SPELL.controller(),
+                holder: events::Cast::CASTER.into(),
             },
         }),
     }
@@ -39,7 +39,7 @@ mod tests {
             effects::Modification::Rule(rules::RuleChange {
                 target: rules::Target::Restriction(events::cast::TIMING),
                 change: rules::Change::AsThough {
-                    holder: events::Cast::SPELL.controller(),
+                    holder: events::Cast::CASTER.into(),
                 },
             })
         );

@@ -2,6 +2,7 @@ use atomic_delegate_macros::atomic_delegate;
 use bevy::prelude::Entity;
 use verdigris_event_derive::EventArgs;
 
+use crate::players;
 use crate::rules;
 use crate::rules::traits::event::Event;
 
@@ -15,6 +16,8 @@ pub const TIMING: rules::RestrictionId = rules::RestrictionId("601.2a/timing");
 pub struct Cast {
     #[arg]
     pub spell: Entity,
+    #[arg]
+    pub caster: players::PlayerId,
 }
 
 impl Event for Cast {
@@ -45,19 +48,16 @@ mod tests {
         let restrictions = Cast::restrictions();
         assert_eq!(restrictions.len(), 5);
         assert_eq!(restrictions[0].id, PRIORITY);
-        assert_eq!(
-            restrictions[0].condition,
-            rules::has_priority(Cast::SPELL.controller())
-        );
+        assert_eq!(restrictions[0].condition, rules::has_priority(Cast::CASTER));
         assert_eq!(restrictions[1].id, FROM_HAND);
         assert_eq!(
             restrictions[1].condition,
-            rules::in_zone(HAND, Cast::SPELL.controller()).of(Cast::SPELL)
+            rules::in_zone(HAND, Cast::CASTER).of(Cast::SPELL)
         );
         assert_eq!(restrictions[2].id, OWNS);
         assert_eq!(
             restrictions[2].condition,
-            rules::points_to::<cards::Owner>(Cast::SPELL.controller()).of(Cast::SPELL)
+            rules::points_to::<cards::Owner>(Cast::CASTER).of(Cast::SPELL)
         );
         assert_eq!(restrictions[3].id, NOT_A_LAND);
         assert_eq!(
@@ -69,9 +69,7 @@ mod tests {
         assert_eq!(
             restrictions[4].condition,
             rules::card_type(cards::CardType::Instant).of(Cast::SPELL)
-                | (rules::main_phase()
-                    & rules::stack_empty()
-                    & rules::active_player(Cast::SPELL.controller()))
+                | (rules::main_phase() & rules::stack_empty() & rules::active_player(Cast::CASTER))
         );
         assert!(
             Cast::restrictions()
@@ -79,7 +77,7 @@ mod tests {
                 .filter(|restriction| restriction.id != NOT_A_LAND)
                 .all(|restriction| !restriction.unwaivable)
         );
-        assert_eq!(Cast::args(), &[Cast::SPELL,]);
+        assert_eq!(Cast::args(), &[Cast::SPELL, Cast::CASTER,]);
     }
 
     #[test]

@@ -59,7 +59,10 @@ fn check_cast(
             continue;
         };
         let spell = *spell;
-        if !answers.legal::<events::Cast>(&events::Cast { spell }) {
+        if !answers.legal::<events::Cast>(&events::Cast {
+            spell,
+            caster: action.player,
+        }) {
             commands.entity(spell).remove::<cards::Controller>();
             rejected.write(actions::Rejected::CannotCast { spell });
             continue;

@@ -386,11 +386,16 @@ ask `X.controller()` / `X.owner()` / `SourceOf(X)`. If the entity does not carry
 sets it first, as the CR does.
 
 ```rust
-// Good: 601.2a, the caster becomes the controller, then the cast is checked (__rules__/r601_2a_cast.rs)
-pub struct Cast { #[arg] pub spell: Entity }        // who casts = Cast::SPELL.controller()
+// Good: 120.2, the damage is dealt by the source's controller (__events__/deal_damage.rs)
+pub struct DealDamage { #[arg] pub source: Entity, #[arg] pub recipient: Entity, #[arg] pub amount: u32 }
+// who deals = DealDamage::SOURCE.controller()
 // Bad
 pub struct CastSpell { #[arg] pub spell: Entity, #[arg] pub player: players::PlayerId }
 ```
+
+Exception: `Cast.caster` and `Play.player`. They name the player proposing the action, who becomes its
+controller (601.2a / 305.1). They can't be read from the card before the action exists, so they are not
+inferable fields.
 
 **Why:** two fields that must agree will one day disagree; a derived one cannot.
 

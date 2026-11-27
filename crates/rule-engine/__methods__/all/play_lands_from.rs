@@ -12,8 +12,8 @@ pub fn play_lands_from(all: &statics::All, zone: zones::Zone) -> abilities::Cont
         modification: effects::Modification::Rule(rules::RuleChange {
             target: rules::Target::Restriction(events::play::FROM_HAND),
             change: rules::Change::Allow {
-                holder: events::Play::CARD.controller(),
-                when: rules::in_zone(zone, events::Play::CARD.controller()).of(events::Play::CARD),
+                holder: events::Play::PLAYER.into(),
+                when: rules::in_zone(zone, events::Play::PLAYER).of(events::Play::CARD),
             },
         }),
     }
@@ -42,9 +42,8 @@ mod tests {
             effects::Modification::Rule(rules::RuleChange {
                 target: rules::Target::Restriction(rules::RestrictionId("305.1/from-hand")),
                 change: rules::Change::Allow {
-                    holder: events::Play::CARD.controller(),
-                    when: rules::in_zone(GRAVEYARD, events::Play::CARD.controller())
-                        .of(events::Play::CARD),
+                    holder: events::Play::PLAYER.into(),
+                    when: rules::in_zone(GRAVEYARD, events::Play::PLAYER).of(events::Play::CARD),
                 },
             })
         );

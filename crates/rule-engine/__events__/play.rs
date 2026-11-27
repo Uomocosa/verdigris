@@ -2,6 +2,7 @@ use atomic_delegate_macros::atomic_delegate;
 use bevy::prelude::Entity;
 use verdigris_event_derive::EventArgs;
 
+use crate::players;
 use crate::rules;
 use crate::rules::traits::event::Event;
 
@@ -17,6 +18,8 @@ pub const OWN_TURN: rules::RestrictionId = rules::RestrictionId("305.3/own-turn"
 pub struct Play {
     #[arg]
     pub card: Entity,
+    #[arg]
+    pub player: players::PlayerId,
 }
 
 impl Event for Play {
@@ -49,10 +52,7 @@ mod tests {
         let restrictions = Play::restrictions();
         assert_eq!(restrictions.len(), 7);
         assert_eq!(restrictions[0].id, PRIORITY);
-        assert_eq!(
-            restrictions[0].condition,
-            rules::has_priority(Play::CARD.controller())
-        );
+        assert_eq!(restrictions[0].condition, rules::has_priority(Play::PLAYER));
         assert_eq!(restrictions[1].id, LAND_CARD);
         assert_eq!(
             restrictions[1].condition,
@@ -61,7 +61,7 @@ mod tests {
         assert_eq!(restrictions[2].id, FROM_HAND);
         assert_eq!(
             restrictions[2].condition,
-            rules::in_zone(HAND, Play::CARD.controller()).of(Play::CARD)
+            rules::in_zone(HAND, Play::PLAYER).of(Play::CARD)
         );
         assert_eq!(restrictions[3].id, MAIN_PHASE);
         assert_eq!(restrictions[3].condition, rules::main_phase());
@@ -70,12 +70,12 @@ mod tests {
         assert_eq!(restrictions[5].id, OWNS);
         assert_eq!(
             restrictions[5].condition,
-            rules::points_to::<cards::Owner>(Play::CARD.controller()).of(Play::CARD)
+            rules::points_to::<cards::Owner>(Play::PLAYER).of(Play::CARD)
         );
         assert_eq!(restrictions[6].id, OWN_TURN);
         assert_eq!(
             restrictions[6].condition,
-            rules::active_player(Play::CARD.controller())
+            rules::active_player(Play::PLAYER)
         );
         assert!(restrictions[6].unwaivable);
         assert!(
@@ -84,7 +84,7 @@ mod tests {
                 .filter(|restriction| restriction.id != OWN_TURN)
                 .all(|restriction| !restriction.unwaivable)
         );
-        assert_eq!(Play::args(), &[Play::CARD,]);
+        assert_eq!(Play::args(), &[Play::CARD, Play::PLAYER,]);
     }
 
     #[test]
