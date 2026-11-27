@@ -1,11 +1,12 @@
 use crate::abilities;
 use crate::cards;
 use crate::effects;
+use crate::rules;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TriggeredAbility {
     pub event: abilities::TriggerEvent,
-    pub intervening_if: Option<abilities::Condition>,
+    pub intervening_if: Option<rules::Condition>,
     pub effect: effects::Effect,
 }
 

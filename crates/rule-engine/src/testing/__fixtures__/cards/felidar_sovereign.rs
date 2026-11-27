@@ -7,6 +7,7 @@ use crate::cost;
 use crate::effects;
 use crate::keywords;
 use crate::pt;
+use crate::rules;
 use crate::testing;
 use crate::turns;
 
@@ -18,7 +19,7 @@ pub const FELIDAR_SOVEREIGN: testing::Card = testing::Card {
             keywords::vigilance(),
             keywords::lifelink(),
             abilities::at(
-                turns::beginning_of(UPKEEP, YOU).if_(YOU.has_life_at_least(40)),
+                turns::beginning_of(UPKEEP, YOU).if_(rules::life().at_least(40).of(rules::YOU)),
                 effects::win_the_game(),
             ),
         }

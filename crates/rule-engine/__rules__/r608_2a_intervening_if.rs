@@ -1,7 +1,8 @@
 use crate::STACK;
-use bevy::prelude::{Commands, Entity, MessageReader, Query};
+use bevy::prelude::{Commands, MessageReader, Query};
 
-use crate::players;
+use crate::events;
+use crate::rules;
 use crate::stack;
 use crate::zones;
 
@@ -12,8 +13,8 @@ pub fn r608_2a_intervening_if(
     mut resolutions: MessageReader<stack::Resolution>,
     mut commands: Commands,
     abilities: Query<(&stack::TriggeredAbilityOnStack, &zones::InZone)>,
-    lives: Query<(Entity, &players::Life)>,
     zones: zones::ZoneLookup,
+    answers: rules::Rules,
 ) {
     for resolution in resolutions.read() {
         let spell = **resolution;
@@ -23,10 +24,10 @@ pub fn r608_2a_intervening_if(
         if !zones.contains(STACK, **in_zone) {
             continue;
         }
-        let Some(condition) = ability.intervening_if else {
+        let Some(condition) = ability.intervening_if.clone() else {
             continue;
         };
-        if !condition.holds(ability.controller, &lives) {
+        if !answers.eval(&condition, &events::AbilityContext { ability: spell }, None) {
             commands.entity(spell).despawn();
         }
     }

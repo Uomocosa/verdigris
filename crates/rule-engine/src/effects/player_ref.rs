@@ -1,4 +1,3 @@
-use crate::abilities;
 use crate::players;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -25,9 +24,6 @@ impl PlayerRef {
 
 #[rustfmt::skip]
 impl PlayerRef {
-    #[must_use]
-    pub const fn has_life_at_least(self, amount: i32) -> abilities::Condition { abilities::Condition::LifeAtLeast(self, amount) }
-
     #[must_use]
     pub(crate) fn players_other_than(
         players: &[players::PlayerId],

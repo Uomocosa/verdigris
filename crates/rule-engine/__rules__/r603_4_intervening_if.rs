@@ -2,7 +2,9 @@ use bevy::prelude::{Entity, MessageReader, Query, Res, ResMut, With};
 
 use crate::abilities;
 use crate::cards;
+use crate::events;
 use crate::players;
+use crate::rules;
 use crate::stack;
 use crate::turns;
 
@@ -33,6 +35,7 @@ pub fn r603_4_intervening_if(
     >,
     lives: Query<(Entity, &players::Life)>,
     state: Res<turns::TurnState>,
+    answers: rules::Rules,
 ) {
     let state = state.into_inner();
     for step in steps.read() {
@@ -60,8 +63,12 @@ pub fn r603_4_intervening_if(
                 continue;
             }
             let ability = (**at_step).clone();
-            if let Some(condition) = ability.intervening_if
-                && !condition.holds(controller, &lives)
+            if let Some(condition) = ability.intervening_if.clone()
+                && !answers.eval(
+                    &condition,
+                    &events::AbilityContext { ability: source },
+                    None,
+                )
             {
                 continue;
             }
@@ -101,6 +108,7 @@ mod tests {
         game.play([p1.pass_priority(), p1.pass_priority(), p2.pass_priority()])?;
         assert!(game.player(p1).cards_in(BATTLEFIELD).has(sovereign));
         assert!(!game.has_won(p1));
+        assert_eq!(game.life(p1), 39);
         assert_eq!(game.trigger_sources().len(), 0);
         Ok(())
     }

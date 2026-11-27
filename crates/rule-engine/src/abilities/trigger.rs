@@ -1,9 +1,10 @@
 use crate::abilities;
+use crate::rules;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Trigger {
     pub event: abilities::TriggerEvent,
-    pub intervening_if: Option<abilities::Condition>,
+    pub intervening_if: Option<rules::Condition>,
 }
 
 impl From<abilities::TriggerEvent> for Trigger {

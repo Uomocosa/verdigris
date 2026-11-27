@@ -11,9 +11,6 @@ pub use basic::structs::{ActivatedAbility, Continuous, TriggeredAbility};
 mod ability;
 pub use ability::Ability;
 
-mod condition;
-pub use condition::Condition;
-
 mod static_ability;
 pub use static_ability::StaticAbility;
 

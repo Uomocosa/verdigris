@@ -1,3 +1,4 @@
+use crate::events;
 use crate::rules;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -6,6 +7,8 @@ pub enum ArgRef {
     ControllerOf(rules::ArgId),
     OwnerOf(rules::ArgId),
 }
+
+pub const YOU: rules::ArgRef = events::AbilityContext::ABILITY.controller();
 
 #[rustfmt::skip]
 impl From<rules::ArgId> for ArgRef {
