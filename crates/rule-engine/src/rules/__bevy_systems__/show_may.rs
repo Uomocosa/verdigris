@@ -1,4 +1,4 @@
-use bevy::prelude::{MessageReader, MessageWriter, ResMut};
+use bevy::prelude::{Entity, MessageReader, MessageWriter, ResMut};
 
 use crate::May;
 use crate::actions;
@@ -20,16 +20,21 @@ pub fn show_may<E: Event>(
             continue;
         };
         if players.is_still_in_the_game(player) {
-            offered.write(actions::Ask(actions::Choice::May(actions::MayChoice {
+            let options: Vec<Entity> = E::args()
+                .iter()
+                .filter_map(|id| match ask.event.arg(*id) {
+                    Some(rules::ArgValue::Entity(entity)) => Some(entity),
+                    _ => None,
+                })
+                .collect();
+            let count = actions::Count::up_to(u32::try_from(options.len()).unwrap_or(u32::MAX));
+            offered.write(actions::Ask(actions::Choice::Pick(actions::PickChoice {
+                id: actions::ChoiceId(*E::ID),
                 player,
-                event: E::ID,
-                options: E::args()
-                    .iter()
-                    .filter_map(|id| match ask.event.arg(*id) {
-                        Some(rules::ArgValue::Entity(entity)) => Some(entity),
-                        _ => None,
-                    })
-                    .collect(),
+                source: None,
+                among: options.into_iter().collect(),
+                count,
+                ordered: false,
             })));
             pending.push(ask.clone());
         }

@@ -51,9 +51,6 @@ pub enum Rejected {
     InvalidTriggerOrder {
         player: players::PlayerId,
     },
-    InvalidMay {
-        player: players::PlayerId,
-    },
     InvalidCombatDamage {
         player: players::PlayerId,
     },

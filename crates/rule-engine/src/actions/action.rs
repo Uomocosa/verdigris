@@ -13,7 +13,6 @@ pub enum Action {
     },
     Cast(Entity),
     Play(Entity),
-    ChooseMay(Vec<Entity>),
     Choose(Vec<Entity>),
     ChooseDefendingPlayer(players::PlayerId),
     OrderTriggers(Vec<Entity>),
@@ -35,7 +34,6 @@ impl Action {
     #[must_use]
     pub const fn rejection(&self, player: players::PlayerId) -> Option<actions::Rejected> {
         match self {
-            Self::ChooseMay(_) => Some(actions::Rejected::InvalidMay { player }),
             Self::ChooseDefendingPlayer(_) => {
                 Some(actions::Rejected::CannotChooseDefendingPlayer { player })
             }
@@ -57,11 +55,8 @@ mod tests {
     #[test]
     fn test_usage() {
         let (game, [p1, ..]) = MockGame::new([P1, P2]);
-        let action = actions::Action::ChooseMay(Vec::new());
-        assert_eq!(
-            action.rejection(p1.id),
-            Some(actions::Rejected::InvalidMay { player: p1.id })
-        );
+        let action = actions::Action::Choose(Vec::new());
+        assert_eq!(action.rejection(p1.id), None);
         assert!(game.player(p1).cards_in(HAND).has_no(GRIZZLY_BEARS));
     }
 
@@ -70,7 +65,7 @@ mod tests {
         let (game, [p1, ..]) = MockGame::new([P1, P2]);
         let legend = game.zone_entity(p1, BATTLEFIELD).unwrap();
         assert_eq!(actions::Action::Choose(Vec::new()).rejection(p1.id), None);
-        assert!(actions::Action::ChooseMay(Vec::new()).answers_a_choice());
+        assert!(actions::Action::Choose(Vec::new()).answers_a_choice());
         assert!(actions::Action::Choose(Vec::new()).answers_a_choice());
         assert!(actions::Action::Choose(vec![legend]).answers_a_choice());
         assert!(!actions::Action::PassPriority.answers_a_choice());

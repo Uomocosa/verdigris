@@ -6,14 +6,6 @@ use crate::actions;
 
 pub fn accepts(choice: &actions::Choice, answer: &actions::Action) -> bool {
     match choice {
-        actions::Choice::May(choice) => {
-            let actions::Action::ChooseMay(chosen) = answer else {
-                return false;
-            };
-            let chosen_set: BTreeSet<Entity> = chosen.iter().copied().collect();
-            let options: BTreeSet<Entity> = choice.options.iter().copied().collect();
-            chosen_set.len() == chosen.len() && chosen_set.is_subset(&options)
-        }
         actions::Choice::Pick(choice) => {
             let actions::Action::Choose(picked) = answer else {
                 return false;
@@ -59,7 +51,6 @@ mod tests {
     use crate::HAND;
     use crate::LIBRARY;
     use crate::actions;
-    use crate::rules;
     use crate::testing::*;
 
     use super::accepts;
@@ -69,15 +60,18 @@ mod tests {
         let (game, [p1, ..]) = MockGame::new([P1, P2]);
         let first = game.zone_entity(p1, BATTLEFIELD).unwrap();
         let second = game.zone_entity(p1, HAND).unwrap();
-        let choice = actions::Choice::May(actions::MayChoice {
+        let choice = actions::Choice::Pick(actions::PickChoice {
+            id: actions::ChoiceId("may"),
             player: p1.id,
-            event: rules::EventId("may"),
-            options: vec![first, second],
+            source: None,
+            among: BTreeSet::from([first, second]),
+            count: actions::Count::up_to(2),
+            ordered: false,
         });
-        assert!(accepts(&choice, &actions::Action::ChooseMay(vec![first])));
+        assert!(accepts(&choice, &actions::Action::Choose(vec![first])));
         assert!(accepts(
             &choice,
-            &actions::Action::ChooseMay(vec![first, second])
+            &actions::Action::Choose(vec![first, second])
         ));
     }
 
@@ -87,19 +81,19 @@ mod tests {
         let first = game.zone_entity(p1, BATTLEFIELD).unwrap();
         let second = game.zone_entity(p1, HAND).unwrap();
         let outsider = game.zone_entity(p2, LIBRARY).unwrap();
-        let choice = actions::Choice::May(actions::MayChoice {
+        let choice = actions::Choice::Pick(actions::PickChoice {
+            id: actions::ChoiceId("may"),
             player: p1.id,
-            event: rules::EventId("may"),
-            options: vec![first, second],
+            source: None,
+            among: BTreeSet::from([first, second]),
+            count: actions::Count::up_to(2),
+            ordered: false,
         });
         assert!(!accepts(
             &choice,
-            &actions::Action::ChooseMay(vec![first, first])
+            &actions::Action::Choose(vec![first, first])
         ));
-        assert!(!accepts(
-            &choice,
-            &actions::Action::ChooseMay(vec![outsider])
-        ));
+        assert!(!accepts(&choice, &actions::Action::Choose(vec![outsider])));
         assert!(!accepts(&choice, &actions::Action::PassPriority));
         let discard = actions::PickChoice {
             id: actions::ChoiceId("701.9b/discard"),
@@ -111,7 +105,7 @@ mod tests {
         };
         assert!(!accepts(
             &actions::Choice::Pick(discard.clone()),
-            &actions::Action::ChooseMay(vec![first])
+            &actions::Action::PassPriority
         ));
         assert_eq!(
             discard.check(&[first, first]),

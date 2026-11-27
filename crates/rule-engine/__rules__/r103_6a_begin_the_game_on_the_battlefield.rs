@@ -40,7 +40,7 @@ mod tests {
         ]);
         let [leyline] = game.player(p1).cards_in(HAND).exactly::<1>(LEYLINE_OF_ANTICIPATION)?;
 
-        game.act(p1, actions::Action::ChooseMay(vec![leyline.into()]));
+        game.act(p1, actions::Action::Choose(vec![leyline.into()]));
 
         assert!(game.moved(leyline).to(BATTLEFIELD).of(p1));
         assert!(game.player(p1).cards_in(HAND).has_no(LEYLINE_OF_ANTICIPATION));
@@ -67,7 +67,7 @@ mod tests {
         let [tundra] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TUNDRA)?;
         let [divination] = game.player(p1).cards_in(HAND).exactly::<1>(DIVINATION)?;
 
-        game.act(p1, actions::Action::ChooseMay(vec![leyline.into()]));
+        game.act(p1, actions::Action::Choose(vec![leyline.into()]));
         assert!(game.moved(leyline).to(BATTLEFIELD).of(p1));
 
         game.play([
@@ -88,7 +88,7 @@ mod tests {
         let (mut game, [p1, p2]) = MockGame::new([P1.hand([LEYLINE_OF_ANTICIPATION]), P2]);
         let [leyline] = game.player(p1).cards_in(HAND).exactly::<1>(LEYLINE_OF_ANTICIPATION)?;
 
-        game.act(p1, actions::Action::ChooseMay(Vec::new()));
+        game.act(p1, actions::Action::Choose(Vec::new()));
 
         assert!(game.card(leyline).is_in(HAND).of(p1));
         assert!(game.player(p1).cards_in(BATTLEFIELD).has_no(LEYLINE_OF_ANTICIPATION));

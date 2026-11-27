@@ -48,7 +48,7 @@ mod tests {
         assert!(game.moved(purge).to(GRAVEYARD).of(p1));
         assert!(game.moved(leyline).to(GRAVEYARD).of(p1));
 
-        game.act(p1, actions::Action::ChooseMay(vec![leyline.into()]));
+        game.act(p1, actions::Action::Choose(vec![leyline.into()]));
 
         assert!(game.moved(leyline).to(GRAVEYARD).of(p1));
         assert!(!game.card(leyline).is_in(BATTLEFIELD).of(p1));
@@ -64,7 +64,7 @@ mod tests {
 
         game.act(
             p1,
-            actions::Action::ChooseMay(vec![purge.into(), leyline.into()]),
+            actions::Action::Choose(vec![purge.into(), leyline.into()]),
         );
 
         assert_eq!(game.priority().holder, None);
@@ -93,7 +93,7 @@ mod tests {
 
         game.act(
             p1,
-            actions::Action::ChooseMay(vec![leyline.into(), purge.into()]),
+            actions::Action::Choose(vec![leyline.into(), purge.into()]),
         );
 
         assert_eq!(game.priority().holder, None);
@@ -244,25 +244,31 @@ mod tests {
         let [p2_leyline] = game.player(p2).cards_in(HAND).exactly::<1>(LEYLINE_OF_ANTICIPATION)?;
         let [p3_leyline] = game.player(p3).cards_in(HAND).exactly::<1>(LEYLINE_OF_ANTICIPATION)?;
 
-        game.act(p3, actions::Action::ChooseMay(vec![p3_leyline.into()]));
+        game.act(p3, actions::Action::Choose(vec![p3_leyline.into()]));
 
         assert_eq!(
             game.last_rejection(),
-            Some(&actions::Rejected::InvalidMay { player: p3.id })
+            Some(&actions::Rejected::InvalidChoice {
+                player: p3.id,
+                why: actions::ChoiceWhy::NotAllowed(p3_leyline.into()),
+            })
         );
         assert!(game.card(p3_leyline).is_in(HAND).of(p3));
 
-        game.act(p2, actions::Action::ChooseMay(vec![p2_leyline.into()]));
+        game.act(p2, actions::Action::Choose(vec![p2_leyline.into()]));
 
         assert_eq!(
             game.last_rejection(),
-            Some(&actions::Rejected::InvalidMay { player: p2.id })
+            Some(&actions::Rejected::InvalidChoice {
+                player: p2.id,
+                why: actions::ChoiceWhy::NotAllowed(p2_leyline.into()),
+            })
         );
         assert!(game.card(p2_leyline).is_in(HAND).of(p2));
 
         assert_eq!(game.life(p2), 20);
 
-        game.act(p1, actions::Action::ChooseMay(vec![p1_leyline.into()]));
+        game.act(p1, actions::Action::Choose(vec![p1_leyline.into()]));
 
         assert!(game.moved(p1_leyline).to(BATTLEFIELD).of(p1));
         assert_eq!(game.priority().holder, None);
@@ -276,12 +282,12 @@ mod tests {
         assert_eq!(game.priority().holder, None);
         assert_eq!(game.life(p2), 23);
 
-        game.act(p2, actions::Action::ChooseMay(vec![p2_leyline.into()]));
+        game.act(p2, actions::Action::Choose(vec![p2_leyline.into()]));
 
         assert!(game.moved(p2_leyline).to(BATTLEFIELD).of(p2));
         assert_eq!(game.priority().holder, None);
 
-        game.act(p3, actions::Action::ChooseMay(vec![p3_leyline.into()]));
+        game.act(p3, actions::Action::Choose(vec![p3_leyline.into()]));
 
         assert!(game.moved(p1_leyline).to(BATTLEFIELD).of(p1));
         assert!(game.moved(p2_leyline).to(BATTLEFIELD).of(p2));

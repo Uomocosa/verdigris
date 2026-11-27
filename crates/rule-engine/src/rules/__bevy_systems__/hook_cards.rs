@@ -23,7 +23,9 @@ pub fn hook_cards<E: HookEvent>(
         return;
     }
     let choice = choice.into_inner();
-    if choice.as_ref().is_some_and(|choice| !matches!(choice, actions::Choice::May(_))) {
+    if choice.as_ref().is_some_and(
+        |choice| !matches!(choice, actions::Choice::Pick(choice) if choice.count.min == 0),
+    ) {
         return;
     }
     let asked = asked.into_inner();

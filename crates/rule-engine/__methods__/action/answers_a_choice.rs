@@ -3,8 +3,7 @@ use crate::actions;
 pub const fn answers_a_choice(action: &actions::Action) -> bool {
     matches!(
         action,
-        actions::Action::ChooseMay(_)
-            | actions::Action::Choose(_)
+        actions::Action::Choose(_)
             | actions::Action::ArrangeGraveyard(_)
             | actions::Action::OrderTriggers(_)
             | actions::Action::AssignCombatDamage(_)

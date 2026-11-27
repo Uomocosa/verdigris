@@ -36,10 +36,10 @@ pub fn r117_5_r704_3_state_based_actions(world: &mut World) {
             if world.resource::<stack::TriggerQueue>().is_empty() {
                 return;
             }
-            if matches!(
-                (*world.resource::<actions::PendingChoice>()).as_ref(),
-                Some(actions::Choice::OrderTriggers(_) | actions::Choice::May(_))
-            ) {
+            if (*world.resource::<actions::PendingChoice>()).as_ref().is_some_and(|choice| {
+                matches!(choice, actions::Choice::OrderTriggers(_))
+                    || matches!(choice, actions::Choice::Pick(choice) if choice.count.min == 0)
+            }) {
                 return;
             }
             comprehensive_rules::r603_3_triggers_on_stack::r603_3_triggers_on_stack(world);

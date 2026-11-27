@@ -18,10 +18,10 @@ pub fn answer_may<E: Event>(
         if !answer.choice.is_may_of(E::ID) {
             continue;
         }
-        let actions::Choice::May(choice) = &answer.choice else {
+        let actions::Choice::Pick(choice) = &answer.choice else {
             continue;
         };
-        let actions::Action::ChooseMay(chosen) = &answer.answer else {
+        let actions::Action::Choose(chosen) = &answer.answer else {
             continue;
         };
         let decisions: Vec<(&Entity, bool)> = chosen
@@ -29,7 +29,7 @@ pub fn answer_may<E: Event>(
             .map(|option| (option, true))
             .chain(
                 choice
-                    .options
+                    .among
                     .iter()
                     .filter(|option| !chosen.contains(option))
                     .map(|option| (option, false)),
@@ -59,8 +59,9 @@ pub fn answer_may<E: Event>(
         }
     }
     let choice = choice.into_inner();
-    let announce_is_open =
-        choice.as_ref().is_none_or(|choice| matches!(choice, actions::Choice::May(_)));
+    let announce_is_open = choice.as_ref().is_none_or(
+        |choice| matches!(choice, actions::Choice::Pick(choice) if choice.count.min == 0),
+    );
     loop {
         let Some(ask) = accepted.first().cloned() else {
             break;

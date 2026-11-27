@@ -10,7 +10,6 @@ pub fn target_choice(game: &testing::MockGame) -> Option<testing::ExpectedTarget
             legal: choice.among.clone(),
         }),
         actions::Choice::Pick(_)
-        | actions::Choice::May(_)
         | actions::Choice::CombatDamage(_)
         | actions::Choice::OrderTriggers(_)
         | actions::Choice::ArrangeGraveyard(_)

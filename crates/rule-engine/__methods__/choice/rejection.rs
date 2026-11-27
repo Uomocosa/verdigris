@@ -7,7 +7,6 @@ pub fn rejection(
     answer: &actions::Action,
 ) -> Option<actions::Rejected> {
     match choice {
-        actions::Choice::May(_) => Some(actions::Rejected::InvalidMay { player }),
         actions::Choice::Pick(choice) => {
             let picked = match answer {
                 actions::Action::Choose(picked) => picked.as_slice(),

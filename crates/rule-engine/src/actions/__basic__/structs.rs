@@ -3,7 +3,6 @@ use bevy::prelude::Entity;
 use std::collections::{BTreeMap, BTreeSet};
 
 use crate::players;
-use crate::rules;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct BlockAssignment {
@@ -30,13 +29,6 @@ pub struct RequiredCombatDamage {
 pub struct OrderTriggersChoice {
     pub player: players::PlayerId,
     pub triggers: Vec<Entity>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct MayChoice {
-    pub player: players::PlayerId,
-    pub event: rules::EventId,
-    pub options: Vec<Entity>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

@@ -8,7 +8,6 @@ use crate::rules;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Choice {
-    May(actions::MayChoice),
     Pick(actions::PickChoice),
     CombatDamage(actions::CombatDamageChoice),
     OrderTriggers(actions::OrderTriggersChoice),
@@ -25,7 +24,7 @@ impl Choice {
 #[rustfmt::skip]
 impl Choice {
     #[must_use]
-    pub fn is_may_of(&self, event: rules::EventId) -> bool { matches!(self, Self::May(choice) if choice.event == event) }
+    pub fn is_may_of(&self, event: rules::EventId) -> bool { matches!(self, Self::Pick(choice) if *choice.id == *event) }
 }
 
 impl Choice {
@@ -40,7 +39,6 @@ impl Choice {
     #[must_use]
     pub const fn player(&self) -> players::PlayerId {
         match self {
-            Self::May(choice) => choice.player,
             Self::Pick(choice) => choice.player,
             Self::CombatDamage(choice) => choice.player,
             Self::OrderTriggers(choice) => choice.player,
@@ -90,10 +88,13 @@ mod tests {
     #[test]
     fn test_usage() {
         let (game, [p1, ..]) = MockGame::new([P1, P2]);
-        let choice = actions::Choice::May(actions::MayChoice {
+        let choice = actions::Choice::Pick(actions::PickChoice {
+            id: actions::ChoiceId("may"),
             player: p1.id,
-            event: rules::EventId("may"),
-            options: Vec::new(),
+            source: None,
+            among: BTreeSet::new(),
+            count: actions::Count::up_to(0),
+            ordered: false,
         });
         assert_eq!(choice.player(), p1.id);
         assert!(game.player(p1).cards_in(HAND).has_no(GRIZZLY_BEARS));
@@ -114,10 +115,13 @@ mod tests {
                 count: actions::Count::exactly(1),
                 ordered: false,
             }),
-            actions::Choice::May(actions::MayChoice {
+            actions::Choice::Pick(actions::PickChoice {
+                id: actions::ChoiceId(*event),
                 player: chooser,
-                event,
-                options: vec![first],
+                source: None,
+                among: BTreeSet::from([first]),
+                count: actions::Count::up_to(1),
+                ordered: false,
             }),
             actions::Choice::Pick(actions::PickChoice {
                 id: actions::ChoiceId("701.9b/discard"),
@@ -164,10 +168,13 @@ mod tests {
         let (game, [p1, ..]) = MockGame::new([P1, P2]);
         let first = game.zone_entity(p1, BATTLEFIELD).unwrap();
         let event = rules::EventId("may");
-        let may = actions::Choice::May(actions::MayChoice {
+        let may = actions::Choice::Pick(actions::PickChoice {
+            id: actions::ChoiceId(*event),
             player: p1.id,
-            event,
-            options: vec![first],
+            source: None,
+            among: BTreeSet::from([first]),
+            count: actions::Count::up_to(1),
+            ordered: false,
         });
         let discard = actions::Choice::Pick(actions::PickChoice {
             id: actions::ChoiceId("701.9b/discard"),

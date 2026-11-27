@@ -41,8 +41,13 @@ pub fn answer_asks(
         queue.retain(|ask| {
             let asked: &actions::Choice = ask;
             match (asked, &choice) {
-                (actions::Choice::May(asked), actions::Choice::May(answered)) => {
-                    asked.player != answered.player || asked.event != answered.event
+                (actions::Choice::Pick(asked), actions::Choice::Pick(answered))
+                    if asked.player == answered.player
+                        && asked.id == answered.id
+                        && asked.count.min == 0
+                        && answered.count.min == 0 =>
+                {
+                    false
                 }
                 (asked, answered) => {
                     if !has_removed_first_equal && asked == answered {
