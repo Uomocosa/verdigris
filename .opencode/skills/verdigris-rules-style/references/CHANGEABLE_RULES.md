@@ -91,7 +91,7 @@ pub type Definition = rules::Statement<rules::DefinitionId>;
 
 - `EventTemplate` describes a replacement event in data; `Amount::{Fixed(u32), FromArg(ArgId)}`
   lets it copy a parameter of the replaced event ("that much life", "that many cards").
-- Conditions may read event parameters through `ArgId` (e.g. `DealDamage::AMOUNT.at_least(1)`).
+- Conditions may read event parameters through `ArgId` (e.g. `DealDamage::AMOUNT.is(rules::Value(1).or_more())`).
 
 ## 2. Nonsense is allowed, dangling is not
 
@@ -111,7 +111,7 @@ add an event, restriction or value rule, register it.
 2. If the CR lists conditions, write them as `restrictions()` with `RestrictionId` consts
    (the id cites the rule, e.g. `RestrictionId("508.1a/controls")`; the doc comment on the
    rule that performs the event quotes the sentence). No text is stored on the restriction.
-   A condition on the event's own numbers is a restriction too: `DealDamage::AMOUNT.at_least(..)`
+   A condition on the event's own numbers is a restriction too: `DealDamage::AMOUNT.is(..)`
    (120.8 `events::deal_damage::NONZERO_DAMAGE`). The same `if event.amount == 0` in several rules is
    such a restriction.
 3. The `__rules__` system that owns the action writes `Attempt<E>` instead of acting directly; the pipeline decides; the owning system reads `Resolve<E>` and performs only what comes out.
@@ -129,9 +129,9 @@ and announces the event only on a yes. Never an implicit default, never a questi
 
 ```rust
 // "If you would draw a card, you may mill a card instead." The rule that announces Draw is untouched.
-Change::Instead { holder: events::Draw::PLAYER.into(), when: ALWAYS, then: may(EventTemplate::Mill { .. }) }
+Change::Instead { holder: events::Draw::PLAYER.into(), when: rules::Condition::True, then: may(EventTemplate::Mill { .. }) }
 // the same without a choice: "If you would draw a card, mill a card instead."
-Change::Instead { holder: events::Draw::PLAYER.into(), when: ALWAYS, then: Then::Events(vec![EventTemplate::Mill { .. }]) }
+Change::Instead { holder: events::Draw::PLAYER.into(), when: rules::Condition::True, then: Then::Events(vec![EventTemplate::Mill { .. }]) }
 ```
 
 ```
@@ -215,12 +215,65 @@ answers.resolve(events::DealDamage::SOURCE.controller(), &damage) // Some(ArgVal
 ```
 
 **A restriction names whom it asks about.** Conditions say whom they ask about with `.of(...)`
-(`src/rules/condition.rs`); amounts read an argument with `E::AMOUNT.greater_than(0)` etc.
+(`src/rules/condition.rs`); amounts read an argument with `E::AMOUNT.is(...)` etc.
 (`src/rules/arg_id.rs`). From `__events__/declare_blocker.rs`:
 
 ```rust
 rules::has::<cards::Creature>().of(DeclareBlocker::BLOCKER)
-DealDamage::AMOUNT.at_least(1) // the 120.8 nonzero restriction, events::deal_damage::NONZERO_DAMAGE
+DealDamage::AMOUNT.is(rules::Value(1).or_more()) // the 120.8 nonzero restriction, events::deal_damage::NONZERO_DAMAGE
+```
+
+**Comparisons.** A quantity becomes a `rules::Condition` with `.is(...)`
+(`crates/rule-engine/src/rules/player_quantity.rs:16`, `player_quantity_of.rs:12`,
+`arg_id.rs:17`, `count.rs:11`, `characteristic.rs:12`). The comparison is built from a
+value or a threshold (`src/rules/value.rs:10`, `src/rules/__basic__/condition_builders.rs:35`):
+
+```rust
+rules::life().of(rules::YOU).is(rules::Value(40).or_more())
+rules::poison_counters().is(rules::Value(0).or_less())
+rules::power().is(rules::Value(3).or_more())
+rules::toughness().is(rules::Value(2).or_less())
+rules::cards_in_hand().is(rules::exactly(0))
+rules::cards_in_library().is(rules::greater_than(5))
+rules::life().is(rules::less_than(10))
+events::AssignCombatDamage::AMOUNT.is(rules::greater_than(0))
+rules::count(events::DeclareAttackers::ATTACKERS).is(rules::Value(1).or_less())
+```
+
+`rules::YOU` is the controller of the ability being evaluated
+(`src/rules/arg_ref.rs:11`: `events::AbilityContext::ABILITY.controller()`), so
+`rules::life().of(rules::YOU)` always asks about that ability's controller
+(`src/rules/player_quantity_of.rs:24`).
+
+**Quantifiers.** `rules::each` / `rules::any` ask about several players at once
+(`src/rules/__basic__/condition_builders.rs:120`):
+
+```rust
+rules::each(rules::Players::Opponents, rules::life().is(rules::Value(10).or_less()))
+rules::any(rules::Players::Opponents, rules::life().is(rules::Value(10).or_less()))
+rules::any(rules::Players::All, rules::life().is(rules::Value(40).or_more()))
+```
+
+**Static "as long as".** A continuous ability holds only while its condition holds
+(`src/abilities/continuous.rs:10`); the layers re-check it against
+`events::AbilityContext { ability }` (`__rules__/r611_3a_static_effects.rs:190`). Serra
+Ascendant (`src/testing/__fixtures__/cards/serra_ascendant.rs:16`):
+
+```rust
+statics::this().get_pt(5, 5).as_long_as(rules::life().of(rules::YOU).is(rules::Value(30).or_more()))
+statics::this().gain(keywords::flying()).as_long_as(rules::life().of(rules::YOU).is(rules::Value(30).or_more()))
+```
+
+**Intervening "if".** A trigger written `Event.if_(<rules::Condition>)`
+(`src/abilities/trigger_event.rs:51`) stores `intervening_if` and is checked twice: at
+trigger time (603.4, `__rules__/r603_4_intervening_if.rs:66`) and on resolution (608.2a,
+`__rules__/r608_2a_intervening_if.rs:27`), both against
+`events::AbilityContext { ability }` (`__events__/ability_context.rs:8`). Felidar Sovereign
+(`src/abilities/trigger_event.rs:63`):
+
+```rust
+abilities::TriggerEvent::BeginningOfStep(UPKEEP, YOU)
+    .if_(rules::life().of(rules::YOU).is(rules::Value(40).or_more()))
 ```
 
 **A restriction vetoes one holder; a waiver names the same holder.** `Change::Restrict { holder,
@@ -284,7 +337,7 @@ rules::RuleChange {
     target: rules::Target::Definition(rules::LETHAL_DAMAGE),
     change: rules::Change::Allow {
         holder: events::AssignCombatDamage::SOURCE.into(),
-        when: events::AssignCombatDamage::AMOUNT.greater_than(0),
+        when: events::AssignCombatDamage::AMOUNT.is(rules::greater_than(0)),
     },
 }
 ```
