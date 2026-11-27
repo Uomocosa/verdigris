@@ -1,15 +1,15 @@
+use bevy::prelude::Entity;
 use verdigris_event_derive::EventArgs;
 
-use crate::players;
 use crate::rules;
 use crate::rules::traits::event::Event;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EventArgs)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, EventArgs)]
 pub struct Discard {
     #[arg]
-    pub player: players::PlayerId,
+    pub cards: Vec<Entity>,
     #[arg]
-    pub amount: u32,
+    pub cause: rules::EventId,
 }
 
 impl Event for Discard {
@@ -20,7 +20,6 @@ impl Event for Discard {
 mod tests {
     use bevy::prelude::Entity;
 
-    use crate::players;
     use crate::rules;
     use crate::rules::traits::event::Event;
     use crate::rules::traits::event_args::EventArgs;
@@ -29,18 +28,21 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let player = players::PlayerId(Entity::PLACEHOLDER);
-        let event = Discard { player, amount: 2 };
+        let card = Entity::PLACEHOLDER;
+        let event = Discard {
+            cards: vec![card],
+            cause: rules::EventId("608.2/resolve"),
+        };
         assert_eq!(
-            event.arg(Discard::PLAYER),
-            Some(rules::ArgValue::Player(player))
+            event.arg(Discard::CARDS),
+            Some(rules::ArgValue::Entities(vec![card]))
         );
         assert_eq!(
-            event.arg(Discard::PLAYER),
-            Some(rules::ArgValue::Player(player))
+            event.arg(Discard::CAUSE),
+            Some(rules::ArgValue::Event(rules::EventId("608.2/resolve")))
         );
         assert_eq!(Discard::ID, rules::EventId("701.9a/discard"));
         assert_eq!(Discard::restrictions(), Vec::new());
-        assert_eq!(Discard::args(), &[Discard::PLAYER, Discard::AMOUNT,]);
+        assert_eq!(Discard::args(), &[Discard::CARDS, Discard::CAUSE,]);
     }
 }

@@ -12,7 +12,7 @@ pub const TEST_CANT_DISCARD: testing::Card = testing::Card {
         card! {
             cards::CardDefinition::from_enchantment("Test Cant Discard", cost![2]);
             statics::you().cant::<events::Discard>(
-                events::Discard::PLAYER,
+                events::Discard::CARDS.owner(),
                 rules::RestrictionId("test/test-cant-discard"),
             ),
             statics::you().cant::<events::GainLife>(

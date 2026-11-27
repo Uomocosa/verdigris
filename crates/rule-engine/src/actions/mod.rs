@@ -7,7 +7,7 @@ mod pending_choice;
 
 pub use action::Action;
 pub use ask_queue::AskQueue;
-pub use basic::messages::{Answered, Ask, PlayerAction, Rejected};
+pub use basic::messages::{Answered, Ask, DiscardRequest, PlayerAction, Rejected};
 pub use basic::resources::{AcceptedMays, PendingMayAsks};
 pub use basic::structs::{
     ArrangeGraveyardChoice, BlockAssignment, DamageAssignment, DefendingPlayerChoice,

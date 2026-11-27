@@ -3,10 +3,10 @@ use bevy::ecs::system::ScheduleSystem;
 use bevy::prelude::{Entity, MessageReader, MessageWriter};
 
 use crate::Attempt;
-use crate::Resolve;
 use crate::actions;
 use crate::events;
 use crate::players;
+use crate::rules;
 
 /// 701.9b By default, effects that cause a player to discard a card allow the affected player to
 /// choose which card to discard. Some effects, however, require a random discard or allow another
@@ -16,26 +16,37 @@ pub fn r701_9b_choose_discards() -> ScheduleConfigs<ScheduleSystem> {
 }
 
 fn ask_which_cards(
-    mut discards: MessageReader<Resolve<events::Discard>>,
+    mut requests: MessageReader<actions::DiscardRequest>,
     mut asks: MessageWriter<actions::Ask>,
-    mut discards_card: MessageWriter<Attempt<events::DiscardCard>>,
+    mut discards: MessageWriter<Attempt<events::Discard>>,
     players: players::Players,
+    answers: rules::Rules,
 ) {
-    for discard in discards.read() {
-        let Some(affected) = players.affected_by(&**discard).into_iter().next() else {
+    for request in requests.read() {
+        let Some(affected) =
+            players.still_in_the_game().into_iter().find(|player| player.id == request.player)
+        else {
             continue;
         };
         let hand: Vec<Entity> = affected.hand().into_iter().map(|card| *card).collect();
-        if hand.len() <= usize::try_from(discard.amount).unwrap_or(usize::MAX) {
-            for card in hand {
-                discards_card.write(Attempt(events::DiscardCard { card }));
-            }
+        if !answers.legal(&events::Discard {
+            cards: hand.clone(),
+            cause: request.cause,
+        }) {
+            continue;
+        }
+        if hand.len() <= usize::try_from(request.count).unwrap_or(usize::MAX) {
+            discards.write(Attempt(events::Discard {
+                cards: hand,
+                cause: request.cause,
+            }));
             continue;
         }
         asks.write(actions::Ask(actions::Choice::Discard(
             actions::DiscardChoice {
-                player: discard.player,
-                count: discard.amount,
+                player: request.player,
+                count: request.count,
+                cause: request.cause,
                 legal: hand.into_iter().collect(),
             },
         )));
@@ -44,18 +55,19 @@ fn ask_which_cards(
 
 fn discard_chosen_cards(
     mut answers: MessageReader<actions::Answered>,
-    mut discards_card: MessageWriter<Attempt<events::DiscardCard>>,
+    mut discards: MessageWriter<Attempt<events::Discard>>,
 ) {
     for answered in answers.read() {
-        let actions::Choice::Discard(_) = &answered.choice else {
+        let actions::Choice::Discard(choice) = &answered.choice else {
             continue;
         };
         let actions::Action::ChooseDiscard(chosen) = &answered.answer else {
             continue;
         };
-        for card in chosen {
-            discards_card.write(Attempt(events::DiscardCard { card: *card }));
-        }
+        discards.write(Attempt(events::Discard {
+            cards: chosen.clone(),
+            cause: choice.cause,
+        }));
     }
 }
 

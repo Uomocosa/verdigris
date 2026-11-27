@@ -1,5 +1,6 @@
 use bevy::prelude::Entity;
 
+use crate::actions;
 use crate::events;
 use crate::players;
 use crate::rules;
@@ -51,6 +52,7 @@ pub fn instantiate<E: Event>(
         } => rules::AnyEvent::Draw(events::Draw {
             player: holder(who),
             amount: amount(template_amount),
+            cause: E::ID,
         }),
         rules::EventTemplate::LoseLife {
             who,
@@ -62,9 +64,10 @@ pub fn instantiate<E: Event>(
         rules::EventTemplate::Discard {
             who,
             amount: template_amount,
-        } => rules::AnyEvent::Discard(events::Discard {
+        } => rules::AnyEvent::RequestDiscard(actions::DiscardRequest {
             player: holder(who),
-            amount: amount(template_amount),
+            count: amount(template_amount),
+            cause: E::ID,
         }),
         rules::EventTemplate::GainLife {
             who,
@@ -79,6 +82,7 @@ pub fn instantiate<E: Event>(
         } => rules::AnyEvent::Mill(events::Mill {
             player: holder(who),
             amount: amount(template_amount),
+            cause: E::ID,
         }),
         rules::EventTemplate::PutCounters {
             who,

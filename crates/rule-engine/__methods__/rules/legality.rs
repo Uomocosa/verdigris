@@ -296,7 +296,8 @@ mod tests {
                         &answers,
                         &events::Mill {
                             player: p1.id,
-                            amount: 5
+                            amount: 5,
+                            cause: rules::EventId("608.2/resolve"),
                         }
                     ),
                     rules::Legality::Illegal
@@ -306,7 +307,8 @@ mod tests {
                         &answers,
                         &events::Mill {
                             player: p2.id,
-                            amount: 5
+                            amount: 5,
+                            cause: rules::EventId("608.2/resolve"),
                         }
                     ),
                     rules::Legality::Legal

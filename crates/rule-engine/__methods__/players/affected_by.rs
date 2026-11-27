@@ -20,25 +20,34 @@ mod tests {
     use bevy::ecs::system::RunSystemOnce;
     use bevy::prelude::Entity;
 
+    use crate::LIBRARY;
     use crate::events;
     use crate::players;
+    use crate::rules;
     use crate::testing::*;
 
     use super::affected_by;
 
     #[test]
     fn test_usage() -> TestResult {
-        let (mut game, [p1, p2, p3]) = MockGame::new([P1, P2.life(0), P3]);
+        let (mut game, [p1, p2, p3]) = MockGame::new([P1, P2.life(0), P3.library([GRIZZLY_BEARS])]);
+        let [bears] = game.player(p3).cards_in(LIBRARY).exactly::<1>(GRIZZLY_BEARS)?;
         game.play([p1.pass_priority()])?;
         game.app
             .world_mut()
             .run_system_once(move |all: players::Players| {
                 let discard = events::Discard {
+                    cards: vec![*bears],
+                    cause: rules::EventId("608.2/resolve"),
+                };
+                assert!(affected_by(&all, &discard).is_empty());
+                let draw = events::Draw {
                     player: p3.id,
                     amount: 1,
+                    cause: rules::EventId("504.1/draw-step"),
                 };
                 assert_eq!(
-                    affected_by(&all, &discard)
+                    affected_by(&all, &draw)
                         .into_iter()
                         .map(|player| player.id)
                         .collect::<Vec<_>>(),

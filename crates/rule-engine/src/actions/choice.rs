@@ -123,6 +123,7 @@ mod tests {
             actions::Choice::Discard(actions::DiscardChoice {
                 player: chooser,
                 count: 1,
+                cause: rules::EventId("608.2/resolve"),
                 legal: BTreeSet::from([first]),
             }),
             actions::Choice::CombatDamage(actions::CombatDamageChoice {
@@ -166,6 +167,7 @@ mod tests {
         let discard = actions::Choice::Discard(actions::DiscardChoice {
             player: p1.id,
             count: 1,
+            cause: rules::EventId("608.2/resolve"),
             legal: BTreeSet::from([first]),
         });
         assert!(may.is_may_of(event));

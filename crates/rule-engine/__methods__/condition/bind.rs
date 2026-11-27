@@ -55,6 +55,7 @@ mod tests {
         let draw_two = events::Draw {
             player: players::PlayerId(Entity::PLACEHOLDER),
             amount: 2,
+            cause: rules::EventId("608.2/resolve"),
         };
         let at_least_two = events::Draw::AMOUNT.is(rules::Value(2).or_more());
         assert_eq!(bind(&at_least_two, &draw_two), rules::Condition::True);
@@ -65,6 +66,7 @@ mod tests {
         let draw_two = events::Draw {
             player: players::PlayerId(Entity::PLACEHOLDER),
             amount: 2,
+            cause: rules::EventId("608.2/resolve"),
         };
         let at_least_three = events::Draw::AMOUNT.is(rules::Value(3).or_more());
         assert_eq!(bind(&at_least_three, &draw_two), !rules::Condition::True);

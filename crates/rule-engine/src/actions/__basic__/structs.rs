@@ -17,6 +17,7 @@ pub struct TargetChoice {
 pub struct DiscardChoice {
     pub player: players::PlayerId,
     pub count: u32,
+    pub cause: rules::EventId,
     pub legal: BTreeSet<Entity>,
 }
 

@@ -8,16 +8,18 @@ use crate::rules::traits::event::Event;
 
 /// 701.9a To discard a card, move it from its owner’s hand to that player’s graveyard.
 pub fn r701_9a_discard(
-    mut discards: MessageReader<Resolve<events::DiscardCard>>,
+    mut discards: MessageReader<Resolve<events::Discard>>,
     mut graveyards: MessageWriter<Attempt<events::PutIntoGraveyard>>,
-    mut did_discard: MessageWriter<Did<events::DiscardCard>>,
+    mut did_discard: MessageWriter<Did<events::Discard>>,
 ) {
     for discard in discards.read() {
-        graveyards.write(Attempt(events::PutIntoGraveyard {
-            object: discard.card,
-            cause: events::DiscardCard::ID,
-        }));
-        did_discard.write(Did(**discard));
+        for card in &discard.cards {
+            graveyards.write(Attempt(events::PutIntoGraveyard {
+                object: *card,
+                cause: events::Discard::ID,
+            }));
+        }
+        did_discard.write(Did((**discard).clone()));
     }
 }
 

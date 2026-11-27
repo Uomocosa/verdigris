@@ -4,6 +4,7 @@ use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, ParamSet};
 
 use crate::Attempt;
 use crate::RESOLUTION_CAUSE;
+use crate::actions;
 use crate::cards;
 use crate::counters;
 use crate::damage;
@@ -24,7 +25,7 @@ type EffectMessageWriters<'a, 'b, 'c, 'd> = (
 
 type PlayerEffectWriters<'a, 'b, 'c, 'd, 'e, 'f, 'g> = (
     MessageWriter<'a, Attempt<events::LoseLife>>,
-    MessageWriter<'b, Attempt<events::Discard>>,
+    MessageWriter<'b, actions::DiscardRequest>,
     MessageWriter<'c, Attempt<events::GainLife>>,
     MessageWriter<'d, Attempt<events::Draw>>,
     MessageWriter<'e, Attempt<events::WinGame>>,
@@ -317,6 +318,7 @@ fn request_draws(
         draws.write(Attempt(events::Draw {
             player,
             amount: count,
+            cause: RESOLUTION_CAUSE,
         }));
     }
 }
@@ -335,15 +337,16 @@ fn request_life_loss(
 }
 
 fn request_discard(
-    discarded: &mut MessageWriter<Attempt<events::Discard>>,
+    discarded: &mut MessageWriter<actions::DiscardRequest>,
     players: &[players::PlayerId],
     count: u32,
 ) {
     for player in players {
-        discarded.write(Attempt(events::Discard {
+        discarded.write(actions::DiscardRequest {
             player: *player,
-            amount: count,
-        }));
+            count,
+            cause: RESOLUTION_CAUSE,
+        });
     }
 }
 
@@ -357,6 +360,7 @@ fn request_mills(
         mills.write(Attempt(events::Mill {
             player,
             amount: count,
+            cause: RESOLUTION_CAUSE,
         }));
     }
 }

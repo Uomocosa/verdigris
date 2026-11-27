@@ -24,9 +24,6 @@ pub fn add_resolution_systems(app: &mut App) {
                         events::Draw,
                     >,
                     comprehensive_rules::r614_1a_r616_1_replacement_effects::r614_1a_r616_1_replacement_effects::<
-                        events::Discard,
-                    >,
-                    comprehensive_rules::r614_1a_r616_1_replacement_effects::r614_1a_r616_1_replacement_effects::<
                         events::Mill,
                     >,
                     comprehensive_rules::r614_1a_r616_1_replacement_effects::r614_1a_r616_1_replacement_effects::<
@@ -75,7 +72,7 @@ pub fn add_resolution_systems(app: &mut App) {
                 ),
                 (
                     comprehensive_rules::r701_9b_choose_discards::r701_9b_choose_discards(),
-                    Attempt::<events::DiscardCard>::resolved_by(
+                    Attempt::<events::Discard>::resolved_by(
                         comprehensive_rules::r701_9a_discard::r701_9a_discard,
                     ),
                 )
@@ -117,7 +114,7 @@ mod tests {
 
         assert_eq!(
             app.get_schedule(Update).map(Schedule::systems_len),
-            Some(39)
+            Some(38)
         );
     }
 }

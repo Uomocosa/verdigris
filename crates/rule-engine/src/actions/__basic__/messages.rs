@@ -3,6 +3,7 @@ use derive_more::Deref;
 
 use crate::actions;
 use crate::players;
+use crate::rules;
 
 #[derive(Message, Debug, Clone, PartialEq, Eq, Deref)]
 pub struct Ask(pub actions::Choice);
@@ -11,6 +12,13 @@ pub struct Ask(pub actions::Choice);
 pub struct Answered {
     pub choice: actions::Choice,
     pub answer: actions::Action,
+}
+
+#[derive(Message, Debug, Clone, PartialEq, Eq)]
+pub struct DiscardRequest {
+    pub player: players::PlayerId,
+    pub count: u32,
+    pub cause: rules::EventId,
 }
 
 #[derive(Message, Debug, Clone, PartialEq, Eq)]

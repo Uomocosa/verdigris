@@ -2,6 +2,7 @@ use crate::events;
 use bevy::prelude::Commands;
 
 use crate::Attempt;
+use crate::actions;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum AnyEvent {
@@ -11,6 +12,7 @@ pub enum AnyEvent {
     Draw(events::Draw),
     LoseLife(events::LoseLife),
     Discard(events::Discard),
+    RequestDiscard(actions::DiscardRequest),
     GainLife(events::GainLife),
     PutCounters(events::PutCounters),
     Mill(events::Mill),
@@ -43,6 +45,9 @@ impl AnyEvent {
             }
             Self::Discard(happened) => {
                 commands.write_message(Attempt(happened));
+            }
+            Self::RequestDiscard(requested) => {
+                commands.write_message(requested);
             }
             Self::GainLife(happened) => {
                 commands.write_message(Attempt(happened));

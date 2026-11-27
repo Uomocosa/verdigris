@@ -5,7 +5,10 @@ use bevy::prelude::MessageWriter;
 use crate::Attempt;
 use crate::Game;
 use crate::events;
+use crate::rules;
 use crate::turns;
+
+const CAUSE: rules::EventId = rules::EventId("504.1/draw-step");
 
 /// 504.1. First, the active player draws a card. This turn-based action doesn’t use the stack.
 pub fn r504_1_draw_step() -> ScheduleConfigs<ScheduleSystem> {
@@ -17,6 +20,7 @@ fn draw_a_card(mut draws: MessageWriter<Attempt<events::Draw>>, game: Game) {
         draws.write(Attempt(events::Draw {
             player: active_player.id,
             amount: 1,
+            cause: CAUSE,
         }));
     }
 }

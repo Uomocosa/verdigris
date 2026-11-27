@@ -34,9 +34,6 @@ pub use destroy::Destroy;
 mod discard;
 pub use discard::Discard;
 
-mod discard_card;
-pub use discard_card::DiscardCard;
-
 mod draw;
 pub use draw::Draw;
 

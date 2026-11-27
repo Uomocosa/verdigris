@@ -10,6 +10,8 @@ pub struct Draw {
     pub player: players::PlayerId,
     #[arg]
     pub amount: u32,
+    #[arg]
+    pub cause: rules::EventId,
 }
 
 impl Event for Draw {
@@ -30,7 +32,11 @@ mod tests {
     #[test]
     fn test_usage() {
         let player = players::PlayerId(Entity::PLACEHOLDER);
-        let event = Draw { player, amount: 2 };
+        let event = Draw {
+            player,
+            amount: 2,
+            cause: rules::EventId("608.2/resolve"),
+        };
         assert_eq!(
             event.arg(Draw::PLAYER),
             Some(rules::ArgValue::Player(player))
@@ -38,9 +44,13 @@ mod tests {
         assert_eq!(
             event.arg(Draw::PLAYER),
             Some(rules::ArgValue::Player(player))
+        );
+        assert_eq!(
+            event.arg(Draw::CAUSE),
+            Some(rules::ArgValue::Event(rules::EventId("608.2/resolve")))
         );
         assert_eq!(Draw::ID, rules::EventId("121.1/draw"));
         assert_eq!(Draw::restrictions(), Vec::new());
-        assert_eq!(Draw::args(), &[Draw::PLAYER, Draw::AMOUNT,]);
+        assert_eq!(Draw::args(), &[Draw::PLAYER, Draw::AMOUNT, Draw::CAUSE,]);
     }
 }

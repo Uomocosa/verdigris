@@ -23,7 +23,7 @@ pub fn register_messages_and_resources(app: &mut App) {
     events::Draw::register(app);
     events::LoseLife::register(app);
     events::Discard::register(app);
-    events::DiscardCard::register(app);
+    app.add_message::<actions::DiscardRequest>();
     events::GainLife::register(app);
     events::PutCounters::register(app);
     events::Mill::register(app);
