@@ -241,6 +241,7 @@ Only a rule that uses the varying data reads the message. One flat loop with one
 - Does it name a card, an ability or a single case of a list? Move it to the case's own rule.
 - Does it validate, reject, or wait for a player? Move it to the shared part.
 - Would the next card or sub-rule edit this file? Then it isn't a hook point yet.
+- Does every event it makes or changes pass CHANGEABLE_RULES §6 (no inferable field, general verb, plural, `cause`)?
 
 ## Smells
 
@@ -265,6 +266,12 @@ Only a rule that uses the varying data reads the message. One flat loop with one
 | a write to `StepStarted` outside `r500_1`/`r500_3` | §17 |
 | a `match` from a step to the step after it, or a resource that says an extra step is due | §17 |
 | a moment whose body writes an outcome a card could change | §16, §10 |
+| an event field readable from another field's entity (`player`, `controller`, `source`) | CHANGEABLE_RULES §6.1 |
+| an event named after one case (`PlayLand`, `GivePoisonCounters`, `CastSpell`) | CHANGEABLE_RULES §6.2 |
+| a singular and a plural event for one verb (`DeclareAttacker` + `DeclareAttackers`) | CHANGEABLE_RULES §6.3 |
+| a wrapper event that only adds a reason (`TapAttacker` instead of `Tap { cause }`) | CHANGEABLE_RULES §6.4 |
+| a state-change event without `cause`, or a cause that is not the producer's `ID` / the rule's own `CAUSE` | CHANGEABLE_RULES §6.4 |
+| a `bool` on an event that a component or rule already tracks | CHANGEABLE_RULES §6.5 |
 
 ## Adding rules here
 

@@ -72,8 +72,8 @@ pub enum Change {
     Allow { holder: rules::ArgRef, when: rules::Condition }, // Restriction/Definition: satisfied if this holds instead
     Restrict { holder: rules::ArgRef, restriction: rules::Restriction }, // Event: named veto for that holder
     Must,                                       // Event: requirement (508.1d / 509.1c)
-    Skip,                                       // Event: do not perform (untap, tap-attacker)
-    Perform,                                    // Event: do perform (overrides Skip)
+    Skip { when: rules::Condition },            // Event: do not perform when `when` holds (vigilance: a Tap CausedBy attacking)
+    Perform { when: rules::Condition },         // Event: do perform when `when` holds (overrides Skip)
     // quantity
     Set(u32), Increase(u32), Decrease(u32), NoMaximum,
     // replacement (614): one named result becomes other events
@@ -92,6 +92,10 @@ pub type Definition = rules::Statement<rules::DefinitionId>;
 - `EventTemplate` describes a replacement event in data; `Amount::{Fixed(u32), FromArg(ArgId)}`
   lets it copy a parameter of the replaced event ("that much life", "that many cards").
 - Conditions may read event parameters through `ArgId` (e.g. `DealDamage::AMOUNT.is(rules::Value(1).or_more())`).
+- A list argument (`ArgValue::Entities`, e.g. `DeclareAttackers::ATTACKERS`) is a holder and a subject element by
+  element: a change held by one element is looked up on that element, and `.of(LIST)` / `points_to` / `in_zone` /
+  `X.controller()` hold only if they hold for EVERY element (`Is`: the entity is one of them). `count(LIST)` reads its size.
+- `Condition::CausedBy(id)` is true when the event's `cause` argument is `id` (§6.4).
 
 ## 2. Nonsense is allowed, dangling is not
 
@@ -148,7 +152,7 @@ Several optional changes of one player may be grouped into one ask. `then` may n
 template is one variant plus its `instantiate`, and the event's own rule performs it.
 
 **"You don't ..." / "players don't ..."** (Upwelling: "Players don't lose unspent mana as steps and
-phases end.") is `Change::Skip` on the event: `statics::all(PLAYER).dont_lose_unspent_mana()`. If the rule
+phases end.") is `Change::Skip { when: rules::Condition::True }` on the event: `statics::all(PLAYER).dont_lose_unspent_mana()`. If the rule
 performs the outcome itself, make it an event first.
 
 **Named arguments.** An event derives `EventArgs` (`#[derive(EventArgs)]`, `crates/event-derive`),
@@ -303,7 +307,7 @@ rules::Change::Restrict {
 rules::Change::AsThough { holder: events::DeclareBlocker::BLOCKER.into() }
 // defender: "can't attack" (702.3b)
 rules::Change::Restrict {
-    holder: events::DeclareAttacker::ATTACKER.into(),
+    holder: events::DeclareAttackers::ATTACKERS.into(),
     restriction: CANT_ATTACK.restriction(!rules::Condition::True),
 }
 ```
@@ -370,3 +374,87 @@ another (reach does not grant "can block flyers" — it waives flying's restrict
 says what 702.9b says). An EFFECT restated by the CR in two places is implemented once — in the
 keyword file (decided: option A): 120.3b lives under infect's `# Restates`, 120.3f under lifelink's,
 and `r702_15b` / `r120_3b` rule files were deleted.
+
+## 6. How an event is shaped
+
+Decided by the user (2026-11-27). Every event struct passes all five; the Smells table in `SKILL.md` points here.
+
+### 6.1 No field readable from another field
+
+If a value can be read from an entity already in the event (controller, owner, source, targets), it is not a field:
+ask `X.controller()` / `X.owner()` / `SourceOf(X)`. If the entity does not carry it yet, the rule that makes the event
+sets it first, as the CR does.
+
+```rust
+// Good: 601.2a, the caster becomes the controller, then the cast is checked (__rules__/r601_2a_cast.rs)
+pub struct Cast { #[arg] pub spell: Entity }        // who casts = Cast::SPELL.controller()
+// Bad
+pub struct CastSpell { #[arg] pub spell: Entity, #[arg] pub player: players::PlayerId }
+```
+
+**Why:** two fields that must agree will one day disagree; a derived one cannot.
+
+### 6.2 General verb, specific filter
+
+Name the event after the CR verb, not one case of it. The case is a filter on the arguments.
+
+```rust
+// Good
+Play { card }                       // "whenever you play a land" = a Play trigger filtered by land()
+PutCounters { recipient, kind, amount }
+EnterTheBattlefield { permanent }   // the CR's words
+// Bad
+PlayLand { land }, GivePoisonCounters { player, amount }, EnterBattlefield { .. }
+```
+
+**Why:** one event per verb means one pipeline, one set of restrictions, and every card that cares about the verb sees it.
+
+### 6.3 One plural event per verb
+
+An action on several objects is ONE event with a list or an amount. A single case is the same event with one item;
+doing it twice is two events.
+
+```rust
+// Good
+DeclareAttackers { attackers: Vec<Entity> }   // vec![a] = "a attacks", vec![] = no attack
+Discard { cards: Vec<Entity>, cause }         // player = the cards' owner
+Draw { player, amount, cause }                // "draw one, then draw one" = two Draw { amount: 1 }
+// Bad
+DeclareAttacker { attacker } + DeclareAttackers { attackers }
+Discard { player, amount } + DiscardCard { card }
+```
+
+A list argument applies to each element (§1); `count(..)` / `AMOUNT` reads the batch, which replacements need:
+Painful Lessons (`src/testing/__fixtures__/cards/test_painful_lessons.rs`) "if a player would draw two or more cards".
+
+**Why:** a singular and a plural event split restrictions and triggers between two places; the CR asks about the
+whole set (508.1c "can't attack alone") and about each element, and one list argument answers both.
+
+### 6.4 Every state change says why
+
+A state-changing event has a required `#[arg] pub cause: rules::EventId`: the producing event's `ID`, or, for a
+producer that is not an event (state-based actions, 608.2 resolution, a step), that rule's own
+`pub const CAUSE: rules::EventId` (e.g. `"704.5g/lethal-damage"`, `"608.2/resolve"`). A card that cares reads it
+with `Condition::CausedBy(..)`.
+
+```rust
+// Good: vigilance (702.20b) "attacking doesn't cause it to tap"
+Change::Skip { when: rules::Condition::CausedBy(events::DeclareAttackers::ID) }   // target: Tap
+// Bad: a wrapper event that only carries the reason
+TapAttacker { attacker }  ->  Tap { permanent }
+```
+
+**Why:** "whenever a creature dies from lethal damage", "tapped for mana", "discarded by an opponent" are all
+questions about the cause; a field answers them all, a wrapper event per reason does not scale.
+
+### 6.5 Bookkeeping is not an event field
+
+State that a rule already tracks lives in its component, not on the event.
+
+```rust
+// Good: everything that enters gets cards::SummoningSick; 302.6 lifts it at its controller's turn start
+EnterTheBattlefield { permanent }
+// Bad
+EnterBattlefield { permanent, controller, summoning_sick: bool }
+```
+

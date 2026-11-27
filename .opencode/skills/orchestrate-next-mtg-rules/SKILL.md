@@ -40,6 +40,10 @@ always on the current branch (orchestrator-core: never create, switch or merge b
    each, fast gate per item. Every brief tells the worker to read
    `.opencode/skills/verdigris-rules-style/SKILL.md` and its `references/CHANGEABLE_RULES.md` first. Every `worker-env.md` says: "Tests: red first, by adding a step or assert to an existing test. A new test needs a reason in the report." Log hash, tier + model, minutes in `plan.md`. Re-rank between items
    if an implementation changes what is possible (a DEFERRED item may become doable).
+   A brief that adds, removes or reshapes an event field lists EVERY construction site
+   (`rg -n '<Event> \{' crates/`) and says where each gets the value, including producers that
+   are not events (state-based actions, 608.2 resolution, steps: they use their rule's own
+   `CAUSE`, CHANGEABLE_RULES §6.4). A missing value stops the worker mid-job.
 5. **Gate.** Run the full suite yourself, then push.
 6. **Report.** In `report.md` and your final message: the ranked table, the steps with commit
    hashes, what was deferred and why, what you took on the workers' word only, the tiers used,
