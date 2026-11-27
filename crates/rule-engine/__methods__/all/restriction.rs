@@ -12,6 +12,7 @@ pub fn restriction<E: Event>(
 ) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
+        as_long_as: None,
         modification: effects::Modification::Rule(rules::RuleChange {
             target: rules::Target::event::<E>(),
             change: rules::Change::Restrict {

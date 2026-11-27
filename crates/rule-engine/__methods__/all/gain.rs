@@ -6,6 +6,7 @@ use crate::statics;
 pub fn gain(all: statics::All, keyword: keywords::Keyword) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
+        as_long_as: None,
         modification: effects::Modification::Characteristic(effects::Layered::GainKeyword(keyword)),
     }
 }

@@ -8,6 +8,7 @@ pub fn cant_lose_the_game(all: statics::All) -> abilities::Continuous {
     const ID: rules::RestrictionId = rules::RestrictionId("statics/cant-lose-the-game");
     abilities::Continuous {
         filter: *all,
+        as_long_as: None,
         modification: effects::Modification::Rule(rules::RuleChange {
             target: rules::Target::event::<events::LoseGame>(),
             change: rules::Change::Restrict {

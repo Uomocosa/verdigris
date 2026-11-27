@@ -6,7 +6,10 @@ pub use basic::card_text::{
     when_this_dies, whenever,
 };
 pub use basic::enums::{ActivationCost, Replacement};
-pub use basic::structs::{ActivatedAbility, Continuous, TriggeredAbility};
+pub use basic::structs::{ActivatedAbility, TriggeredAbility};
+
+mod continuous;
+pub use continuous::Continuous;
 
 mod ability;
 pub use ability::Ability;

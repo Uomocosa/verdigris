@@ -7,6 +7,7 @@ use crate::statics;
 pub fn must_attack(all: statics::All) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
+        as_long_as: None,
         modification: effects::Modification::Rule(rules::RuleChange {
             target: rules::Target::event::<events::DeclareAttacker>(),
             change: rules::Change::Must,

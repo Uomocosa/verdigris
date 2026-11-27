@@ -5,6 +5,7 @@ use crate::statics;
 pub fn get_pt(all: statics::All, power: i32, toughness: i32) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
+        as_long_as: None,
         modification: effects::Modification::Characteristic(effects::Layered::ModifyPT {
             power,
             toughness,

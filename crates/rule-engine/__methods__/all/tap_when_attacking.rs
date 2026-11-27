@@ -7,6 +7,7 @@ use crate::statics;
 pub fn tap_when_attacking(all: statics::All) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
+        as_long_as: None,
         modification: effects::Modification::Rule(rules::RuleChange {
             target: rules::Target::event::<events::TapAttacker>(),
             change: rules::Change::Perform,

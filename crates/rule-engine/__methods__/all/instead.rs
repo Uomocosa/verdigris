@@ -12,6 +12,7 @@ pub fn instead(
 ) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
+        as_long_as: None,
         modification: effects::Modification::Rule(rules::RuleChange {
             target: rules::Target::Event(event),
             change: rules::Change::Instead {

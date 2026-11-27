@@ -10,12 +10,6 @@ pub struct TriggeredAbility {
     pub effect: effects::Effect,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Continuous {
-    pub filter: effects::Filter,
-    pub modification: effects::Modification,
-}
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct ActivatedAbility {
     pub cost: abilities::ActivationCost,

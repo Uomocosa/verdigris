@@ -6,6 +6,7 @@ use crate::statics;
 pub fn no_maximum_hand_size(all: statics::All) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
+        as_long_as: None,
         modification: effects::Modification::Rule(rules::RuleChange {
             target: rules::Target::value::<rules::MaximumHandSize>(),
             change: rules::Change::NoMaximum,

@@ -4,7 +4,9 @@ use crate::BATTLEFIELD;
 use crate::abilities;
 use crate::cards;
 use crate::effects;
+use crate::events;
 use crate::players;
+use crate::rules;
 use crate::turns;
 use crate::zones;
 
@@ -50,6 +52,7 @@ pub fn r611_3a_static_effects(
     applied: Query<(Entity, &effects::ContinuousEffect)>,
     players: Res<turns::TurnOrder>,
     zones: zones::ZoneLookup,
+    answers: rules::Rules,
     mut timestamp: ResMut<effects::Timestamp>,
 ) {
     let players = players.into_inner();
@@ -82,6 +85,7 @@ pub fn r611_3a_static_effects(
                 &candidates,
                 &zones,
                 &players,
+                &answers,
             )
         });
         if !still_applies {
@@ -98,6 +102,9 @@ pub fn r611_3a_static_effects(
         }
         let stamp = stamp_for(source, &mut commands, &stamped, &mut timestamp);
         for ability in definition.continuous_abilities() {
+            if !condition_holds(ability, source, &answers) {
+                continue;
+            }
             match ability.filter.kind {
                 effects::FilterKind::Creature => spawn_creature_effects(
                     &mut commands,
@@ -136,8 +143,12 @@ fn ability_still_applies(
     candidates: &StaticCandidates<'_, '_, '_, '_, '_, '_, '_>,
     zones: &zones::ZoneLookup,
     players: &[players::PlayerId],
+    answers: &rules::Rules,
 ) -> bool {
     if ability.modification != effect.modification {
+        return false;
+    }
+    if !condition_holds(ability, source, answers) {
         return false;
     }
     match ability.filter.kind {
@@ -168,6 +179,16 @@ fn ability_still_applies(
         ),
         _ => false,
     }
+}
+
+fn condition_holds(
+    ability: &abilities::Continuous,
+    source: Entity,
+    answers: &rules::Rules,
+) -> bool {
+    ability.as_long_as.as_ref().is_none_or(|condition| {
+        answers.eval(condition, &events::AbilityContext { ability: source }, None)
+    })
 }
 
 fn spawn_creature_effects(
@@ -337,6 +358,7 @@ mod tests {
 
     use crate::BATTLEFIELD;
     use crate::HAND;
+    use crate::actions;
     use crate::effects;
     use crate::events;
     use crate::keywords;
@@ -699,6 +721,110 @@ mod tests {
                 );
             })
             .unwrap();
+        Ok(())
+    }
+
+    #[test]
+    fn serra_ascendant_is_six_six_flying_only_at_thirty_life() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.battlefield([SERRA_ASCENDANT]).life(30),
+            P2.hand([GUT_SHOT]),
+        ]);
+        let [serra] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(SERRA_ASCENDANT)?;
+        let [gut_shot] = game.player(p2).cards_in(HAND).exactly::<1>(GUT_SHOT)?;
+        game.pass_priority();
+        assert_eq!(game.pt(serra), Some(crate::pt!(6, 6)));
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                assert!(
+                    answers
+                        .characteristics(*serra)
+                        .keywords
+                        .iter()
+                        .any(|keyword| keyword.id == keywords::flying::ID)
+                );
+            })
+            .unwrap();
+        game.play([
+            p2.cast(gut_shot).targeting(p1).pass_priority(),
+            p1.pass_priority(),
+        ])?;
+        assert_eq!(game.life(p1), 29);
+        assert_eq!(game.pt(serra), Some(crate::pt!(1, 1)));
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                assert!(
+                    !answers
+                        .characteristics(*serra)
+                        .keywords
+                        .iter()
+                        .any(|keyword| keyword.id == keywords::flying::ID)
+                );
+            })
+            .unwrap();
+        Ok(())
+    }
+
+    #[test]
+    fn test_bloodscent_hound_has_haste_while_an_opponent_is_at_ten_life() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.hand([TEST_BLOODSCENT_HOUND]).mana_pool(mana![1, R]),
+            P2.life(10),
+        ]);
+        let [hound] = game.player(p1).cards_in(HAND).exactly::<1>(TEST_BLOODSCENT_HOUND)?;
+        game.play([p1.cast(hound).pass_priority(), p2.pass_priority()])?;
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                assert!(
+                    answers
+                        .characteristics(*hound)
+                        .keywords
+                        .iter()
+                        .any(|keyword| keyword.id == keywords::haste::ID)
+                );
+            })
+            .unwrap();
+        game.play([
+            p1.pass_to(turns::Step::DeclareAttackers),
+            p2.pass_to(turns::Step::DeclareAttackers),
+            p1.declare_attackers([hound]),
+        ])?;
+        assert!(game.is_attacking(hound));
+
+        let (mut fresh, [q1, q2]) = MockGame::new([
+            P1.hand([TEST_BLOODSCENT_HOUND]).mana_pool(mana![1, R]),
+            P2.life(11),
+        ]);
+        let [resting] = fresh.player(q1).cards_in(HAND).exactly::<1>(TEST_BLOODSCENT_HOUND)?;
+        fresh.play([q1.cast(resting).pass_priority(), q2.pass_priority()])?;
+        fresh
+            .app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                assert!(
+                    !answers
+                        .characteristics(*resting)
+                        .keywords
+                        .iter()
+                        .any(|keyword| keyword.id == keywords::haste::ID)
+                );
+            })
+            .unwrap();
+        fresh.play([
+            q1.pass_to(turns::Step::DeclareAttackers),
+            q2.pass_to(turns::Step::DeclareAttackers),
+        ])?;
+        fresh.act(q1, actions::Action::DeclareAttackers(vec![resting.into()]));
+        assert_eq!(
+            fresh.last_rejection(),
+            Some(&actions::Rejected::CannotAttack {
+                attackers: vec![resting.into()]
+            })
+        );
+        assert!(!fresh.is_attacking(resting));
         Ok(())
     }
 }

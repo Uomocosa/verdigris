@@ -11,6 +11,7 @@ pub fn allow(
 ) -> abilities::Continuous {
     abilities::Continuous {
         filter: *all,
+        as_long_as: None,
         modification: effects::Modification::Rule(rules::RuleChange {
             target: rules::Target::Restriction(restriction),
             change: rules::Change::Allow {
