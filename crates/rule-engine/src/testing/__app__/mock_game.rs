@@ -189,6 +189,8 @@ impl MockGame {
     pub(crate) fn stack_objects(&self) -> Vec<testing::ZoneObject> {}
 
     pub(crate) fn rejection_count(&self) -> usize {}
+
+    pub(crate) fn check_pick_previews(&mut self, disagreements: &mut Vec<String>) {}
 }
 
 impl MockGame {
@@ -238,6 +240,19 @@ impl MockGame {
             | actions::Action::Choose(_)
             | actions::Action::AssignCombatDamage(_) => true,
         }
+    }
+
+    pub(crate) fn pick_preview_accepts(
+        &mut self,
+        choice: &actions::PickChoice,
+        picked: &[Entity],
+    ) -> bool {
+        let choice = choice.clone();
+        let picked = picked.to_vec();
+        self.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| choice.check(&answers, &picked))
+            .is_ok_and(|outcome| outcome.is_ok())
     }
 }
 

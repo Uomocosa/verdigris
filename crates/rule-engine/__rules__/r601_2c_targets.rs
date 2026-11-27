@@ -161,10 +161,11 @@ mod tests {
     fn bolt_lists_every_legal_target() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
-            P2.battlefield([GRIZZLY_BEARS]),
+            P2.battlefield([GRIZZLY_BEARS, FOREST]),
         ]);
         let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
         let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        let [forest] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(FOREST)?;
         game.play([p1.cast(bolt)])?;
         assert_eq!(
             game.target_choice(),
@@ -192,6 +193,14 @@ mod tests {
                     )));
             })
             .unwrap();
+        let legal = game.app.world().resource::<actions::LegalActions>().clone();
+        assert!(legal.actions.iter().any(|(action, legality)| *action
+            == actions::Action::Choose(vec![forest.into()])
+            && matches!(legality, rules::Legality::Illegal(_))));
+        assert!(legal.actions.iter().any(|(action, legality)| *action
+            == actions::Action::Choose(vec![bears.into()])
+            && *legality == rules::Legality::Legal));
+        game.assert_legal_actions_agree()?;
         Ok(())
     }
 

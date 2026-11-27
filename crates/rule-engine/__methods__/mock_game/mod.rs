@@ -1,5 +1,6 @@
 mod assert_legal_actions_agree;
 mod cards_in_zone;
+mod check_pick_previews;
 mod last_rejection;
 mod p;
 mod play;
@@ -12,6 +13,7 @@ mod with_queries;
 mod with_query;
 pub use assert_legal_actions_agree::assert_legal_actions_agree;
 pub use cards_in_zone::cards_in_zone;
+pub use check_pick_previews::check_pick_previews;
 pub use last_rejection::last_rejection;
 pub use p::p;
 pub use play::play;
