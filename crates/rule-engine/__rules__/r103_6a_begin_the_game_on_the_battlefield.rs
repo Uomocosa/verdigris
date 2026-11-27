@@ -1,5 +1,5 @@
 use crate::events;
-use bevy::prelude::{Commands, MessageReader, MessageWriter};
+use bevy::prelude::{Commands, MessageReader, MessageWriter, Query};
 
 use crate::Attempt;
 use crate::Resolve;
@@ -11,9 +11,13 @@ pub fn r103_6a_begin_the_game_on_the_battlefield(
     mut beginning: MessageReader<Resolve<events::BeginTheGameOnTheBattlefield>>,
     mut entering: MessageWriter<Attempt<events::EnterTheBattlefield>>,
     mut commands: Commands,
+    owners: Query<&cards::Owner>,
 ) {
     for action in beginning.read() {
-        commands.entity(action.card).insert(cards::Controller(action.player));
+        let Ok(owner) = owners.get(action.card) else {
+            continue;
+        };
+        commands.entity(action.card).insert(cards::Controller(**owner));
         entering.write(Attempt(events::EnterTheBattlefield {
             permanent: action.card,
         }));

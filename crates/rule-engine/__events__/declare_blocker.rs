@@ -2,8 +2,6 @@ use atomic_delegate_macros::atomic_delegate;
 use bevy::prelude::Entity;
 use verdigris_event_derive::EventArgs;
 
-use crate::players;
-
 use crate::rules;
 use crate::rules::traits::event::Event;
 
@@ -17,8 +15,6 @@ pub struct DeclareBlocker {
     pub blocker: Entity,
     #[arg]
     pub attacker: Entity,
-    #[arg]
-    pub player: players::PlayerId,
 }
 
 impl Event for DeclareBlocker {
@@ -36,7 +32,6 @@ mod tests {
 
     use crate::cards;
     use crate::events;
-    use crate::players;
     use crate::rules;
     use crate::rules::traits::event::Event;
     use crate::rules::traits::event_args::EventArgs;
@@ -59,9 +54,7 @@ mod tests {
         assert_eq!(restrictions[1].id, CONTROLS);
         assert_eq!(
             restrictions[1].condition,
-            (rules::points_to::<cards::Controller>(DeclareBlocker::PLAYER)
-                & rules::has::<cards::OnBattlefield>())
-            .of(DeclareBlocker::BLOCKER)
+            rules::has::<cards::OnBattlefield>().of(DeclareBlocker::BLOCKER)
         );
         assert_eq!(restrictions[2].id, UNTAPPED);
         assert_eq!(
@@ -71,7 +64,6 @@ mod tests {
         let event = DeclareBlocker {
             blocker: Entity::PLACEHOLDER,
             attacker: Entity::from_raw_u32(1).unwrap(),
-            player: players::PlayerId(Entity::from_raw_u32(2).unwrap()),
         };
         assert_eq!(
             event.arg(DeclareBlocker::BLOCKER),
@@ -79,11 +71,7 @@ mod tests {
         );
         assert_eq!(
             DeclareBlocker::args(),
-            &[
-                DeclareBlocker::BLOCKER,
-                DeclareBlocker::ATTACKER,
-                DeclareBlocker::PLAYER,
-            ]
+            &[DeclareBlocker::BLOCKER, DeclareBlocker::ATTACKER,]
         );
     }
 

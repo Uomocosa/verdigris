@@ -10,7 +10,6 @@ mod tests {
     use bevy::prelude::Entity;
 
     use crate::events;
-    use crate::players;
     use crate::rules;
     use crate::rules::traits::event_args::EventArgs;
 
@@ -19,7 +18,6 @@ mod tests {
         let blocker = events::DeclareBlocker {
             blocker: Entity::from_raw_u32(1).unwrap(),
             attacker: Entity::PLACEHOLDER,
-            player: players::PlayerId(Entity::from_raw_u32(2).unwrap()),
         };
         assert_eq!(
             blocker.arg(events::DeclareBlocker::BLOCKER),
@@ -30,7 +28,6 @@ mod tests {
             &[
                 events::DeclareBlocker::BLOCKER,
                 events::DeclareBlocker::ATTACKER,
-                events::DeclareBlocker::PLAYER,
             ]
         );
     }

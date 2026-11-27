@@ -1,7 +1,6 @@
 use bevy::prelude::Entity;
 use verdigris_event_derive::EventArgs;
 
-use crate::players;
 use crate::rules;
 use crate::rules::traits::event::Event;
 
@@ -9,8 +8,6 @@ use crate::rules::traits::event::Event;
 pub struct DiscardCard {
     #[arg]
     pub card: Entity,
-    #[arg]
-    pub player: players::PlayerId,
 }
 
 impl Event for DiscardCard {
@@ -21,7 +18,6 @@ impl Event for DiscardCard {
 mod tests {
     use bevy::prelude::Entity;
 
-    use crate::players;
     use crate::rules;
     use crate::rules::traits::event::Event;
     use crate::rules::traits::event_args::EventArgs;
@@ -31,21 +27,13 @@ mod tests {
     #[test]
     fn test_usage() {
         let card = Entity::PLACEHOLDER;
-        let player = players::PlayerId(Entity::PLACEHOLDER);
-        let event = DiscardCard { card, player };
+        let event = DiscardCard { card };
         assert_eq!(
             event.arg(DiscardCard::CARD),
             Some(rules::ArgValue::Entity(card))
         );
-        assert_eq!(
-            event.arg(DiscardCard::PLAYER),
-            Some(rules::ArgValue::Player(player))
-        );
         assert_eq!(DiscardCard::ID, rules::EventId("701.9a/discard-card"));
         assert_eq!(DiscardCard::restrictions(), Vec::new());
-        assert_eq!(
-            DiscardCard::args(),
-            &[DiscardCard::CARD, DiscardCard::PLAYER,]
-        );
+        assert_eq!(DiscardCard::args(), &[DiscardCard::CARD,]);
     }
 }

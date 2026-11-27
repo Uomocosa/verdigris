@@ -28,10 +28,7 @@ fn ask_which_cards(
         let hand: Vec<Entity> = affected.hand().into_iter().map(|card| *card).collect();
         if hand.len() <= usize::try_from(discard.amount).unwrap_or(usize::MAX) {
             for card in hand {
-                discards_card.write(Attempt(events::DiscardCard {
-                    card,
-                    player: discard.player,
-                }));
+                discards_card.write(Attempt(events::DiscardCard { card }));
             }
             continue;
         }
@@ -50,17 +47,14 @@ fn discard_chosen_cards(
     mut discards_card: MessageWriter<Attempt<events::DiscardCard>>,
 ) {
     for answered in answers.read() {
-        let actions::Choice::Discard(choice) = &answered.choice else {
+        let actions::Choice::Discard(_) = &answered.choice else {
             continue;
         };
         let actions::Action::ChooseDiscard(chosen) = &answered.answer else {
             continue;
         };
         for card in chosen {
-            discards_card.write(Attempt(events::DiscardCard {
-                card: *card,
-                player: choice.player,
-            }));
+            discards_card.write(Attempt(events::DiscardCard { card: *card }));
         }
     }
 }

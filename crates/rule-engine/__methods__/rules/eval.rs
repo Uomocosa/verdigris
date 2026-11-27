@@ -253,12 +253,10 @@ mod tests {
         let bears_blocked = events::DeclareBlocker {
             blocker: *bears,
             attacker: *drake,
-            player: p2.id,
         };
         let drake_blocked = events::DeclareBlocker {
             blocker: *drake,
             attacker: *bears,
-            player: p1.id,
         };
         game.app
             .world_mut()

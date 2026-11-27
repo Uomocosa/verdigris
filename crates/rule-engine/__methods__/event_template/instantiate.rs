@@ -95,7 +95,6 @@ pub fn instantiate<E: Event>(
                         _ => None,
                     })
                     .unwrap_or(Entity::PLACEHOLDER),
-                player: fallback,
             })
         }
         rules::EventTemplate::Exile { what } => rules::AnyEvent::Exile(events::Exile {

@@ -55,10 +55,12 @@ pub fn r509_1a_declare_blockers(
         }
         let all_legal = assignments.iter().all(|assignment| {
             attacking.get(assignment.attacker).is_ok()
+                && blockers.iter().any(|(entity, controller)| {
+                    entity == assignment.blocker && **controller == action.player
+                })
                 && answers.legal::<events::DeclareBlocker>(&events::DeclareBlocker {
                     blocker: assignment.blocker,
                     attacker: assignment.attacker,
-                    player: action.player,
                 })
         });
         let blocks_one_creature = assignments.iter().all(|assignment| {
@@ -72,7 +74,6 @@ pub fn r509_1a_declare_blockers(
                     answers.legal::<events::DeclareBlocker>(&events::DeclareBlocker {
                         blocker: entity,
                         attacker,
-                        player: action.player,
                     })
                 })
         });
@@ -86,7 +87,6 @@ pub fn r509_1a_declare_blockers(
             declared.write(Attempt(events::DeclareBlocker {
                 blocker: assignment.blocker,
                 attacker: assignment.attacker,
-                player: action.player,
             }));
         }
     }
