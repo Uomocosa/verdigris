@@ -4,6 +4,7 @@ use bevy::prelude::{Entity, MessageReader, MessageWriter, Query};
 use crate::Attempt;
 use crate::LIBRARY;
 use crate::Resolve;
+use crate::rules::traits::event::Event;
 use crate::zones;
 
 /// 701.17a For a player to mill a number of cards, that player puts that many cards from the top
@@ -33,7 +34,10 @@ pub fn r701_17a_mill(
             })
             .unwrap_or_default();
         for card in milled_from_top {
-            moves_to_graveyard.write(Attempt(events::PutIntoGraveyard { object: card }));
+            moves_to_graveyard.write(Attempt(events::PutIntoGraveyard {
+                object: card,
+                cause: events::Mill::ID,
+            }));
         }
     }
 }

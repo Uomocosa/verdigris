@@ -4,6 +4,7 @@ use bevy::prelude::{MessageReader, MessageWriter, Query};
 
 use crate::Attempt;
 use crate::Resolve;
+use crate::rules::traits::event::Event;
 use crate::zones;
 
 /// 701.6a To counter a spell or ability means to cancel it, removing it from the stack. It doesn’t
@@ -22,7 +23,10 @@ pub fn r701_6a_counter(
         if !zones.contains(STACK, **in_zone) {
             continue;
         }
-        moves_to_graveyard.write(Attempt(events::PutIntoGraveyard { object: spell }));
+        moves_to_graveyard.write(Attempt(events::PutIntoGraveyard {
+            object: spell,
+            cause: events::Counter::ID,
+        }));
     }
 }
 

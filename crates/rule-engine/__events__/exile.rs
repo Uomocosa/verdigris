@@ -8,6 +8,8 @@ use crate::rules::traits::event::Event;
 pub struct Exile {
     #[arg]
     pub object: Entity,
+    #[arg]
+    pub cause: rules::EventId,
 }
 
 impl Event for Exile {
@@ -27,13 +29,20 @@ mod tests {
     #[test]
     fn test_usage() {
         let object = Entity::PLACEHOLDER;
-        let event = Exile { object };
+        let event = Exile {
+            object,
+            cause: rules::EventId("608.2/resolve"),
+        };
         assert_eq!(
             event.arg(Exile::OBJECT),
             Some(rules::ArgValue::Entity(object))
         );
+        assert_eq!(
+            event.arg(Exile::CAUSE),
+            Some(rules::ArgValue::Event(rules::EventId("608.2/resolve")))
+        );
         assert_eq!(Exile::ID, rules::EventId("701.13a/exile"));
         assert_eq!(Exile::restrictions(), Vec::new());
-        assert_eq!(Exile::args(), &[Exile::OBJECT,]);
+        assert_eq!(Exile::args(), &[Exile::OBJECT, Exile::CAUSE,]);
     }
 }

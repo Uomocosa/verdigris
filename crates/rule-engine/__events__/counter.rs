@@ -8,6 +8,8 @@ use crate::rules::traits::event::Event;
 pub struct Counter {
     #[arg]
     pub spell: Entity,
+    #[arg]
+    pub cause: rules::EventId,
 }
 
 impl Event for Counter {
@@ -27,13 +29,20 @@ mod tests {
     #[test]
     fn test_usage() {
         let spell = Entity::PLACEHOLDER;
-        let event = Counter { spell };
+        let event = Counter {
+            spell,
+            cause: rules::EventId("608.2/resolve"),
+        };
         assert_eq!(
             event.arg(Counter::SPELL),
             Some(rules::ArgValue::Entity(spell))
         );
+        assert_eq!(
+            event.arg(Counter::CAUSE),
+            Some(rules::ArgValue::Event(rules::EventId("608.2/resolve")))
+        );
         assert_eq!(Counter::ID, rules::EventId("701.6a/counter"));
         assert_eq!(Counter::restrictions(), Vec::new());
-        assert_eq!(Counter::args(), &[Counter::SPELL,]);
+        assert_eq!(Counter::args(), &[Counter::SPELL, Counter::CAUSE,]);
     }
 }

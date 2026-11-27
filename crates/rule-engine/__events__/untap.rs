@@ -8,6 +8,8 @@ use crate::rules::traits::event::Event;
 pub struct Untap {
     #[arg]
     pub permanent: Entity,
+    #[arg]
+    pub cause: rules::EventId,
 }
 
 impl Event for Untap {
@@ -27,13 +29,20 @@ mod tests {
     #[test]
     fn test_usage() {
         let permanent = Entity::PLACEHOLDER;
-        let event = Untap { permanent };
+        let event = Untap {
+            permanent,
+            cause: rules::EventId("502.3/untap-step"),
+        };
         assert_eq!(
             event.arg(Untap::PERMANENT),
             Some(rules::ArgValue::Entity(permanent))
         );
+        assert_eq!(
+            event.arg(Untap::CAUSE),
+            Some(rules::ArgValue::Event(rules::EventId("502.3/untap-step")))
+        );
         assert_eq!(Untap::ID, rules::EventId("701.26b/untap"));
         assert_eq!(Untap::restrictions(), Vec::new());
-        assert_eq!(Untap::args(), &[Untap::PERMANENT,]);
+        assert_eq!(Untap::args(), &[Untap::PERMANENT, Untap::CAUSE,]);
     }
 }

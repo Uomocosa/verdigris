@@ -3,6 +3,7 @@ use crate::{BATTLEFIELD, STACK};
 use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, ParamSet};
 
 use crate::Attempt;
+use crate::RESOLUTION_CAUSE;
 use crate::cards;
 use crate::counters;
 use crate::damage;
@@ -204,7 +205,10 @@ fn request_destroy(
     target: Option<Entity>,
 ) {
     if let Some(target) = target {
-        destructions.write(Attempt(events::Destroy { permanent: target }));
+        destructions.write(Attempt(events::Destroy {
+            permanent: target,
+            cause: RESOLUTION_CAUSE,
+        }));
     }
 }
 
@@ -218,7 +222,10 @@ fn request_counter(
     if let Some(target) = target
         && target_on_stack
     {
-        countered.write(Attempt(events::Counter { spell: target }));
+        countered.write(Attempt(events::Counter {
+            spell: target,
+            cause: RESOLUTION_CAUSE,
+        }));
     }
 }
 
@@ -231,7 +238,10 @@ fn request_exile(
     let source =
         chosen_target.or_else(|| lookups.abilities.get(spell).ok().map(|ability| ability.source));
     if let Some(target) = source {
-        exiles.write(Attempt(events::Exile { object: target }));
+        exiles.write(Attempt(events::Exile {
+            object: target,
+            cause: RESOLUTION_CAUSE,
+        }));
     }
 }
 

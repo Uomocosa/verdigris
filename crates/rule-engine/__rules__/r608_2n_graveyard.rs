@@ -2,6 +2,7 @@ use crate::events;
 use bevy::prelude::{Commands, MessageReader, MessageWriter, Query, With};
 
 use crate::Attempt;
+use crate::RESOLUTION_CAUSE;
 use crate::STACK;
 use crate::cards;
 use crate::stack;
@@ -41,7 +42,10 @@ pub fn r608_2n_graveyard(
         if !is_instant_or_sorcery {
             continue;
         }
-        graveyards.write(Attempt(events::PutIntoGraveyard { object: spell }));
+        graveyards.write(Attempt(events::PutIntoGraveyard {
+            object: spell,
+            cause: RESOLUTION_CAUSE,
+        }));
     }
 }
 

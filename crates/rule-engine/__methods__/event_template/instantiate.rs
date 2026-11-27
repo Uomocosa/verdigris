@@ -102,6 +102,7 @@ pub fn instantiate<E: Event>(
         }
         rules::EventTemplate::Exile { what } => rules::AnyEvent::Exile(events::Exile {
             object: object(what),
+            cause: E::ID,
         }),
     }
 }
@@ -114,6 +115,7 @@ mod tests {
     use crate::events;
     use crate::players;
     use crate::rules;
+    use crate::rules::traits::event::Event;
     use crate::testing::{MockGame, P1, P2};
 
     use super::instantiate;
@@ -148,7 +150,10 @@ mod tests {
                         &happened,
                         &answers,
                     ),
-                    rules::AnyEvent::Exile(events::Exile { object: player })
+                    rules::AnyEvent::Exile(events::Exile {
+                        object: player,
+                        cause: events::DrawFromEmptyLibrary::ID,
+                    })
                 );
             })
             .unwrap();

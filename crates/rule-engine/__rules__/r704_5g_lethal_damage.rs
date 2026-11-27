@@ -4,6 +4,9 @@ use bevy::prelude::{Entity, MessageWriter, Query, With};
 use crate::Attempt;
 use crate::cards;
 use crate::damage;
+use crate::rules;
+
+const CAUSE: rules::EventId = rules::EventId("704.5g/lethal-damage");
 
 /// 704.5g If a creature has toughness greater than 0, it has damage marked on it, and the total
 /// damage marked on it is greater than or equal to its toughness, that creature has been dealt
@@ -20,6 +23,7 @@ pub fn r704_5g_lethal_damage(
         }
         destructions.write(Attempt(events::Destroy {
             permanent: creature,
+            cause: CAUSE,
         }));
     }
 }

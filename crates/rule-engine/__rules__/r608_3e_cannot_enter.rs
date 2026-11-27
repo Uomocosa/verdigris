@@ -1,6 +1,7 @@
 use bevy::prelude::{MessageReader, MessageWriter, Query};
 
 use crate::Attempt;
+use crate::RESOLUTION_CAUSE;
 use crate::STACK;
 use crate::cards;
 use crate::events;
@@ -34,7 +35,10 @@ pub fn r608_3e_cannot_enter(
             continue;
         }
         if !answers.legal(&events::EnterTheBattlefield { permanent: spell }) {
-            graveyards.write(Attempt(events::PutIntoGraveyard { object: spell }));
+            graveyards.write(Attempt(events::PutIntoGraveyard {
+                object: spell,
+                cause: RESOLUTION_CAUSE,
+            }));
         }
     }
 }

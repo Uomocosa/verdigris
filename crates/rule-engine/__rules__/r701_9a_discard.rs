@@ -4,6 +4,7 @@ use crate::Attempt;
 use crate::Did;
 use crate::Resolve;
 use crate::events;
+use crate::rules::traits::event::Event;
 
 /// 701.9a To discard a card, move it from its owner’s hand to that player’s graveyard.
 pub fn r701_9a_discard(
@@ -14,6 +15,7 @@ pub fn r701_9a_discard(
     for discard in discards.read() {
         graveyards.write(Attempt(events::PutIntoGraveyard {
             object: discard.card,
+            cause: events::DiscardCard::ID,
         }));
         did_discard.write(Did(**discard));
     }

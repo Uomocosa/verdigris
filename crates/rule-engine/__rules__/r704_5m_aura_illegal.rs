@@ -4,7 +4,10 @@ use bevy::prelude::{Entity, MessageWriter, Query, With};
 use crate::Attempt;
 use crate::BATTLEFIELD;
 use crate::cards;
+use crate::rules;
 use crate::zones;
+
+const CAUSE: rules::EventId = rules::EventId("704.5m/aura-illegal");
 
 /// 704.5m If an Aura is attached to an illegal object or player, or is not attached to an object or
 /// player, that Aura is put into its owner’s graveyard.
@@ -23,7 +26,10 @@ pub fn r704_5m_aura_illegal(
         } else if !moved.contains(**enchanted) {
             continue;
         }
-        burials.write(Attempt(events::PutIntoGraveyard { object: aura }));
+        burials.write(Attempt(events::PutIntoGraveyard {
+            object: aura,
+            cause: CAUSE,
+        }));
     }
 }
 

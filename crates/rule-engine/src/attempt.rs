@@ -26,6 +26,7 @@ mod tests {
     use bevy::prelude::Entity;
 
     use crate::events;
+    use crate::rules::traits::event::Event;
 
     use super::Attempt;
 
@@ -33,6 +34,7 @@ mod tests {
     fn test_usage() {
         let untap = events::Untap {
             permanent: Entity::PLACEHOLDER,
+            cause: events::Cast::ID,
         };
         let attempt = Attempt(untap);
         assert_eq!(attempt.permanent, Entity::PLACEHOLDER);

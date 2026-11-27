@@ -8,6 +8,8 @@ use crate::rules::traits::event::Event;
 pub struct Destroy {
     #[arg]
     pub permanent: Entity,
+    #[arg]
+    pub cause: rules::EventId,
 }
 
 impl Event for Destroy {
@@ -27,13 +29,22 @@ mod tests {
     #[test]
     fn test_usage() {
         let permanent = Entity::PLACEHOLDER;
-        let event = Destroy { permanent };
+        let event = Destroy {
+            permanent,
+            cause: rules::EventId("704.5g/lethal-damage"),
+        };
         assert_eq!(
             event.arg(Destroy::PERMANENT),
             Some(rules::ArgValue::Entity(permanent))
         );
+        assert_eq!(
+            event.arg(Destroy::CAUSE),
+            Some(rules::ArgValue::Event(rules::EventId(
+                "704.5g/lethal-damage"
+            )))
+        );
         assert_eq!(Destroy::ID, rules::EventId("701.8a/destroy"));
         assert_eq!(Destroy::restrictions(), Vec::new());
-        assert_eq!(Destroy::args(), &[Destroy::PERMANENT,]);
+        assert_eq!(Destroy::args(), &[Destroy::PERMANENT, Destroy::CAUSE,]);
     }
 }

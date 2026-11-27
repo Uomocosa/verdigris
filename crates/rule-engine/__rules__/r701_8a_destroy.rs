@@ -4,6 +4,7 @@ use bevy::prelude::{MessageReader, MessageWriter, Query, With};
 use crate::Attempt;
 use crate::Resolve;
 use crate::cards;
+use crate::rules::traits::event::Event;
 
 /// 701.8a To destroy a permanent, move it from the battlefield to its owner’s graveyard.
 ///
@@ -23,6 +24,7 @@ pub fn r701_8a_destroy(
         }
         moves_to_graveyard.write(Attempt(events::PutIntoGraveyard {
             object: destruction.permanent,
+            cause: events::Destroy::ID,
         }));
     }
 }

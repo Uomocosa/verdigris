@@ -6,7 +6,10 @@ use crate::Attempt;
 use crate::Game;
 use crate::cards;
 use crate::events;
+use crate::rules;
 use crate::turns;
+
+const CAUSE: rules::EventId = rules::EventId("502.3/untap-step");
 
 /// 502.3. Third, the active player determines which permanents they control will untap. Then they
 /// untap them all simultaneously. This turn-based action doesn’t use the stack. Normally, all of
@@ -26,7 +29,10 @@ fn untap(
     };
     for (entity, controller) in &tapped {
         if **controller == active_player.id {
-            untaps.write(Attempt(events::Untap { permanent: entity }));
+            untaps.write(Attempt(events::Untap {
+                permanent: entity,
+                cause: CAUSE,
+            }));
         }
     }
 }

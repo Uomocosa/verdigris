@@ -388,7 +388,8 @@ mod tests {
                     legality::<events::Destroy>(
                         &answers,
                         &events::Destroy {
-                            permanent: *protected
+                            permanent: *protected,
+                            cause: crate::RESOLUTION_CAUSE,
                         }
                     ),
                     rules::Legality::Illegal
@@ -397,7 +398,8 @@ mod tests {
                     legality::<events::Destroy>(
                         &answers,
                         &events::Destroy {
-                            permanent: *exposed
+                            permanent: *exposed,
+                            cause: crate::RESOLUTION_CAUSE,
                         }
                     ),
                     rules::Legality::Legal
@@ -420,11 +422,23 @@ mod tests {
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
                 assert_eq!(
-                    legality::<events::Counter>(&answers, &events::Counter { spell: *protected }),
+                    legality::<events::Counter>(
+                        &answers,
+                        &events::Counter {
+                            spell: *protected,
+                            cause: crate::RESOLUTION_CAUSE,
+                        },
+                    ),
                     rules::Legality::Illegal
                 );
                 assert_eq!(
-                    legality::<events::Counter>(&answers, &events::Counter { spell: *exposed }),
+                    legality::<events::Counter>(
+                        &answers,
+                        &events::Counter {
+                            spell: *exposed,
+                            cause: crate::RESOLUTION_CAUSE,
+                        },
+                    ),
                     rules::Legality::Legal
                 );
             })

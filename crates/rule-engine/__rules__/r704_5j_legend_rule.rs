@@ -10,6 +10,9 @@ use crate::actions;
 use crate::cards;
 use crate::events;
 use crate::players;
+use crate::rules;
+
+const CAUSE: rules::EventId = rules::EventId("704.5j/legend-rule");
 
 /// 704.5j If two or more legendary permanents with the same name are controlled by the same
 /// player, that player chooses one of them, and the rest are put into their owners’ graveyards.
@@ -69,7 +72,10 @@ fn put_the_rest_into_graveyards(
             if permanents.get(other).is_err() {
                 continue;
             }
-            burials.write(Attempt(events::PutIntoGraveyard { object: other }));
+            burials.write(Attempt(events::PutIntoGraveyard {
+                object: other,
+                cause: CAUSE,
+            }));
         }
         **performed = true;
     }
