@@ -47,7 +47,7 @@ fn ask_which_cards(
             id: events::discard::DISCARD,
             player: request.player,
             source: None,
-            among: hand.into_iter().collect(),
+            among: actions::Candidates::Fixed(hand.into_iter().collect()),
             count: actions::Count::exactly(request.count),
             ordered: false,
         })));

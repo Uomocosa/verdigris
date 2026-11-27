@@ -29,8 +29,9 @@ pub fn answer_may<E: Event>(
             .map(|option| (option, true))
             .chain(
                 choice
-                    .among
-                    .iter()
+                    .fixed()
+                    .into_iter()
+                    .flatten()
                     .filter(|option| !chosen.contains(option))
                     .map(|option| (option, false)),
             )

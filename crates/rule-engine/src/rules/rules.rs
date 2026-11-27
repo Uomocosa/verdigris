@@ -140,6 +140,10 @@ impl Rules<'_, '_> {
 
 #[atomic_delegates]
 impl Rules<'_, '_> {
+    #[must_use]
+    pub(crate) fn visible_entities(&self, viewer: players::PlayerId) -> Vec<Entity> {}
+
+    #[must_use]
     pub(crate) fn holder_changes<E: rules::traits::event::Event>(
         &self,
         event: &E,

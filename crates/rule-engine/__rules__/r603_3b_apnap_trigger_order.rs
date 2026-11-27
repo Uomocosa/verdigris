@@ -105,7 +105,7 @@ mod tests {
             panic!("expected P1 to be asked to order their triggers");
         };
         assert_eq!(choice.id, ORDER_TRIGGERS);
-        let instances: Vec<Entity> = choice.among.iter().copied().collect();
+        let instances: Vec<Entity> = choice.fixed().unwrap().iter().copied().collect();
         assert_eq!(instances.len(), 2);
         let mut sources: Vec<Entity> = instances
             .iter()
@@ -139,7 +139,7 @@ mod tests {
         };
         assert_eq!(choice.id, ORDER_TRIGGERS);
         assert_eq!(choice.player, p1.id);
-        let mut instances: Vec<Entity> = choice.among.iter().copied().collect();
+        let mut instances: Vec<Entity> = choice.fixed().unwrap().iter().copied().collect();
         assert_eq!(instances.len(), 2);
         let mut sources: Vec<Entity> = instances
             .iter()

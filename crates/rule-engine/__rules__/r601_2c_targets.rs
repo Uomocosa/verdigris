@@ -103,7 +103,7 @@ fn ask_for_targets(
             id: TARGET,
             player: controller,
             source: Some(spell),
-            among: legal,
+            among: actions::Candidates::Fixed(legal),
             count: actions::Count::exactly(target.count),
             ordered: false,
         })));

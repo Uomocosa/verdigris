@@ -7,7 +7,7 @@ pub fn target_choice(game: &testing::MockGame) -> Option<testing::ExpectedTarget
     match pending {
         actions::Choice::Pick(choice) if choice.id == TARGET => Some(testing::ExpectedTargets {
             count: choice.count.max,
-            legal: choice.among.clone(),
+            legal: choice.fixed().cloned().unwrap_or_default(),
         }),
         actions::Choice::Pick(_) | actions::Choice::CombatDamage(_) => None,
     }

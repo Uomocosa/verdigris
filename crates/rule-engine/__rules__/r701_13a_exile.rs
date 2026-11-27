@@ -64,7 +64,7 @@ mod tests {
             panic!("expected P1 to be asked to order their triggers");
         };
         assert_eq!(choice.id, ORDER_TRIGGERS);
-        let instances: Vec<Entity> = choice.among.iter().copied().collect();
+        let instances: Vec<Entity> = choice.fixed().unwrap().iter().copied().collect();
         assert_eq!(instances.len(), 3);
         game.play([p1.order_triggers([instances[0], instances[1], instances[2]])])?;
         for _ in 0..3 {

@@ -47,7 +47,7 @@ fn ask_which_opponent(mut asks: MessageWriter<actions::Ask>, game: Game) {
         id: DEFENDING_PLAYER,
         player: attacking_player.id,
         source: None,
-        among: opponents.into_iter().collect(),
+        among: actions::Candidates::Fixed(opponents.into_iter().collect()),
         count: actions::Count::exactly(1),
         ordered: false,
     })));

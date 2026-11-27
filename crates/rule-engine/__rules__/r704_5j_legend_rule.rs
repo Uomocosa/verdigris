@@ -51,7 +51,7 @@ fn ask_which_to_keep(
             id: LEGEND,
             player: controller,
             source: None,
-            among: entities.into_iter().collect(),
+            among: actions::Candidates::Fixed(entities.into_iter().collect()),
             count: actions::Count::exactly(1),
             ordered: false,
         })));
@@ -74,7 +74,9 @@ fn put_the_rest_into_graveyards(
         let actions::Action::Choose(chosen) = &answered.answer else {
             continue;
         };
-        for other in choice.among.iter().copied().filter(|other| !chosen.contains(other)) {
+        for other in
+            choice.fixed().into_iter().flatten().copied().filter(|other| !chosen.contains(other))
+        {
             if permanents.get(other).is_err() {
                 continue;
             }

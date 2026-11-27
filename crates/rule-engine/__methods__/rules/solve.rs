@@ -3,7 +3,6 @@ use bevy::prelude::Entity;
 use crate::players;
 use crate::rules;
 use crate::rules::traits::event::Event;
-use crate::zones;
 
 #[must_use]
 pub fn solve<E: Event>(
@@ -29,28 +28,7 @@ pub fn solve<E: Event>(
                     .collect(),
             ),
             Some(rules::ArgKind::Entity) => {
-                let mut entities: Vec<Entity> = answers
-                    .entities
-                    .iter()
-                    .filter_map(|entity| {
-                        let in_zone = entity.get::<zones::InZone>()?;
-                        let (_, zone, owner) = answers.zones.get(**in_zone).ok()?;
-                        if matches!(
-                            *zone,
-                            zones::Zone::Battlefield
-                                | zones::Zone::Graveyard
-                                | zones::Zone::Exile
-                                | zones::Zone::Stack
-                        ) || *zone == zones::Zone::Hand
-                            && owner.is_some_and(|owner| ***owner == *viewer)
-                        {
-                            Some(entity.id())
-                        } else {
-                            None
-                        }
-                    })
-                    .collect();
-                entities.sort();
+                let entities: Vec<Entity> = answers.visible_entities(viewer);
                 domains.push(entities.into_iter().map(rules::ArgValue::Entity).collect());
             }
             Some(rules::ArgKind::Entities | rules::ArgKind::Amount | rules::ArgKind::Event)

@@ -45,11 +45,12 @@ impl Choice {
 #[atomic_delegates]
 impl Choice {
     #[must_use]
-    pub fn accepts(&self, answer: &actions::Action) -> bool {}
+    pub fn accepts(&self, answers: &rules::Rules, answer: &actions::Action) -> bool {}
 
     #[must_use]
     pub fn rejection(
         &self,
+        answers: &rules::Rules,
         player: players::PlayerId,
         answer: &actions::Action,
     ) -> Option<actions::Rejected> {
@@ -87,7 +88,7 @@ mod tests {
             id: actions::ChoiceId("may"),
             player: p1.id,
             source: None,
-            among: BTreeSet::new(),
+            among: actions::Candidates::Fixed(BTreeSet::new()),
             count: actions::Count::up_to(0),
             ordered: false,
         });
@@ -106,7 +107,7 @@ mod tests {
                 id: TARGET,
                 player: chooser,
                 source: Some(first),
-                among: BTreeSet::from([first]),
+                among: actions::Candidates::Fixed(BTreeSet::from([first])),
                 count: actions::Count::exactly(1),
                 ordered: false,
             }),
@@ -114,7 +115,7 @@ mod tests {
                 id: actions::ChoiceId(*event),
                 player: chooser,
                 source: None,
-                among: BTreeSet::from([first]),
+                among: actions::Candidates::Fixed(BTreeSet::from([first])),
                 count: actions::Count::up_to(1),
                 ordered: false,
             }),
@@ -122,7 +123,7 @@ mod tests {
                 id: actions::ChoiceId("701.9b/discard"),
                 player: chooser,
                 source: None,
-                among: BTreeSet::from([first]),
+                among: actions::Candidates::Fixed(BTreeSet::from([first])),
                 count: actions::Count::exactly(1),
                 ordered: false,
             }),
@@ -134,7 +135,7 @@ mod tests {
                 id: ORDER_TRIGGERS,
                 player: chooser,
                 source: None,
-                among: BTreeSet::from([first]),
+                among: actions::Candidates::Fixed(BTreeSet::from([first])),
                 count: actions::Count::exactly(1),
                 ordered: true,
             }),
@@ -142,7 +143,7 @@ mod tests {
                 id: LEGEND,
                 player: chooser,
                 source: None,
-                among: BTreeSet::from([first]),
+                among: actions::Candidates::Fixed(BTreeSet::from([first])),
                 count: actions::Count::exactly(1),
                 ordered: false,
             }),
@@ -164,7 +165,7 @@ mod tests {
             id: actions::ChoiceId(*event),
             player: p1.id,
             source: None,
-            among: BTreeSet::from([first]),
+            among: actions::Candidates::Fixed(BTreeSet::from([first])),
             count: actions::Count::up_to(1),
             ordered: false,
         });
@@ -172,7 +173,7 @@ mod tests {
             id: actions::ChoiceId("701.9b/discard"),
             player: p1.id,
             source: None,
-            among: BTreeSet::from([first]),
+            among: actions::Candidates::Fixed(BTreeSet::from([first])),
             count: actions::Count::exactly(1),
             ordered: false,
         });

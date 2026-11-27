@@ -9,7 +9,7 @@ mod pick_choice;
 
 pub use action::Action;
 pub use ask_queue::AskQueue;
-pub use basic::enums::ChoiceWhy;
+pub use basic::enums::{CandidateCheck, Candidates, ChoiceWhy};
 pub use basic::messages::{Answered, Ask, DiscardRequest, PlayerAction, Rejected};
 pub use basic::newtypes::ChoiceId;
 pub use basic::resources::{AcceptedMays, LegalActions, PendingMayAsks};
