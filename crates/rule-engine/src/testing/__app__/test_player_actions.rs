@@ -36,7 +36,7 @@ impl TestPlayerActions {
     pub fn discard<const N: usize>(self, cards: [testing::TestCard; N]) -> Self {}
 
     #[must_use]
-    pub fn order_triggers<const N: usize>(self, triggers: [testing::TestCard; N]) -> Self {}
+    pub fn order_triggers<const N: usize>(self, triggers: [impl Into<Entity>; N]) -> Self {}
 
     #[must_use]
     pub fn arrange_graveyard<const N: usize>(self, cards: [testing::TestCard; N]) -> Self {}

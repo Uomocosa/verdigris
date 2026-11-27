@@ -1,7 +1,8 @@
-use bevy::prelude::World;
+use bevy::prelude::{Entity, With, World};
 
 use crate::GameEnded;
 use crate::MAX_STATE_BASED_PASSES;
+use crate::ORDER_TRIGGERS;
 use crate::StateBasedActions;
 use crate::StateBasedActionsPerformed;
 use crate::actions;
@@ -33,11 +34,17 @@ pub fn r117_5_r704_3_state_based_actions(world: &mut World) {
             return;
         }
         if !**world.resource::<StateBasedActionsPerformed>() {
-            if world.resource::<stack::TriggerQueue>().is_empty() {
+            let queue_empty = world.resource::<stack::TriggerQueue>().is_empty();
+            let held_empty = world
+                .query_filtered::<Entity, With<stack::PendingTrigger>>()
+                .iter(world)
+                .next()
+                .is_none();
+            if queue_empty && held_empty {
                 return;
             }
             if (*world.resource::<actions::PendingChoice>()).as_ref().is_some_and(|choice| {
-                matches!(choice, actions::Choice::OrderTriggers(_))
+                matches!(choice, actions::Choice::Pick(choice) if choice.id == ORDER_TRIGGERS)
                     || matches!(choice, actions::Choice::Pick(choice) if choice.count.min == 0)
             }) {
                 return;

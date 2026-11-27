@@ -48,9 +48,6 @@ pub enum Rejected {
         player: players::PlayerId,
         why: actions::ChoiceWhy,
     },
-    InvalidTriggerOrder {
-        player: players::PlayerId,
-    },
     InvalidCombatDamage {
         player: players::PlayerId,
     },

@@ -9,9 +9,7 @@ pub fn target_choice(game: &testing::MockGame) -> Option<testing::ExpectedTarget
             count: choice.count.max,
             legal: choice.among.clone(),
         }),
-        actions::Choice::Pick(_)
-        | actions::Choice::CombatDamage(_)
-        | actions::Choice::OrderTriggers(_) => None,
+        actions::Choice::Pick(_) | actions::Choice::CombatDamage(_) => None,
     }
 }
 

@@ -1,6 +1,6 @@
 use bevy::ecs::schedule::{IntoScheduleConfigs, ScheduleConfigs};
 use bevy::ecs::system::ScheduleSystem;
-use bevy::prelude::{Query, Res, ResMut, not, on_message};
+use bevy::prelude::{Entity, Query, Res, ResMut, With, not, on_message};
 
 use crate::GameMut;
 use crate::STACK;
@@ -28,6 +28,7 @@ fn check_for_a_priority_window(
     mut game: GameMut,
     reentry: ResMut<turns::CleanupReentry>,
     triggers: Res<stack::TriggerQueue>,
+    held: Query<Entity, With<stack::PendingTrigger>>,
     performed: Res<StateBasedActionsPerformed>,
     pending: Res<actions::PendingChoice>,
     zones: zones::ZoneLookup,
@@ -50,7 +51,7 @@ fn check_for_a_priority_window(
         .find(STACK, None)
         .and_then(|stack| stack_contents.get(stack).ok())
         .is_none_or(|contents| contents.is_empty());
-    if **performed || !triggers.is_empty() || !stack_is_empty {
+    if **performed || !triggers.is_empty() || !held.is_empty() || !stack_is_empty {
         reentry.is_priority_window = true;
         game.give_priority_to_active_player();
     }
@@ -67,10 +68,15 @@ fn repeat_cleanup_step(reentry: ResMut<turns::CleanupReentry>, mut game: GameMut
 
 #[cfg(test)]
 mod tests {
+    use bevy::prelude::Entity;
+
     use crate::BATTLEFIELD;
     use crate::CLEANUP;
     use crate::HAND;
+    use crate::ORDER_TRIGGERS;
+    use crate::actions;
     use crate::mana;
+    use crate::stack;
     use crate::testing::*;
     use crate::turns;
 
@@ -87,7 +93,27 @@ mod tests {
         assert_eq!(game.priority().holder, Some(p1.id));
 
         game.play([p1.pass_priority()])?;
-        game.play([p1.order_triggers([knight_1, knight_2, knight_3])])?;
+        let Some(actions::Choice::Pick(choice)) =
+            game.app.world().resource::<actions::PendingChoice>().as_ref().cloned()
+        else {
+            panic!("expected P1 to be asked to order their triggers");
+        };
+        assert_eq!(choice.id, ORDER_TRIGGERS);
+        let instances: Vec<Entity> = choice.among.iter().copied().collect();
+        assert_eq!(instances.len(), 3);
+        let mut sources: Vec<Entity> = instances
+            .iter()
+            .map(|instance| game.get::<stack::PendingTrigger>(*instance).unwrap().source)
+            .collect();
+        sources.sort();
+        let mut expected = [
+            Entity::from(knight_1),
+            Entity::from(knight_2),
+            Entity::from(knight_3),
+        ];
+        expected.sort();
+        assert_eq!(sources, expected);
+        game.play([p1.order_triggers([instances[0], instances[1], instances[2]])])?;
         assert_eq!(game.trigger_sources().len(), 3);
         for _ in 0..3 {
             game.play([p1.pass_priority(), p2.pass_priority()])?;

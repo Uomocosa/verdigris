@@ -1,7 +1,8 @@
 use bevy::ecs::system::RunSystemOnce;
-use bevy::prelude::{Entity, World};
+use bevy::prelude::{Entity, With, World};
 
 use crate::Game;
+use crate::ORDER_TRIGGERS;
 use crate::actions;
 use crate::cards;
 use crate::players;
@@ -34,28 +35,26 @@ pub fn r603_3_triggers_on_stack(world: &mut World) {
         return;
     }
     let pending = world.resource_mut::<stack::TriggerQueue>().take_pending();
-    if pending.is_empty() {
-        return;
-    }
-    let Ok(apnap) = world.run_system_once(|game: Game| game.players_in_apnap_order()) else {
-        return;
-    };
-    let mut ordered: Vec<(players::PlayerId, stack::PendingTrigger)> = Vec::new();
-    {
+    if !pending.is_empty() {
         let mut controllers = world.query::<&cards::Controller>();
         for trigger in pending {
             let Ok(controller) = controllers.get(world, trigger.source) else {
                 continue;
             };
-            ordered.push((**controller, trigger));
+            world.spawn((cards::Controller(**controller), trigger));
         }
     }
-    if ordered.is_empty() {
+    let Ok(apnap) = world.run_system_once(|game: Game| game.players_in_apnap_order()) else {
         return;
-    }
-    ordered.sort_by_key(|(controller, _)| apnap_position(&apnap, *controller));
-    let mut groups: Vec<Vec<(players::PlayerId, stack::PendingTrigger)>> = Vec::new();
-    for (controller, trigger) in ordered {
+    };
+    let mut held: Vec<(players::PlayerId, Entity)> = world
+        .query_filtered::<(Entity, &cards::Controller), With<stack::PendingTrigger>>()
+        .iter(world)
+        .map(|(instance, controller)| (**controller, instance))
+        .collect();
+    held.sort_by_key(|(controller, _)| apnap_position(&apnap, *controller));
+    let mut groups: Vec<Vec<(players::PlayerId, Entity)>> = Vec::new();
+    for (controller, instance) in held {
         let continues_run = groups.last().is_some_and(|group| {
             group.first().is_some_and(|first| {
                 let (first_controller, _) = first;
@@ -64,18 +63,17 @@ pub fn r603_3_triggers_on_stack(world: &mut World) {
         });
         if continues_run {
             if let Some(group) = groups.last_mut() {
-                group.push((controller, trigger));
+                group.push((controller, instance));
             }
         } else {
-            groups.push(vec![(controller, trigger)]);
+            groups.push(vec![(controller, instance)]);
         }
     }
-    let mut groups = groups.into_iter();
-    while let Some(group) = groups.next() {
+    for group in groups {
         if group.len() == 1 {
             let mut single = group;
-            if let Some((controller, trigger)) = single.pop() {
-                spawn_trigger(world, controller, trigger);
+            if let Some((_, instance)) = single.pop() {
+                put_on_stack(world, instance);
             }
             continue;
         }
@@ -83,22 +81,16 @@ pub fn r603_3_triggers_on_stack(world: &mut World) {
             continue;
         };
         let controller = *controller;
-        world.write_message(actions::Ask(actions::Choice::OrderTriggers(
-            actions::OrderTriggersChoice {
-                player: controller,
-                triggers: group.iter().map(|(_, trigger)| trigger.source).collect(),
-            },
-        )));
+        let among: Vec<Entity> = group.iter().map(|(_, instance)| *instance).collect();
+        world.write_message(actions::Ask(actions::Choice::Pick(actions::PickChoice {
+            id: ORDER_TRIGGERS,
+            player: controller,
+            source: None,
+            among: among.iter().copied().collect(),
+            count: actions::Count::exactly(u32::try_from(among.len()).unwrap_or(u32::MAX)),
+            ordered: true,
+        })));
         let _ = world.run_system_once(actions::bevy_systems::show_asks::show_asks);
-        let mut queue = world.resource_mut::<stack::TriggerQueue>();
-        for (_, trigger) in group {
-            queue.push(trigger);
-        }
-        for rest in groups.by_ref() {
-            for (_, trigger) in rest {
-                queue.push(trigger);
-            }
-        }
         return;
     }
 }
@@ -107,16 +99,22 @@ fn apnap_position(order: &[players::PlayerId], player: players::PlayerId) -> usi
     order.iter().position(|candidate| *candidate == player).unwrap_or(usize::MAX)
 }
 
-fn spawn_trigger(world: &mut World, controller: players::PlayerId, trigger: stack::PendingTrigger) {
+fn put_on_stack(world: &mut World, instance: Entity) {
     let mut zones = world.query::<(Entity, &zones::Zone)>();
     let Some(stack) =
         zones.iter(world).find(|(_, zone)| **zone == zones::Zone::Stack).map(|(entity, _)| entity)
     else {
         return;
     };
-    world.spawn((
+    let Ok(mut held) = world.get_entity_mut(instance) else {
+        return;
+    };
+    let Some(trigger) = held.get::<stack::PendingTrigger>().cloned() else {
+        return;
+    };
+    held.remove::<stack::PendingTrigger>();
+    held.insert((
         zones::InZone(stack),
-        cards::Controller(controller),
         stack::TriggeredAbilityOnStack {
             source: trigger.source,
             intervening_if: trigger.ability.intervening_if,

@@ -46,4 +46,6 @@ pub const TARGET: actions::ChoiceId = actions::ChoiceId("601.2c");
 
 pub const DEFENDING_PLAYER: actions::ChoiceId = actions::ChoiceId("507.1");
 
+pub const ORDER_TRIGGERS: actions::ChoiceId = actions::ChoiceId("603.3b");
+
 pub const GRAVEYARD_ORDER: actions::ChoiceId = actions::ChoiceId("404.3");

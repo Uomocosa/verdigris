@@ -1,11 +1,9 @@
-use std::collections::BTreeSet;
-
 use bevy::prelude::{Commands, Entity, MessageReader, Query, ResMut};
 
+use crate::ORDER_TRIGGERS;
 use crate::STACK;
 use crate::actions;
 use crate::cards;
-use crate::players;
 use crate::stack;
 use crate::zones;
 
@@ -33,46 +31,49 @@ pub fn r603_3b_apnap_trigger_order(
     mut commands: Commands,
     zones: zones::ZoneLookup,
     controllers: Query<&cards::Controller>,
+    held: Query<&stack::PendingTrigger>,
 ) {
-    for answered in answers.read() {
-        let actions::Choice::OrderTriggers(choice) = &answered.choice else {
+    let mut ordered: Vec<Entity> = Vec::new();
+    let mut answered = false;
+    for answer in answers.read() {
+        let actions::Choice::Pick(choice) = &answer.choice else {
             continue;
         };
-        let actions::Action::OrderTriggers(ordered) = &answered.answer else {
+        if choice.id != ORDER_TRIGGERS {
+            continue;
+        }
+        let actions::Action::Choose(instances) = &answer.answer else {
             continue;
         };
-        let expected: BTreeSet<Entity> = choice.triggers.iter().copied().collect();
-        let Some(stack) = zones.find(STACK, None) else {
+        answered = true;
+        ordered.extend(instances.iter().copied());
+    }
+    if !answered {
+        return;
+    }
+    let Some(stack) = zones.find(STACK, None) else {
+        return;
+    };
+    for instance in ordered {
+        let Ok(trigger) = held.get(instance) else {
             continue;
         };
-        let mut held: Vec<(players::PlayerId, stack::PendingTrigger)> = Vec::new();
-        for trigger in queue.take_pending() {
-            let Ok(controller) = controllers.get(trigger.source) else {
-                continue;
-            };
-            if **controller == choice.player && expected.contains(&trigger.source) {
-                held.push((**controller, trigger));
-            } else {
-                queue.push(trigger);
-            }
-        }
-        for source in ordered {
-            if let Some(position) = held.iter().position(|(_, trigger)| trigger.source == *source) {
-                let (controller, trigger) = held.remove(position);
-                commands.spawn((
-                    zones::InZone(stack),
-                    cards::Controller(controller),
-                    stack::TriggeredAbilityOnStack {
-                        source: trigger.source,
-                        intervening_if: trigger.ability.intervening_if,
-                        effect: trigger.ability.effect,
-                    },
-                ));
-            }
-        }
-        for (_, trigger) in held {
-            queue.push(trigger);
-        }
+        let trigger = trigger.clone();
+        commands.entity(instance).remove::<stack::PendingTrigger>();
+        commands.entity(instance).insert((
+            zones::InZone(stack),
+            stack::TriggeredAbilityOnStack {
+                source: trigger.source,
+                intervening_if: trigger.ability.intervening_if,
+                effect: trigger.ability.effect,
+            },
+        ));
+    }
+    for trigger in queue.take_pending() {
+        let Ok(controller) = controllers.get(trigger.source) else {
+            continue;
+        };
+        commands.spawn((cards::Controller(**controller), trigger));
     }
 }
 
@@ -80,8 +81,10 @@ pub fn r603_3b_apnap_trigger_order(
 mod tests {
     use bevy::prelude::Entity;
 
+    use crate::ORDER_TRIGGERS;
     use crate::actions;
     use crate::mana;
+    use crate::stack;
     use crate::testing::*;
     use crate::{BATTLEFIELD, HAND};
 
@@ -96,7 +99,23 @@ mod tests {
             game.player(p1).cards_in(BATTLEFIELD).exactly::<2>(SOUL_WARDEN)?;
         game.play([p1.cast(bears).pass_priority(), p2.pass_priority()])?;
         assert_eq!(game.trigger_sources().len(), 0);
-        game.play([p1.order_triggers([warden_1, warden_2])])?;
+        let Some(actions::Choice::Pick(choice)) =
+            game.app.world().resource::<actions::PendingChoice>().as_ref().cloned()
+        else {
+            panic!("expected P1 to be asked to order their triggers");
+        };
+        assert_eq!(choice.id, ORDER_TRIGGERS);
+        let instances: Vec<Entity> = choice.among.iter().copied().collect();
+        assert_eq!(instances.len(), 2);
+        let mut sources: Vec<Entity> = instances
+            .iter()
+            .map(|instance| game.get::<stack::PendingTrigger>(*instance).unwrap().source)
+            .collect();
+        sources.sort();
+        let mut expected = [Entity::from(warden_1), Entity::from(warden_2)];
+        expected.sort();
+        assert_eq!(sources, expected);
+        game.play([p1.order_triggers([instances[0], instances[1]])])?;
         assert_eq!(game.trigger_sources().len(), 2);
         game.play([p1.pass_priority(), p2.pass_priority()])?;
         game.play([p1.pass_priority(), p2.pass_priority()])?;
@@ -115,20 +134,28 @@ mod tests {
             game.player(p1).cards_in(BATTLEFIELD).exactly::<2>(SOUL_WARDEN)?;
         game.play([p1.cast(bears).pass_priority(), p2.pass_priority()])?;
         let pending = game.app.world().resource::<actions::PendingChoice>().as_ref().cloned();
-        let Some(actions::Choice::OrderTriggers(choice)) = pending else {
+        let Some(actions::Choice::Pick(choice)) = pending else {
             panic!("expected P1 to be asked to order their triggers");
         };
+        assert_eq!(choice.id, ORDER_TRIGGERS);
         assert_eq!(choice.player, p1.id);
-        let mut triggers = choice.triggers;
-        triggers.sort();
+        let mut instances: Vec<Entity> = choice.among.iter().copied().collect();
+        assert_eq!(instances.len(), 2);
+        let mut sources: Vec<Entity> = instances
+            .iter()
+            .map(|instance| game.get::<stack::PendingTrigger>(*instance).unwrap().source)
+            .collect();
+        sources.sort();
         let mut expected = [Entity::from(warden_1), Entity::from(warden_2)];
         expected.sort();
-        assert_eq!(triggers, expected);
-        game.play([p1.order_triggers([warden_1, warden_2])])?;
-        assert_eq!(
-            game.trigger_sources(),
-            vec![Entity::from(warden_1), Entity::from(warden_2)]
-        );
+        assert_eq!(sources, expected);
+        instances.reverse();
+        let ordered: Vec<Entity> = instances
+            .iter()
+            .map(|instance| game.get::<stack::PendingTrigger>(*instance).unwrap().source)
+            .collect();
+        game.play([p1.order_triggers([instances[0], instances[1]])])?;
+        assert_eq!(game.trigger_sources(), ordered);
         Ok(())
     }
 

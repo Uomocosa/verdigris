@@ -62,7 +62,7 @@ impl TestPlayer {
     pub fn keep_legendary(self, card: testing::TestCard) -> testing::TestPlayerActions { testing::TestPlayerActions::of(self).keep_legendary(card) }
 
     #[must_use]
-    pub fn order_triggers<const N: usize>(self, triggers: [testing::TestCard; N]) -> testing::TestPlayerActions { testing::TestPlayerActions::of(self).order_triggers(triggers) }
+    pub fn order_triggers<const N: usize>(self, triggers: [impl Into<Entity>; N]) -> testing::TestPlayerActions { testing::TestPlayerActions::of(self).order_triggers(triggers) }
 
     #[must_use]
     pub fn arrange_graveyard<const N: usize>(self, cards: [testing::TestCard; N]) -> testing::TestPlayerActions { testing::TestPlayerActions::of(self).arrange_graveyard(cards) }

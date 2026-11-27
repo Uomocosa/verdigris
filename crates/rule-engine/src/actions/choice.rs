@@ -10,7 +10,6 @@ use crate::rules;
 pub enum Choice {
     Pick(actions::PickChoice),
     CombatDamage(actions::CombatDamageChoice),
-    OrderTriggers(actions::OrderTriggersChoice),
 }
 
 #[atomic_delegates]
@@ -30,7 +29,7 @@ impl Choice {
     pub fn is_found_by_a_state_based_check(&self) -> bool {
         match self {
             Self::Pick(choice) => choice.id == LEGEND,
-            _ => false,
+            Self::CombatDamage(_) => false,
         }
     }
 
@@ -39,7 +38,6 @@ impl Choice {
         match self {
             Self::Pick(choice) => choice.player,
             Self::CombatDamage(choice) => choice.player,
-            Self::OrderTriggers(choice) => choice.player,
         }
     }
 }
@@ -63,7 +61,7 @@ impl Choice {
     pub(crate) fn blocks_priority(&self) -> bool {
         match self {
             Self::Pick(choice) => choice.id != TARGET,
-            _ => true,
+            Self::CombatDamage(_) => true,
         }
     }
 }
@@ -75,6 +73,7 @@ mod tests {
     use crate::BATTLEFIELD;
     use crate::HAND;
     use crate::LEGEND;
+    use crate::ORDER_TRIGGERS;
     use crate::TARGET;
     use crate::actions;
     use crate::players;
@@ -131,9 +130,13 @@ mod tests {
                 player: chooser,
                 needed: Vec::new(),
             }),
-            actions::Choice::OrderTriggers(actions::OrderTriggersChoice {
+            actions::Choice::Pick(actions::PickChoice {
+                id: ORDER_TRIGGERS,
                 player: chooser,
-                triggers: vec![first],
+                source: None,
+                among: BTreeSet::from([first]),
+                count: actions::Count::exactly(1),
+                ordered: true,
             }),
             actions::Choice::Pick(actions::PickChoice {
                 id: LEGEND,

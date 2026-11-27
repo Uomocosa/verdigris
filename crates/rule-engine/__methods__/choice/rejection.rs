@@ -18,9 +18,6 @@ pub fn rejection(
             }
         }
         actions::Choice::CombatDamage(_) => Some(actions::Rejected::InvalidCombatDamage { player }),
-        actions::Choice::OrderTriggers(_) => {
-            Some(actions::Rejected::InvalidTriggerOrder { player })
-        }
     }
 }
 

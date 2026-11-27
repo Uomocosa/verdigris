@@ -5,11 +5,10 @@ use crate::testing;
 
 pub fn order_triggers<const N: usize>(
     player_actions: testing::TestPlayerActions,
-    triggers: [testing::TestCard; N],
+    triggers: [impl Into<Entity>; N],
 ) -> testing::TestPlayerActions {
-    player_actions.act(actions::Action::OrderTriggers(
-        triggers.into_iter().map(Entity::from).collect(),
-    ))
+    let ordered: Vec<Entity> = triggers.into_iter().map(Into::into).collect();
+    player_actions.act(actions::Action::Choose(ordered))
 }
 
 #[cfg(test)]
@@ -38,7 +37,7 @@ mod tests {
             .steps,
             vec![testing::PlayStep::Act(
                 chooser,
-                actions::Action::OrderTriggers(vec![trigger])
+                actions::Action::Choose(vec![trigger])
             )]
         );
     }

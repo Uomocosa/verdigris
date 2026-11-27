@@ -39,6 +39,8 @@ pub fn r701_13a_exile(
 mod tests {
     use bevy::prelude::Entity;
 
+    use crate::ORDER_TRIGGERS;
+    use crate::actions;
     use crate::mana;
     use crate::testing::*;
     use crate::turns;
@@ -56,7 +58,15 @@ mod tests {
         game.play([p1.pass_to(CLEANUP), p2.pass_to(CLEANUP)])?;
         assert_eq!(game.turn().step, turns::Step::Cleanup);
         game.play([p1.pass_priority()])?;
-        game.play([p1.order_triggers([knight_1, knight_2, knight_3])])?;
+        let Some(actions::Choice::Pick(choice)) =
+            game.app.world().resource::<actions::PendingChoice>().as_ref().cloned()
+        else {
+            panic!("expected P1 to be asked to order their triggers");
+        };
+        assert_eq!(choice.id, ORDER_TRIGGERS);
+        let instances: Vec<Entity> = choice.among.iter().copied().collect();
+        assert_eq!(instances.len(), 3);
+        game.play([p1.order_triggers([instances[0], instances[1], instances[2]])])?;
         for _ in 0..3 {
             game.play([p1.pass_priority(), p2.pass_priority()])?;
         }

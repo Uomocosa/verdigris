@@ -1,6 +1,7 @@
 use bevy::prelude::{Res, ResMut};
 
 use crate::Game;
+use crate::ORDER_TRIGGERS;
 use crate::actions;
 use crate::events;
 use crate::rules;
@@ -15,6 +16,12 @@ pub fn refresh_legal_actions(
     let actions::PendingChoice(choice) = pending;
     if let Some(choice) = choice {
         match choice {
+            actions::Choice::Pick(pick) if pick.id == ORDER_TRIGGERS => {
+                *legal = actions::LegalActions {
+                    player: Some(pick.player),
+                    actions: Vec::new(),
+                };
+            }
             actions::Choice::Pick(pick) => {
                 let previews: Vec<(actions::Action, rules::Legality)> = pick
                     .among
@@ -31,7 +38,7 @@ pub fn refresh_legal_actions(
                     actions: previews,
                 };
             }
-            actions::Choice::CombatDamage(_) | actions::Choice::OrderTriggers(_) => {
+            actions::Choice::CombatDamage(_) => {
                 *legal = actions::LegalActions {
                     player: Some(choice.player()),
                     actions: Vec::new(),

@@ -1,17 +1,10 @@
 use bevy::ecs::system::SystemParam;
 use bevy::prelude::{Entity, Query};
 
-use crate::abilities;
 use crate::cards;
 use crate::players;
 use crate::stack;
 use crate::zones;
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct PendingTrigger {
-    pub source: Entity,
-    pub ability: abilities::TriggeredAbility,
-}
 
 #[derive(SystemParam, Clone, Copy)]
 pub struct ResolutionLookups<'w, 's> {

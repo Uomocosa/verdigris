@@ -1,11 +1,18 @@
 use bevy::prelude::{Component, Entity};
 use derive_more::Deref;
 
+use crate::abilities;
 use crate::effects;
 use crate::rules;
 
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Deref)]
 pub struct ChosenTarget(pub Entity);
+
+#[derive(Component, Debug, Clone, PartialEq, Eq)]
+pub struct PendingTrigger {
+    pub source: Entity,
+    pub ability: abilities::TriggeredAbility,
+}
 
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CastingStage {

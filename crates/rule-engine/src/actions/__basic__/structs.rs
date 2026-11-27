@@ -2,8 +2,6 @@ use bevy::prelude::Entity;
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use crate::players;
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct BlockAssignment {
     pub blocker: Entity,
@@ -23,10 +21,4 @@ pub struct RequiredCombatDamage {
     pub legal: BTreeSet<Entity>,
     pub trample_defender: Option<Entity>,
     pub lethal_by_target: BTreeMap<Entity, u32>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct OrderTriggersChoice {
-    pub player: players::PlayerId,
-    pub triggers: Vec<Entity>,
 }

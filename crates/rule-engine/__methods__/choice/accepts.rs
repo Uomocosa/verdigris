@@ -1,7 +1,3 @@
-use std::collections::BTreeSet;
-
-use bevy::prelude::Entity;
-
 use crate::actions;
 
 pub fn accepts(choice: &actions::Choice, answer: &actions::Action) -> bool {
@@ -11,14 +7,6 @@ pub fn accepts(choice: &actions::Choice, answer: &actions::Action) -> bool {
                 return false;
             };
             choice.check(picked).is_ok()
-        }
-        actions::Choice::OrderTriggers(choice) => {
-            let actions::Action::OrderTriggers(answered) = answer else {
-                return false;
-            };
-            let expected: BTreeSet<Entity> = choice.triggers.iter().copied().collect();
-            let received: BTreeSet<Entity> = answered.iter().copied().collect();
-            received == expected && answered.len() == choice.triggers.len()
         }
         actions::Choice::CombatDamage(choice) => {
             let actions::Action::AssignCombatDamage(assignments) = answer else {

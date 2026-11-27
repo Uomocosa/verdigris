@@ -51,7 +51,12 @@ pub fn r603_2_r603_6a_triggered_abilities(
 
 #[cfg(test)]
 mod tests {
+    use bevy::prelude::Entity;
+
+    use crate::ORDER_TRIGGERS;
+    use crate::actions;
     use crate::mana;
+    use crate::stack;
     use crate::testing::*;
     use crate::turns;
     use crate::{BATTLEFIELD, GRAVEYARD, HAND};
@@ -121,7 +126,20 @@ mod tests {
         let [warden] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(SOUL_WARDEN)?;
         game.play([p1.cast(alarm).pass_priority(), p2.pass_priority()])?;
         assert_eq!(game.life(p1), 20);
-        game.play([p1.order_triggers([warden, warden])])?;
+        let Some(actions::Choice::Pick(choice)) =
+            game.app.world().resource::<actions::PendingChoice>().as_ref().cloned()
+        else {
+            panic!("expected P1 to be asked to order their triggers");
+        };
+        assert_eq!(choice.id, ORDER_TRIGGERS);
+        let instances: Vec<Entity> = choice.among.iter().copied().collect();
+        assert_eq!(instances.len(), 2);
+        assert_ne!(instances[0], instances[1]);
+        for instance in &instances {
+            let trigger = game.get::<stack::PendingTrigger>(*instance).unwrap();
+            assert_eq!(trigger.source, Entity::from(warden));
+        }
+        game.play([p1.order_triggers([instances[0], instances[1]])])?;
         game.play([p1.pass_priority(), p2.pass_priority()])?;
         game.play([p1.pass_priority(), p2.pass_priority()])?;
         assert_eq!(game.life(p1), 22);
