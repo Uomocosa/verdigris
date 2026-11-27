@@ -36,8 +36,7 @@ impl TriggerQueue {
             answers.eval(
                 condition,
                 &events::AbilityContext {
-                    ability: source,
-                    source,
+                    spell_or_ability: source,
                 },
                 None,
             )

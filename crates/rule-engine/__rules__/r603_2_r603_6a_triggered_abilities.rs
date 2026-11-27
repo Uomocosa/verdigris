@@ -39,8 +39,7 @@ pub fn r603_2_r603_6a_triggered_abilities(
             let ability = (**enters).clone();
             if let abilities::TriggerEvent::Enters(filter) = &ability.event {
                 let context = events::AbilityContext {
-                    ability: source,
-                    source,
+                    spell_or_ability: source,
                 };
                 if answers.eval(filter, &context, Some(permanent)) {
                     queue.push_checked(source, ability, &answers);

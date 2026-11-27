@@ -49,8 +49,7 @@ mod tests {
         let [own] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
         let [foe] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
         let context = events::AbilityContext {
-            ability: *own,
-            source: *own,
+            spell_or_ability: *own,
         };
         game.app
             .world_mut()

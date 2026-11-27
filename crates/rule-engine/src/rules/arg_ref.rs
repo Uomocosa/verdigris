@@ -6,9 +6,10 @@ pub enum ArgRef {
     Arg(rules::ArgId),
     ControllerOf(rules::ArgId),
     OwnerOf(rules::ArgId),
+    SourceOf(rules::ArgId),
 }
 
-pub const YOU: rules::ArgRef = events::AbilityContext::ABILITY.controller();
+pub const YOU: rules::ArgRef = events::AbilityContext::SPELL_OR_ABILITY.controller();
 
 #[rustfmt::skip]
 impl From<rules::ArgId> for ArgRef {

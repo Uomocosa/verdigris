@@ -426,8 +426,7 @@ mod tests {
             })
             .unwrap();
         let context = events::AbilityContext {
-            ability: *bears,
-            source: *bears,
+            spell_or_ability: *bears,
         };
         game.app
             .world_mut()

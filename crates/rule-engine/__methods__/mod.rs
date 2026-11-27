@@ -53,6 +53,7 @@ pub mod rules;
 pub mod rules_plugin;
 pub mod statement;
 pub mod step;
+pub mod subject;
 pub mod targeting;
 #[cfg(feature = "testing")]
 pub mod test_card;

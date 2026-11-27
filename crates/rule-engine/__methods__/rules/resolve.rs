@@ -2,6 +2,7 @@ use crate::cards;
 use crate::players;
 use crate::rules;
 use crate::rules::traits::event_args::EventArgs;
+use crate::stack;
 
 pub fn resolve<E: EventArgs>(
     answers: &rules::Rules,
@@ -10,7 +11,9 @@ pub fn resolve<E: EventArgs>(
 ) -> Option<rules::ArgValue> {
     let id = match reference {
         rules::ArgRef::Arg(id) => return event.arg(id),
-        rules::ArgRef::ControllerOf(id) | rules::ArgRef::OwnerOf(id) => id,
+        rules::ArgRef::ControllerOf(id)
+        | rules::ArgRef::OwnerOf(id)
+        | rules::ArgRef::SourceOf(id) => id,
     };
     let entity = match event.arg(id)? {
         rules::ArgValue::Entity(entity) => entity,
@@ -21,6 +24,11 @@ pub fn resolve<E: EventArgs>(
     if found.get::<players::Player>().is_some() {
         return Some(rules::ArgValue::Player(players::PlayerId(entity)));
     }
+    if let rules::ArgRef::SourceOf(_) = reference {
+        return Some(rules::ArgValue::Entity(
+            found.get::<stack::TriggeredAbilityOnStack>().map_or(entity, |ability| ability.source),
+        ));
+    }
     match reference {
         rules::ArgRef::ControllerOf(_) => found
             .get::<cards::Controller>()
@@ -29,7 +37,7 @@ pub fn resolve<E: EventArgs>(
         rules::ArgRef::OwnerOf(_) => {
             found.get::<cards::Owner>().map(|owner| rules::ArgValue::Player(**owner))
         }
-        rules::ArgRef::Arg(_) => None,
+        rules::ArgRef::Arg(_) | rules::ArgRef::SourceOf(_) => None,
     }
 }
 

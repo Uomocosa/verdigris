@@ -64,8 +64,7 @@ pub fn r608_3a_permanent_enters(
         }
         if let Some(enchant_filter) = definition.enchant() {
             let context = events::AbilityContext {
-                ability: spell,
-                source: spell,
+                spell_or_ability: spell,
             };
             let is_legal = chosen.is_some_and(|chosen| {
                 let target = **chosen;

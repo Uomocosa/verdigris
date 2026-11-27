@@ -10,9 +10,10 @@ pub fn eval_enchanted<E: EventArgs>(
     event: &E,
     viewpoint: Option<Entity>,
 ) -> bool {
-    let Some(rules::ArgValue::Entity(source)) =
-        answers.resolve(rules::ArgRef::Arg(events::AbilityContext::SOURCE), event)
-    else {
+    let Some(rules::ArgValue::Entity(source)) = answers.resolve(
+        rules::ArgRef::SourceOf(events::AbilityContext::SPELL_OR_ABILITY),
+        event,
+    ) else {
         return false;
     };
     viewpoint.is_some_and(|subject| {
@@ -54,8 +55,7 @@ mod tests {
         assert!(game.moved(strength).to(BATTLEFIELD).of(p1));
         let [aura] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(HOLY_STRENGTH)?;
         let context = events::AbilityContext {
-            ability: *aura,
-            source: *aura,
+            spell_or_ability: *aura,
         };
         game.app
             .world_mut()

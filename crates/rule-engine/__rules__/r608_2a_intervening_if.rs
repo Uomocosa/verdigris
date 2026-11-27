@@ -30,8 +30,7 @@ pub fn r608_2a_intervening_if(
         if !answers.eval(
             &condition,
             &events::AbilityContext {
-                ability: spell,
-                source: ability.source,
+                spell_or_ability: spell,
             },
             None,
         ) {

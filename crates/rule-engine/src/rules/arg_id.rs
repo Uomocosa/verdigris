@@ -27,7 +27,7 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let id = ArgId("source");
+        let id = ArgId("spell_or_ability");
         assert_eq!(id.controller(), rules::ArgRef::ControllerOf(id));
         assert_eq!(id.owner(), rules::ArgRef::OwnerOf(id));
         assert_eq!(

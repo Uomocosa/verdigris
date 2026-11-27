@@ -33,8 +33,7 @@ mod tests {
         let (mut game, [p1, _]) = MockGame::new([P1.battlefield([GRIZZLY_BEARS]), P2]);
         let [bears] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
         let context = events::AbilityContext {
-            ability: *bears,
-            source: *bears,
+            spell_or_ability: *bears,
         };
         game.app
             .world_mut()

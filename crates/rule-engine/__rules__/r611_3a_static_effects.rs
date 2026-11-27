@@ -130,8 +130,7 @@ fn ability_still_applies(
     answers.eval(
         &ability.filter,
         &events::AbilityContext {
-            ability: source,
-            source,
+            spell_or_ability: source,
         },
         Some(effect.affected),
     )
@@ -146,8 +145,7 @@ fn condition_holds(
         answers.eval(
             condition,
             &events::AbilityContext {
-                ability: source,
-                source,
+                spell_or_ability: source,
             },
             None,
         )
@@ -165,8 +163,7 @@ fn spawn_creature_effects(
     answers: &rules::Rules,
 ) {
     let context = events::AbilityContext {
-        ability: source,
-        source,
+        spell_or_ability: source,
     };
     for (candidate, _, _, zone, _, _) in candidates.iter() {
         if !zones.contains(BATTLEFIELD, **zone) {
@@ -198,8 +195,7 @@ fn spawn_player_effects(
     answers: &rules::Rules,
 ) {
     let context = events::AbilityContext {
-        ability: source,
-        source,
+        spell_or_ability: source,
     };
     for candidate in players {
         if !answers.eval(&ability.filter, &context, Some(**candidate)) {

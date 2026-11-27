@@ -168,8 +168,7 @@ fn self_target_on_battlefield(
     let source = lookups.abilities.get(spell).ok().map(|ability| ability.source)?;
     let target = effect.target.as_ref()?;
     let context = events::AbilityContext {
-        ability: source,
-        source,
+        spell_or_ability: spell,
     };
     if !answers.eval(&target.filter, &context, Some(source)) {
         return None;

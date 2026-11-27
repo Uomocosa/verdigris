@@ -1,4 +1,5 @@
-use crate::events;
+use atomic_delegate_macros::atomic_delegates;
+
 use crate::rules;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -34,8 +35,7 @@ impl From<rules::You> for Subject {
 }
 
 #[rustfmt::skip]
+#[atomic_delegates]
 impl From<rules::This> for Subject {
-    fn from(_: rules::This) -> Self {
-        Self::One(rules::ArgRef::Arg(events::AbilityContext::SOURCE))
-    }
+    fn from(this: rules::This) -> Self {}
 }

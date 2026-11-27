@@ -69,7 +69,9 @@ impl Filter {
 
     #[must_use]
     pub fn source() -> Self {
-        Self(rules::is(events::AbilityContext::SOURCE))
+        Self(rules::is(rules::ArgRef::SourceOf(
+            events::AbilityContext::SPELL_OR_ABILITY,
+        )))
     }
 
     #[must_use]

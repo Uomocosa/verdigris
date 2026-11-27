@@ -240,12 +240,13 @@ events::AssignCombatDamage::AMOUNT.is(rules::greater_than(0))
 rules::count(events::DeclareAttackers::ATTACKERS).is(rules::Value(1).or_less())
 ```
 
-`YOU` is the controller of the ability being evaluated
-(`src/rules/arg_ref.rs:11`: `events::AbilityContext::ABILITY.controller()`), so
-`rules::life().of(YOU)` always asks about that ability's controller
+`YOU` is the controller of the spell or ability being evaluated
+(`src/rules/arg_ref.rs:11`: `events::AbilityContext::SPELL_OR_ABILITY.controller()`), so
+`rules::life().of(YOU)` always asks about that object's controller
 (`src/rules/player_quantity_of.rs:24`).
 
-`THIS` is the ability's source (`events::AbilityContext::SOURCE`), so
+`THIS` is the spell or ability's source
+(`rules::ArgRef::SourceOf(events::AbilityContext::SPELL_OR_ABILITY)`), so
 `rules::power().of(THIS).is(rules::Value(3).or_more())` asks about the source's own
 power — for a dies trigger, its last-known power (CR 603.10). Test Last Stand
 (`src/testing/__fixtures__/cards/test_last_stand.rs`) reads "when this dies, if its
@@ -262,7 +263,7 @@ rules::any(PLAYER, rules::life().is(rules::Value(40).or_more()))
 
 **Static "as long as".** A continuous ability holds only while its condition holds
 (`src/abilities/continuous.rs:10`); the layers re-check it against
-`events::AbilityContext { ability }` (`__rules__/r611_3a_static_effects.rs:190`). Serra
+`events::AbilityContext { spell_or_ability }` (`__rules__/r611_3a_static_effects.rs:190`). Serra
 Ascendant (`src/testing/__fixtures__/cards/serra_ascendant.rs:16`):
 
 ```rust
@@ -274,7 +275,7 @@ statics::this().gain(keywords::flying()).as_long_as(rules::life().of(YOU).is(rul
 (`src/abilities/trigger_event.rs:51`) stores `intervening_if` and is checked twice: at
 trigger time (603.4, `__rules__/r603_4_intervening_if.rs:66`) and on resolution (608.2a,
 `__rules__/r608_2a_intervening_if.rs:27`), both against
-`events::AbilityContext { ability }` (`__events__/ability_context.rs:8`). Felidar Sovereign
+`events::AbilityContext { spell_or_ability }` (`__events__/ability_context.rs:8`). Felidar Sovereign
 (`src/testing/__fixtures__/cards/felidar_sovereign.rs:22`):
 
 ```rust

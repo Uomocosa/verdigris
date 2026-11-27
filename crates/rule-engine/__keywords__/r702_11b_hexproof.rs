@@ -20,8 +20,9 @@ fn abilities() -> Vec<effects::Modification> {
         change: rules::Change::Restrict {
             holder: events::BecomeTarget::TARGET.into(),
             restriction: CANT_BE_TARGETED.restriction(
-                (rules::points_to::<cards::Controller>(events::BecomeTarget::SPELL.controller())
-                    | rules::is(events::BecomeTarget::SPELL.controller()))
+                (rules::points_to::<cards::Controller>(
+                    events::BecomeTarget::SPELL_OR_ABILITY.controller(),
+                ) | rules::is(events::BecomeTarget::SPELL_OR_ABILITY.controller()))
                 .of(events::BecomeTarget::TARGET),
             ),
         },
@@ -47,8 +48,8 @@ mod tests {
                     holder: events::BecomeTarget::TARGET.into(),
                     restriction: super::CANT_BE_TARGETED.restriction(
                         (rules::points_to::<cards::Controller>(
-                            events::BecomeTarget::SPELL.controller()
-                        ) | rules::is(events::BecomeTarget::SPELL.controller()))
+                            events::BecomeTarget::SPELL_OR_ABILITY.controller()
+                        ) | rules::is(events::BecomeTarget::SPELL_OR_ABILITY.controller()))
                         .of(events::BecomeTarget::TARGET),
                     ),
                 },
