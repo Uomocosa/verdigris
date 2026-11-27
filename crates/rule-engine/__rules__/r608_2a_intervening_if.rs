@@ -27,7 +27,14 @@ pub fn r608_2a_intervening_if(
         let Some(condition) = ability.intervening_if.clone() else {
             continue;
         };
-        if !answers.eval(&condition, &events::AbilityContext { ability: spell }, None) {
+        if !answers.eval(
+            &condition,
+            &events::AbilityContext {
+                ability: spell,
+                source: ability.source,
+            },
+            None,
+        ) {
             commands.entity(spell).despawn();
         }
     }

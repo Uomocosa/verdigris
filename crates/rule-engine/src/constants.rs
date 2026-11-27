@@ -108,17 +108,7 @@ pub const NONBLACK_CREATURE: effects::Filter = effects::Filter {
 };
 
 /// The source of “it” in printed text such as “it gets +2/+0”: the ability's own source.
-pub const THIS: effects::Target = effects::Target {
-    count: 1,
-    filter: effects::Filter {
-        kind: effects::FilterKind::Creature,
-        controlled_by: None,
-        excluded_color: None,
-        attacking: false,
-        nontoken: false,
-        object: Some(effects::ObjectRelation::ThisObject),
-    },
-};
+pub const THIS: rules::This = rules::This;
 
 pub const LOSES_LIFE: rules::ResultId = rules::ResultId("120.3a/loses-life");
 

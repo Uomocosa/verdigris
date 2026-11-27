@@ -187,7 +187,14 @@ fn condition_holds(
     answers: &rules::Rules,
 ) -> bool {
     ability.as_long_as.as_ref().is_none_or(|condition| {
-        answers.eval(condition, &events::AbilityContext { ability: source }, None)
+        answers.eval(
+            condition,
+            &events::AbilityContext {
+                ability: source,
+                source,
+            },
+            None,
+        )
     })
 }
 

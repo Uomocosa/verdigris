@@ -13,7 +13,7 @@ pub struct Effect {
 #[atomic_delegates]
 impl Effect {
     #[must_use]
-    pub fn to(self, target: effects::Target) -> Self {}
+    pub fn to(self, target: impl Into<effects::Target>) -> Self {}
 
     #[must_use]
     pub fn to_player(self, player: impl Into<rules::Players>) -> Self {}

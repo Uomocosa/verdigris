@@ -8,7 +8,7 @@ pub use basic::condition_builders::{
 };
 pub use basic::enums::{Amount, Change, Legality, may};
 pub use basic::newtypes::{An, Each, EventId, ResultId, RuleId};
-pub use basic::structs::{RuleChange, You};
+pub use basic::structs::{RuleChange, This, You};
 pub use basic::type_aliases::{Definition, Restriction};
 
 mod value;

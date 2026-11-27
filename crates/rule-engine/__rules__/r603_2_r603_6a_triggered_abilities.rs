@@ -4,6 +4,7 @@ use crate::Did;
 use crate::abilities;
 use crate::cards;
 use crate::events;
+use crate::rules;
 use crate::stack;
 
 /// 603.2. Whenever a game event or game state matches a triggered ability’s trigger event, that
@@ -31,6 +32,7 @@ pub fn r603_2_r603_6a_triggered_abilities(
         (Entity, &cards::Controller, &cards::TriggeredEnters),
         With<cards::OnBattlefield>,
     >,
+    answers: rules::Rules,
 ) {
     for event in entered.read() {
         let permanent = event.permanent;
@@ -51,7 +53,7 @@ pub fn r603_2_r603_6a_triggered_abilities(
             ) {
                 continue;
             }
-            queue.push(stack::PendingTrigger { source, ability });
+            queue.push_checked(source, ability, &answers);
         }
     }
 }

@@ -4,6 +4,7 @@ use crate::Did;
 use crate::abilities;
 use crate::cards;
 use crate::events;
+use crate::rules;
 use crate::stack;
 
 /// 508.1m Any abilities that trigger on attackers being declared trigger.
@@ -21,6 +22,7 @@ pub fn r508_1m_r508_2a_r508_3a_attack_triggers(
     mut declared: MessageReader<Did<events::DeclareAttacker>>,
     mut queue: ResMut<stack::TriggerQueue>,
     attackers: Query<(&cards::CardDefinition, &cards::Controller)>,
+    answers: rules::Rules,
 ) {
     for declared in declared.read() {
         let Ok((definition, _)) = attackers.get(declared.attacker) else {
@@ -30,10 +32,7 @@ pub fn r508_1m_r508_2a_r508_3a_attack_triggers(
             if !matches!(ability.event, abilities::TriggerEvent::Attacks) {
                 continue;
             }
-            queue.push(stack::PendingTrigger {
-                source: declared.attacker,
-                ability: ability.clone(),
-            });
+            queue.push_checked(declared.attacker, ability.clone(), &answers);
         }
     }
 }

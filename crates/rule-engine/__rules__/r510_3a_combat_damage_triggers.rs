@@ -1,10 +1,11 @@
-use crate::events;
 use bevy::prelude::{MessageReader, Query, ResMut, With};
 
 use crate::Did;
 use crate::abilities;
 use crate::cards;
+use crate::events;
 use crate::players;
+use crate::rules;
 use crate::stack;
 
 /// 510.3a Any abilities that triggered on damage being dealt or while state-based actions are
@@ -15,6 +16,7 @@ pub fn r510_3a_combat_damage_triggers(
     mut queue: ResMut<stack::TriggerQueue>,
     sources: Query<(&cards::CardDefinition, &cards::Controller), With<cards::Attacking>>,
     targets: Query<&players::Life>,
+    answers: rules::Rules,
 ) {
     for event in dealt.read() {
         if targets.get(event.recipient).is_err() {
@@ -30,10 +32,7 @@ pub fn r510_3a_combat_damage_triggers(
             ) {
                 continue;
             }
-            queue.push(stack::PendingTrigger {
-                source: event.source,
-                ability: ability.clone(),
-            });
+            queue.push_checked(event.source, ability.clone(), &answers);
         }
     }
 }

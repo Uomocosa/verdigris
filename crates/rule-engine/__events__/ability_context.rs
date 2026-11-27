@@ -8,6 +8,8 @@ use crate::rules::traits::event::Event;
 pub struct AbilityContext {
     #[arg]
     pub ability: Entity,
+    #[arg]
+    pub source: Entity,
 }
 
 #[rustfmt::skip]
@@ -28,13 +30,21 @@ mod tests {
     #[test]
     fn test_usage() {
         let ability = Entity::PLACEHOLDER;
-        let event = AbilityContext { ability };
+        let source = Entity::from_raw_u32(1).unwrap();
+        let event = AbilityContext { ability, source };
         assert_eq!(
             event.arg(AbilityContext::ABILITY),
             Some(rules::ArgValue::Entity(ability))
         );
+        assert_eq!(
+            event.arg(AbilityContext::SOURCE),
+            Some(rules::ArgValue::Entity(source))
+        );
         assert_eq!(AbilityContext::ID, rules::EventId("603.4/ability-context"));
         assert_eq!(AbilityContext::restrictions(), Vec::new());
-        assert_eq!(AbilityContext::args(), &[AbilityContext::ABILITY]);
+        assert_eq!(
+            AbilityContext::args(),
+            &[AbilityContext::ABILITY, AbilityContext::SOURCE]
+        );
     }
 }

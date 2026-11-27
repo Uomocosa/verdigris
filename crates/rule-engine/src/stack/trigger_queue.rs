@@ -1,6 +1,9 @@
-use bevy::prelude::Resource;
+use bevy::prelude::{Entity, Resource};
 use derive_more::Deref;
 
+use crate::abilities;
+use crate::events;
+use crate::rules;
 use crate::stack;
 
 #[derive(Resource, Debug, Default, Deref)]
@@ -21,6 +24,27 @@ impl TriggerQueue {
     pub fn take_pending(&mut self) -> Vec<stack::PendingTrigger> {
         let Self(pending) = self;
         std::mem::take(pending)
+    }
+
+    pub(crate) fn push_checked(
+        &mut self,
+        source: Entity,
+        ability: abilities::TriggeredAbility,
+        answers: &rules::Rules,
+    ) {
+        let triggers = ability.intervening_if.as_ref().is_none_or(|condition| {
+            answers.eval(
+                condition,
+                &events::AbilityContext {
+                    ability: source,
+                    source,
+                },
+                None,
+            )
+        });
+        if triggers {
+            self.push(stack::PendingTrigger { source, ability });
+        }
     }
 }
 

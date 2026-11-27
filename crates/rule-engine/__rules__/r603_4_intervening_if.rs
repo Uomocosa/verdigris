@@ -2,7 +2,6 @@ use bevy::prelude::{Entity, MessageReader, Query, Res, ResMut, With};
 
 use crate::abilities;
 use crate::cards;
-use crate::events;
 use crate::players;
 use crate::rules;
 use crate::stack;
@@ -63,16 +62,7 @@ pub fn r603_4_intervening_if(
                 continue;
             }
             let ability = (**at_step).clone();
-            if let Some(condition) = ability.intervening_if.clone()
-                && !answers.eval(
-                    &condition,
-                    &events::AbilityContext { ability: source },
-                    None,
-                )
-            {
-                continue;
-            }
-            queue.push(stack::PendingTrigger { source, ability });
+            queue.push_checked(source, ability, &answers);
         }
     }
 }

@@ -69,6 +69,7 @@ pub const ALL_CARDS: &[testing::Card] = &[
     testing::TEST_FROZEN_RELIC,
     testing::TEST_GROUNDING_MIST,
     testing::TEST_HASTY_BANNER,
+    testing::TEST_LAST_STAND,
     testing::TEST_LOW_SKIMMER,
     testing::TEST_LURE_OF_BATTLE,
     testing::TEST_MAY_PURGE,

@@ -416,7 +416,10 @@ mod tests {
                 ));
             })
             .unwrap();
-        let context = events::AbilityContext { ability: *bears };
+        let context = events::AbilityContext {
+            ability: *bears,
+            source: *bears,
+        };
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {

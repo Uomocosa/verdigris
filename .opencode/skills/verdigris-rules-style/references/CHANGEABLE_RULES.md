@@ -232,6 +232,7 @@ value or a threshold (`src/rules/value.rs:10`, `src/rules/__basic__/condition_bu
 rules::life().of(YOU).is(rules::Value(40).or_more())
 rules::poison_counters().is(rules::Value(0).or_less())
 rules::power().is(rules::Value(3).or_more())
+rules::power().is(rules::Value(3).or_more()).of(THIS)
 rules::toughness().is(rules::Value(2).or_less())
 rules::cards_in_hand().is(rules::exactly(0))
 rules::cards_in_library().is(rules::greater_than(5))
@@ -244,6 +245,12 @@ rules::count(events::DeclareAttackers::ATTACKERS).is(rules::Value(1).or_less())
 (`src/rules/arg_ref.rs:11`: `events::AbilityContext::ABILITY.controller()`), so
 `rules::life().of(YOU)` always asks about that ability's controller
 (`src/rules/player_quantity_of.rs:24`).
+
+`THIS` is the ability's source (`events::AbilityContext::SOURCE`), so
+`rules::power().is(rules::Value(3).or_more()).of(THIS)` asks about the source's own
+power — for a dies trigger, its last-known power (CR 603.10). Test Last Stand
+(`src/testing/__fixtures__/cards/test_last_stand.rs`) reads "whenever this dies, if its
+power is 3 or more, draw a card."
 
 **Quantifiers.** `rules::each` / `rules::any` ask about several players at once
 (`src/rules/__basic__/condition_builders.rs:120`):

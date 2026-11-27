@@ -3,6 +3,7 @@ use bevy::prelude::{Query, RemovedComponents, ResMut};
 use crate::GRAVEYARD;
 use crate::abilities;
 use crate::cards;
+use crate::rules;
 use crate::stack;
 use crate::zones;
 
@@ -22,6 +23,7 @@ pub fn r603_6c_r700_4_leaves_the_battlefield(
     cards: Query<(&cards::CardDefinition, &cards::Controller, &zones::LeftZone)>,
     new_zones: Query<&zones::InZone>,
     zones: zones::ZoneLookup,
+    answers: rules::Rules,
 ) {
     for source in left.read() {
         let Ok((definition, _, left_zone)) = cards.get(source) else {
@@ -37,10 +39,7 @@ pub fn r603_6c_r700_4_leaves_the_battlefield(
             if !matches!(ability.event, abilities::TriggerEvent::Dies) {
                 continue;
             }
-            queue.push(stack::PendingTrigger {
-                source,
-                ability: ability.clone(),
-            });
+            queue.push_checked(source, ability.clone(), &answers);
         }
     }
 }
@@ -48,6 +47,7 @@ pub fn r603_6c_r700_4_leaves_the_battlefield(
 #[cfg(test)]
 mod tests {
     use crate::mana;
+    use crate::pt;
     use crate::testing::*;
     use crate::turns;
     use crate::{BATTLEFIELD, GRAVEYARD, HAND, LIBRARY};
@@ -69,6 +69,52 @@ mod tests {
         assert!(game.player(p1).cards_in(LIBRARY).has(LIGHTNING_BOLT));
         game.play([p2.pass_priority(), p1.pass_priority()])?;
         assert!(game.player(p1).cards_in(HAND).has(LIGHTNING_BOLT));
+        Ok(())
+    }
+
+    #[test]
+    fn test_last_stand_draws_when_it_dies_with_three_power() -> TestResult {
+        let (mut game, [p1, p2]) =
+            MockGame::builder().turn(2, turns::Step::PrecombatMain).players([
+                P1.battlefield([TEST_LAST_STAND]).library([LIGHTNING_BOLT]),
+                P2.active().hand([LIGHTNING_BOLT]).mana_pool(mana![R]),
+            ]);
+        let [stand] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TEST_LAST_STAND)?;
+        let [bolt] = game.player(p2).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
+        game.play([
+            p2.cast(bolt).targeting(stand).pass_priority(),
+            p1.pass_priority(),
+        ])?;
+        assert!(game.moved(stand).to(GRAVEYARD).of(p1));
+        assert!(game.player(p1).cards_in(LIBRARY).has(LIGHTNING_BOLT));
+        game.play([p2.pass_priority(), p1.pass_priority()])?;
+        assert!(game.player(p1).cards_in(HAND).has(LIGHTNING_BOLT));
+        assert_eq!(game.player(p1).cards_in(HAND).count(), 1);
+        Ok(())
+    }
+
+    #[test]
+    fn test_last_stand_uses_last_known_power() -> TestResult {
+        let (mut game, [p1, p2]) =
+            MockGame::builder().turn(2, turns::Step::PrecombatMain).players([
+                P1.battlefield([TEST_LAST_STAND]).library([LIGHTNING_BOLT]),
+                P2.active().hand([DISFIGURE, LIGHTNING_BOLT]).mana_pool(mana![B, R]),
+            ]);
+        let [stand] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TEST_LAST_STAND)?;
+        let [disfigure] = game.player(p2).cards_in(HAND).exactly::<1>(DISFIGURE)?;
+        let [bolt] = game.player(p2).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
+        game.play([
+            p2.cast(disfigure).targeting(stand).pass_priority(),
+            p1.pass_priority(),
+        ])?;
+        assert_eq!(game.pt(stand), Some(pt!(1, 1)));
+        game.play([
+            p2.cast(bolt).targeting(stand).pass_priority(),
+            p1.pass_priority(),
+        ])?;
+        assert!(game.moved(stand).to(GRAVEYARD).of(p1));
+        game.play([p2.pass_priority(), p1.pass_priority()])?;
+        assert_eq!(game.player(p1).cards_in(HAND).count(), 0);
         Ok(())
     }
 }

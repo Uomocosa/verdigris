@@ -11,8 +11,10 @@ pub use basic::messages::{KeywordGranted, PowerToughnessModified};
 
 mod token_definition;
 pub use basic::components::SourceTimestamp;
-pub use basic::structs::Target;
+pub use target::Target;
 pub use token_definition::TokenDefinition;
+
+mod target;
 
 mod timestamp;
 pub use timestamp::Timestamp;

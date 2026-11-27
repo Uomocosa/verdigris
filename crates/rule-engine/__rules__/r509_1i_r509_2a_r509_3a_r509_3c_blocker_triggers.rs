@@ -6,6 +6,7 @@ use crate::Did;
 use crate::abilities;
 use crate::cards;
 use crate::events;
+use crate::rules;
 use crate::stack;
 
 /// 509.1i Any abilities that trigger on blockers being declared trigger. See rule 509.2a for
@@ -32,6 +33,7 @@ pub fn r509_1i_r509_2a_r509_3a_r509_3c_blocker_triggers(
     mut declared: MessageReader<Did<events::DeclareBlocker>>,
     mut queue: ResMut<stack::TriggerQueue>,
     creatures: Query<(&cards::CardDefinition, &cards::Controller)>,
+    answers: rules::Rules,
 ) {
     let mut fired: BTreeSet<Entity> = BTreeSet::new();
     for declared in declared.read() {
@@ -42,10 +44,7 @@ pub fn r509_1i_r509_2a_r509_3a_r509_3c_blocker_triggers(
                 if !matches!(ability.event, abilities::TriggerEvent::Blocks) {
                     continue;
                 }
-                queue.push(stack::PendingTrigger {
-                    source: declared.blocker,
-                    ability: ability.clone(),
-                });
+                queue.push_checked(declared.blocker, ability.clone(), &answers);
             }
         }
         if fired.insert(declared.attacker)
@@ -55,10 +54,7 @@ pub fn r509_1i_r509_2a_r509_3a_r509_3c_blocker_triggers(
                 if !matches!(ability.event, abilities::TriggerEvent::BecomesBlocked) {
                     continue;
                 }
-                queue.push(stack::PendingTrigger {
-                    source: declared.attacker,
-                    ability: ability.clone(),
-                });
+                queue.push_checked(declared.attacker, ability.clone(), &answers);
             }
         }
     }
