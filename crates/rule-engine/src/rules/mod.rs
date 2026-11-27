@@ -7,7 +7,7 @@ pub use basic::condition_builders::{
     in_zone, is, less_than, life, main_phase, points_to, power, spell, stack_empty, step_is,
     subtype, supertype, toughness,
 };
-pub use basic::enums::{Amount, Change, Legality, may};
+pub use basic::enums::{Amount, Change, Legality, Why, may};
 pub use basic::newtypes::{An, EventId, ResultId, RuleId};
 pub use basic::structs::RuleChange;
 pub use basic::type_aliases::{Definition, Restriction};

@@ -42,10 +42,16 @@ pub enum Change {
     },
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Legality {
     Legal,
-    Illegal,
+    Illegal(Vec<rules::Why>),
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum Why {
+    Restriction(rules::RestrictionId),
+    NotPerformable,
 }
 
 #[must_use]

@@ -17,15 +17,20 @@ pub fn legality<E: Event>(answers: &rules::Rules, event: &E) -> rules::Legality 
             _ => None,
         })
         .collect();
-    let base_and_added_hold = E::restrictions()
+    let mut reasons: Vec<rules::Why> = E::restrictions()
         .into_iter()
         .chain(added)
         .filter(|restriction| !waived(restriction))
-        .all(|restriction| answers.eval(&restriction.condition.bind(event), event, None));
-    if base_and_added_hold && answers.performs(event) {
+        .filter(|restriction| !answers.eval(&restriction.condition.bind(event), event, None))
+        .map(|restriction| rules::Why::Restriction(restriction.id))
+        .collect();
+    if !answers.performs(event) {
+        reasons.push(rules::Why::NotPerformable);
+    }
+    if reasons.is_empty() {
         rules::Legality::Legal
     } else {
-        rules::Legality::Illegal
+        rules::Legality::Illegal(reasons)
     }
 }
 
@@ -81,7 +86,7 @@ mod tests {
                             player: p2.id
                         }
                     ),
-                    rules::Legality::Illegal
+                    rules::Legality::Illegal(vec![rules::Why::Restriction(UNTAPPED)])
                 );
             })
             .unwrap();
@@ -128,7 +133,9 @@ mod tests {
                             player: p1.id
                         }
                     ),
-                    rules::Legality::Illegal
+                    rules::Legality::Illegal(vec![rules::Why::Restriction(rules::RestrictionId(
+                        "test/test-rule-restriction"
+                    ),)])
                 );
             })
             .unwrap();
@@ -196,7 +203,7 @@ mod tests {
                             player: p2.id
                         }
                     ),
-                    rules::Legality::Illegal
+                    rules::Legality::Illegal(vec![rules::Why::Restriction(UNTAPPED)])
                 );
             })
             .unwrap();
@@ -219,7 +226,7 @@ mod tests {
                             player: p1.id
                         }
                     ),
-                    rules::Legality::Illegal
+                    rules::Legality::Illegal(vec![rules::Why::Restriction(UNTAPPED)])
                 );
             })
             .unwrap();
@@ -243,7 +250,9 @@ mod tests {
                             player: p1.id
                         }
                     ),
-                    rules::Legality::Illegal
+                    rules::Legality::Illegal(vec![rules::Why::Restriction(rules::RestrictionId(
+                        "test/player-restriction"
+                    ),)])
                 );
             })
             .unwrap();
@@ -266,7 +275,9 @@ mod tests {
                             amount: 3
                         }
                     ),
-                    rules::Legality::Illegal
+                    rules::Legality::Illegal(vec![rules::Why::Restriction(rules::RestrictionId(
+                        "test/test-cant-discard"
+                    ),)])
                 );
                 assert_eq!(
                     legality::<events::GainLife>(
@@ -300,7 +311,9 @@ mod tests {
                             cause: rules::EventId("608.2/resolve"),
                         }
                     ),
-                    rules::Legality::Illegal
+                    rules::Legality::Illegal(vec![rules::Why::Restriction(rules::RestrictionId(
+                        "test/test-cant-discard"
+                    ),)])
                 );
                 assert_eq!(
                     legality::<events::Mill>(
@@ -330,7 +343,9 @@ mod tests {
             .run_system_once(move |answers: rules::Rules| {
                 assert_eq!(
                     legality::<events::Create>(&answers, &events::Create { token: own_token }),
-                    rules::Legality::Illegal
+                    rules::Legality::Illegal(vec![rules::Why::Restriction(rules::RestrictionId(
+                        "test/test-cant-discard"
+                    ),)])
                 );
                 assert_eq!(
                     legality::<events::Create>(&answers, &events::Create { token: other_token }),
@@ -357,7 +372,9 @@ mod tests {
                             amount: 3
                         }
                     ),
-                    rules::Legality::Illegal
+                    rules::Legality::Illegal(vec![rules::Why::Restriction(rules::RestrictionId(
+                        "test/test-cant-discard"
+                    ),)])
                 );
                 assert_eq!(
                     legality::<events::LoseLife>(
@@ -394,7 +411,9 @@ mod tests {
                             cause: crate::RESOLUTION_CAUSE,
                         }
                     ),
-                    rules::Legality::Illegal
+                    rules::Legality::Illegal(vec![rules::Why::Restriction(rules::RestrictionId(
+                        "test/test-safe-haven"
+                    ),)])
                 );
                 assert_eq!(
                     legality::<events::Destroy>(
@@ -431,7 +450,9 @@ mod tests {
                             cause: crate::RESOLUTION_CAUSE,
                         },
                     ),
-                    rules::Legality::Illegal
+                    rules::Legality::Illegal(vec![rules::Why::Restriction(rules::RestrictionId(
+                        "test/test-safe-haven"
+                    ),)])
                 );
                 assert_eq!(
                     legality::<events::Counter>(
@@ -466,7 +487,9 @@ mod tests {
                             permanent: *protected,
                         }
                     ),
-                    rules::Legality::Illegal
+                    rules::Legality::Illegal(vec![rules::Why::Restriction(rules::RestrictionId(
+                        "test/test-no-tokens"
+                    ),)])
                 );
             })
             .unwrap();
@@ -515,7 +538,9 @@ mod tests {
                             amount: 3,
                         }
                     ),
-                    rules::Legality::Illegal
+                    rules::Legality::Illegal(vec![rules::Why::Restriction(rules::RestrictionId(
+                        "test/test-safe-haven"
+                    ),)])
                 );
                 assert_eq!(
                     legality::<events::DealDamage>(
@@ -558,7 +583,12 @@ mod tests {
                     amount: 0,
                 };
                 let one = events::DealDamage { amount: 1, ..zero };
-                assert_eq!(legality(&answers, &zero), rules::Legality::Illegal);
+                assert_eq!(
+                    legality(&answers, &zero),
+                    rules::Legality::Illegal(vec![rules::Why::Restriction(
+                        events::deal_damage::NONZERO_DAMAGE
+                    )])
+                );
                 assert_eq!(legality(&answers, &one), rules::Legality::Legal);
             })
             .unwrap();
