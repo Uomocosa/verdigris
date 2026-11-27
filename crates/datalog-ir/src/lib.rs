@@ -1,5 +1,6 @@
 #[path = "__basic__/mod.rs"]
 mod basic;
+mod case;
 mod facts;
 mod program;
 #[path = "__traits__/mod.rs"]
@@ -13,6 +14,7 @@ pub use basic::rel::Rel;
 pub use basic::rule::Rule;
 pub use basic::term::Term;
 pub use basic::value::Value;
+pub use case::Case;
 pub use facts::Facts;
 pub use program::Program;
 

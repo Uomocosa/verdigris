@@ -37,8 +37,9 @@ check-crate CRATE:
         verdigris-game) dir=crates/game ;;
         verdigris-lint) dir=crates/verdigris-lint ;;
         verdigris-datalog-ir) dir=crates/datalog-ir ;;
+        verdigris-datalog-datafrog) dir=crates/datalog-datafrog ;;
         *)
-            echo "check-crate: unknown crate '{{ CRATE }}'; known: verdigris-event-derive verdigris-rule-engine verdigris-parser verdigris-game verdigris-lint verdigris-datalog-ir" >&2
+            echo "check-crate: unknown crate '{{ CRATE }}'; known: verdigris-event-derive verdigris-rule-engine verdigris-parser verdigris-game verdigris-lint verdigris-datalog-ir verdigris-datalog-datafrog" >&2
             exit 1
             ;;
     esac
@@ -66,6 +67,7 @@ lint:
     cargo run --quiet -p verdigris-lint -- --config lele.toml crates/game
     cargo run --quiet -p verdigris-lint -- --config lele.toml crates/verdigris-lint
     cargo run --quiet -p verdigris-lint -- --config lele.toml crates/datalog-ir
+    cargo run --quiet -p verdigris-lint -- --config lele.toml crates/datalog-datafrog
 
 # Regenerate the __methods__ indexes after adding or removing #[atomic_delegates] shells.
 [group('dev')]
