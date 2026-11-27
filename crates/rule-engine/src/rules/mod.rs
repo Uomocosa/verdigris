@@ -7,7 +7,7 @@ pub use basic::condition_builders::{
     points_to, poison_counters, power, stack_empty, step_is, toughness,
 };
 pub use basic::enums::{Amount, Change, Legality, may};
-pub use basic::newtypes::{EventId, ResultId, RuleId};
+pub use basic::newtypes::{An, Each, EventId, ResultId, RuleId};
 pub use basic::structs::RuleChange;
 pub use basic::type_aliases::{Definition, Restriction};
 

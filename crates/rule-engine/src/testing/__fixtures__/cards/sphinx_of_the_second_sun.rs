@@ -17,7 +17,7 @@ pub const SPHINX_OF_THE_SECOND_SUN: testing::Card = testing::Card {
             cards::creature("Sphinx of the Second Sun", cost![6, U, U], pt!(6, 6));
             keywords::flying(),
             abilities::at(
-                turns::beginning_of(MAIN_2, YOU),
+                turns::beginning_of(MAIN_2).of(YOU),
                 effects::additional_phase(turns::Phase::Beginning),
             ),
         }

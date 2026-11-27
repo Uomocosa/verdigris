@@ -1,6 +1,7 @@
 use bevy::prelude::Component;
 
 use crate::effects;
+use crate::rules;
 use crate::zones;
 
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -27,12 +28,13 @@ impl PartialEq<zones::SharedZone> for Zone {
 #[rustfmt::skip]
 impl Zone {
     #[must_use]
-    pub fn of(self, player: effects::PlayerRef) -> effects::ZoneRef { effects::ZoneRef::from(self).of(player) }
+    pub fn of(self, player: rules::Players) -> effects::ZoneRef { effects::ZoneRef::from(self).of(player) }
 }
 
 #[cfg(test)]
 mod tests {
     use crate::effects;
+    use crate::rules;
     use crate::testing::*;
     use crate::zones::SharedZone;
     use crate::{BATTLEFIELD, STACK, YOU};
@@ -45,7 +47,7 @@ mod tests {
             BATTLEFIELD.of(YOU),
             effects::ZoneRef {
                 zone: Zone::Battlefield,
-                of: effects::PlayerRef::You,
+                of: rules::Players::You,
             }
         );
 

@@ -1,6 +1,7 @@
 use atomic_delegate_macros::atomic_delegates;
 
 use crate::effects;
+use crate::rules;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Effect {
@@ -15,7 +16,7 @@ impl Effect {
     pub fn to(self, target: effects::Target) -> Self {}
 
     #[must_use]
-    pub fn to_player(self, player: effects::PlayerRef) -> Self {}
+    pub fn to_player(self, player: rules::Players) -> Self {}
 }
 
 impl Effect {

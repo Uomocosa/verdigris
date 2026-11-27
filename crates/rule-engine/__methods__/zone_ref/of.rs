@@ -1,6 +1,7 @@
 use crate::effects;
+use crate::rules;
 
-pub const fn of(zone_ref: effects::ZoneRef, player: effects::PlayerRef) -> effects::ZoneRef {
+pub const fn of(zone_ref: effects::ZoneRef, player: rules::Players) -> effects::ZoneRef {
     effects::ZoneRef {
         zone: zone_ref.zone,
         of: player,
@@ -10,7 +11,9 @@ pub const fn of(zone_ref: effects::ZoneRef, player: effects::PlayerRef) -> effec
 #[cfg(test)]
 mod tests {
     use crate::HAND;
+    use crate::YOU;
     use crate::effects;
+    use crate::rules;
 
     use super::of;
 
@@ -18,11 +21,8 @@ mod tests {
     fn test_usage() {
         let hand = effects::ZoneRef {
             zone: HAND,
-            of: effects::PlayerRef::Any,
+            of: rules::Players::All,
         };
-        assert_eq!(
-            of(hand, effects::PlayerRef::You).of,
-            effects::PlayerRef::You
-        );
+        assert_eq!(of(hand, YOU).of, YOU);
     }
 }

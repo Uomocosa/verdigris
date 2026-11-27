@@ -1,6 +1,7 @@
 use crate::effects;
+use crate::rules;
 
-pub fn to_player(effect: effects::Effect, player: effects::PlayerRef) -> effects::Effect {
+pub fn to_player(effect: effects::Effect, player: rules::Players) -> effects::Effect {
     effects::Effect {
         target: Some(effects::target(1, effects::Filter::player(player))),
         ..effect

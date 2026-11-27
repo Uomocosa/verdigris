@@ -4,9 +4,9 @@ use crate::rules;
 use crate::turns;
 use crate::zones;
 
-pub const YOU: effects::PlayerRef = effects::PlayerRef::You;
-pub const OPPONENT: effects::PlayerRef = effects::PlayerRef::Opponent;
-pub const ANY: effects::PlayerRef = effects::PlayerRef::Any;
+pub const YOU: rules::Players = rules::Players::You;
+pub const OPPONENT: rules::Players = rules::Players::Opponents;
+pub const ANY: rules::Players = rules::Players::All;
 
 pub const ANOTHER_CREATURE: cards::ObjectFilter = cards::ObjectFilter::AnotherCreature;
 

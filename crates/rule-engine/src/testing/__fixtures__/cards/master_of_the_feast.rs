@@ -20,7 +20,7 @@ pub const MASTER_OF_THE_FEAST: testing::Card = testing::Card {
             keywords::flying(),
             statics::this().must_attack(),
             abilities::at(
-                turns::beginning_of(UPKEEP, YOU),
+                turns::beginning_of(UPKEEP).of(YOU),
                 effects::draw(1).to_player(OPPONENT),
             ),
         }

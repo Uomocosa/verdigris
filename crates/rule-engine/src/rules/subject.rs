@@ -16,3 +16,13 @@ impl From<rules::ArgRef> for Subject {
 impl From<rules::ArgId> for Subject {
     fn from(id: rules::ArgId) -> Self { Self::One(rules::ArgRef::Arg(id)) }
 }
+
+#[rustfmt::skip]
+impl From<rules::Each> for Subject {
+    fn from(each: rules::Each) -> Self { Self::Each(*each) }
+}
+
+#[rustfmt::skip]
+impl From<rules::An> for Subject {
+    fn from(an: rules::An) -> Self { Self::An(*an) }
+}

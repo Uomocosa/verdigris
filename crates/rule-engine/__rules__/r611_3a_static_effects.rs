@@ -304,7 +304,7 @@ fn candidate_matches(
         _ => {}
     }
     if let Some(controller_ref) = filter.controlled_by
-        && !controller_ref.resolve(controller, players).contains(&candidate_controller)
+        && !controller_ref.resolve(Some(controller), players).contains(&candidate_controller)
     {
         return false;
     }
@@ -334,7 +334,7 @@ fn player_matches(
     }
     filter.controlled_by.map_or_else(
         || players.contains(&candidate),
-        |controller_ref| controller_ref.resolve(controller, players).contains(&candidate),
+        |controller_ref| controller_ref.resolve(Some(controller), players).contains(&candidate),
     )
 }
 

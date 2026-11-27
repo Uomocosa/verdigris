@@ -1,5 +1,6 @@
 use crate::abilities;
 use crate::effects;
+use crate::rules;
 use crate::statics;
 
 #[must_use]
@@ -9,12 +10,12 @@ pub const fn all(filter: effects::Filter) -> statics::All {
 
 #[must_use]
 pub const fn you() -> statics::All {
-    statics::all(effects::Filter::player(effects::PlayerRef::You))
+    statics::all(effects::Filter::player(rules::Players::You))
 }
 
 #[must_use]
 pub const fn each_opponent() -> statics::All {
-    statics::all(effects::Filter::player(effects::PlayerRef::Opponent))
+    statics::all(effects::Filter::player(rules::Players::Opponents))
 }
 
 #[must_use]

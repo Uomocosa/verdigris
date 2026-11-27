@@ -2,11 +2,12 @@ use atomic_delegate_macros::atomic_delegates;
 
 use crate::cards;
 use crate::effects;
+use crate::rules;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Filter {
     pub kind: effects::FilterKind,
-    pub controlled_by: Option<effects::PlayerRef>,
+    pub controlled_by: Option<rules::Players>,
     pub excluded_color: Option<cards::Color>,
     pub attacking: bool,
     pub nontoken: bool,
@@ -16,13 +17,13 @@ pub struct Filter {
 #[atomic_delegates]
 impl Filter {
     #[must_use]
-    pub const fn player(who: effects::PlayerRef) -> Self {}
+    pub const fn player(who: rules::Players) -> Self {}
 }
 
 #[atomic_delegates]
 impl Filter {
     #[must_use]
-    pub fn controlled_by(self, player: effects::PlayerRef) -> Self {}
+    pub fn controlled_by(self, player: rules::Players) -> Self {}
 
     #[must_use]
     pub fn attacking(self) -> Self {}
@@ -78,8 +79,8 @@ mod tests {
         assert_eq!(CREATURE.excluded_color, None);
         assert_eq!(ANY_TARGET.kind, effects::FilterKind::AnyTarget);
         assert_eq!(
-            CREATURE.controlled_by(effects::PlayerRef::You).controlled_by,
-            Some(effects::PlayerRef::You)
+            CREATURE.controlled_by(crate::YOU).controlled_by,
+            Some(crate::YOU)
         );
         let bears = (testing::GRIZZLY_BEARS.definition)();
         let bolt = (testing::LIGHTNING_BOLT.definition)();

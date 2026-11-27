@@ -1,10 +1,16 @@
 use crate::players;
+use crate::rules;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Players {
     You,
     Opponents,
     All,
+}
+
+#[rustfmt::skip]
+impl From<rules::Each> for Players {
+    fn from(each: rules::Each) -> Self { *each }
 }
 
 impl Players {

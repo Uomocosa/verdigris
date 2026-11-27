@@ -2,14 +2,13 @@ use atomic_delegate_macros::atomic_delegates;
 
 use crate::abilities;
 use crate::cards;
-use crate::effects;
 use crate::rules;
 use crate::turns;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum TriggerEvent {
     Enters(cards::ObjectFilter),
-    BeginningOfStep(turns::Step, effects::PlayerRef),
+    BeginningOfStep(turns::Step, rules::Players),
     BeginningOfNextCleanup,
     Attacks,
     Blocks,

@@ -46,7 +46,7 @@ pub fn r603_4_intervening_if(
                     **step == expected && {
                         let players: Vec<players::PlayerId> =
                             lives.iter().map(|(player, _)| players::PlayerId(player)).collect();
-                        who.resolve(controller, &players).contains(&state.turn.active)
+                        who.resolve(Some(controller), &players).contains(&state.turn.active)
                     }
                 }
                 abilities::TriggerEvent::BeginningOfNextCleanup => {

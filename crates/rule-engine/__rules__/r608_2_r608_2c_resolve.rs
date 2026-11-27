@@ -397,7 +397,7 @@ fn resolve_player_targets(
     };
     let players: Vec<players::PlayerId> =
         lookups.lives.iter().map(|(player, _)| players::PlayerId(player)).collect();
-    player.resolve(controller, &players)
+    player.resolve(Some(controller), &players)
 }
 
 #[cfg(test)]

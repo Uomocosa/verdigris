@@ -25,10 +25,9 @@ pub fn is_legal_target(
     let candidate_controller = candidate.map(|(_, _, candidate, _)| **candidate);
     let in_zone = candidate.map(|(_, _, _, in_zone)| in_zone);
     let on_battlefield = targeting.battlefield.contains(target);
-    if let Some(allowed) = filter
-        .controlled_by
-        .map(|player| player.resolve(controller, &all_players).into_iter().collect::<BTreeSet<_>>())
-        && let Some(candidate_controller) = candidate_controller
+    if let Some(allowed) = filter.controlled_by.map(|player| {
+        player.resolve(Some(controller), &all_players).into_iter().collect::<BTreeSet<_>>()
+    }) && let Some(candidate_controller) = candidate_controller
         && !allowed.contains(&candidate_controller)
     {
         return false;
