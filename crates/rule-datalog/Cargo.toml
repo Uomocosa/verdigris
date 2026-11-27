@@ -1,0 +1,24 @@
+[package]
+name = "verdigris-rule-datalog"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Play legality as Datalog, agreeing with the rule engine on both engines"
+
+[lib]
+name = "rule_datalog"
+
+[lints]
+workspace = true
+
+[dependencies]
+atomic-delegate-macros.workspace = true
+bevy.workspace = true
+thiserror.workspace = true
+verdigris-datalog-ir = { path = "../datalog-ir" }
+verdigris-rule-engine = { path = "../rule-engine" }
+
+[dev-dependencies]
+verdigris-datalog-datafrog = { path = "../datalog-datafrog" }
+verdigris-datalog-nemo = { path = "../datalog-nemo" }
+verdigris-rule-engine = { path = "../rule-engine", features = ["testing"] }

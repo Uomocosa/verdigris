@@ -3556,6 +3556,19 @@ name = "verdigris-parser"
 version = "0.0.2"
 
 [[package]]
+name = "verdigris-rule-datalog"
+version = "0.0.2"
+dependencies = [
+ "atomic-delegate-macros",
+ "bevy",
+ "thiserror 2.0.21",
+ "verdigris-datalog-datafrog",
+ "verdigris-datalog-ir",
+ "verdigris-datalog-nemo",
+ "verdigris-rule-engine",
+]
+
+[[package]]
 name = "verdigris-rule-engine"
 version = "0.0.2"
 dependencies = [

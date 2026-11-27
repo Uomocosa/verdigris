@@ -9,6 +9,7 @@ members = [
     "crates/datalog-ir",
     "crates/datalog-datafrog",
     "crates/datalog-nemo",
+    "crates/rule-datalog",
 ]
 
 [workspace.package]
