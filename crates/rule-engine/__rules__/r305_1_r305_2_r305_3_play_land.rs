@@ -134,6 +134,16 @@ mod tests {
                         events::play::LAND_PLAYS
                     )])
                 );
+                assert!(
+                    answers
+                        .solve::<events::Play>(
+                            &[(events::Play::PLAYER, rules::ArgValue::Player(p1.id))],
+                            p1.id
+                        )
+                        .iter()
+                        .any(|(event, legality)| event.card == *forest_2
+                            && matches!(legality, rules::Legality::Illegal(reasons) if reasons.contains(&rules::Why::Restriction(events::play::LAND_PLAYS))))
+                );
             })
             .unwrap();
         Ok(())

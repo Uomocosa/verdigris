@@ -78,6 +78,14 @@ impl Rules<'_, '_> {
     }
 
     #[must_use]
+    pub fn solve<E: rules::traits::event::Event>(
+        &self,
+        fixed: &[(rules::ArgId, rules::ArgValue)],
+        viewer: players::PlayerId,
+    ) -> Vec<(E, rules::Legality)> {
+    }
+
+    #[must_use]
     pub fn players_in_game(
         &self,
         set: rules::Players,
