@@ -1,5 +1,6 @@
 use atomic_delegate_macros::atomic_delegates;
 
+use crate::LEGEND;
 use crate::actions;
 use crate::players;
 use crate::rules;
@@ -12,7 +13,6 @@ pub enum Choice {
     CombatDamage(actions::CombatDamageChoice),
     OrderTriggers(actions::OrderTriggersChoice),
     ArrangeGraveyard(actions::ArrangeGraveyardChoice),
-    Legendary(actions::LegendaryChoice),
     DefendingPlayer(actions::DefendingPlayerChoice),
 }
 
@@ -26,12 +26,17 @@ impl Choice {
 impl Choice {
     #[must_use]
     pub fn is_may_of(&self, event: rules::EventId) -> bool { matches!(self, Self::May(choice) if choice.event == event) }
-
-    #[must_use]
-    pub const fn is_found_by_a_state_based_check(&self) -> bool { matches!(self, Self::Legendary(_)) }
 }
 
 impl Choice {
+    #[must_use]
+    pub fn is_found_by_a_state_based_check(&self) -> bool {
+        match self {
+            Self::Pick(choice) => choice.id == LEGEND,
+            _ => false,
+        }
+    }
+
     #[must_use]
     pub const fn player(&self) -> players::PlayerId {
         match self {
@@ -41,7 +46,6 @@ impl Choice {
             Self::CombatDamage(choice) => choice.player,
             Self::OrderTriggers(choice) => choice.player,
             Self::ArrangeGraveyard(choice) => choice.player,
-            Self::Legendary(choice) => choice.player,
             Self::DefendingPlayer(choice) => choice.player,
         }
     }
@@ -73,6 +77,7 @@ mod tests {
 
     use crate::BATTLEFIELD;
     use crate::HAND;
+    use crate::LEGEND;
     use crate::actions;
     use crate::players;
     use crate::rules;
@@ -129,9 +134,13 @@ mod tests {
                 graveyard: first,
                 cards: vec![first],
             }),
-            actions::Choice::Legendary(actions::LegendaryChoice {
+            actions::Choice::Pick(actions::PickChoice {
+                id: LEGEND,
                 player: chooser,
-                legal: BTreeSet::from([first]),
+                source: None,
+                among: BTreeSet::from([first]),
+                count: actions::Count::exactly(1),
+                ordered: false,
             }),
         ];
         let answered_by: Vec<players::PlayerId> =

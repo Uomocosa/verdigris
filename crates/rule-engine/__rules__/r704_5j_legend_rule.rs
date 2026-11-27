@@ -5,6 +5,7 @@ use bevy::ecs::system::ScheduleSystem;
 use bevy::prelude::{Entity, MessageReader, MessageWriter, Query, ResMut, With, not, on_message};
 
 use crate::Attempt;
+use crate::LEGEND;
 use crate::StateBasedActionsPerformed;
 use crate::actions;
 use crate::cards;
@@ -46,12 +47,14 @@ fn ask_which_to_keep(
         if entities.len() < 2 {
             continue;
         }
-        asks.write(actions::Ask(actions::Choice::Legendary(
-            actions::LegendaryChoice {
-                player: controller,
-                legal: entities.into_iter().collect(),
-            },
-        )));
+        asks.write(actions::Ask(actions::Choice::Pick(actions::PickChoice {
+            id: LEGEND,
+            player: controller,
+            source: None,
+            among: entities.into_iter().collect(),
+            count: actions::Count::exactly(1),
+            ordered: false,
+        })));
     }
 }
 
@@ -62,13 +65,16 @@ fn put_the_rest_into_graveyards(
     permanents: Query<Entity, With<cards::OnBattlefield>>,
 ) {
     for answered in answers.read() {
-        let actions::Choice::Legendary(choice) = &answered.choice else {
+        let actions::Choice::Pick(choice) = &answered.choice else {
             continue;
         };
-        let actions::Action::ChooseLegendary(chosen) = &answered.answer else {
+        if choice.id != LEGEND {
+            continue;
+        }
+        let actions::Action::Choose(chosen) = &answered.answer else {
             continue;
         };
-        for other in choice.legal.iter().copied().filter(|other| other != chosen) {
+        for other in choice.among.iter().copied().filter(|other| !chosen.contains(other)) {
             if permanents.get(other).is_err() {
                 continue;
             }

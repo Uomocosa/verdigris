@@ -14,8 +14,8 @@ pub use basic::messages::{Answered, Ask, DiscardRequest, PlayerAction, Rejected}
 pub use basic::newtypes::ChoiceId;
 pub use basic::resources::{AcceptedMays, PendingMayAsks};
 pub use basic::structs::{
-    ArrangeGraveyardChoice, BlockAssignment, DamageAssignment, DefendingPlayerChoice,
-    LegendaryChoice, MayChoice, OrderTriggersChoice, RequiredCombatDamage, TargetChoice,
+    ArrangeGraveyardChoice, BlockAssignment, DamageAssignment, DefendingPlayerChoice, MayChoice,
+    OrderTriggersChoice, RequiredCombatDamage, TargetChoice,
 };
 pub use choice::Choice;
 pub use count::Count;

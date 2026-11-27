@@ -1,3 +1,4 @@
+use crate::actions;
 use crate::rules;
 use crate::turns;
 use crate::zones;
@@ -38,3 +39,5 @@ pub const FIRST_COMBAT_DAMAGE_STEP: rules::DefinitionId = rules::DefinitionId("5
 pub const ASSIGNS_AGAIN: rules::DefinitionId = rules::DefinitionId("510.4/assigns-again");
 
 pub const RESOLUTION_CAUSE: rules::EventId = rules::EventId("608.2/resolve");
+
+pub const LEGEND: actions::ChoiceId = actions::ChoiceId("704.5j");

@@ -48,12 +48,6 @@ pub struct MayChoice {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct LegendaryChoice {
-    pub player: players::PlayerId,
-    pub legal: BTreeSet<Entity>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ArrangeGraveyardChoice {
     pub player: players::PlayerId,
     pub graveyard: Entity,

@@ -28,7 +28,6 @@ pub fn rejection(
         actions::Choice::OrderTriggers(_) => {
             Some(actions::Rejected::InvalidTriggerOrder { player })
         }
-        actions::Choice::Legendary(_) => None,
         actions::Choice::DefendingPlayer(_) => {
             Some(actions::Rejected::CannotChooseDefendingPlayer { player })
         }

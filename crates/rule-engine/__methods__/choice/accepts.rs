@@ -30,12 +30,6 @@ pub fn accepts(choice: &actions::Choice, answer: &actions::Action) -> bool {
                 && chosen_set.len() == chosen.len()
                 && chosen_set.is_subset(&choice.legal)
         }
-        actions::Choice::Legendary(choice) => {
-            let actions::Action::ChooseLegendary(chosen) = answer else {
-                return false;
-            };
-            choice.legal.contains(chosen)
-        }
         actions::Choice::DefendingPlayer(choice) => {
             let actions::Action::ChooseDefendingPlayer(chosen) = answer else {
                 return false;
