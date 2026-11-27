@@ -9,9 +9,10 @@ mod fixtures;
 
 pub use app::{
     AutoPassUntil, Card, CardCheck, CardQuery, Cards, CardsError, CardsInZone, MockGame,
-    MockGameBuilder, P1, P2, P3, P4, P5, P6, P7, P8, PlayError, PlayStep, PlayerSeat, PlayerSetup,
-    PlayerView, Targets, TestAbility, TestCard, TestError, TestPlayer, TestPlayerActions,
-    TestResult, TestTrigger, TriggerQuery, ZoneCheck, ZoneObject, ZoneOwner,
+    MockGameBuilder, MoveCheck, MoveDestination, P1, P2, P3, P4, P5, P6, P7, P8, PlayError,
+    PlayStep, PlayerSeat, PlayerSetup, PlayerView, Targets, TestAbility, TestCard, TestError,
+    TestPlayer, TestPlayerActions, TestResult, TestTrigger, TriggerQuery, ZoneCheck, ZoneObject,
+    ZoneOwner,
 };
 pub use basic::newtypes::TestCardName;
 pub use fakes::{AbsoluteRule, RestrictedRule, TestRule, TestStep, UNTAPPED};

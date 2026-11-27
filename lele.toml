@@ -153,6 +153,10 @@ replaced_by = "rule_comments"
 [lele.rules.lint.no_free_functions]
 
 [[lele.rules.lint.no_free_functions.exempt]]
+path = "crates/rule-engine/src/zones/move_object.rs"
+reason = "CR 400.7 zone-move primitive called by every zone-change rule; neither the first argument (&mut Commands) nor the return (Entity) is a crate type, so there is no owner to attach a method to, and the brief fixes the zones::move_object path."
+
+[[lele.rules.lint.no_free_functions.exempt]]
 path = "crates/rule-engine/__rules__"
 reason = "A rule file holds exactly one pub fn Bevy system named after the CR rule; the system takes Bevy system parameters and has no owner type to become a method of, so it stays a free function by convention."
 
