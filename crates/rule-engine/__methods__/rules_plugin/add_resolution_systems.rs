@@ -70,8 +70,8 @@ pub fn add_resolution_systems(app: &mut App) {
                 comprehensive_rules::r121_1_r121_2_draw::r121_1_r121_2_draw,
                 comprehensive_rules::r701_17a_mill::r701_17a_mill,
                 comprehensive_rules::r119_3_life_loss::r119_3_life_loss,
-                Attempt::<events::GivePoisonCounters>::resolved_by(
-                    comprehensive_rules::r122_1_give_poison_counters::r122_1_give_poison_counters,
+                Attempt::<events::PutCounters>::resolved_by(
+                    comprehensive_rules::r122_6_put_counters::r122_6_put_counters,
                 ),
                 (
                     comprehensive_rules::r701_9b_choose_discards::r701_9b_choose_discards(),

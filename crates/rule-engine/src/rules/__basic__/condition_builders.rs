@@ -1,6 +1,7 @@
 use bevy::prelude::Component;
 
 use crate::cards;
+use crate::counters;
 use crate::keywords;
 use crate::rules;
 use crate::turns;
@@ -87,8 +88,8 @@ pub const fn life() -> rules::PlayerQuantity {
 }
 
 #[must_use]
-pub const fn poison_counters() -> rules::PlayerQuantity {
-    rules::PlayerQuantity::PoisonCounters
+pub const fn counters(kind: counters::CounterId) -> rules::PlayerQuantity {
+    rules::PlayerQuantity::Counters(kind)
 }
 
 #[must_use]

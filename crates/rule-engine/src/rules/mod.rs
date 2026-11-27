@@ -2,9 +2,9 @@
 mod basic;
 
 pub use basic::condition_builders::{
-    a, active_player, an, card_type, cards_in_hand, cards_in_library, count, each, exactly,
-    greater_than, has, has_keyword, has_priority, in_zone, is, less_than, life, main_phase,
-    points_to, poison_counters, power, stack_empty, step_is, toughness,
+    a, active_player, an, card_type, cards_in_hand, cards_in_library, count, counters, each,
+    exactly, greater_than, has, has_keyword, has_priority, in_zone, is, less_than, life,
+    main_phase, points_to, power, stack_empty, step_is, toughness,
 };
 pub use basic::enums::{Amount, Change, Legality, may};
 pub use basic::newtypes::{An, Each, EventId, ResultId, RuleId};

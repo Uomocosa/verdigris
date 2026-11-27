@@ -49,8 +49,8 @@ pub use exile::Exile;
 mod gain_life;
 pub use gain_life::GainLife;
 
-mod give_poison_counters;
-pub use give_poison_counters::GivePoisonCounters;
+mod put_counters;
+pub use put_counters::PutCounters;
 
 mod join_combat_damage_step;
 pub use join_combat_damage_step::JoinCombatDamageStep;

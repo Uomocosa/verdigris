@@ -2,6 +2,7 @@ use crate::events;
 use bevy::prelude::{Entity, MessageWriter, Query};
 
 use crate::Attempt;
+use crate::counters;
 use crate::players;
 
 /// 704.5c If a player has ten or more poison counters, that player loses the game. Ignore this rule
@@ -14,10 +15,10 @@ use crate::players;
 /// 810 for additional rules for Two-Headed Giant games.)
 pub fn r704_5c_poison(
     mut losses: MessageWriter<Attempt<events::LoseGame>>,
-    poisoned: Query<(Entity, &players::PoisonCounters), players::StillInTheGame>,
+    poisoned: Query<(Entity, &counters::Counters), players::StillInTheGame>,
 ) {
-    for (player, poison_counters) in poisoned.iter() {
-        if **poison_counters >= 10 {
+    for (player, held) in poisoned.iter() {
+        if held.get(counters::POISON) >= 10 {
             losses.write(Attempt(events::LoseGame {
                 player: players::PlayerId(player),
             }));

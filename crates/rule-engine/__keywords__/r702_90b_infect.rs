@@ -1,4 +1,5 @@
 use crate::LOSES_LIFE;
+use crate::counters;
 use crate::effects;
 use crate::events;
 use crate::keywords;
@@ -25,8 +26,9 @@ fn abilities() -> Vec<effects::Modification> {
         change: rules::Change::Instead {
             holder: events::DealDamage::SOURCE.into(),
             when: rules::Condition::True,
-            then: rules::Then::Events(vec![rules::EventTemplate::GivePoisonCounters {
+            then: rules::Then::Events(vec![rules::EventTemplate::PutCounters {
                 who: events::DealDamage::RECIPIENT.into(),
+                kind: counters::POISON,
                 amount: rules::Amount::FromArg(events::DealDamage::AMOUNT),
             }]),
         },
@@ -36,7 +38,7 @@ fn abilities() -> Vec<effects::Modification> {
 #[cfg(test)]
 mod tests {
     use crate::BATTLEFIELD;
-    use crate::players;
+    use crate::counters;
     use crate::testing::*;
     use crate::turns;
 
@@ -66,10 +68,9 @@ mod tests {
         ])?;
 
         assert_eq!(game.life(p2), 20);
-        assert_eq!(
-            game.get::<players::PoisonCounters>(p2),
-            Some(players::PoisonCounters(1))
-        );
+        let mut expected = counters::Counters::default();
+        expected.add(counters::POISON, 1);
+        assert_eq!(game.get::<counters::Counters>(p2), Some(expected));
         Ok(())
     }
 }

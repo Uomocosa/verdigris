@@ -84,6 +84,7 @@ mod tests {
     use crate::BATTLEFIELD;
     use crate::HAND;
     use crate::cards;
+    use crate::counters;
     use crate::events;
     use crate::keywords;
     use crate::mana;
@@ -398,7 +399,9 @@ mod tests {
                 ));
                 assert!(eval(
                     &answers,
-                    &rules::poison_counters().of(TestRule::PLAYER).is(rules::Value(0).or_less()),
+                    &rules::counters(counters::POISON)
+                        .of(TestRule::PLAYER)
+                        .is(rules::Value(0).or_less()),
                     &attack,
                     None,
                 ));

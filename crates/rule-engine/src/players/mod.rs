@@ -3,7 +3,7 @@ mod basic;
 
 pub use basic::components::{
     AttemptedDrawFromEmptyLibrary, DefendingPlayer, GameIsADraw, LeftTheGame, Life, Lost, Player,
-    PoisonCounters, Won,
+    Won,
 };
 pub use basic::newtypes::PlayerId;
 pub use basic::status::{Status, StatusItem};

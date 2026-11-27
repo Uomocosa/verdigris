@@ -7,6 +7,7 @@ mod basic;
 pub mod cards;
 #[path = "../__rules__/mod.rs"]
 mod comprehensive_rules;
+pub mod counters;
 pub mod damage;
 pub mod effects;
 #[path = "../__events__/mod.rs"]

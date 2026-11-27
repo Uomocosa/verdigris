@@ -203,6 +203,10 @@ reason = "A rule file holds exactly one pub fn Bevy system named after the CR ru
 path = "crates/rule-engine/src/constants.rs"
 reason = "LELE019 matches by last segment: rules::Hooked::PLAYER (an event argument naming the hooked event's acting player, mirroring every concrete event's PLAYER argument) is a different item from the crate-wide PLAYER player set (rules::Players::All in src/constants.rs) but counts as its only non-test user; the constant stays at the root because the card-definition DSL names it from every domain."
 
+[[lele.rules.lint.constants_placement.exempt]]
+path = "crates/rule-engine/src/counters/__basic__/poison.rs"
+reason = "User-decided public name counters::POISON (brief N1 models counters on keywords::KeywordId); the const lives with its CounterId domain like each keyword ID lives in its __keywords__ file, re-exported flat from counters."
+
 # LELE020 · Behavior-free types (plain structs, enums, newtypes, aliases, ECS markers) go in the domain's…
 [lele.rules.lint.container_placement]
 
@@ -217,6 +221,11 @@ reason = "LELE019 matches by last segment: rules::Hooked::PLAYER (an event argum
 
 # LELE026 · No newtype around a collection (`Rooms(Vec<String>)`); wrap the element (`Room(String)`) and use…
 [lele.rules.lint.no_collection_newtype]
+
+[[lele.rules.lint.no_collection_newtype.exempt]]
+type = "Counters"
+file = "crates/rule-engine/src/counters/counters.rs"
+reason = "Counters holds exactly one count per CounterId for any bearer (players now, permanents later); CR 122.1 makes same-named counters interchangeable, so one map keyed by kind is the set itself — splitting it by kind would be parallel collections (SMELLS S3)."
 
 # LELE027 · A type's impls in `src/` follow one order: `impl Default`, constructors (receiver-less fns…
 [lele.rules.lint.impl_item_order]

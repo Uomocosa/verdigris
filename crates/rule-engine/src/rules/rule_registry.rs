@@ -57,7 +57,7 @@ mod tests {
         )));
         assert!(registry.resolves(&rules::Target::value::<rules::MaximumHandSize>()));
         assert_eq!(registry.duplicates, Vec::<rules::EventId>::new());
-        assert!(!registry.resolves(&rules::Target::event::<events::GivePoisonCounters>()));
+        assert!(!registry.resolves(&rules::Target::event::<events::PutCounters>()));
     }
 
     #[test]

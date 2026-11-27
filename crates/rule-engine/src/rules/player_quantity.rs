@@ -1,11 +1,12 @@
 use atomic_delegate_macros::atomic_delegates;
 
+use crate::counters;
 use crate::rules;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum PlayerQuantity {
     Life,
-    PoisonCounters,
+    Counters(counters::CounterId),
     CardsInHand,
     CardsInLibrary,
 }
@@ -26,6 +27,7 @@ impl PlayerQuantity {
 
 #[cfg(test)]
 mod tests {
+    use crate::counters;
     use crate::rules;
 
     use super::PlayerQuantity;
@@ -37,9 +39,9 @@ mod tests {
             rules::Condition::PlayerValue(PlayerQuantity::Life, rules::Comparison::OrMore(20))
         );
         assert_eq!(
-            rules::poison_counters().is(rules::Value(0).or_less()),
+            rules::counters(counters::POISON).is(rules::Value(0).or_less()),
             rules::Condition::PlayerValue(
-                PlayerQuantity::PoisonCounters,
+                PlayerQuantity::Counters(counters::POISON),
                 rules::Comparison::OrLess(0),
             )
         );

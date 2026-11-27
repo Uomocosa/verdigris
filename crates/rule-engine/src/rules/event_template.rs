@@ -1,5 +1,6 @@
 use atomic_delegate_macros::atomic_delegates;
 
+use crate::counters;
 use crate::rules;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -30,8 +31,9 @@ pub enum EventTemplate {
         who: rules::ArgRef,
         amount: rules::Amount,
     },
-    GivePoisonCounters {
+    PutCounters {
         who: rules::ArgRef,
+        kind: counters::CounterId,
         amount: rules::Amount,
     },
     Exile {

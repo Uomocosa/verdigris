@@ -77,11 +77,13 @@ pub fn instantiate<E: Event>(
             player: holder(who),
             amount: amount(template_amount),
         }),
-        rules::EventTemplate::GivePoisonCounters {
+        rules::EventTemplate::PutCounters {
             who,
+            kind,
             amount: template_amount,
-        } => rules::AnyEvent::GivePoisonCounters(events::GivePoisonCounters {
-            player: holder(who),
+        } => rules::AnyEvent::PutCounters(events::PutCounters {
+            recipient: object(who),
+            kind: *kind,
             amount: amount(template_amount),
         }),
         rules::EventTemplate::BeginTheGameOnTheBattlefield => {

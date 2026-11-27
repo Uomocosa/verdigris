@@ -1,5 +1,6 @@
 use bevy::prelude::Entity;
 
+use crate::counters;
 use crate::players;
 use crate::rules;
 use crate::zones;
@@ -21,10 +22,9 @@ pub fn eval_player_value(
                     rules::PlayerQuantity::Life => {
                         entity.get::<players::Life>().map(|life| comparison.holds(**life))
                     }
-                    rules::PlayerQuantity::PoisonCounters => {
-                        let counters = entity
-                            .get::<players::PoisonCounters>()
-                            .map_or(0, |counters| **counters);
+                    rules::PlayerQuantity::Counters(kind) => {
+                        let counters =
+                            entity.get::<counters::Counters>().map_or(0, |held| held.get(kind));
                         i32::try_from(counters).ok().map(|value| comparison.holds(value))
                     }
                     rules::PlayerQuantity::CardsInHand | rules::PlayerQuantity::CardsInLibrary => {

@@ -3,6 +3,7 @@ use crate::{BATTLEFIELD, STACK};
 use bevy::prelude::{Entity, MessageReader, MessageWriter, ParamSet};
 
 use crate::Attempt;
+use crate::counters;
 use crate::effects;
 use crate::keywords;
 use crate::players;
@@ -43,7 +44,7 @@ pub fn r608_2_r608_2c_resolve(
     mut destructions: MessageWriter<Attempt<events::Destroy>>,
     mut countered: MessageWriter<Attempt<events::Counter>>,
     mut exiles: MessageWriter<Attempt<events::Exile>>,
-    mut poison_counters: MessageWriter<Attempt<events::GivePoisonCounters>>,
+    mut poison_counters: MessageWriter<Attempt<events::PutCounters>>,
     mut player_effects: ParamSet<PlayerEffectWriters<'_, '_, '_, '_, '_, '_>>,
     mut effect_messages: ParamSet<EffectMessageWriters<'_, '_, '_, '_>>,
     lookups: stack::ResolutionLookups<'_, '_>,
@@ -240,13 +241,14 @@ fn request_gain_keyword(
 }
 
 fn request_poison(
-    poison_counters: &mut MessageWriter<Attempt<events::GivePoisonCounters>>,
+    poison_counters: &mut MessageWriter<Attempt<events::PutCounters>>,
     players: &[players::PlayerId],
     amount: u32,
 ) {
     for player in players {
-        poison_counters.write(Attempt(events::GivePoisonCounters {
-            player: *player,
+        poison_counters.write(Attempt(events::PutCounters {
+            recipient: **player,
+            kind: counters::POISON,
             amount,
         }));
     }
