@@ -7,6 +7,7 @@ use crate::keywords;
 use crate::players;
 use crate::rules;
 use crate::statics;
+use crate::zones;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Deref)]
 pub struct Filter(rules::Condition);
@@ -82,6 +83,11 @@ impl Filter {
     #[must_use]
     pub fn controlled_by(players: impl Into<rules::Players>) -> Self {
         Self(rules::controlled_by(players))
+    }
+
+    #[must_use]
+    pub fn from_in_zone(zone: zones::Zone, role: impl Into<rules::ArgRef>) -> Self {
+        Self(rules::in_zone(zone, role))
     }
 
     #[must_use]
