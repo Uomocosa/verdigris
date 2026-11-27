@@ -1,7 +1,8 @@
-use bevy::prelude::{MessageReader, MessageWriter, Messages, ResMut};
+use bevy::prelude::{MessageReader, MessageWriter, Messages, ParamSet, ResMut};
 
 use crate::actions;
 use crate::players;
+use crate::rules;
 use crate::turns;
 
 pub fn answer_asks(
@@ -11,7 +12,7 @@ pub fn answer_asks(
     mut rejected: MessageWriter<actions::Rejected>,
     mut pending: ResMut<actions::PendingChoice>,
     mut queue: ResMut<actions::AskQueue>,
-    mut state: ResMut<turns::TurnState>,
+    mut state_and_answers: ParamSet<(ResMut<turns::TurnState>, rules::Rules)>,
     players: players::Players,
 ) {
     queue.ingest(&mut asks, &players);
@@ -27,8 +28,16 @@ pub fn answer_asks(
             continue;
         };
         let is_chooser = choice.player() == action.player;
-        if !(is_chooser && choice.accepts(&action.action)) {
-            if let Some(rejection) = choice.rejection(action.player, &action.action) {
+        let accepted = {
+            let answers = state_and_answers.p1();
+            is_chooser && choice.accepts(&answers, &action.action)
+        };
+        if !accepted {
+            let rejection = {
+                let answers = state_and_answers.p1();
+                choice.rejection(&answers, action.player, &action.action)
+            };
+            if let Some(rejection) = rejection {
                 rejected.write(rejection);
             }
             continue;
@@ -63,6 +72,6 @@ pub fn answer_asks(
     }
     pending.refresh(&queue, &players);
     if !pending.blocks_priority() {
-        state.resume_priority();
+        state_and_answers.p0().resume_priority();
     }
 }

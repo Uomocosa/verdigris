@@ -38,7 +38,7 @@ use crate::rules;
 pub fn r508_1a_declare_attackers(
     mut actions: MessageReader<actions::PlayerAction>,
     mut rejected: MessageWriter<actions::Rejected>,
-    mut declared: MessageWriter<Attempt<events::DeclareAttackers>>,
+    mut declared: MessageWriter<Attempt<events::Attack>>,
     game: Game,
     answers: rules::Rules,
 ) {
@@ -54,8 +54,8 @@ pub fn r508_1a_declare_attackers(
             continue;
         }
         for attacker in attackers {
-            declared.write(Attempt(events::DeclareAttackers {
-                attackers: vec![*attacker],
+            declared.write(Attempt(events::Attack {
+                attacker: *attacker,
             }));
         }
     }
@@ -121,7 +121,7 @@ mod tests {
                     },
                     actions::DeclarationWhy {
                         creature: Some(tundra.into()),
-                        why: rules::Why::Restriction(events::declare_attackers::CREATURE),
+                        why: rules::Why::Restriction(events::attack::CREATURE),
                     },
                 ],
             })
@@ -149,9 +149,7 @@ mod tests {
         let legal = game.app.world().resource::<actions::LegalActions>().clone();
         assert!(legal.attackers.contains(&(
             bears.into(),
-            rules::Legality::Illegal(vec![rules::Why::Restriction(
-                events::declare_attackers::UNTAPPED
-            )])
+            rules::Legality::Illegal(vec![rules::Why::Restriction(events::attack::UNTAPPED)])
         )));
         assert_eq!(
             game.last_rejection(),
@@ -159,7 +157,7 @@ mod tests {
                 attackers: vec![bears.into()],
                 why: vec![actions::DeclarationWhy {
                     creature: Some(bears.into()),
-                    why: rules::Why::Restriction(events::declare_attackers::UNTAPPED),
+                    why: rules::Why::Restriction(events::attack::UNTAPPED),
                 }],
             })
         );
@@ -194,7 +192,7 @@ mod tests {
                 attackers: vec![corpse_on_battlefield.into()],
                 why: vec![actions::DeclarationWhy {
                     creature: Some(corpse_on_battlefield.into()),
-                    why: rules::Why::Restriction(events::declare_attackers::SUMMONING_SICK),
+                    why: rules::Why::Restriction(events::attack::SUMMONING_SICK),
                 }],
             })
         );
@@ -263,7 +261,7 @@ mod tests {
                 attackers: vec![goblin_on_battlefield.into(), corpse_on_battlefield.into()],
                 why: vec![actions::DeclarationWhy {
                     creature: Some(corpse_on_battlefield.into()),
-                    why: rules::Why::Restriction(events::declare_attackers::SUMMONING_SICK),
+                    why: rules::Why::Restriction(events::attack::SUMMONING_SICK),
                 }],
             })
         );
@@ -477,7 +475,7 @@ mod tests {
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
-                assert!(answers.required::<events::DeclareAttackers>(bears.into()));
+                assert!(answers.required::<events::Attack>(bears.into()));
             })
             .unwrap();
         Ok(())

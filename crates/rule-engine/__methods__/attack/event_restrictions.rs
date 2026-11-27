@@ -4,16 +4,14 @@ use crate::rules;
 
 pub fn event_restrictions() -> Vec<rules::Restriction> {
     vec![
-        events::declare_attackers::CREATURE
-            .restriction(rules::has::<cards::Creature>().of(events::DeclareAttackers::ATTACKERS)),
-        events::declare_attackers::CONTROLS.restriction(
-            rules::has::<cards::OnBattlefield>().of(events::DeclareAttackers::ATTACKERS),
-        ),
-        events::declare_attackers::UNTAPPED
-            .restriction((!rules::has::<cards::Tapped>()).of(events::DeclareAttackers::ATTACKERS)),
-        events::declare_attackers::SUMMONING_SICK.restriction(
-            (!rules::has::<cards::SummoningSick>()).of(events::DeclareAttackers::ATTACKERS),
-        ),
+        events::attack::CREATURE
+            .restriction(rules::has::<cards::Creature>().of(events::Attack::ATTACKER)),
+        events::attack::CONTROLS
+            .restriction(rules::has::<cards::OnBattlefield>().of(events::Attack::ATTACKER)),
+        events::attack::UNTAPPED
+            .restriction((!rules::has::<cards::Tapped>()).of(events::Attack::ATTACKER)),
+        events::attack::SUMMONING_SICK
+            .restriction((!rules::has::<cards::SummoningSick>()).of(events::Attack::ATTACKER)),
     ]
 }
 
@@ -32,17 +30,17 @@ mod tests {
         assert_eq!(restrictions[0].id, rules::RestrictionId("508.1a/creature"));
         assert_eq!(
             restrictions[0].condition,
-            rules::has::<cards::Creature>().of(events::DeclareAttackers::ATTACKERS)
+            rules::has::<cards::Creature>().of(events::Attack::ATTACKER)
         );
         assert_eq!(restrictions[1].id, rules::RestrictionId("508.1a/controls"));
         assert_eq!(
             restrictions[1].condition,
-            rules::has::<cards::OnBattlefield>().of(events::DeclareAttackers::ATTACKERS)
+            rules::has::<cards::OnBattlefield>().of(events::Attack::ATTACKER)
         );
         assert_eq!(restrictions[2].id, rules::RestrictionId("508.1a/untapped"));
         assert_eq!(
             restrictions[2].condition,
-            (!rules::has::<cards::Tapped>()).of(events::DeclareAttackers::ATTACKERS)
+            (!rules::has::<cards::Tapped>()).of(events::Attack::ATTACKER)
         );
         assert_eq!(
             restrictions[3].id,
@@ -50,7 +48,7 @@ mod tests {
         );
         assert_eq!(
             restrictions[3].condition,
-            (!rules::has::<cards::SummoningSick>()).of(events::DeclareAttackers::ATTACKERS)
+            (!rules::has::<cards::SummoningSick>()).of(events::Attack::ATTACKER)
         );
     }
 }

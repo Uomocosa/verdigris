@@ -146,7 +146,7 @@ impl MockGame {
     pub fn stack(&self) -> testing::CardsInZone {}
 
     #[must_use]
-    pub fn target_choice(&self) -> Option<testing::ExpectedTargets> {}
+    pub fn target_choice(&mut self) -> Option<testing::ExpectedTargets> {}
 
     #[must_use]
     pub fn trigger_sources(&self) -> Vec<Entity> {}
@@ -189,6 +189,8 @@ impl MockGame {
     pub(crate) fn stack_objects(&self) -> Vec<testing::ZoneObject> {}
 
     pub(crate) fn rejection_count(&self) -> usize {}
+
+    pub(crate) fn check_pick_previews(&mut self, disagreements: &mut Vec<String>) {}
 }
 
 impl MockGame {
@@ -238,6 +240,19 @@ impl MockGame {
             | actions::Action::Choose(_)
             | actions::Action::AssignCombatDamage(_) => true,
         }
+    }
+
+    pub(crate) fn pick_preview_accepts(
+        &mut self,
+        choice: &actions::PickChoice,
+        picked: &[Entity],
+    ) -> bool {
+        let choice = choice.clone();
+        let picked = picked.to_vec();
+        self.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| choice.check(&answers, &picked))
+            .is_ok_and(|outcome| outcome.is_ok())
     }
 }
 
@@ -392,7 +407,7 @@ mod tests {
 
     #[test]
     fn fresh_game_has_no_target_or_rejection() {
-        let (game, [p1, ..]) = MockGame::new([P1, P2]);
+        let (mut game, [p1, ..]) = MockGame::new([P1, P2]);
         assert!(game.player(p1).cards_in(HAND).has_no(LIGHTNING_BOLT));
         assert!(game.target_choice().is_none());
         assert!(game.last_rejection().is_none());

@@ -359,9 +359,9 @@ mod tests {
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
-                assert!(answers.required::<events::DeclareAttackers>(golem.into()));
+                assert!(answers.required::<events::Attack>(golem.into()));
                 assert!(answers.required::<events::DeclareBlocker>(golem.into()));
-                assert!(!answers.required::<events::DeclareAttackers>(bears.into()));
+                assert!(!answers.required::<events::Attack>(bears.into()));
                 assert!(!answers.required::<events::DeclareBlocker>(bears.into()));
             })
             .unwrap();
@@ -723,7 +723,7 @@ mod tests {
                 attackers: vec![resting_on_battlefield.into()],
                 why: vec![actions::DeclarationWhy {
                     creature: Some(resting_on_battlefield.into()),
-                    why: rules::Why::Restriction(events::declare_attackers::SUMMONING_SICK),
+                    why: rules::Why::Restriction(events::attack::SUMMONING_SICK),
                 }],
             })
         );

@@ -28,14 +28,9 @@ pub fn refresh_legal_actions(
             }
             actions::Choice::Pick(pick) => {
                 let previews: Vec<(actions::Action, rules::Legality)> = pick
-                    .among
-                    .iter()
-                    .map(|entity| {
-                        (
-                            actions::Action::Choose(vec![*entity]),
-                            rules::Legality::Legal,
-                        )
-                    })
+                    .candidates(&answers)
+                    .into_iter()
+                    .map(|(entity, legality)| (actions::Action::Choose(vec![entity]), legality))
                     .collect();
                 *legal = actions::LegalActions {
                     player: Some(pick.player),

@@ -32,7 +32,7 @@ pub fn show_may<E: Event>(
                 id: actions::ChoiceId(*E::ID),
                 player,
                 source: None,
-                among: options.into_iter().collect(),
+                among: actions::Candidates::Fixed(options.into_iter().collect()),
                 count,
                 ordered: false,
             })));

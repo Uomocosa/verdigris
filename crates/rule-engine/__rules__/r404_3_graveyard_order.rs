@@ -1,4 +1,4 @@
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::BTreeMap;
 
 use bevy::ecs::schedule::{IntoScheduleConfigs, ScheduleConfigs};
 use bevy::ecs::system::ScheduleSystem;
@@ -44,7 +44,9 @@ fn arrange_as_answered(
         let Ok(mut contents) = zone_contents.get_mut(graveyard) else {
             continue;
         };
-        let expected: &BTreeSet<Entity> = &choice.among;
+        let Some(expected) = choice.fixed() else {
+            continue;
+        };
         let mut ordered = ordered.iter().copied();
         for card in contents.iter_mut() {
             if expected.contains(card) {
@@ -91,7 +93,7 @@ fn ask_for_the_order(
             id: GRAVEYARD_ORDER,
             player: owner_entity,
             source: Some(graveyard),
-            among: batch.into_iter().collect(),
+            among: actions::Candidates::Fixed(batch.into_iter().collect()),
             count,
             ordered: true,
         })));

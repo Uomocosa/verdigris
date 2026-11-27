@@ -86,7 +86,7 @@ pub fn r603_3_triggers_on_stack(world: &mut World) {
             id: ORDER_TRIGGERS,
             player: controller,
             source: None,
-            among: among.iter().copied().collect(),
+            among: actions::Candidates::Fixed(among.iter().copied().collect()),
             count: actions::Count::exactly(u32::try_from(among.len()).unwrap_or(u32::MAX)),
             ordered: true,
         })));

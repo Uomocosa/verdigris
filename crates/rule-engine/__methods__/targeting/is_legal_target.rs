@@ -17,8 +17,7 @@ pub fn is_legal_target(
         target,
         spell_or_ability: spell,
     };
-    targeting.answers.eval(&requirement.filter, &context, Some(target))
-        && targeting.answers.legal(&context)
+    targeting.eval(&requirement.filter, &context, Some(target)) && targeting.legal(&context)
 }
 
 #[cfg(test)]

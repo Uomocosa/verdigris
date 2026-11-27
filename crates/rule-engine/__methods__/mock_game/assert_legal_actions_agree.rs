@@ -43,6 +43,7 @@ pub fn assert_legal_actions_agree(game: &mut testing::MockGame) -> testing::Test
         ));
     }
     let mut disagreements: Vec<String> = Vec::new();
+    game.check_pick_previews(&mut disagreements);
     for (action, involved, listed) in candidates {
         let engine = game.oracle_engine_accepts(holder, &action);
         if listed && !engine {

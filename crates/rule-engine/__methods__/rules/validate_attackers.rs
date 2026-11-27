@@ -41,8 +41,8 @@ pub fn validate_attackers(
         }
     }
     for attacker in attackers {
-        if let rules::Legality::Illegal(reasons) = answers.legality(&events::DeclareAttackers {
-            attackers: vec![*attacker],
+        if let rules::Legality::Illegal(reasons) = answers.legality(&events::Attack {
+            attacker: *attacker,
         }) {
             for why in reasons {
                 whys.push(actions::DeclarationWhy {
@@ -55,9 +55,9 @@ pub fn validate_attackers(
     for candidate in answers.entities.iter() {
         if candidate.get::<cards::Creature>().is_some()
             && candidate.get::<cards::Controller>().is_some_and(|controller| **controller == player)
-            && answers.required::<events::DeclareAttackers>(candidate.id())
-            && answers.legal(&events::DeclareAttackers {
-                attackers: vec![candidate.id()],
+            && answers.required::<events::Attack>(candidate.id())
+            && answers.legal(&events::Attack {
+                attacker: candidate.id(),
             })
             && !attackers.contains(&candidate.id())
         {

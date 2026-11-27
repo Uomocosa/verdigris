@@ -14,7 +14,7 @@ pub fn r508_1f_tap_attackers(
     for attacker in attackers.iter() {
         taps.write(Attempt(events::Tap {
             permanent: attacker,
-            cause: events::DeclareAttackers::ID,
+            cause: events::Attack::ID,
         }));
     }
 }

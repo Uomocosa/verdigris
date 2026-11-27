@@ -60,6 +60,7 @@ pub enum Legality {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Why {
     Restriction(rules::RestrictionId),
+    NotMatching,
     NotPerformable,
     NotYours,
     NotAttacking,

@@ -20,16 +20,18 @@ pub fn first_queued(queue: &actions::AskQueue) -> Option<actions::Choice> {
                 return None;
             };
             (next.player == first.player && next.id == first.id && next.count.min == 0)
-                .then(|| next.among.clone())
+                .then(|| next.fixed())
         })
         .flatten()
+        .flatten()
+        .copied()
         .collect();
     let count = actions::Count::up_to(u32::try_from(options.len()).unwrap_or(u32::MAX));
     Some(actions::Choice::Pick(actions::PickChoice {
         player: first.player,
         id: first.id,
         source: None,
-        among: options,
+        among: actions::Candidates::Fixed(options),
         count,
         ordered: false,
     }))
@@ -57,7 +59,7 @@ mod tests {
                 id: actions::ChoiceId("may"),
                 player: p1.id,
                 source: None,
-                among: BTreeSet::from([first]),
+                among: actions::Candidates::Fixed(BTreeSet::from([first])),
                 count: actions::Count::up_to(1),
                 ordered: false,
             },
@@ -68,7 +70,7 @@ mod tests {
                 id: actions::ChoiceId("may"),
                 player: p1.id,
                 source: None,
-                among: BTreeSet::from([first]),
+                among: actions::Candidates::Fixed(BTreeSet::from([first])),
                 count: actions::Count::up_to(1),
                 ordered: false,
             }))
@@ -87,7 +89,7 @@ mod tests {
                 id: event,
                 player: p1.id,
                 source: None,
-                among: options,
+                among: actions::Candidates::Fixed(options),
                 count: actions::Count::up_to(1),
                 ordered: false,
             }))
@@ -99,7 +101,7 @@ mod tests {
                 id: event,
                 player: p2.id,
                 source: None,
-                among: BTreeSet::from([other]),
+                among: actions::Candidates::Fixed(BTreeSet::from([other])),
                 count: actions::Count::up_to(1),
                 ordered: false,
             })),
@@ -107,7 +109,7 @@ mod tests {
                 id: actions::ChoiceId("701.9b/discard"),
                 player: p1.id,
                 source: None,
-                among: BTreeSet::from([first]),
+                among: actions::Candidates::Fixed(BTreeSet::from([first])),
                 count: actions::Count::exactly(1),
                 ordered: false,
             })),
@@ -118,7 +120,7 @@ mod tests {
                 id: event,
                 player: p1.id,
                 source: None,
-                among: BTreeSet::from([first, second]),
+                among: actions::Candidates::Fixed(BTreeSet::from([first, second])),
                 count: actions::Count::up_to(2),
                 ordered: false,
             }))
