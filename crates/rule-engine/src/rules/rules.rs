@@ -6,6 +6,7 @@ use bevy::prelude::{Entity, EntityRef, Query, Without};
 use crate::cards;
 use crate::effects;
 use crate::keywords;
+use crate::players;
 use crate::rules;
 use crate::turns;
 use crate::zones;
@@ -74,6 +75,14 @@ impl Rules<'_, '_> {
         reference: rules::ArgRef,
         event: &E,
     ) -> Option<rules::ArgValue> {
+    }
+
+    #[must_use]
+    pub fn players_in_game(
+        &self,
+        set: rules::Players,
+        you: Option<players::PlayerId>,
+    ) -> Vec<players::PlayerId> {
     }
 }
 
@@ -151,6 +160,22 @@ impl Rules<'_, '_> {
         reference: rules::ArgRef,
         event: &E,
         viewpoint: Option<Entity>,
+    ) -> bool {
+    }
+
+    pub(crate) fn eval_each<E: rules::traits::event_args::EventArgs>(
+        &self,
+        set: rules::Players,
+        inner: &rules::Condition,
+        event: &E,
+    ) -> bool {
+    }
+
+    pub(crate) fn eval_any_player<E: rules::traits::event_args::EventArgs>(
+        &self,
+        set: rules::Players,
+        inner: &rules::Condition,
+        event: &E,
     ) -> bool {
     }
 

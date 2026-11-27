@@ -37,6 +37,8 @@ pub fn eval<E: EventArgs>(
         rules::Condition::Of(reference, inner) => {
             entity(reference).is_some_and(|candidate| eval(answers, inner, event, Some(candidate)))
         }
+        rules::Condition::Each(set, inner) => answers.eval_each(*set, inner, event),
+        rules::Condition::AnyPlayer(set, inner) => answers.eval_any_player(*set, inner, event),
         rules::Condition::All(conditions) => {
             conditions.iter().all(|inner| eval(answers, inner, event, viewpoint))
         }
@@ -409,6 +411,42 @@ mod tests {
                     &answers,
                     &rules::cards_in_hand().at_least(1000).of(TestRule::PLAYER),
                     &attack,
+                    None,
+                ));
+            })
+            .unwrap();
+        let context = events::AbilityContext { ability: *bears };
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                assert!(eval(
+                    &answers,
+                    &rules::each(rules::Players::Opponents, rules::life().at_least(20)),
+                    &context,
+                    None,
+                ));
+                assert!(!eval(
+                    &answers,
+                    &rules::each(rules::Players::Opponents, rules::life().at_least(21)),
+                    &context,
+                    None,
+                ));
+                assert!(eval(
+                    &answers,
+                    &rules::any(rules::Players::All, rules::life().at_most(20)),
+                    &context,
+                    None,
+                ));
+                assert!(!eval(
+                    &answers,
+                    &rules::any(rules::Players::Opponents, rules::life().at_most(19)),
+                    &context,
+                    None,
+                ));
+                assert!(eval(
+                    &answers,
+                    &rules::each(rules::Players::You, rules::life().at_least(20)),
+                    &context,
                     None,
                 ));
             })

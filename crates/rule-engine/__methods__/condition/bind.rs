@@ -22,6 +22,12 @@ pub fn bind<E: EventArgs>(condition: &rules::Condition, event: &E) -> rules::Con
         rules::Condition::Of(role, inner) => {
             rules::Condition::Of(*role, Box::new(bind(inner, event)))
         }
+        rules::Condition::Each(set, inner) => {
+            rules::Condition::Each(*set, Box::new(bind(inner, event)))
+        }
+        rules::Condition::AnyPlayer(set, inner) => {
+            rules::Condition::AnyPlayer(*set, Box::new(bind(inner, event)))
+        }
         rules::Condition::All(conditions) => {
             rules::Condition::All(conditions.iter().map(|inner| bind(inner, event)).collect())
         }

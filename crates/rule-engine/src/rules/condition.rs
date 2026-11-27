@@ -16,6 +16,8 @@ pub enum Condition {
     Characteristic(rules::Characteristic, rules::Comparison, i32),
     PlayerValue(rules::PlayerQuantity, rules::Comparison, i32),
     Of(rules::ArgRef, Box<Self>),
+    Each(rules::Players, Box<Self>),
+    AnyPlayer(rules::Players, Box<Self>),
     All(Vec<Self>),
     Any(Vec<Self>),
     Not(Box<Self>),

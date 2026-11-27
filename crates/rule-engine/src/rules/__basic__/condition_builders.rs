@@ -105,3 +105,13 @@ pub fn has_priority(role: impl Into<rules::ArgRef>) -> rules::Condition {
 pub const fn count(id: rules::ArgId) -> rules::Count {
     rules::Count(id)
 }
+
+#[must_use]
+pub fn each(players: rules::Players, condition: rules::Condition) -> rules::Condition {
+    rules::Condition::Each(players, Box::new(condition))
+}
+
+#[must_use]
+pub fn any(players: rules::Players, condition: rules::Condition) -> rules::Condition {
+    rules::Condition::AnyPlayer(players, Box::new(condition))
+}
