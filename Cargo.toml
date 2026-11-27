@@ -6,6 +6,7 @@ members = [
     "crates/parser",
     "crates/game",
     "crates/verdigris-lint",
+    "crates/datalog-ir",
 ]
 
 [workspace.package]

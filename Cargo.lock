@@ -1503,6 +1503,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "verdigris-datalog-ir"
+version = "0.0.2"
+dependencies = [
+ "atomic-delegate-macros",
+ "derive_more",
+ "thiserror 2.0.21",
+]
+
+[[package]]
 name = "verdigris-event-derive"
 version = "0.0.2"
 dependencies = [

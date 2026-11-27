@@ -5,7 +5,7 @@ set shell := ["bash", "-eu", "-o", "pipefail", "-c"]
 set shell := ["powershell.exe", "-NoLogo", "-Command"]
 
 # Build outside `[R] Rust` (the path has spaces); persistent, portable.
-export CARGO_TARGET_DIR := env("HOME") / ".cache/cargo-target/verdigris"
+export CARGO_TARGET_DIR := env("HOME") / ".cache/cargo-target/verdigris-datalog"
 
 # Toolchain: rust-toolchain.toml (nightly).
 # Extra tools: cargo-nextest, just, lele-lint / lele-bevy-lint, prek.
@@ -36,8 +36,9 @@ check-crate CRATE:
         verdigris-parser) dir=crates/parser ;;
         verdigris-game) dir=crates/game ;;
         verdigris-lint) dir=crates/verdigris-lint ;;
+        verdigris-datalog-ir) dir=crates/datalog-ir ;;
         *)
-            echo "check-crate: unknown crate '{{ CRATE }}'; known: verdigris-event-derive verdigris-rule-engine verdigris-parser verdigris-game verdigris-lint" >&2
+            echo "check-crate: unknown crate '{{ CRATE }}'; known: verdigris-event-derive verdigris-rule-engine verdigris-parser verdigris-game verdigris-lint verdigris-datalog-ir" >&2
             exit 1
             ;;
     esac
@@ -64,6 +65,7 @@ lint:
     cargo run --quiet -p verdigris-lint -- --config lele.toml crates/parser
     cargo run --quiet -p verdigris-lint -- --config lele.toml crates/game
     cargo run --quiet -p verdigris-lint -- --config lele.toml crates/verdigris-lint
+    cargo run --quiet -p verdigris-lint -- --config lele.toml crates/datalog-ir
 
 # Regenerate the __methods__ indexes after adding or removing #[atomic_delegates] shells.
 [group('dev')]
