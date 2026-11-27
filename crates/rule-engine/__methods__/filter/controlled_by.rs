@@ -1,9 +1,12 @@
 use crate::effects;
 use crate::rules;
 
-pub const fn controlled_by(filter: effects::Filter, player: rules::Players) -> effects::Filter {
+pub fn controlled_by(
+    filter: effects::Filter,
+    player: impl Into<rules::Players>,
+) -> effects::Filter {
     effects::Filter {
-        controlled_by: Some(player),
+        controlled_by: Some(player.into()),
         ..filter
     }
 }

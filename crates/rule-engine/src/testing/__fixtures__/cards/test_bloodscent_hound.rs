@@ -1,3 +1,4 @@
+use crate::OPPONENT;
 use crate::card;
 use crate::cards;
 use crate::cost;
@@ -12,7 +13,7 @@ pub const TEST_BLOODSCENT_HOUND: testing::Card = testing::Card {
     definition: || {
         card! {
             cards::creature("Test Bloodscent Hound", cost![1, R], pt!(2, 1));
-            statics::this().gain(keywords::haste()).as_long_as(rules::life().of(rules::an(rules::Players::Opponents)).is(rules::Value(10).or_less())),
+            statics::this().gain(keywords::haste()).as_long_as(rules::life().of(rules::an(OPPONENT)).is(rules::Value(10).or_less())),
         }
     },
 };

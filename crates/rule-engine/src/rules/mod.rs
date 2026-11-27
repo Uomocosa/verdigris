@@ -8,7 +8,7 @@ pub use basic::condition_builders::{
 };
 pub use basic::enums::{Amount, Change, Legality, may};
 pub use basic::newtypes::{An, Each, EventId, ResultId, RuleId};
-pub use basic::structs::RuleChange;
+pub use basic::structs::{RuleChange, You};
 pub use basic::type_aliases::{Definition, Restriction};
 
 mod value;
@@ -21,7 +21,8 @@ mod comparison;
 pub use comparison::Comparison;
 
 mod arg_ref;
-pub use arg_ref::{ArgRef, YOU};
+pub use arg_ref::ArgRef;
+pub(crate) use arg_ref::YOU;
 
 mod arg_value;
 pub use arg_value::ArgValue;

@@ -19,7 +19,6 @@ pub fn cast_spells_as_though_they_had_flash(all: statics::All) -> abilities::Con
 
 #[cfg(test)]
 mod tests {
-    use crate::PLAYER;
     use crate::YOU;
     use crate::effects;
     use crate::events;
@@ -31,7 +30,7 @@ mod tests {
     #[test]
     fn test_usage() {
         let ability = cast_spells_as_though_they_had_flash(statics::you());
-        assert_eq!(ability.filter, PLAYER.controlled_by(YOU));
+        assert_eq!(ability.filter, effects::Filter::player(YOU));
         assert_eq!(
             ability.modification,
             effects::Modification::Rule(rules::RuleChange {

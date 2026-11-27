@@ -14,16 +14,26 @@ pub struct Filter {
     pub object: Option<effects::ObjectRelation>,
 }
 
-#[atomic_delegates]
-impl Filter {
-    #[must_use]
-    pub const fn player(who: rules::Players) -> Self {}
+#[rustfmt::skip]
+impl From<rules::Players> for Filter {
+    fn from(players: rules::Players) -> Self { Self::player(players) }
+}
+
+#[rustfmt::skip]
+impl From<rules::You> for Filter {
+    fn from(you: rules::You) -> Self { Self::player(you) }
 }
 
 #[atomic_delegates]
 impl Filter {
     #[must_use]
-    pub fn controlled_by(self, player: rules::Players) -> Self {}
+    pub fn player(who: impl Into<rules::Players>) -> Self {}
+}
+
+#[atomic_delegates]
+impl Filter {
+    #[must_use]
+    pub fn controlled_by(self, player: impl Into<rules::Players>) -> Self {}
 
     #[must_use]
     pub fn attacking(self) -> Self {}
@@ -71,6 +81,7 @@ mod tests {
     use crate::ANY_TARGET;
     use crate::CREATURE;
     use crate::effects;
+    use crate::rules;
     use crate::testing;
 
     #[test]
@@ -80,7 +91,7 @@ mod tests {
         assert_eq!(ANY_TARGET.kind, effects::FilterKind::AnyTarget);
         assert_eq!(
             CREATURE.controlled_by(crate::YOU).controlled_by,
-            Some(crate::YOU)
+            Some(rules::Players::You)
         );
         let bears = (testing::GRIZZLY_BEARS.definition)();
         let bolt = (testing::LIGHTNING_BOLT.definition)();

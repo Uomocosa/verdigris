@@ -17,7 +17,7 @@ impl From<zones::Zone> for ZoneRef {
 #[atomic_delegates]
 impl ZoneRef {
     #[must_use]
-    pub fn of(self, player: rules::Players) -> Self {}
+    pub fn of(self, player: impl Into<rules::Players>) -> Self {}
 }
 
 #[cfg(test)]

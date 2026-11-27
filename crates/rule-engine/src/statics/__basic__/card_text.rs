@@ -4,17 +4,17 @@ use crate::rules;
 use crate::statics;
 
 #[must_use]
-pub const fn all(filter: effects::Filter) -> statics::All {
-    statics::All(filter)
+pub fn all(filter: impl Into<effects::Filter>) -> statics::All {
+    statics::All(filter.into())
 }
 
 #[must_use]
-pub const fn you() -> statics::All {
+pub fn you() -> statics::All {
     statics::all(effects::Filter::player(rules::Players::You))
 }
 
 #[must_use]
-pub const fn each_opponent() -> statics::All {
+pub fn each_opponent() -> statics::All {
     statics::all(effects::Filter::player(rules::Players::Opponents))
 }
 

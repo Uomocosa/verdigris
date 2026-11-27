@@ -26,7 +26,6 @@ pub fn instead(
 
 #[cfg(test)]
 mod tests {
-    use crate::PLAYER;
     use crate::YOU;
     use crate::effects;
     use crate::events;
@@ -47,7 +46,7 @@ mod tests {
                 who: events::DrawFromEmptyLibrary::PLAYER.into(),
             }],
         );
-        assert_eq!(ability.filter, PLAYER.controlled_by(YOU));
+        assert_eq!(ability.filter, effects::Filter::player(YOU));
         assert_eq!(
             ability.modification,
             effects::Modification::Rule(rules::RuleChange {

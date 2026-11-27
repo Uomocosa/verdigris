@@ -24,12 +24,12 @@ mod tests {
     fn test_usage() {
         assert_eq!(
             if_(
-                abilities::TriggerEvent::BeginningOfStep(UPKEEP, YOU),
-                rules::life().of(rules::YOU).is(rules::Value(40).or_more())
+                abilities::TriggerEvent::BeginningOfStep(UPKEEP, YOU.into()),
+                rules::life().of(YOU).is(rules::Value(40).or_more())
             ),
             abilities::Trigger {
-                event: abilities::TriggerEvent::BeginningOfStep(UPKEEP, YOU),
-                intervening_if: Some(rules::life().of(rules::YOU).is(rules::Value(40).or_more())),
+                event: abilities::TriggerEvent::BeginningOfStep(UPKEEP, YOU.into()),
+                intervening_if: Some(rules::life().of(YOU).is(rules::Value(40).or_more())),
             }
         );
     }

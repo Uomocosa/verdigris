@@ -4,9 +4,9 @@ use crate::rules;
 use crate::turns;
 use crate::zones;
 
-pub const YOU: rules::Players = rules::Players::You;
+pub const YOU: rules::You = rules::You;
 pub const OPPONENT: rules::Players = rules::Players::Opponents;
-pub const ANY: rules::Players = rules::Players::All;
+pub const PLAYER: rules::Players = rules::Players::All;
 
 pub const ANOTHER_CREATURE: cards::ObjectFilter = cards::ObjectFilter::AnotherCreature;
 
@@ -51,14 +51,6 @@ pub const ENCHANTMENT: effects::Filter = effects::Filter {
 };
 pub const ANY_TARGET: effects::Filter = effects::Filter {
     kind: effects::FilterKind::AnyTarget,
-    controlled_by: None,
-    excluded_color: None,
-    attacking: false,
-    nontoken: false,
-    object: None,
-};
-pub const PLAYER: effects::Filter = effects::Filter {
-    kind: effects::FilterKind::Player,
     controlled_by: None,
     excluded_color: None,
     attacking: false,

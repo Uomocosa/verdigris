@@ -1,10 +1,10 @@
 use crate::effects;
 use crate::rules;
 
-pub const fn of(zone_ref: effects::ZoneRef, player: rules::Players) -> effects::ZoneRef {
+pub fn of(zone_ref: effects::ZoneRef, player: impl Into<rules::Players>) -> effects::ZoneRef {
     effects::ZoneRef {
         zone: zone_ref.zone,
-        of: player,
+        of: player.into(),
     }
 }
 
@@ -23,6 +23,12 @@ mod tests {
             zone: HAND,
             of: rules::Players::All,
         };
-        assert_eq!(of(hand, YOU).of, YOU);
+        assert_eq!(
+            of(hand, YOU),
+            effects::ZoneRef {
+                zone: HAND,
+                of: rules::Players::You,
+            }
+        );
     }
 }

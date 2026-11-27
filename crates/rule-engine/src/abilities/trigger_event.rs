@@ -59,13 +59,13 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let trigger = abilities::TriggerEvent::BeginningOfStep(UPKEEP, YOU)
-            .if_(rules::life().of(rules::YOU).is(rules::Value(40).or_more()));
+        let trigger = abilities::TriggerEvent::BeginningOfStep(UPKEEP, YOU.into())
+            .if_(rules::life().of(YOU).is(rules::Value(40).or_more()));
         assert_eq!(
             trigger,
             abilities::Trigger {
-                event: abilities::TriggerEvent::BeginningOfStep(UPKEEP, YOU),
-                intervening_if: Some(rules::life().of(rules::YOU).is(rules::Value(40).or_more())),
+                event: abilities::TriggerEvent::BeginningOfStep(UPKEEP, YOU.into()),
+                intervening_if: Some(rules::life().of(YOU).is(rules::Value(40).or_more())),
             }
         );
         assert_eq!(

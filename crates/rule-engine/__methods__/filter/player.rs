@@ -1,12 +1,14 @@
-use crate::PLAYER;
 use crate::effects;
 use crate::rules;
 
-pub const fn player(who: rules::Players) -> effects::Filter {
+pub fn player(who: impl Into<rules::Players>) -> effects::Filter {
     effects::Filter {
         kind: effects::FilterKind::Player,
-        controlled_by: Some(who),
-        ..PLAYER
+        controlled_by: Some(who.into()),
+        excluded_color: None,
+        attacking: false,
+        nontoken: false,
+        object: None,
     }
 }
 
@@ -14,6 +16,7 @@ pub const fn player(who: rules::Players) -> effects::Filter {
 mod tests {
     use crate::YOU;
     use crate::effects;
+    use crate::rules;
 
     use super::player;
 
@@ -21,6 +24,6 @@ mod tests {
     fn test_usage() {
         let filter = player(YOU);
         assert_eq!(filter.kind, effects::FilterKind::Player);
-        assert_eq!(filter.controlled_by, Some(YOU));
+        assert_eq!(filter.controlled_by, Some(rules::Players::You));
     }
 }

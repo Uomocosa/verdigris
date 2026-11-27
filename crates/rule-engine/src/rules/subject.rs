@@ -26,3 +26,8 @@ impl From<rules::Each> for Subject {
 impl From<rules::An> for Subject {
     fn from(an: rules::An) -> Self { Self::An(*an) }
 }
+
+#[rustfmt::skip]
+impl From<rules::You> for Subject {
+    fn from(_: rules::You) -> Self { Self::One(rules::YOU) }
+}

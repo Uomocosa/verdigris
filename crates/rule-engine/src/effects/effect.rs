@@ -16,7 +16,7 @@ impl Effect {
     pub fn to(self, target: effects::Target) -> Self {}
 
     #[must_use]
-    pub fn to_player(self, player: rules::Players) -> Self {}
+    pub fn to_player(self, player: impl Into<rules::Players>) -> Self {}
 }
 
 impl Effect {

@@ -26,7 +26,7 @@ mod tests {
     #[test]
     fn test_usage() {
         let ability = no_maximum_hand_size(statics::all(PLAYER));
-        assert_eq!(ability.filter, PLAYER);
+        assert_eq!(ability.filter, effects::Filter::player(PLAYER));
         assert_eq!(
             ability.modification,
             effects::Modification::Rule(rules::RuleChange {

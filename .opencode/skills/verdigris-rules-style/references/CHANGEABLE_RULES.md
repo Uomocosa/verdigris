@@ -229,7 +229,7 @@ DealDamage::AMOUNT.is(rules::Value(1).or_more()) // the 120.8 nonzero restrictio
 value or a threshold (`src/rules/value.rs:10`, `src/rules/__basic__/condition_builders.rs:35`):
 
 ```rust
-rules::life().of(rules::YOU).is(rules::Value(40).or_more())
+rules::life().of(YOU).is(rules::Value(40).or_more())
 rules::poison_counters().is(rules::Value(0).or_less())
 rules::power().is(rules::Value(3).or_more())
 rules::toughness().is(rules::Value(2).or_less())
@@ -240,18 +240,18 @@ events::AssignCombatDamage::AMOUNT.is(rules::greater_than(0))
 rules::count(events::DeclareAttackers::ATTACKERS).is(rules::Value(1).or_less())
 ```
 
-`rules::YOU` is the controller of the ability being evaluated
+`YOU` is the controller of the ability being evaluated
 (`src/rules/arg_ref.rs:11`: `events::AbilityContext::ABILITY.controller()`), so
-`rules::life().of(rules::YOU)` always asks about that ability's controller
+`rules::life().of(YOU)` always asks about that ability's controller
 (`src/rules/player_quantity_of.rs:24`).
 
 **Quantifiers.** `rules::each` / `rules::any` ask about several players at once
 (`src/rules/__basic__/condition_builders.rs:120`):
 
 ```rust
-rules::each(rules::Players::Opponents, rules::life().is(rules::Value(10).or_less()))
-rules::any(rules::Players::Opponents, rules::life().is(rules::Value(10).or_less()))
-rules::any(rules::Players::All, rules::life().is(rules::Value(40).or_more()))
+rules::each(OPPONENT, rules::life().is(rules::Value(10).or_less()))
+rules::any(OPPONENT, rules::life().is(rules::Value(10).or_less()))
+rules::any(PLAYER, rules::life().is(rules::Value(40).or_more()))
 ```
 
 **Static "as long as".** A continuous ability holds only while its condition holds
@@ -260,8 +260,8 @@ rules::any(rules::Players::All, rules::life().is(rules::Value(40).or_more()))
 Ascendant (`src/testing/__fixtures__/cards/serra_ascendant.rs:16`):
 
 ```rust
-statics::this().get_pt(5, 5).as_long_as(rules::life().of(rules::YOU).is(rules::Value(30).or_more()))
-statics::this().gain(keywords::flying()).as_long_as(rules::life().of(rules::YOU).is(rules::Value(30).or_more()))
+statics::this().get_pt(5, 5).as_long_as(rules::life().of(YOU).is(rules::Value(30).or_more()))
+statics::this().gain(keywords::flying()).as_long_as(rules::life().of(YOU).is(rules::Value(30).or_more()))
 ```
 
 **Intervening "if".** A trigger written `Event.if_(<rules::Condition>)`
@@ -269,11 +269,11 @@ statics::this().gain(keywords::flying()).as_long_as(rules::life().of(rules::YOU)
 trigger time (603.4, `__rules__/r603_4_intervening_if.rs:66`) and on resolution (608.2a,
 `__rules__/r608_2a_intervening_if.rs:27`), both against
 `events::AbilityContext { ability }` (`__events__/ability_context.rs:8`). Felidar Sovereign
-(`src/abilities/trigger_event.rs:63`):
+(`src/testing/__fixtures__/cards/felidar_sovereign.rs:22`):
 
 ```rust
-abilities::TriggerEvent::BeginningOfStep(UPKEEP, YOU)
-    .if_(rules::life().of(rules::YOU).is(rules::Value(40).or_more()))
+turns::beginning_of(UPKEEP).of(YOU)
+    .if_(rules::life().of(YOU).is(rules::Value(40).or_more()))
 ```
 
 **A restriction vetoes one holder; a waiver names the same holder.** `Change::Restrict { holder,

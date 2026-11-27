@@ -19,6 +19,7 @@ impl Continuous {
 #[cfg(test)]
 mod tests {
     use crate::CREATURE;
+    use crate::YOU;
     use crate::abilities;
     use crate::keywords;
     use crate::rules;
@@ -28,11 +29,11 @@ mod tests {
     fn test_usage() {
         let ability = statics::all(CREATURE)
             .gain(keywords::vigilance())
-            .as_long_as(rules::life().of(rules::YOU).is(rules::Value(30).or_more()));
+            .as_long_as(rules::life().of(YOU).is(rules::Value(30).or_more()));
         assert_eq!(ability.filter, CREATURE);
         assert_eq!(
             ability.as_long_as,
-            Some(rules::life().of(rules::YOU).is(rules::Value(30).or_more()))
+            Some(rules::life().of(YOU).is(rules::Value(30).or_more()))
         );
         assert_eq!(
             statics::all(CREATURE).gain(keywords::vigilance()),

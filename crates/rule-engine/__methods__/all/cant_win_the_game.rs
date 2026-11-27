@@ -32,7 +32,7 @@ mod tests {
     #[test]
     fn test_usage() {
         let ability = cant_win_the_game(statics::all(PLAYER));
-        assert_eq!(ability.filter, PLAYER);
+        assert_eq!(ability.filter, effects::Filter::player(PLAYER));
         assert_eq!(
             ability.modification,
             effects::Modification::Rule(rules::RuleChange {

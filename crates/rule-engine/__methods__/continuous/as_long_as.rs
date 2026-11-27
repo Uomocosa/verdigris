@@ -14,6 +14,7 @@ pub fn as_long_as(
 #[cfg(test)]
 mod tests {
     use crate::CREATURE;
+    use crate::YOU;
     use crate::keywords;
     use crate::rules;
     use crate::statics;
@@ -24,11 +25,11 @@ mod tests {
     fn test_usage() {
         let ability = as_long_as(
             statics::all(CREATURE).gain(keywords::vigilance()),
-            rules::life().of(rules::YOU).is(rules::Value(30).or_more()),
+            rules::life().of(YOU).is(rules::Value(30).or_more()),
         );
         assert_eq!(
             ability.as_long_as,
-            Some(rules::life().of(rules::YOU).is(rules::Value(30).or_more()))
+            Some(rules::life().of(YOU).is(rules::Value(30).or_more()))
         );
         assert_eq!(ability.filter, CREATURE);
     }

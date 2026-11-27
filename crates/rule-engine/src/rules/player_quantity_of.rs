@@ -16,17 +16,18 @@ impl PlayerQuantityOf {
 
 #[cfg(test)]
 mod tests {
+    use crate::YOU;
     use crate::rules;
 
     #[test]
     fn test_usage() {
         assert_eq!(
-            rules::life().of(rules::YOU).is(rules::Value(40).or_more()),
+            rules::life().of(YOU).is(rules::Value(40).or_more()),
             rules::Condition::PlayerValue(
                 rules::PlayerQuantity::Life,
                 rules::Comparison::OrMore(40),
             )
-            .of(rules::YOU),
+            .of(YOU),
         );
     }
 }

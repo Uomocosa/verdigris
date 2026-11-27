@@ -138,6 +138,9 @@ pub const fn win_the_game() -> effects::Effect {
 }
 
 #[must_use]
-pub const fn target(count: u32, filter: effects::Filter) -> effects::Target {
-    effects::Target { count, filter }
+pub fn target(count: u32, filter: impl Into<effects::Filter>) -> effects::Target {
+    effects::Target {
+        count,
+        filter: filter.into(),
+    }
 }

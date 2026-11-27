@@ -13,6 +13,11 @@ impl From<rules::Each> for Players {
     fn from(each: rules::Each) -> Self { *each }
 }
 
+#[rustfmt::skip]
+impl From<rules::You> for Players {
+    fn from(_: rules::You) -> Self { Self::You }
+}
+
 impl Players {
     #[must_use]
     pub fn resolve(

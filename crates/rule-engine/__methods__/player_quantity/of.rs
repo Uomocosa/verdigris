@@ -12,6 +12,7 @@ pub fn of(
 
 #[cfg(test)]
 mod tests {
+    use crate::YOU;
     use crate::rules;
 
     use super::of;
@@ -19,10 +20,10 @@ mod tests {
     #[test]
     fn test_usage() {
         assert_eq!(
-            of(rules::PlayerQuantity::Life, rules::YOU),
+            of(rules::PlayerQuantity::Life, YOU),
             rules::PlayerQuantityOf {
                 quantity: rules::PlayerQuantity::Life,
-                player: rules::YOU.into(),
+                player: YOU.into(),
             }
         );
     }

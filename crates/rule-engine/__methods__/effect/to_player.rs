@@ -1,9 +1,9 @@
 use crate::effects;
 use crate::rules;
 
-pub fn to_player(effect: effects::Effect, player: rules::Players) -> effects::Effect {
+pub fn to_player(effect: effects::Effect, player: impl Into<rules::Players>) -> effects::Effect {
     effects::Effect {
-        target: Some(effects::target(1, effects::Filter::player(player))),
+        target: Some(effects::target(1, effects::Filter::player(player.into()))),
         ..effect
     }
 }
@@ -19,9 +19,6 @@ mod tests {
     fn test_usage() {
         let effect = to_player(effects::gain_life(1), YOU);
         assert_eq!(effect.kind, effects::EffectKind::GainLife(1));
-        assert_eq!(
-            effect.target,
-            Some(effects::target(1, crate::PLAYER.controlled_by(YOU)))
-        );
+        assert_eq!(effect.target, Some(effects::target(1, YOU)));
     }
 }

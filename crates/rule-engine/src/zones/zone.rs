@@ -28,7 +28,7 @@ impl PartialEq<zones::SharedZone> for Zone {
 #[rustfmt::skip]
 impl Zone {
     #[must_use]
-    pub fn of(self, player: rules::Players) -> effects::ZoneRef { effects::ZoneRef::from(self).of(player) }
+    pub fn of(self, player: impl Into<rules::Players>) -> effects::ZoneRef { effects::ZoneRef::from(self).of(player.into()) }
 }
 
 #[cfg(test)]
