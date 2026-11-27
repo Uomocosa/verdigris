@@ -13,8 +13,12 @@ pub fn performs<E: Event>(answers: &rules::Rules, event: &E) -> bool {
         };
         for change in answers.changes(entity, rules::Target::event::<E>()) {
             match change {
-                rules::Change::Skip => performs = false,
-                rules::Change::Perform => performs = true,
+                rules::Change::Skip { when } if answers.eval(&when.bind(event), event, None) => {
+                    performs = false;
+                }
+                rules::Change::Perform { when } if answers.eval(&when.bind(event), event, None) => {
+                    performs = true;
+                }
                 _ => {}
             }
         }

@@ -1,45 +1,30 @@
-use bevy::ecs::schedule::{IntoScheduleConfigs, ScheduleConfigs};
-use bevy::ecs::system::ScheduleSystem;
-use bevy::prelude::{Added, Entity, MessageReader, MessageWriter, Query};
+use bevy::prelude::{Added, Entity, MessageWriter, Query};
 
 use crate::Attempt;
-use crate::Resolve;
 use crate::cards;
 use crate::events;
+use crate::rules::traits::event::Event;
 
 /// 508.1f The active player taps the chosen creatures. Tapping a creature when it’s declared as
 /// an attacker isn’t a cost; attacking simply causes creatures to become tapped.
-pub fn r508_1f_tap_attackers() -> ScheduleConfigs<ScheduleSystem> {
-    (
-        attempt_to_tap_attackers,
-        Attempt::<events::TapAttacker>::resolved_by(tap_attacker),
-    )
-        .chain()
-}
-
-fn attempt_to_tap_attackers(
+pub fn r508_1f_tap_attackers(
     attackers: Query<Entity, Added<cards::Attacking>>,
-    mut taps: MessageWriter<Attempt<events::TapAttacker>>,
-) {
-    for attacker in attackers.iter() {
-        taps.write(Attempt(events::TapAttacker { attacker }));
-    }
-}
-
-fn tap_attacker(
-    mut attackers: MessageReader<Resolve<events::TapAttacker>>,
     mut taps: MessageWriter<Attempt<events::Tap>>,
 ) {
-    for attacker in attackers.read() {
+    for attacker in attackers.iter() {
         taps.write(Attempt(events::Tap {
-            permanent: attacker.attacker,
+            permanent: attacker,
+            cause: events::DeclareAttackers::ID,
         }));
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use crate::Attempt;
     use crate::BATTLEFIELD;
+    use crate::events;
+    use crate::rules::traits::event::Event;
     use crate::testing::*;
     use crate::turns;
 
@@ -58,6 +43,12 @@ mod tests {
 
         assert!(game.is_attacking(sovereign));
         assert!(!game.is_tapped(sovereign));
+        game.app.world_mut().write_message(Attempt(events::Tap {
+            permanent: *sovereign,
+            cause: events::Cast::ID,
+        }));
+        game.app.update();
+        assert!(game.is_tapped(sovereign));
         Ok(())
     }
 }

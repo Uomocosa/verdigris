@@ -13,7 +13,10 @@ pub fn eval<E: EventArgs>(
     let entity = |reference: &rules::ArgRef| match answers.resolve(*reference, event) {
         Some(rules::ArgValue::Entity(found)) => Some(found),
         Some(rules::ArgValue::Player(player)) => Some(*player),
-        Some(rules::ArgValue::Entities(_) | rules::ArgValue::Amount(_)) | None => None,
+        Some(
+            rules::ArgValue::Entities(_) | rules::ArgValue::Amount(_) | rules::ArgValue::Event(_),
+        )
+        | None => None,
     };
     let amount = |id: &rules::ArgId| match event.arg(*id) {
         Some(rules::ArgValue::Amount(found)) => Some(found),
@@ -89,6 +92,9 @@ pub fn eval<E: EventArgs>(
         rules::Condition::ArgAtLeastRemainingToughness(id) => viewpoint.is_some_and(|subject| {
             amount(id).is_some_and(|found| found >= answers.remaining_toughness(subject))
         }),
+        rules::Condition::CausedBy(cause) => {
+            E::args().iter().any(|id| event.arg(*id) == Some(rules::ArgValue::Event(*cause)))
+        }
     }
 }
 

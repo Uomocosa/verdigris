@@ -20,8 +20,12 @@ pub enum Change {
         restriction: rules::Restriction,
     },
     Must,
-    Skip,
-    Perform,
+    Skip {
+        when: rules::Condition,
+    },
+    Perform {
+        when: rules::Condition,
+    },
     Set(u32),
     Increase(u32),
     Decrease(u32),

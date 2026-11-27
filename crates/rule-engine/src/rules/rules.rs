@@ -231,6 +231,7 @@ mod tests {
     use crate::LIBRARY;
     use crate::events;
     use crate::rules;
+    use crate::rules::traits::event::Event;
     use crate::testing::*;
 
     #[test]
@@ -255,9 +256,13 @@ mod tests {
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
-                assert!(answers.performs(&events::TapAttacker { attacker: *bears }));
-                assert!(!answers.performs(&events::TapAttacker {
-                    attacker: *sovereign,
+                assert!(answers.performs(&events::Tap {
+                    permanent: *bears,
+                    cause: events::DeclareAttackers::ID,
+                }));
+                assert!(!answers.performs(&events::Tap {
+                    permanent: *sovereign,
+                    cause: events::DeclareAttackers::ID,
                 }));
                 assert_eq!(
                     answers.resolve(events::DealDamage::SOURCE.controller(), &damage),

@@ -2,6 +2,7 @@ use crate::abilities;
 use crate::effects;
 use crate::events;
 use crate::rules;
+use crate::rules::traits::event::Event;
 use crate::statics;
 
 pub fn attack_without_tapping(all: &statics::All) -> abilities::Continuous {
@@ -9,8 +10,10 @@ pub fn attack_without_tapping(all: &statics::All) -> abilities::Continuous {
         filter: all.into(),
         as_long_as: None,
         modification: effects::Modification::Rule(rules::RuleChange {
-            target: rules::Target::event::<events::TapAttacker>(),
-            change: rules::Change::Skip,
+            target: rules::Target::event::<events::Tap>(),
+            change: rules::Change::Skip {
+                when: rules::Condition::CausedBy(events::DeclareAttackers::ID),
+            },
         }),
     }
 }
@@ -21,6 +24,7 @@ mod tests {
     use crate::effects;
     use crate::events;
     use crate::rules;
+    use crate::rules::traits::event::Event;
     use crate::statics;
 
     use super::attack_without_tapping;
@@ -32,8 +36,10 @@ mod tests {
         assert_eq!(
             ability.modification,
             effects::Modification::Rule(rules::RuleChange {
-                target: rules::Target::event::<events::TapAttacker>(),
-                change: rules::Change::Skip,
+                target: rules::Target::event::<events::Tap>(),
+                change: rules::Change::Skip {
+                    when: rules::Condition::CausedBy(events::DeclareAttackers::ID),
+                },
             }),
         );
     }

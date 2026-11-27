@@ -36,6 +36,7 @@ pub enum Condition {
     ArgAmount(rules::ArgId, rules::Comparison),
     ArgAtLeastRemainingToughness(rules::ArgId),
     Count(rules::ArgId, rules::Comparison),
+    CausedBy(rules::EventId),
 }
 
 #[rustfmt::skip]

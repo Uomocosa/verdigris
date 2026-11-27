@@ -14,7 +14,7 @@ pub fn eval_points_to<E: EventArgs>(
         Some(rules::ArgValue::Entity(found)) => vec![found],
         Some(rules::ArgValue::Player(player)) => vec![*player],
         Some(rules::ArgValue::Entities(found)) => found,
-        Some(rules::ArgValue::Amount(_)) | None => return false,
+        Some(rules::ArgValue::Amount(_) | rules::ArgValue::Event(_)) | None => return false,
     };
     viewpoint.is_some_and(|subject| {
         wanteds.iter().all(|wanted| {

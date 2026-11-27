@@ -20,13 +20,16 @@ pub fn instantiate<E: Event>(
     let holder = |who: &rules::ArgRef| match answers.resolve(*who, event) {
         Some(rules::ArgValue::Player(player)) => player,
         Some(rules::ArgValue::Entity(entity)) => players::PlayerId(entity),
-        Some(rules::ArgValue::Entities(_) | rules::ArgValue::Amount(_)) | None => fallback,
+        Some(
+            rules::ArgValue::Entities(_) | rules::ArgValue::Amount(_) | rules::ArgValue::Event(_),
+        )
+        | None => fallback,
     };
     let object = |what: &rules::ArgRef| match answers.resolve(*what, event) {
         Some(rules::ArgValue::Entity(entity)) => entity,
         Some(rules::ArgValue::Player(player)) => *player,
         Some(rules::ArgValue::Entities(entities)) => entities.first().copied().unwrap_or(*fallback),
-        Some(rules::ArgValue::Amount(_)) | None => *fallback,
+        Some(rules::ArgValue::Amount(_) | rules::ArgValue::Event(_)) | None => *fallback,
     };
     let amount = |amount: &rules::Amount| match amount {
         rules::Amount::Fixed(fixed) => *fixed,

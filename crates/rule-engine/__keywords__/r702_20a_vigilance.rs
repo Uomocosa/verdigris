@@ -2,6 +2,7 @@ use crate::effects;
 use crate::events;
 use crate::keywords;
 use crate::rules;
+use crate::rules::traits::event::Event;
 
 /// 702.20a Vigilance is a static ability that modifies the rules for the declare attackers step.
 #[must_use]
@@ -13,8 +14,10 @@ pub const ID: keywords::KeywordId = keywords::KeywordId("702.20/vigilance");
 
 fn abilities() -> Vec<effects::Modification> {
     vec![effects::Modification::Rule(rules::RuleChange {
-        target: rules::Target::event::<events::TapAttacker>(),
-        change: rules::Change::Skip,
+        target: rules::Target::event::<events::Tap>(),
+        change: rules::Change::Skip {
+            when: rules::Condition::CausedBy(events::DeclareAttackers::ID),
+        },
     })]
 }
 
@@ -23,6 +26,7 @@ mod tests {
     use crate::effects;
     use crate::events;
     use crate::rules;
+    use crate::rules::traits::event::Event;
 
     #[test]
     fn test_usage() {
@@ -31,8 +35,10 @@ mod tests {
         assert_eq!(
             super::abilities(),
             vec![effects::Modification::Rule(rules::RuleChange {
-                target: rules::Target::event::<events::TapAttacker>(),
-                change: rules::Change::Skip,
+                target: rules::Target::event::<events::Tap>(),
+                change: rules::Change::Skip {
+                    when: rules::Condition::CausedBy(events::DeclareAttackers::ID),
+                },
             })]
         );
     }

@@ -41,7 +41,7 @@ pub fn resolve<E: EventArgs>(
                 .all(|holder| holder == first)
                 .then_some(rules::ArgValue::Player(players::PlayerId(first)));
         }
-        rules::ArgValue::Amount(_) => return None,
+        rules::ArgValue::Amount(_) | rules::ArgValue::Event(_) => return None,
     };
     let found = answers.entities.get(entity).ok()?;
     if found.get::<players::Player>().is_some() {

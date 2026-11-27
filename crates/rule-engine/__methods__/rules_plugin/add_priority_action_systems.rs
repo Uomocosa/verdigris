@@ -19,13 +19,10 @@ pub fn add_priority_action_systems(app: &mut App) {
             ),
             comprehensive_rules::r508_1m_r508_2a_r508_3a_attack_triggers::r508_1m_r508_2a_r508_3a_attack_triggers,
             comprehensive_rules::r611_3a_static_effects::r611_3a_static_effects,
-            (
-                comprehensive_rules::r508_1f_tap_attackers::r508_1f_tap_attackers(),
-                Attempt::<events::Tap>::resolved_by(
-                    comprehensive_rules::r701_26a_tap::r701_26a_tap,
-                ),
-            )
-                .chain(),
+            comprehensive_rules::r508_1f_tap_attackers::r508_1f_tap_attackers,
+            Attempt::<events::Tap>::resolved_by(
+                comprehensive_rules::r701_26a_tap::r701_26a_tap,
+            ),
             (
                 comprehensive_rules::r509_1a_declare_blockers::r509_1a_declare_blockers,
                 Attempt::<events::DeclareBlocker>::resolved_by(
@@ -62,7 +59,7 @@ mod tests {
 
         assert_eq!(
             app.get_schedule(Update).map(Schedule::systems_len),
-            Some(30)
+            Some(28)
         );
     }
 }

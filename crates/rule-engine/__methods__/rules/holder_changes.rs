@@ -39,7 +39,9 @@ pub fn holder_changes<E: Event>(
                     answers.resolve(reference, event).and_then(|value| match value {
                         rules::ArgValue::Entity(entity) => Some(entity),
                         rules::ArgValue::Player(player) => Some(*player),
-                        rules::ArgValue::Entities(_) | rules::ArgValue::Amount(_) => None,
+                        rules::ArgValue::Entities(_)
+                        | rules::ArgValue::Amount(_)
+                        | rules::ArgValue::Event(_) => None,
                     })
                 else {
                     continue;

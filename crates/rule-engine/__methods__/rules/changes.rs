@@ -45,7 +45,9 @@ mod tests {
                 );
                 assert_eq!(
                     changes(&answers, *waiver, rules::Target::event::<TestStep>()),
-                    vec![rules::Change::Skip]
+                    vec![rules::Change::Skip {
+                        when: rules::Condition::True,
+                    }]
                 );
                 assert_eq!(
                     changes(&answers, *waiver, rules::Target::event::<TestRule>()),

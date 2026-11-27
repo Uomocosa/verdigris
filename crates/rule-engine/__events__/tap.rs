@@ -8,6 +8,8 @@ use crate::rules::traits::event::Event;
 pub struct Tap {
     #[arg]
     pub permanent: Entity,
+    #[arg]
+    pub cause: rules::EventId,
 }
 
 impl Event for Tap {
@@ -27,13 +29,22 @@ mod tests {
     #[test]
     fn test_usage() {
         let permanent = Entity::PLACEHOLDER;
-        let event = Tap { permanent };
+        let event = Tap {
+            permanent,
+            cause: rules::EventId("508.1a/declare-attackers"),
+        };
         assert_eq!(
             event.arg(Tap::PERMANENT),
             Some(rules::ArgValue::Entity(permanent))
         );
+        assert_eq!(
+            event.arg(Tap::CAUSE),
+            Some(rules::ArgValue::Event(rules::EventId(
+                "508.1a/declare-attackers"
+            )))
+        );
         assert_eq!(Tap::ID, rules::EventId("701.26a/tap"));
         assert_eq!(Tap::restrictions(), Vec::new());
-        assert_eq!(Tap::args(), &[Tap::PERMANENT,]);
+        assert_eq!(Tap::args(), &[Tap::PERMANENT, Tap::CAUSE,]);
     }
 }

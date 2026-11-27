@@ -90,6 +90,3 @@ pub use put_into_graveyard::PutIntoGraveyard;
 
 mod tap;
 pub use tap::Tap;
-
-mod tap_attacker;
-pub use tap_attacker::TapAttacker;

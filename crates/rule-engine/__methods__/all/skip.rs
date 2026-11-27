@@ -10,7 +10,9 @@ pub fn skip<E: Event>(all: &statics::All) -> abilities::Continuous {
         as_long_as: None,
         modification: effects::Modification::Rule(rules::RuleChange {
             target: rules::Target::event::<E>(),
-            change: rules::Change::Skip,
+            change: rules::Change::Skip {
+                when: rules::Condition::True,
+            },
         }),
     }
 }
@@ -33,7 +35,9 @@ mod tests {
             ability.modification,
             effects::Modification::Rule(rules::RuleChange {
                 target: rules::Target::event::<events::Draw>(),
-                change: rules::Change::Skip,
+                change: rules::Change::Skip {
+                    when: rules::Condition::True,
+                },
             })
         );
     }

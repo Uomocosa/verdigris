@@ -68,7 +68,9 @@ mod tests {
                         }),
                         effects::Modification::Rule(rules::RuleChange {
                             target: rules::Target::event::<TestStep>(),
-                            change: rules::Change::Skip,
+                            change: rules::Change::Skip {
+                                when: rules::Condition::True,
+                            },
                         }),
                     ]
                 );
