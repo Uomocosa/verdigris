@@ -148,6 +148,11 @@ pub fn has_priority(role: impl Into<rules::ArgRef>) -> rules::Condition {
 }
 
 #[must_use]
+pub fn land_play_available(who: impl Into<rules::ArgRef>) -> rules::Condition {
+    rules::Condition::LandPlayAvailable(who.into())
+}
+
+#[must_use]
 pub const fn count(id: rules::ArgId) -> rules::Count {
     rules::Count(id)
 }

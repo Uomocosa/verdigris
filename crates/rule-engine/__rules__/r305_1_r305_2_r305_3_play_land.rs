@@ -64,28 +64,16 @@ fn check_play(
             rejected.write(actions::Rejected::CannotPlay { card });
             continue;
         }
-        let Ok(record) = answers
+        let Some(mut record) = answers
             .entities
             .get(*action.player)
-            .map(|entity| entity.get::<players::LandsPlayedThisTurn>().copied())
+            .ok()
+            .and_then(|entity| entity.get::<players::LandsPlayedThisTurn>().copied())
         else {
             commands.entity(card).remove::<cards::Controller>();
             rejected.write(actions::Rejected::CannotPlay { card });
             continue;
         };
-        let Some(mut record) = record else {
-            commands.entity(card).remove::<cards::Controller>();
-            rejected.write(actions::Rejected::CannotPlay { card });
-            continue;
-        };
-        if !answers
-            .value::<rules::LandPlays>(*action.player)
-            .allows(u32::from(record.count_for(state.turn.number)))
-        {
-            commands.entity(card).remove::<cards::Controller>();
-            rejected.write(actions::Rejected::CannotPlay { card });
-            continue;
-        }
         record.record_play(state.turn.number);
         commands.entity(*action.player).insert(record);
         if answers.zones.find(BATTLEFIELD, Some(action.player)).is_some() {
@@ -96,8 +84,12 @@ fn check_play(
 
 #[cfg(test)]
 mod tests {
+    use bevy::ecs::system::RunSystemOnce;
+
     use crate::actions;
+    use crate::events;
     use crate::mana;
+    use crate::rules;
     use crate::testing::*;
     use crate::turns;
     use crate::{BATTLEFIELD, GRAVEYARD, HAND};
@@ -130,6 +122,20 @@ mod tests {
             })
         );
         assert!(game.card(forest_2).is_in(HAND).of(p1));
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                assert_eq!(
+                    answers.legality(&events::Play {
+                        card: forest_2.into(),
+                        player: p1.id,
+                    }),
+                    rules::Legality::Illegal(vec![rules::Why::Restriction(
+                        events::play::LAND_PLAYS
+                    )])
+                );
+            })
+            .unwrap();
         Ok(())
     }
 

@@ -13,6 +13,7 @@ pub const MAIN_PHASE: rules::RestrictionId = rules::RestrictionId("305.1/main-ph
 pub const EMPTY_STACK: rules::RestrictionId = rules::RestrictionId("305.1/empty-stack");
 pub const OWNS: rules::RestrictionId = rules::RestrictionId("305.1/owns");
 pub const OWN_TURN: rules::RestrictionId = rules::RestrictionId("305.3/own-turn");
+pub const LAND_PLAYS: rules::RestrictionId = rules::RestrictionId("305.2/land-plays");
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EventArgs)]
 pub struct Play {
@@ -40,6 +41,7 @@ mod tests {
     use super::EMPTY_STACK;
     use super::FROM_HAND;
     use super::LAND_CARD;
+    use super::LAND_PLAYS;
     use super::MAIN_PHASE;
     use super::OWN_TURN;
     use super::OWNS;
@@ -50,7 +52,7 @@ mod tests {
     fn test_usage() {
         assert_eq!(Play::ID, rules::EventId("305.1/play"));
         let restrictions = Play::restrictions();
-        assert_eq!(restrictions.len(), 7);
+        assert_eq!(restrictions.len(), 8);
         assert_eq!(restrictions[0].id, PRIORITY);
         assert_eq!(restrictions[0].condition, rules::has_priority(Play::PLAYER));
         assert_eq!(restrictions[1].id, LAND_CARD);
@@ -78,6 +80,12 @@ mod tests {
             rules::active_player(Play::PLAYER)
         );
         assert!(restrictions[6].unwaivable);
+        assert_eq!(restrictions[7].id, LAND_PLAYS);
+        assert_eq!(
+            restrictions[7].condition,
+            rules::land_play_available(Play::PLAYER)
+        );
+        assert!(!restrictions[7].unwaivable);
         assert!(
             Play::restrictions()
                 .iter()

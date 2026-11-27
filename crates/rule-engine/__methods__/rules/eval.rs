@@ -95,6 +95,7 @@ pub fn eval<E: EventArgs>(
         rules::Condition::CausedBy(cause) => {
             E::args().iter().any(|id| event.arg(*id) == Some(rules::ArgValue::Event(*cause)))
         }
+        rules::Condition::LandPlayAvailable(who) => answers.eval_land_play_available(*who, event),
     }
 }
 

@@ -37,6 +37,7 @@ pub enum Condition {
     ArgAtLeastRemainingToughness(rules::ArgId),
     Count(rules::ArgId, rules::Comparison),
     CausedBy(rules::EventId),
+    LandPlayAvailable(rules::ArgRef),
 }
 
 #[rustfmt::skip]

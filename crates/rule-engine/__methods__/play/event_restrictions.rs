@@ -16,6 +16,7 @@ pub fn event_restrictions() -> Vec<rules::Restriction> {
             rules::points_to::<cards::Owner>(events::Play::PLAYER).of(events::Play::CARD),
         ),
         events::play::OWN_TURN.restriction(rules::active_player(events::Play::PLAYER)).unwaivable(),
+        events::play::LAND_PLAYS.restriction(rules::land_play_available(events::Play::PLAYER)),
     ]
 }
 
@@ -31,7 +32,7 @@ mod tests {
     #[test]
     fn test_usage() {
         let restrictions = event_restrictions();
-        assert_eq!(restrictions.len(), 7);
+        assert_eq!(restrictions.len(), 8);
         assert_eq!(restrictions[0].id, rules::RestrictionId("305.1/priority"));
         assert_eq!(
             restrictions[0].condition,
@@ -65,5 +66,11 @@ mod tests {
             rules::active_player(events::Play::PLAYER)
         );
         assert!(restrictions[6].unwaivable);
+        assert_eq!(restrictions[7].id, rules::RestrictionId("305.2/land-plays"));
+        assert_eq!(
+            restrictions[7].condition,
+            rules::land_play_available(events::Play::PLAYER)
+        );
+        assert!(!restrictions[7].unwaivable);
     }
 }

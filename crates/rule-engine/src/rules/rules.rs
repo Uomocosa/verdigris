@@ -194,6 +194,13 @@ impl Rules<'_, '_> {
     ) -> bool {
     }
 
+    pub(crate) fn eval_land_play_available<E: rules::traits::event_args::EventArgs>(
+        &self,
+        who: rules::ArgRef,
+        event: &E,
+    ) -> bool {
+    }
+
     pub(crate) fn eval_each<E: rules::traits::event_args::EventArgs>(
         &self,
         set: rules::Players,
