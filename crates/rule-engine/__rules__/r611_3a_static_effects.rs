@@ -64,36 +64,23 @@ pub fn r611_3a_static_effects(
         let Some(source) = effect.source else {
             continue;
         };
-        let Ok((_, source_definition, source_controller, source_zone, enchanting)) =
-            sources.get(source)
-        else {
+        let Ok((_, source_definition, _, source_zone, _)) = sources.get(source) else {
             commands.entity(entity).despawn();
             continue;
         };
-        let enchanted = enchanting.map(|entity| **entity);
         if !zones.contains(BATTLEFIELD, **source_zone) {
             commands.entity(entity).despawn();
             continue;
         }
-        let still_applies = source_definition.continuous_abilities().any(|ability| {
-            ability_still_applies(
-                ability,
-                effect,
-                source,
-                enchanted,
-                **source_controller,
-                &candidates,
-                &zones,
-                &players,
-                &answers,
-            )
-        });
+        let still_applies = source_definition
+            .continuous_abilities()
+            .any(|ability| ability_still_applies(ability, effect, source, &answers));
         if !still_applies {
             commands.entity(entity).despawn();
         }
     }
     for (source, definition, controller, in_zone, enchanting) in sources.iter() {
-        let enchanted = enchanting.map(|entity| **entity);
+        let _ = (controller, enchanting);
         if definition.continuous_abilities().next().is_none() {
             continue;
         }
@@ -105,31 +92,25 @@ pub fn r611_3a_static_effects(
             if !condition_holds(ability, source, &answers) {
                 continue;
             }
-            match ability.filter.kind {
-                effects::FilterKind::Creature => spawn_creature_effects(
-                    &mut commands,
-                    source,
-                    ability,
-                    enchanted,
-                    **controller,
-                    &candidates,
-                    &zones,
-                    &players,
-                    &applied,
-                    stamp,
-                ),
-                effects::FilterKind::Player => spawn_player_effects(
-                    &mut commands,
-                    source,
-                    ability,
-                    enchanted,
-                    **controller,
-                    &players,
-                    &applied,
-                    stamp,
-                ),
-                _ => {}
-            }
+            spawn_creature_effects(
+                &mut commands,
+                source,
+                ability,
+                &candidates,
+                &zones,
+                &applied,
+                stamp,
+                &answers,
+            );
+            spawn_player_effects(
+                &mut commands,
+                source,
+                ability,
+                &players,
+                &applied,
+                stamp,
+                &answers,
+            );
         }
     }
 }
@@ -138,11 +119,6 @@ fn ability_still_applies(
     ability: &abilities::Continuous,
     effect: &effects::ContinuousEffect,
     source: Entity,
-    enchanted: Option<Entity>,
-    controller: players::PlayerId,
-    candidates: &StaticCandidates<'_, '_, '_, '_, '_, '_, '_>,
-    zones: &zones::ZoneLookup,
-    players: &[players::PlayerId],
     answers: &rules::Rules,
 ) -> bool {
     if ability.modification != effect.modification {
@@ -151,34 +127,14 @@ fn ability_still_applies(
     if !condition_holds(ability, source, answers) {
         return false;
     }
-    match ability.filter.kind {
-        effects::FilterKind::Creature => candidates.get(effect.affected).is_ok_and(
-            |(_, definition, candidate_controller, zone, attacking, token)| {
-                zones.contains(BATTLEFIELD, **zone)
-                    && candidate_matches(
-                        ability.filter,
-                        source,
-                        effect.affected,
-                        enchanted,
-                        controller,
-                        **candidate_controller,
-                        attacking.is_some(),
-                        token.is_some(),
-                        definition,
-                        players,
-                    )
-            },
-        ),
-        effects::FilterKind::Player => player_matches(
-            ability.filter,
+    answers.eval(
+        &ability.filter,
+        &events::AbilityContext {
+            ability: source,
             source,
-            players::PlayerId(effect.affected),
-            enchanted,
-            controller,
-            players,
-        ),
-        _ => false,
-    }
+        },
+        Some(effect.affected),
+    )
 }
 
 fn condition_holds(
@@ -202,30 +158,21 @@ fn spawn_creature_effects(
     commands: &mut Commands,
     source: Entity,
     ability: &abilities::Continuous,
-    enchanted: Option<Entity>,
-    controller: players::PlayerId,
     candidates: &StaticCandidates<'_, '_, '_, '_, '_, '_, '_>,
     zones: &zones::ZoneLookup,
-    players: &[players::PlayerId],
     applied: &Query<(Entity, &effects::ContinuousEffect)>,
     stamp: u64,
+    answers: &rules::Rules,
 ) {
-    for (candidate, definition, candidate_controller, zone, attacking, token) in candidates.iter() {
+    let context = events::AbilityContext {
+        ability: source,
+        source,
+    };
+    for (candidate, _, _, zone, _, _) in candidates.iter() {
         if !zones.contains(BATTLEFIELD, **zone) {
             continue;
         }
-        if !candidate_matches(
-            ability.filter,
-            source,
-            candidate,
-            enchanted,
-            controller,
-            **candidate_controller,
-            attacking.is_some(),
-            token.is_some(),
-            definition,
-            players,
-        ) {
+        if !answers.eval(&ability.filter, &context, Some(candidate)) {
             continue;
         }
         if already_applied(applied, source, candidate, &ability.modification) {
@@ -245,21 +192,17 @@ fn spawn_player_effects(
     commands: &mut Commands,
     source: Entity,
     ability: &abilities::Continuous,
-    enchanted: Option<Entity>,
-    controller: players::PlayerId,
     players: &[players::PlayerId],
     applied: &Query<(Entity, &effects::ContinuousEffect)>,
     stamp: u64,
+    answers: &rules::Rules,
 ) {
+    let context = events::AbilityContext {
+        ability: source,
+        source,
+    };
     for candidate in players {
-        if !player_matches(
-            ability.filter,
-            source,
-            *candidate,
-            enchanted,
-            controller,
-            players,
-        ) {
+        if !answers.eval(&ability.filter, &context, Some(**candidate)) {
             continue;
         }
         if already_applied(applied, source, **candidate, &ability.modification) {
@@ -288,60 +231,6 @@ fn stamp_for(
             next
         },
         |existing| **existing,
-    )
-}
-
-fn candidate_matches(
-    filter: effects::Filter,
-    source: Entity,
-    candidate: Entity,
-    enchanted: Option<Entity>,
-    controller: players::PlayerId,
-    candidate_controller: players::PlayerId,
-    is_attacking: bool,
-    is_token: bool,
-    definition: &cards::CardDefinition,
-    players: &[players::PlayerId],
-) -> bool {
-    match filter.object {
-        Some(effects::ObjectRelation::ThisObject) if candidate != source => return false,
-        Some(effects::ObjectRelation::EnchantedObject) if enchanted != Some(candidate) => {
-            return false;
-        }
-        _ => {}
-    }
-    if let Some(controller_ref) = filter.controlled_by
-        && !controller_ref.resolve(Some(controller), players).contains(&candidate_controller)
-    {
-        return false;
-    }
-    if filter.attacking && !is_attacking {
-        return false;
-    }
-    if filter.nontoken && is_token {
-        return false;
-    }
-    filter.does_creature_match(definition)
-}
-
-fn player_matches(
-    filter: effects::Filter,
-    source: Entity,
-    candidate: players::PlayerId,
-    enchanted: Option<Entity>,
-    controller: players::PlayerId,
-    players: &[players::PlayerId],
-) -> bool {
-    match filter.object {
-        Some(effects::ObjectRelation::ThisObject) if *candidate != source => return false,
-        Some(effects::ObjectRelation::EnchantedObject) if enchanted != Some(*candidate) => {
-            return false;
-        }
-        _ => {}
-    }
-    filter.controlled_by.map_or_else(
-        || players.contains(&candidate),
-        |controller_ref| controller_ref.resolve(Some(controller), players).contains(&candidate),
     )
 }
 

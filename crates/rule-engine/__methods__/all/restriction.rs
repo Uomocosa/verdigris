@@ -5,13 +5,14 @@ use crate::rules::traits::event::Event;
 use crate::statics;
 
 pub fn restriction<E: Event>(
-    all: statics::All,
+    all: &statics::All,
     holder: impl Into<rules::ArgRef>,
     id: rules::RestrictionId,
     requirement: rules::Condition,
 ) -> abilities::Continuous {
+    let filter: &effects::Filter = all;
     abilities::Continuous {
-        filter: *all,
+        filter: filter.clone(),
         as_long_as: None,
         modification: effects::Modification::Rule(rules::RuleChange {
             target: rules::Target::event::<E>(),
@@ -25,7 +26,7 @@ pub fn restriction<E: Event>(
 
 #[cfg(test)]
 mod tests {
-    use crate::CREATURE;
+    use crate::creature;
     use crate::effects;
     use crate::rules;
     use crate::statics;
@@ -36,12 +37,12 @@ mod tests {
     #[test]
     fn test_usage() {
         let ability = restriction::<testing::RestrictedRule>(
-            statics::all(CREATURE),
+            &statics::all(creature()),
             testing::RestrictedRule::ATTACKER,
             rules::RestrictionId("test/restriction"),
             rules::Condition::True,
         );
-        assert_eq!(ability.filter, CREATURE);
+        assert_eq!(ability.filter, creature());
         assert_eq!(
             ability.modification,
             effects::Modification::Rule(rules::RuleChange {

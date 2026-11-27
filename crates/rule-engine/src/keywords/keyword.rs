@@ -73,7 +73,7 @@ impl Keyword {
 
 #[cfg(test)]
 mod tests {
-    use crate::CREATURE;
+    use crate::creature;
     use crate::keywords;
 
     #[test]
@@ -82,13 +82,13 @@ mod tests {
         assert_eq!(keyword.id, keywords::flying::ID);
         assert_eq!(keyword.abilities(), keywords::flying().abilities());
         assert_eq!(keyword.params::<()>(), Some(&()));
-        let enchanted = keywords::enchant(CREATURE);
+        let enchanted = keywords::enchant(creature());
         assert_eq!(enchanted.id, keywords::enchant::ID);
         assert_eq!(
             enchanted.params::<keywords::EnchantFilter>(),
-            Some(&keywords::EnchantFilter(CREATURE))
+            Some(&keywords::EnchantFilter(creature()))
         );
-        assert_eq!(enchanted, keywords::enchant(CREATURE));
+        assert_eq!(enchanted, keywords::enchant(creature()));
         assert_ne!(enchanted, keyword);
     }
 }

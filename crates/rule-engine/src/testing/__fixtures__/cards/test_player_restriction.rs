@@ -13,7 +13,7 @@ pub const TEST_PLAYER_RESTRICTION: testing::Card = testing::Card {
         card! {
             cards::CardDefinition::from_enchantment("Test Player Restriction", cost![2]);
             abilities::Continuous {
-                filter: effects::Filter::player(YOU),
+                filter: effects::Filter::player() & effects::Filter::controlled_by(YOU),
                 as_long_as: None,
                 modification: effects::Modification::Rule(rules::RuleChange {
                     target: rules::Target::event::<testing::TestRule>(),

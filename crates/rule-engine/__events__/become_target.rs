@@ -10,6 +10,8 @@ pub struct BecomeTarget {
     pub target: Entity,
     #[arg]
     pub spell: Entity,
+    #[arg]
+    pub ability: Entity,
 }
 
 impl Event for BecomeTarget {
@@ -30,7 +32,11 @@ mod tests {
     fn test_usage() {
         let target = Entity::PLACEHOLDER;
         let spell = Entity::from_raw_u32(1).unwrap();
-        let event = BecomeTarget { target, spell };
+        let event = BecomeTarget {
+            target,
+            spell,
+            ability: spell,
+        };
         assert_eq!(
             event.arg(BecomeTarget::TARGET),
             Some(rules::ArgValue::Entity(target))
@@ -39,11 +45,19 @@ mod tests {
             event.arg(BecomeTarget::SPELL),
             Some(rules::ArgValue::Entity(spell))
         );
+        assert_eq!(
+            event.arg(BecomeTarget::ABILITY),
+            Some(rules::ArgValue::Entity(spell))
+        );
         assert_eq!(BecomeTarget::ID, rules::EventId("601.2c/become-target"));
         assert_eq!(BecomeTarget::restrictions(), Vec::new());
         assert_eq!(
             BecomeTarget::args(),
-            &[BecomeTarget::TARGET, BecomeTarget::SPELL,]
+            &[
+                BecomeTarget::TARGET,
+                BecomeTarget::SPELL,
+                BecomeTarget::ABILITY,
+            ]
         );
     }
 }

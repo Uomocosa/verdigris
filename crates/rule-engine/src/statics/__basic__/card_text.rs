@@ -1,4 +1,5 @@
 use crate::abilities;
+use crate::creature;
 use crate::effects;
 use crate::rules;
 use crate::statics;
@@ -10,36 +11,24 @@ pub fn all(filter: impl Into<effects::Filter>) -> statics::All {
 
 #[must_use]
 pub fn you() -> statics::All {
-    statics::all(effects::Filter::player(rules::Players::You))
+    statics::all(effects::Filter::player() & effects::Filter::controlled_by(rules::Players::You))
 }
 
 #[must_use]
 pub fn each_opponent() -> statics::All {
-    statics::all(effects::Filter::player(rules::Players::Opponents))
+    statics::all(
+        effects::Filter::player() & effects::Filter::controlled_by(rules::Players::Opponents),
+    )
 }
 
 #[must_use]
-pub const fn this() -> statics::All {
-    statics::All(effects::Filter {
-        kind: effects::FilterKind::Creature,
-        controlled_by: None,
-        excluded_color: None,
-        attacking: false,
-        nontoken: false,
-        object: Some(effects::ObjectRelation::ThisObject),
-    })
+pub fn this() -> statics::All {
+    statics::all(creature() & effects::Filter::source())
 }
 
 #[must_use]
-pub const fn enchanted() -> statics::All {
-    statics::All(effects::Filter {
-        kind: effects::FilterKind::Creature,
-        controlled_by: None,
-        excluded_color: None,
-        attacking: false,
-        nontoken: false,
-        object: Some(effects::ObjectRelation::EnchantedObject),
-    })
+pub fn enchanted() -> statics::All {
+    statics::all(creature() & effects::Filter::enchanted())
 }
 
 #[must_use]

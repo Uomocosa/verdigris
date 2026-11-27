@@ -1,6 +1,6 @@
 use atomic_delegate_macros::atomic_delegates;
 use bevy::ecs::system::SystemParam;
-use bevy::prelude::{Entity, Query, With};
+use bevy::prelude::{Entity, Query};
 use std::collections::BTreeSet;
 
 use crate::cards;
@@ -22,8 +22,6 @@ pub struct Targeting<'w, 's> {
             &'static zones::InZone,
         ),
     >,
-    pub(crate) battlefield: Query<'w, 's, (), With<cards::OnBattlefield>>,
-    pub(crate) zones: zones::ZoneLookup<'w, 's>,
     pub(crate) answers: rules::Rules<'w, 's>,
 }
 
@@ -33,20 +31,13 @@ impl Targeting<'_, '_> {
     pub fn is_legal_target(
         &self,
         spell: Entity,
-        requirement: effects::Target,
-        controller: players::PlayerId,
+        requirement: &effects::Target,
         target: Entity,
     ) -> bool {
     }
 
     #[must_use]
-    pub fn legal_targets(
-        &self,
-        spell: Entity,
-        requirement: effects::Target,
-        controller: players::PlayerId,
-    ) -> BTreeSet<Entity> {
-    }
+    pub fn legal_targets(&self, spell: Entity, requirement: &effects::Target) -> BTreeSet<Entity> {}
 }
 
 #[cfg(test)]
@@ -59,7 +50,7 @@ mod tests {
     use crate::mana;
     use crate::stack;
     use crate::testing::*;
-    use crate::{ANY_TARGET, BATTLEFIELD, HAND};
+    use crate::{BATTLEFIELD, HAND, any_target};
 
     #[test]
     fn test_usage() -> TestResult {
@@ -73,12 +64,12 @@ mod tests {
         game.app
             .world_mut()
             .run_system_once(move |targeting: stack::Targeting| {
-                let requirement = effects::target(1, ANY_TARGET);
+                let requirement = effects::target(1, any_target());
                 assert_eq!(
-                    targeting.legal_targets(*bolt, requirement, p1.id),
+                    targeting.legal_targets(*bolt, &requirement),
                     BTreeSet::from([*p1, *p2, Entity::from(bears)])
                 );
-                assert!(targeting.is_legal_target(*bolt, requirement, p1.id, Entity::from(bears)));
+                assert!(targeting.is_legal_target(*bolt, &requirement, Entity::from(bears)));
             })
             .unwrap();
         Ok(())

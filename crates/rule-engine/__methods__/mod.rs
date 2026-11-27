@@ -28,7 +28,6 @@ pub mod enter_battlefield;
 pub mod event_template;
 #[cfg(feature = "testing")]
 pub mod expected_targets;
-pub mod filter;
 pub mod game_mut;
 pub mod hook_queue;
 pub mod keyword;

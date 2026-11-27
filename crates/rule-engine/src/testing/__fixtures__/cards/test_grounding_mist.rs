@@ -1,8 +1,9 @@
-use crate::CREATURE;
 use crate::OPPONENT;
 use crate::card;
 use crate::cards;
 use crate::cost;
+use crate::creature;
+use crate::effects;
 use crate::keywords;
 use crate::statics;
 use crate::testing;
@@ -12,7 +13,7 @@ pub const TEST_GROUNDING_MIST: testing::Card = testing::Card {
     definition: || {
         card! {
             cards::CardDefinition::from_enchantment("Test Grounding Mist", cost![1, G]);
-            statics::all(CREATURE.controlled_by(OPPONENT)).lose(keywords::flying()),
+            statics::all(creature() & effects::Filter::controlled_by(OPPONENT)).lose(keywords::flying()),
         }
     },
 };

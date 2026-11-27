@@ -77,17 +77,17 @@ impl Effect {
 
 #[cfg(test)]
 mod tests {
-    use crate::ANY_TARGET;
     use crate::THIS;
+    use crate::any_target;
     use crate::counters;
     use crate::effects;
     use crate::rules;
 
     #[test]
     fn test_usage() {
-        let effect = THIS.deals(rules::damage(3)).to(effects::target(1, ANY_TARGET));
+        let effect = THIS.deals(rules::damage(3)).to(effects::target(1, any_target()));
         assert_eq!(effect.kind, effects::EffectKind::Damage(3));
-        assert_eq!(effect.target, Some(effects::target(1, ANY_TARGET)));
+        assert_eq!(effect.target, Some(effects::target(1, any_target())));
         let sequence = effects::draw(2) & effects::lose_life(2);
         assert_eq!(sequence.kind, effects::EffectKind::Draw(2));
         assert_eq!(

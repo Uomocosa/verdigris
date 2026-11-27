@@ -14,10 +14,10 @@ pub fn continuous_abilities(
 
 #[cfg(test)]
 mod tests {
-    use crate::CREATURE;
     use crate::abilities;
     use crate::cards;
     use crate::cost;
+    use crate::creature;
     use crate::keywords;
     use crate::pt;
     use crate::statics;
@@ -26,7 +26,7 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let continuous = statics::all(CREATURE).gain(keywords::vigilance());
+        let continuous = statics::all(creature()).gain(keywords::vigilance());
         let definition = cards::creature("Grizzly Bears", cost![1, G], pt!(2, 2))
             .abilities([abilities::Ability::from(continuous.clone())]);
         assert_eq!(

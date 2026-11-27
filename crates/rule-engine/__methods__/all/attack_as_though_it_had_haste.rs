@@ -4,9 +4,10 @@ use crate::events;
 use crate::rules;
 use crate::statics;
 
-pub fn attack_as_though_it_had_haste(all: statics::All) -> abilities::Continuous {
+pub fn attack_as_though_it_had_haste(all: &statics::All) -> abilities::Continuous {
+    let filter: &effects::Filter = all;
     abilities::Continuous {
-        filter: *all,
+        filter: filter.clone(),
         as_long_as: None,
         modification: effects::Modification::Rule(rules::RuleChange {
             target: rules::Target::Restriction(events::declare_attacker::SUMMONING_SICK),
@@ -19,7 +20,7 @@ pub fn attack_as_though_it_had_haste(all: statics::All) -> abilities::Continuous
 
 #[cfg(test)]
 mod tests {
-    use crate::CREATURE;
+    use crate::creature;
     use crate::effects;
     use crate::events;
     use crate::rules;
@@ -29,8 +30,8 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let ability = attack_as_though_it_had_haste(statics::all(CREATURE));
-        assert_eq!(ability.filter, CREATURE);
+        let ability = attack_as_though_it_had_haste(&statics::all(creature()));
+        assert_eq!(ability.filter, creature());
         assert_eq!(
             ability.modification,
             effects::Modification::Rule(rules::RuleChange {

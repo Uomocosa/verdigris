@@ -6,7 +6,11 @@ pub use basic::card_text::{
     lose_life, mill, target, win_the_game,
 };
 pub use basic::components::ContinuousEffect;
-pub use basic::enums::{Duration, EffectKind, FilterKind, Layered, Modification, ObjectRelation};
+pub use basic::enums::{Duration, EffectKind, Layered, Modification};
+pub use basic::filter_builders::{
+    any_target, creature, creature_spell, enchantment, instant_spell, nonblack_creature,
+    noncreature_spell, spell,
+};
 pub use basic::messages::{KeywordGranted, PowerToughnessModified};
 
 #[path = "__traits__/mod.rs"]

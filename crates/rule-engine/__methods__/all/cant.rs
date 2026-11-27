@@ -5,12 +5,13 @@ use crate::rules::traits::event::Event;
 use crate::statics;
 
 pub fn cant<E: Event>(
-    all: statics::All,
+    all: &statics::All,
     holder: impl Into<rules::ArgRef>,
     id: rules::RestrictionId,
 ) -> abilities::Continuous {
+    let filter: &effects::Filter = all;
     abilities::Continuous {
-        filter: *all,
+        filter: filter.clone(),
         as_long_as: None,
         modification: effects::Modification::Rule(rules::RuleChange {
             target: rules::Target::event::<E>(),
@@ -35,11 +36,14 @@ mod tests {
     #[test]
     fn test_usage() {
         let ability = cant::<events::Draw>(
-            statics::all(PLAYER),
+            &statics::all(PLAYER),
             events::Draw::PLAYER,
             rules::RestrictionId("test/cant"),
         );
-        assert_eq!(ability.filter, effects::Filter::player(PLAYER));
+        assert_eq!(
+            ability.filter,
+            effects::Filter::player() & effects::Filter::controlled_by(PLAYER)
+        );
         assert_eq!(
             ability.modification,
             effects::Modification::Rule(rules::RuleChange {

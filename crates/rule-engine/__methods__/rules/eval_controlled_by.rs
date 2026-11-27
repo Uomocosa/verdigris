@@ -11,10 +11,11 @@ pub fn eval_controlled_by<E: EventArgs>(
     event: &E,
     viewpoint: Option<Entity>,
 ) -> bool {
-    let Some(rules::ArgValue::Player(you)) = answers.resolve(rules::YOU, event) else {
-        return false;
-    };
-    let members = answers.players_in_game(set, Some(you));
+    let you = answers.resolve(rules::YOU, event).and_then(|value| match value {
+        rules::ArgValue::Player(player) => Some(player),
+        _ => None,
+    });
+    let members = answers.players_in_game(set, you);
     viewpoint.is_some_and(|subject| {
         answers.entities.get(subject).is_ok_and(|entity| {
             if entity.get::<players::Player>().is_some() {

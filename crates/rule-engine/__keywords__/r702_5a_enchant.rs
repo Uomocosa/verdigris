@@ -12,16 +12,16 @@ pub const ID: keywords::KeywordId = keywords::KeywordId("702.5/enchant");
 
 #[cfg(test)]
 mod tests {
-    use crate::CREATURE;
+    use crate::creature;
     use crate::keywords;
 
     #[test]
     fn test_usage() {
-        let keyword = super::r702_5a_enchant(CREATURE);
+        let keyword = super::r702_5a_enchant(creature());
         assert_eq!(keyword.id, super::ID);
         assert_eq!(
             keyword.params::<keywords::EnchantFilter>(),
-            Some(&keywords::EnchantFilter(CREATURE))
+            Some(&keywords::EnchantFilter(creature()))
         );
         assert_eq!(keyword.abilities(), Vec::new());
     }

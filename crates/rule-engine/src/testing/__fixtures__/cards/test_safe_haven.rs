@@ -1,8 +1,9 @@
-use crate::CREATURE;
 use crate::YOU;
 use crate::card;
 use crate::cards;
 use crate::cost;
+use crate::creature;
+use crate::effects;
 use crate::events;
 use crate::rules;
 use crate::statics;
@@ -13,7 +14,7 @@ pub const TEST_SAFE_HAVEN: testing::Card = testing::Card {
     definition: || {
         card! {
             cards::CardDefinition::from_enchantment("Test Safe Haven", cost![2]);
-            statics::all(CREATURE.controlled_by(YOU)).cant::<events::Destroy>(
+            statics::all(creature() & effects::Filter::controlled_by(YOU)).cant::<events::Destroy>(
                 events::Destroy::PERMANENT,
                 rules::RestrictionId("test/test-safe-haven"),
             ),
@@ -21,7 +22,7 @@ pub const TEST_SAFE_HAVEN: testing::Card = testing::Card {
                 events::Counter::SPELL.controller(),
                 rules::RestrictionId("test/test-safe-haven"),
             ),
-            statics::all(CREATURE.controlled_by(YOU)).cant::<events::DealDamage>(
+            statics::all(creature() & effects::Filter::controlled_by(YOU)).cant::<events::DealDamage>(
                 events::DealDamage::RECIPIENT,
                 rules::RestrictionId("test/test-safe-haven"),
             ),

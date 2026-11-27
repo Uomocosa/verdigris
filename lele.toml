@@ -149,6 +149,10 @@ path = "crates/rule-engine/__rules__"
 reason = "Every rule file starts with a doc comment quoting the Comprehensive Rules text it enforces; that quotation is the rule's specification next to its system, and VRDG007 enforces the stricter verdigris version (only the system fn's doc comment, checked word-for-word against the rule text), outside the single constants.rs comment exception."
 replaced_by = "rule_comments"
 
+[[lele.rules.lint.no_comments.exempt]]
+path = "crates/rule-engine/src/effects/__basic__/filter_builders.rs"
+reason = "F2 user decision: each vocabulary fn keeps the CR citation its constants.rs const had (109.2, 115.5/115.2, 105.1/202.2); the citations moved with the vocabulary from constants.rs, where doc comments are allowed, to the builders file."
+
 # LELECORE016 · locked · A `pub`/`pub(crate)` top-level `fn` in `src/` must be a method of a type: its owner is the…
 [lele.rules.lint.no_free_functions]
 

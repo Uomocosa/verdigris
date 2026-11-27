@@ -2,28 +2,21 @@ use bevy::prelude::Entity;
 use std::collections::BTreeSet;
 
 use crate::effects;
-use crate::players;
 use crate::stack;
 
 pub fn legal_targets(
     targeting: &stack::Targeting,
     spell: Entity,
-    requirement: effects::Target,
-    controller: players::PlayerId,
+    requirement: &effects::Target,
 ) -> BTreeSet<Entity> {
     let mut legal = BTreeSet::new();
-    if matches!(
-        requirement.filter.kind,
-        effects::FilterKind::AnyTarget | effects::FilterKind::Player
-    ) {
-        for player in targeting.players.iter() {
-            if targeting.is_legal_target(spell, requirement, controller, player) {
-                legal.insert(player);
-            }
+    for player in targeting.players.iter() {
+        if targeting.is_legal_target(spell, requirement, player) {
+            legal.insert(player);
         }
     }
     for (candidate, ..) in targeting.cards.iter() {
-        if targeting.is_legal_target(spell, requirement, controller, candidate) {
+        if targeting.is_legal_target(spell, requirement, candidate) {
             legal.insert(candidate);
         }
     }
@@ -40,7 +33,7 @@ mod tests {
     use crate::mana;
     use crate::stack;
     use crate::testing::*;
-    use crate::{ANY_TARGET, BATTLEFIELD, HAND};
+    use crate::{BATTLEFIELD, HAND, any_target};
 
     use super::legal_targets;
 
@@ -57,7 +50,7 @@ mod tests {
             .world_mut()
             .run_system_once(move |targeting: stack::Targeting| {
                 assert_eq!(
-                    legal_targets(&targeting, *bolt, effects::target(1, ANY_TARGET), p1.id),
+                    legal_targets(&targeting, *bolt, &effects::target(1, any_target())),
                     BTreeSet::from([*p1, *p2, Entity::from(bears)])
                 );
             })

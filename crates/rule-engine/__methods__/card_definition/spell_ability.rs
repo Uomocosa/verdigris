@@ -11,9 +11,9 @@ pub fn spell_ability(definition: &cards::CardDefinition) -> Option<&effects::Eff
 
 #[cfg(test)]
 mod tests {
-    use crate::CREATURE;
     use crate::cards;
     use crate::cost;
+    use crate::creature;
     use crate::effects;
 
     use super::spell_ability;
@@ -21,10 +21,10 @@ mod tests {
     #[test]
     fn test_usage() {
         let definition = cards::instant("Murder", cost![1, B, B])
-            .spell(effects::destroy(effects::target(1, CREATURE)));
+            .spell(effects::destroy(effects::target(1, creature())));
         assert_eq!(
             spell_ability(&definition),
-            Some(&effects::destroy(effects::target(1, CREATURE)))
+            Some(&effects::destroy(effects::target(1, creature())))
         );
     }
 }

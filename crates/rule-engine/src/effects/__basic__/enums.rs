@@ -29,24 +29,6 @@ pub enum EffectKind {
     WinTheGame,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum FilterKind {
-    Creature,
-    Enchantment,
-    Player,
-    AnyTarget,
-    Spell,
-    CreatureSpell,
-    NoncreatureSpell,
-    InstantSpell,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum ObjectRelation {
-    ThisObject,
-    EnchantedObject,
-}
-
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Layered {
     ModifyPT { power: i32, toughness: i32 },

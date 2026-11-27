@@ -20,15 +20,15 @@ impl DealsDamage {
 
 #[cfg(test)]
 mod tests {
-    use crate::ANY_TARGET;
+    use crate::any_target;
     use crate::effects;
 
     use super::DealsDamage;
 
     #[test]
     fn test_usage() {
-        let effect = DealsDamage::from(3u32).to(effects::target(1, ANY_TARGET));
+        let effect = DealsDamage::from(3u32).to(effects::target(1, any_target()));
         assert_eq!(effect.kind, effects::EffectKind::Damage(3));
-        assert_eq!(effect.target, Some(effects::target(1, ANY_TARGET)));
+        assert_eq!(effect.target, Some(effects::target(1, any_target())));
     }
 }

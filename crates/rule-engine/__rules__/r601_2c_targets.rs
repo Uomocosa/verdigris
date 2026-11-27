@@ -76,13 +76,13 @@ fn ask_for_targets(
         let controller = **controller;
         let target = definition
             .spell_ability()
-            .and_then(|effect| effect.target)
+            .and_then(|effect| effect.target.clone())
             .or_else(|| definition.enchant().map(|filter| effects::target(1, filter)));
         let Some(target) = target else {
             commands.entity(spell).insert(stack::CastingStage::AwaitingPayment);
             continue;
         };
-        let legal = targeting.legal_targets(spell, target, controller);
+        let legal = targeting.legal_targets(spell, &target);
         if legal.is_empty() {
             if let Some(hand) = zones.find(HAND, Some(**owner)) {
                 let moved = zones::move_object(

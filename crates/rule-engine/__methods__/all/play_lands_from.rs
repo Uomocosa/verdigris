@@ -5,9 +5,10 @@ use crate::rules;
 use crate::statics;
 use crate::zones;
 
-pub fn play_lands_from(all: statics::All, zone: zones::Zone) -> abilities::Continuous {
+pub fn play_lands_from(all: &statics::All, zone: zones::Zone) -> abilities::Continuous {
+    let filter: &effects::Filter = all;
     abilities::Continuous {
-        filter: *all,
+        filter: filter.clone(),
         as_long_as: None,
         modification: effects::Modification::Rule(rules::RuleChange {
             target: rules::Target::Restriction(events::play_land::FROM_HAND),
@@ -32,8 +33,11 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let ability = play_lands_from(statics::all(PLAYER), GRAVEYARD);
-        assert_eq!(ability.filter, effects::Filter::player(PLAYER));
+        let ability = play_lands_from(&statics::all(PLAYER), GRAVEYARD);
+        assert_eq!(
+            ability.filter,
+            effects::Filter::player() & effects::Filter::controlled_by(PLAYER)
+        );
         assert_eq!(
             ability.modification,
             effects::Modification::Rule(rules::RuleChange {

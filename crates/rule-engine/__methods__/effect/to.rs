@@ -9,8 +9,8 @@ pub fn to(effect: effects::Effect, target: impl Into<effects::Target>) -> effect
 
 #[cfg(test)]
 mod tests {
-    use crate::ANY_TARGET;
     use crate::THIS;
+    use crate::any_target;
     use crate::effects;
     use crate::pt;
 
@@ -24,9 +24,9 @@ mod tests {
             target: None,
             affected: None,
         };
-        let effect = to(untargeted, effects::target(1, ANY_TARGET));
+        let effect = to(untargeted, effects::target(1, any_target()));
         assert_eq!(effect.kind, effects::EffectKind::Damage(3));
-        assert_eq!(effect.target, Some(effects::target(1, ANY_TARGET)));
+        assert_eq!(effect.target, Some(effects::target(1, any_target())));
     }
 
     #[test]
@@ -34,10 +34,6 @@ mod tests {
         let effect = to(effects::get(pt!(3, 3)), THIS);
         let target = effect.target.unwrap();
         assert_eq!(target.count, 1);
-        assert_eq!(target.filter.kind, effects::FilterKind::Creature);
-        assert_eq!(
-            target.filter.object,
-            Some(effects::ObjectRelation::ThisObject)
-        );
+        assert_eq!(target.filter, crate::creature() & effects::Filter::source());
     }
 }

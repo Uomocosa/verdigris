@@ -4,14 +4,15 @@ use crate::rules;
 use crate::statics;
 
 pub fn instead(
-    all: statics::All,
+    all: &statics::All,
     event: rules::EventId,
     holder: impl Into<rules::ArgRef>,
     when: rules::Condition,
     then: impl Into<rules::Then>,
 ) -> abilities::Continuous {
+    let filter: &effects::Filter = all;
     abilities::Continuous {
-        filter: *all,
+        filter: filter.clone(),
         as_long_as: None,
         modification: effects::Modification::Rule(rules::RuleChange {
             target: rules::Target::Event(event),
@@ -38,7 +39,7 @@ mod tests {
     #[test]
     fn test_usage() {
         let ability = instead(
-            statics::you(),
+            &statics::you(),
             events::DrawFromEmptyLibrary::ID,
             events::DrawFromEmptyLibrary::PLAYER,
             rules::Condition::True,
@@ -46,7 +47,10 @@ mod tests {
                 who: events::DrawFromEmptyLibrary::PLAYER.into(),
             }],
         );
-        assert_eq!(ability.filter, effects::Filter::player(YOU));
+        assert_eq!(
+            ability.filter,
+            effects::Filter::player() & effects::Filter::controlled_by(YOU)
+        );
         assert_eq!(
             ability.modification,
             effects::Modification::Rule(rules::RuleChange {

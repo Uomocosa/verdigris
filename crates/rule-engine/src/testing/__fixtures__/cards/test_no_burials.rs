@@ -1,8 +1,9 @@
-use crate::CREATURE;
 use crate::YOU;
 use crate::card;
 use crate::cards;
 use crate::cost;
+use crate::creature;
+use crate::effects;
 use crate::events;
 use crate::rules;
 use crate::statics;
@@ -13,7 +14,7 @@ pub const TEST_NO_BURIALS: testing::Card = testing::Card {
     definition: || {
         card! {
             cards::CardDefinition::from_enchantment("Test No Burials", cost![2]);
-            statics::all(CREATURE.controlled_by(YOU)).cant::<events::PutIntoGraveyard>(
+            statics::all(creature() & effects::Filter::controlled_by(YOU)).cant::<events::PutIntoGraveyard>(
                 events::PutIntoGraveyard::OBJECT,
                 rules::RestrictionId("test/test-no-burials"),
             ),

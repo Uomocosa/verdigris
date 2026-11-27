@@ -49,11 +49,11 @@ pub fn r608_2_r608_2c_resolve(
     mut player_effects: ParamSet<PlayerEffectWriters<'_, '_, '_, '_, '_, '_>>,
     mut effect_messages: ParamSet<EffectMessageWriters<'_, '_, '_, '_>>,
     lookups: stack::ResolutionLookups<'_, '_>,
-    zones: zones::ZoneLookup,
+    answers: rules::Rules,
 ) {
     for resolution in resolutions.read() {
         let spell = **resolution;
-        if !lookups.in_zone.get(spell).is_ok_and(|zone| zones.contains(STACK, **zone)) {
+        if !lookups.in_zone.get(spell).is_ok_and(|zone| answers.zones.contains(STACK, **zone)) {
             continue;
         }
         let Some(effect) = effect_of(&lookups, spell) else {
@@ -66,8 +66,15 @@ pub fn r608_2_r608_2c_resolve(
         let chosen_target = lookups.chosen_targets.get(spell).ok().map(|chosen| **chosen);
         let player_targets = player_targets_for(&lookups, chosen_target, &effect, controller);
         let target_zone = chosen_target.and_then(|target| lookups.in_zone.get(target).ok());
-        let battlefield_target =
-            battlefield_target_for(&lookups, chosen_target, target_zone, spell, &effect, &zones);
+        let battlefield_target = battlefield_target_for(
+            &lookups,
+            chosen_target,
+            target_zone,
+            spell,
+            &effect,
+            &answers.zones,
+            &answers,
+        );
         for kind in std::iter::once(effect.kind).chain(effect.follow_ups.into_iter().flatten()) {
             match kind {
                 effects::EffectKind::Damage(amount) => {
@@ -81,7 +88,7 @@ pub fn r608_2_r608_2c_resolve(
                     request_exile(&mut exiles, &lookups, spell, chosen_target);
                 }
                 effects::EffectKind::Counter => {
-                    request_counter(&mut countered, chosen_target, target_zone, &zones);
+                    request_counter(&mut countered, chosen_target, target_zone, &answers.zones);
                 }
                 effects::EffectKind::CreateTokens { count, definition } => {
                     request_tokens(&mut effect_messages.p3(), controller, count, definition);
@@ -144,10 +151,11 @@ fn battlefield_target_for(
     spell: Entity,
     effect: &effects::Effect,
     zones: &zones::ZoneLookup,
+    answers: &rules::Rules,
 ) -> Option<Entity> {
     chosen_target
         .filter(|_| target_zone.is_some_and(|zone| zones.contains(BATTLEFIELD, **zone)))
-        .or_else(|| self_target_on_battlefield(lookups, spell, effect, zones))
+        .or_else(|| self_target_on_battlefield(lookups, spell, effect, zones, answers))
 }
 
 fn self_target_on_battlefield(
@@ -155,14 +163,17 @@ fn self_target_on_battlefield(
     spell: Entity,
     effect: &effects::Effect,
     zones: &zones::ZoneLookup,
+    answers: &rules::Rules,
 ) -> Option<Entity> {
-    if !effect
-        .target
-        .is_some_and(|target| target.filter.object == Some(effects::ObjectRelation::ThisObject))
-    {
+    let source = lookups.abilities.get(spell).ok().map(|ability| ability.source)?;
+    let target = effect.target.as_ref()?;
+    let context = events::AbilityContext {
+        ability: source,
+        source,
+    };
+    if !answers.eval(&target.filter, &context, Some(source)) {
         return None;
     }
-    let source = lookups.abilities.get(spell).ok().map(|ability| ability.source)?;
     let zone = lookups.in_zone.get(source).ok().copied()?;
     if zones.contains(BATTLEFIELD, *zone) {
         Some(source)

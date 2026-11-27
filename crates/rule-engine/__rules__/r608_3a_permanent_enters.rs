@@ -4,6 +4,7 @@ use bevy::prelude::{Commands, Entity, Has, MessageReader, MessageWriter, Query, 
 
 use crate::Attempt;
 use crate::cards;
+use crate::rules;
 use crate::stack;
 use crate::zones;
 
@@ -41,6 +42,7 @@ pub fn r608_3a_permanent_enters(
     cards: ResolvingPermanent<'_, '_>,
     battlefield: Query<Entity, With<cards::OnBattlefield>>,
     zones: zones::ZoneLookup,
+    answers: rules::Rules,
 ) {
     for resolution in resolutions.read() {
         let spell = **resolution;
@@ -61,11 +63,15 @@ pub fn r608_3a_permanent_enters(
             continue;
         }
         if let Some(enchant_filter) = definition.enchant() {
+            let context = events::AbilityContext {
+                ability: spell,
+                source: spell,
+            };
             let is_legal = chosen.is_some_and(|chosen| {
                 let target = **chosen;
-                let still_matches = cards.get(target).is_ok_and(|(definition, _, _, _, _, _)| {
-                    enchant_filter.does_creature_match(definition)
-                });
+                let still_matches = cards
+                    .get(target)
+                    .is_ok_and(|_| answers.eval(&enchant_filter, &context, Some(target)));
                 still_matches && battlefield.contains(target)
             });
             if !is_legal {

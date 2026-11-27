@@ -2,9 +2,10 @@ use crate::abilities;
 use crate::effects;
 use crate::statics;
 
-pub fn get_pt(all: statics::All, power: i32, toughness: i32) -> abilities::Continuous {
+pub fn get_pt(all: &statics::All, power: i32, toughness: i32) -> abilities::Continuous {
+    let filter: &effects::Filter = all;
     abilities::Continuous {
-        filter: *all,
+        filter: filter.clone(),
         as_long_as: None,
         modification: effects::Modification::Characteristic(effects::Layered::ModifyPT {
             power,
@@ -15,7 +16,7 @@ pub fn get_pt(all: statics::All, power: i32, toughness: i32) -> abilities::Conti
 
 #[cfg(test)]
 mod tests {
-    use crate::CREATURE;
+    use crate::creature;
     use crate::effects;
     use crate::statics;
 
@@ -23,8 +24,8 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let ability = get_pt(statics::all(CREATURE), 1, 1);
-        assert_eq!(ability.filter, CREATURE);
+        let ability = get_pt(&statics::all(creature()), 1, 1);
+        assert_eq!(ability.filter, creature());
         assert_eq!(
             ability.modification,
             effects::Modification::Characteristic(effects::Layered::ModifyPT {

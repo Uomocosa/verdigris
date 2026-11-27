@@ -1,9 +1,10 @@
+use crate::creature;
 use crate::effects;
 use crate::effects::traits::gets::Gets;
 use crate::keywords;
 use crate::rules;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Target {
     pub count: u32,
     pub filter: effects::Filter,
@@ -13,14 +14,7 @@ impl From<rules::This> for Target {
     fn from(_: rules::This) -> Self {
         Self {
             count: 1,
-            filter: effects::Filter {
-                kind: effects::FilterKind::Creature,
-                controlled_by: None,
-                excluded_color: None,
-                attacking: false,
-                nontoken: false,
-                object: Some(effects::ObjectRelation::ThisObject),
-            },
+            filter: creature() & effects::Filter::source(),
         }
     }
 }
@@ -61,8 +55,8 @@ impl Target {
 
 #[cfg(test)]
 mod tests {
-    use crate::CREATURE;
     use crate::PLAYER;
+    use crate::creature;
     use crate::effects;
     use crate::keywords;
     use crate::pt;
@@ -72,7 +66,7 @@ mod tests {
     #[test]
     fn test_usage() {
         let target = effects::target(1, PLAYER);
-        let effect = target.discard(2);
+        let effect = target.clone().discard(2);
         assert_eq!(effect.kind, effects::EffectKind::Discard(2));
         assert_eq!(effect.target, Some(target));
         assert_eq!(effect.affected, None);
@@ -87,7 +81,7 @@ mod tests {
         assert_eq!(milled.kind, effects::EffectKind::Mill(5));
         let won = effects::target(1, PLAYER).win_the_game();
         assert_eq!(won.kind, effects::EffectKind::WinTheGame);
-        let grown = effects::target(1, CREATURE).get(pt!(3, 3));
+        let grown = effects::target(1, creature()).get(pt!(3, 3));
         assert_eq!(
             grown.kind,
             effects::EffectKind::ModifyPowerToughness {
@@ -95,12 +89,12 @@ mod tests {
                 toughness: 3
             }
         );
-        let granted = effects::target(1, CREATURE).gain(keywords::hexproof());
+        let granted = effects::target(1, creature()).gain(keywords::hexproof());
         assert_eq!(
             granted.target,
             Some(Target {
                 count: 1,
-                filter: CREATURE,
+                filter: creature(),
             })
         );
         let chained = effects::draw(3) & effects::lose_life(3);

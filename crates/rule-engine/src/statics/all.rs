@@ -7,20 +7,20 @@ use crate::keywords;
 use crate::rules;
 use crate::zones;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Deref)]
+#[derive(Debug, Clone, PartialEq, Eq, Deref)]
 pub struct All(pub effects::Filter);
 
 #[atomic_delegates]
 impl All {
     #[must_use]
-    pub fn gain(self, keyword: keywords::Keyword) -> abilities::Continuous {}
+    pub fn gain(&self, keyword: keywords::Keyword) -> abilities::Continuous {}
 
     #[must_use]
-    pub fn get_pt(self, power: i32, toughness: i32) -> abilities::Continuous {}
+    pub fn get_pt(&self, power: i32, toughness: i32) -> abilities::Continuous {}
 
     #[must_use]
     pub fn instead(
-        self,
+        &self,
         event: rules::EventId,
         holder: impl Into<rules::ArgRef>,
         when: rules::Condition,
@@ -29,46 +29,46 @@ impl All {
     }
 
     #[must_use]
-    pub fn lose(self, keyword: keywords::Keyword) -> abilities::Continuous {}
+    pub fn lose(&self, keyword: keywords::Keyword) -> abilities::Continuous {}
 
     #[must_use]
-    pub fn attack_as_though_it_had_haste(self) -> abilities::Continuous {}
+    pub fn attack_as_though_it_had_haste(&self) -> abilities::Continuous {}
 
     #[must_use]
-    pub fn cast_spells_as_though_they_had_flash(self) -> abilities::Continuous {}
+    pub fn cast_spells_as_though_they_had_flash(&self) -> abilities::Continuous {}
 
     #[must_use]
-    pub fn must_attack(self) -> abilities::Continuous {}
+    pub fn must_attack(&self) -> abilities::Continuous {}
 
     #[must_use]
-    pub fn must_block(self) -> abilities::Continuous {}
+    pub fn must_block(&self) -> abilities::Continuous {}
 
     #[must_use]
-    pub fn attack_without_tapping(self) -> abilities::Continuous {}
+    pub fn attack_without_tapping(&self) -> abilities::Continuous {}
 
     #[must_use]
-    pub fn cant_lose_the_game(self) -> abilities::Continuous {}
+    pub fn cant_lose_the_game(&self) -> abilities::Continuous {}
 
     #[must_use]
     pub fn cant<E: rules::traits::event::Event>(
-        self,
+        &self,
         holder: impl Into<rules::ArgRef>,
         id: rules::RestrictionId,
     ) -> abilities::Continuous {
     }
 
     #[must_use]
-    pub fn cant_win_the_game(self) -> abilities::Continuous {}
+    pub fn cant_win_the_game(&self) -> abilities::Continuous {}
 
     #[must_use]
-    pub fn dont_lose_unspent_mana(self) -> abilities::Continuous {}
+    pub fn dont_lose_unspent_mana(&self) -> abilities::Continuous {}
 
     #[must_use]
-    pub fn tap_when_attacking(self) -> abilities::Continuous {}
+    pub fn tap_when_attacking(&self) -> abilities::Continuous {}
 
     #[must_use]
     pub fn as_though(
-        self,
+        &self,
         restriction: rules::RestrictionId,
         holder: impl Into<rules::ArgRef>,
     ) -> abilities::Continuous {
@@ -76,7 +76,7 @@ impl All {
 
     #[must_use]
     pub fn allow(
-        self,
+        &self,
         restriction: rules::RestrictionId,
         alternative: rules::Condition,
         holder: impl Into<rules::ArgRef>,
@@ -85,7 +85,7 @@ impl All {
 
     #[must_use]
     pub fn restriction<E: rules::traits::event::Event>(
-        self,
+        &self,
         holder: impl Into<rules::ArgRef>,
         id: rules::RestrictionId,
         requirement: rules::Condition,
@@ -93,35 +93,35 @@ impl All {
     }
 
     #[must_use]
-    pub fn requirement<E: rules::traits::event::Event>(self) -> abilities::Continuous {}
+    pub fn requirement<E: rules::traits::event::Event>(&self) -> abilities::Continuous {}
 
     #[must_use]
-    pub fn skip<E: rules::traits::event::Event>(self) -> abilities::Continuous {}
+    pub fn skip<E: rules::traits::event::Event>(&self) -> abilities::Continuous {}
 
     #[must_use]
-    pub fn perform<E: rules::traits::event::Event>(self) -> abilities::Continuous {}
+    pub fn perform<E: rules::traits::event::Event>(&self) -> abilities::Continuous {}
 
     #[must_use]
-    pub fn play_lands_from(self, zone: zones::Zone) -> abilities::Continuous {}
+    pub fn play_lands_from(&self, zone: zones::Zone) -> abilities::Continuous {}
 
     #[must_use]
-    pub fn no_maximum_hand_size(self) -> abilities::Continuous {}
+    pub fn no_maximum_hand_size(&self) -> abilities::Continuous {}
 
     #[must_use]
-    pub fn play_additional_lands(self, count: u32) -> abilities::Continuous {}
+    pub fn play_additional_lands(&self, count: u32) -> abilities::Continuous {}
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::CREATURE;
+    use crate::creature;
     use crate::keywords;
     use crate::statics;
 
     #[test]
     fn test_usage() {
-        let builder = statics::all(CREATURE);
-        assert_eq!(*builder, CREATURE);
+        let builder = statics::all(creature());
+        assert_eq!(*builder, creature());
         let ability = builder.gain(keywords::vigilance());
-        assert_eq!(ability.filter, CREATURE);
+        assert_eq!(ability.filter, creature());
     }
 }

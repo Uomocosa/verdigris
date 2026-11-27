@@ -4,9 +4,10 @@ use crate::events;
 use crate::rules;
 use crate::statics;
 
-pub fn cast_spells_as_though_they_had_flash(all: statics::All) -> abilities::Continuous {
+pub fn cast_spells_as_though_they_had_flash(all: &statics::All) -> abilities::Continuous {
+    let filter: &effects::Filter = all;
     abilities::Continuous {
-        filter: *all,
+        filter: filter.clone(),
         as_long_as: None,
         modification: effects::Modification::Rule(rules::RuleChange {
             target: rules::Target::Restriction(events::cast_spell::TIMING),
@@ -29,8 +30,11 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let ability = cast_spells_as_though_they_had_flash(statics::you());
-        assert_eq!(ability.filter, effects::Filter::player(YOU));
+        let ability = cast_spells_as_though_they_had_flash(&statics::you());
+        assert_eq!(
+            ability.filter,
+            effects::Filter::player() & effects::Filter::controlled_by(YOU)
+        );
         assert_eq!(
             ability.modification,
             effects::Modification::Rule(rules::RuleChange {

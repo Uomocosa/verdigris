@@ -3,9 +3,10 @@ use crate::effects;
 use crate::rules;
 use crate::statics;
 
-pub fn no_maximum_hand_size(all: statics::All) -> abilities::Continuous {
+pub fn no_maximum_hand_size(all: &statics::All) -> abilities::Continuous {
+    let filter: &effects::Filter = all;
     abilities::Continuous {
-        filter: *all,
+        filter: filter.clone(),
         as_long_as: None,
         modification: effects::Modification::Rule(rules::RuleChange {
             target: rules::Target::value::<rules::MaximumHandSize>(),
@@ -25,8 +26,11 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let ability = no_maximum_hand_size(statics::all(PLAYER));
-        assert_eq!(ability.filter, effects::Filter::player(PLAYER));
+        let ability = no_maximum_hand_size(&statics::all(PLAYER));
+        assert_eq!(
+            ability.filter,
+            effects::Filter::player() & effects::Filter::controlled_by(PLAYER)
+        );
         assert_eq!(
             ability.modification,
             effects::Modification::Rule(rules::RuleChange {

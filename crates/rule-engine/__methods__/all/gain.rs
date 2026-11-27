@@ -3,9 +3,10 @@ use crate::effects;
 use crate::keywords;
 use crate::statics;
 
-pub fn gain(all: statics::All, keyword: keywords::Keyword) -> abilities::Continuous {
+pub fn gain(all: &statics::All, keyword: keywords::Keyword) -> abilities::Continuous {
+    let filter: &effects::Filter = all;
     abilities::Continuous {
-        filter: *all,
+        filter: filter.clone(),
         as_long_as: None,
         modification: effects::Modification::Characteristic(effects::Layered::GainKeyword(keyword)),
     }
@@ -13,7 +14,7 @@ pub fn gain(all: statics::All, keyword: keywords::Keyword) -> abilities::Continu
 
 #[cfg(test)]
 mod tests {
-    use crate::CREATURE;
+    use crate::creature;
     use crate::effects;
     use crate::keywords;
     use crate::statics;
@@ -22,8 +23,8 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let ability = gain(statics::all(CREATURE), keywords::vigilance());
-        assert_eq!(ability.filter, CREATURE);
+        let ability = gain(&statics::all(creature()), keywords::vigilance());
+        assert_eq!(ability.filter, creature());
         assert_eq!(
             ability.modification,
             effects::Modification::Characteristic(effects::Layered::GainKeyword(

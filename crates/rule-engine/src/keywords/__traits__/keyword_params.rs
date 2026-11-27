@@ -33,7 +33,7 @@ mod tests {
     use std::hash::Hash;
     use std::hash::Hasher;
 
-    use crate::CREATURE;
+    use crate::creature;
     use crate::keywords;
     use crate::keywords::traits::keyword_params::KeywordParams;
 
@@ -41,8 +41,8 @@ mod tests {
     fn test_usage() {
         let plain: &dyn KeywordParams = &();
         assert!(plain.dyn_eq(&()));
-        let filtered: &dyn KeywordParams = &keywords::EnchantFilter(CREATURE);
-        assert!(filtered.dyn_eq(&keywords::EnchantFilter(CREATURE)));
+        let filtered: &dyn KeywordParams = &keywords::EnchantFilter(creature());
+        assert!(filtered.dyn_eq(&keywords::EnchantFilter(creature())));
         assert!(!plain.dyn_eq(filtered));
         let mut dynamic = DefaultHasher::new();
         plain.dyn_hash(&mut dynamic);
@@ -50,7 +50,7 @@ mod tests {
         let mut dynamic = DefaultHasher::new();
         filtered.dyn_hash(&mut dynamic);
         let mut direct = DefaultHasher::new();
-        keywords::EnchantFilter(CREATURE).hash(&mut direct);
+        keywords::EnchantFilter(creature()).hash(&mut direct);
         assert_eq!(dynamic.finish(), direct.finish());
     }
 }

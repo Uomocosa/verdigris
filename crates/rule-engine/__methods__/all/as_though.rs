@@ -4,12 +4,13 @@ use crate::rules;
 use crate::statics;
 
 pub fn as_though(
-    all: statics::All,
+    all: &statics::All,
     restriction: rules::RestrictionId,
     holder: impl Into<rules::ArgRef>,
 ) -> abilities::Continuous {
+    let filter: &effects::Filter = all;
     abilities::Continuous {
-        filter: *all,
+        filter: filter.clone(),
         as_long_as: None,
         modification: effects::Modification::Rule(rules::RuleChange {
             target: rules::Target::Restriction(restriction),
@@ -22,7 +23,7 @@ pub fn as_though(
 
 #[cfg(test)]
 mod tests {
-    use crate::CREATURE;
+    use crate::creature;
     use crate::effects;
     use crate::rules;
     use crate::statics;
@@ -33,11 +34,11 @@ mod tests {
     #[test]
     fn test_usage() {
         let ability = as_though(
-            statics::all(CREATURE),
+            &statics::all(creature()),
             rules::RestrictionId("test/untapped"),
             testing::TestRule::ATTACKER,
         );
-        assert_eq!(ability.filter, CREATURE);
+        assert_eq!(ability.filter, creature());
         assert_eq!(
             ability.modification,
             effects::Modification::Rule(rules::RuleChange {

@@ -160,10 +160,10 @@ impl CardDefinition {
 
 #[cfg(test)]
 mod tests {
-    use crate::CREATURE;
     use crate::card;
     use crate::cards;
     use crate::cost;
+    use crate::creature;
     use crate::effects;
     use crate::keywords;
     use crate::pt;
@@ -181,10 +181,10 @@ mod tests {
             vec![keywords::indestructible()]
         );
         let spell = cards::instant("Murder", cards::Cost::default())
-            .spell(effects::destroy(effects::target(1, CREATURE)));
+            .spell(effects::destroy(effects::target(1, creature())));
         assert_eq!(
             spell.spell_ability(),
-            Some(&effects::destroy(effects::target(1, CREATURE)))
+            Some(&effects::destroy(effects::target(1, creature())))
         );
     }
 
@@ -193,7 +193,7 @@ mod tests {
         let definition = card! {
             cards::creature("Grizzly Bears", cost![1, G], pt!(2, 2));
             keywords::vigilance(),
-            statics::all(CREATURE).gain(keywords::vigilance()),
+            statics::all(creature()).gain(keywords::vigilance()),
         };
         assert_eq!(
             definition.keywords().collect::<Vec<_>>(),

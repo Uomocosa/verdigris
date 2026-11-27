@@ -4,10 +4,11 @@ use crate::events;
 use crate::rules;
 use crate::statics;
 
-pub fn cant_win_the_game(all: statics::All) -> abilities::Continuous {
+pub fn cant_win_the_game(all: &statics::All) -> abilities::Continuous {
     const ID: rules::RestrictionId = rules::RestrictionId("statics/cant-win-the-game");
+    let filter: &effects::Filter = all;
     abilities::Continuous {
-        filter: *all,
+        filter: filter.clone(),
         as_long_as: None,
         modification: effects::Modification::Rule(rules::RuleChange {
             target: rules::Target::event::<events::WinGame>(),
@@ -31,8 +32,11 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let ability = cant_win_the_game(statics::all(PLAYER));
-        assert_eq!(ability.filter, effects::Filter::player(PLAYER));
+        let ability = cant_win_the_game(&statics::all(PLAYER));
+        assert_eq!(
+            ability.filter,
+            effects::Filter::player() & effects::Filter::controlled_by(PLAYER)
+        );
         assert_eq!(
             ability.modification,
             effects::Modification::Rule(rules::RuleChange {

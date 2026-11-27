@@ -1,5 +1,4 @@
 use crate::cards;
-use crate::effects;
 use crate::rules;
 use crate::turns;
 use crate::zones;
@@ -32,80 +31,6 @@ pub const END_OF_COMBAT: turns::Step = turns::Step::EndOfCombat;
 pub const MAIN_2: turns::Step = turns::Step::PostcombatMain;
 pub const END: turns::Step = turns::Step::End;
 pub const CLEANUP: turns::Step = turns::Step::Cleanup;
-
-pub const CREATURE: effects::Filter = effects::Filter {
-    kind: effects::FilterKind::Creature,
-    controlled_by: None,
-    excluded_color: None,
-    attacking: false,
-    nontoken: false,
-    object: None,
-};
-pub const ENCHANTMENT: effects::Filter = effects::Filter {
-    kind: effects::FilterKind::Enchantment,
-    controlled_by: None,
-    excluded_color: None,
-    attacking: false,
-    nontoken: false,
-    object: None,
-};
-pub const ANY_TARGET: effects::Filter = effects::Filter {
-    kind: effects::FilterKind::AnyTarget,
-    controlled_by: None,
-    excluded_color: None,
-    attacking: false,
-    nontoken: false,
-    object: None,
-};
-
-/// 115.5 A spell or ability on the stack is an illegal target for itself.
-///
-/// 115.2 Only permanents are legal targets for spells and abilities, unless a spell or ability
-/// specifies that it can target an object in another zone or a player, or targets an object that
-/// can't exist on the battlefield, such as a spell.
-pub const SPELL: effects::Filter = effects::Filter {
-    kind: effects::FilterKind::Spell,
-    controlled_by: None,
-    excluded_color: None,
-    attacking: false,
-    nontoken: false,
-    object: None,
-};
-pub const CREATURE_SPELL: effects::Filter = effects::Filter {
-    kind: effects::FilterKind::CreatureSpell,
-    controlled_by: None,
-    excluded_color: None,
-    attacking: false,
-    nontoken: false,
-    object: None,
-};
-pub const NONCREATURE_SPELL: effects::Filter = effects::Filter {
-    kind: effects::FilterKind::NoncreatureSpell,
-    controlled_by: None,
-    excluded_color: None,
-    attacking: false,
-    nontoken: false,
-    object: None,
-};
-pub const INSTANT_SPELL: effects::Filter = effects::Filter {
-    kind: effects::FilterKind::InstantSpell,
-    controlled_by: None,
-    excluded_color: None,
-    attacking: false,
-    nontoken: false,
-    object: None,
-};
-
-/// 105.1 There are five colors in the Magic game: white, blue, black, red, and green.
-/// 202.2 An object is the color or colors of the mana symbols in its mana cost.
-pub const NONBLACK_CREATURE: effects::Filter = effects::Filter {
-    kind: effects::FilterKind::Creature,
-    controlled_by: None,
-    excluded_color: Some(cards::Color::Black),
-    attacking: false,
-    nontoken: false,
-    object: None,
-};
 
 /// The source of “it” in printed text such as “it gets +2/+0”: the ability's own source.
 pub const THIS: rules::This = rules::This;
