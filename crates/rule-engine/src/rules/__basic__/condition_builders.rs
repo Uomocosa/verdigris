@@ -23,6 +23,36 @@ pub const fn card_type(card: cards::CardType) -> rules::Condition {
 }
 
 #[must_use]
+pub const fn color(color: cards::Color) -> rules::Condition {
+    rules::Condition::Color(color)
+}
+
+#[must_use]
+pub const fn subtype(subtype: cards::SubtypeId) -> rules::Condition {
+    rules::Condition::Subtype(subtype)
+}
+
+#[must_use]
+pub const fn supertype(supertype: cards::Supertype) -> rules::Condition {
+    rules::Condition::Supertype(supertype)
+}
+
+#[must_use]
+pub const fn spell() -> rules::Condition {
+    rules::Condition::Spell
+}
+
+#[must_use]
+pub fn controlled_by(players: impl Into<rules::Players>) -> rules::Condition {
+    rules::Condition::ControlledBy(players.into())
+}
+
+#[must_use]
+pub const fn enchanted() -> rules::Condition {
+    rules::Condition::Enchanted
+}
+
+#[must_use]
 pub const fn power() -> rules::Characteristic {
     rules::Characteristic::Power
 }

@@ -28,6 +28,12 @@ pub fn eval<E: EventArgs>(
         }
         rules::Condition::Is(reference) => entity(reference) == viewpoint,
         rules::Condition::CardType(card) => answers.eval_card_type(*card, viewpoint),
+        rules::Condition::Color(color) => answers.eval_color(*color, viewpoint),
+        rules::Condition::Subtype(subtype) => answers.eval_subtype(*subtype, viewpoint),
+        rules::Condition::Supertype(supertype) => answers.eval_supertype(*supertype, viewpoint),
+        rules::Condition::Spell => answers.eval_spell(viewpoint),
+        rules::Condition::ControlledBy(set) => answers.eval_controlled_by(*set, event, viewpoint),
+        rules::Condition::Enchanted => answers.eval_enchanted(event, viewpoint),
         rules::Condition::Characteristic(characteristic, comparison) => {
             answers.eval_characteristic(*characteristic, *comparison, viewpoint)
         }

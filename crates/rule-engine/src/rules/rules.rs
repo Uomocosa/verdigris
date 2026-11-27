@@ -136,6 +136,39 @@ impl Rules<'_, '_> {
 
     pub(crate) fn eval_card_type(&self, card: cards::CardType, viewpoint: Option<Entity>) -> bool {}
 
+    pub(crate) fn eval_color(&self, color: cards::Color, viewpoint: Option<Entity>) -> bool {}
+
+    pub(crate) fn eval_subtype(
+        &self,
+        subtype: cards::SubtypeId,
+        viewpoint: Option<Entity>,
+    ) -> bool {
+    }
+
+    pub(crate) fn eval_supertype(
+        &self,
+        supertype: cards::Supertype,
+        viewpoint: Option<Entity>,
+    ) -> bool {
+    }
+
+    pub(crate) fn eval_spell(&self, viewpoint: Option<Entity>) -> bool {}
+
+    pub(crate) fn eval_controlled_by<E: rules::traits::event_args::EventArgs>(
+        &self,
+        set: rules::Players,
+        event: &E,
+        viewpoint: Option<Entity>,
+    ) -> bool {
+    }
+
+    pub(crate) fn eval_enchanted<E: rules::traits::event_args::EventArgs>(
+        &self,
+        event: &E,
+        viewpoint: Option<Entity>,
+    ) -> bool {
+    }
+
     pub(crate) fn eval_characteristic(
         &self,
         characteristic: rules::Characteristic,
