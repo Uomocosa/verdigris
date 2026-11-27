@@ -61,7 +61,7 @@ impl TestPlayerActions {
     pub fn concede(self) -> Self { self.act(actions::Action::Concede) }
 
     #[must_use]
-    pub fn play_land(self, land: testing::TestCard) -> Self { self.act(actions::Action::PlayLand(land.into())) }
+    pub fn play_land(self, land: testing::TestCard) -> Self { self.act(actions::Action::Play(land.into())) }
 
     #[must_use]
     pub fn choose_defending_player(self, defender: testing::TestPlayer) -> Self { self.act(actions::Action::ChooseDefendingPlayer(defender.id)) }

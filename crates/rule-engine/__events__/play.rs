@@ -2,8 +2,6 @@ use atomic_delegate_macros::atomic_delegate;
 use bevy::prelude::Entity;
 use verdigris_event_derive::EventArgs;
 
-use crate::players;
-
 use crate::rules;
 use crate::rules::traits::event::Event;
 
@@ -16,17 +14,15 @@ pub const OWNS: rules::RestrictionId = rules::RestrictionId("305.1/owns");
 pub const OWN_TURN: rules::RestrictionId = rules::RestrictionId("305.3/own-turn");
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EventArgs)]
-pub struct PlayLand {
+pub struct Play {
     #[arg]
-    pub land: Entity,
-    #[arg]
-    pub player: players::PlayerId,
+    pub card: Entity,
 }
 
-impl Event for PlayLand {
-    const ID: rules::EventId = rules::EventId("305.1/play-land");
+impl Event for Play {
+    const ID: rules::EventId = rules::EventId("305.1/play");
 
-    #[atomic_delegate(PlayLand, Event)]
+    #[atomic_delegate(Play, Event)]
     fn restrictions() -> Vec<rules::Restriction> {}
 }
 
@@ -45,27 +41,27 @@ mod tests {
     use super::OWN_TURN;
     use super::OWNS;
     use super::PRIORITY;
-    use super::PlayLand;
+    use super::Play;
 
     #[test]
     fn test_usage() {
-        assert_eq!(PlayLand::ID, rules::EventId("305.1/play-land"));
-        let restrictions = PlayLand::restrictions();
+        assert_eq!(Play::ID, rules::EventId("305.1/play"));
+        let restrictions = Play::restrictions();
         assert_eq!(restrictions.len(), 7);
         assert_eq!(restrictions[0].id, PRIORITY);
         assert_eq!(
             restrictions[0].condition,
-            rules::has_priority(PlayLand::PLAYER)
+            rules::has_priority(Play::CARD.controller())
         );
         assert_eq!(restrictions[1].id, LAND_CARD);
         assert_eq!(
             restrictions[1].condition,
-            rules::card_type(cards::CardType::Land).of(PlayLand::LAND)
+            rules::card_type(cards::CardType::Land).of(Play::CARD)
         );
         assert_eq!(restrictions[2].id, FROM_HAND);
         assert_eq!(
             restrictions[2].condition,
-            rules::in_zone(HAND, PlayLand::PLAYER).of(PlayLand::LAND)
+            rules::in_zone(HAND, Play::CARD.controller()).of(Play::CARD)
         );
         assert_eq!(restrictions[3].id, MAIN_PHASE);
         assert_eq!(restrictions[3].condition, rules::main_phase());
@@ -74,27 +70,27 @@ mod tests {
         assert_eq!(restrictions[5].id, OWNS);
         assert_eq!(
             restrictions[5].condition,
-            rules::points_to::<cards::Owner>(PlayLand::PLAYER).of(PlayLand::LAND)
+            rules::points_to::<cards::Owner>(Play::CARD.controller()).of(Play::CARD)
         );
         assert_eq!(restrictions[6].id, OWN_TURN);
         assert_eq!(
             restrictions[6].condition,
-            rules::active_player(PlayLand::PLAYER)
+            rules::active_player(Play::CARD.controller())
         );
         assert!(restrictions[6].unwaivable);
         assert!(
-            PlayLand::restrictions()
+            Play::restrictions()
                 .iter()
                 .filter(|restriction| restriction.id != OWN_TURN)
                 .all(|restriction| !restriction.unwaivable)
         );
-        assert_eq!(PlayLand::args(), &[PlayLand::LAND, PlayLand::PLAYER,]);
+        assert_eq!(Play::args(), &[Play::CARD,]);
     }
 
     #[test]
     fn restriction_rule_numbers_occur_in_comprehensive_rules() {
         const RULES_TEXT: &str = include_str!("../../../docs/MagicCompRules-20250919.txt");
-        for restriction in PlayLand::restrictions() {
+        for restriction in Play::restrictions() {
             let id: &str = *restriction.id;
             if id.starts_with("test/") || id.starts_with("statics/") || id.starts_with("glossary/")
             {

@@ -174,12 +174,12 @@ mod tests {
         let (mut game, [p1, ..]) = MockGame::new([P1.hand([LEYLINE_OF_ANTICIPATION, FOREST]), P2]);
         let [forest] = game.player(p1).cards_in(HAND).exactly::<1>(FOREST)?;
 
-        game.act(p1, actions::Action::PlayLand(forest.into()));
+        game.act(p1, actions::Action::Play(forest.into()));
 
         assert_eq!(
             game.last_rejection(),
-            Some(&actions::Rejected::CannotPlayLand {
-                land: forest.into()
+            Some(&actions::Rejected::CannotPlay {
+                card: forest.into()
             })
         );
         assert!(game.card(forest).is_in(HAND).of(p1));

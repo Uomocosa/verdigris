@@ -5,18 +5,20 @@ use crate::rules;
 
 pub fn event_restrictions() -> Vec<rules::Restriction> {
     vec![
-        events::play_land::PRIORITY.restriction(rules::has_priority(events::PlayLand::PLAYER)),
-        events::play_land::LAND_CARD
-            .restriction(rules::card_type(cards::CardType::Land).of(events::PlayLand::LAND)),
-        events::play_land::FROM_HAND
-            .restriction(rules::in_zone(HAND, events::PlayLand::PLAYER).of(events::PlayLand::LAND)),
-        events::play_land::MAIN_PHASE.restriction(rules::main_phase()),
-        events::play_land::EMPTY_STACK.restriction(rules::stack_empty()),
-        events::play_land::OWNS.restriction(
-            rules::points_to::<cards::Owner>(events::PlayLand::PLAYER).of(events::PlayLand::LAND),
+        events::play::PRIORITY.restriction(rules::has_priority(events::Play::CARD.controller())),
+        events::play::LAND_CARD
+            .restriction(rules::card_type(cards::CardType::Land).of(events::Play::CARD)),
+        events::play::FROM_HAND.restriction(
+            rules::in_zone(HAND, events::Play::CARD.controller()).of(events::Play::CARD),
         ),
-        events::play_land::OWN_TURN
-            .restriction(rules::active_player(events::PlayLand::PLAYER))
+        events::play::MAIN_PHASE.restriction(rules::main_phase()),
+        events::play::EMPTY_STACK.restriction(rules::stack_empty()),
+        events::play::OWNS.restriction(
+            rules::points_to::<cards::Owner>(events::Play::CARD.controller())
+                .of(events::Play::CARD),
+        ),
+        events::play::OWN_TURN
+            .restriction(rules::active_player(events::Play::CARD.controller()))
             .unwaivable(),
     ]
 }
@@ -37,17 +39,17 @@ mod tests {
         assert_eq!(restrictions[0].id, rules::RestrictionId("305.1/priority"));
         assert_eq!(
             restrictions[0].condition,
-            rules::has_priority(events::PlayLand::PLAYER)
+            rules::has_priority(events::Play::CARD.controller())
         );
         assert_eq!(restrictions[1].id, rules::RestrictionId("305.1/land-card"));
         assert_eq!(
             restrictions[1].condition,
-            rules::card_type(cards::CardType::Land).of(events::PlayLand::LAND)
+            rules::card_type(cards::CardType::Land).of(events::Play::CARD)
         );
         assert_eq!(restrictions[2].id, rules::RestrictionId("305.1/from-hand"));
         assert_eq!(
             restrictions[2].condition,
-            rules::in_zone(HAND, events::PlayLand::PLAYER).of(events::PlayLand::LAND)
+            rules::in_zone(HAND, events::Play::CARD.controller()).of(events::Play::CARD)
         );
         assert_eq!(restrictions[3].id, rules::RestrictionId("305.1/main-phase"));
         assert_eq!(restrictions[3].condition, rules::main_phase());
@@ -59,12 +61,13 @@ mod tests {
         assert_eq!(restrictions[5].id, rules::RestrictionId("305.1/owns"));
         assert_eq!(
             restrictions[5].condition,
-            rules::points_to::<cards::Owner>(events::PlayLand::PLAYER).of(events::PlayLand::LAND)
+            rules::points_to::<cards::Owner>(events::Play::CARD.controller())
+                .of(events::Play::CARD)
         );
         assert_eq!(restrictions[6].id, rules::RestrictionId("305.3/own-turn"));
         assert_eq!(
             restrictions[6].condition,
-            rules::active_player(events::PlayLand::PLAYER)
+            rules::active_player(events::Play::CARD.controller())
         );
         assert!(restrictions[6].unwaivable);
     }

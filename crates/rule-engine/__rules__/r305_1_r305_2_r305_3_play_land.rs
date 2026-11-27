@@ -1,8 +1,11 @@
+use bevy::ecs::schedule::{IntoScheduleConfigs, ScheduleConfigs};
+use bevy::ecs::system::ScheduleSystem;
 use bevy::prelude::{Commands, MessageReader, MessageWriter, Res};
 
 use crate::Attempt;
 use crate::BATTLEFIELD;
 use crate::actions;
+use crate::cards;
 use crate::events;
 use crate::players;
 use crate::rules;
@@ -26,7 +29,20 @@ use crate::turns;
 /// battlefield from the zone it was in (usually that player’s hand). By default, a player can take
 /// this action only once during each of their turns. A player can take this action any time they
 /// have priority and the stack is empty during a main phase of their turn. See rule 305, “Lands.”
-pub fn r305_1_r305_2_r305_3_play_land(
+pub fn r305_1_r305_2_r305_3_play_land() -> ScheduleConfigs<ScheduleSystem> {
+    (propose_play, check_play).chain()
+}
+
+fn propose_play(mut actions: MessageReader<actions::PlayerAction>, mut commands: Commands) {
+    for action in actions.read() {
+        let actions::Action::Play(card) = &action.action else {
+            continue;
+        };
+        commands.entity(*card).insert(cards::Controller(action.player));
+    }
+}
+
+fn check_play(
     mut actions: MessageReader<actions::PlayerAction>,
     mut rejected: MessageWriter<actions::Rejected>,
     mut entering: MessageWriter<Attempt<events::EnterBattlefield>>,
@@ -36,16 +52,13 @@ pub fn r305_1_r305_2_r305_3_play_land(
 ) {
     let state = state.into_inner();
     for action in actions.read() {
-        let actions::Action::PlayLand(land) = &action.action else {
+        let actions::Action::Play(card) = &action.action else {
             continue;
         };
-        let land = *land;
-        let is_legal = answers.legal::<events::PlayLand>(&events::PlayLand {
-            land,
-            player: action.player,
-        });
-        if !is_legal {
-            rejected.write(actions::Rejected::CannotPlayLand { land });
+        let card = *card;
+        if !answers.legal::<events::Play>(&events::Play { card }) {
+            commands.entity(card).remove::<cards::Controller>();
+            rejected.write(actions::Rejected::CannotPlay { card });
             continue;
         }
         let Ok(record) = answers
@@ -53,18 +66,21 @@ pub fn r305_1_r305_2_r305_3_play_land(
             .get(*action.player)
             .map(|entity| entity.get::<players::LandsPlayedThisTurn>().copied())
         else {
-            rejected.write(actions::Rejected::CannotPlayLand { land });
+            commands.entity(card).remove::<cards::Controller>();
+            rejected.write(actions::Rejected::CannotPlay { card });
             continue;
         };
         let Some(mut record) = record else {
-            rejected.write(actions::Rejected::CannotPlayLand { land });
+            commands.entity(card).remove::<cards::Controller>();
+            rejected.write(actions::Rejected::CannotPlay { card });
             continue;
         };
         if !answers
             .value::<rules::LandPlays>(*action.player)
             .allows(u32::from(record.count_for(state.turn.number)))
         {
-            rejected.write(actions::Rejected::CannotPlayLand { land });
+            commands.entity(card).remove::<cards::Controller>();
+            rejected.write(actions::Rejected::CannotPlay { card });
             continue;
         }
         record.record_play(state.turn.number);
@@ -72,7 +88,7 @@ pub fn r305_1_r305_2_r305_3_play_land(
         if answers.zones.find(BATTLEFIELD, Some(action.player)).is_some() {
             entering.write(Attempt(events::EnterBattlefield::from_controller(
                 action.player,
-                land,
+                card,
             )));
         }
     }
@@ -104,13 +120,13 @@ mod tests {
         let [forest_1, forest_2] = game.player(p1).cards_in(HAND).exactly::<2>(FOREST)?;
 
         game.play([p1.play_land(forest_1)])?;
-        game.act(p1, actions::Action::PlayLand(forest_2.into()));
+        game.act(p1, actions::Action::Play(forest_2.into()));
 
         assert!(game.moved(forest_1).to(BATTLEFIELD).of(p1));
         assert_eq!(
             game.last_rejection(),
-            Some(&actions::Rejected::CannotPlayLand {
-                land: forest_2.into()
+            Some(&actions::Rejected::CannotPlay {
+                card: forest_2.into()
             })
         );
         assert!(game.card(forest_2).is_in(HAND).of(p1));
@@ -129,15 +145,15 @@ mod tests {
         game.play([p1.play_land(forest_1)])?;
         game.play([p1.play_land(forest_2)])?;
         game.play([p1.play_land(forest_3)])?;
-        game.act(p1, actions::Action::PlayLand(forest_4.into()));
+        game.act(p1, actions::Action::Play(forest_4.into()));
 
         assert!(game.moved(forest_1).to(BATTLEFIELD).of(p1));
         assert!(game.moved(forest_2).to(BATTLEFIELD).of(p1));
         assert!(game.moved(forest_3).to(BATTLEFIELD).of(p1));
         assert_eq!(
             game.last_rejection(),
-            Some(&actions::Rejected::CannotPlayLand {
-                land: forest_4.into()
+            Some(&actions::Rejected::CannotPlay {
+                card: forest_4.into()
             })
         );
         assert!(game.card(forest_4).is_in(HAND).of(p1));
@@ -152,12 +168,12 @@ mod tests {
         let [forest] = game.player(p1).cards_in(HAND).exactly::<1>(FOREST)?;
         game.play([p2.pass_priority()])?;
 
-        game.act(p1, actions::Action::PlayLand(forest.into()));
+        game.act(p1, actions::Action::Play(forest.into()));
 
         assert_eq!(
             game.last_rejection(),
-            Some(&actions::Rejected::CannotPlayLand {
-                land: forest.into()
+            Some(&actions::Rejected::CannotPlay {
+                card: forest.into()
             })
         );
         assert!(game.card(forest).is_in(HAND).of(p1));
@@ -201,12 +217,12 @@ mod tests {
         assert!(game.moved(forest).to(GRAVEYARD).of(p1));
 
         let [forest_buried] = game.player(p1).cards_in(GRAVEYARD).exactly::<1>(FOREST)?;
-        game.act(p1, actions::Action::PlayLand(forest_buried.into()));
+        game.act(p1, actions::Action::Play(forest_buried.into()));
 
         assert_eq!(
             game.last_rejection(),
-            Some(&actions::Rejected::CannotPlayLand {
-                land: forest_buried.into()
+            Some(&actions::Rejected::CannotPlay {
+                card: forest_buried.into()
             })
         );
         assert!(game.moved(forest).to(GRAVEYARD).of(p1));
@@ -230,12 +246,12 @@ mod tests {
         assert!(game.moved(forest).to(GRAVEYARD).of(p2));
 
         let [forest_buried] = game.player(p2).cards_in(GRAVEYARD).exactly::<1>(FOREST)?;
-        game.act(p1, actions::Action::PlayLand(forest_buried.into()));
+        game.act(p1, actions::Action::Play(forest_buried.into()));
 
         assert_eq!(
             game.last_rejection(),
-            Some(&actions::Rejected::CannotPlayLand {
-                land: forest_buried.into()
+            Some(&actions::Rejected::CannotPlay {
+                card: forest_buried.into()
             })
         );
         assert!(game.moved(forest).to(GRAVEYARD).of(p2));
@@ -261,12 +277,12 @@ mod tests {
         game.play([p1.end_turn(), p2.end_turn()])?;
         assert!(game.moved(forest).to(GRAVEYARD).of(p1));
 
-        game.act(p1, actions::Action::PlayLand(forest_buried.into()));
+        game.act(p1, actions::Action::Play(forest_buried.into()));
 
         assert_eq!(
             game.last_rejection(),
-            Some(&actions::Rejected::CannotPlayLand {
-                land: forest_buried.into()
+            Some(&actions::Rejected::CannotPlay {
+                card: forest_buried.into()
             })
         );
         assert!(game.moved(forest).to(GRAVEYARD).of(p1));

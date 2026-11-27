@@ -12,7 +12,7 @@ pub enum Action {
         produces: cards::ManaType,
     },
     Cast(Entity),
-    PlayLand(Entity),
+    Play(Entity),
     ChooseTargets(Vec<Entity>),
     ChooseMay(Vec<Entity>),
     ChooseDiscard(Vec<Entity>),

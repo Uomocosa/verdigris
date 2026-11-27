@@ -65,10 +65,12 @@ fn check_cast(
             continue;
         }
         let Some(stack) = answers.zones.find(STACK, None) else {
+            commands.entity(spell).remove::<cards::Controller>();
             rejected.write(actions::Rejected::CannotCast { spell });
             continue;
         };
         let Ok((definition, owner, has_token)) = spells.get(spell) else {
+            commands.entity(spell).remove::<cards::Controller>();
             rejected.write(actions::Rejected::CannotCast { spell });
             continue;
         };

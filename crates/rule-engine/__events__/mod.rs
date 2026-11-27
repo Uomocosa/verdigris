@@ -85,8 +85,8 @@ pub use declare_attacker::DeclareAttacker;
 pub mod declare_attackers;
 pub use declare_attackers::DeclareAttackers;
 
-pub mod play_land;
-pub use play_land::PlayLand;
+pub mod play;
+pub use play::Play;
 
 mod put_into_graveyard;
 pub use put_into_graveyard::PutIntoGraveyard;
