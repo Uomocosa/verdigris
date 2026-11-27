@@ -58,16 +58,27 @@ mod tests {
             ]),
         ]);
         let [tome_scour] = game.player(p1).cards_in(HAND).exactly::<1>(TOME_SCOUR)?;
-        let [bears] = game.player(p2).cards_in(LIBRARY).exactly::<1>(GRIZZLY_BEARS)?;
-        let [corpse] = game.player(p2).cards_in(LIBRARY).exactly::<1>(WALKING_CORPSE)?;
-        let [wolf] = game.player(p2).cards_in(LIBRARY).exactly::<1>(WATCHWOLF)?;
-        let [rats] = game.player(p2).cards_in(LIBRARY).exactly::<1>(TYPHOID_RATS)?;
-        let [drake] = game.player(p2).cards_in(LIBRARY).exactly::<1>(WIND_DRAKE)?;
+        let [_bears] = game.player(p2).cards_in(LIBRARY).exactly::<1>(GRIZZLY_BEARS)?;
+        let [_corpse] = game.player(p2).cards_in(LIBRARY).exactly::<1>(WALKING_CORPSE)?;
+        let [_wolf] = game.player(p2).cards_in(LIBRARY).exactly::<1>(WATCHWOLF)?;
+        let [_rats] = game.player(p2).cards_in(LIBRARY).exactly::<1>(TYPHOID_RATS)?;
+        let [_drake] = game.player(p2).cards_in(LIBRARY).exactly::<1>(WIND_DRAKE)?;
         game.play([
             p1.cast(tome_scour).targeting(p2).pass_priority(),
             p2.pass_priority(),
         ])?;
-        game.play([p2.arrange_graveyard([drake, rats, wolf, corpse, bears])])?;
+        let [bears_buried] = game.player(p2).cards_in(GRAVEYARD).exactly::<1>(GRIZZLY_BEARS)?;
+        let [corpse_buried] = game.player(p2).cards_in(GRAVEYARD).exactly::<1>(WALKING_CORPSE)?;
+        let [wolf_buried] = game.player(p2).cards_in(GRAVEYARD).exactly::<1>(WATCHWOLF)?;
+        let [rats_buried] = game.player(p2).cards_in(GRAVEYARD).exactly::<1>(TYPHOID_RATS)?;
+        let [drake_buried] = game.player(p2).cards_in(GRAVEYARD).exactly::<1>(WIND_DRAKE)?;
+        game.play([p2.arrange_graveyard([
+            drake_buried,
+            rats_buried,
+            wolf_buried,
+            corpse_buried,
+            bears_buried,
+        ])])?;
 
         assert_eq!(game.player(p2).cards_in(GRAVEYARD).count(), 5);
         assert_eq!(game.player(p2).cards_in(LIBRARY).count(), 1);
@@ -87,13 +98,15 @@ mod tests {
             P2.library([GRIZZLY_BEARS, FOREST]),
         ]);
         let [tome_scour] = game.player(p1).cards_in(HAND).exactly::<1>(TOME_SCOUR)?;
-        let [bears] = game.player(p2).cards_in(LIBRARY).exactly::<1>(GRIZZLY_BEARS)?;
-        let [forest] = game.player(p2).cards_in(LIBRARY).exactly::<1>(FOREST)?;
+        let [_bears] = game.player(p2).cards_in(LIBRARY).exactly::<1>(GRIZZLY_BEARS)?;
+        let [_forest] = game.player(p2).cards_in(LIBRARY).exactly::<1>(FOREST)?;
         game.play([
             p1.cast(tome_scour).targeting(p2).pass_priority(),
             p2.pass_priority(),
         ])?;
-        game.play([p2.arrange_graveyard([forest, bears])])?;
+        let [bears_buried] = game.player(p2).cards_in(GRAVEYARD).exactly::<1>(GRIZZLY_BEARS)?;
+        let [forest_buried] = game.player(p2).cards_in(GRAVEYARD).exactly::<1>(FOREST)?;
+        game.play([p2.arrange_graveyard([forest_buried, bears_buried])])?;
 
         assert_eq!(game.player(p2).cards_in(GRAVEYARD).count(), 2);
         assert_eq!(game.player(p2).cards_in(LIBRARY).count(), 0);

@@ -1,5 +1,5 @@
 use crate::events;
-use bevy::prelude::{Commands, MessageReader, Query, ResMut};
+use bevy::prelude::{Commands, Has, MessageReader, Query, ResMut};
 
 use crate::EXILE;
 use crate::Resolve;
@@ -13,17 +13,24 @@ pub fn r701_13a_exile(
     mut exiles: MessageReader<Resolve<events::Exile>>,
     mut commands: Commands,
     mut state_based_actions_performed: ResMut<StateBasedActionsPerformed>,
-    owners: Query<&cards::Owner>,
+    cards: Query<(&cards::CardDefinition, &cards::Owner, Has<cards::Token>)>,
     zones: zones::ZoneLookup,
 ) {
     for event in exiles.read() {
-        let Ok(owner) = owners.get(event.object) else {
+        let Ok((definition, owner, has_token)) = cards.get(event.object) else {
             continue;
         };
         let Some(exile) = zones.find(EXILE, Some(**owner)) else {
             continue;
         };
-        commands.entity(event.object).insert(zones::InZone(exile));
+        zones::move_object(
+            &mut commands,
+            event.object,
+            definition.clone(),
+            *owner,
+            has_token.then_some(cards::Token),
+            exile,
+        );
         **state_based_actions_performed = true;
     }
 }
@@ -35,6 +42,7 @@ mod tests {
     use crate::mana;
     use crate::testing::*;
     use crate::turns;
+    use crate::zones;
     use crate::{BATTLEFIELD, CLEANUP, GRAVEYARD, HAND};
 
     #[test]
@@ -57,7 +65,10 @@ mod tests {
         assert!(!game.card(knight_2).is_in(BATTLEFIELD).of(p1));
         assert!(!game.card(knight_3).is_in(BATTLEFIELD).of(p1));
         assert!(!game.card(knight_1).is_in(GRAVEYARD).of(p1));
-        assert!(game.app.world().get_entity(Entity::from(knight_1)).is_err());
+        let exile_record = game
+            .get::<zones::LeftZone>(Entity::from(knight_1))
+            .expect("exiled token leaves a record");
+        assert!(game.app.world().get_entity(*exile_record).is_err());
         Ok(())
     }
 }

@@ -95,7 +95,7 @@ mod tests {
         game.play([p1.keep_legendary(isamaru_1)])?;
 
         assert!(game.card(isamaru_1).is_in(BATTLEFIELD).of(p1));
-        assert!(game.card(isamaru_2).is_in(GRAVEYARD).of(p1));
+        assert!(game.moved(isamaru_2).to(GRAVEYARD).of(p1));
         assert!(game.app.world().resource::<actions::PendingChoice>().is_none());
         Ok(())
     }
@@ -117,7 +117,7 @@ mod tests {
         game.play([p1.keep_legendary(isamaru_1)])?;
 
         assert!(game.card(isamaru_1).is_in(BATTLEFIELD).of(p1));
-        assert!(game.card(isamaru_2).is_in(GRAVEYARD).of(p1));
+        assert!(game.moved(isamaru_2).to(GRAVEYARD).of(p1));
         Ok(())
     }
 }

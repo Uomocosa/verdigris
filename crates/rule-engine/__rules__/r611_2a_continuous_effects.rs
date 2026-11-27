@@ -72,7 +72,7 @@ mod tests {
             p2.pass_priority(),
         ])?;
         assert_eq!(game.pt(bears), Some(crate::pt!(5, 5)));
-        assert!(game.card(growth).is_in(GRAVEYARD).of(p1));
+        assert!(game.moved(growth).to(GRAVEYARD).of(p1));
         Ok(())
     }
 

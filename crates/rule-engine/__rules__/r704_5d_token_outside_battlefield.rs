@@ -27,6 +27,7 @@ mod tests {
 
     use crate::mana;
     use crate::testing::*;
+    use crate::zones;
     use crate::{BATTLEFIELD, GRAVEYARD, HAND};
 
     #[test]
@@ -49,8 +50,11 @@ mod tests {
         assert!(game.card(survivor).is_in(BATTLEFIELD).of(p1));
         assert!(!game.card(soldier).is_in(BATTLEFIELD).of(p1));
         assert!(!game.card(soldier).is_in(GRAVEYARD).of(p1));
-        assert!(game.app.world().get_entity(Entity::from(soldier)).is_err());
-        assert!(game.card(bolt).is_in(GRAVEYARD).of(p1));
+        let burial_record = game
+            .get::<zones::LeftZone>(Entity::from(soldier))
+            .expect("buried token leaves a record");
+        assert!(game.app.world().get_entity(*burial_record).is_err());
+        assert!(game.moved(bolt).to(GRAVEYARD).of(p1));
         Ok(())
     }
 }

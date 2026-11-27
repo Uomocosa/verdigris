@@ -347,9 +347,11 @@ mod tests {
             p1.cast(blade).targeting(scout).pass_priority(),
             p2.pass_priority(),
         ])?;
-        game.play([p1.arrange_graveyard([scout, blade])])?;
-        assert!(game.card(scout).is_in(GRAVEYARD).of(p1));
-        assert!(game.card(blade).is_in(GRAVEYARD).of(p1));
+        let [scout_buried] = game.player(p1).cards_in(GRAVEYARD).exactly::<1>(GLADECOVER_SCOUT)?;
+        let [blade_buried] = game.player(p1).cards_in(GRAVEYARD).exactly::<1>(DOOM_BLADE)?;
+        game.play([p1.arrange_graveyard([scout_buried, blade_buried])])?;
+        assert!(game.moved(scout).to(GRAVEYARD).of(p1));
+        assert!(game.moved(blade).to(GRAVEYARD).of(p1));
         Ok(())
     }
 

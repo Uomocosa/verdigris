@@ -1,5 +1,5 @@
 use crate::events;
-use bevy::prelude::{Commands, MessageReader, Query, ResMut};
+use bevy::prelude::{Commands, Has, MessageReader, Query, ResMut};
 
 use crate::GRAVEYARD;
 use crate::Resolve;
@@ -14,17 +14,24 @@ pub fn r404_1_put_into_graveyard(
     mut proceeds: MessageReader<Resolve<events::PutIntoGraveyard>>,
     mut commands: Commands,
     mut state_based_actions_performed: ResMut<StateBasedActionsPerformed>,
-    owners: Query<&cards::Owner>,
+    cards: Query<(&cards::CardDefinition, &cards::Owner, Has<cards::Token>)>,
     zones: zones::ZoneLookup,
 ) {
     for event in proceeds.read() {
-        let Ok(owner) = owners.get(event.object) else {
+        let Ok((definition, owner, has_token)) = cards.get(event.object) else {
             continue;
         };
         let Some(graveyard) = zones.find(GRAVEYARD, Some(**owner)) else {
             continue;
         };
-        commands.entity(event.object).insert(zones::InZone(graveyard));
+        zones::move_object(
+            &mut commands,
+            event.object,
+            definition.clone(),
+            *owner,
+            has_token.then_some(cards::Token),
+            graveyard,
+        );
         **state_based_actions_performed = true;
     }
 }
@@ -53,7 +60,7 @@ mod tests {
             p1.pass_priority(),
         ])?;
 
-        assert!(game.card(strength).is_in(GRAVEYARD).of(p1));
+        assert!(game.moved(strength).to(GRAVEYARD).of(p1));
         Ok(())
     }
 }

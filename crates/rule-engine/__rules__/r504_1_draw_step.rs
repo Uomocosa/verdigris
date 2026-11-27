@@ -36,7 +36,7 @@ mod tests {
 
         game.play([p1.pass_priority(), p2.pass_priority(), p1.pass_priority()])?;
 
-        assert!(game.card(bears).is_in(HAND).of(p1));
+        assert!(game.moved(bears).to(HAND).of(p1));
         Ok(())
     }
 }

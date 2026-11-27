@@ -45,12 +45,12 @@ mod tests {
 
         game.act(p1, actions::Action::PassPriority);
 
-        assert!(game.card(purge).is_in(GRAVEYARD).of(p1));
-        assert!(game.card(leyline).is_in(GRAVEYARD).of(p1));
+        assert!(game.moved(purge).to(GRAVEYARD).of(p1));
+        assert!(game.moved(leyline).to(GRAVEYARD).of(p1));
 
         game.act(p1, actions::Action::ChooseMay(vec![leyline.into()]));
 
-        assert!(game.card(leyline).is_in(GRAVEYARD).of(p1));
+        assert!(game.moved(leyline).to(GRAVEYARD).of(p1));
         assert!(!game.card(leyline).is_in(BATTLEFIELD).of(p1));
         Ok(())
     }
@@ -68,8 +68,8 @@ mod tests {
         );
 
         assert_eq!(game.priority().holder, None);
-        assert!(game.card(purge).is_in(GRAVEYARD).of(p1));
-        assert!(game.card(leyline).is_in(GRAVEYARD).of(p1));
+        assert!(game.moved(purge).to(GRAVEYARD).of(p1));
+        assert!(game.moved(leyline).to(GRAVEYARD).of(p1));
 
         game.act(p2, actions::Action::PassPriority);
 
@@ -77,10 +77,13 @@ mod tests {
             game.last_rejection(),
             Some(&actions::Rejected::NoPriority { player: p2.id })
         );
-        assert!(game.card(purge).is_in(GRAVEYARD).of(p1));
-        assert!(game.card(leyline).is_in(GRAVEYARD).of(p1));
+        assert!(game.moved(purge).to(GRAVEYARD).of(p1));
+        assert!(game.moved(leyline).to(GRAVEYARD).of(p1));
         assert!(!game.card(leyline).is_in(BATTLEFIELD).of(p1));
-        game.play([p1.arrange_graveyard([purge, leyline])])?;
+        let [purge_buried] = game.player(p1).cards_in(GRAVEYARD).exactly::<1>(TEST_MAY_PURGE)?;
+        let [leyline_buried] =
+            game.player(p1).cards_in(GRAVEYARD).exactly::<1>(LEYLINE_OF_ANTICIPATION)?;
+        game.play([p1.arrange_graveyard([purge_buried, leyline_buried])])?;
         assert_eq!(game.priority_player(), Some(p1.id));
 
         let (mut game, [p1, p2]) =
@@ -103,7 +106,7 @@ mod tests {
             Some(&actions::Rejected::NoPriority { player: p2.id })
         );
         assert!(game.card(leyline).is_in(BATTLEFIELD).of(p1));
-        assert!(game.card(purge).is_in(GRAVEYARD).of(p1));
+        assert!(game.moved(purge).to(GRAVEYARD).of(p1));
         assert_eq!(game.priority_player(), Some(p1.id));
         Ok(())
     }
@@ -126,7 +129,7 @@ mod tests {
 
         game.act(p1, actions::Action::ChooseDiscard(vec![bears.into()]));
 
-        assert!(game.card(bears).is_in(GRAVEYARD).of(p1));
+        assert!(game.moved(bears).to(GRAVEYARD).of(p1));
         assert_eq!(game.life(p2), 20);
 
         game.act(p2, actions::Action::PassPriority);

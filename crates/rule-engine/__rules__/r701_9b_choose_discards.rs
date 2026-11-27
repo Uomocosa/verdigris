@@ -87,10 +87,12 @@ mod tests {
         assert_eq!(game.turn().number, 1);
 
         game.play([p2.discard([bears, bolt])])?;
-        game.play([p2.arrange_graveyard([bolt, bears])])?;
+        let [bears_buried] = game.player(p2).cards_in(GRAVEYARD).exactly::<1>(GRIZZLY_BEARS)?;
+        let [bolt_buried] = game.player(p2).cards_in(GRAVEYARD).exactly::<1>(LIGHTNING_BOLT)?;
+        game.play([p2.arrange_graveyard([bolt_buried, bears_buried])])?;
 
-        assert!(game.card(bears).is_in(GRAVEYARD).of(p2));
-        assert!(game.card(bolt).is_in(GRAVEYARD).of(p2));
+        assert!(game.moved(bears).to(GRAVEYARD).of(p2));
+        assert!(game.moved(bolt).to(GRAVEYARD).of(p2));
         assert!(game.player(p2).cards_in(HAND).has(MURDER));
         Ok(())
     }

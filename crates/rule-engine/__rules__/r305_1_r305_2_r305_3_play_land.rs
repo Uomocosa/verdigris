@@ -171,16 +171,18 @@ mod tests {
             P2,
         ]);
         let [mind_rot] = game.player(p1).cards_in(HAND).exactly::<1>(MIND_ROT)?;
-        let [forest] = game.player(p1).cards_in(HAND).exactly::<1>(FOREST)?;
+        let [_forest] = game.player(p1).cards_in(HAND).exactly::<1>(FOREST)?;
 
         game.play([
             p1.cast(mind_rot).targeting(p1).pass_priority(),
             p2.pass_priority(),
         ])?;
-        game.play([p1.arrange_graveyard([forest, mind_rot])])?;
-        game.play([p1.play_land(forest)])?;
+        let [forest_buried] = game.player(p1).cards_in(GRAVEYARD).exactly::<1>(FOREST)?;
+        let [mind_rot_buried] = game.player(p1).cards_in(GRAVEYARD).exactly::<1>(MIND_ROT)?;
+        game.play([p1.arrange_graveyard([forest_buried, mind_rot_buried])])?;
+        game.play([p1.play_land(forest_buried)])?;
 
-        assert!(game.card(forest).is_in(BATTLEFIELD).of(p1));
+        assert!(game.card(forest_buried).is_in(BATTLEFIELD).of(p1));
         assert!(game.last_rejection().is_none());
         Ok(())
     }
@@ -196,17 +198,18 @@ mod tests {
             p1.cast(mind_rot).targeting(p1).pass_priority(),
             p2.pass_priority(),
         ])?;
-        assert!(game.card(forest).is_in(GRAVEYARD).of(p1));
+        assert!(game.moved(forest).to(GRAVEYARD).of(p1));
 
-        game.act(p1, actions::Action::PlayLand(forest.into()));
+        let [forest_buried] = game.player(p1).cards_in(GRAVEYARD).exactly::<1>(FOREST)?;
+        game.act(p1, actions::Action::PlayLand(forest_buried.into()));
 
         assert_eq!(
             game.last_rejection(),
             Some(&actions::Rejected::CannotPlayLand {
-                land: forest.into()
+                land: forest_buried.into()
             })
         );
-        assert!(game.card(forest).is_in(GRAVEYARD).of(p1));
+        assert!(game.moved(forest).to(GRAVEYARD).of(p1));
         Ok(())
     }
 
@@ -224,17 +227,18 @@ mod tests {
             p1.cast(mind_rot).targeting(p2).pass_priority(),
             p2.pass_priority(),
         ])?;
-        assert!(game.card(forest).is_in(GRAVEYARD).of(p2));
+        assert!(game.moved(forest).to(GRAVEYARD).of(p2));
 
-        game.act(p1, actions::Action::PlayLand(forest.into()));
+        let [forest_buried] = game.player(p2).cards_in(GRAVEYARD).exactly::<1>(FOREST)?;
+        game.act(p1, actions::Action::PlayLand(forest_buried.into()));
 
         assert_eq!(
             game.last_rejection(),
             Some(&actions::Rejected::CannotPlayLand {
-                land: forest.into()
+                land: forest_buried.into()
             })
         );
-        assert!(game.card(forest).is_in(GRAVEYARD).of(p2));
+        assert!(game.moved(forest).to(GRAVEYARD).of(p2));
         Ok(())
     }
 
@@ -251,19 +255,21 @@ mod tests {
             p1.cast(mind_rot).targeting(p1).pass_priority(),
             p2.pass_priority(),
         ])?;
-        game.play([p1.arrange_graveyard([forest, mind_rot])])?;
+        let [forest_buried] = game.player(p1).cards_in(GRAVEYARD).exactly::<1>(FOREST)?;
+        let [mind_rot_buried] = game.player(p1).cards_in(GRAVEYARD).exactly::<1>(MIND_ROT)?;
+        game.play([p1.arrange_graveyard([forest_buried, mind_rot_buried])])?;
         game.play([p1.end_turn(), p2.end_turn()])?;
-        assert!(game.card(forest).is_in(GRAVEYARD).of(p1));
+        assert!(game.moved(forest).to(GRAVEYARD).of(p1));
 
-        game.act(p1, actions::Action::PlayLand(forest.into()));
+        game.act(p1, actions::Action::PlayLand(forest_buried.into()));
 
         assert_eq!(
             game.last_rejection(),
             Some(&actions::Rejected::CannotPlayLand {
-                land: forest.into()
+                land: forest_buried.into()
             })
         );
-        assert!(game.card(forest).is_in(GRAVEYARD).of(p1));
+        assert!(game.moved(forest).to(GRAVEYARD).of(p1));
         Ok(())
     }
 }

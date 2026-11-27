@@ -98,7 +98,7 @@ mod tests {
                 );
             })
             .unwrap();
-        assert!(game.card(jump).is_in(GRAVEYARD).of(p1));
+        assert!(game.moved(jump).to(GRAVEYARD).of(p1));
         Ok(())
     }
 

@@ -84,8 +84,8 @@ mod tests {
             p2.pass_priority(),
         ])?;
 
-        assert!(game.card(rats).is_in(GRAVEYARD).of(p1));
-        assert!(game.card(bears).is_in(GRAVEYARD).of(p2));
+        assert!(game.moved(rats).to(GRAVEYARD).of(p1));
+        assert!(game.moved(bears).to(GRAVEYARD).of(p2));
         Ok(())
     }
 
@@ -151,7 +151,7 @@ mod tests {
         ])?;
 
         assert!(game.card(bears).is_in(BATTLEFIELD).of(p2));
-        assert!(game.card(corpse).is_in(GRAVEYARD).of(p1));
+        assert!(game.moved(corpse).to(GRAVEYARD).of(p1));
         Ok(())
     }
 }

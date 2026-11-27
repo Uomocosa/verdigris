@@ -60,7 +60,7 @@ mod tests {
             p1.cast(bolt).targeting(p2).pass_priority(),
             p2.pass_priority(),
         ])?;
-        assert!(game.card(bolt).is_in(GRAVEYARD).of(p1));
+        assert!(game.moved(bolt).to(GRAVEYARD).of(p1));
         assert!(game.player(p1).cards_in(GRAVEYARD).has(LIGHTNING_BOLT));
         Ok(())
     }
@@ -76,7 +76,7 @@ mod tests {
             p1.cast(bolt).targeting(p2).pass_priority(),
             p2.pass_priority(),
         ])?;
-        assert!(game.card(bolt).is_in(EXILE).of(p1));
+        assert!(game.moved(bolt).to(EXILE).of(p1));
         assert!(!game.card(bolt).is_in(GRAVEYARD).of(p1));
         Ok(())
     }

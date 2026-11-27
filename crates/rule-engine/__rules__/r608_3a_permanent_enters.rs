@@ -111,10 +111,12 @@ mod tests {
             p2.cast(bolt).targeting(bears).pass_priority(),
             p1.pass_priority(),
         ])?;
-        assert!(game.card(bears).is_in(GRAVEYARD).of(p2));
+        assert!(game.moved(bears).to(GRAVEYARD).of(p2));
         assert!(!game.stack().matching(strength).is_empty());
 
-        game.play([p2.arrange_graveyard([bears, bolt])])?;
+        let [bears_buried] = game.player(p2).cards_in(GRAVEYARD).exactly::<1>(GRIZZLY_BEARS)?;
+        let [bolt_buried] = game.player(p2).cards_in(GRAVEYARD).exactly::<1>(LIGHTNING_BOLT)?;
+        game.play([p2.arrange_graveyard([bears_buried, bolt_buried])])?;
         game.play([p1.pass_priority(), p2.pass_priority()])?;
         assert!(game.card(strength).is_in(GRAVEYARD).of(p1));
         assert!(!game.card(strength).is_in(BATTLEFIELD).of(p1));

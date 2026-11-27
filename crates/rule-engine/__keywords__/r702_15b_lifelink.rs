@@ -71,8 +71,8 @@ mod tests {
         ])?;
 
         assert_eq!(game.life(p1), 22);
-        assert!(game.card(vampire).is_in(GRAVEYARD).of(p1));
-        assert!(game.card(bears).is_in(GRAVEYARD).of(p2));
+        assert!(game.moved(vampire).to(GRAVEYARD).of(p1));
+        assert!(game.moved(bears).to(GRAVEYARD).of(p2));
         Ok(())
     }
 

@@ -57,7 +57,7 @@ mod tests {
         ]);
         let [bears] = game.player(p1).cards_in(HAND).exactly::<1>(GRIZZLY_BEARS)?;
         game.play([p1.cast(bears).pass_priority(), p2.pass_priority()])?;
-        assert!(game.card(bears).is_in(GRAVEYARD).of(p1));
+        assert!(game.moved(bears).to(GRAVEYARD).of(p1));
         assert!(!game.card(bears).is_in(BATTLEFIELD).of(p1));
         assert!(game.stack().matching(bears).is_empty());
         Ok(())

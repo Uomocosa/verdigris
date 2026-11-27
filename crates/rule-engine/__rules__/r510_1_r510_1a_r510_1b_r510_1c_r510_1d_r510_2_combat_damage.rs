@@ -182,8 +182,8 @@ mod tests {
             p2.pass_priority(),
         ])?;
 
-        assert!(game.card(rats).is_in(GRAVEYARD).of(p1));
-        assert!(game.card(bears).is_in(GRAVEYARD).of(p2));
+        assert!(game.moved(rats).to(GRAVEYARD).of(p1));
+        assert!(game.moved(bears).to(GRAVEYARD).of(p2));
         Ok(())
     }
 
@@ -317,7 +317,7 @@ mod tests {
         ])?;
 
         assert_eq!(game.life(p2), 17);
-        assert!(game.card(goblin).is_in(GRAVEYARD).of(p2));
+        assert!(game.moved(goblin).to(GRAVEYARD).of(p2));
         assert!(game.card(bears).is_in(BATTLEFIELD).of(p1));
         Ok(())
     }
@@ -325,6 +325,7 @@ mod tests {
     #[test]
     fn trample_assigns_excess_damage_past_two_blockers_to_the_defending_player() -> TestResult {
         use crate::BATTLEFIELD;
+        use crate::GRAVEYARD;
         use crate::turns;
 
         let (mut game, [p1, p2]) = MockGame::new([
@@ -356,12 +357,14 @@ mod tests {
             (p2.into(), 1),
         ])])?;
         game.play([p1.pass_priority()])?;
-        game.play([p2.arrange_graveyard([rats_1, rats_2])])?;
+        let [rats_1_buried, rats_2_buried] =
+            game.player(p2).cards_in(GRAVEYARD).exactly::<2>(TYPHOID_RATS)?;
+        game.play([p2.arrange_graveyard([rats_1_buried, rats_2_buried])])?;
         game.play([p2.pass_priority()])?;
 
         assert_eq!(game.player(p2).life(), 19);
-        assert!(game.card(rats_1).is_in(GRAVEYARD).of(p2));
-        assert!(game.card(rats_2).is_in(GRAVEYARD).of(p2));
+        assert!(game.moved(rats_1).to(GRAVEYARD).of(p2));
+        assert!(game.moved(rats_2).to(GRAVEYARD).of(p2));
         Ok(())
     }
 
@@ -404,7 +407,7 @@ mod tests {
 
         assert_eq!(game.damage(bears), 1);
         assert_eq!(game.life(p2), 18);
-        assert!(game.card(bears).is_in(GRAVEYARD).of(p2));
+        assert!(game.moved(bears).to(GRAVEYARD).of(p2));
         Ok(())
     }
 

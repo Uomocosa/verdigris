@@ -2,13 +2,20 @@ use std::collections::{BTreeMap, BTreeSet};
 
 use bevy::ecs::schedule::{IntoScheduleConfigs, ScheduleConfigs};
 use bevy::ecs::system::ScheduleSystem;
-use bevy::prelude::{Changed, Entity, MessageReader, MessageWriter, Query};
+use bevy::prelude::{Added, Changed, Entity, MessageReader, MessageWriter, Or, Query};
 
 use crate::GRAVEYARD;
 use crate::actions;
 use crate::cards;
 use crate::players;
 use crate::zones;
+
+type MovedToGraveyard<'w, 's> = Query<
+    'w,
+    's,
+    (Entity, &'static cards::Owner, &'static zones::InZone),
+    Or<(Added<zones::InZone>, Changed<zones::InZone>)>,
+>;
 
 /// 404.3. If an effect or rule puts two or more cards into the same graveyard at the same time,
 /// the owner of those cards may arrange them in any order.
@@ -45,7 +52,7 @@ fn arrange_as_answered(
 
 fn ask_for_the_order(
     mut asks: MessageWriter<actions::Ask>,
-    moved: Query<(Entity, &cards::Owner, &zones::InZone), Changed<zones::InZone>>,
+    moved: MovedToGraveyard,
     zone_contents: Query<&zones::ZoneContents>,
     zones: zones::ZoneLookup,
 ) {
@@ -109,18 +116,29 @@ mod tests {
             ]),
         ]);
         let [tome_scour] = game.player(p1).cards_in(HAND).exactly::<1>(TOME_SCOUR)?;
-        let [bears] = game.player(p2).cards_in(LIBRARY).exactly::<1>(GRIZZLY_BEARS)?;
-        let [corpse] = game.player(p2).cards_in(LIBRARY).exactly::<1>(WALKING_CORPSE)?;
-        let [wolf] = game.player(p2).cards_in(LIBRARY).exactly::<1>(WATCHWOLF)?;
-        let [rats] = game.player(p2).cards_in(LIBRARY).exactly::<1>(TYPHOID_RATS)?;
-        let [drake] = game.player(p2).cards_in(LIBRARY).exactly::<1>(WIND_DRAKE)?;
+        let [_bears] = game.player(p2).cards_in(LIBRARY).exactly::<1>(GRIZZLY_BEARS)?;
+        let [_corpse] = game.player(p2).cards_in(LIBRARY).exactly::<1>(WALKING_CORPSE)?;
+        let [_wolf] = game.player(p2).cards_in(LIBRARY).exactly::<1>(WATCHWOLF)?;
+        let [_rats] = game.player(p2).cards_in(LIBRARY).exactly::<1>(TYPHOID_RATS)?;
+        let [_drake] = game.player(p2).cards_in(LIBRARY).exactly::<1>(WIND_DRAKE)?;
         let [forest] = game.player(p2).cards_in(LIBRARY).exactly::<1>(FOREST)?;
 
         game.play([
             p1.cast(tome_scour).targeting(p2).pass_priority(),
             p2.pass_priority(),
         ])?;
-        game.play([p2.arrange_graveyard([drake, wolf, rats, corpse, bears])])?;
+        let [bears_buried] = game.player(p2).cards_in(GRAVEYARD).exactly::<1>(GRIZZLY_BEARS)?;
+        let [corpse_buried] = game.player(p2).cards_in(GRAVEYARD).exactly::<1>(WALKING_CORPSE)?;
+        let [wolf_buried] = game.player(p2).cards_in(GRAVEYARD).exactly::<1>(WATCHWOLF)?;
+        let [rats_buried] = game.player(p2).cards_in(GRAVEYARD).exactly::<1>(TYPHOID_RATS)?;
+        let [drake_buried] = game.player(p2).cards_in(GRAVEYARD).exactly::<1>(WIND_DRAKE)?;
+        game.play([p2.arrange_graveyard([
+            drake_buried,
+            wolf_buried,
+            rats_buried,
+            corpse_buried,
+            bears_buried,
+        ])])?;
 
         let graveyard = game.zone_entity(p2, GRAVEYARD).expect("p2 graveyard");
         let top_first = game.with_query::<&zones::ZoneContents, Vec<Entity>>(|contents| {
@@ -129,11 +147,11 @@ mod tests {
         assert_eq!(
             top_first,
             vec![
-                Entity::from(drake),
-                Entity::from(wolf),
-                Entity::from(rats),
-                Entity::from(corpse),
-                Entity::from(bears),
+                Entity::from(drake_buried),
+                Entity::from(wolf_buried),
+                Entity::from(rats_buried),
+                Entity::from(corpse_buried),
+                Entity::from(bears_buried),
             ]
         );
         assert!(game.card(forest).is_in(LIBRARY).of(p2));

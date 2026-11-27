@@ -46,7 +46,7 @@ mod tests {
             p2.pass_priority(),
         ])?;
         assert!(game.card(myr).is_in(BATTLEFIELD).of(p2));
-        assert!(game.card(murder).is_in(GRAVEYARD).of(p1));
+        assert!(game.moved(murder).to(GRAVEYARD).of(p1));
         assert!(game.player(p2).cards_in(BATTLEFIELD).has(DARKSTEEL_MYR));
         Ok(())
     }
@@ -81,7 +81,7 @@ mod tests {
             p2.pass_priority(),
         ])?;
         assert!(game.card(myr).is_in(BATTLEFIELD).of(p2));
-        assert!(game.card(blade).is_in(GRAVEYARD).of(p1));
+        assert!(game.moved(blade).to(GRAVEYARD).of(p1));
         Ok(())
     }
 
@@ -98,7 +98,7 @@ mod tests {
             p2.pass_priority(),
         ])?;
         assert!(game.card(bears).is_in(BATTLEFIELD).of(p2));
-        assert!(game.card(murder).is_in(GRAVEYARD).of(p1));
+        assert!(game.moved(murder).to(GRAVEYARD).of(p1));
         Ok(())
     }
 }

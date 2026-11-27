@@ -19,11 +19,15 @@ use crate::zones;
 pub fn r603_6c_r700_4_leaves_the_battlefield(
     mut left: RemovedComponents<cards::OnBattlefield>,
     mut queue: ResMut<stack::TriggerQueue>,
-    cards: Query<(&cards::CardDefinition, &cards::Controller, &zones::InZone)>,
+    cards: Query<(&cards::CardDefinition, &cards::Controller, &zones::LeftZone)>,
+    new_zones: Query<&zones::InZone>,
     zones: zones::ZoneLookup,
 ) {
     for source in left.read() {
-        let Ok((definition, _, in_zone)) = cards.get(source) else {
+        let Ok((definition, _, left_zone)) = cards.get(source) else {
+            continue;
+        };
+        let Ok(in_zone) = new_zones.get(**left_zone) else {
             continue;
         };
         if !zones.contains(GRAVEYARD, **in_zone) {
@@ -61,7 +65,7 @@ mod tests {
             p2.cast(murder).targeting(crawler).pass_priority(),
             p1.pass_priority(),
         ])?;
-        assert!(game.card(crawler).is_in(GRAVEYARD).of(p1));
+        assert!(game.moved(crawler).to(GRAVEYARD).of(p1));
         assert!(game.player(p1).cards_in(LIBRARY).has(LIGHTNING_BOLT));
         game.play([p2.pass_priority(), p1.pass_priority()])?;
         assert!(game.player(p1).cards_in(HAND).has(LIGHTNING_BOLT));

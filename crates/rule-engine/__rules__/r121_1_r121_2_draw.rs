@@ -1,9 +1,10 @@
 use crate::events;
 use crate::{HAND, LIBRARY};
-use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query};
+use bevy::prelude::{Commands, Entity, Has, MessageReader, MessageWriter, Query};
 
 use crate::Attempt;
 use crate::Resolve;
+use crate::cards;
 use crate::zones;
 
 /// 121.1. A player draws a card by putting the top card of their library into their hand. This is
@@ -23,6 +24,7 @@ pub fn r121_1_r121_2_draw(
     mut commands: Commands,
     zones: zones::ZoneLookup,
     zone_contents: Query<&zones::ZoneContents>,
+    cards: Query<(&cards::CardDefinition, &cards::Owner, Has<cards::Token>)>,
 ) {
     for draw in draws.read() {
         let player = draw.player;
@@ -39,7 +41,17 @@ pub fn r121_1_r121_2_draw(
             .unwrap_or_default();
         if let Some(hand) = zones.find(HAND, Some(player)) {
             for card in &drawn_from_top {
-                commands.entity(*card).insert(zones::InZone(hand));
+                let Ok((definition, owner, has_token)) = cards.get(*card) else {
+                    continue;
+                };
+                zones::move_object(
+                    &mut commands,
+                    *card,
+                    definition.clone(),
+                    *owner,
+                    has_token.then_some(cards::Token),
+                    hand,
+                );
             }
         }
         if u32::try_from(drawn_from_top.len()).unwrap_or(u32::MAX) < count {
@@ -69,9 +81,9 @@ mod tests {
         let [murder] = game.player(p1).cards_in(LIBRARY).exactly::<1>(MURDER)?;
 
         game.play([p1.cast(divination).pass_priority(), p2.pass_priority()])?;
-        assert!(game.card(bears).is_in(HAND).of(p1));
-        assert!(game.card(bolt).is_in(HAND).of(p1));
-        assert!(game.card(divination).is_in(GRAVEYARD).of(p1));
+        assert!(game.moved(bears).to(HAND).of(p1));
+        assert!(game.moved(bolt).to(HAND).of(p1));
+        assert!(game.moved(divination).to(GRAVEYARD).of(p1));
         assert!(game.card(murder).is_in(LIBRARY).of(p1));
         Ok(())
     }
@@ -107,7 +119,7 @@ mod tests {
 
         game.play([p1.pass_priority(), p2.pass_priority(), p1.pass_priority()])?;
 
-        assert!(game.card(bears).is_in(HAND).of(p1));
+        assert!(game.moved(bears).to(HAND).of(p1));
         assert_eq!(game.player(p1).cards_in(HAND).count(), hand_before + 1);
         assert_eq!(game.life(p1), 20);
         Ok(())

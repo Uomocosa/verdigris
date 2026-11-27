@@ -12,13 +12,15 @@ pub fn r704_5m_aura_illegal(
     mut burials: MessageWriter<Attempt<events::PutIntoGraveyard>>,
     auras: Query<(Entity, &cards::Enchanting), With<cards::OnBattlefield>>,
     enchanted_zones: Query<&zones::InZone>,
+    moved: Query<(), With<zones::LeftZone>>,
     zones: zones::ZoneLookup,
 ) {
     for (aura, enchanted) in auras.iter() {
-        let Ok(enchanted_zone) = enchanted_zones.get(**enchanted) else {
-            continue;
-        };
-        if zones.contains(BATTLEFIELD, **enchanted_zone) {
+        if let Ok(enchanted_zone) = enchanted_zones.get(**enchanted) {
+            if zones.contains(BATTLEFIELD, **enchanted_zone) {
+                continue;
+            }
+        } else if !moved.contains(**enchanted) {
             continue;
         }
         burials.write(Attempt(events::PutIntoGraveyard { object: aura }));
@@ -49,8 +51,8 @@ mod tests {
             p1.pass_priority(),
         ])?;
 
-        assert!(game.card(bears).is_in(GRAVEYARD).of(p2));
-        assert!(game.card(strength).is_in(GRAVEYARD).of(p1));
+        assert!(game.moved(bears).to(GRAVEYARD).of(p2));
+        assert!(game.moved(strength).to(GRAVEYARD).of(p1));
         Ok(())
     }
 }

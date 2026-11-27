@@ -37,7 +37,7 @@ mod tests {
         ])?;
         assert!(!game.player(p2).cards_in(BATTLEFIELD).has(GRIZZLY_BEARS));
         assert!(game.player(p2).cards_in(GRAVEYARD).has(GRIZZLY_BEARS));
-        assert!(game.card(disfigure).is_in(GRAVEYARD).of(p1));
+        assert!(game.moved(disfigure).to(GRAVEYARD).of(p1));
         Ok(())
     }
 
@@ -57,8 +57,8 @@ mod tests {
             p2.pass_priority(),
         ])?;
         assert!(game.card(bears).is_in(BATTLEFIELD).of(p2));
-        assert!(game.card(disfigure).is_in(GRAVEYARD).of(p1));
-        assert!(game.card(murder).is_in(GRAVEYARD).of(p1));
+        assert!(game.moved(disfigure).to(GRAVEYARD).of(p1));
+        assert!(game.moved(murder).to(GRAVEYARD).of(p1));
         Ok(())
     }
 }

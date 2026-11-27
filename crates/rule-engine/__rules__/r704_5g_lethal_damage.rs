@@ -42,7 +42,7 @@ mod tests {
             p1.cast(bolt).targeting(bears).pass_priority(),
             p2.pass_priority(),
         ])?;
-        assert!(game.card(bears).is_in(GRAVEYARD).of(p2));
+        assert!(game.moved(bears).to(GRAVEYARD).of(p2));
         Ok(())
     }
 }

@@ -130,8 +130,8 @@ mod tests {
 
         game.play([p1.pass_priority(), p2.pass_priority()])?;
 
-        assert!(game.card(ace).is_in(GRAVEYARD).of(p1));
-        assert!(game.card(bears).is_in(GRAVEYARD).of(p2));
+        assert!(game.moved(ace).to(GRAVEYARD).of(p1));
+        assert!(game.moved(bears).to(GRAVEYARD).of(p2));
         assert_eq!(game.turn().step, turns::Step::EndOfCombat);
         Ok(())
     }
@@ -173,7 +173,7 @@ mod tests {
         ])?;
 
         assert_eq!(game.turn().step, turns::Step::SecondCombatDamage);
-        assert!(game.card(blocker).is_in(GRAVEYARD).of(p2));
+        assert!(game.moved(blocker).to(GRAVEYARD).of(p2));
         assert!(game.card(attacker).is_in(BATTLEFIELD).of(p1));
         assert_eq!(game.life(p2), 20);
 
@@ -262,7 +262,7 @@ mod tests {
         ])?;
 
         assert_eq!(game.turn().step, turns::Step::SecondCombatDamage);
-        assert!(game.card(lord).is_in(GRAVEYARD).of(p1));
+        assert!(game.moved(lord).to(GRAVEYARD).of(p1));
         assert_eq!(game.life(p2), 18);
 
         game.play([p1.pass_priority(), p2.pass_priority()])?;

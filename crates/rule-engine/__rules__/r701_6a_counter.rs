@@ -48,8 +48,8 @@ mod tests {
         ])?;
 
         assert_eq!(game.life(p2), 20);
-        assert!(game.card(bolt).is_in(GRAVEYARD).of(p1));
-        assert!(game.card(cancel).is_in(GRAVEYARD).of(p2));
+        assert!(game.moved(bolt).to(GRAVEYARD).of(p1));
+        assert!(game.moved(cancel).to(GRAVEYARD).of(p2));
         Ok(())
     }
 
@@ -68,8 +68,8 @@ mod tests {
             p1.pass_priority(),
         ])?;
 
-        assert!(game.card(bears).is_in(GRAVEYARD).of(p1));
-        assert!(game.card(scatter).is_in(GRAVEYARD).of(p2));
+        assert!(game.moved(bears).to(GRAVEYARD).of(p1));
+        assert!(game.moved(scatter).to(GRAVEYARD).of(p2));
         Ok(())
     }
 
@@ -89,7 +89,7 @@ mod tests {
         ])?;
 
         assert!(!game.card(spell).is_in(GRAVEYARD).of(p1));
-        assert!(game.card(scatter).is_in(GRAVEYARD).of(p2));
+        assert!(game.moved(scatter).to(GRAVEYARD).of(p2));
         Ok(())
     }
 
@@ -109,8 +109,8 @@ mod tests {
         ])?;
 
         assert_eq!(game.life(p2), 20);
-        assert!(game.card(bolt).is_in(GRAVEYARD).of(p1));
-        assert!(game.card(negate).is_in(GRAVEYARD).of(p2));
+        assert!(game.moved(bolt).to(GRAVEYARD).of(p1));
+        assert!(game.moved(negate).to(GRAVEYARD).of(p2));
         Ok(())
     }
 
@@ -130,13 +130,13 @@ mod tests {
             p1.cast(dispel).targeting(cancel).pass_priority(),
             p2.pass_priority(),
         ])?;
-        assert!(game.card(cancel).is_in(GRAVEYARD).of(p2));
+        assert!(game.moved(cancel).to(GRAVEYARD).of(p2));
         assert_eq!(game.life(p2), 20);
 
         game.play([p1.pass_priority(), p2.pass_priority()])?;
         assert_eq!(game.life(p2), 17);
-        assert!(game.card(bolt).is_in(GRAVEYARD).of(p1));
-        assert!(game.card(dispel).is_in(GRAVEYARD).of(p1));
+        assert!(game.moved(bolt).to(GRAVEYARD).of(p1));
+        assert!(game.moved(dispel).to(GRAVEYARD).of(p1));
         Ok(())
     }
 
@@ -156,13 +156,13 @@ mod tests {
             p1.cast(p1_cancel).targeting(p2_cancel).pass_priority(),
             p2.pass_priority(),
         ])?;
-        assert!(game.card(p2_cancel).is_in(GRAVEYARD).of(p2));
+        assert!(game.moved(p2_cancel).to(GRAVEYARD).of(p2));
         assert_eq!(game.life(p2), 20);
 
         game.play([p1.pass_priority(), p2.pass_priority()])?;
         assert_eq!(game.life(p2), 17);
-        assert!(game.card(bolt).is_in(GRAVEYARD).of(p1));
-        assert!(game.card(p1_cancel).is_in(GRAVEYARD).of(p1));
+        assert!(game.moved(bolt).to(GRAVEYARD).of(p1));
+        assert!(game.moved(p1_cancel).to(GRAVEYARD).of(p1));
         Ok(())
     }
 }

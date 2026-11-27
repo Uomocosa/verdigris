@@ -76,7 +76,7 @@ mod tests {
             p1.cast(bolt).targeting(p2).pass_priority(),
             p2.pass_priority(),
         ])?;
-        assert!(game.card(bolt).is_in(GRAVEYARD).of(p1));
+        assert!(game.moved(bolt).to(GRAVEYARD).of(p1));
         Ok(())
     }
 
@@ -95,8 +95,8 @@ mod tests {
             p1.cast(murder).targeting(bears).pass_priority(),
             p2.pass_priority(),
         ])?;
-        assert!(game.card(bears).is_in(GRAVEYARD).of(p2));
-        assert!(game.card(murder).is_in(GRAVEYARD).of(p1));
+        assert!(game.moved(bears).to(GRAVEYARD).of(p2));
+        assert!(game.moved(murder).to(GRAVEYARD).of(p1));
         assert!(!game.stack().matching(bolt).is_empty());
 
         game.play([p1.pass_priority(), p2.pass_priority()])?;
