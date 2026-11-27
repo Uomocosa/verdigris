@@ -17,6 +17,7 @@ pub fn engine() -> rules::RuleRegistry {
     let mut ids = vec![
         events::AddPhase::ID,
         events::AssignCombatDamage::ID,
+        events::Attack::ID,
         events::BecomeTarget::ID,
         events::Cast::ID,
         events::Counter::ID,
@@ -47,6 +48,7 @@ pub fn engine() -> rules::RuleRegistry {
     let mut lists = vec![
         events::AddPhase::restrictions(),
         events::AssignCombatDamage::restrictions(),
+        events::Attack::restrictions(),
         events::BecomeTarget::restrictions(),
         events::Cast::restrictions(),
         events::Counter::restrictions(),
@@ -117,7 +119,7 @@ mod tests {
     fn test_usage() {
         let registry = engine();
         assert!(registry.events.contains(&events::Draw::ID));
-        assert!(registry.restrictions.contains(&events::declare_attackers::SUMMONING_SICK));
+        assert!(registry.restrictions.contains(&events::attack::SUMMONING_SICK));
         assert!(registry.values.contains(&rules::LandPlays::ID));
         assert_eq!(events::Draw::ID, rules::EventId("121.1/draw"));
     }

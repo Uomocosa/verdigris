@@ -9,9 +9,9 @@ pub fn attack_as_though_it_had_haste(all: &statics::All) -> abilities::Continuou
         filter: all.into(),
         as_long_as: None,
         modification: effects::Modification::Rule(rules::RuleChange {
-            target: rules::Target::Restriction(events::declare_attackers::SUMMONING_SICK),
+            target: rules::Target::Restriction(events::attack::SUMMONING_SICK),
             change: rules::Change::AsThough {
-                holder: events::DeclareAttackers::ATTACKERS.into(),
+                holder: events::Attack::ATTACKER.into(),
             },
         }),
     }
@@ -34,9 +34,9 @@ mod tests {
         assert_eq!(
             ability.modification,
             effects::Modification::Rule(rules::RuleChange {
-                target: rules::Target::Restriction(events::declare_attackers::SUMMONING_SICK),
+                target: rules::Target::Restriction(events::attack::SUMMONING_SICK),
                 change: rules::Change::AsThough {
-                    holder: events::DeclareAttackers::ATTACKERS.into(),
+                    holder: events::Attack::ATTACKER.into(),
                 },
             })
         );

@@ -52,9 +52,7 @@ mod tests {
     fn test_usage() {
         let registry = rules::RuleRegistry::engine();
         assert!(registry.resolves(&rules::Target::event::<events::Draw>()));
-        assert!(registry.resolves(&rules::Target::Restriction(
-            events::declare_attackers::SUMMONING_SICK
-        )));
+        assert!(registry.resolves(&rules::Target::Restriction(events::attack::SUMMONING_SICK)));
         assert!(registry.resolves(&rules::Target::value::<rules::MaximumHandSize>()));
         assert_eq!(registry.duplicates, Vec::<rules::EventId>::new());
         assert!(!registry.resolves(&rules::Target::event::<events::PutCounters>()));

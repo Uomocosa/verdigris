@@ -1,3 +1,6 @@
+pub mod attack;
+pub use attack::Attack;
+
 pub mod cast;
 pub use cast::Cast;
 

@@ -36,6 +36,7 @@ pub fn register_messages_and_resources(app: &mut App) {
     events::BeginTheGameOnTheBattlefield::register(app);
     events::OpeningHandAction::register(app);
     events::Untap::register(app);
+    events::Attack::register(app);
     events::DeclareAttackers::register(app);
     events::DeclareBlocker::register(app);
     events::Tap::register(app);
