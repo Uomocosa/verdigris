@@ -694,6 +694,8 @@ mod tests {
         ]);
         let [resting] = fresh.player(q1).cards_in(HAND).exactly::<1>(TEST_BLOODSCENT_HOUND)?;
         fresh.play([q1.cast(resting).pass_priority(), q2.pass_priority()])?;
+        let [resting_on_battlefield] =
+            fresh.player(q1).cards_in(BATTLEFIELD).exactly::<1>(TEST_BLOODSCENT_HOUND)?;
         fresh
             .app
             .world_mut()
@@ -711,36 +713,21 @@ mod tests {
             q1.pass_to(turns::Step::DeclareAttackers),
             q2.pass_to(turns::Step::DeclareAttackers),
         ])?;
-        fresh.act(q1, actions::Action::DeclareAttackers(vec![resting.into()]));
+        fresh.act(
+            q1,
+            actions::Action::DeclareAttackers(vec![resting_on_battlefield.into()]),
+        );
         assert_eq!(
             fresh.last_rejection(),
             Some(&actions::Rejected::CannotAttack {
-                attackers: vec![resting.into()],
-                why: vec![
-                    actions::DeclarationWhy {
-                        creature: Some(resting.into()),
-                        why: rules::Why::NotYours,
-                    },
-                    actions::DeclarationWhy {
-                        creature: Some(resting.into()),
-                        why: rules::Why::Restriction(events::declare_attackers::CREATURE),
-                    },
-                    actions::DeclarationWhy {
-                        creature: Some(resting.into()),
-                        why: rules::Why::Restriction(events::declare_attackers::CONTROLS),
-                    },
-                    actions::DeclarationWhy {
-                        creature: None,
-                        why: rules::Why::Restriction(events::declare_attackers::CREATURE),
-                    },
-                    actions::DeclarationWhy {
-                        creature: None,
-                        why: rules::Why::Restriction(events::declare_attackers::CONTROLS),
-                    },
-                ],
+                attackers: vec![resting_on_battlefield.into()],
+                why: vec![actions::DeclarationWhy {
+                    creature: Some(resting_on_battlefield.into()),
+                    why: rules::Why::Restriction(events::declare_attackers::SUMMONING_SICK),
+                }],
             })
         );
-        assert!(!fresh.is_attacking(resting));
+        assert!(!fresh.is_attacking(resting_on_battlefield));
         Ok(())
     }
 }

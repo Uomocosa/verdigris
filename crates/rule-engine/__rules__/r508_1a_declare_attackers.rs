@@ -123,10 +123,6 @@ mod tests {
                         creature: Some(tundra.into()),
                         why: rules::Why::Restriction(events::declare_attackers::CREATURE),
                     },
-                    actions::DeclarationWhy {
-                        creature: None,
-                        why: rules::Why::Restriction(events::declare_attackers::CREATURE),
-                    },
                 ],
             })
         );
@@ -160,16 +156,10 @@ mod tests {
             game.last_rejection(),
             Some(&actions::Rejected::CannotAttack {
                 attackers: vec![bears.into()],
-                why: vec![
-                    actions::DeclarationWhy {
-                        creature: Some(bears.into()),
-                        why: rules::Why::Restriction(events::declare_attackers::UNTAPPED),
-                    },
-                    actions::DeclarationWhy {
-                        creature: None,
-                        why: rules::Why::Restriction(events::declare_attackers::UNTAPPED),
-                    },
-                ],
+                why: vec![actions::DeclarationWhy {
+                    creature: Some(bears.into()),
+                    why: rules::Why::Restriction(events::declare_attackers::UNTAPPED),
+                }],
             })
         );
         assert!(!game.is_attacking(bears));
@@ -185,42 +175,29 @@ mod tests {
             MockGame::new([P1.hand([WALKING_CORPSE]).mana_pool(mana![1, B]), P2]);
         let [corpse] = game.player(p1).cards_in(HAND).exactly::<1>(WALKING_CORPSE)?;
         game.play([p1.cast(corpse).pass_priority(), p2.pass_priority()])?;
+        let [corpse_on_battlefield] =
+            game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(WALKING_CORPSE)?;
         game.play([
             p1.pass_to(turns::Step::DeclareAttackers),
             p2.pass_to(turns::Step::DeclareAttackers),
         ])?;
 
-        game.act(p1, actions::Action::DeclareAttackers(vec![corpse.into()]));
+        game.act(
+            p1,
+            actions::Action::DeclareAttackers(vec![corpse_on_battlefield.into()]),
+        );
 
         assert_eq!(
             game.last_rejection(),
             Some(&actions::Rejected::CannotAttack {
-                attackers: vec![corpse.into()],
-                why: vec![
-                    actions::DeclarationWhy {
-                        creature: Some(corpse.into()),
-                        why: rules::Why::NotYours,
-                    },
-                    actions::DeclarationWhy {
-                        creature: Some(corpse.into()),
-                        why: rules::Why::Restriction(events::declare_attackers::CREATURE),
-                    },
-                    actions::DeclarationWhy {
-                        creature: Some(corpse.into()),
-                        why: rules::Why::Restriction(events::declare_attackers::CONTROLS),
-                    },
-                    actions::DeclarationWhy {
-                        creature: None,
-                        why: rules::Why::Restriction(events::declare_attackers::CREATURE),
-                    },
-                    actions::DeclarationWhy {
-                        creature: None,
-                        why: rules::Why::Restriction(events::declare_attackers::CONTROLS),
-                    },
-                ],
+                attackers: vec![corpse_on_battlefield.into()],
+                why: vec![actions::DeclarationWhy {
+                    creature: Some(corpse_on_battlefield.into()),
+                    why: rules::Why::Restriction(events::declare_attackers::SUMMONING_SICK),
+                }],
             })
         );
-        assert!(!game.is_attacking(corpse));
+        assert!(!game.is_attacking(corpse_on_battlefield));
         Ok(())
     }
 
@@ -239,16 +216,10 @@ mod tests {
             game.last_rejection(),
             Some(&actions::Rejected::CannotAttack {
                 attackers: vec![wall.into()],
-                why: vec![
-                    actions::DeclarationWhy {
-                        creature: Some(wall.into()),
-                        why: rules::Why::Restriction(keywords::defender::CANT_ATTACK),
-                    },
-                    actions::DeclarationWhy {
-                        creature: None,
-                        why: rules::Why::Restriction(keywords::defender::CANT_ATTACK),
-                    },
-                ],
+                why: vec![actions::DeclarationWhy {
+                    creature: Some(wall.into()),
+                    why: rules::Why::Restriction(keywords::defender::CANT_ATTACK),
+                }],
             })
         );
         assert!(!game.is_attacking(wall));

@@ -71,10 +71,12 @@ pub fn validate_attackers(
         attackers: attackers.to_vec(),
     }) {
         for why in reasons {
-            whys.push(actions::DeclarationWhy {
-                creature: None,
-                why,
-            });
+            if !whys.iter().any(|existing: &actions::DeclarationWhy| existing.why == why) {
+                whys.push(actions::DeclarationWhy {
+                    creature: None,
+                    why,
+                });
+            }
         }
     }
     if whys.is_empty() { Ok(()) } else { Err(whys) }
