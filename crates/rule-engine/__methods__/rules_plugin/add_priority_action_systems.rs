@@ -9,7 +9,7 @@ pub fn add_priority_action_systems(app: &mut App) {
     app.add_systems(
         Update,
         (
-            comprehensive_rules::r601_2a_cast::r601_2a_cast(),
+            comprehensive_rules::r601_2a_cast::r601_2a_cast,
             comprehensive_rules::r601_2c_targets::r601_2c_targets(),
             comprehensive_rules::r119_4_r119_8_pay_life::r119_4_r119_8_pay_life,
             comprehensive_rules::r601_2h_pay::r601_2h_pay,
@@ -32,7 +32,7 @@ pub fn add_priority_action_systems(app: &mut App) {
             )
                 .chain(),
             comprehensive_rules::r509_1i_r509_2a_r509_3a_r509_3c_blocker_triggers::r509_1i_r509_2a_r509_3a_r509_3c_blocker_triggers,
-            comprehensive_rules::r305_1_r305_2_r305_3_play_land::r305_1_r305_2_r305_3_play_land(),
+            comprehensive_rules::r305_1_r305_2_r305_3_play_land::r305_1_r305_2_r305_3_play_land,
             comprehensive_rules::r305_6_basic_land_mana_ability::r305_6_basic_land_mana_ability,
             comprehensive_rules::r605_3a_mana_abilities::r605_3a_mana_abilities,
             comprehensive_rules::r601_2g_mana_abilities::r601_2g_mana_abilities,
@@ -59,7 +59,7 @@ mod tests {
 
         assert_eq!(
             app.get_schedule(Update).map(Schedule::systems_len),
-            Some(28)
+            Some(26)
         );
     }
 }

@@ -60,13 +60,13 @@ pub fn assert_legal_actions_agree(game: &mut testing::MockGame) -> testing::Test
         if listed {
             continue;
         }
-        let safe = match &action {
-            actions::Action::DeclareAttackers(_) | actions::Action::DeclareBlockers(_) => true,
-            actions::Action::Play(_) | actions::Action::Cast(_) => involved
-                .iter()
-                .all(|card| game.app.world().get::<cards::Controller>(*card).is_none()),
-            _ => false,
-        };
+        let safe = matches!(
+            &action,
+            actions::Action::DeclareAttackers(_)
+                | actions::Action::DeclareBlockers(_)
+                | actions::Action::Play(_)
+                | actions::Action::Cast(_)
+        );
         if !safe {
             continue;
         }

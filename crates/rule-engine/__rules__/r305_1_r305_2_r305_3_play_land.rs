@@ -1,5 +1,3 @@
-use bevy::ecs::schedule::{IntoScheduleConfigs, ScheduleConfigs};
-use bevy::ecs::system::ScheduleSystem;
 use bevy::prelude::{Commands, MessageReader, MessageWriter, Res};
 
 use crate::Attempt;
@@ -29,20 +27,7 @@ use crate::turns;
 /// battlefield from the zone it was in (usually that player’s hand). By default, a player can take
 /// this action only once during each of their turns. A player can take this action any time they
 /// have priority and the stack is empty during a main phase of their turn. See rule 305, “Lands.”
-pub fn r305_1_r305_2_r305_3_play_land() -> ScheduleConfigs<ScheduleSystem> {
-    (propose_play, check_play).chain()
-}
-
-fn propose_play(mut actions: MessageReader<actions::PlayerAction>, mut commands: Commands) {
-    for action in actions.read() {
-        let actions::Action::Play(card) = &action.action else {
-            continue;
-        };
-        commands.entity(*card).insert(cards::Controller(action.player));
-    }
-}
-
-fn check_play(
+pub fn r305_1_r305_2_r305_3_play_land(
     mut actions: MessageReader<actions::PlayerAction>,
     mut rejected: MessageWriter<actions::Rejected>,
     mut entering: MessageWriter<Attempt<events::EnterTheBattlefield>>,
@@ -60,7 +45,6 @@ fn check_play(
             card,
             player: action.player,
         }) {
-            commands.entity(card).remove::<cards::Controller>();
             rejected.write(actions::Rejected::CannotPlay { card });
             continue;
         }
@@ -70,12 +54,12 @@ fn check_play(
             .ok()
             .and_then(|entity| entity.get::<players::LandsPlayedThisTurn>().copied())
         else {
-            commands.entity(card).remove::<cards::Controller>();
             rejected.write(actions::Rejected::CannotPlay { card });
             continue;
         };
         record.record_play(state.turn.number);
         commands.entity(*action.player).insert(record);
+        commands.entity(card).insert(cards::Controller(action.player));
         if answers.zones.find(BATTLEFIELD, Some(action.player)).is_some() {
             entering.write(Attempt(events::EnterTheBattlefield { permanent: card }));
         }
@@ -87,6 +71,7 @@ mod tests {
     use bevy::ecs::system::RunSystemOnce;
 
     use crate::actions;
+    use crate::cards;
     use crate::events;
     use crate::mana;
     use crate::rules;
@@ -150,6 +135,19 @@ mod tests {
             })
         );
         assert!(game.card(forest_2).is_in(HAND).of(p1));
+        game.act(p1, actions::Action::Play(forest_1.into()));
+
+        assert_eq!(
+            game.last_rejection(),
+            Some(&actions::Rejected::CannotPlay {
+                card: forest_1.into()
+            })
+        );
+        assert!(game.moved(forest_1).to(BATTLEFIELD).of(p1));
+        assert_eq!(
+            game.get::<cards::Controller>(*forest_1),
+            Some(cards::Controller(p1.id))
+        );
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
