@@ -146,7 +146,7 @@ impl MockGame {
     pub fn stack(&self) -> testing::CardsInZone {}
 
     #[must_use]
-    pub fn target_choice(&self) -> Option<testing::ExpectedTargets> {}
+    pub fn target_choice(&mut self) -> Option<testing::ExpectedTargets> {}
 
     #[must_use]
     pub fn trigger_sources(&self) -> Vec<Entity> {}
@@ -392,7 +392,7 @@ mod tests {
 
     #[test]
     fn fresh_game_has_no_target_or_rejection() {
-        let (game, [p1, ..]) = MockGame::new([P1, P2]);
+        let (mut game, [p1, ..]) = MockGame::new([P1, P2]);
         assert!(game.player(p1).cards_in(HAND).has_no(LIGHTNING_BOLT));
         assert!(game.target_choice().is_none());
         assert!(game.last_rejection().is_none());

@@ -81,6 +81,7 @@ mod tests {
         for restriction in DeclareBlocker::restrictions()
             .into_iter()
             .chain(events::DeclareAttackers::restrictions())
+            .chain(events::Attack::restrictions())
         {
             assert!(
                 seen.insert(restriction.id),

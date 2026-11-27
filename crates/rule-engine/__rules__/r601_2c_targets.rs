@@ -99,7 +99,7 @@ fn ask_for_targets(
             ordered: false,
         };
         let has_legal = choice
-            .candidates(&targeting.answers)
+            .candidates(&targeting)
             .iter()
             .any(|(_, legality)| *legality == rules::Legality::Legal);
         if !has_legal {
@@ -149,10 +149,7 @@ fn take_the_chosen_targets(mut answers: MessageReader<actions::Answered>, mut co
 
 #[cfg(test)]
 mod tests {
-    use std::collections::BTreeSet;
-
     use bevy::ecs::system::RunSystemOnce;
-    use bevy::prelude::Entity;
 
     use crate::actions;
     use crate::mana;
@@ -169,6 +166,10 @@ mod tests {
         let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
         let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
         game.play([p1.cast(bolt)])?;
+        assert_eq!(
+            game.target_choice(),
+            Some(pick(1).from([bears.into(), *p1, *p2]))
+        );
         let actions::Choice::Pick(choice) = game
             .app
             .world()
@@ -182,12 +183,6 @@ mod tests {
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
                 let listed = choice.candidates(&answers);
-                let legal: BTreeSet<Entity> = listed
-                    .iter()
-                    .filter(|(_, legality)| *legality == rules::Legality::Legal)
-                    .map(|(entity, _)| *entity)
-                    .collect();
-                assert_eq!(legal, BTreeSet::from([bears.into(), *p1, *p2]));
                 let spell = choice.source.unwrap();
                 assert!(listed.iter().any(|(entity, legality)| *entity == spell
                     && matches!(
@@ -225,27 +220,7 @@ mod tests {
         let [blade] = game.player(p1).cards_in(HAND).exactly::<1>(DOOM_BLADE)?;
         let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
         game.play([p1.cast(blade)])?;
-        let actions::Choice::Pick(choice) = game
-            .app
-            .world()
-            .get_resource::<actions::PendingChoice>()
-            .and_then(|pending| (**pending).clone())
-            .expect("a pending target choice")
-        else {
-            panic!("expected a pick choice");
-        };
-        game.app
-            .world_mut()
-            .run_system_once(move |answers: rules::Rules| {
-                let legal: BTreeSet<Entity> = choice
-                    .candidates(&answers)
-                    .into_iter()
-                    .filter(|(_, legality)| *legality == rules::Legality::Legal)
-                    .map(|(entity, _)| entity)
-                    .collect();
-                assert_eq!(legal, BTreeSet::from([bears.into()]));
-            })
-            .unwrap();
+        assert_eq!(game.target_choice(), Some(pick(1).from([bears.into()])));
         Ok(())
     }
 
@@ -300,6 +275,10 @@ mod tests {
         game.play([p1.cast(bolt).targeting(p2), p1.cast(cancel)])?;
 
         let [bolt_on_stack] = game.stack().exactly::<1>(LIGHTNING_BOLT)?;
+        assert_eq!(
+            game.target_choice(),
+            Some(pick(1).from([bolt_on_stack.into()]))
+        );
         let actions::Choice::Pick(choice) = game
             .app
             .world()
@@ -313,12 +292,6 @@ mod tests {
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
                 let listed = choice.candidates(&answers);
-                let legal: BTreeSet<Entity> = listed
-                    .iter()
-                    .filter(|(_, legality)| *legality == rules::Legality::Legal)
-                    .map(|(entity, _)| *entity)
-                    .collect();
-                assert_eq!(legal, BTreeSet::from([bolt_on_stack.into()]));
                 let spell = choice.source.unwrap();
                 assert!(listed.iter().any(|(entity, legality)| *entity == spell
                     && matches!(
@@ -420,27 +393,10 @@ mod tests {
             MockGame::new([P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]), P2, P3, P4]);
         let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
         game.play([p1.cast(bolt)])?;
-        let actions::Choice::Pick(choice) = game
-            .app
-            .world()
-            .get_resource::<actions::PendingChoice>()
-            .and_then(|pending| (**pending).clone())
-            .expect("a pending target choice")
-        else {
-            panic!("expected a pick choice");
-        };
-        game.app
-            .world_mut()
-            .run_system_once(move |answers: rules::Rules| {
-                let legal: BTreeSet<Entity> = choice
-                    .candidates(&answers)
-                    .into_iter()
-                    .filter(|(_, legality)| *legality == rules::Legality::Legal)
-                    .map(|(entity, _)| entity)
-                    .collect();
-                assert_eq!(legal, BTreeSet::from([*p1, *p2, *p3, *p4]));
-            })
-            .unwrap();
+        assert_eq!(
+            game.target_choice(),
+            Some(pick(1).from([*p1, *p2, *p3, *p4]))
+        );
         Ok(())
     }
 
@@ -504,27 +460,7 @@ mod tests {
         let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
         game.play([p1.pass_priority(), p2.pass_priority()])?;
         game.play([p1.cast(bolt)])?;
-        let actions::Choice::Pick(choice) = game
-            .app
-            .world()
-            .get_resource::<actions::PendingChoice>()
-            .and_then(|pending| (**pending).clone())
-            .expect("a pending target choice")
-        else {
-            panic!("expected a pick choice");
-        };
-        game.app
-            .world_mut()
-            .run_system_once(move |answers: rules::Rules| {
-                let legal: BTreeSet<Entity> = choice
-                    .candidates(&answers)
-                    .into_iter()
-                    .filter(|(_, legality)| *legality == rules::Legality::Legal)
-                    .map(|(entity, _)| entity)
-                    .collect();
-                assert_eq!(legal, BTreeSet::from([*p1]));
-            })
-            .unwrap();
+        assert_eq!(game.target_choice(), Some(pick(1).from([*p1])));
         Ok(())
     }
 
