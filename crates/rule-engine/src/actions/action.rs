@@ -14,7 +14,6 @@ pub enum Action {
     Cast(Entity),
     Play(Entity),
     Choose(Vec<Entity>),
-    ChooseDefendingPlayer(players::PlayerId),
     OrderTriggers(Vec<Entity>),
     ArrangeGraveyard(Vec<Entity>),
     AssignCombatDamage(Vec<actions::DamageAssignment>),
@@ -34,9 +33,6 @@ impl Action {
     #[must_use]
     pub const fn rejection(&self, player: players::PlayerId) -> Option<actions::Rejected> {
         match self {
-            Self::ChooseDefendingPlayer(_) => {
-                Some(actions::Rejected::CannotChooseDefendingPlayer { player })
-            }
             Self::ArrangeGraveyard(_) => Some(actions::Rejected::InvalidGraveyardOrder { player }),
             Self::OrderTriggers(_) => Some(actions::Rejected::InvalidTriggerOrder { player }),
             Self::AssignCombatDamage(_) => Some(actions::Rejected::InvalidCombatDamage { player }),

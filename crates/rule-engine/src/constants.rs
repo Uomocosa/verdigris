@@ -43,3 +43,5 @@ pub const RESOLUTION_CAUSE: rules::EventId = rules::EventId("608.2/resolve");
 pub const LEGEND: actions::ChoiceId = actions::ChoiceId("704.5j");
 
 pub const TARGET: actions::ChoiceId = actions::ChoiceId("601.2c");
+
+pub const DEFENDING_PLAYER: actions::ChoiceId = actions::ChoiceId("507.1");

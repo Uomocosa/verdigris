@@ -12,12 +12,6 @@ pub fn accepts(choice: &actions::Choice, answer: &actions::Action) -> bool {
             };
             choice.check(picked).is_ok()
         }
-        actions::Choice::DefendingPlayer(choice) => {
-            let actions::Action::ChooseDefendingPlayer(chosen) = answer else {
-                return false;
-            };
-            choice.legal.contains(chosen)
-        }
         actions::Choice::ArrangeGraveyard(choice) => {
             let actions::Action::ArrangeGraveyard(answered) = answer else {
                 return false;

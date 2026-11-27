@@ -64,7 +64,7 @@ impl TestPlayerActions {
     pub fn play_land(self, land: testing::TestCard) -> Self { self.act(actions::Action::Play(land.into())) }
 
     #[must_use]
-    pub fn choose_defending_player(self, defender: testing::TestPlayer) -> Self { self.act(actions::Action::ChooseDefendingPlayer(defender.id)) }
+    pub fn choose_defending_player(self, defender: testing::TestPlayer) -> Self { self.act(actions::Action::Choose(vec![defender.into()])) }
 
     #[must_use]
     pub fn keep_legendary(self, card: testing::TestCard) -> Self { self.act(actions::Action::Choose(vec![card.into()])) }

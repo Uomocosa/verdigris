@@ -24,9 +24,6 @@ pub fn rejection(
         actions::Choice::OrderTriggers(_) => {
             Some(actions::Rejected::InvalidTriggerOrder { player })
         }
-        actions::Choice::DefendingPlayer(_) => {
-            Some(actions::Rejected::CannotChooseDefendingPlayer { player })
-        }
     }
 }
 

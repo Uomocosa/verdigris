@@ -12,7 +12,6 @@ pub enum Choice {
     CombatDamage(actions::CombatDamageChoice),
     OrderTriggers(actions::OrderTriggersChoice),
     ArrangeGraveyard(actions::ArrangeGraveyardChoice),
-    DefendingPlayer(actions::DefendingPlayerChoice),
 }
 
 #[atomic_delegates]
@@ -43,7 +42,6 @@ impl Choice {
             Self::CombatDamage(choice) => choice.player,
             Self::OrderTriggers(choice) => choice.player,
             Self::ArrangeGraveyard(choice) => choice.player,
-            Self::DefendingPlayer(choice) => choice.player,
         }
     }
 }

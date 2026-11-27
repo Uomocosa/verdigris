@@ -57,9 +57,6 @@ pub enum Rejected {
     InvalidGraveyardOrder {
         player: players::PlayerId,
     },
-    CannotChooseDefendingPlayer {
-        player: players::PlayerId,
-    },
     CannotAttack {
         attackers: Vec<Entity>,
     },

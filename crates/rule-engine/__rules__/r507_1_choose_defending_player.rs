@@ -2,6 +2,7 @@ use bevy::ecs::schedule::{IntoScheduleConfigs, ScheduleConfigs};
 use bevy::ecs::system::ScheduleSystem;
 use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query, With};
 
+use crate::DEFENDING_PLAYER;
 use crate::Game;
 use crate::actions;
 use crate::players;
@@ -34,20 +35,22 @@ fn ask_which_opponent(mut asks: MessageWriter<actions::Ask>, game: Game) {
     let Some(attacking_player) = game.active_player() else {
         return;
     };
-    let opponents: Vec<players::PlayerId> = attacking_player
+    let opponents: Vec<Entity> = attacking_player
         .opponents_still_in_the_game()
         .into_iter()
-        .map(|opponent| opponent.id)
+        .map(|opponent| *opponent.id)
         .collect();
     if opponents.len() < 2 {
         return;
     }
-    asks.write(actions::Ask(actions::Choice::DefendingPlayer(
-        actions::DefendingPlayerChoice {
-            player: attacking_player.id,
-            legal: opponents,
-        },
-    )));
+    asks.write(actions::Ask(actions::Choice::Pick(actions::PickChoice {
+        id: DEFENDING_PLAYER,
+        player: attacking_player.id,
+        source: None,
+        among: opponents.into_iter().collect(),
+        count: actions::Count::exactly(1),
+        ordered: false,
+    })));
 }
 
 fn mark_the_chosen_opponent(
@@ -57,19 +60,26 @@ fn mark_the_chosen_opponent(
     players: players::Players,
 ) {
     for answered in answers.read() {
-        let actions::Choice::DefendingPlayer(_) = &answered.choice else {
+        let actions::Choice::Pick(choice) = &answered.choice else {
             continue;
         };
-        let actions::Action::ChooseDefendingPlayer(chosen) = &answered.answer else {
+        if choice.id != DEFENDING_PLAYER {
+            continue;
+        }
+        let actions::Action::Choose(chosen) = &answered.answer else {
             continue;
         };
-        if !players.is_still_in_the_game(*chosen) {
+        let [chosen] = chosen.as_slice() else {
+            continue;
+        };
+        let chosen = players::PlayerId(*chosen);
+        if !players.is_still_in_the_game(chosen) {
             continue;
         }
         for player in defending.iter() {
             commands.entity(player).remove::<players::DefendingPlayer>();
         }
-        commands.entity(**chosen).insert(players::DefendingPlayer);
+        commands.entity(*chosen).insert(players::DefendingPlayer);
     }
 }
 
@@ -117,21 +127,25 @@ mod tests {
 
     #[test]
     fn a_player_who_has_lost_cannot_be_chosen_as_the_defending_player() -> TestResult {
-        let (mut game, [p1, p2, p3]) = MockGame::new([P1, P2, P3.life(0)]);
+        let (mut game, [p1, p2, p3, p4]) = MockGame::new([P1, P2, P3, P4.life(0)]);
         game.play([
             p1.pass_to(turns::Step::BeginningOfCombat),
             p2.pass_to(turns::Step::BeginningOfCombat),
             p3.pass_to(turns::Step::BeginningOfCombat),
+            p4.pass_to(turns::Step::BeginningOfCombat),
         ])?;
-        assert!(game.has_lost(p3));
+        assert!(game.has_lost(p4));
 
-        game.act(p1, actions::Action::ChooseDefendingPlayer(p3.id));
+        game.act(p1, actions::Action::Choose(vec![p4.into()]));
 
         assert_eq!(
             game.last_rejection(),
-            Some(&actions::Rejected::CannotChooseDefendingPlayer { player: p1.id })
+            Some(&actions::Rejected::InvalidChoice {
+                player: p1.id,
+                why: actions::ChoiceWhy::NotAllowed(p4.into()),
+            })
         );
-        assert!(!game.has::<players::DefendingPlayer>(p3));
+        assert!(!game.has::<players::DefendingPlayer>(p4));
         Ok(())
     }
 }
