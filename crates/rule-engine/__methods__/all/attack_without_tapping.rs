@@ -12,7 +12,7 @@ pub fn attack_without_tapping(all: &statics::All) -> abilities::Continuous {
         modification: effects::Modification::Rule(rules::RuleChange {
             target: rules::Target::event::<events::Tap>(),
             change: rules::Change::Skip {
-                when: rules::Condition::CausedBy(events::DeclareAttackers::ID),
+                when: rules::Condition::CausedBy(events::Attack::ID),
             },
         }),
     }
@@ -38,7 +38,7 @@ mod tests {
             effects::Modification::Rule(rules::RuleChange {
                 target: rules::Target::event::<events::Tap>(),
                 change: rules::Change::Skip {
-                    when: rules::Condition::CausedBy(events::DeclareAttackers::ID),
+                    when: rules::Condition::CausedBy(events::Attack::ID),
                 },
             }),
         );

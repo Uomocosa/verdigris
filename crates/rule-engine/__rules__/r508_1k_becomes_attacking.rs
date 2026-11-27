@@ -9,16 +9,14 @@ use crate::events;
 /// It remains an attacking creature until it’s removed from combat or the combat phase ends,
 /// whichever comes first. See rule 506.4.
 pub fn r508_1k_becomes_attacking(
-    mut declared: MessageReader<Resolve<events::DeclareAttackers>>,
-    mut did_declare: MessageWriter<Did<events::DeclareAttackers>>,
+    mut declared: MessageReader<Resolve<events::Attack>>,
+    mut did_declare: MessageWriter<Did<events::Attack>>,
     mut commands: Commands,
 ) {
     for declared in declared.read() {
-        for attacker in &declared.attackers {
-            commands.entity(*attacker).insert(cards::Attacking);
-        }
-        did_declare.write(Did(events::DeclareAttackers {
-            attackers: declared.attackers.clone(),
+        commands.entity(declared.attacker).insert(cards::Attacking);
+        did_declare.write(Did(events::Attack {
+            attacker: declared.attacker,
         }));
     }
 }

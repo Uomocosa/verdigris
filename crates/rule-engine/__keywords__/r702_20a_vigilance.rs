@@ -16,7 +16,7 @@ fn abilities() -> Vec<effects::Modification> {
     vec![effects::Modification::Rule(rules::RuleChange {
         target: rules::Target::event::<events::Tap>(),
         change: rules::Change::Skip {
-            when: rules::Condition::CausedBy(events::DeclareAttackers::ID),
+            when: rules::Condition::CausedBy(events::Attack::ID),
         },
     })]
 }
@@ -37,7 +37,7 @@ mod tests {
             vec![effects::Modification::Rule(rules::RuleChange {
                 target: rules::Target::event::<events::Tap>(),
                 change: rules::Change::Skip {
-                    when: rules::Condition::CausedBy(events::DeclareAttackers::ID),
+                    when: rules::Condition::CausedBy(events::Attack::ID),
                 },
             })]
         );

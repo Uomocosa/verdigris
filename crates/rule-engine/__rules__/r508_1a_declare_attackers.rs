@@ -38,7 +38,7 @@ use crate::rules;
 pub fn r508_1a_declare_attackers(
     mut actions: MessageReader<actions::PlayerAction>,
     mut rejected: MessageWriter<actions::Rejected>,
-    mut declared: MessageWriter<Attempt<events::DeclareAttackers>>,
+    mut declared: MessageWriter<Attempt<events::Attack>>,
     game: Game,
     answers: rules::Rules,
 ) {
@@ -54,8 +54,8 @@ pub fn r508_1a_declare_attackers(
             continue;
         }
         for attacker in attackers {
-            declared.write(Attempt(events::DeclareAttackers {
-                attackers: vec![*attacker],
+            declared.write(Attempt(events::Attack {
+                attacker: *attacker,
             }));
         }
     }

@@ -305,11 +305,11 @@ mod tests {
             .run_system_once(move |answers: rules::Rules| {
                 assert!(answers.performs(&events::Tap {
                     permanent: *bears,
-                    cause: events::DeclareAttackers::ID,
+                    cause: events::Attack::ID,
                 }));
                 assert!(!answers.performs(&events::Tap {
                     permanent: *sovereign,
-                    cause: events::DeclareAttackers::ID,
+                    cause: events::Attack::ID,
                 }));
                 assert_eq!(
                     answers.resolve(events::DealDamage::SOURCE.controller(), &damage),
