@@ -22,7 +22,7 @@ impl PlayDatalog {
         answers: &rules::Rules,
         card: Entity,
         player: players::PlayerId,
-    ) -> Result<rules::Legality, TranslationError> {
+    ) -> Result<Option<rules::Legality>, TranslationError> {
     }
 }
 

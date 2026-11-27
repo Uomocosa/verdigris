@@ -174,6 +174,13 @@ impl MockGame {
     ) -> R {
     }
 
+    #[must_use]
+    pub fn read_rules<R>(
+        &mut self,
+        with: impl FnOnce(&rules::Rules, &actions::LegalActions) -> R,
+    ) -> Option<R> {
+    }
+
     pub fn assert_legal_actions_agree(&mut self) -> testing::TestResult {}
 }
 
