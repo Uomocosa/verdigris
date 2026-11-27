@@ -23,7 +23,7 @@ pub fn r508_1m_r508_2a_r508_3a_attack_triggers(
     attackers: Query<(&cards::CardDefinition, &cards::Controller)>,
 ) {
     for declared in declared.read() {
-        let Ok((definition, controller)) = attackers.get(declared.attacker) else {
+        let Ok((definition, _)) = attackers.get(declared.attacker) else {
             continue;
         };
         for ability in definition.triggered_abilities() {
@@ -32,7 +32,6 @@ pub fn r508_1m_r508_2a_r508_3a_attack_triggers(
             }
             queue.push(stack::PendingTrigger {
                 source: declared.attacker,
-                controller: **controller,
                 ability: ability.clone(),
             });
         }

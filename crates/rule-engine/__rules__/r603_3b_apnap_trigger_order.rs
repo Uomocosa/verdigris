@@ -1,10 +1,11 @@
 use std::collections::BTreeSet;
 
-use bevy::prelude::{Commands, Entity, MessageReader, ResMut};
+use bevy::prelude::{Commands, Entity, MessageReader, Query, ResMut};
 
 use crate::STACK;
 use crate::actions;
 use crate::cards;
+use crate::players;
 use crate::stack;
 use crate::zones;
 
@@ -31,6 +32,7 @@ pub fn r603_3b_apnap_trigger_order(
     mut queue: ResMut<stack::TriggerQueue>,
     mut commands: Commands,
     zones: zones::ZoneLookup,
+    controllers: Query<&cards::Controller>,
 ) {
     for answered in answers.read() {
         let actions::Choice::OrderTriggers(choice) = &answered.choice else {
@@ -43,30 +45,32 @@ pub fn r603_3b_apnap_trigger_order(
         let Some(stack) = zones.find(STACK, None) else {
             continue;
         };
-        let mut held: Vec<stack::PendingTrigger> = Vec::new();
+        let mut held: Vec<(players::PlayerId, stack::PendingTrigger)> = Vec::new();
         for trigger in queue.take_pending() {
-            if trigger.controller == choice.player && expected.contains(&trigger.source) {
-                held.push(trigger);
+            let Ok(controller) = controllers.get(trigger.source) else {
+                continue;
+            };
+            if **controller == choice.player && expected.contains(&trigger.source) {
+                held.push((**controller, trigger));
             } else {
                 queue.push(trigger);
             }
         }
         for source in ordered {
-            if let Some(position) = held.iter().position(|trigger| trigger.source == *source) {
-                let trigger = held.remove(position);
+            if let Some(position) = held.iter().position(|(_, trigger)| trigger.source == *source) {
+                let (controller, trigger) = held.remove(position);
                 commands.spawn((
                     zones::InZone(stack),
-                    cards::Controller(trigger.controller),
+                    cards::Controller(controller),
                     stack::TriggeredAbilityOnStack {
                         source: trigger.source,
-                        controller: trigger.controller,
                         intervening_if: trigger.ability.intervening_if,
                         effect: trigger.ability.effect,
                     },
                 ));
             }
         }
-        for trigger in held {
+        for (_, trigger) in held {
             queue.push(trigger);
         }
     }

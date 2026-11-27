@@ -20,7 +20,7 @@ pub fn r510_3a_combat_damage_triggers(
         if targets.get(event.recipient).is_err() {
             continue;
         }
-        let Ok((definition, controller)) = sources.get(event.source) else {
+        let Ok((definition, _)) = sources.get(event.source) else {
             continue;
         };
         for ability in definition.triggered_abilities() {
@@ -32,7 +32,6 @@ pub fn r510_3a_combat_damage_triggers(
             }
             queue.push(stack::PendingTrigger {
                 source: event.source,
-                controller: **controller,
                 ability: ability.clone(),
             });
         }

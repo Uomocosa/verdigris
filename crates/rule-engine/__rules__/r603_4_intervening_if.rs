@@ -72,11 +72,7 @@ pub fn r603_4_intervening_if(
             {
                 continue;
             }
-            queue.push(stack::PendingTrigger {
-                source,
-                controller,
-                ability,
-            });
+            queue.push(stack::PendingTrigger { source, ability });
         }
     }
 }

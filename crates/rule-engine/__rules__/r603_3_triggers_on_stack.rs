@@ -33,52 +33,69 @@ pub fn r603_3_triggers_on_stack(world: &mut World) {
     if world.resource::<actions::PendingChoice>().is_some() {
         return;
     }
-    let mut pending = world.resource_mut::<stack::TriggerQueue>().take_pending();
+    let pending = world.resource_mut::<stack::TriggerQueue>().take_pending();
     if pending.is_empty() {
         return;
     }
     let Ok(apnap) = world.run_system_once(|game: Game| game.players_in_apnap_order()) else {
         return;
     };
-    pending.sort_by_key(|trigger| apnap_position(&apnap, trigger.controller));
-    let mut groups: Vec<Vec<stack::PendingTrigger>> = Vec::new();
-    for trigger in pending {
+    let mut ordered: Vec<(players::PlayerId, stack::PendingTrigger)> = Vec::new();
+    {
+        let mut controllers = world.query::<&cards::Controller>();
+        for trigger in pending {
+            let Ok(controller) = controllers.get(world, trigger.source) else {
+                continue;
+            };
+            ordered.push((**controller, trigger));
+        }
+    }
+    if ordered.is_empty() {
+        return;
+    }
+    ordered.sort_by_key(|(controller, _)| apnap_position(&apnap, *controller));
+    let mut groups: Vec<Vec<(players::PlayerId, stack::PendingTrigger)>> = Vec::new();
+    for (controller, trigger) in ordered {
         let continues_run = groups.last().is_some_and(|group| {
-            group.first().is_some_and(|first| first.controller == trigger.controller)
+            group.first().is_some_and(|first| {
+                let (first_controller, _) = first;
+                first_controller == &controller
+            })
         });
         if continues_run {
             if let Some(group) = groups.last_mut() {
-                group.push(trigger);
+                group.push((controller, trigger));
             }
         } else {
-            groups.push(vec![trigger]);
+            groups.push(vec![(controller, trigger)]);
         }
     }
     let mut groups = groups.into_iter();
     while let Some(group) = groups.next() {
         if group.len() == 1 {
             let mut single = group;
-            if let Some(trigger) = single.pop() {
-                spawn_trigger(world, trigger);
+            if let Some((controller, trigger)) = single.pop() {
+                spawn_trigger(world, controller, trigger);
             }
             continue;
         }
-        let Some(first) = group.first() else {
+        let Some((controller, _)) = group.first() else {
             continue;
         };
+        let controller = *controller;
         world.write_message(actions::Ask(actions::Choice::OrderTriggers(
             actions::OrderTriggersChoice {
-                player: first.controller,
-                triggers: group.iter().map(|trigger| trigger.source).collect(),
+                player: controller,
+                triggers: group.iter().map(|(_, trigger)| trigger.source).collect(),
             },
         )));
         let _ = world.run_system_once(actions::bevy_systems::show_asks::show_asks);
         let mut queue = world.resource_mut::<stack::TriggerQueue>();
-        for trigger in group {
+        for (_, trigger) in group {
             queue.push(trigger);
         }
         for rest in groups.by_ref() {
-            for trigger in rest {
+            for (_, trigger) in rest {
                 queue.push(trigger);
             }
         }
@@ -90,7 +107,7 @@ fn apnap_position(order: &[players::PlayerId], player: players::PlayerId) -> usi
     order.iter().position(|candidate| *candidate == player).unwrap_or(usize::MAX)
 }
 
-fn spawn_trigger(world: &mut World, trigger: stack::PendingTrigger) {
+fn spawn_trigger(world: &mut World, controller: players::PlayerId, trigger: stack::PendingTrigger) {
     let mut zones = world.query::<(Entity, &zones::Zone)>();
     let Some(stack) =
         zones.iter(world).find(|(_, zone)| **zone == zones::Zone::Stack).map(|(entity, _)| entity)
@@ -99,10 +116,9 @@ fn spawn_trigger(world: &mut World, trigger: stack::PendingTrigger) {
     };
     world.spawn((
         zones::InZone(stack),
-        cards::Controller(trigger.controller),
+        cards::Controller(controller),
         stack::TriggeredAbilityOnStack {
             source: trigger.source,
-            controller: trigger.controller,
             intervening_if: trigger.ability.intervening_if,
             effect: trigger.ability.effect,
         },
@@ -112,8 +128,8 @@ fn spawn_trigger(world: &mut World, trigger: stack::PendingTrigger) {
 #[cfg(test)]
 mod tests {
     use crate::HAND;
+    use crate::cards;
     use crate::mana;
-    use crate::stack;
     use crate::testing::*;
 
     #[test]
@@ -128,8 +144,8 @@ mod tests {
         assert!(game.stack().has_trigger(SOUL_WARDEN.trigger()));
         assert!(game.stack().has_no(SOUL_WARDEN));
         let [trigger] = game.stack().exactly_trigger::<1>(SOUL_WARDEN.trigger())?;
-        let ability = game.get::<stack::TriggeredAbilityOnStack>(trigger).unwrap();
-        assert_eq!(ability.controller, p1.id);
+        let controller = game.get::<cards::Controller>(trigger).unwrap();
+        assert_eq!(*controller, p1.id);
         assert!(!game.has::<crate::cards::CardDefinition>(trigger));
         Ok(())
     }

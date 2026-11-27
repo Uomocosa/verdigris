@@ -36,7 +36,7 @@ pub fn r509_1i_r509_2a_r509_3a_r509_3c_blocker_triggers(
     let mut fired: BTreeSet<Entity> = BTreeSet::new();
     for declared in declared.read() {
         if fired.insert(declared.blocker)
-            && let Ok((definition, controller)) = creatures.get(declared.blocker)
+            && let Ok((definition, _)) = creatures.get(declared.blocker)
         {
             for ability in definition.triggered_abilities() {
                 if !matches!(ability.event, abilities::TriggerEvent::Blocks) {
@@ -44,13 +44,12 @@ pub fn r509_1i_r509_2a_r509_3a_r509_3c_blocker_triggers(
                 }
                 queue.push(stack::PendingTrigger {
                     source: declared.blocker,
-                    controller: **controller,
                     ability: ability.clone(),
                 });
             }
         }
         if fired.insert(declared.attacker)
-            && let Ok((definition, controller)) = creatures.get(declared.attacker)
+            && let Ok((definition, _)) = creatures.get(declared.attacker)
         {
             for ability in definition.triggered_abilities() {
                 if !matches!(ability.event, abilities::TriggerEvent::BecomesBlocked) {
@@ -58,7 +57,6 @@ pub fn r509_1i_r509_2a_r509_3a_r509_3c_blocker_triggers(
                 }
                 queue.push(stack::PendingTrigger {
                     source: declared.attacker,
-                    controller: **controller,
                     ability: ability.clone(),
                 });
             }

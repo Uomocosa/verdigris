@@ -40,7 +40,7 @@ pub fn r603_2_r603_6a_triggered_abilities(
         if !definition.type_line.types.contains(&cards::CardType::Creature) {
             continue;
         }
-        for (source, controller, enters) in sources.iter() {
+        for (source, _, enters) in sources.iter() {
             if source == permanent {
                 continue;
             }
@@ -51,11 +51,7 @@ pub fn r603_2_r603_6a_triggered_abilities(
             ) {
                 continue;
             }
-            queue.push(stack::PendingTrigger {
-                source,
-                controller: **controller,
-                ability,
-            });
+            queue.push(stack::PendingTrigger { source, ability });
         }
     }
 }

@@ -60,8 +60,7 @@ pub fn r608_2_r608_2c_resolve(
         let Ok(controller) = lookups.controllers.get(spell) else {
             continue;
         };
-        let controller =
-            lookups.abilities.get(spell).map_or(**controller, |ability| ability.controller);
+        let controller = **controller;
         let chosen_target = lookups.chosen_targets.get(spell).ok().map(|chosen| **chosen);
         let player_targets = player_targets_for(&lookups, chosen_target, &effect, controller);
         let target_zone = chosen_target.and_then(|target| lookups.in_zone.get(target).ok());

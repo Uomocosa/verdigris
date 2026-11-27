@@ -2,7 +2,6 @@ use bevy::prelude::{Component, Entity};
 use derive_more::Deref;
 
 use crate::effects;
-use crate::players;
 use crate::rules;
 
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Deref)]
@@ -17,7 +16,6 @@ pub enum CastingStage {
 #[derive(Component, Debug, Clone, PartialEq, Eq)]
 pub struct TriggeredAbilityOnStack {
     pub source: Entity,
-    pub controller: players::PlayerId,
     pub intervening_if: Option<rules::Condition>,
     pub effect: effects::Effect,
 }
