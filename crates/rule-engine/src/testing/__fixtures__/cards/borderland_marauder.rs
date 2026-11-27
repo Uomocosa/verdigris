@@ -12,7 +12,7 @@ pub const BORDERLAND_MARAUDER: testing::Card = testing::Card {
     definition: || {
         card! {
             cards::creature("Borderland Marauder", cost![1, R], pt!(1, 2));
-            abilities::whenever(abilities::TriggerEvent::attacks(), effects::gets(2, 0).to(THIS)),
+            abilities::whenever(THIS.attacks(), effects::gets(2, 0).to(THIS)),
         }
     },
 };

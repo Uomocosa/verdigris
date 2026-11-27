@@ -2,8 +2,7 @@
 mod basic;
 
 pub use basic::card_text::{
-    at, begin_the_game_with_it_on_the_battlefield, opening_hand_action, tap_add, when,
-    when_this_dies, whenever,
+    at, begin_the_game_with_it_on_the_battlefield, opening_hand_action, tap_add, when, whenever,
 };
 pub use basic::enums::{ActivationCost, Replacement};
 pub use basic::structs::{ActivatedAbility, TriggeredAbility};
@@ -13,6 +12,9 @@ pub use continuous::Continuous;
 
 mod ability;
 pub use ability::Ability;
+
+mod deals_damage;
+pub use deals_damage::DealsDamage;
 
 mod static_ability;
 pub use static_ability::StaticAbility;

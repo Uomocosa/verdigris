@@ -226,7 +226,7 @@ mod tests {
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
-                let big = rules::power().is(rules::Value(3).or_more()).of(TestRule::ATTACKER);
+                let big = rules::power().of(TestRule::ATTACKER).is(rules::Value(3).or_more());
                 assert!(!eval(&answers, &big, &small, None));
                 assert!(eval(&answers, &big, &big_attack, None));
             })

@@ -28,7 +28,7 @@ pub fn write_triggered_markers(
                 | abilities::TriggerEvent::Attacks
                 | abilities::TriggerEvent::Blocks
                 | abilities::TriggerEvent::BecomesBlocked
-                | abilities::TriggerEvent::DealtCombatDamageToPlayer => {}
+                | abilities::TriggerEvent::DealsDamage { .. } => {}
             }
         }
     }

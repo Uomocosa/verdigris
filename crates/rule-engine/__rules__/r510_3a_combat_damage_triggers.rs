@@ -1,4 +1,4 @@
-use bevy::prelude::{MessageReader, Query, ResMut, With};
+use bevy::prelude::{Entity, MessageReader, Query, ResMut, With};
 
 use crate::Did;
 use crate::abilities;
@@ -15,21 +15,26 @@ pub fn r510_3a_combat_damage_triggers(
     mut dealt: MessageReader<Did<events::DealDamage>>,
     mut queue: ResMut<stack::TriggerQueue>,
     sources: Query<(&cards::CardDefinition, &cards::Controller), With<cards::Attacking>>,
-    targets: Query<&players::Life>,
+    targets: Query<(Entity, &players::Life)>,
     answers: rules::Rules,
 ) {
     for event in dealt.read() {
         if targets.get(event.recipient).is_err() {
             continue;
         }
-        let Ok((definition, _)) = sources.get(event.source) else {
+        let Ok((definition, controller)) = sources.get(event.source) else {
             continue;
         };
         for ability in definition.triggered_abilities() {
-            if !matches!(
-                ability.event,
-                abilities::TriggerEvent::DealtCombatDamageToPlayer
-            ) {
+            let abilities::TriggerEvent::DealsDamage { to, .. } = ability.event else {
+                continue;
+            };
+            let in_game: Vec<players::PlayerId> =
+                targets.iter().map(|(player, _)| players::PlayerId(player)).collect();
+            if !to
+                .resolve(Some(**controller), &in_game)
+                .contains(&players::PlayerId(event.recipient))
+            {
                 continue;
             }
             queue.push_checked(event.source, ability.clone(), &answers);

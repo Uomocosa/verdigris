@@ -13,7 +13,7 @@ pub enum TriggerEvent {
     Attacks,
     Blocks,
     BecomesBlocked,
-    DealtCombatDamageToPlayer,
+    DealsDamage { combat: bool, to: rules::Players },
     Dies,
 }
 
@@ -21,26 +21,6 @@ impl TriggerEvent {
     #[must_use]
     pub const fn beginning_of_next_cleanup() -> Self {
         Self::BeginningOfNextCleanup
-    }
-
-    #[must_use]
-    pub const fn attacks() -> Self {
-        Self::Attacks
-    }
-
-    #[must_use]
-    pub const fn blocks() -> Self {
-        Self::Blocks
-    }
-
-    #[must_use]
-    pub const fn becomes_blocked() -> Self {
-        Self::BecomesBlocked
-    }
-
-    #[must_use]
-    pub const fn dealt_combat_damage_to_player() -> Self {
-        Self::DealtCombatDamageToPlayer
     }
 }
 
@@ -52,6 +32,7 @@ impl TriggerEvent {
 
 #[cfg(test)]
 mod tests {
+    use crate::PLAYER;
     use crate::UPKEEP;
     use crate::YOU;
     use crate::abilities;
@@ -73,20 +54,11 @@ mod tests {
             abilities::TriggerEvent::BeginningOfNextCleanup
         );
         assert_eq!(
-            abilities::TriggerEvent::attacks(),
-            abilities::TriggerEvent::Attacks
-        );
-        assert_eq!(
-            abilities::TriggerEvent::blocks(),
-            abilities::TriggerEvent::Blocks
-        );
-        assert_eq!(
-            abilities::TriggerEvent::becomes_blocked(),
-            abilities::TriggerEvent::BecomesBlocked
-        );
-        assert_eq!(
-            abilities::TriggerEvent::dealt_combat_damage_to_player(),
-            abilities::TriggerEvent::DealtCombatDamageToPlayer
+            abilities::DealsDamage(true).to(rules::a(PLAYER)),
+            abilities::TriggerEvent::DealsDamage {
+                combat: true,
+                to: rules::Players::All,
+            }
         );
     }
 }

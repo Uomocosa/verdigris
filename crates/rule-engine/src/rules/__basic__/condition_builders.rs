@@ -125,3 +125,8 @@ pub fn each(players: impl Into<rules::Players>) -> rules::Each {
 pub fn an(players: impl Into<rules::Players>) -> rules::An {
     rules::An(players.into())
 }
+
+#[must_use]
+pub fn a(players: impl Into<rules::Players>) -> rules::An {
+    rules::An(players.into())
+}

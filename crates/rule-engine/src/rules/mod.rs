@@ -2,13 +2,13 @@
 mod basic;
 
 pub use basic::condition_builders::{
-    active_player, an, card_type, cards_in_hand, cards_in_library, count, each, exactly,
+    a, active_player, an, card_type, cards_in_hand, cards_in_library, count, each, exactly,
     greater_than, has, has_keyword, has_priority, in_zone, is, less_than, life, main_phase,
     points_to, poison_counters, power, stack_empty, step_is, toughness,
 };
 pub use basic::enums::{Amount, Change, Legality, may};
 pub use basic::newtypes::{An, Each, EventId, ResultId, RuleId};
-pub use basic::structs::{RuleChange, This, You};
+pub use basic::structs::{RuleChange, You};
 pub use basic::type_aliases::{Definition, Restriction};
 
 mod value;
@@ -75,6 +75,9 @@ pub use count::Count;
 mod characteristic;
 pub use characteristic::Characteristic;
 
+mod characteristic_of;
+pub use characteristic_of::CharacteristicOf;
+
 mod rules;
 pub use rules::Rules;
 
@@ -89,6 +92,9 @@ pub use player_quantity_of::PlayerQuantityOf;
 
 mod subject;
 pub use subject::Subject;
+
+mod this;
+pub use this::This;
 
 mod rule_registry;
 pub use rule_registry::RuleRegistry;

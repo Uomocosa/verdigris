@@ -56,7 +56,7 @@ pub fn r603_4_intervening_if(
                 | abilities::TriggerEvent::Attacks
                 | abilities::TriggerEvent::Blocks
                 | abilities::TriggerEvent::BecomesBlocked
-                | abilities::TriggerEvent::DealtCombatDamageToPlayer => false,
+                | abilities::TriggerEvent::DealsDamage { .. } => false,
             };
             if !triggered {
                 continue;

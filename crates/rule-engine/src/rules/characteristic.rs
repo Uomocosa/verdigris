@@ -1,3 +1,5 @@
+use atomic_delegate_macros::atomic_delegates;
+
 use crate::rules;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -12,6 +14,12 @@ impl Characteristic {
     pub const fn is(self, comparison: rules::Comparison) -> rules::Condition {
         rules::Condition::Characteristic(self, comparison)
     }
+}
+
+#[atomic_delegates]
+impl Characteristic {
+    #[must_use]
+    pub fn of(self, who: impl Into<rules::Subject>) -> rules::CharacteristicOf {}
 }
 
 #[cfg(test)]

@@ -34,11 +34,6 @@ pub fn when(
 }
 
 #[must_use]
-pub const fn when_this_dies() -> abilities::TriggerEvent {
-    abilities::TriggerEvent::Dies
-}
-
-#[must_use]
 pub const fn tap_add(produces: cards::ManaType) -> abilities::ActivatedAbility {
     abilities::ActivatedAbility {
         cost: abilities::ActivationCost::Tap,

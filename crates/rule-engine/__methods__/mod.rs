@@ -12,12 +12,14 @@ pub mod cards;
 #[cfg(feature = "testing")]
 pub mod cards_in_zone;
 pub mod cast_spell;
+pub mod characteristic;
 pub mod characteristics;
 pub mod choice;
 pub mod combat_damage_choice;
 pub mod condition;
 pub mod continuous;
 pub mod deal_damage;
+pub mod deals_damage;
 pub mod declare_attacker;
 pub mod declare_blocker;
 pub mod definition_id;

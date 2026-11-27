@@ -12,14 +12,8 @@ pub const CHUB_TOAD: testing::Card = testing::Card {
     definition: || {
         card! {
             cards::creature("Chub Toad", cost![2, G], pt!(1, 1));
-            abilities::whenever(
-                abilities::TriggerEvent::blocks(),
-                effects::gets(3, 3).to(THIS),
-            ),
-            abilities::whenever(
-                abilities::TriggerEvent::becomes_blocked(),
-                effects::gets(3, 3).to(THIS),
-            ),
+            abilities::whenever(THIS.blocks(), effects::gets(3, 3).to(THIS)),
+            abilities::whenever(THIS.becomes_blocked(), effects::gets(3, 3).to(THIS)),
         }
     },
 };

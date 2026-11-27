@@ -16,8 +16,9 @@ pub const TEST_TIMID_FIELD: testing::Card = testing::Card {
                 .restriction::<events::DeclareBlocker>(
                     events::DeclareBlocker::BLOCKER,
                     rules::RestrictionId("test/test-timid-field"),
-                    rules::power().is(rules::Value(3).or_more())
-                        .of(events::DeclareBlocker::BLOCKER),
+                    rules::power()
+                        .of(events::DeclareBlocker::BLOCKER)
+                        .is(rules::Value(3).or_more()),
                 )
         }
     },
