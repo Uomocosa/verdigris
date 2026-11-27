@@ -10,6 +10,7 @@ pub fn cases() -> Vec<Case> {
         Case::negated_relation_empty(),
         Case::unstratifiable(),
         Case::unsafe_head(),
+        Case::entity_traversal(),
     ]
 }
 
@@ -20,7 +21,7 @@ mod tests {
     #[test]
     fn test_usage() {
         let all = cases();
-        assert_eq!(all.len(), 8);
+        assert_eq!(all.len(), 9);
         assert_eq!(all[1].name, "stratified_negation");
         assert!(all.iter().any(|case| case.name == "unsafe_head"));
     }

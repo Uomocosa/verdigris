@@ -1,5 +1,6 @@
 use std::collections::BTreeSet;
 
+use verdigris_datalog_ir::Atom;
 use verdigris_datalog_ir::CmpOp;
 use verdigris_datalog_ir::Facts;
 use verdigris_datalog_ir::Literal;
@@ -8,35 +9,9 @@ use verdigris_datalog_ir::Rel;
 use verdigris_datalog_ir::Term;
 use verdigris_datalog_ir::Value;
 
+use crate::NemoEngine;
+
 pub fn render_program_text(program: &Program, facts: &Facts) -> String {
-    let render_value = |value: &Value| -> String {
-        match value {
-            Value::Int(number) => number.to_string(),
-            Value::Entity(number) => number.to_string(),
-            Value::Sym(text) => format!("\"{}\"", text.replace('\\', "\\\\").replace('"', "\\\"")),
-        }
-    };
-    let render_term = |term: &Term| -> String {
-        match term {
-            Term::Var(name) => format!("?{name}"),
-            Term::Val(value) => render_value(value),
-        }
-    };
-    let render_atom = |relation: &Rel, terms: &[Term]| -> String {
-        let mut text = relation.to_string();
-        text.push('(');
-        let mut first = true;
-        for term in terms {
-            if first {
-                first = false;
-            } else {
-                text.push_str(", ");
-            }
-            text.push_str(&render_term(term));
-        }
-        text.push(')');
-        text
-    };
     let comparison_holds = |first: &Value, operation: CmpOp, second: &Value| -> bool {
         let ordering = first.cmp(second);
         match operation {
@@ -61,7 +36,10 @@ pub fn render_program_text(program: &Program, facts: &Facts) -> String {
     let mut text = String::new();
     for (relation, tuple) in facts.iter() {
         let terms: Vec<Term> = tuple.iter().map(|value| Term::Val(*value)).collect();
-        text.push_str(&render_atom(&relation, &terms));
+        text.push_str(&NemoEngine::render_atom_text(&Atom {
+            rel: relation,
+            terms,
+        }));
         text.push_str(".\n");
     }
     let mut heads: BTreeSet<Rel> = BTreeSet::new();
@@ -70,9 +48,9 @@ pub fn render_program_text(program: &Program, facts: &Facts) -> String {
         let mut conditions: Vec<String> = Vec::new();
         for literal in &rule.body {
             match literal {
-                Literal::Pos(atom) => conditions.push(render_atom(&atom.rel, &atom.terms)),
+                Literal::Pos(atom) => conditions.push(NemoEngine::render_atom_text(atom)),
                 Literal::Neg(atom) => {
-                    conditions.push(format!("~{}", render_atom(&atom.rel, &atom.terms)));
+                    conditions.push(format!("~{}", NemoEngine::render_atom_text(atom)));
                 }
                 Literal::Cmp(left, operation, right) => {
                     if let (Term::Val(first), Term::Val(second)) = (left, right) {
@@ -84,9 +62,9 @@ pub fn render_program_text(program: &Program, facts: &Facts) -> String {
                     }
                     conditions.push(format!(
                         "{} {} {}",
-                        render_term(left),
+                        NemoEngine::render_term_text(left),
                         comparison_text(*operation),
-                        render_term(right)
+                        NemoEngine::render_term_text(right)
                     ));
                 }
             }
@@ -95,7 +73,7 @@ pub fn render_program_text(program: &Program, facts: &Facts) -> String {
             continue;
         }
         heads.insert(rule.head.rel);
-        text.push_str(&render_atom(&rule.head.rel, &rule.head.terms));
+        text.push_str(&NemoEngine::render_atom_text(&rule.head));
         if !conditions.is_empty() {
             text.push_str(" :- ");
             text.push_str(&conditions.join(", "));
@@ -197,5 +175,16 @@ mod tests {
         assert!(text.contains("present(?X) :- query(?X), ~missing(?X), ?X > 0.\n"));
         assert!(!text.contains("dead"));
         assert!(text.contains("named(\"ada\").\n"));
+    }
+
+    #[test]
+    fn renders_entities_as_iris() {
+        use crate::NemoEngine;
+
+        let mut facts = Facts::default();
+        assert!(facts.add(Rel("edge"), vec![Value::Entity(1), Value::Entity(2)]));
+        let text = render_program_text(&Program::default(), &facts);
+        let prefix = NemoEngine::ENTITY_IRI_PREFIX;
+        assert!(text.contains(&format!("edge(<{prefix}1>, <{prefix}2>).\n")));
     }
 }

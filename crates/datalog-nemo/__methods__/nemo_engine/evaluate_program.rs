@@ -2,16 +2,43 @@ use std::collections::BTreeMap;
 
 use verdigris_datalog_ir::EngineError;
 use verdigris_datalog_ir::Facts;
+use verdigris_datalog_ir::Literal;
 use verdigris_datalog_ir::Program;
 use verdigris_datalog_ir::Rel;
+use verdigris_datalog_ir::Term;
+use verdigris_datalog_ir::Value;
 
 use crate::NemoEngine;
 
 pub fn evaluate_program(program: &Program, facts: &Facts) -> Result<Facts, EngineError> {
     let _strata = program.stratify()?;
     let mut names: BTreeMap<String, Rel> = BTreeMap::new();
+    let mut symbols: BTreeMap<String, &'static str> = BTreeMap::new();
+    let mut collect_term = |term: &Term| {
+        if let Term::Val(Value::Sym(text)) = term {
+            symbols.insert(text.to_string(), text);
+        }
+    };
     for rule in &program.rules {
         names.insert(rule.head.rel.to_string(), rule.head.rel);
+        for term in &rule.head.terms {
+            collect_term(term);
+        }
+        for literal in &rule.body {
+            let (Literal::Pos(atom) | Literal::Neg(atom)) = literal else {
+                continue;
+            };
+            for term in &atom.terms {
+                collect_term(term);
+            }
+        }
+    }
+    for (_, tuple) in facts.iter() {
+        for value in tuple {
+            if let Value::Sym(text) = value {
+                symbols.insert(text.to_string(), text);
+            }
+        }
     }
     let text = NemoEngine::render_program_text(program, facts);
     let runtime = tokio::runtime::Builder::new_current_thread()
@@ -43,7 +70,7 @@ pub fn evaluate_program(program: &Program, facts: &Facts) -> Result<Facts, Engin
             for row in rows {
                 let mut tuple = Vec::with_capacity(row.len());
                 for cell in &row {
-                    tuple.push(NemoEngine::decode_cell(cell)?);
+                    tuple.push(NemoEngine::decode_cell(cell, &symbols)?);
                 }
                 let _ = derived.add(*relation, tuple);
             }
@@ -65,6 +92,7 @@ mod tests {
 
     use super::evaluate_program;
     use crate::NemoEngine;
+    use verdigris_datalog_ir::traits::engine::Engine;
 
     #[test]
     fn test_usage() {
@@ -98,5 +126,10 @@ mod tests {
             elapsed.as_millis()
         );
         assert!(outcome.is_ok());
+        let repeated = verdigris_datalog_ir::Case::entity_traversal();
+        for _ in 0..1000 {
+            let derived = engine.evaluate(&repeated.program, &repeated.facts).unwrap();
+            assert_eq!(derived, repeated.expected);
+        }
     }
 }

@@ -21,6 +21,8 @@ impl Case {
     #[must_use]
     pub fn transitive_closure() -> Case {}
     #[must_use]
+    pub fn entity_traversal() -> Case {}
+    #[must_use]
     pub fn stratified_negation() -> Case {}
     #[must_use]
     pub fn comparison_literal() -> Case {}
@@ -43,7 +45,7 @@ mod tests {
     #[test]
     fn test_usage() {
         let all = Case::cases();
-        assert_eq!(all.len(), 8);
+        assert_eq!(all.len(), 9);
         assert_eq!(all[0].name, "transitive_closure");
     }
 }
