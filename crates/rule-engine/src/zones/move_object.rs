@@ -31,6 +31,7 @@ pub fn move_object(
         .remove::<cards::HadFirstStrikeAsDamageBegan>()
         .remove::<cards::TriggeredEnters>()
         .remove::<cards::TriggeredAtStep>()
+        .remove::<damage::DealtByDeathtouch>()
         .remove::<stack::CastingStage>()
         .remove::<stack::ChosenTarget>()
         .remove::<effects::SourceTimestamp>();
