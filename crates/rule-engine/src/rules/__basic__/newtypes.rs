@@ -12,7 +12,4 @@ pub struct ResultId(pub &'static str);
 pub struct RuleId(pub &'static str);
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deref)]
-pub struct Each(pub rules::Players);
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deref)]
 pub struct An(pub rules::Players);

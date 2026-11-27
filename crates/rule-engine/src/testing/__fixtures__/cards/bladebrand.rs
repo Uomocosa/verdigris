@@ -1,4 +1,5 @@
 use crate::CREATURE;
+use crate::YOU;
 use crate::cards;
 use crate::cost;
 use crate::effects;
@@ -8,10 +9,7 @@ use crate::testing;
 pub const BLADEBRAND: testing::Card = testing::Card {
     name: testing::TestCardName("Bladebrand"),
     definition: || {
-        cards::instant("Bladebrand", cost![1, B]).spell(
-            effects::gains(keywords::deathtouch())
-                .to(effects::target(1, CREATURE))
-                .and(effects::draw(1)),
-        )
+        cards::instant("Bladebrand", cost![1, B])
+            .spell(effects::target(1, CREATURE).gains(keywords::deathtouch()) & YOU.draws(1))
     },
 };

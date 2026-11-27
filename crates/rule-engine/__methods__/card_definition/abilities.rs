@@ -15,7 +15,6 @@ mod tests {
     use crate::CREATURE;
     use crate::YOU;
     use crate::abilities;
-    use crate::effects;
     use crate::keywords;
     use crate::statics;
     use crate::testing;
@@ -24,10 +23,7 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let triggered = abilities::whenever(
-            ANOTHER_CREATURE.enters(),
-            effects::gain_life(1).to_player(YOU),
-        );
+        let triggered = abilities::whenever(ANOTHER_CREATURE.enters(), YOU.gains_life(1));
         let definition = (testing::GRIZZLY_BEARS.definition)();
         let static_ability = statics::all(CREATURE).gain(keywords::vigilance());
         let definition = apply_abilities(

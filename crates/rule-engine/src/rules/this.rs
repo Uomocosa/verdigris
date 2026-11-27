@@ -1,4 +1,7 @@
 use crate::abilities;
+use crate::effects;
+use crate::effects::traits::gets::Gets;
+use crate::keywords;
 use crate::rules::traits::dealt::Dealt;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -18,6 +21,10 @@ impl This {
     }
     #[must_use]
     pub fn deals<D: Dealt>(self, dealt: D) -> D::Builder { dealt.build() }
+    #[must_use]
+    pub fn gets(self, got: impl Gets) -> effects::Effect { effects::gets(got).to(self) }
+    #[must_use]
+    pub fn gains(self, kw: keywords::Keyword) -> effects::Effect { effects::gains(kw).to(self) }
 }
 
 #[cfg(test)]

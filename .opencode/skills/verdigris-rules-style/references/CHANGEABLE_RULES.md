@@ -230,7 +230,7 @@ value or a threshold (`src/rules/value.rs:10`, `src/rules/__basic__/condition_bu
 
 ```rust
 rules::life().of(YOU).is(rules::Value(40).or_more())
-rules::poison_counters().is(rules::Value(0).or_less())
+rules::counters(counters::POISON).is(rules::Value(0).or_less())
 rules::power().of(THIS).is(rules::Value(3).or_more())
 rules::toughness().is(rules::Value(2).or_less())
 rules::cards_in_hand().is(rules::exactly(0))
@@ -318,8 +318,9 @@ the winner's `Then` instead of its default (`__rules__/r120_3a_damage_to_a_playe
 rules::Change::Instead {
     holder: events::DealDamage::SOURCE.into(),
     when: rules::Condition::True,
-    then: rules::Then::Events(vec![rules::EventTemplate::GivePoisonCounters {
+    then: rules::Then::Events(vec![rules::EventTemplate::PutCounters {
         who: events::DealDamage::RECIPIENT.into(),
+        kind: counters::POISON,
         amount: rules::Amount::FromArg(events::DealDamage::AMOUNT),
     }]),
 }

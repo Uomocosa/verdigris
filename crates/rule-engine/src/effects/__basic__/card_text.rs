@@ -1,4 +1,5 @@
 use crate::effects;
+use crate::effects::traits::gets::Gets;
 use crate::keywords;
 use crate::turns;
 
@@ -73,9 +74,9 @@ pub const fn lose_life(amount: u32) -> effects::Effect {
 }
 
 #[must_use]
-pub const fn poison(amount: u32) -> effects::Effect {
+pub fn gets(got: impl Gets) -> effects::Effect {
     effects::Effect {
-        kind: effects::EffectKind::Poison(amount),
+        kind: got.kind(),
         follow_ups: [None, None, None, None],
         target: None,
         affected: None,
@@ -96,16 +97,6 @@ pub const fn gain_life(amount: u32) -> effects::Effect {
 pub const fn discard(count: u32) -> effects::Effect {
     effects::Effect {
         kind: effects::EffectKind::Discard(count),
-        follow_ups: [None, None, None, None],
-        target: None,
-        affected: None,
-    }
-}
-
-#[must_use]
-pub const fn gets(power: i32, toughness: i32) -> effects::Effect {
-    effects::Effect {
-        kind: effects::EffectKind::ModifyPowerToughness { power, toughness },
         follow_ups: [None, None, None, None],
         target: None,
         affected: None,

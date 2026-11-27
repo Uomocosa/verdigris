@@ -244,13 +244,13 @@ fn request_gain_keyword(
 fn request_poison(
     poison_counters: &mut MessageWriter<Attempt<events::PutCounters>>,
     players: &[players::PlayerId],
-    amount: u32,
+    amount: counters::CounterAmount,
 ) {
     for player in players {
         poison_counters.write(Attempt(events::PutCounters {
             recipient: **player,
-            kind: counters::POISON,
-            amount,
+            kind: amount.kind,
+            amount: amount.count,
         }));
     }
 }

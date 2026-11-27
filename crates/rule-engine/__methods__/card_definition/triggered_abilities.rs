@@ -17,17 +17,13 @@ mod tests {
     use crate::abilities;
     use crate::cards;
     use crate::cost;
-    use crate::effects;
     use crate::pt;
 
     use super::triggered_abilities;
 
     #[test]
     fn test_usage() {
-        let ability = abilities::whenever(
-            ANOTHER_CREATURE.enters(),
-            effects::gain_life(1).to_player(YOU),
-        );
+        let ability = abilities::whenever(ANOTHER_CREATURE.enters(), YOU.gains_life(1));
         let definition =
             cards::creature("Grizzly Bears", cost![1, G], pt!(2, 2)).triggered(ability.clone());
         assert_eq!(

@@ -11,18 +11,10 @@ pub struct Effect {
     pub affected: Option<rules::Subject>,
 }
 
-#[atomic_delegates]
-impl Effect {
-    #[must_use]
-    pub fn to(self, target: impl Into<effects::Target>) -> Self {}
+impl std::ops::BitAnd for Effect {
+    type Output = Self;
 
-    #[must_use]
-    pub fn to_player(self, player: impl Into<rules::Players>) -> Self {}
-}
-
-impl Effect {
-    #[must_use]
-    pub fn and(self, next: Self) -> Self {
+    fn bitand(self, next: Self) -> Self {
         let Self {
             kind,
             follow_ups,
@@ -65,7 +57,15 @@ impl Effect {
             }
         }
     }
+}
 
+#[atomic_delegates]
+impl Effect {
+    #[must_use]
+    pub fn to(self, target: impl Into<effects::Target>) -> Self {}
+}
+
+impl Effect {
     pub(crate) fn assert_chain_has_room(follow_ups: &[Option<effects::EffectKind>; 4]) {
         let is_full = matches!(follow_ups, [Some(_), Some(_), Some(_), Some(_)]);
         assert!(
@@ -79,6 +79,7 @@ impl Effect {
 mod tests {
     use crate::ANY_TARGET;
     use crate::THIS;
+    use crate::counters;
     use crate::effects;
     use crate::rules;
 
@@ -87,15 +88,18 @@ mod tests {
         let effect = THIS.deals(rules::damage(3)).to(effects::target(1, ANY_TARGET));
         assert_eq!(effect.kind, effects::EffectKind::Damage(3));
         assert_eq!(effect.target, Some(effects::target(1, ANY_TARGET)));
-        let sequence = effects::draw(2).and(effects::lose_life(2));
+        let sequence = effects::draw(2) & effects::lose_life(2);
         assert_eq!(sequence.kind, effects::EffectKind::Draw(2));
         assert_eq!(
             sequence.follow_ups[0],
             Some(effects::EffectKind::LoseLife(2))
         );
-        let longer = sequence.and(effects::poison(3));
-        assert_eq!(longer.follow_ups[1], Some(effects::EffectKind::Poison(3)));
-        let full = longer.and(effects::gain_life(1)).and(effects::discard(1));
+        let longer = sequence & effects::gets(3 * counters::POISON);
+        assert_eq!(
+            longer.follow_ups[1],
+            Some(effects::EffectKind::Poison(3 * counters::POISON))
+        );
+        let full = longer & effects::gain_life(1) & effects::discard(1);
         assert_eq!(full.follow_ups[2], Some(effects::EffectKind::GainLife(1)));
         assert_eq!(full.follow_ups[3], Some(effects::EffectKind::Discard(1)));
     }
@@ -104,10 +108,10 @@ mod tests {
     #[should_panic(expected = "an Effect chain holds at most 4 follow-up effects")]
     fn a_fifth_follow_up_overflows_the_chain() {
         let _ = effects::draw(1)
-            .and(effects::lose_life(1))
-            .and(effects::gain_life(1))
-            .and(effects::mills(1))
-            .and(effects::discard(1))
-            .and(effects::poison(1));
+            & effects::lose_life(1)
+            & effects::gain_life(1)
+            & effects::mills(1)
+            & effects::discard(1)
+            & effects::gets(1 * counters::POISON);
     }
 }

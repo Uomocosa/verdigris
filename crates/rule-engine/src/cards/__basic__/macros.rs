@@ -42,6 +42,30 @@ macro_rules! mana {
 
 #[macro_export]
 macro_rules! pt {
+    (+$power:literal, +$toughness:literal $(,)?) => {
+        $crate::cards::PowerToughness {
+            power: $power,
+            toughness: $toughness,
+        }
+    };
+    (+$power:literal, -$toughness:literal $(,)?) => {
+        $crate::cards::PowerToughness {
+            power: $power,
+            toughness: -$toughness,
+        }
+    };
+    (-$power:literal, +$toughness:literal $(,)?) => {
+        $crate::cards::PowerToughness {
+            power: -$power,
+            toughness: $toughness,
+        }
+    };
+    (-$power:literal, -$toughness:literal $(,)?) => {
+        $crate::cards::PowerToughness {
+            power: -$power,
+            toughness: -$toughness,
+        }
+    };
     ($power:expr, $toughness:expr $(,)?) => {
         $crate::cards::PowerToughness {
             power: $power,

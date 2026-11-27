@@ -9,6 +9,6 @@ pub const JUMP: testing::Card = testing::Card {
     name: testing::TestCardName("Jump"),
     definition: || {
         cards::instant("Jump", cost![U])
-            .spell(effects::gains(keywords::flying()).to(effects::target(1, CREATURE)))
+            .spell(effects::target(1, CREATURE).gains(keywords::flying()))
     },
 };

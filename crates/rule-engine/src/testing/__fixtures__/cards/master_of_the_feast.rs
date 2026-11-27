@@ -5,9 +5,9 @@ use crate::abilities;
 use crate::card;
 use crate::cards;
 use crate::cost;
-use crate::effects;
 use crate::keywords;
 use crate::pt;
+use crate::rules;
 use crate::statics;
 use crate::testing;
 use crate::turns;
@@ -21,7 +21,7 @@ pub const MASTER_OF_THE_FEAST: testing::Card = testing::Card {
             statics::this().must_attack(),
             abilities::at(
                 turns::beginning_of(UPKEEP).of(YOU),
-                effects::draw(1).to_player(OPPONENT),
+                rules::each(OPPONENT).draws(1),
             ),
         }
     },

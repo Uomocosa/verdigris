@@ -7,7 +7,6 @@ use crate::testing;
 pub const TOME_SCOUR: testing::Card = testing::Card {
     name: testing::TestCardName("Tome Scour"),
     definition: || {
-        cards::sorcery("Tome Scour", cost![U])
-            .spell(effects::mills(5).to(effects::target(1, PLAYER)))
+        cards::sorcery("Tome Scour", cost![U]).spell(effects::target(1, PLAYER).mills(5))
     },
 };

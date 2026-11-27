@@ -9,7 +9,6 @@ pub use basic::components::{
 pub use basic::current_markers::{CurrentMarkers, CurrentMarkersItem};
 pub use basic::enums::{CardType, Color, CreatureType, EnchantmentType, ManaSymbol, Supertype};
 pub use basic::newtypes::{CardId, CardName};
-pub use basic::structs::PowerToughness;
 pub use basic::type_aliases::InCombat;
 
 mod blocking;
@@ -20,6 +19,9 @@ pub use enchanting::Enchanting;
 
 mod object_filter;
 pub use object_filter::ObjectFilter;
+
+mod power_toughness;
+pub use power_toughness::PowerToughness;
 
 mod card_definition;
 pub use card_definition::CardDefinition;

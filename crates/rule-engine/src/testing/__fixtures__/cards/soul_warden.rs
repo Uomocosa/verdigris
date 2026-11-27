@@ -4,7 +4,6 @@ use crate::abilities;
 use crate::card;
 use crate::cards;
 use crate::cost;
-use crate::effects;
 use crate::pt;
 use crate::testing;
 
@@ -13,7 +12,7 @@ pub const SOUL_WARDEN: testing::Card = testing::Card {
     definition: || {
         card! {
             cards::creature("Soul Warden", cost![W], pt!(1, 1));
-            abilities::whenever(ANOTHER_CREATURE.enters(), effects::gain_life(1).to_player(YOU)),
+            abilities::whenever(ANOTHER_CREATURE.enters(), YOU.gains_life(1)),
         }
     },
 };

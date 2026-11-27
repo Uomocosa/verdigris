@@ -46,6 +46,7 @@ pub mod play_land;
 pub mod player_quantity;
 pub mod player_view;
 pub mod players;
+pub mod power_toughness;
 pub mod priority;
 pub mod restriction_id;
 pub mod rule_registry;

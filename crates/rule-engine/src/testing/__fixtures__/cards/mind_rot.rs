@@ -7,7 +7,6 @@ use crate::testing;
 pub const MIND_ROT: testing::Card = testing::Card {
     name: testing::TestCardName("Mind Rot"),
     definition: || {
-        cards::sorcery("Mind Rot", cost![2, B])
-            .spell(effects::discard(2).to(effects::target(1, PLAYER)))
+        cards::sorcery("Mind Rot", cost![2, B]).spell(effects::target(1, PLAYER).discards(2))
     },
 };

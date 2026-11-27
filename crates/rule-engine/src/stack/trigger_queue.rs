@@ -55,7 +55,6 @@ mod tests {
     use crate::ANOTHER_CREATURE;
     use crate::YOU;
     use crate::abilities;
-    use crate::effects;
     use crate::stack;
 
     use super::TriggerQueue;
@@ -67,7 +66,7 @@ mod tests {
             ability: abilities::TriggeredAbility {
                 event: ANOTHER_CREATURE.enters(),
                 intervening_if: None,
-                effect: effects::gain_life(1).to_player(YOU),
+                effect: YOU.gains_life(1),
             },
         };
         let mut queue = TriggerQueue::default();

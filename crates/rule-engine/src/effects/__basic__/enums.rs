@@ -1,3 +1,4 @@
+use crate::counters;
 use crate::effects;
 use crate::keywords;
 use crate::rules;
@@ -16,7 +17,7 @@ pub enum EffectKind {
     Draw(u32),
     Mill(u32),
     LoseLife(u32),
-    Poison(u32),
+    Poison(counters::CounterAmount),
     GainLife(u32),
     Discard(u32),
     ModifyPowerToughness {

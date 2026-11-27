@@ -14,7 +14,6 @@ mod tests {
     use crate::ANOTHER_CREATURE;
     use crate::YOU;
     use crate::abilities;
-    use crate::effects;
     use crate::testing;
 
     use super::triggered;
@@ -25,7 +24,7 @@ mod tests {
         let ability = abilities::TriggeredAbility {
             event: ANOTHER_CREATURE.enters(),
             intervening_if: None,
-            effect: effects::gain_life(1).to_player(YOU),
+            effect: YOU.gains_life(1),
         };
         assert_eq!(
             triggered(definition, ability.clone())
