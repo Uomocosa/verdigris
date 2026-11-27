@@ -4,31 +4,31 @@ use crate::keywords;
 use crate::turns;
 
 #[must_use]
-pub const fn destroy() -> effects::Effect {
+pub fn destroy(target: impl Into<effects::Target>) -> effects::Effect {
     effects::Effect {
         kind: effects::EffectKind::Destroy,
         follow_ups: [None, None, None, None],
-        target: None,
+        target: Some(target.into()),
         affected: None,
     }
 }
 
 #[must_use]
-pub const fn exile() -> effects::Effect {
+pub fn exile(target: impl Into<effects::Target>) -> effects::Effect {
     effects::Effect {
         kind: effects::EffectKind::Exile,
         follow_ups: [None, None, None, None],
-        target: None,
+        target: Some(target.into()),
         affected: None,
     }
 }
 
 #[must_use]
-pub const fn counter() -> effects::Effect {
+pub fn counter(target: impl Into<effects::Target>) -> effects::Effect {
     effects::Effect {
         kind: effects::EffectKind::Counter,
         follow_ups: [None, None, None, None],
-        target: None,
+        target: Some(target.into()),
         affected: None,
     }
 }

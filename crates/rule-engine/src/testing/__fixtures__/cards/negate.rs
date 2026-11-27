@@ -8,6 +8,6 @@ pub const NEGATE: testing::Card = testing::Card {
     name: testing::TestCardName("Negate"),
     definition: || {
         cards::instant("Negate", cost![1, U])
-            .spell(effects::counter().to(effects::target(1, NONCREATURE_SPELL)))
+            .spell(effects::counter(effects::target(1, NONCREATURE_SPELL)))
     },
 };

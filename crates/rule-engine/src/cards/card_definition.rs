@@ -180,8 +180,12 @@ mod tests {
             myr.keywords().collect::<Vec<_>>(),
             vec![keywords::indestructible()]
         );
-        let spell = cards::instant("Murder", cards::Cost::default()).spell(effects::destroy());
-        assert_eq!(spell.spell_ability(), Some(&effects::destroy()));
+        let spell = cards::instant("Murder", cards::Cost::default())
+            .spell(effects::destroy(effects::target(1, CREATURE)));
+        assert_eq!(
+            spell.spell_ability(),
+            Some(&effects::destroy(effects::target(1, CREATURE)))
+        );
     }
 
     #[test]

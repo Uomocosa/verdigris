@@ -8,6 +8,6 @@ pub const DISPEL: testing::Card = testing::Card {
     name: testing::TestCardName("Dispel"),
     definition: || {
         cards::instant("Dispel", cost![U])
-            .spell(effects::counter().to(effects::target(1, INSTANT_SPELL)))
+            .spell(effects::counter(effects::target(1, INSTANT_SPELL)))
     },
 };

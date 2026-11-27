@@ -12,6 +12,7 @@ pub fn spell(
 
 #[cfg(test)]
 mod tests {
+    use crate::CREATURE;
     use crate::cards;
     use crate::cost;
     use crate::effects;
@@ -21,7 +22,10 @@ mod tests {
     #[test]
     fn test_usage() {
         let definition = cards::instant("Murder", cost![1, B, B]);
-        let spell = spell(definition, effects::destroy());
-        assert_eq!(spell.spell_ability(), Some(&effects::destroy()));
+        let spell = spell(definition, effects::destroy(effects::target(1, CREATURE)));
+        assert_eq!(
+            spell.spell_ability(),
+            Some(&effects::destroy(effects::target(1, CREATURE)))
+        );
     }
 }

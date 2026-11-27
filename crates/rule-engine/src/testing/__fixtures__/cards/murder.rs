@@ -8,6 +8,6 @@ pub const MURDER: testing::Card = testing::Card {
     name: testing::TestCardName("Murder"),
     definition: || {
         cards::instant("Murder", cost![1, B, B])
-            .spell(effects::destroy().to(effects::target(1, CREATURE)))
+            .spell(effects::destroy(effects::target(1, CREATURE)))
     },
 };

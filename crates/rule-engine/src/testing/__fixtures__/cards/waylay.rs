@@ -1,3 +1,4 @@
+use crate::THIS;
 use crate::abilities;
 use crate::card;
 use crate::cards;
@@ -13,7 +14,7 @@ pub const KNIGHT_TOKEN: testing::Card = testing::Card {
             cards::creature("Knight", cost![W], pt!(2, 2));
             abilities::at(
                 abilities::TriggerEvent::beginning_of_next_cleanup(),
-                effects::exile(),
+                effects::exile(THIS),
             ),
         }
     },
