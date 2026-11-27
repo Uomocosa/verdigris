@@ -11,7 +11,6 @@ pub enum Choice {
     Pick(actions::PickChoice),
     CombatDamage(actions::CombatDamageChoice),
     OrderTriggers(actions::OrderTriggersChoice),
-    ArrangeGraveyard(actions::ArrangeGraveyardChoice),
 }
 
 #[atomic_delegates]
@@ -41,7 +40,6 @@ impl Choice {
             Self::Pick(choice) => choice.player,
             Self::CombatDamage(choice) => choice.player,
             Self::OrderTriggers(choice) => choice.player,
-            Self::ArrangeGraveyard(choice) => choice.player,
         }
     }
 }
@@ -137,11 +135,6 @@ mod tests {
                 player: chooser,
                 triggers: vec![first],
             }),
-            actions::Choice::ArrangeGraveyard(actions::ArrangeGraveyardChoice {
-                player: chooser,
-                graveyard: first,
-                cards: vec![first],
-            }),
             actions::Choice::Pick(actions::PickChoice {
                 id: LEGEND,
                 player: chooser,
@@ -155,9 +148,7 @@ mod tests {
             choices.iter().map(actions::Choice::player).collect();
         assert_eq!(
             answered_by,
-            [
-                chooser, chooser, chooser, chooser, chooser, chooser, chooser,
-            ]
+            [chooser, chooser, chooser, chooser, chooser, chooser,]
         );
     }
 

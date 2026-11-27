@@ -54,9 +54,6 @@ pub enum Rejected {
     InvalidCombatDamage {
         player: players::PlayerId,
     },
-    InvalidGraveyardOrder {
-        player: players::PlayerId,
-    },
     CannotAttack {
         attackers: Vec<Entity>,
     },

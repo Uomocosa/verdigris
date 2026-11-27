@@ -12,14 +12,6 @@ pub fn accepts(choice: &actions::Choice, answer: &actions::Action) -> bool {
             };
             choice.check(picked).is_ok()
         }
-        actions::Choice::ArrangeGraveyard(choice) => {
-            let actions::Action::ArrangeGraveyard(answered) = answer else {
-                return false;
-            };
-            let expected: BTreeSet<Entity> = choice.cards.iter().copied().collect();
-            let received: BTreeSet<Entity> = answered.iter().copied().collect();
-            received == expected && answered.len() == choice.cards.len()
-        }
         actions::Choice::OrderTriggers(choice) => {
             let actions::Action::OrderTriggers(answered) = answer else {
                 return false;

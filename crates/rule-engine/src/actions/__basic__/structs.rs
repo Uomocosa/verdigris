@@ -30,10 +30,3 @@ pub struct OrderTriggersChoice {
     pub player: players::PlayerId,
     pub triggers: Vec<Entity>,
 }
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ArrangeGraveyardChoice {
-    pub player: players::PlayerId,
-    pub graveyard: Entity,
-    pub cards: Vec<Entity>,
-}

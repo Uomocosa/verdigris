@@ -11,8 +11,7 @@ pub fn target_choice(game: &testing::MockGame) -> Option<testing::ExpectedTarget
         }),
         actions::Choice::Pick(_)
         | actions::Choice::CombatDamage(_)
-        | actions::Choice::OrderTriggers(_)
-        | actions::Choice::ArrangeGraveyard(_) => None,
+        | actions::Choice::OrderTriggers(_) => None,
     }
 }
 

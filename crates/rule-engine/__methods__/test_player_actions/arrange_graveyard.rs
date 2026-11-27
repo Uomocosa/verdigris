@@ -7,7 +7,7 @@ pub fn arrange_graveyard<const N: usize>(
     player_actions: testing::TestPlayerActions,
     cards: [testing::TestCard; N],
 ) -> testing::TestPlayerActions {
-    player_actions.act(actions::Action::ArrangeGraveyard(
+    player_actions.act(actions::Action::Choose(
         cards.into_iter().map(Entity::from).collect(),
     ))
 }
@@ -38,7 +38,7 @@ mod tests {
             .steps,
             vec![testing::PlayStep::Act(
                 chooser,
-                actions::Action::ArrangeGraveyard(vec![card])
+                actions::Action::Choose(vec![card])
             )]
         );
     }

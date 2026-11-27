@@ -5,6 +5,7 @@ use bevy::ecs::system::ScheduleSystem;
 use bevy::prelude::{Added, Changed, Entity, MessageReader, MessageWriter, Or, Query};
 
 use crate::GRAVEYARD;
+use crate::GRAVEYARD_ORDER;
 use crate::actions;
 use crate::cards;
 use crate::players;
@@ -28,16 +29,22 @@ fn arrange_as_answered(
     mut zone_contents: Query<&mut zones::ZoneContents>,
 ) {
     for answered in answers.read() {
-        let actions::Choice::ArrangeGraveyard(choice) = &answered.choice else {
+        let actions::Choice::Pick(choice) = &answered.choice else {
             continue;
         };
-        let actions::Action::ArrangeGraveyard(ordered) = &answered.answer else {
+        if choice.id != GRAVEYARD_ORDER {
+            continue;
+        }
+        let actions::Action::Choose(ordered) = &answered.answer else {
             continue;
         };
-        let Ok(mut contents) = zone_contents.get_mut(choice.graveyard) else {
+        let Some(graveyard) = choice.source else {
             continue;
         };
-        let expected: BTreeSet<Entity> = choice.cards.iter().copied().collect();
+        let Ok(mut contents) = zone_contents.get_mut(graveyard) else {
+            continue;
+        };
+        let expected: &BTreeSet<Entity> = &choice.among;
         let mut ordered = ordered.iter().copied();
         for card in contents.iter_mut() {
             if expected.contains(card) {
@@ -79,13 +86,15 @@ fn ask_for_the_order(
             contents.iter().copied().enumerate().map(|(position, card)| (card, position)).collect();
         let mut batch: Vec<Entity> = moved_cards;
         batch.sort_by_key(|card| positions.get(card).copied().unwrap_or(usize::MAX));
-        asks.write(actions::Ask(actions::Choice::ArrangeGraveyard(
-            actions::ArrangeGraveyardChoice {
-                player: owner_entity,
-                graveyard,
-                cards: batch,
-            },
-        )));
+        let count = actions::Count::exactly(u32::try_from(batch.len()).unwrap_or(u32::MAX));
+        asks.write(actions::Ask(actions::Choice::Pick(actions::PickChoice {
+            id: GRAVEYARD_ORDER,
+            player: owner_entity,
+            source: Some(graveyard),
+            among: batch.into_iter().collect(),
+            count,
+            ordered: true,
+        })));
     }
 }
 
