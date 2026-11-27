@@ -48,6 +48,7 @@ pub fn register_messages_and_resources(app: &mut App) {
         .add_message::<turns::MulligansComplete>()
         .add_message::<turns::TurnStarted>();
     app.init_resource::<actions::PendingChoice>();
+    app.init_resource::<actions::LegalActions>();
     app.init_resource::<actions::AskQueue>();
     app.init_resource::<turns::CombatDamageParticipants>();
     app.init_resource::<StateBasedActionsPerformed>();

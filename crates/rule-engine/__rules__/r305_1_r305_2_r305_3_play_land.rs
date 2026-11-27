@@ -108,8 +108,35 @@ mod tests {
 
     #[test]
     fn a_second_land_in_the_same_turn_is_rejected() -> TestResult {
-        let (mut game, [p1, ..]) = MockGame::new([P1.hand([FOREST, FOREST]), P2]);
+        let (mut game, [p1, ..]) = MockGame::new([P1.hand([FOREST, FOREST, GRIZZLY_BEARS]), P2]);
         let [forest_1, forest_2] = game.player(p1).cards_in(HAND).exactly::<2>(FOREST)?;
+        let [bears] = game.player(p1).cards_in(HAND).exactly::<1>(GRIZZLY_BEARS)?;
+        game.app.update();
+        let legal = game.app.world().resource::<actions::LegalActions>().clone();
+        assert_eq!(legal.player, Some(p1.id));
+        assert_eq!(
+            legal.actions.first(),
+            Some(&(actions::Action::PassPriority, rules::Legality::Legal))
+        );
+        assert_eq!(
+            legal.actions.get(1),
+            Some(&(actions::Action::Concede, rules::Legality::Legal))
+        );
+        assert!(legal.actions.contains(&(
+            actions::Action::Play(forest_1.into()),
+            rules::Legality::Legal
+        )));
+        assert!(legal.actions.contains(&(
+            actions::Action::Play(forest_2.into()),
+            rules::Legality::Legal
+        )));
+        assert!(legal.actions.iter().any(|(action, legality)| *action
+            == actions::Action::Play(bears.into())
+            && matches!(legality, rules::Legality::Illegal(reasons)
+                if reasons.contains(&rules::Why::Restriction(events::play::LAND_CARD)))));
+        assert!(
+            legal.actions.contains(&(actions::Action::Cast(bears.into()), rules::Legality::Legal))
+        );
 
         game.play([p1.play_land(forest_1)])?;
         game.act(p1, actions::Action::Play(forest_2.into()));
@@ -146,6 +173,19 @@ mod tests {
                 );
             })
             .unwrap();
+        let legal = game.app.world().resource::<actions::LegalActions>().clone();
+        assert_eq!(legal.player, Some(p1.id));
+        assert!(legal.actions.iter().any(|(action, legality)| *action
+            == actions::Action::Play(forest_2.into())
+            && matches!(legality, rules::Legality::Illegal(reasons)
+                if reasons.contains(&rules::Why::Restriction(events::play::LAND_PLAYS)))));
+        assert!(legal.actions.iter().any(|(action, legality)| *action
+            == actions::Action::Play(bears.into())
+            && matches!(legality, rules::Legality::Illegal(reasons)
+                if reasons.contains(&rules::Why::Restriction(events::play::LAND_CARD)))));
+        assert!(
+            legal.actions.contains(&(actions::Action::Cast(bears.into()), rules::Legality::Legal))
+        );
         Ok(())
     }
 

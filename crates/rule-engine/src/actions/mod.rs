@@ -12,7 +12,7 @@ pub use ask_queue::AskQueue;
 pub use basic::enums::ChoiceWhy;
 pub use basic::messages::{Answered, Ask, DiscardRequest, PlayerAction, Rejected};
 pub use basic::newtypes::ChoiceId;
-pub use basic::resources::{AcceptedMays, PendingMayAsks};
+pub use basic::resources::{AcceptedMays, LegalActions, PendingMayAsks};
 pub use basic::structs::{
     BlockAssignment, DamageAssignment, OrderTriggersChoice, RequiredCombatDamage,
 };
