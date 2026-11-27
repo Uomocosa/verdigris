@@ -18,7 +18,30 @@ pub fn resolve<E: EventArgs>(
     let entity = match event.arg(id)? {
         rules::ArgValue::Entity(entity) => entity,
         rules::ArgValue::Player(player) => return Some(rules::ArgValue::Player(player)),
-        rules::ArgValue::Entities(_) | rules::ArgValue::Amount(_) => return None,
+        rules::ArgValue::Entities(elements) => {
+            let mut holders = elements.iter().filter_map(|element| {
+                let found = answers.entities.get(*element).ok()?;
+                if found.get::<players::Player>().is_some() {
+                    Some(*element)
+                } else {
+                    match reference {
+                        rules::ArgRef::ControllerOf(_) => found
+                            .get::<cards::Controller>()
+                            .map(|controller| ***controller)
+                            .or_else(|| found.get::<cards::Owner>().map(|owner| ***owner)),
+                        rules::ArgRef::OwnerOf(_) => {
+                            found.get::<cards::Owner>().map(|owner| ***owner)
+                        }
+                        rules::ArgRef::Arg(_) | rules::ArgRef::SourceOf(_) => None,
+                    }
+                }
+            });
+            let first = holders.next()?;
+            return holders
+                .all(|holder| holder == first)
+                .then_some(rules::ArgValue::Player(players::PlayerId(first)));
+        }
+        rules::ArgValue::Amount(_) => return None,
     };
     let found = answers.entities.get(entity).ok()?;
     if found.get::<players::Player>().is_some() {

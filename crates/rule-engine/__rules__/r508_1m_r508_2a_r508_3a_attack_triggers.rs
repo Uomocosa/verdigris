@@ -19,20 +19,22 @@ use crate::stack;
 /// attacking that player or permanent. Such abilities won’t trigger if a creature is put onto
 /// the battlefield attacking.
 pub fn r508_1m_r508_2a_r508_3a_attack_triggers(
-    mut declared: MessageReader<Did<events::DeclareAttacker>>,
+    mut declared: MessageReader<Did<events::DeclareAttackers>>,
     mut queue: ResMut<stack::TriggerQueue>,
     attackers: Query<(&cards::CardDefinition, &cards::Controller)>,
     answers: rules::Rules,
 ) {
     for declared in declared.read() {
-        let Ok((definition, _)) = attackers.get(declared.attacker) else {
-            continue;
-        };
-        for ability in definition.triggered_abilities() {
-            if !matches!(ability.event, abilities::TriggerEvent::Attacks) {
+        for attacker in &declared.attackers {
+            let Ok((definition, _)) = attackers.get(*attacker) else {
                 continue;
+            };
+            for ability in definition.triggered_abilities() {
+                if !matches!(ability.event, abilities::TriggerEvent::Attacks) {
+                    continue;
+                }
+                queue.push_checked(*attacker, ability.clone(), &answers);
             }
-            queue.push_checked(declared.attacker, ability.clone(), &answers);
         }
     }
 }

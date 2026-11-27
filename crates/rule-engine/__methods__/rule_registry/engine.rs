@@ -22,7 +22,6 @@ pub fn engine() -> rules::RuleRegistry {
         events::Counter::ID,
         events::Create::ID,
         events::DealDamage::ID,
-        events::DeclareAttacker::ID,
         events::DeclareAttackers::ID,
         events::DeclareBlocker::ID,
         events::Destroy::ID,
@@ -55,7 +54,6 @@ pub fn engine() -> rules::RuleRegistry {
         events::Counter::restrictions(),
         events::Create::restrictions(),
         events::DealDamage::restrictions(),
-        events::DeclareAttacker::restrictions(),
         events::DeclareAttackers::restrictions(),
         events::DeclareBlocker::restrictions(),
         events::Destroy::restrictions(),
@@ -123,7 +121,7 @@ mod tests {
     fn test_usage() {
         let registry = engine();
         assert!(registry.events.contains(&events::Draw::ID));
-        assert!(registry.restrictions.contains(&events::declare_attacker::SUMMONING_SICK));
+        assert!(registry.restrictions.contains(&events::declare_attackers::SUMMONING_SICK));
         assert!(registry.values.contains(&rules::LandPlays::ID));
         assert_eq!(events::Draw::ID, rules::EventId("121.1/draw"));
     }

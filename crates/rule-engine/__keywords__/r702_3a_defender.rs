@@ -14,9 +14,9 @@ pub const CANT_ATTACK: rules::RestrictionId = rules::RestrictionId("702.3b/defen
 
 fn abilities() -> Vec<effects::Modification> {
     vec![effects::Modification::Rule(rules::RuleChange {
-        target: rules::Target::event::<events::DeclareAttacker>(),
+        target: rules::Target::event::<events::DeclareAttackers>(),
         change: rules::Change::Restrict {
-            holder: events::DeclareAttacker::ATTACKER.into(),
+            holder: events::DeclareAttackers::ATTACKERS.into(),
             restriction: CANT_ATTACK.restriction(!rules::Condition::True),
         },
     })]
@@ -35,9 +35,9 @@ mod tests {
         assert_eq!(
             super::abilities(),
             vec![effects::Modification::Rule(rules::RuleChange {
-                target: rules::Target::event::<events::DeclareAttacker>(),
+                target: rules::Target::event::<events::DeclareAttackers>(),
                 change: rules::Change::Restrict {
-                    holder: events::DeclareAttacker::ATTACKER.into(),
+                    holder: events::DeclareAttackers::ATTACKERS.into(),
                     restriction: super::CANT_ATTACK.restriction(!rules::Condition::True,),
                 },
             })]

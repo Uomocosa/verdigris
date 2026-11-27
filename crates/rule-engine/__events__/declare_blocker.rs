@@ -80,7 +80,7 @@ mod tests {
         let mut seen = HashSet::new();
         for restriction in DeclareBlocker::restrictions()
             .into_iter()
-            .chain(events::DeclareAttacker::restrictions())
+            .chain(events::DeclareAttackers::restrictions())
         {
             assert!(
                 seen.insert(restriction.id),

@@ -40,7 +40,7 @@ use crate::turns;
 pub fn r508_1a_declare_attackers(
     mut actions: MessageReader<actions::PlayerAction>,
     mut rejected: MessageWriter<actions::Rejected>,
-    mut declared: MessageWriter<Attempt<events::DeclareAttacker>>,
+    mut declared: MessageWriter<Attempt<events::DeclareAttackers>>,
     game: Game,
     candidates: Query<(Entity, &cards::Controller), With<cards::Creature>>,
     answers: rules::Rules,
@@ -59,17 +59,18 @@ pub fn r508_1a_declare_attackers(
             continue;
         }
         let all_legal = attackers.iter().all(|attacker| {
-            answers.legal::<events::DeclareAttacker>(&events::DeclareAttacker {
-                attacker: *attacker,
-                player: action.player,
-            })
+            candidates
+                .iter()
+                .any(|(entity, controller)| entity == *attacker && **controller == action.player)
+                && answers.legal(&events::DeclareAttackers {
+                    attackers: vec![*attacker],
+                })
         });
         let requirement_unmet = candidates.iter().any(|(entity, controller)| {
             **controller == action.player
-                && answers.required::<events::DeclareAttacker>(entity)
-                && answers.legal::<events::DeclareAttacker>(&events::DeclareAttacker {
-                    attacker: entity,
-                    player: action.player,
+                && answers.required::<events::DeclareAttackers>(entity)
+                && answers.legal(&events::DeclareAttackers {
+                    attackers: vec![entity],
                 })
                 && !attackers.contains(&entity)
         });
@@ -81,7 +82,6 @@ pub fn r508_1a_declare_attackers(
         }
         if !answers.legal(&events::DeclareAttackers {
             attackers: attackers.clone(),
-            player: action.player,
         }) {
             rejected.write(actions::Rejected::CannotAttack {
                 attackers: attackers.clone(),
@@ -89,9 +89,8 @@ pub fn r508_1a_declare_attackers(
             continue;
         }
         for attacker in attackers {
-            declared.write(Attempt(events::DeclareAttacker {
-                attacker: *attacker,
-                player: action.player,
+            declared.write(Attempt(events::DeclareAttackers {
+                attackers: vec![*attacker],
             }));
         }
     }
@@ -226,10 +225,14 @@ mod tests {
         use crate::HAND;
         use crate::mana;
 
-        let (mut game, [p1, p2]) =
-            MockGame::new([P1.hand([RAGING_GOBLIN]).mana_pool(mana![R]), P2]);
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.hand([RAGING_GOBLIN, WALKING_CORPSE]).mana_pool(mana![1, R, B]),
+            P2,
+        ]);
         let [goblin] = game.player(p1).cards_in(HAND).exactly::<1>(RAGING_GOBLIN)?;
+        let [corpse] = game.player(p1).cards_in(HAND).exactly::<1>(WALKING_CORPSE)?;
         game.play([p1.cast(goblin).pass_priority(), p2.pass_priority()])?;
+        game.play([p1.cast(corpse).pass_priority(), p2.pass_priority()])?;
         game.play([
             p1.pass_to(turns::Step::DeclareAttackers),
             p2.pass_to(turns::Step::DeclareAttackers),
@@ -237,6 +240,25 @@ mod tests {
 
         let [goblin_on_battlefield] =
             game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(RAGING_GOBLIN)?;
+        let [corpse_on_battlefield] =
+            game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(WALKING_CORPSE)?;
+        game.act(
+            p1,
+            actions::Action::DeclareAttackers(vec![
+                goblin_on_battlefield.into(),
+                corpse_on_battlefield.into(),
+            ]),
+        );
+
+        assert_eq!(
+            game.last_rejection(),
+            Some(&actions::Rejected::CannotAttack {
+                attackers: vec![goblin_on_battlefield.into(), corpse_on_battlefield.into()]
+            })
+        );
+        assert!(!game.is_attacking(goblin_on_battlefield));
+        assert!(!game.is_attacking(corpse_on_battlefield));
+
         game.act(
             p1,
             actions::Action::DeclareAttackers(vec![goblin_on_battlefield.into()]),
@@ -244,7 +266,8 @@ mod tests {
 
         assert!(game.moved(goblin).to(BATTLEFIELD).of(p1));
         assert!(game.is_attacking(goblin_on_battlefield));
-        assert_eq!(game.last_rejection(), None);
+        assert!(!game.is_attacking(corpse_on_battlefield));
+        assert_eq!(game.rejection_count(), 1);
         Ok(())
     }
 
@@ -421,7 +444,7 @@ mod tests {
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
-                assert!(answers.required::<events::DeclareAttacker>(bears.into()));
+                assert!(answers.required::<events::DeclareAttackers>(bears.into()));
             })
             .unwrap();
         Ok(())

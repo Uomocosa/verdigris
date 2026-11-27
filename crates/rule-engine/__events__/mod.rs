@@ -79,9 +79,6 @@ pub use draw_from_empty_library::DrawFromEmptyLibrary;
 mod win_game;
 pub use win_game::WinGame;
 
-pub mod declare_attacker;
-pub use declare_attacker::DeclareAttacker;
-
 pub mod declare_attackers;
 pub use declare_attackers::DeclareAttackers;
 

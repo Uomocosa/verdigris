@@ -9,7 +9,7 @@ pub fn must_attack(all: &statics::All) -> abilities::Continuous {
         filter: all.into(),
         as_long_as: None,
         modification: effects::Modification::Rule(rules::RuleChange {
-            target: rules::Target::event::<events::DeclareAttacker>(),
+            target: rules::Target::event::<events::DeclareAttackers>(),
             change: rules::Change::Must,
         }),
     }
@@ -33,13 +33,13 @@ mod tests {
         assert_eq!(
             ability.modification,
             effects::Modification::Rule(rules::RuleChange {
-                target: rules::Target::event::<events::DeclareAttacker>(),
+                target: rules::Target::event::<events::DeclareAttackers>(),
                 change: rules::Change::Must,
             })
         );
         assert_eq!(
-            events::DeclareAttacker::ID,
-            rules::EventId("508.1a/declare-attacker")
+            events::DeclareAttackers::ID,
+            rules::EventId("508.1a/declare-attackers")
         );
     }
 }

@@ -118,7 +118,7 @@ path = "crates/rule-engine/__methods__/deal_damage"
 reason = "Events live in __events__/ (crate-root core folder like __rules__/); the rule assumes src/."
 
 [[lele.rules.lint.methods_layout.exempt]]
-path = "crates/rule-engine/__methods__/declare_attacker"
+path = "crates/rule-engine/__methods__/declare_attackers"
 reason = "Events live in __events__/ (crate-root core folder like __rules__/); the rule assumes src/."
 
 [[lele.rules.lint.methods_layout.exempt]]

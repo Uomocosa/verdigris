@@ -13,9 +13,9 @@ pub const ID: keywords::KeywordId = keywords::KeywordId("702.10/haste");
 
 fn abilities() -> Vec<effects::Modification> {
     vec![effects::Modification::Rule(rules::RuleChange {
-        target: rules::Target::Restriction(events::declare_attacker::SUMMONING_SICK),
+        target: rules::Target::Restriction(events::declare_attackers::SUMMONING_SICK),
         change: rules::Change::AsThough {
-            holder: events::DeclareAttacker::ATTACKER.into(),
+            holder: events::DeclareAttackers::ATTACKERS.into(),
         },
     })]
 }
@@ -33,9 +33,9 @@ mod tests {
         assert_eq!(
             super::abilities(),
             vec![effects::Modification::Rule(rules::RuleChange {
-                target: rules::Target::Restriction(events::declare_attacker::SUMMONING_SICK),
+                target: rules::Target::Restriction(events::declare_attackers::SUMMONING_SICK),
                 change: rules::Change::AsThough {
-                    holder: events::DeclareAttacker::ATTACKER.into(),
+                    holder: events::DeclareAttackers::ATTACKERS.into(),
                 },
             })]
         );

@@ -11,7 +11,7 @@ pub const TEST_RESTLESS_WATCHER: testing::Card = testing::Card {
     definition: || {
         card! {
             cards::creature("Test Restless Watcher", cost![2, U], pt!(2, 2));
-            statics::this().as_though(events::declare_attacker::UNTAPPED, events::DeclareAttacker::ATTACKER),
+            statics::this().as_though(events::declare_attackers::UNTAPPED, events::DeclareAttackers::ATTACKERS),
         }
     },
 };

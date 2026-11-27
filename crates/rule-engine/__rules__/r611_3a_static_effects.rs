@@ -359,9 +359,9 @@ mod tests {
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
-                assert!(answers.required::<events::DeclareAttacker>(golem.into()));
+                assert!(answers.required::<events::DeclareAttackers>(golem.into()));
                 assert!(answers.required::<events::DeclareBlocker>(golem.into()));
-                assert!(!answers.required::<events::DeclareAttacker>(bears.into()));
+                assert!(!answers.required::<events::DeclareAttackers>(bears.into()));
                 assert!(!answers.required::<events::DeclareBlocker>(bears.into()));
             })
             .unwrap();

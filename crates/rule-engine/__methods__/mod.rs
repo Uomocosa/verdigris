@@ -20,7 +20,7 @@ pub mod condition;
 pub mod continuous;
 pub mod deal_damage;
 pub mod deals_damage;
-pub mod declare_attacker;
+pub mod declare_attackers;
 pub mod declare_blocker;
 pub mod definition_id;
 pub mod effect;

@@ -11,13 +11,14 @@ pub fn eval_in_zone<E: EventArgs>(
     event: &E,
     viewpoint: Option<Entity>,
 ) -> bool {
-    let holder = match answers.resolve(reference, event) {
-        Some(rules::ArgValue::Entity(found)) => Some(found),
-        Some(rules::ArgValue::Player(player)) => Some(*player),
-        Some(rules::ArgValue::Entities(_) | rules::ArgValue::Amount(_)) | None => None,
+    let holders: Vec<Entity> = match answers.resolve(reference, event) {
+        Some(rules::ArgValue::Entity(found)) => vec![found],
+        Some(rules::ArgValue::Player(player)) => vec![*player],
+        Some(rules::ArgValue::Entities(found)) => found,
+        Some(rules::ArgValue::Amount(_)) | None => return false,
     };
     viewpoint.is_some_and(|subject| {
-        holder.is_some_and(|holder| {
+        holders.iter().all(|holder| {
             answers
                 .entities
                 .get(subject)
@@ -25,7 +26,7 @@ pub fn eval_in_zone<E: EventArgs>(
                 .and_then(|entity| entity.get::<zones::InZone>())
                 .is_some_and(|in_zone| {
                     answers.zones.get(**in_zone).is_ok_and(|(_, found, owner)| {
-                        *found == zone && owner.is_some_and(|owner| ***owner == holder)
+                        *found == zone && owner.is_some_and(|owner| ***owner == *holder)
                     })
                 })
         })

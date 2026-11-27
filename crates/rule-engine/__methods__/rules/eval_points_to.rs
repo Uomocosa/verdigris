@@ -10,19 +10,20 @@ pub fn eval_points_to<E: EventArgs>(
     event: &E,
     viewpoint: Option<Entity>,
 ) -> bool {
-    let wanted = match answers.resolve(reference, event) {
-        Some(rules::ArgValue::Entity(found)) => Some(found),
-        Some(rules::ArgValue::Player(player)) => Some(*player),
-        Some(rules::ArgValue::Entities(_) | rules::ArgValue::Amount(_)) | None => None,
+    let wanteds: Vec<Entity> = match answers.resolve(reference, event) {
+        Some(rules::ArgValue::Entity(found)) => vec![found],
+        Some(rules::ArgValue::Player(player)) => vec![*player],
+        Some(rules::ArgValue::Entities(found)) => found,
+        Some(rules::ArgValue::Amount(_)) | None => return false,
     };
     viewpoint.is_some_and(|subject| {
-        wanted.is_some_and(|wanted| {
+        wanteds.iter().all(|wanted| {
             answers
                 .entities
                 .get(subject)
                 .ok()
                 .and_then(|entity| component.target.and_then(|read| read(&entity)))
-                .is_some_and(|found| found == wanted)
+                .is_some_and(|found| found == *wanted)
         })
     })
 }

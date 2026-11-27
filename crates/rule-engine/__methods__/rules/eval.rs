@@ -26,7 +26,12 @@ pub fn eval<E: EventArgs>(
         rules::Condition::PointsTo(component, reference) => {
             answers.eval_points_to(component, *reference, event, viewpoint)
         }
-        rules::Condition::Is(reference) => entity(reference) == viewpoint,
+        rules::Condition::Is(reference) => match answers.resolve(*reference, event) {
+            Some(rules::ArgValue::Entities(elements)) => {
+                viewpoint.is_some_and(|subject| elements.contains(&subject))
+            }
+            _ => entity(reference) == viewpoint,
+        },
         rules::Condition::CardType(card) => answers.eval_card_type(*card, viewpoint),
         rules::Condition::Color(color) => answers.eval_color(*color, viewpoint),
         rules::Condition::Subtype(subtype) => answers.eval_subtype(*subtype, viewpoint),
@@ -40,9 +45,13 @@ pub fn eval<E: EventArgs>(
         rules::Condition::PlayerValue(quantity, comparison) => {
             answers.eval_player_value(*quantity, *comparison, viewpoint)
         }
-        rules::Condition::Of(reference, inner) => {
-            entity(reference).is_some_and(|candidate| eval(answers, inner, event, Some(candidate)))
-        }
+        rules::Condition::Of(reference, inner) => match answers.resolve(*reference, event) {
+            Some(rules::ArgValue::Entities(elements)) => {
+                elements.iter().all(|candidate| eval(answers, inner, event, Some(*candidate)))
+            }
+            _ => entity(reference)
+                .is_some_and(|candidate| eval(answers, inner, event, Some(candidate))),
+        },
         rules::Condition::Each(set, inner) => answers.eval_each(*set, inner, event),
         rules::Condition::AnyPlayer(set, inner) => answers.eval_any_player(*set, inner, event),
         rules::Condition::All(conditions) => {

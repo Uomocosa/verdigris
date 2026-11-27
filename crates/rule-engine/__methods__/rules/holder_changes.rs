@@ -1,5 +1,6 @@
 use bevy::prelude::Entity;
 
+use crate::cards;
 use crate::rules;
 use crate::rules::traits::event::Event;
 
@@ -11,18 +12,42 @@ pub fn holder_changes<E: Event>(
     let mut visited: Vec<(rules::ArgRef, Entity)> = Vec::new();
     let mut kept = Vec::new();
     for id in E::args() {
-        for reference in [
-            rules::ArgRef::Arg(*id),
-            rules::ArgRef::ControllerOf(*id),
-            rules::ArgRef::OwnerOf(*id),
-        ] {
-            let Some(entity) = answers.resolve(reference, event).and_then(|value| match value {
-                rules::ArgValue::Entity(entity) => Some(entity),
-                rules::ArgValue::Player(player) => Some(*player),
-                rules::ArgValue::Entities(_) | rules::ArgValue::Amount(_) => None,
-            }) else {
-                continue;
-            };
+        let mut candidates: Vec<(rules::ArgRef, Entity)> = Vec::new();
+        if let Some(rules::ArgValue::Entities(elements)) = event.arg(*id) {
+            for element in elements {
+                candidates.push((rules::ArgRef::Arg(*id), element));
+                if let Ok(found) = answers.entities.get(element) {
+                    if let Some(controller) = found
+                        .get::<cards::Controller>()
+                        .map(|controller| ***controller)
+                        .or_else(|| found.get::<cards::Owner>().map(|owner| ***owner))
+                    {
+                        candidates.push((rules::ArgRef::ControllerOf(*id), controller));
+                    }
+                    if let Some(owner) = found.get::<cards::Owner>().map(|owner| ***owner) {
+                        candidates.push((rules::ArgRef::OwnerOf(*id), owner));
+                    }
+                }
+            }
+        } else {
+            for reference in [
+                rules::ArgRef::Arg(*id),
+                rules::ArgRef::ControllerOf(*id),
+                rules::ArgRef::OwnerOf(*id),
+            ] {
+                let Some(entity) =
+                    answers.resolve(reference, event).and_then(|value| match value {
+                        rules::ArgValue::Entity(entity) => Some(entity),
+                        rules::ArgValue::Player(player) => Some(*player),
+                        rules::ArgValue::Entities(_) | rules::ArgValue::Amount(_) => None,
+                    })
+                else {
+                    continue;
+                };
+                candidates.push((reference, entity));
+            }
+        }
+        for (reference, entity) in candidates {
             if visited.contains(&(reference, entity)) {
                 continue;
             }
