@@ -1,5 +1,6 @@
 use derive_more::Deref;
 
+use crate::abilities;
 use crate::cards;
 use crate::events;
 use crate::keywords;
@@ -110,6 +111,9 @@ impl Filter {
     pub fn of(self, who: impl Into<rules::Subject>) -> rules::Condition {
         (*self).clone().of(who)
     }
+
+    #[must_use]
+    pub const fn enters(self) -> abilities::TriggerEvent { abilities::TriggerEvent::Enters(self) }
 }
 
 #[cfg(test)]

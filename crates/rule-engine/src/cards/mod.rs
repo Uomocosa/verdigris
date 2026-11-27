@@ -21,9 +21,6 @@ pub use blocking::Blocking;
 mod enchanting;
 pub use enchanting::Enchanting;
 
-mod object_filter;
-pub use object_filter::ObjectFilter;
-
 mod power_toughness;
 pub use power_toughness::PowerToughness;
 

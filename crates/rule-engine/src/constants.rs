@@ -1,4 +1,3 @@
-use crate::cards;
 use crate::rules;
 use crate::turns;
 use crate::zones;
@@ -6,8 +5,6 @@ use crate::zones;
 pub const YOU: rules::You = rules::You;
 pub const OPPONENT: rules::Players = rules::Players::Opponents;
 pub const PLAYER: rules::Players = rules::Players::All;
-
-pub const ANOTHER_CREATURE: cards::ObjectFilter = cards::ObjectFilter::AnotherCreature;
 
 /// Guards the 117.5 loop against an endless chain of state-based actions.
 pub const MAX_STATE_BASED_PASSES: u32 = 64;

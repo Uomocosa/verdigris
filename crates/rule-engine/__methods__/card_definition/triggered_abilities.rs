@@ -12,9 +12,9 @@ pub fn triggered_abilities(
 
 #[cfg(test)]
 mod tests {
-    use crate::ANOTHER_CREATURE;
     use crate::YOU;
     use crate::abilities;
+    use crate::another_creature;
     use crate::cards;
     use crate::cost;
     use crate::pt;
@@ -23,7 +23,7 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let ability = abilities::whenever(ANOTHER_CREATURE.enters(), YOU.gain_life(1));
+        let ability = abilities::whenever(another_creature().enters(), YOU.gain_life(1));
         let definition =
             cards::creature("Grizzly Bears", cost![1, G], pt!(2, 2)).triggered(ability.clone());
         assert_eq!(

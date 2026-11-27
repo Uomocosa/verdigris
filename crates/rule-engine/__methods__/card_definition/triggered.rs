@@ -11,9 +11,9 @@ pub fn triggered(
 
 #[cfg(test)]
 mod tests {
-    use crate::ANOTHER_CREATURE;
     use crate::YOU;
     use crate::abilities;
+    use crate::another_creature;
     use crate::testing;
 
     use super::triggered;
@@ -22,7 +22,7 @@ mod tests {
     fn test_usage() {
         let definition = (testing::GRIZZLY_BEARS.definition)();
         let ability = abilities::TriggeredAbility {
-            event: ANOTHER_CREATURE.enters(),
+            event: another_creature().enters(),
             intervening_if: None,
             effect: YOU.gain_life(1),
         };

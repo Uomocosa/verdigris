@@ -28,6 +28,11 @@ pub fn any_target() -> effects::Filter {
     creature() | effects::Filter::player()
 }
 
+#[must_use]
+pub fn another_creature() -> effects::Filter {
+    creature() & !effects::Filter::source()
+}
+
 /// 115.5 A spell or ability on the stack is an illegal target for itself.
 ///
 /// 115.2 Only permanents are legal targets for spells and abilities, unless a spell or ability

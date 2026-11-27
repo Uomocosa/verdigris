@@ -52,9 +52,9 @@ impl TriggerQueue {
 mod tests {
     use bevy::prelude::Entity;
 
-    use crate::ANOTHER_CREATURE;
     use crate::YOU;
     use crate::abilities;
+    use crate::another_creature;
     use crate::stack;
 
     use super::TriggerQueue;
@@ -64,7 +64,7 @@ mod tests {
         let trigger = stack::PendingTrigger {
             source: Entity::PLACEHOLDER,
             ability: abilities::TriggeredAbility {
-                event: ANOTHER_CREATURE.enters(),
+                event: another_creature().enters(),
                 intervening_if: None,
                 effect: YOU.gain_life(1),
             },

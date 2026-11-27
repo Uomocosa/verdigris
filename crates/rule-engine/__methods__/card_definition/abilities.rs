@@ -11,9 +11,9 @@ pub fn abilities<const N: usize>(
 
 #[cfg(test)]
 mod tests {
-    use crate::ANOTHER_CREATURE;
     use crate::YOU;
     use crate::abilities;
+    use crate::another_creature;
     use crate::creature;
     use crate::keywords;
     use crate::statics;
@@ -23,7 +23,7 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let triggered = abilities::whenever(ANOTHER_CREATURE.enters(), YOU.gain_life(1));
+        let triggered = abilities::whenever(another_creature().enters(), YOU.gain_life(1));
         let definition = (testing::GRIZZLY_BEARS.definition)();
         let static_ability = statics::all(creature()).gain(keywords::vigilance());
         let definition = apply_abilities(

@@ -27,7 +27,6 @@ use crate::stack;
 pub fn r603_2_r603_6a_triggered_abilities(
     mut entered: MessageReader<Did<events::EnterBattlefield>>,
     mut queue: ResMut<stack::TriggerQueue>,
-    entered_cards: Query<&cards::CardDefinition>,
     sources: Query<
         (Entity, &cards::Controller, &cards::TriggeredEnters),
         With<cards::OnBattlefield>,
@@ -36,24 +35,17 @@ pub fn r603_2_r603_6a_triggered_abilities(
 ) {
     for event in entered.read() {
         let permanent = event.permanent;
-        let Ok(definition) = entered_cards.get(permanent) else {
-            continue;
-        };
-        if !definition.type_line.types.contains(&cards::CardType::Creature) {
-            continue;
-        }
         for (source, _, enters) in sources.iter() {
-            if source == permanent {
-                continue;
-            }
             let ability = (**enters).clone();
-            if !matches!(
-                ability.event,
-                abilities::TriggerEvent::Enters(cards::ObjectFilter::AnotherCreature)
-            ) {
-                continue;
+            if let abilities::TriggerEvent::Enters(filter) = &ability.event {
+                let context = events::AbilityContext {
+                    ability: source,
+                    source,
+                };
+                if answers.eval(filter, &context, Some(permanent)) {
+                    queue.push_checked(source, ability, &answers);
+                }
             }
-            queue.push_checked(source, ability, &answers);
         }
     }
 }
