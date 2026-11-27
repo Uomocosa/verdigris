@@ -15,7 +15,7 @@ pub enum Action {
     Play(Entity),
     ChooseTargets(Vec<Entity>),
     ChooseMay(Vec<Entity>),
-    ChooseDiscard(Vec<Entity>),
+    Choose(Vec<Entity>),
     ChooseLegendary(Entity),
     ChooseDefendingPlayer(players::PlayerId),
     OrderTriggers(Vec<Entity>),
@@ -41,7 +41,6 @@ impl Action {
             Self::ChooseDefendingPlayer(_) => {
                 Some(actions::Rejected::CannotChooseDefendingPlayer { player })
             }
-            Self::ChooseDiscard(_) => Some(actions::Rejected::InvalidDiscard { player }),
             Self::ArrangeGraveyard(_) => Some(actions::Rejected::InvalidGraveyardOrder { player }),
             Self::OrderTriggers(_) => Some(actions::Rejected::InvalidTriggerOrder { player }),
             Self::AssignCombatDamage(_) => Some(actions::Rejected::InvalidCombatDamage { player }),
@@ -72,12 +71,9 @@ mod tests {
     fn only_shared_choices_carry_a_rejection() {
         let (game, [p1, ..]) = MockGame::new([P1, P2]);
         let legend = game.zone_entity(p1, BATTLEFIELD).unwrap();
-        assert_eq!(
-            actions::Action::ChooseDiscard(Vec::new()).rejection(p1.id),
-            Some(actions::Rejected::InvalidDiscard { player: p1.id })
-        );
+        assert_eq!(actions::Action::Choose(Vec::new()).rejection(p1.id), None);
         assert!(actions::Action::ChooseMay(Vec::new()).answers_a_choice());
-        assert!(actions::Action::ChooseDiscard(Vec::new()).answers_a_choice());
+        assert!(actions::Action::Choose(Vec::new()).answers_a_choice());
         assert!(actions::Action::ChooseTargets(Vec::new()).answers_a_choice());
         assert!(actions::Action::ChooseLegendary(legend).answers_a_choice());
         assert!(!actions::Action::PassPriority.answers_a_choice());

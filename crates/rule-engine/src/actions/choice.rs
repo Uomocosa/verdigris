@@ -8,7 +8,7 @@ use crate::rules;
 pub enum Choice {
     Target(actions::TargetChoice),
     May(actions::MayChoice),
-    Discard(actions::DiscardChoice),
+    Pick(actions::PickChoice),
     CombatDamage(actions::CombatDamageChoice),
     OrderTriggers(actions::OrderTriggersChoice),
     ArrangeGraveyard(actions::ArrangeGraveyardChoice),
@@ -37,7 +37,7 @@ impl Choice {
         match self {
             Self::Target(choice) => choice.player,
             Self::May(choice) => choice.player,
-            Self::Discard(choice) => choice.player,
+            Self::Pick(choice) => choice.player,
             Self::CombatDamage(choice) => choice.player,
             Self::OrderTriggers(choice) => choice.player,
             Self::ArrangeGraveyard(choice) => choice.player,
@@ -47,30 +47,18 @@ impl Choice {
     }
 }
 
-impl Choice {
-    #[must_use]
-    pub const fn rejection(&self, player: players::PlayerId) -> Option<actions::Rejected> {
-        match self {
-            Self::Target(choice) => Some(actions::Rejected::InvalidTargets {
-                spell: choice.spell,
-            }),
-            Self::May(_) => Some(actions::Rejected::InvalidMay { player }),
-            Self::Discard(_) => Some(actions::Rejected::InvalidDiscard { player }),
-            Self::CombatDamage(_) => Some(actions::Rejected::InvalidCombatDamage { player }),
-            Self::ArrangeGraveyard(_) => Some(actions::Rejected::InvalidGraveyardOrder { player }),
-            Self::OrderTriggers(_) => Some(actions::Rejected::InvalidTriggerOrder { player }),
-            Self::Legendary(_) => None,
-            Self::DefendingPlayer(_) => {
-                Some(actions::Rejected::CannotChooseDefendingPlayer { player })
-            }
-        }
-    }
-}
-
 #[atomic_delegates]
 impl Choice {
     #[must_use]
     pub fn accepts(&self, answer: &actions::Action) -> bool {}
+
+    #[must_use]
+    pub fn rejection(
+        &self,
+        player: players::PlayerId,
+        answer: &actions::Action,
+    ) -> Option<actions::Rejected> {
+    }
 }
 
 #[rustfmt::skip]
@@ -120,11 +108,13 @@ mod tests {
                 event,
                 options: vec![first],
             }),
-            actions::Choice::Discard(actions::DiscardChoice {
+            actions::Choice::Pick(actions::PickChoice {
+                id: actions::ChoiceId("701.9b/discard"),
                 player: chooser,
-                count: 1,
-                cause: rules::EventId("608.2/resolve"),
-                legal: BTreeSet::from([first]),
+                source: None,
+                among: BTreeSet::from([first]),
+                count: actions::Count::exactly(1),
+                ordered: false,
             }),
             actions::Choice::CombatDamage(actions::CombatDamageChoice {
                 player: chooser,
@@ -164,11 +154,13 @@ mod tests {
             event,
             options: vec![first],
         });
-        let discard = actions::Choice::Discard(actions::DiscardChoice {
+        let discard = actions::Choice::Pick(actions::PickChoice {
+            id: actions::ChoiceId("701.9b/discard"),
             player: p1.id,
-            count: 1,
-            cause: rules::EventId("608.2/resolve"),
-            legal: BTreeSet::from([first]),
+            source: None,
+            among: BTreeSet::from([first]),
+            count: actions::Count::exactly(1),
+            ordered: false,
         });
         assert!(may.is_may_of(event));
         assert!(!may.is_may_of(rules::EventId("other")));

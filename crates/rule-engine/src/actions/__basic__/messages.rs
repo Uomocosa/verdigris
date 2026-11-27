@@ -47,8 +47,9 @@ pub enum Rejected {
     InvalidTargets {
         spell: Entity,
     },
-    InvalidDiscard {
+    InvalidChoice {
         player: players::PlayerId,
+        why: actions::ChoiceWhy,
     },
     InvalidTriggerOrder {
         player: players::PlayerId,

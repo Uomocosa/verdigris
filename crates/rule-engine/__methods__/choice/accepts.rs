@@ -14,14 +14,11 @@ pub fn accepts(choice: &actions::Choice, answer: &actions::Action) -> bool {
             let options: BTreeSet<Entity> = choice.options.iter().copied().collect();
             chosen_set.len() == chosen.len() && chosen_set.is_subset(&options)
         }
-        actions::Choice::Discard(choice) => {
-            let actions::Action::ChooseDiscard(chosen) = answer else {
+        actions::Choice::Pick(choice) => {
+            let actions::Action::Choose(picked) = answer else {
                 return false;
             };
-            let chosen_set: BTreeSet<Entity> = chosen.iter().copied().collect();
-            u32::try_from(chosen.len()).unwrap_or(u32::MAX) == choice.count
-                && chosen_set.len() == chosen.len()
-                && chosen_set.is_subset(&choice.legal)
+            choice.check(picked).is_ok()
         }
         actions::Choice::Target(choice) => {
             let actions::Action::ChooseTargets(chosen) = answer else {
@@ -120,12 +117,25 @@ mod tests {
             &actions::Action::ChooseMay(vec![outsider])
         ));
         assert!(!accepts(&choice, &actions::Action::PassPriority));
-        let discard = actions::Choice::Discard(actions::DiscardChoice {
+        let discard = actions::PickChoice {
+            id: actions::ChoiceId("701.9b/discard"),
             player: p1.id,
-            count: 1,
-            cause: rules::EventId("608.2/resolve"),
-            legal: BTreeSet::from([first]),
-        });
-        assert!(!accepts(&discard, &actions::Action::ChooseMay(vec![first])));
+            source: None,
+            among: BTreeSet::from([first]),
+            count: actions::Count::exactly(1),
+            ordered: false,
+        };
+        assert!(!accepts(
+            &actions::Choice::Pick(discard.clone()),
+            &actions::Action::ChooseMay(vec![first])
+        ));
+        assert_eq!(
+            discard.check(&[first, first]),
+            Err(actions::ChoiceWhy::Duplicate)
+        );
+        assert_eq!(
+            discard.check(&[]),
+            Err(actions::ChoiceWhy::TooFew { min: 1 })
+        );
     }
 }

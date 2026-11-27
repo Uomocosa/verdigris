@@ -13,14 +13,6 @@ pub struct TargetChoice {
     pub legal: BTreeSet<Entity>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct DiscardChoice {
-    pub player: players::PlayerId,
-    pub count: u32,
-    pub cause: rules::EventId,
-    pub legal: BTreeSet<Entity>,
-}
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct BlockAssignment {
     pub blocker: Entity,

@@ -7,7 +7,7 @@ pub fn discard<const N: usize>(
     player_actions: testing::TestPlayerActions,
     cards: [testing::TestCard; N],
 ) -> testing::TestPlayerActions {
-    player_actions.act(actions::Action::ChooseDiscard(
+    player_actions.act(actions::Action::Choose(
         cards.into_iter().map(Entity::from).collect(),
     ))
 }
@@ -38,7 +38,7 @@ mod tests {
             .steps,
             vec![testing::PlayStep::Act(
                 caster,
-                actions::Action::ChooseDiscard(vec![card])
+                actions::Action::Choose(vec![card])
             )]
         );
     }

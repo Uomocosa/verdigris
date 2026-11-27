@@ -28,7 +28,7 @@ pub fn answer_asks(
         };
         let is_chooser = choice.player() == action.player;
         if !(is_chooser && choice.accepts(&action.action)) {
-            if let Some(rejection) = choice.rejection(action.player) {
+            if let Some(rejection) = choice.rejection(action.player, &action.action) {
                 rejected.write(rejection);
             }
             continue;

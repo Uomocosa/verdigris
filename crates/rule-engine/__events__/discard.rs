@@ -1,8 +1,11 @@
 use bevy::prelude::Entity;
 use verdigris_event_derive::EventArgs;
 
+use crate::actions;
 use crate::rules;
 use crate::rules::traits::event::Event;
+
+pub const DISCARD: actions::ChoiceId = actions::ChoiceId("701.9b/discard");
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, EventArgs)]
 pub struct Discard {

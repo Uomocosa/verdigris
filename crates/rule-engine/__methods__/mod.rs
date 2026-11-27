@@ -40,6 +40,7 @@ pub mod move_destination;
 pub mod opening_hand_action;
 #[cfg(feature = "testing")]
 pub mod pass_budget;
+pub mod pick_choice;
 pub mod play;
 pub mod player_quantity;
 pub mod player_view;

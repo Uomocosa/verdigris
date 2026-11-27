@@ -127,7 +127,7 @@ mod tests {
         );
         assert_eq!(game.life(p2), 20);
 
-        game.act(p1, actions::Action::ChooseDiscard(vec![bears.into()]));
+        game.act(p1, actions::Action::Choose(vec![bears.into()]));
 
         assert!(game.moved(bears).to(GRAVEYARD).of(p1));
         assert_eq!(game.life(p2), 20);

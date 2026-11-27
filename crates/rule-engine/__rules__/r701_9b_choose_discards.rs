@@ -7,6 +7,7 @@ use crate::actions;
 use crate::events;
 use crate::players;
 use crate::rules;
+use crate::rules::traits::event::Event;
 
 /// 701.9b By default, effects that cause a player to discard a card allow the affected player to
 /// choose which card to discard. Some effects, however, require a random discard or allow another
@@ -42,14 +43,14 @@ fn ask_which_cards(
             }));
             continue;
         }
-        asks.write(actions::Ask(actions::Choice::Discard(
-            actions::DiscardChoice {
-                player: request.player,
-                count: request.count,
-                cause: request.cause,
-                legal: hand.into_iter().collect(),
-            },
-        )));
+        asks.write(actions::Ask(actions::Choice::Pick(actions::PickChoice {
+            id: events::discard::DISCARD,
+            player: request.player,
+            source: None,
+            among: hand.into_iter().collect(),
+            count: actions::Count::exactly(request.count),
+            ordered: false,
+        })));
     }
 }
 
@@ -58,15 +59,18 @@ fn discard_chosen_cards(
     mut discards: MessageWriter<Attempt<events::Discard>>,
 ) {
     for answered in answers.read() {
-        let actions::Choice::Discard(choice) = &answered.choice else {
+        let actions::Choice::Pick(choice) = &answered.choice else {
             continue;
         };
-        let actions::Action::ChooseDiscard(chosen) = &answered.answer else {
+        if choice.id != events::discard::DISCARD {
+            continue;
+        }
+        let actions::Action::Choose(chosen) = &answered.answer else {
             continue;
         };
         discards.write(Attempt(events::Discard {
             cards: chosen.clone(),
-            cause: choice.cause,
+            cause: events::Discard::ID,
         }));
     }
 }

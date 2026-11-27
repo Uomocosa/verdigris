@@ -31,7 +31,7 @@ pub use deal_damage::DealDamage;
 mod destroy;
 pub use destroy::Destroy;
 
-mod discard;
+pub mod discard;
 pub use discard::Discard;
 
 mod draw;
