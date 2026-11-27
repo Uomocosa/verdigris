@@ -21,7 +21,7 @@ impl PlayerQuantity {
 #[atomic_delegates]
 impl PlayerQuantity {
     #[must_use]
-    pub fn of(self, player: impl Into<rules::ArgRef>) -> rules::PlayerQuantityOf {}
+    pub fn of(self, player: impl Into<rules::Subject>) -> rules::PlayerQuantityOf {}
 }
 
 #[cfg(test)]

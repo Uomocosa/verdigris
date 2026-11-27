@@ -422,46 +422,41 @@ mod tests {
             .run_system_once(move |answers: rules::Rules| {
                 assert!(eval(
                     &answers,
-                    &rules::each(
-                        rules::Players::Opponents,
-                        rules::life().is(rules::Value(20).or_more())
-                    ),
+                    &rules::life()
+                        .is(rules::Value(20).or_more())
+                        .of(rules::each(rules::Players::Opponents)),
                     &context,
                     None,
                 ));
                 assert!(!eval(
                     &answers,
-                    &rules::each(
-                        rules::Players::Opponents,
-                        rules::life().is(rules::Value(21).or_more())
-                    ),
+                    &rules::life()
+                        .is(rules::Value(21).or_more())
+                        .of(rules::each(rules::Players::Opponents)),
                     &context,
                     None,
                 ));
                 assert!(eval(
                     &answers,
-                    &rules::any(
-                        rules::Players::All,
-                        rules::life().is(rules::Value(20).or_less())
-                    ),
+                    &rules::life()
+                        .is(rules::Value(20).or_less())
+                        .of(rules::an(rules::Players::All)),
                     &context,
                     None,
                 ));
                 assert!(!eval(
                     &answers,
-                    &rules::any(
-                        rules::Players::Opponents,
-                        rules::life().is(rules::Value(19).or_less())
-                    ),
+                    &rules::life()
+                        .is(rules::Value(19).or_less())
+                        .of(rules::an(rules::Players::Opponents)),
                     &context,
                     None,
                 ));
                 assert!(eval(
                     &answers,
-                    &rules::each(
-                        rules::Players::You,
-                        rules::life().is(rules::Value(20).or_more())
-                    ),
+                    &rules::life()
+                        .is(rules::Value(20).or_more())
+                        .of(rules::each(rules::Players::You)),
                     &context,
                     None,
                 ));

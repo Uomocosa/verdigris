@@ -15,14 +15,7 @@ pub fn players_in_game(
         })
         .map(|entity| players::PlayerId(entity.id()))
         .collect();
-    match (set, you) {
-        (rules::Players::You, Some(player)) => vec![player],
-        (rules::Players::Opponents, Some(player)) => {
-            in_game.into_iter().filter(|candidate| *candidate != player).collect()
-        }
-        (rules::Players::You | rules::Players::Opponents, None) => Vec::new(),
-        (rules::Players::All, _) => in_game,
-    }
+    set.resolve(you, &in_game)
 }
 
 #[cfg(test)]

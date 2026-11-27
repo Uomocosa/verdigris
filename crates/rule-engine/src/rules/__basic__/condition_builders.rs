@@ -117,11 +117,11 @@ pub const fn count(id: rules::ArgId) -> rules::Count {
 }
 
 #[must_use]
-pub fn each(players: rules::Players, condition: rules::Condition) -> rules::Condition {
-    rules::Condition::Each(players, Box::new(condition))
+pub const fn each(players: rules::Players) -> rules::Subject {
+    rules::Subject::Each(players)
 }
 
 #[must_use]
-pub fn any(players: rules::Players, condition: rules::Condition) -> rules::Condition {
-    rules::Condition::AnyPlayer(players, Box::new(condition))
+pub const fn an(players: rules::Players) -> rules::Subject {
+    rules::Subject::An(players)
 }

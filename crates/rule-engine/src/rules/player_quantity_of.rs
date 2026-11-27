@@ -3,7 +3,7 @@ use crate::rules;
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct PlayerQuantityOf {
     pub quantity: rules::PlayerQuantity,
-    pub player: rules::ArgRef,
+    pub player: rules::Subject,
 }
 
 #[rustfmt::skip]

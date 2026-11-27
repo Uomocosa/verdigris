@@ -2,7 +2,7 @@ use crate::rules;
 
 pub fn of(
     quantity: rules::PlayerQuantity,
-    player: impl Into<rules::ArgRef>,
+    player: impl Into<rules::Subject>,
 ) -> rules::PlayerQuantityOf {
     rules::PlayerQuantityOf {
         quantity,
@@ -22,7 +22,7 @@ mod tests {
             of(rules::PlayerQuantity::Life, rules::YOU),
             rules::PlayerQuantityOf {
                 quantity: rules::PlayerQuantity::Life,
-                player: rules::YOU,
+                player: rules::YOU.into(),
             }
         );
     }

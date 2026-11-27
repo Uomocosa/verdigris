@@ -1,13 +1,6 @@
 use crate::rules;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum Players {
-    You,
-    Opponents,
-    All,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Amount {
     Fixed(u32),
     FromArg(rules::ArgId),

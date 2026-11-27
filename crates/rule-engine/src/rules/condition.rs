@@ -74,10 +74,15 @@ impl Condition {
     pub fn bind<E: rules::traits::event_args::EventArgs>(&self, event: &E) -> Self {}
 }
 
-#[rustfmt::skip]
 impl Condition {
     #[must_use]
-    pub fn of(self, who: impl Into<rules::ArgRef>) -> Self { Self::Of(who.into(), Box::new(self)) }
+    pub fn of(self, who: impl Into<rules::Subject>) -> Self {
+        match who.into() {
+            rules::Subject::One(reference) => Self::Of(reference, Box::new(self)),
+            rules::Subject::Each(set) => Self::Each(set, Box::new(self)),
+            rules::Subject::An(set) => Self::AnyPlayer(set, Box::new(self)),
+        }
+    }
 }
 
 #[cfg(test)]
