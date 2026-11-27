@@ -1,4 +1,3 @@
-use atomic_delegate_macros::atomic_delegates;
 use derive_more::Deref;
 
 use crate::rules;
@@ -13,24 +12,11 @@ impl ArgId {
 
     #[must_use]
     pub const fn owner(self) -> rules::ArgRef { rules::ArgRef::OwnerOf(self) }
-}
-
-#[atomic_delegates]
-impl ArgId {
-    #[must_use]
-    pub fn at_least(self, threshold: u32) -> rules::Condition {}
 
     #[must_use]
-    pub fn at_most(self, threshold: u32) -> rules::Condition {}
-
-    #[must_use]
-    pub fn equal_to(self, threshold: u32) -> rules::Condition {}
-
-    #[must_use]
-    pub fn greater_than(self, threshold: u32) -> rules::Condition {}
-
-    #[must_use]
-    pub fn less_than(self, threshold: u32) -> rules::Condition {}
+    pub const fn is(self, comparison: rules::Comparison) -> rules::Condition {
+        rules::Condition::ArgAmount(self, comparison)
+    }
 }
 
 #[cfg(test)]
@@ -44,5 +30,9 @@ mod tests {
         let id = ArgId("source");
         assert_eq!(id.controller(), rules::ArgRef::ControllerOf(id));
         assert_eq!(id.owner(), rules::ArgRef::OwnerOf(id));
+        assert_eq!(
+            id.is(rules::Value(2).or_more()),
+            rules::Condition::ArgAmount(id, rules::Comparison::OrMore(2)),
+        );
     }
 }

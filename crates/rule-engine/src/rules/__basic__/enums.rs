@@ -1,12 +1,6 @@
 use crate::rules;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum Characteristic {
-    Power,
-    Toughness,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Players {
     You,
     Opponents,

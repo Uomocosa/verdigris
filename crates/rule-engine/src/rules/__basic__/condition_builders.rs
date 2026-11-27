@@ -22,18 +22,13 @@ pub const fn card_type(card: cards::CardType) -> rules::Condition {
 }
 
 #[must_use]
-pub const fn at_least(characteristic: rules::Characteristic, threshold: i32) -> rules::Condition {
-    rules::Condition::Characteristic(characteristic, rules::Comparison::OrMore(threshold))
+pub const fn power() -> rules::Characteristic {
+    rules::Characteristic::Power
 }
 
 #[must_use]
-pub const fn at_most(characteristic: rules::Characteristic, threshold: i32) -> rules::Condition {
-    rules::Condition::Characteristic(characteristic, rules::Comparison::OrLess(threshold))
-}
-
-#[must_use]
-pub const fn equal_to(characteristic: rules::Characteristic, threshold: i32) -> rules::Condition {
-    rules::Condition::Characteristic(characteristic, rules::Comparison::Exactly(threshold))
+pub const fn toughness() -> rules::Characteristic {
+    rules::Characteristic::Toughness
 }
 
 #[must_use]

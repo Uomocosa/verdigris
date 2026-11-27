@@ -56,7 +56,7 @@ mod tests {
             player: players::PlayerId(Entity::PLACEHOLDER),
             amount: 2,
         };
-        let at_least_two = events::Draw::AMOUNT.at_least(2);
+        let at_least_two = events::Draw::AMOUNT.is(rules::Value(2).or_more());
         assert_eq!(bind(&at_least_two, &draw_two), rules::Condition::True);
     }
 
@@ -66,17 +66,17 @@ mod tests {
             player: players::PlayerId(Entity::PLACEHOLDER),
             amount: 2,
         };
-        let at_least_three = events::Draw::AMOUNT.at_least(3);
+        let at_least_three = events::Draw::AMOUNT.is(rules::Value(3).or_more());
         assert_eq!(bind(&at_least_three, &draw_two), !rules::Condition::True);
         let nested = rules::Condition::All(vec![
-            events::Draw::AMOUNT.at_least(2),
+            events::Draw::AMOUNT.is(rules::Value(2).or_more()),
             rules::Condition::True,
         ]);
         assert_eq!(
             bind(&nested, &draw_two),
             rules::Condition::All(vec![rules::Condition::True, rules::Condition::True])
         );
-        let missing = events::Draw::AMOUNT.at_least(1);
+        let missing = events::Draw::AMOUNT.is(rules::Value(1).or_more());
         assert_eq!(
             bind(
                 &missing,

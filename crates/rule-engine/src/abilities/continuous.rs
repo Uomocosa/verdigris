@@ -28,11 +28,11 @@ mod tests {
     fn test_usage() {
         let ability = statics::all(CREATURE)
             .gain(keywords::vigilance())
-            .as_long_as(rules::life().at_least(30).of(rules::YOU));
+            .as_long_as(rules::life().of(rules::YOU).is(rules::Value(30).or_more()));
         assert_eq!(ability.filter, CREATURE);
         assert_eq!(
             ability.as_long_as,
-            Some(rules::life().at_least(30).of(rules::YOU))
+            Some(rules::life().of(rules::YOU).is(rules::Value(30).or_more()))
         );
         assert_eq!(
             statics::all(CREATURE).gain(keywords::vigilance()),

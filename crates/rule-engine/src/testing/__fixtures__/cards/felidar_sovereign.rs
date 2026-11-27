@@ -19,7 +19,7 @@ pub const FELIDAR_SOVEREIGN: testing::Card = testing::Card {
             keywords::vigilance(),
             keywords::lifelink(),
             abilities::at(
-                turns::beginning_of(UPKEEP, YOU).if_(rules::life().at_least(40).of(rules::YOU)),
+                turns::beginning_of(UPKEEP, YOU).if_(rules::life().of(rules::YOU).is(rules::Value(40).or_more())),
                 effects::win_the_game(),
             ),
         }

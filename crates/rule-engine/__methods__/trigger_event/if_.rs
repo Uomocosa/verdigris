@@ -25,11 +25,11 @@ mod tests {
         assert_eq!(
             if_(
                 abilities::TriggerEvent::BeginningOfStep(UPKEEP, YOU),
-                rules::life().at_least(40).of(rules::YOU)
+                rules::life().of(rules::YOU).is(rules::Value(40).or_more())
             ),
             abilities::Trigger {
                 event: abilities::TriggerEvent::BeginningOfStep(UPKEEP, YOU),
-                intervening_if: Some(rules::life().at_least(40).of(rules::YOU)),
+                intervening_if: Some(rules::life().of(rules::YOU).is(rules::Value(40).or_more())),
             }
         );
     }

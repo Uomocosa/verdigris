@@ -16,7 +16,7 @@ pub const TEST_SILENT_ARBITER: testing::Card = testing::Card {
             statics::all(PLAYER).restriction::<events::DeclareAttackers>(
                 events::DeclareAttackers::PLAYER,
                 rules::RestrictionId("test/silent-arbiter"),
-                rules::count(events::DeclareAttackers::ATTACKERS).at_most(1),
+                rules::count(events::DeclareAttackers::ATTACKERS).is(rules::Value(1).or_less()),
             ),
         }
     },

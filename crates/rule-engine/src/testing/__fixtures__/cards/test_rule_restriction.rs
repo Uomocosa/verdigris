@@ -14,7 +14,7 @@ pub const TEST_RULE_RESTRICTION: testing::Card = testing::Card {
             statics::this().restriction::<testing::RestrictedRule>(
                 testing::RestrictedRule::ATTACKER,
                 rules::RestrictionId("test/test-rule-restriction"),
-                rules::at_least(rules::Characteristic::Power, 3)
+                rules::power().is(rules::Value(3).or_more())
                     .of(testing::RestrictedRule::ATTACKER),
             ),
         }

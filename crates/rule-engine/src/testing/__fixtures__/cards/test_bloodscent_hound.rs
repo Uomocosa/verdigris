@@ -12,7 +12,7 @@ pub const TEST_BLOODSCENT_HOUND: testing::Card = testing::Card {
     definition: || {
         card! {
             cards::creature("Test Bloodscent Hound", cost![1, R], pt!(2, 1));
-            statics::this().gain(keywords::haste()).as_long_as(rules::any(rules::Players::Opponents, rules::life().at_most(10))),
+            statics::this().gain(keywords::haste()).as_long_as(rules::any(rules::Players::Opponents, rules::life().is(rules::Value(10).or_less()))),
         }
     },
 };

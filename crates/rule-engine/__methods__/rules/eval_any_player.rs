@@ -39,13 +39,13 @@ mod tests {
                 assert!(eval_any_player(
                     &answers,
                     rules::Players::All,
-                    &rules::life().at_most(20),
+                    &rules::life().is(rules::Value(20).or_less()),
                     &context,
                 ));
                 assert!(!eval_any_player(
                     &answers,
                     rules::Players::Opponents,
-                    &rules::life().at_most(19),
+                    &rules::life().is(rules::Value(19).or_less()),
                     &context,
                 ));
             })

@@ -16,7 +16,7 @@ pub const TEST_PAINFUL_LESSONS: testing::Card = testing::Card {
             statics::all(PLAYER).instead(
                 events::Draw::ID,
                 events::Draw::PLAYER,
-                events::Draw::AMOUNT.at_least(2),
+                events::Draw::AMOUNT.is(rules::Value(2).or_more()),
                 vec![rules::EventTemplate::LoseLife {
                     who: events::Draw::PLAYER.into(),
                     amount: rules::Amount::FromArg(events::Draw::AMOUNT),

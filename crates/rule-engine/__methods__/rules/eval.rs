@@ -226,7 +226,7 @@ mod tests {
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
-                let big = rules::at_least(rules::Characteristic::Power, 3).of(TestRule::ATTACKER);
+                let big = rules::power().is(rules::Value(3).or_more()).of(TestRule::ATTACKER);
                 assert!(!eval(&answers, &big, &small, None));
                 assert!(eval(&answers, &big, &big_attack, None));
             })
@@ -386,31 +386,31 @@ mod tests {
                 assert!(!eval(&answers, &missing, &attack, None));
                 assert!(eval(
                     &answers,
-                    &rules::life().at_least(20).of(TestRule::PLAYER),
+                    &rules::life().of(TestRule::PLAYER).is(rules::Value(20).or_more()),
                     &attack,
                     None
                 ));
                 assert!(!eval(
                     &answers,
-                    &rules::life().at_least(21).of(TestRule::PLAYER),
+                    &rules::life().of(TestRule::PLAYER).is(rules::Value(21).or_more()),
                     &attack,
                     None
                 ));
                 assert!(eval(
                     &answers,
-                    &rules::poison_counters().at_most(0).of(TestRule::PLAYER),
+                    &rules::poison_counters().of(TestRule::PLAYER).is(rules::Value(0).or_less()),
                     &attack,
                     None,
                 ));
                 assert!(eval(
                     &answers,
-                    &rules::cards_in_hand().at_least(0).of(TestRule::PLAYER),
+                    &rules::cards_in_hand().of(TestRule::PLAYER).is(rules::Value(0).or_more()),
                     &attack,
                     None,
                 ));
                 assert!(!eval(
                     &answers,
-                    &rules::cards_in_hand().at_least(1000).of(TestRule::PLAYER),
+                    &rules::cards_in_hand().of(TestRule::PLAYER).is(rules::Value(1000).or_more()),
                     &attack,
                     None,
                 ));
@@ -422,31 +422,46 @@ mod tests {
             .run_system_once(move |answers: rules::Rules| {
                 assert!(eval(
                     &answers,
-                    &rules::each(rules::Players::Opponents, rules::life().at_least(20)),
+                    &rules::each(
+                        rules::Players::Opponents,
+                        rules::life().is(rules::Value(20).or_more())
+                    ),
                     &context,
                     None,
                 ));
                 assert!(!eval(
                     &answers,
-                    &rules::each(rules::Players::Opponents, rules::life().at_least(21)),
+                    &rules::each(
+                        rules::Players::Opponents,
+                        rules::life().is(rules::Value(21).or_more())
+                    ),
                     &context,
                     None,
                 ));
                 assert!(eval(
                     &answers,
-                    &rules::any(rules::Players::All, rules::life().at_most(20)),
+                    &rules::any(
+                        rules::Players::All,
+                        rules::life().is(rules::Value(20).or_less())
+                    ),
                     &context,
                     None,
                 ));
                 assert!(!eval(
                     &answers,
-                    &rules::any(rules::Players::Opponents, rules::life().at_most(19)),
+                    &rules::any(
+                        rules::Players::Opponents,
+                        rules::life().is(rules::Value(19).or_less())
+                    ),
                     &context,
                     None,
                 ));
                 assert!(eval(
                     &answers,
-                    &rules::each(rules::Players::You, rules::life().at_least(20)),
+                    &rules::each(
+                        rules::Players::You,
+                        rules::life().is(rules::Value(20).or_more())
+                    ),
                     &context,
                     None,
                 ));

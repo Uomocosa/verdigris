@@ -18,7 +18,7 @@ fn abilities() -> Vec<effects::Modification> {
         target: rules::Target::Definition(rules::LETHAL_DAMAGE),
         change: rules::Change::Allow {
             holder: events::AssignCombatDamage::SOURCE.into(),
-            when: events::AssignCombatDamage::AMOUNT.greater_than(0),
+            when: events::AssignCombatDamage::AMOUNT.is(rules::greater_than(0)),
         },
     })]
 }

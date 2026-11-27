@@ -54,7 +54,10 @@ mod tests {
         let restrictions = DealDamage::restrictions();
         assert_eq!(restrictions.len(), 1);
         assert_eq!(restrictions[0].id, super::NONZERO_DAMAGE);
-        assert_eq!(restrictions[0].condition, DealDamage::AMOUNT.at_least(1));
+        assert_eq!(
+            restrictions[0].condition,
+            DealDamage::AMOUNT.is(rules::Value(1).or_more())
+        );
         assert_eq!(
             event.arg(DealDamage::SOURCE),
             Some(rules::ArgValue::Entity(source))
