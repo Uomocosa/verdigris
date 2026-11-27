@@ -45,7 +45,7 @@ fn propose_play(mut actions: MessageReader<actions::PlayerAction>, mut commands:
 fn check_play(
     mut actions: MessageReader<actions::PlayerAction>,
     mut rejected: MessageWriter<actions::Rejected>,
-    mut entering: MessageWriter<Attempt<events::EnterBattlefield>>,
+    mut entering: MessageWriter<Attempt<events::EnterTheBattlefield>>,
     mut commands: Commands,
     state: Res<turns::TurnState>,
     answers: rules::Rules,
@@ -86,10 +86,7 @@ fn check_play(
         record.record_play(state.turn.number);
         commands.entity(*action.player).insert(record);
         if answers.zones.find(BATTLEFIELD, Some(action.player)).is_some() {
-            entering.write(Attempt(events::EnterBattlefield::from_controller(
-                action.player,
-                card,
-            )));
+            entering.write(Attempt(events::EnterTheBattlefield { permanent: card }));
         }
     }
 }

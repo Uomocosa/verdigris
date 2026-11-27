@@ -7,7 +7,7 @@ use crate::events;
 /// 110.5b Permanents enter the battlefield untapped, unflipped, face up, and phased in unless a
 /// spell or ability says otherwise.
 pub fn r110_5b_enters_untapped(
-    mut entered: MessageReader<Did<events::EnterBattlefield>>,
+    mut entered: MessageReader<Did<events::EnterTheBattlefield>>,
     mut commands: Commands,
     definitions: Query<&cards::CardDefinition>,
 ) {

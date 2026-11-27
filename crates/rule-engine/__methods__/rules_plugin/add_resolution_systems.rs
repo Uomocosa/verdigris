@@ -88,8 +88,8 @@ pub fn add_resolution_systems(app: &mut App) {
                 Attempt::<events::BeginTheGameOnTheBattlefield>::resolved_by(
                     comprehensive_rules::r103_6a_begin_the_game_on_the_battlefield::r103_6a_begin_the_game_on_the_battlefield,
                 ),
-                Attempt::<events::EnterBattlefield>::resolved_by(
-                    comprehensive_rules::r110_1_enter_battlefield::r110_1_enter_battlefield,
+                Attempt::<events::EnterTheBattlefield>::resolved_by(
+                    comprehensive_rules::r110_1_enter_the_battlefield::r110_1_enter_the_battlefield,
                 ),
                 comprehensive_rules::r110_5b_enters_untapped::r110_5b_enters_untapped,
                 (

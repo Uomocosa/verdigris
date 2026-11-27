@@ -24,7 +24,6 @@ pub mod declare_attacker;
 pub mod declare_blocker;
 pub mod definition_id;
 pub mod effect;
-pub mod enter_battlefield;
 pub mod event_template;
 #[cfg(feature = "testing")]
 pub mod expected_targets;

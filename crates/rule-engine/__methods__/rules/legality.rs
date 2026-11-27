@@ -34,6 +34,7 @@ mod tests {
     use bevy::ecs::system::RunSystemOnce;
 
     use crate::BATTLEFIELD;
+    use crate::cards;
     use crate::effects;
     use crate::events;
     use crate::keywords;
@@ -456,23 +457,31 @@ mod tests {
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
                 assert_eq!(
-                    legality::<events::EnterBattlefield>(
+                    legality::<events::EnterTheBattlefield>(
                         &answers,
-                        &events::EnterBattlefield {
+                        &events::EnterTheBattlefield {
                             permanent: *protected,
-                            controller: p1.id,
-                            summoning_sick: true,
                         }
                     ),
                     rules::Legality::Illegal
                 );
+            })
+            .unwrap();
+        let protected_entity = *protected;
+        game.app
+            .world_mut()
+            .run_system_once(move |mut commands: bevy::prelude::Commands| {
+                commands.entity(protected_entity).insert(cards::Controller(p2.id));
+            })
+            .unwrap();
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
                 assert_eq!(
-                    legality::<events::EnterBattlefield>(
+                    legality::<events::EnterTheBattlefield>(
                         &answers,
-                        &events::EnterBattlefield {
+                        &events::EnterTheBattlefield {
                             permanent: *protected,
-                            controller: p2.id,
-                            summoning_sick: true,
                         }
                     ),
                     rules::Legality::Legal

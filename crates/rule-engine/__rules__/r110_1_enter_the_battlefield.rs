@@ -7,42 +7,46 @@ use crate::Resolve;
 use crate::cards;
 use crate::zones;
 
+type EnteringPermanent<'w, 's> = Query<
+    'w,
+    's,
+    (
+        &'static cards::CardDefinition,
+        &'static cards::Controller,
+        &'static cards::Owner,
+        Has<cards::Token>,
+        Option<&'static cards::Enchanting>,
+    ),
+>;
+
 /// 110.1. A permanent is a card or token on the battlefield. A permanent remains on the battlefield
 /// indefinitely. A card or token becomes a permanent as it enters the battlefield and it stops
 /// being a permanent as it’s moved to another zone by an effect or rule.
-pub fn r110_1_enter_battlefield(
-    mut entering: MessageReader<Resolve<events::EnterBattlefield>>,
-    mut entered: MessageWriter<Did<events::EnterBattlefield>>,
+pub fn r110_1_enter_the_battlefield(
+    mut entering: MessageReader<Resolve<events::EnterTheBattlefield>>,
+    mut entered: MessageWriter<Did<events::EnterTheBattlefield>>,
     mut commands: Commands,
-    permanents: Query<(
-        &cards::CardDefinition,
-        &cards::Owner,
-        Has<cards::Token>,
-        Option<&cards::Enchanting>,
-    )>,
+    permanents: EnteringPermanent<'_, '_>,
     zones: zones::ZoneLookup,
 ) {
     for event in entering.read() {
-        let Some(battlefield) = zones.find(BATTLEFIELD, Some(event.controller)) else {
+        let Ok((definition, controller, owner, has_token, enchanting)) =
+            permanents.get(event.permanent)
+        else {
             continue;
         };
-        let Ok((definition, owner, has_token, enchanting)) = permanents.get(event.permanent) else {
+        let Some(battlefield) = zones.find(BATTLEFIELD, Some(**controller)) else {
             continue;
         };
         if has_token {
-            if event.summoning_sick {
-                commands.entity(event.permanent).insert((
-                    zones::InZone(battlefield),
-                    cards::Controller(event.controller),
-                    cards::SummoningSick,
-                ));
-            } else {
-                commands.entity(event.permanent).insert((
-                    zones::InZone(battlefield),
-                    cards::Controller(event.controller),
-                ));
-            }
-            entered.write(Did(**event));
+            commands.entity(event.permanent).insert((
+                zones::InZone(battlefield),
+                *controller,
+                cards::SummoningSick,
+            ));
+            entered.write(Did(events::EnterTheBattlefield {
+                permanent: event.permanent,
+            }));
             continue;
         }
         let moved = zones::move_object(
@@ -53,18 +57,11 @@ pub fn r110_1_enter_battlefield(
             None,
             battlefield,
         );
-        commands.entity(moved).insert(cards::Controller(event.controller));
+        commands.entity(moved).insert((*controller, cards::SummoningSick));
         if let Some(enchanting) = enchanting {
             commands.entity(moved).insert(*enchanting);
         }
-        if event.summoning_sick {
-            commands.entity(moved).insert(cards::SummoningSick);
-        }
-        entered.write(Did(events::EnterBattlefield {
-            permanent: moved,
-            controller: event.controller,
-            summoning_sick: event.summoning_sick,
-        }));
+        entered.write(Did(events::EnterTheBattlefield { permanent: moved }));
     }
 }
 

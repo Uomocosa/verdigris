@@ -19,7 +19,7 @@ pub enum AnyEvent {
     Destroy(events::Destroy),
     Counter(events::Counter),
     DealDamage(events::DealDamage),
-    EnterBattlefield(events::EnterBattlefield),
+    EnterTheBattlefield(events::EnterTheBattlefield),
     BeginTheGameOnTheBattlefield(events::BeginTheGameOnTheBattlefield),
 }
 
@@ -68,7 +68,7 @@ impl AnyEvent {
             Self::DealDamage(happened) => {
                 commands.write_message(Attempt(happened));
             }
-            Self::EnterBattlefield(happened) => {
+            Self::EnterTheBattlefield(happened) => {
                 commands.write_message(Attempt(happened));
             }
             Self::BeginTheGameOnTheBattlefield(happened) => {

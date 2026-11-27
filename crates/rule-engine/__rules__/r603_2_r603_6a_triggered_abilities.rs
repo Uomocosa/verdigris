@@ -25,7 +25,7 @@ use crate::stack;
 /// determine if those abilities trigger, using the existence of those abilities and the appearance
 /// of objects immediately prior to the event. The list of exceptions is as follows:
 pub fn r603_2_r603_6a_triggered_abilities(
-    mut entered: MessageReader<Did<events::EnterBattlefield>>,
+    mut entered: MessageReader<Did<events::EnterTheBattlefield>>,
     mut queue: ResMut<stack::TriggerQueue>,
     sources: Query<
         (Entity, &cards::Controller, &cards::TriggeredEnters),

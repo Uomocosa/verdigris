@@ -18,7 +18,7 @@ use crate::zones;
 /// the characteristics its creation effect defines.
 pub fn r701_7a_create_tokens(
     mut requested: MessageReader<Resolve<events::CreateTokens>>,
-    mut entering: MessageWriter<Attempt<events::EnterBattlefield>>,
+    mut entering: MessageWriter<Attempt<events::EnterTheBattlefield>>,
     mut commands: Commands,
     zones: zones::ZoneLookup,
 ) {
@@ -37,11 +37,7 @@ pub fn r701_7a_create_tokens(
                     cards::Token,
                 ))
                 .id();
-            entering.write(Attempt(events::EnterBattlefield {
-                permanent: token,
-                controller: request.controller,
-                summoning_sick: true,
-            }));
+            entering.write(Attempt(events::EnterTheBattlefield { permanent: token }));
         }
     }
 }

@@ -12,8 +12,8 @@ pub const TEST_NO_TOKENS: testing::Card = testing::Card {
         card! {
             cards::CardDefinition::from_enchantment("Test No Tokens", cost![2]);
             statics::you()
-                .cant::<events::EnterBattlefield>(
-                    events::EnterBattlefield::CONTROLLER,
+                .cant::<events::EnterTheBattlefield>(
+                    events::EnterTheBattlefield::PERMANENT.controller(),
                     rules::RestrictionId("test/test-no-tokens"),
                 ),
         }

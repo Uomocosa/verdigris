@@ -40,8 +40,8 @@ pub use discard_card::DiscardCard;
 mod draw;
 pub use draw::Draw;
 
-mod enter_battlefield;
-pub use enter_battlefield::EnterBattlefield;
+mod enter_the_battlefield;
+pub use enter_the_battlefield::EnterTheBattlefield;
 
 mod exile;
 pub use exile::Exile;

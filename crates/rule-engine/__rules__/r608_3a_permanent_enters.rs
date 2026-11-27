@@ -37,7 +37,7 @@ type ResolvingPermanent<'w, 's> = Query<
 /// the stack and put into its owner’s graveyard.
 pub fn r608_3a_permanent_enters(
     mut resolutions: MessageReader<stack::Resolution>,
-    mut entering: MessageWriter<Attempt<events::EnterBattlefield>>,
+    mut entering: MessageWriter<Attempt<events::EnterTheBattlefield>>,
     mut commands: Commands,
     cards: ResolvingPermanent<'_, '_>,
     battlefield: Query<Entity, With<cards::OnBattlefield>>,
@@ -46,8 +46,7 @@ pub fn r608_3a_permanent_enters(
 ) {
     for resolution in resolutions.read() {
         let spell = **resolution;
-        let Ok((definition, controller, owner, in_zone, chosen, has_token)) = cards.get(spell)
-        else {
+        let Ok((definition, _, owner, in_zone, chosen, has_token)) = cards.get(spell) else {
             continue;
         };
         if !zones.contains(STACK, **in_zone) {
@@ -91,11 +90,7 @@ pub fn r608_3a_permanent_enters(
             }
         }
         if zones.find(BATTLEFIELD, Some(**owner)).is_some() {
-            entering.write(Attempt(events::EnterBattlefield {
-                permanent: spell,
-                controller: **controller,
-                summoning_sick: true,
-            }));
+            entering.write(Attempt(events::EnterTheBattlefield { permanent: spell }));
         }
     }
 }

@@ -18,7 +18,7 @@ pub fn r608_3e_cannot_enter(
 ) {
     for resolution in resolutions.read() {
         let spell = **resolution;
-        let Ok((definition, controller, in_zone)) = cards.get(spell) else {
+        let Ok((definition, _, in_zone)) = cards.get(spell) else {
             continue;
         };
         if !answers.zones.contains(STACK, **in_zone) {
@@ -33,11 +33,7 @@ pub fn r608_3e_cannot_enter(
         if !is_permanent {
             continue;
         }
-        if !answers.legal(&events::EnterBattlefield {
-            permanent: spell,
-            controller: **controller,
-            summoning_sick: true,
-        }) {
+        if !answers.legal(&events::EnterTheBattlefield { permanent: spell }) {
             graveyards.write(Attempt(events::PutIntoGraveyard { object: spell }));
         }
     }
