@@ -56,7 +56,7 @@ mod tests {
             p1.cast(bolt).targeting(p2).pass_priority(),
             p2.pass_priority(),
         ])?;
-        assert!(game.player(p1).cards_in(GRAVEYARD).has(bolt));
+        assert!(game.card(bolt).is_in(GRAVEYARD).of(p1));
         Ok(())
     }
 
@@ -73,8 +73,8 @@ mod tests {
             p2.pass_priority(),
         ])?;
 
-        assert!(game.player(p1).cards_in(GRAVEYARD).has(bolt_2));
-        assert!(game.stack().has(bolt_1));
+        assert!(game.card(bolt_2).is_in(GRAVEYARD).of(p1));
+        assert!(!game.stack().matching(bolt_1).is_empty());
         assert_eq!(game.life(p2), 17);
         Ok(())
     }
@@ -94,8 +94,8 @@ mod tests {
             p2.pass_priority(),
         ])?;
 
-        assert!(game.player(p1).cards_in(GRAVEYARD).has(bolt_2));
-        assert!(game.player(p1).cards_in(GRAVEYARD).has(bolt_1));
+        assert!(game.card(bolt_2).is_in(GRAVEYARD).of(p1));
+        assert!(game.card(bolt_1).is_in(GRAVEYARD).of(p1));
         assert_eq!(game.life(p2), 14);
         Ok(())
     }

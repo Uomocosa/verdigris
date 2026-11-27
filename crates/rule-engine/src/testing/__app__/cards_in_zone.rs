@@ -32,7 +32,7 @@ impl CardsInZone {
     pub const fn count(&self) -> usize { self.objects.len() }
 
     #[must_use]
-    pub fn has_no(&self, card: impl Into<testing::CardQuery>) -> bool { !self.has(card) }
+    pub fn has_no(&self, card: testing::Card) -> bool { !self.has(card) }
 
     #[must_use]
     pub fn has_no_trigger(&self, query: testing::TriggerQuery) -> bool { !self.has_trigger(query) }
@@ -45,8 +45,8 @@ impl CardsInZone {
 
 impl CardsInZone {
     #[must_use]
-    pub fn has(&self, card: impl Into<testing::CardQuery>) -> bool {
-        let query: testing::CardQuery = card.into();
+    pub fn has(&self, card: testing::Card) -> bool {
+        let query = testing::CardQuery::from(card);
         self.objects.iter().any(|object| query.matches(object).is_some())
     }
 
@@ -101,7 +101,7 @@ mod tests {
         let cards = game.player(p1).cards_in(HAND);
         let [found] = cards.exactly::<1>(LIGHTNING_BOLT)?;
 
-        assert!(cards.has(found));
+        assert!(game.card(found).is_in(HAND).of(p1));
         Ok(())
     }
 

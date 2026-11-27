@@ -46,11 +46,11 @@ mod tests {
             p2.pass_priority(),
         ])?;
 
-        assert!(game.player(p1).cards_in(BATTLEFIELD).has(survivor));
-        assert!(game.player(p1).cards_in(BATTLEFIELD).has_no(soldier));
-        assert!(game.player(p1).cards_in(GRAVEYARD).has_no(soldier));
+        assert!(game.card(survivor).is_in(BATTLEFIELD).of(p1));
+        assert!(!game.card(soldier).is_in(BATTLEFIELD).of(p1));
+        assert!(!game.card(soldier).is_in(GRAVEYARD).of(p1));
         assert!(game.app.world().get_entity(Entity::from(soldier)).is_err());
-        assert!(game.player(p1).cards_in(GRAVEYARD).has(bolt));
+        assert!(game.card(bolt).is_in(GRAVEYARD).of(p1));
         Ok(())
     }
 }

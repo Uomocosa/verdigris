@@ -61,7 +61,7 @@ mod tests {
             p2.cast(murder).targeting(crawler).pass_priority(),
             p1.pass_priority(),
         ])?;
-        assert!(game.player(p1).cards_in(GRAVEYARD).has(crawler));
+        assert!(game.card(crawler).is_in(GRAVEYARD).of(p1));
         assert!(game.player(p1).cards_in(LIBRARY).has(LIGHTNING_BOLT));
         game.play([p2.pass_priority(), p1.pass_priority()])?;
         assert!(game.player(p1).cards_in(HAND).has(LIGHTNING_BOLT));

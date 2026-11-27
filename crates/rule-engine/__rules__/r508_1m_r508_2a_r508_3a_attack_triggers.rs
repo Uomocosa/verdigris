@@ -61,7 +61,7 @@ mod tests {
         game.play([p1.pass_priority(), p2.pass_priority()])?;
 
         assert_eq!(game.pt(marauder), Some(pt!(3, 2)));
-        assert!(game.player(p1).cards_in(BATTLEFIELD).has(marauder));
+        assert!(game.card(marauder).is_in(BATTLEFIELD).of(p1));
         Ok(())
     }
 

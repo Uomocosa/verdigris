@@ -93,7 +93,7 @@ mod tests {
 
         game.play([p1.play_land(forest)])?;
 
-        assert!(game.player(p1).cards_in(BATTLEFIELD).has(forest));
+        assert!(game.card(forest).is_in(BATTLEFIELD).of(p1));
         assert!(game.last_rejection().is_none());
         Ok(())
     }
@@ -106,14 +106,14 @@ mod tests {
         game.play([p1.play_land(forest_1)])?;
         game.act(p1, actions::Action::PlayLand(forest_2.into()));
 
-        assert!(game.player(p1).cards_in(BATTLEFIELD).has(forest_1));
+        assert!(game.card(forest_1).is_in(BATTLEFIELD).of(p1));
         assert_eq!(
             game.last_rejection(),
             Some(&actions::Rejected::CannotPlayLand {
                 land: forest_2.into()
             })
         );
-        assert!(game.player(p1).cards_in(HAND).has(forest_2));
+        assert!(game.card(forest_2).is_in(HAND).of(p1));
         Ok(())
     }
 
@@ -131,16 +131,16 @@ mod tests {
         game.play([p1.play_land(forest_3)])?;
         game.act(p1, actions::Action::PlayLand(forest_4.into()));
 
-        assert!(game.player(p1).cards_in(BATTLEFIELD).has(forest_1));
-        assert!(game.player(p1).cards_in(BATTLEFIELD).has(forest_2));
-        assert!(game.player(p1).cards_in(BATTLEFIELD).has(forest_3));
+        assert!(game.card(forest_1).is_in(BATTLEFIELD).of(p1));
+        assert!(game.card(forest_2).is_in(BATTLEFIELD).of(p1));
+        assert!(game.card(forest_3).is_in(BATTLEFIELD).of(p1));
         assert_eq!(
             game.last_rejection(),
             Some(&actions::Rejected::CannotPlayLand {
                 land: forest_4.into()
             })
         );
-        assert!(game.player(p1).cards_in(HAND).has(forest_4));
+        assert!(game.card(forest_4).is_in(HAND).of(p1));
         Ok(())
     }
 
@@ -160,7 +160,7 @@ mod tests {
                 land: forest.into()
             })
         );
-        assert!(game.player(p1).cards_in(HAND).has(forest));
+        assert!(game.card(forest).is_in(HAND).of(p1));
         Ok(())
     }
 
@@ -180,7 +180,7 @@ mod tests {
         game.play([p1.arrange_graveyard([forest, mind_rot])])?;
         game.play([p1.play_land(forest)])?;
 
-        assert!(game.player(p1).cards_in(BATTLEFIELD).has(forest));
+        assert!(game.card(forest).is_in(BATTLEFIELD).of(p1));
         assert!(game.last_rejection().is_none());
         Ok(())
     }
@@ -196,7 +196,7 @@ mod tests {
             p1.cast(mind_rot).targeting(p1).pass_priority(),
             p2.pass_priority(),
         ])?;
-        assert!(game.player(p1).cards_in(GRAVEYARD).has(forest));
+        assert!(game.card(forest).is_in(GRAVEYARD).of(p1));
 
         game.act(p1, actions::Action::PlayLand(forest.into()));
 
@@ -206,7 +206,7 @@ mod tests {
                 land: forest.into()
             })
         );
-        assert!(game.player(p1).cards_in(GRAVEYARD).has(forest));
+        assert!(game.card(forest).is_in(GRAVEYARD).of(p1));
         Ok(())
     }
 
@@ -224,7 +224,7 @@ mod tests {
             p1.cast(mind_rot).targeting(p2).pass_priority(),
             p2.pass_priority(),
         ])?;
-        assert!(game.player(p2).cards_in(GRAVEYARD).has(forest));
+        assert!(game.card(forest).is_in(GRAVEYARD).of(p2));
 
         game.act(p1, actions::Action::PlayLand(forest.into()));
 
@@ -234,7 +234,7 @@ mod tests {
                 land: forest.into()
             })
         );
-        assert!(game.player(p2).cards_in(GRAVEYARD).has(forest));
+        assert!(game.card(forest).is_in(GRAVEYARD).of(p2));
         Ok(())
     }
 
@@ -253,7 +253,7 @@ mod tests {
         ])?;
         game.play([p1.arrange_graveyard([forest, mind_rot])])?;
         game.play([p1.end_turn(), p2.end_turn()])?;
-        assert!(game.player(p1).cards_in(GRAVEYARD).has(forest));
+        assert!(game.card(forest).is_in(GRAVEYARD).of(p1));
 
         game.act(p1, actions::Action::PlayLand(forest.into()));
 
@@ -263,7 +263,7 @@ mod tests {
                 land: forest.into()
             })
         );
-        assert!(game.player(p1).cards_in(GRAVEYARD).has(forest));
+        assert!(game.card(forest).is_in(GRAVEYARD).of(p1));
         Ok(())
     }
 }

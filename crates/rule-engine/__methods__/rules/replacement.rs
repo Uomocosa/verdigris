@@ -29,7 +29,7 @@ mod tests {
         let [maniac] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(LABORATORY_MANIAC)?;
         let player = p1.id;
         game.pass_priority();
-        assert!(game.player(p1).cards_in(BATTLEFIELD).has(maniac));
+        assert!(game.card(maniac).is_in(BATTLEFIELD).of(p1));
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {

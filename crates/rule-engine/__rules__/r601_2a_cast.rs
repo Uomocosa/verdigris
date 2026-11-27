@@ -72,7 +72,7 @@ mod tests {
             MockGame::new([P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]), P2]);
         let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
         game.play([p1.cast(bolt)])?;
-        assert!(game.stack().has(bolt));
+        assert!(!game.stack().matching(bolt).is_empty());
         Ok(())
     }
 
@@ -91,7 +91,7 @@ mod tests {
                 spell: divination.into()
             })
         );
-        assert!(game.player(p1).cards_in(HAND).has(divination));
+        assert!(game.card(divination).is_in(HAND).of(p1));
         Ok(())
     }
 
@@ -112,7 +112,7 @@ mod tests {
                 spell: divination.into()
             })
         );
-        assert!(game.player(p1).cards_in(HAND).has(divination));
+        assert!(game.card(divination).is_in(HAND).of(p1));
         Ok(())
     }
 
@@ -129,8 +129,8 @@ mod tests {
                 spell: forest.into()
             })
         );
-        assert!(game.player(p1).cards_in(HAND).has(forest));
-        assert!(!game.stack().has(forest));
+        assert!(game.card(forest).is_in(HAND).of(p1));
+        assert!(game.stack().matching(forest).is_empty());
         Ok(())
     }
 
@@ -149,8 +149,8 @@ mod tests {
                 spell: divination.into()
             })
         );
-        assert!(game.player(p1).cards_in(HAND).has(divination));
-        assert!(!game.stack().has(divination));
+        assert!(game.card(divination).is_in(HAND).of(p1));
+        assert!(game.stack().matching(divination).is_empty());
         Ok(())
     }
 
@@ -166,7 +166,7 @@ mod tests {
         game.play([p2.pass_priority()])?;
         game.play([p1.cast(divination)])?;
 
-        assert!(game.stack().has(divination));
+        assert!(!game.stack().matching(divination).is_empty());
         Ok(())
     }
 
@@ -181,7 +181,7 @@ mod tests {
 
         game.play([p1.cast(divination)])?;
 
-        assert!(game.stack().has(divination));
+        assert!(!game.stack().matching(divination).is_empty());
         Ok(())
     }
 
@@ -204,7 +204,7 @@ mod tests {
         ])?;
         game.play([p2.pass_priority(), p1.cast(divination)])?;
 
-        assert!(game.stack().has(divination));
+        assert!(!game.stack().matching(divination).is_empty());
         Ok(())
     }
 
@@ -226,8 +226,8 @@ mod tests {
                 spell: divination.into()
             })
         );
-        assert!(game.player(p2).cards_in(HAND).has(divination));
-        assert!(!game.stack().has(divination));
+        assert!(game.card(divination).is_in(HAND).of(p2));
+        assert!(game.stack().matching(divination).is_empty());
         Ok(())
     }
 
@@ -245,8 +245,8 @@ mod tests {
                 spell: forest.into()
             })
         );
-        assert!(game.player(p1).cards_in(HAND).has(forest));
-        assert!(!game.stack().has(forest));
+        assert!(game.card(forest).is_in(HAND).of(p1));
+        assert!(game.stack().matching(forest).is_empty());
         Ok(())
     }
 }

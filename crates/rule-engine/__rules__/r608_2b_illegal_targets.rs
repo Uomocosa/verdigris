@@ -76,7 +76,7 @@ mod tests {
             p1.cast(bolt).targeting(p2).pass_priority(),
             p2.pass_priority(),
         ])?;
-        assert!(game.player(p1).cards_in(GRAVEYARD).has(bolt));
+        assert!(game.card(bolt).is_in(GRAVEYARD).of(p1));
         Ok(())
     }
 
@@ -95,12 +95,12 @@ mod tests {
             p1.cast(murder).targeting(bears).pass_priority(),
             p2.pass_priority(),
         ])?;
-        assert!(game.player(p2).cards_in(GRAVEYARD).has(bears));
-        assert!(game.player(p1).cards_in(GRAVEYARD).has(murder));
-        assert!(game.stack().has(bolt));
+        assert!(game.card(bears).is_in(GRAVEYARD).of(p2));
+        assert!(game.card(murder).is_in(GRAVEYARD).of(p1));
+        assert!(!game.stack().matching(bolt).is_empty());
 
         game.play([p1.pass_priority(), p2.pass_priority()])?;
-        assert!(game.player(p1).cards_in(GRAVEYARD).has(bolt));
+        assert!(game.card(bolt).is_in(GRAVEYARD).of(p1));
         assert_eq!(game.life(p2), 20);
         Ok(())
     }
@@ -121,8 +121,8 @@ mod tests {
             p1.pass_priority(),
         ])?;
         game.play([p1.pass_priority(), p2.pass_priority()])?;
-        assert!(game.player(p2).cards_in(BATTLEFIELD).has(bears));
-        assert!(game.player(p1).cards_in(GRAVEYARD).has(blade));
+        assert!(game.card(bears).is_in(BATTLEFIELD).of(p2));
+        assert!(game.card(blade).is_in(GRAVEYARD).of(p1));
         Ok(())
     }
 
@@ -143,8 +143,8 @@ mod tests {
         game.app.world_mut().entity_mut(Entity::from(bears)).insert(definition);
 
         game.play([p1.pass_priority(), p2.pass_priority()])?;
-        assert!(game.player(p2).cards_in(BATTLEFIELD).has(bears));
-        assert!(game.player(p1).cards_in(GRAVEYARD).has(blade));
+        assert!(game.card(bears).is_in(BATTLEFIELD).of(p2));
+        assert!(game.card(blade).is_in(GRAVEYARD).of(p1));
         Ok(())
     }
 }

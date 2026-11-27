@@ -58,7 +58,7 @@ mod tests {
         ])?;
         assert_eq!(game.life(p1), 37);
         assert!(!game.has_won(p1));
-        assert!(game.player(p1).cards_in(BATTLEFIELD).has(sovereign));
+        assert!(game.card(sovereign).is_in(BATTLEFIELD).of(p1));
         Ok(())
     }
 }

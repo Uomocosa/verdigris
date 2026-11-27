@@ -55,7 +55,7 @@ mod tests {
         ])?;
         game.play([p1.end_turn(), p2.end_turn()])?;
 
-        assert!(game.player(p2).cards_in(BATTLEFIELD).has(bears));
+        assert!(game.card(bears).is_in(BATTLEFIELD).of(p2));
         assert_eq!(game.get::<damage::Damage>(bears), Some(damage::Damage(0)));
         assert_eq!(game.pt(bears), Some(crate::pt!(2, 2)));
         Ok(())
@@ -86,7 +86,7 @@ mod tests {
             p2.pass_priority(),
         ])?;
 
-        assert!(game.player(p1).cards_in(GRAVEYARD).has(bears));
+        assert!(game.card(bears).is_in(GRAVEYARD).of(p1));
         Ok(())
     }
 }

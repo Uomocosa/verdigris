@@ -86,7 +86,7 @@ mod tests {
             err.rejection(),
             Some(&actions::Rejected::CannotPay { spell: bolt.into() })
         );
-        assert!(game.player(p1).cards_in(HAND).has(bolt));
+        assert!(game.card(bolt).is_in(HAND).of(p1));
         Ok(())
     }
 }

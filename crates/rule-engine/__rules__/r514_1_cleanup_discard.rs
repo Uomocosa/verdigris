@@ -70,7 +70,7 @@ mod tests {
         game.play([p1.discard([bears])])?;
         assert_eq!(game.turn().number, 2);
         assert_eq!(game.turn().active, p2.id);
-        assert!(game.player(p1).cards_in(GRAVEYARD).has(bears));
+        assert!(game.card(bears).is_in(GRAVEYARD).of(p1));
         assert_eq!(game.player(p1).cards_in(HAND).count(), 7);
         Ok(())
     }

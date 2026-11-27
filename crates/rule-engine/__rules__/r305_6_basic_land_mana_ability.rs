@@ -110,7 +110,7 @@ mod tests {
         assert_eq!(game.mana_pool(p1), mana![G]);
         assert!(game.last_rejection().is_none());
         assert!(game.is_tapped(forest));
-        assert!(game.player(p1).cards_in(BATTLEFIELD).has(forest));
+        assert!(game.card(forest).is_in(BATTLEFIELD).of(p1));
         Ok(())
     }
 

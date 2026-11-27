@@ -53,10 +53,10 @@ mod tests {
             game.play([p1.pass_priority(), p2.pass_priority()])?;
         }
 
-        assert!(game.player(p1).cards_in(BATTLEFIELD).has_no(knight_1));
-        assert!(game.player(p1).cards_in(BATTLEFIELD).has_no(knight_2));
-        assert!(game.player(p1).cards_in(BATTLEFIELD).has_no(knight_3));
-        assert!(game.player(p1).cards_in(GRAVEYARD).has_no(knight_1));
+        assert!(!game.card(knight_1).is_in(BATTLEFIELD).of(p1));
+        assert!(!game.card(knight_2).is_in(BATTLEFIELD).of(p1));
+        assert!(!game.card(knight_3).is_in(BATTLEFIELD).of(p1));
+        assert!(!game.card(knight_1).is_in(GRAVEYARD).of(p1));
         assert!(game.app.world().get_entity(Entity::from(knight_1)).is_err());
         Ok(())
     }

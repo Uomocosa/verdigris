@@ -45,13 +45,13 @@ mod tests {
 
         game.act(p1, actions::Action::PassPriority);
 
-        assert!(game.player(p1).cards_in(GRAVEYARD).has(purge));
-        assert!(game.player(p1).cards_in(GRAVEYARD).has(leyline));
+        assert!(game.card(purge).is_in(GRAVEYARD).of(p1));
+        assert!(game.card(leyline).is_in(GRAVEYARD).of(p1));
 
         game.act(p1, actions::Action::ChooseMay(vec![leyline.into()]));
 
-        assert!(game.player(p1).cards_in(GRAVEYARD).has(leyline));
-        assert!(game.player(p1).cards_in(BATTLEFIELD).has_no(leyline));
+        assert!(game.card(leyline).is_in(GRAVEYARD).of(p1));
+        assert!(!game.card(leyline).is_in(BATTLEFIELD).of(p1));
         Ok(())
     }
 
@@ -68,8 +68,8 @@ mod tests {
         );
 
         assert_eq!(game.priority().holder, None);
-        assert!(game.player(p1).cards_in(GRAVEYARD).has(purge));
-        assert!(game.player(p1).cards_in(GRAVEYARD).has(leyline));
+        assert!(game.card(purge).is_in(GRAVEYARD).of(p1));
+        assert!(game.card(leyline).is_in(GRAVEYARD).of(p1));
 
         game.act(p2, actions::Action::PassPriority);
 
@@ -77,9 +77,9 @@ mod tests {
             game.last_rejection(),
             Some(&actions::Rejected::NoPriority { player: p2.id })
         );
-        assert!(game.player(p1).cards_in(GRAVEYARD).has(purge));
-        assert!(game.player(p1).cards_in(GRAVEYARD).has(leyline));
-        assert!(game.player(p1).cards_in(BATTLEFIELD).has_no(leyline));
+        assert!(game.card(purge).is_in(GRAVEYARD).of(p1));
+        assert!(game.card(leyline).is_in(GRAVEYARD).of(p1));
+        assert!(!game.card(leyline).is_in(BATTLEFIELD).of(p1));
         game.play([p1.arrange_graveyard([purge, leyline])])?;
         assert_eq!(game.priority_player(), Some(p1.id));
 
@@ -94,7 +94,7 @@ mod tests {
         );
 
         assert_eq!(game.priority().holder, None);
-        assert!(game.player(p1).cards_in(BATTLEFIELD).has(leyline));
+        assert!(game.card(leyline).is_in(BATTLEFIELD).of(p1));
 
         game.act(p2, actions::Action::PassPriority);
 
@@ -102,8 +102,8 @@ mod tests {
             game.last_rejection(),
             Some(&actions::Rejected::NoPriority { player: p2.id })
         );
-        assert!(game.player(p1).cards_in(BATTLEFIELD).has(leyline));
-        assert!(game.player(p1).cards_in(GRAVEYARD).has(purge));
+        assert!(game.card(leyline).is_in(BATTLEFIELD).of(p1));
+        assert!(game.card(purge).is_in(GRAVEYARD).of(p1));
         assert_eq!(game.priority_player(), Some(p1.id));
         Ok(())
     }
@@ -126,7 +126,7 @@ mod tests {
 
         game.act(p1, actions::Action::ChooseDiscard(vec![bears.into()]));
 
-        assert!(game.player(p1).cards_in(GRAVEYARD).has(bears));
+        assert!(game.card(bears).is_in(GRAVEYARD).of(p1));
         assert_eq!(game.life(p2), 20);
 
         game.act(p2, actions::Action::PassPriority);
@@ -161,8 +161,8 @@ mod tests {
             game.last_rejection(),
             Some(&actions::Rejected::CannotCast { spell: bolt.into() })
         );
-        assert!(game.player(p1).cards_in(HAND).has(bolt));
-        assert!(!game.stack().has(bolt));
+        assert!(game.card(bolt).is_in(HAND).of(p1));
+        assert!(game.stack().matching(bolt).is_empty());
         Ok(())
     }
 
@@ -179,7 +179,7 @@ mod tests {
                 land: forest.into()
             })
         );
-        assert!(game.player(p1).cards_in(HAND).has(forest));
+        assert!(game.card(forest).is_in(HAND).of(p1));
         Ok(())
     }
 
@@ -247,7 +247,7 @@ mod tests {
             game.last_rejection(),
             Some(&actions::Rejected::InvalidMay { player: p3.id })
         );
-        assert!(game.player(p3).cards_in(HAND).has(p3_leyline));
+        assert!(game.card(p3_leyline).is_in(HAND).of(p3));
 
         game.act(p2, actions::Action::ChooseMay(vec![p2_leyline.into()]));
 
@@ -255,13 +255,13 @@ mod tests {
             game.last_rejection(),
             Some(&actions::Rejected::InvalidMay { player: p2.id })
         );
-        assert!(game.player(p2).cards_in(HAND).has(p2_leyline));
+        assert!(game.card(p2_leyline).is_in(HAND).of(p2));
 
         assert_eq!(game.life(p2), 20);
 
         game.act(p1, actions::Action::ChooseMay(vec![p1_leyline.into()]));
 
-        assert!(game.player(p1).cards_in(BATTLEFIELD).has(p1_leyline));
+        assert!(game.card(p1_leyline).is_in(BATTLEFIELD).of(p1));
         assert_eq!(game.priority().holder, None);
 
         game.act(p1, actions::Action::PassPriority);
@@ -275,14 +275,14 @@ mod tests {
 
         game.act(p2, actions::Action::ChooseMay(vec![p2_leyline.into()]));
 
-        assert!(game.player(p2).cards_in(BATTLEFIELD).has(p2_leyline));
+        assert!(game.card(p2_leyline).is_in(BATTLEFIELD).of(p2));
         assert_eq!(game.priority().holder, None);
 
         game.act(p3, actions::Action::ChooseMay(vec![p3_leyline.into()]));
 
-        assert!(game.player(p1).cards_in(BATTLEFIELD).has(p1_leyline));
-        assert!(game.player(p2).cards_in(BATTLEFIELD).has(p2_leyline));
-        assert!(game.player(p3).cards_in(BATTLEFIELD).has(p3_leyline));
+        assert!(game.card(p1_leyline).is_in(BATTLEFIELD).of(p1));
+        assert!(game.card(p2_leyline).is_in(BATTLEFIELD).of(p2));
+        assert!(game.card(p3_leyline).is_in(BATTLEFIELD).of(p3));
         assert_eq!(game.priority_player(), Some(p1.id));
         Ok(())
     }

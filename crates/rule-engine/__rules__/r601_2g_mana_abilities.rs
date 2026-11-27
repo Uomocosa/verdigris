@@ -72,7 +72,7 @@ mod tests {
 
         game.play([p1.cast(bears).activate_ability(forest.ability())])?;
 
-        assert!(game.stack().has(bears));
+        assert!(!game.stack().matching(bears).is_empty());
         assert!(game.is_tapped(forest));
         assert_eq!(game.mana_pool(p1), cards::ManaPool::EMPTY);
         Ok(())
@@ -95,8 +95,8 @@ mod tests {
                 spell: bears.into()
             })
         );
-        assert!(game.player(p1).cards_in(HAND).has(bears));
-        assert!(!game.stack().has(bears));
+        assert!(game.card(bears).is_in(HAND).of(p1));
+        assert!(game.stack().matching(bears).is_empty());
         assert_eq!(game.mana_pool(p1), mana![1]);
         Ok(())
     }

@@ -125,13 +125,13 @@ mod tests {
         ])?;
 
         assert_eq!(game.damage(bears), 1);
-        assert!(game.player(p1).cards_in(BATTLEFIELD).has(ace));
+        assert!(game.card(ace).is_in(BATTLEFIELD).of(p1));
         assert_eq!(game.turn().step, turns::Step::SecondCombatDamage);
 
         game.play([p1.pass_priority(), p2.pass_priority()])?;
 
-        assert!(game.player(p1).cards_in(GRAVEYARD).has(ace));
-        assert!(game.player(p2).cards_in(GRAVEYARD).has(bears));
+        assert!(game.card(ace).is_in(GRAVEYARD).of(p1));
+        assert!(game.card(bears).is_in(GRAVEYARD).of(p2));
         assert_eq!(game.turn().step, turns::Step::EndOfCombat);
         Ok(())
     }
@@ -173,14 +173,14 @@ mod tests {
         ])?;
 
         assert_eq!(game.turn().step, turns::Step::SecondCombatDamage);
-        assert!(game.player(p2).cards_in(GRAVEYARD).has(blocker));
-        assert!(game.player(p1).cards_in(BATTLEFIELD).has(attacker));
+        assert!(game.card(blocker).is_in(GRAVEYARD).of(p2));
+        assert!(game.card(attacker).is_in(BATTLEFIELD).of(p1));
         assert_eq!(game.life(p2), 20);
 
         game.play([p1.pass_priority(), p2.pass_priority()])?;
 
         assert_eq!(game.turn().step, turns::Step::EndOfCombat);
-        assert!(game.player(p1).cards_in(BATTLEFIELD).has(attacker));
+        assert!(game.card(attacker).is_in(BATTLEFIELD).of(p1));
         assert_eq!(game.life(p2), 20);
         Ok(())
     }
@@ -262,7 +262,7 @@ mod tests {
         ])?;
 
         assert_eq!(game.turn().step, turns::Step::SecondCombatDamage);
-        assert!(game.player(p1).cards_in(GRAVEYARD).has(lord));
+        assert!(game.card(lord).is_in(GRAVEYARD).of(p1));
         assert_eq!(game.life(p2), 18);
 
         game.play([p1.pass_priority(), p2.pass_priority()])?;

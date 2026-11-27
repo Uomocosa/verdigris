@@ -69,10 +69,10 @@ mod tests {
         let [murder] = game.player(p1).cards_in(LIBRARY).exactly::<1>(MURDER)?;
 
         game.play([p1.cast(divination).pass_priority(), p2.pass_priority()])?;
-        assert!(game.player(p1).cards_in(HAND).has(bears));
-        assert!(game.player(p1).cards_in(HAND).has(bolt));
-        assert!(game.player(p1).cards_in(GRAVEYARD).has(divination));
-        assert!(game.player(p1).cards_in(LIBRARY).has(murder));
+        assert!(game.card(bears).is_in(HAND).of(p1));
+        assert!(game.card(bolt).is_in(HAND).of(p1));
+        assert!(game.card(divination).is_in(GRAVEYARD).of(p1));
+        assert!(game.card(murder).is_in(LIBRARY).of(p1));
         Ok(())
     }
 
@@ -107,7 +107,7 @@ mod tests {
 
         game.play([p1.pass_priority(), p2.pass_priority(), p1.pass_priority()])?;
 
-        assert!(game.player(p1).cards_in(HAND).has(bears));
+        assert!(game.card(bears).is_in(HAND).of(p1));
         assert_eq!(game.player(p1).cards_in(HAND).count(), hand_before + 1);
         assert_eq!(game.life(p1), 20);
         Ok(())

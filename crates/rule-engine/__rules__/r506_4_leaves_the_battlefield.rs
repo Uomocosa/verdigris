@@ -50,7 +50,7 @@ mod tests {
             p2.pass_priority(),
         ])?;
 
-        assert!(game.player(p1).cards_in(GRAVEYARD).has(bears));
+        assert!(game.card(bears).is_in(GRAVEYARD).of(p1));
         assert!(!game.is_attacking(bears));
         Ok(())
     }

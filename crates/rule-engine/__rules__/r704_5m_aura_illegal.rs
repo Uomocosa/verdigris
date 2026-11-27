@@ -49,8 +49,8 @@ mod tests {
             p1.pass_priority(),
         ])?;
 
-        assert!(game.player(p2).cards_in(GRAVEYARD).has(bears));
-        assert!(game.player(p1).cards_in(GRAVEYARD).has(strength));
+        assert!(game.card(bears).is_in(GRAVEYARD).of(p2));
+        assert!(game.card(strength).is_in(GRAVEYARD).of(p1));
         Ok(())
     }
 }

@@ -36,7 +36,7 @@ mod tests {
 
         game.act(p1, actions::Action::ChooseMay(vec![leyline.into()]));
 
-        assert!(game.player(p1).cards_in(BATTLEFIELD).has(leyline));
+        assert!(game.card(leyline).is_in(BATTLEFIELD).of(p1));
         assert!(game.player(p1).cards_in(HAND).has_no(LEYLINE_OF_ANTICIPATION));
         assert_eq!(game.turn().number, 1);
         assert_eq!(game.priority_player(), Some(p1.id));
@@ -62,7 +62,7 @@ mod tests {
         let [divination] = game.player(p1).cards_in(HAND).exactly::<1>(DIVINATION)?;
 
         game.act(p1, actions::Action::ChooseMay(vec![leyline.into()]));
-        assert!(game.player(p1).cards_in(BATTLEFIELD).has(leyline));
+        assert!(game.card(leyline).is_in(BATTLEFIELD).of(p1));
 
         game.play([
             p2.pass_priority(),
@@ -72,7 +72,7 @@ mod tests {
             p1.cast(divination),
         ])?;
 
-        assert!(game.stack().has(divination));
+        assert!(!game.stack().matching(divination).is_empty());
         assert_eq!(game.mana_pool(p1), cards::ManaPool::EMPTY);
         Ok(())
     }
@@ -84,7 +84,7 @@ mod tests {
 
         game.act(p1, actions::Action::ChooseMay(Vec::new()));
 
-        assert!(game.player(p1).cards_in(HAND).has(leyline));
+        assert!(game.card(leyline).is_in(HAND).of(p1));
         assert!(game.player(p1).cards_in(BATTLEFIELD).has_no(LEYLINE_OF_ANTICIPATION));
         assert!(game.last_rejection().is_none());
         game.play([p1.pass_priority(), p2.pass_priority()])?;

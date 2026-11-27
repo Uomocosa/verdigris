@@ -41,7 +41,7 @@ mod tests {
 
         game.play([p1.play_land(guildgate)])?;
 
-        assert!(game.player(p1).cards_in(BATTLEFIELD).has(guildgate));
+        assert!(game.card(guildgate).is_in(BATTLEFIELD).of(p1));
         assert!(game.is_tapped(guildgate));
         Ok(())
     }
@@ -53,7 +53,7 @@ mod tests {
 
         game.play([p1.play_land(forest)])?;
 
-        assert!(game.player(p1).cards_in(BATTLEFIELD).has(forest));
+        assert!(game.card(forest).is_in(BATTLEFIELD).of(p1));
         assert!(!game.is_tapped(forest));
         Ok(())
     }

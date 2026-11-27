@@ -36,8 +36,8 @@ mod tests {
 
         game.play([p1.cast(mind_rot).targeting(p2).end_turn(), p2.end_turn()])?;
 
-        assert!(game.player(p2).cards_in(GRAVEYARD).has(bears));
-        assert!(game.player(p2).cards_in(HAND).has_no(bears));
+        assert!(game.card(bears).is_in(GRAVEYARD).of(p2));
+        assert!(!game.card(bears).is_in(HAND).of(p2));
         Ok(())
     }
 }

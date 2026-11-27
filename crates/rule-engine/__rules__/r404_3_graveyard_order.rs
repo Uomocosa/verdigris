@@ -136,7 +136,7 @@ mod tests {
                 Entity::from(bears),
             ]
         );
-        assert!(game.player(p2).cards_in(LIBRARY).has(forest));
+        assert!(game.card(forest).is_in(LIBRARY).of(p2));
         Ok(())
     }
 

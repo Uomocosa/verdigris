@@ -84,8 +84,8 @@ mod tests {
             p2.pass_priority(),
         ])?;
 
-        assert!(game.player(p1).cards_in(GRAVEYARD).has(rats));
-        assert!(game.player(p2).cards_in(GRAVEYARD).has(bears));
+        assert!(game.card(rats).is_in(GRAVEYARD).of(p1));
+        assert!(game.card(bears).is_in(GRAVEYARD).of(p2));
         Ok(())
     }
 
@@ -114,8 +114,8 @@ mod tests {
             p2.pass_priority(),
         ])?;
 
-        assert!(game.player(p1).cards_in(BATTLEFIELD).has(rats));
-        assert!(game.player(p2).cards_in(BATTLEFIELD).has(myr));
+        assert!(game.card(rats).is_in(BATTLEFIELD).of(p1));
+        assert!(game.card(myr).is_in(BATTLEFIELD).of(p2));
         Ok(())
     }
 
@@ -150,8 +150,8 @@ mod tests {
             p2.pass_priority(),
         ])?;
 
-        assert!(game.player(p2).cards_in(BATTLEFIELD).has(bears));
-        assert!(game.player(p1).cards_in(GRAVEYARD).has(corpse));
+        assert!(game.card(bears).is_in(BATTLEFIELD).of(p2));
+        assert!(game.card(corpse).is_in(GRAVEYARD).of(p1));
         Ok(())
     }
 }

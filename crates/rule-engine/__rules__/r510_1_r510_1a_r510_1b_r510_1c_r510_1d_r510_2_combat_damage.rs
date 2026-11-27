@@ -182,8 +182,8 @@ mod tests {
             p2.pass_priority(),
         ])?;
 
-        assert!(game.player(p1).cards_in(GRAVEYARD).has(rats));
-        assert!(game.player(p2).cards_in(GRAVEYARD).has(bears));
+        assert!(game.card(rats).is_in(GRAVEYARD).of(p1));
+        assert!(game.card(bears).is_in(GRAVEYARD).of(p2));
         Ok(())
     }
 
@@ -209,7 +209,7 @@ mod tests {
         ])?;
 
         assert_eq!(game.player(p2).life(), 18);
-        assert!(game.player(p1).cards_in(BATTLEFIELD).has(bears));
+        assert!(game.card(bears).is_in(BATTLEFIELD).of(p1));
         Ok(())
     }
 
@@ -317,8 +317,8 @@ mod tests {
         ])?;
 
         assert_eq!(game.life(p2), 17);
-        assert!(game.player(p2).cards_in(GRAVEYARD).has(goblin));
-        assert!(game.player(p1).cards_in(BATTLEFIELD).has(bears));
+        assert!(game.card(goblin).is_in(GRAVEYARD).of(p2));
+        assert!(game.card(bears).is_in(BATTLEFIELD).of(p1));
         Ok(())
     }
 
@@ -360,8 +360,8 @@ mod tests {
         game.play([p2.pass_priority()])?;
 
         assert_eq!(game.player(p2).life(), 19);
-        assert!(game.player(p2).cards_in(GRAVEYARD).has(rats_1));
-        assert!(game.player(p2).cards_in(GRAVEYARD).has(rats_2));
+        assert!(game.card(rats_1).is_in(GRAVEYARD).of(p2));
+        assert!(game.card(rats_2).is_in(GRAVEYARD).of(p2));
         Ok(())
     }
 
@@ -404,7 +404,7 @@ mod tests {
 
         assert_eq!(game.damage(bears), 1);
         assert_eq!(game.life(p2), 18);
-        assert!(game.player(p2).cards_in(GRAVEYARD).has(bears));
+        assert!(game.card(bears).is_in(GRAVEYARD).of(p2));
         Ok(())
     }
 
@@ -430,7 +430,7 @@ mod tests {
         ])?;
 
         assert_eq!(game.player(p2).life(), 20);
-        assert!(game.player(p1).cards_in(BATTLEFIELD).has(myr));
+        assert!(game.card(myr).is_in(BATTLEFIELD).of(p1));
         Ok(())
     }
 }

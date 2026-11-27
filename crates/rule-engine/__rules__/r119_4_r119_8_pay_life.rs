@@ -114,7 +114,7 @@ mod tests {
             })
         );
         assert_eq!(game.life(p1), 1);
-        assert!(game.player(p1).cards_in(HAND).has(gut_shot));
+        assert!(game.card(gut_shot).is_in(HAND).of(p1));
         Ok(())
     }
 
@@ -133,7 +133,7 @@ mod tests {
             })
         );
         assert_eq!(game.life(p1), 20);
-        assert!(game.player(p1).cards_in(HAND).has(gut_shot));
+        assert!(game.card(gut_shot).is_in(HAND).of(p1));
         Ok(())
     }
 }

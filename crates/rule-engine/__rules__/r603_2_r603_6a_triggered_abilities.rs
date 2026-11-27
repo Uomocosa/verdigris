@@ -146,7 +146,7 @@ mod tests {
         let [one] = game.player(p1).cards_in(HAND).exactly::<1>(ENDLESS_ONE)?;
         game.play([p1.cast(one).pass_priority(), p2.pass_priority()])?;
         assert_eq!(game.life(p1), 20);
-        assert!(game.player(p1).cards_in(GRAVEYARD).has(one));
+        assert!(game.card(one).is_in(GRAVEYARD).of(p1));
         game.play([p1.pass_priority(), p2.pass_priority()])?;
         assert_eq!(game.life(p1), 21);
         Ok(())

@@ -45,8 +45,8 @@ mod tests {
             p1.cast(murder).targeting(myr).pass_priority(),
             p2.pass_priority(),
         ])?;
-        assert!(game.player(p2).cards_in(BATTLEFIELD).has(myr));
-        assert!(game.player(p1).cards_in(GRAVEYARD).has(murder));
+        assert!(game.card(myr).is_in(BATTLEFIELD).of(p2));
+        assert!(game.card(murder).is_in(GRAVEYARD).of(p1));
         assert!(game.player(p2).cards_in(BATTLEFIELD).has(DARKSTEEL_MYR));
         Ok(())
     }
@@ -63,7 +63,7 @@ mod tests {
             p1.cast(bolt).targeting(myr).pass_priority(),
             p2.pass_priority(),
         ])?;
-        assert!(game.player(p2).cards_in(BATTLEFIELD).has(myr));
+        assert!(game.card(myr).is_in(BATTLEFIELD).of(p2));
         assert_eq!(game.damage(myr), 3);
         Ok(())
     }
@@ -80,8 +80,8 @@ mod tests {
             p1.cast(blade).targeting(myr).pass_priority(),
             p2.pass_priority(),
         ])?;
-        assert!(game.player(p2).cards_in(BATTLEFIELD).has(myr));
-        assert!(game.player(p1).cards_in(GRAVEYARD).has(blade));
+        assert!(game.card(myr).is_in(BATTLEFIELD).of(p2));
+        assert!(game.card(blade).is_in(GRAVEYARD).of(p1));
         Ok(())
     }
 
@@ -97,8 +97,8 @@ mod tests {
             p1.cast(murder).targeting(bears).pass_priority(),
             p2.pass_priority(),
         ])?;
-        assert!(game.player(p2).cards_in(BATTLEFIELD).has(bears));
-        assert!(game.player(p1).cards_in(GRAVEYARD).has(murder));
+        assert!(game.card(bears).is_in(BATTLEFIELD).of(p2));
+        assert!(game.card(murder).is_in(GRAVEYARD).of(p1));
         Ok(())
     }
 }

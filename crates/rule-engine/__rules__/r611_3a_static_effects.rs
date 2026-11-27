@@ -597,7 +597,7 @@ mod tests {
 
         game.play([p1.pass_priority(), p2.pass_priority()])?;
 
-        assert!(game.player(p1).cards_in(GRAVEYARD).has(watching));
+        assert!(game.card(watching).is_in(GRAVEYARD).of(p1));
         assert_eq!(game.pt(bears), Some(crate::pt!(2, 2)));
         game.app
             .world_mut()
@@ -705,7 +705,7 @@ mod tests {
             })
             .unwrap();
         game.play([p1.pass_priority(), p2.pass_priority()])?;
-        assert!(game.player(p1).cards_in(GRAVEYARD).has(waiver));
+        assert!(game.card(waiver).is_in(GRAVEYARD).of(p1));
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {

@@ -89,8 +89,8 @@ mod tests {
         game.play([p2.discard([bears, bolt])])?;
         game.play([p2.arrange_graveyard([bolt, bears])])?;
 
-        assert!(game.player(p2).cards_in(GRAVEYARD).has(bears));
-        assert!(game.player(p2).cards_in(GRAVEYARD).has(bolt));
+        assert!(game.card(bears).is_in(GRAVEYARD).of(p2));
+        assert!(game.card(bolt).is_in(GRAVEYARD).of(p2));
         assert!(game.player(p2).cards_in(HAND).has(MURDER));
         Ok(())
     }

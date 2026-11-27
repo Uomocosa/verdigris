@@ -92,7 +92,7 @@ mod tests {
             MockGame::new([P1.hand([GRIZZLY_BEARS]).mana_pool(mana![1, G]), P2]);
         let [bears] = game.player(p1).cards_in(HAND).exactly::<1>(GRIZZLY_BEARS)?;
         game.play([p1.cast(bears).pass_priority(), p2.pass_priority()])?;
-        assert!(game.player(p1).cards_in(BATTLEFIELD).has(bears));
+        assert!(game.card(bears).is_in(BATTLEFIELD).of(p1));
         Ok(())
     }
 
@@ -111,13 +111,13 @@ mod tests {
             p2.cast(bolt).targeting(bears).pass_priority(),
             p1.pass_priority(),
         ])?;
-        assert!(game.player(p2).cards_in(GRAVEYARD).has(bears));
-        assert!(game.stack().has(strength));
+        assert!(game.card(bears).is_in(GRAVEYARD).of(p2));
+        assert!(!game.stack().matching(strength).is_empty());
 
         game.play([p2.arrange_graveyard([bears, bolt])])?;
         game.play([p1.pass_priority(), p2.pass_priority()])?;
-        assert!(game.player(p1).cards_in(GRAVEYARD).has(strength));
-        assert!(!game.player(p1).cards_in(BATTLEFIELD).has(strength));
+        assert!(game.card(strength).is_in(GRAVEYARD).of(p1));
+        assert!(!game.card(strength).is_in(BATTLEFIELD).of(p1));
         Ok(())
     }
 }

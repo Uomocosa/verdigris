@@ -116,8 +116,8 @@ mod tests {
             p2.pass_priority(),
         ])?;
 
-        assert!(game.player(p2).cards_in(LIBRARY).has(never_buried));
-        assert!(game.player(p2).cards_in(GRAVEYARD).has_no(never_buried));
+        assert!(game.card(never_buried).is_in(LIBRARY).of(p2));
+        assert!(!game.card(never_buried).is_in(GRAVEYARD).of(p2));
         Ok(())
     }
 }

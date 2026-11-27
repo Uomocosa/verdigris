@@ -199,9 +199,9 @@ mod tests {
         ])?;
 
         assert_eq!(game.player(p2).life(), 17);
-        assert!(game.player(p1).cards_in(GRAVEYARD).has(bolt));
-        assert!(game.player(p2).cards_in(GRAVEYARD).has(cancel));
-        assert!(game.player(p1).cards_in(GRAVEYARD).has(dispel));
+        assert!(game.card(bolt).is_in(GRAVEYARD).of(p1));
+        assert!(game.card(cancel).is_in(GRAVEYARD).of(p2));
+        assert!(game.card(dispel).is_in(GRAVEYARD).of(p1));
         Ok(())
     }
 

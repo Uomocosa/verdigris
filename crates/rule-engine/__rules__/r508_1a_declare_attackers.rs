@@ -237,7 +237,7 @@ mod tests {
 
         game.act(p1, actions::Action::DeclareAttackers(vec![goblin.into()]));
 
-        assert!(game.player(p1).cards_in(BATTLEFIELD).has(goblin));
+        assert!(game.card(goblin).is_in(BATTLEFIELD).of(p1));
         assert!(game.is_attacking(goblin));
         assert_eq!(game.last_rejection(), None);
         Ok(())
@@ -294,7 +294,7 @@ mod tests {
 
         game.act(p1, actions::Action::DeclareAttackers(vec![corpse.into()]));
 
-        assert!(game.player(p1).cards_in(BATTLEFIELD).has(corpse));
+        assert!(game.card(corpse).is_in(BATTLEFIELD).of(p1));
         assert!(game.is_attacking(corpse));
         assert_eq!(game.last_rejection(), None);
         Ok(())
@@ -339,7 +339,7 @@ mod tests {
 
         game.act(p1, actions::Action::DeclareAttackers(vec![corpse.into()]));
 
-        assert!(game.player(p1).cards_in(BATTLEFIELD).has(corpse));
+        assert!(game.card(corpse).is_in(BATTLEFIELD).of(p1));
         assert!(game.is_attacking(corpse));
         assert_eq!(game.last_rejection(), None);
         game.app

@@ -38,6 +38,9 @@ impl MockGame {
     pub const fn player(&self, player: testing::TestPlayer) -> testing::PlayerView<'_> { testing::PlayerView::from_game_and_player(self, player) }
 
     #[must_use]
+    pub const fn card(&self, card: testing::TestCard) -> testing::CardCheck<'_> { testing::CardCheck::from_game_and_card(self, card) }
+
+    #[must_use]
     pub fn life(&self, player: impl Into<Entity>) -> i32 { self.app.world().get::<players::Life>(player.into()).map_or(0, |life| **life) }
 
     #[must_use]

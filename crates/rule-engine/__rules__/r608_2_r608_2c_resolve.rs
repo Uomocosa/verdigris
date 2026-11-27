@@ -465,8 +465,8 @@ mod tests {
         let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
         let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
         game.play([p1.cast(bolt).targeting(bears).end_turn(), p2.end_turn()])?;
-        assert!(game.player(p2).cards_in(GRAVEYARD).has(bears));
-        assert!(game.player(p1).cards_in(GRAVEYARD).has(bolt));
+        assert!(game.card(bears).is_in(GRAVEYARD).of(p2));
+        assert!(game.card(bolt).is_in(GRAVEYARD).of(p1));
         Ok(())
     }
 
@@ -479,7 +479,7 @@ mod tests {
         let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
         let [murder] = game.player(p1).cards_in(HAND).exactly::<1>(MURDER)?;
         game.play([p1.cast(murder).targeting(bears).end_turn(), p2.end_turn()])?;
-        assert!(game.player(p2).cards_in(GRAVEYARD).has(bears));
+        assert!(game.card(bears).is_in(GRAVEYARD).of(p2));
         Ok(())
     }
 
@@ -495,8 +495,8 @@ mod tests {
             p1.cast(doom_blade).targeting(bears).end_turn(),
             p2.end_turn(),
         ])?;
-        assert!(game.player(p2).cards_in(GRAVEYARD).has(bears));
-        assert!(game.player(p1).cards_in(GRAVEYARD).has(doom_blade));
+        assert!(game.card(bears).is_in(GRAVEYARD).of(p2));
+        assert!(game.card(doom_blade).is_in(GRAVEYARD).of(p1));
         Ok(())
     }
 }

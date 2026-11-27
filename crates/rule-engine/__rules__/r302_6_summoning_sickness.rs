@@ -49,20 +49,20 @@ mod tests {
         let [corpse] = game.player(p1).cards_in(HAND).exactly::<1>(WALKING_CORPSE)?;
         game.play([p1.cast(corpse).pass_priority(), p2.pass_priority()])?;
 
-        assert!(game.player(p1).cards_in(BATTLEFIELD).has(corpse));
+        assert!(game.card(corpse).is_in(BATTLEFIELD).of(p1));
         assert!(game.has::<cards::SummoningSick>(corpse));
 
         game.play([p1.end_turn(), p2.end_turn()])?;
 
         assert_eq!(game.turn().number, 2);
-        assert!(game.player(p1).cards_in(BATTLEFIELD).has(corpse));
+        assert!(game.card(corpse).is_in(BATTLEFIELD).of(p1));
         assert!(game.has::<cards::SummoningSick>(corpse));
 
         game.play([p2.end_turn(), p1.end_turn()])?;
         game.play([p1.pass_to(turns::Step::Upkeep)])?;
 
         assert_eq!(game.turn().number, 3);
-        assert!(game.player(p1).cards_in(BATTLEFIELD).has(corpse));
+        assert!(game.card(corpse).is_in(BATTLEFIELD).of(p1));
         assert!(!game.has::<cards::SummoningSick>(corpse));
         Ok(())
     }

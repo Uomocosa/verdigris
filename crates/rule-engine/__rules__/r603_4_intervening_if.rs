@@ -89,7 +89,7 @@ mod tests {
             .turn(1, turns::Step::Untap)
             .players([P1.battlefield([FELIDAR_SOVEREIGN]).life(40), P2]);
         let [sovereign] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(FELIDAR_SOVEREIGN)?;
-        assert!(game.player(p1).cards_in(BATTLEFIELD).has(sovereign));
+        assert!(game.card(sovereign).is_in(BATTLEFIELD).of(p1));
         game.play([p1.pass_priority(), p1.pass_priority(), p2.pass_priority()])?;
         assert!(game.has_won(p1));
         Ok(())
@@ -102,7 +102,7 @@ mod tests {
             .players([P1.battlefield([FELIDAR_SOVEREIGN]).life(39), P2]);
         let [sovereign] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(FELIDAR_SOVEREIGN)?;
         game.play([p1.pass_priority(), p1.pass_priority(), p2.pass_priority()])?;
-        assert!(game.player(p1).cards_in(BATTLEFIELD).has(sovereign));
+        assert!(game.card(sovereign).is_in(BATTLEFIELD).of(p1));
         assert!(!game.has_won(p1));
         assert_eq!(game.life(p1), 39);
         assert_eq!(game.trigger_sources().len(), 0);

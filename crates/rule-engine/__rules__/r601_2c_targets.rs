@@ -144,7 +144,7 @@ mod tests {
                 spell: murder.into()
             })
         );
-        assert!(game.player(p1).cards_in(HAND).has(murder));
+        assert!(game.card(murder).is_in(HAND).of(p1));
         Ok(())
     }
 
@@ -193,7 +193,7 @@ mod tests {
                 spell: blade.into()
             })
         );
-        assert!(game.player(p1).cards_in(HAND).has(blade));
+        assert!(game.card(blade).is_in(HAND).of(p1));
         Ok(())
     }
 
@@ -243,8 +243,8 @@ mod tests {
                 spell: scatter.into()
             })
         );
-        assert!(game.player(p2).cards_in(HAND).has(scatter));
-        assert!(game.stack().has(bolt));
+        assert!(game.card(scatter).is_in(HAND).of(p2));
+        assert!(!game.stack().matching(bolt).is_empty());
         Ok(())
     }
 
@@ -265,8 +265,8 @@ mod tests {
                 spell: negate.into()
             })
         );
-        assert!(game.player(p2).cards_in(HAND).has(negate));
-        assert!(game.stack().has(bears));
+        assert!(game.card(negate).is_in(HAND).of(p2));
+        assert!(!game.stack().matching(bears).is_empty());
         Ok(())
     }
 
@@ -287,8 +287,8 @@ mod tests {
                 spell: dispel.into()
             })
         );
-        assert!(game.player(p2).cards_in(HAND).has(dispel));
-        assert!(game.stack().has(divination));
+        assert!(game.card(dispel).is_in(HAND).of(p2));
+        assert!(!game.stack().matching(divination).is_empty());
         Ok(())
     }
 
@@ -322,7 +322,7 @@ mod tests {
             p2.cast(guile).targeting(bears).pass_priority(),
             p1.pass_priority(),
         ])?;
-        assert!(game.player(p2).cards_in(BATTLEFIELD).has(bears));
+        assert!(game.card(bears).is_in(BATTLEFIELD).of(p2));
 
         let err = game.play([p1.cast(blade)]).unwrap_err();
         assert_eq!(
@@ -331,7 +331,7 @@ mod tests {
                 spell: blade.into()
             })
         );
-        assert!(game.player(p1).cards_in(HAND).has(blade));
+        assert!(game.card(blade).is_in(HAND).of(p1));
         Ok(())
     }
 
@@ -348,8 +348,8 @@ mod tests {
             p2.pass_priority(),
         ])?;
         game.play([p1.arrange_graveyard([scout, blade])])?;
-        assert!(game.player(p1).cards_in(GRAVEYARD).has(scout));
-        assert!(game.player(p1).cards_in(GRAVEYARD).has(blade));
+        assert!(game.card(scout).is_in(GRAVEYARD).of(p1));
+        assert!(game.card(blade).is_in(GRAVEYARD).of(p1));
         Ok(())
     }
 
