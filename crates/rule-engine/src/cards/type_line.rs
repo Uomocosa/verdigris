@@ -1,18 +1,15 @@
-use atomic_delegate_macros::atomic_delegates;
-
 use crate::cards;
 
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct TypeLine {
     pub supertypes: Vec<cards::Supertype>,
     pub types: Vec<cards::CardType>,
-    pub subtypes: Vec<cards::Subtype>,
+    pub subtypes: Vec<cards::SubtypeId>,
 }
 
-#[atomic_delegates]
+#[rustfmt::skip]
 impl TypeLine {
-    #[must_use]
-    pub fn land_types(&self) -> impl Iterator<Item = cards::LandType> + '_ {}
+    pub fn land_types(&self) -> impl Iterator<Item = cards::LandType> + '_ { self.subtypes.iter().copied().filter_map(cards::LandType::from_subtype) }
 }
 
 #[cfg(test)]
@@ -26,9 +23,21 @@ mod tests {
         let type_line = TypeLine {
             supertypes: vec![cards::Supertype::Basic],
             types: vec![cards::CardType::Land],
-            subtypes: vec![cards::Subtype::from(cards::LandType::Forest)],
+            subtypes: vec![cards::FOREST],
         };
         assert_eq!(type_line.supertypes, vec![cards::Supertype::Basic]);
         assert_eq!(type_line.types, vec![cards::CardType::Land]);
+    }
+
+    #[test]
+    fn land_types_returns_the_basic_land_types() {
+        let type_line = TypeLine {
+            subtypes: vec![cards::PLAINS, cards::ISLAND],
+            ..TypeLine::default()
+        };
+        assert_eq!(
+            type_line.land_types().collect::<Vec<_>>(),
+            vec![cards::LandType::Plains, cards::LandType::Island]
+        );
     }
 }

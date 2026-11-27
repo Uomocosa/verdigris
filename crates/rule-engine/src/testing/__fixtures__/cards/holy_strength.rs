@@ -11,7 +11,7 @@ pub const HOLY_STRENGTH: testing::Card = testing::Card {
     definition: || {
         card! {
             cards::CardDefinition::from_enchantment("Holy Strength", cost![W])
-                .subtype(cards::EnchantmentType::Aura.into());
+                .subtype(cards::AURA);
             keywords::enchant(CREATURE),
             statics::enchanted().get_pt(1, 2),
         }

@@ -13,8 +13,8 @@ pub const LABORATORY_MANIAC: testing::Card = testing::Card {
     definition: || {
         card! {
             cards::creature("Laboratory Maniac", cost![2, U], pt!(2, 2))
-                .subtype(cards::CreatureType::Human.into())
-                .subtype(cards::CreatureType::Wizard.into());
+                .subtype(cards::HUMAN)
+                .subtype(cards::WIZARD);
             statics::you().instead(
                 events::DrawFromEmptyLibrary::ID,
                 events::DrawFromEmptyLibrary::PLAYER,

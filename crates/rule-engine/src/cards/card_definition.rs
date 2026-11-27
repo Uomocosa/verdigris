@@ -124,7 +124,7 @@ impl CardDefinition {
     }
 
     #[must_use]
-    pub fn subtype(mut self, subtype: cards::Subtype) -> Self {
+    pub fn subtype(mut self, subtype: cards::SubtypeId) -> Self {
         self.type_line.subtypes.push(subtype);
         self
     }

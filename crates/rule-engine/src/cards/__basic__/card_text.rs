@@ -74,7 +74,7 @@ pub fn land(
         type_line: cards::TypeLine {
             supertypes: Vec::new(),
             types: vec![cards::CardType::Land],
-            subtypes: land_subtypes.into_iter().map(cards::Subtype::from).collect(),
+            subtypes: land_subtypes.into_iter().map(cards::LandType::subtype).collect(),
         },
         power_toughness: None,
         text: Vec::new(),

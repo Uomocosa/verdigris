@@ -64,6 +64,5 @@ pub mod test_rule;
 pub mod then;
 pub mod trigger_event;
 pub mod turn_state;
-pub mod type_line;
 pub mod zone_lookup;
 pub mod zone_ref;

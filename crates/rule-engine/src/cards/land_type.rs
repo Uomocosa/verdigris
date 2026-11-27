@@ -11,6 +11,29 @@ pub enum LandType {
 
 impl LandType {
     #[must_use]
+    pub fn from_subtype(id: cards::SubtypeId) -> Option<Self> {
+        match id {
+            cards::PLAINS => Some(Self::Plains),
+            cards::ISLAND => Some(Self::Island),
+            cards::SWAMP => Some(Self::Swamp),
+            cards::MOUNTAIN => Some(Self::Mountain),
+            cards::FOREST => Some(Self::Forest),
+            _ => None,
+        }
+    }
+
+    #[must_use]
+    pub const fn subtype(self) -> cards::SubtypeId {
+        match self {
+            Self::Plains => cards::PLAINS,
+            Self::Island => cards::ISLAND,
+            Self::Swamp => cards::SWAMP,
+            Self::Mountain => cards::MOUNTAIN,
+            Self::Forest => cards::FOREST,
+        }
+    }
+
+    #[must_use]
     pub const fn color(self) -> cards::Color {
         match self {
             Self::Plains => cards::Color::White,

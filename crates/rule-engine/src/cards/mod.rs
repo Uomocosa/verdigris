@@ -6,9 +6,13 @@ pub use basic::components::{
     Attacking, Blocked, Creature, EffectivePT, HadFirstStrikeAsDamageBegan, OnBattlefield,
     SummoningSick, Tapped, Token, TriggeredAtStep, TriggeredEnters,
 };
+pub use basic::constants::{
+    ANGEL, AURA, FOREST, HUMAN, ISLAND, MONK, MOUNTAIN, PLAINS, SWAMP, WIZARD,
+};
 pub use basic::current_markers::{CurrentMarkers, CurrentMarkersItem};
-pub use basic::enums::{CardType, Color, CreatureType, EnchantmentType, ManaSymbol, Supertype};
+pub use basic::enums::{CardType, Color, ManaSymbol, Supertype};
 pub use basic::newtypes::{CardId, CardName};
+pub use basic::subtype_id::SubtypeId;
 pub use basic::type_aliases::InCombat;
 
 mod blocking;
@@ -46,9 +50,6 @@ pub use mana_type::ManaType;
 
 mod owner;
 pub use owner::Owner;
-
-mod subtype;
-pub use subtype::Subtype;
 
 mod type_line;
 pub use type_line::TypeLine;

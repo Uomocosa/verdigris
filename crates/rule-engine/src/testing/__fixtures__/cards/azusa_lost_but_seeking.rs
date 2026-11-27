@@ -11,8 +11,8 @@ pub const AZUSA_LOST_BUT_SEEKING: testing::Card = testing::Card {
         card! {
             cards::creature("Azusa, Lost but Seeking", cost![2, G], pt!(1, 2))
                 .supertype(cards::Supertype::Legendary)
-                .subtype(cards::CreatureType::Human.into())
-                .subtype(cards::CreatureType::Monk.into());
+                .subtype(cards::HUMAN)
+                .subtype(cards::MONK);
             statics::you().play_additional_lands(2),
         }
     },
