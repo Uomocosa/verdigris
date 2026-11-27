@@ -1,11 +1,24 @@
 use crate::events;
 use crate::{BATTLEFIELD, GRAVEYARD, STACK};
-use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query, With};
+use bevy::prelude::{Commands, Entity, Has, MessageReader, MessageWriter, Query, With};
 
 use crate::Attempt;
 use crate::cards;
 use crate::stack;
 use crate::zones;
+
+type ResolvingPermanent<'w, 's> = Query<
+    'w,
+    's,
+    (
+        &'static cards::CardDefinition,
+        &'static cards::Controller,
+        &'static cards::Owner,
+        &'static zones::InZone,
+        Option<&'static stack::ChosenTarget>,
+        Has<cards::Token>,
+    ),
+>;
 
 /// 608.3a If the object that’s resolving has no targets, it becomes a permanent and enters the
 /// battlefield under the control of the spell’s controller.
@@ -25,19 +38,14 @@ pub fn r608_3a_permanent_enters(
     mut resolutions: MessageReader<stack::Resolution>,
     mut entering: MessageWriter<Attempt<events::EnterBattlefield>>,
     mut commands: Commands,
-    cards: Query<(
-        &cards::CardDefinition,
-        &cards::Controller,
-        &cards::Owner,
-        &zones::InZone,
-        Option<&stack::ChosenTarget>,
-    )>,
+    cards: ResolvingPermanent<'_, '_>,
     battlefield: Query<Entity, With<cards::OnBattlefield>>,
     zones: zones::ZoneLookup,
 ) {
     for resolution in resolutions.read() {
         let spell = **resolution;
-        let Ok((definition, controller, owner, in_zone, chosen)) = cards.get(spell) else {
+        let Ok((definition, controller, owner, in_zone, chosen, has_token)) = cards.get(spell)
+        else {
             continue;
         };
         if !zones.contains(STACK, **in_zone) {
@@ -55,14 +63,21 @@ pub fn r608_3a_permanent_enters(
         if let Some(enchant_filter) = definition.enchant() {
             let is_legal = chosen.is_some_and(|chosen| {
                 let target = **chosen;
-                let still_matches = cards.get(target).is_ok_and(|(definition, _, _, _, _)| {
+                let still_matches = cards.get(target).is_ok_and(|(definition, _, _, _, _, _)| {
                     enchant_filter.does_creature_match(definition)
                 });
                 still_matches && battlefield.contains(target)
             });
             if !is_legal {
                 if let Some(graveyard) = zones.find(GRAVEYARD, Some(**owner)) {
-                    commands.entity(spell).insert(zones::InZone(graveyard));
+                    zones::move_object(
+                        &mut commands,
+                        spell,
+                        definition.clone(),
+                        *owner,
+                        has_token.then_some(cards::Token),
+                        graveyard,
+                    );
                 }
                 continue;
             }
@@ -92,7 +107,7 @@ mod tests {
             MockGame::new([P1.hand([GRIZZLY_BEARS]).mana_pool(mana![1, G]), P2]);
         let [bears] = game.player(p1).cards_in(HAND).exactly::<1>(GRIZZLY_BEARS)?;
         game.play([p1.cast(bears).pass_priority(), p2.pass_priority()])?;
-        assert!(game.card(bears).is_in(BATTLEFIELD).of(p1));
+        assert!(game.moved(bears).to(BATTLEFIELD).of(p1));
         Ok(())
     }
 
@@ -112,13 +127,13 @@ mod tests {
             p1.pass_priority(),
         ])?;
         assert!(game.moved(bears).to(GRAVEYARD).of(p2));
-        assert!(!game.stack().matching(strength).is_empty());
+        assert!(game.stack().has(HOLY_STRENGTH));
 
         let [bears_buried] = game.player(p2).cards_in(GRAVEYARD).exactly::<1>(GRIZZLY_BEARS)?;
         let [bolt_buried] = game.player(p2).cards_in(GRAVEYARD).exactly::<1>(LIGHTNING_BOLT)?;
         game.play([p2.arrange_graveyard([bears_buried, bolt_buried])])?;
         game.play([p1.pass_priority(), p2.pass_priority()])?;
-        assert!(game.card(strength).is_in(GRAVEYARD).of(p1));
+        assert!(game.moved(strength).to(GRAVEYARD).of(p1));
         assert!(!game.card(strength).is_in(BATTLEFIELD).of(p1));
         Ok(())
     }

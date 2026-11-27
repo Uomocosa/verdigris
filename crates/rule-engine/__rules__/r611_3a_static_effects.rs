@@ -775,12 +775,14 @@ mod tests {
         ]);
         let [hound] = game.player(p1).cards_in(HAND).exactly::<1>(TEST_BLOODSCENT_HOUND)?;
         game.play([p1.cast(hound).pass_priority(), p2.pass_priority()])?;
+        let [hound_on_battlefield] =
+            game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TEST_BLOODSCENT_HOUND)?;
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
                 assert!(
                     answers
-                        .characteristics(*hound)
+                        .characteristics(*hound_on_battlefield)
                         .keywords
                         .iter()
                         .any(|keyword| keyword.id == keywords::haste::ID)
@@ -790,9 +792,9 @@ mod tests {
         game.play([
             p1.pass_to(turns::Step::DeclareAttackers),
             p2.pass_to(turns::Step::DeclareAttackers),
-            p1.declare_attackers([hound]),
+            p1.declare_attackers([hound_on_battlefield]),
         ])?;
-        assert!(game.is_attacking(hound));
+        assert!(game.is_attacking(hound_on_battlefield));
 
         let (mut fresh, [q1, q2]) = MockGame::new([
             P1.hand([TEST_BLOODSCENT_HOUND]).mana_pool(mana![1, R]),

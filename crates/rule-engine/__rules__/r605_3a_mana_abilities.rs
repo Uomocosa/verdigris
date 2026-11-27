@@ -183,7 +183,7 @@ mod tests {
         ])?;
 
         assert_eq!(game.mana_pool(p1), cards::ManaPool::EMPTY);
-        assert!(game.card(myr).is_in(BATTLEFIELD).of(p1));
+        assert!(game.moved(myr).to(BATTLEFIELD).of(p1));
         Ok(())
     }
 }

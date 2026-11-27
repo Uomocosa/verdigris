@@ -1,5 +1,5 @@
 use crate::events;
-use bevy::prelude::{Commands, MessageReader, MessageWriter};
+use bevy::prelude::{Commands, Has, MessageReader, MessageWriter, Query};
 
 use crate::BATTLEFIELD;
 use crate::Did;
@@ -14,25 +14,57 @@ pub fn r110_1_enter_battlefield(
     mut entering: MessageReader<Resolve<events::EnterBattlefield>>,
     mut entered: MessageWriter<Did<events::EnterBattlefield>>,
     mut commands: Commands,
+    permanents: Query<(
+        &cards::CardDefinition,
+        &cards::Owner,
+        Has<cards::Token>,
+        Option<&cards::Enchanting>,
+    )>,
     zones: zones::ZoneLookup,
 ) {
     for event in entering.read() {
         let Some(battlefield) = zones.find(BATTLEFIELD, Some(event.controller)) else {
             continue;
         };
-        if event.summoning_sick {
-            commands.entity(event.permanent).insert((
-                zones::InZone(battlefield),
-                cards::Controller(event.controller),
-                cards::SummoningSick,
-            ));
-        } else {
-            commands.entity(event.permanent).insert((
-                zones::InZone(battlefield),
-                cards::Controller(event.controller),
-            ));
+        let Ok((definition, owner, has_token, enchanting)) = permanents.get(event.permanent) else {
+            continue;
+        };
+        if has_token {
+            if event.summoning_sick {
+                commands.entity(event.permanent).insert((
+                    zones::InZone(battlefield),
+                    cards::Controller(event.controller),
+                    cards::SummoningSick,
+                ));
+            } else {
+                commands.entity(event.permanent).insert((
+                    zones::InZone(battlefield),
+                    cards::Controller(event.controller),
+                ));
+            }
+            entered.write(Did(**event));
+            continue;
         }
-        entered.write(Did(**event));
+        let moved = zones::move_object(
+            &mut commands,
+            event.permanent,
+            definition.clone(),
+            *owner,
+            None,
+            battlefield,
+        );
+        commands.entity(moved).insert(cards::Controller(event.controller));
+        if let Some(enchanting) = enchanting {
+            commands.entity(moved).insert(*enchanting);
+        }
+        if event.summoning_sick {
+            commands.entity(moved).insert(cards::SummoningSick);
+        }
+        entered.write(Did(events::EnterBattlefield {
+            permanent: moved,
+            controller: event.controller,
+            summoning_sick: event.summoning_sick,
+        }));
     }
 }
 

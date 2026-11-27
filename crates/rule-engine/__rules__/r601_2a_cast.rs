@@ -1,5 +1,5 @@
 use crate::STACK;
-use bevy::prelude::{Commands, MessageReader, MessageWriter};
+use bevy::prelude::{Commands, Has, MessageReader, MessageWriter, Query};
 
 use crate::actions;
 use crate::cards;
@@ -37,6 +37,7 @@ pub fn r601_2a_cast(
     mut rejected: MessageWriter<actions::Rejected>,
     mut commands: Commands,
     answers: rules::Rules,
+    spells: Query<(&cards::CardDefinition, &cards::Owner, Has<cards::Token>)>,
 ) {
     for action in actions.read() {
         let actions::Action::Cast(spell) = &action.action else {
@@ -54,7 +55,19 @@ pub fn r601_2a_cast(
             rejected.write(actions::Rejected::CannotCast { spell });
             continue;
         };
-        commands.entity(spell).insert((zones::InZone(stack), cards::Controller(action.player)));
+        let Ok((definition, owner, has_token)) = spells.get(spell) else {
+            rejected.write(actions::Rejected::CannotCast { spell });
+            continue;
+        };
+        let moved = zones::move_object(
+            &mut commands,
+            spell,
+            definition.clone(),
+            *owner,
+            has_token.then_some(cards::Token),
+            stack,
+        );
+        commands.entity(moved).insert(cards::Controller(action.player));
     }
 }
 
@@ -72,7 +85,7 @@ mod tests {
             MockGame::new([P1.hand([LIGHTNING_BOLT]).mana_pool(mana![R]), P2]);
         let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
         game.play([p1.cast(bolt)])?;
-        assert!(!game.stack().matching(bolt).is_empty());
+        assert!(game.stack().has(LIGHTNING_BOLT));
         Ok(())
     }
 
@@ -166,7 +179,7 @@ mod tests {
         game.play([p2.pass_priority()])?;
         game.play([p1.cast(divination)])?;
 
-        assert!(!game.stack().matching(divination).is_empty());
+        assert!(game.stack().has(DIVINATION));
         Ok(())
     }
 
@@ -181,7 +194,7 @@ mod tests {
 
         game.play([p1.cast(divination)])?;
 
-        assert!(!game.stack().matching(divination).is_empty());
+        assert!(game.stack().has(DIVINATION));
         Ok(())
     }
 
@@ -198,13 +211,12 @@ mod tests {
         let [dispel] = game.player(p2).cards_in(HAND).exactly::<1>(DISPEL)?;
         let [divination] = game.player(p1).cards_in(HAND).exactly::<1>(DIVINATION)?;
 
-        game.play([
-            p1.cast(bolt).targeting(p2).pass_priority(),
-            p2.cast(dispel).targeting(bolt),
-        ])?;
+        game.play([p1.cast(bolt).targeting(p2).pass_priority()])?;
+        let [bolt_on_stack] = game.stack().exactly::<1>(LIGHTNING_BOLT)?;
+        game.play([p2.cast(dispel).targeting(bolt_on_stack)])?;
         game.play([p2.pass_priority(), p1.cast(divination)])?;
 
-        assert!(!game.stack().matching(divination).is_empty());
+        assert!(game.stack().has(DIVINATION));
         Ok(())
     }
 

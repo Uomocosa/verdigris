@@ -41,9 +41,10 @@ mod tests {
         let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
         let [cancel] = game.player(p2).cards_in(HAND).exactly::<1>(CANCEL)?;
 
+        game.play([p1.cast(bolt).targeting(p2).pass_priority()])?;
+        let [bolt_on_stack] = game.stack().exactly::<1>(LIGHTNING_BOLT)?;
         game.play([
-            p1.cast(bolt).targeting(p2).pass_priority(),
-            p2.cast(cancel).targeting(bolt).pass_priority(),
+            p2.cast(cancel).targeting(bolt_on_stack).pass_priority(),
             p1.pass_priority(),
         ])?;
 
@@ -62,9 +63,10 @@ mod tests {
         let [bears] = game.player(p1).cards_in(HAND).exactly::<1>(GRIZZLY_BEARS)?;
         let [scatter] = game.player(p2).cards_in(HAND).exactly::<1>(ESSENCE_SCATTER)?;
 
+        game.play([p1.cast(bears).pass_priority()])?;
+        let [bears_on_stack] = game.stack().exactly::<1>(GRIZZLY_BEARS)?;
         game.play([
-            p1.cast(bears).pass_priority(),
-            p2.cast(scatter).targeting(bears).pass_priority(),
+            p2.cast(scatter).targeting(bears_on_stack).pass_priority(),
             p1.pass_priority(),
         ])?;
 
@@ -82,9 +84,10 @@ mod tests {
         let [spell] = game.player(p1).cards_in(HAND).exactly::<1>(TEST_NEVER_BURIED)?;
         let [scatter] = game.player(p2).cards_in(HAND).exactly::<1>(ESSENCE_SCATTER)?;
 
+        game.play([p1.cast(spell).pass_priority()])?;
+        let [spell_on_stack] = game.stack().exactly::<1>(TEST_NEVER_BURIED)?;
         game.play([
-            p1.cast(spell).pass_priority(),
-            p2.cast(scatter).targeting(spell).pass_priority(),
+            p2.cast(scatter).targeting(spell_on_stack).pass_priority(),
             p1.pass_priority(),
         ])?;
 
@@ -102,9 +105,10 @@ mod tests {
         let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
         let [negate] = game.player(p2).cards_in(HAND).exactly::<1>(NEGATE)?;
 
+        game.play([p1.cast(bolt).targeting(p2).pass_priority()])?;
+        let [bolt_on_stack] = game.stack().exactly::<1>(LIGHTNING_BOLT)?;
         game.play([
-            p1.cast(bolt).targeting(p2).pass_priority(),
-            p2.cast(negate).targeting(bolt).pass_priority(),
+            p2.cast(negate).targeting(bolt_on_stack).pass_priority(),
             p1.pass_priority(),
         ])?;
 
@@ -124,10 +128,12 @@ mod tests {
         let [dispel] = game.player(p1).cards_in(HAND).exactly::<1>(DISPEL)?;
         let [cancel] = game.player(p2).cards_in(HAND).exactly::<1>(CANCEL)?;
 
+        game.play([p1.cast(bolt).targeting(p2).pass_priority()])?;
+        let [bolt_on_stack] = game.stack().exactly::<1>(LIGHTNING_BOLT)?;
+        game.play([p2.cast(cancel).targeting(bolt_on_stack).pass_priority()])?;
+        let [cancel_on_stack] = game.stack().exactly::<1>(CANCEL)?;
         game.play([
-            p1.cast(bolt).targeting(p2).pass_priority(),
-            p2.cast(cancel).targeting(bolt).pass_priority(),
-            p1.cast(dispel).targeting(cancel).pass_priority(),
+            p1.cast(dispel).targeting(cancel_on_stack).pass_priority(),
             p2.pass_priority(),
         ])?;
         assert!(game.moved(cancel).to(GRAVEYARD).of(p2));
@@ -150,10 +156,12 @@ mod tests {
         let [p1_cancel] = game.player(p1).cards_in(HAND).exactly::<1>(CANCEL)?;
         let [p2_cancel] = game.player(p2).cards_in(HAND).exactly::<1>(CANCEL)?;
 
+        game.play([p1.cast(bolt).targeting(p2).pass_priority()])?;
+        let [bolt_on_stack] = game.stack().exactly::<1>(LIGHTNING_BOLT)?;
+        game.play([p2.cast(p2_cancel).targeting(bolt_on_stack).pass_priority()])?;
+        let [cancel_on_stack] = game.stack().exactly::<1>(CANCEL)?;
         game.play([
-            p1.cast(bolt).targeting(p2).pass_priority(),
-            p2.cast(p2_cancel).targeting(bolt).pass_priority(),
-            p1.cast(p1_cancel).targeting(p2_cancel).pass_priority(),
+            p1.cast(p1_cancel).targeting(cancel_on_stack).pass_priority(),
             p2.pass_priority(),
         ])?;
         assert!(game.moved(p2_cancel).to(GRAVEYARD).of(p2));

@@ -41,8 +41,10 @@ mod tests {
 
         game.play([p1.play_land(guildgate)])?;
 
-        assert!(game.card(guildgate).is_in(BATTLEFIELD).of(p1));
-        assert!(game.is_tapped(guildgate));
+        assert!(game.moved(guildgate).to(BATTLEFIELD).of(p1));
+        let [guildgate_on_battlefield] =
+            game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRUUL_GUILDGATE)?;
+        assert!(game.is_tapped(guildgate_on_battlefield));
         Ok(())
     }
 
@@ -53,8 +55,9 @@ mod tests {
 
         game.play([p1.play_land(forest)])?;
 
-        assert!(game.card(forest).is_in(BATTLEFIELD).of(p1));
-        assert!(!game.is_tapped(forest));
+        assert!(game.moved(forest).to(BATTLEFIELD).of(p1));
+        let [forest_on_battlefield] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(FOREST)?;
+        assert!(!game.is_tapped(forest_on_battlefield));
         Ok(())
     }
 }

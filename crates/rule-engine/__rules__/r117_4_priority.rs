@@ -74,7 +74,7 @@ mod tests {
         ])?;
 
         assert!(game.moved(bolt_2).to(GRAVEYARD).of(p1));
-        assert!(!game.stack().matching(bolt_1).is_empty());
+        assert!(game.stack().has(LIGHTNING_BOLT));
         assert_eq!(game.life(p2), 17);
         Ok(())
     }

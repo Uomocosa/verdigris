@@ -93,7 +93,7 @@ mod tests {
 
         game.play([p1.play_land(forest)])?;
 
-        assert!(game.card(forest).is_in(BATTLEFIELD).of(p1));
+        assert!(game.moved(forest).to(BATTLEFIELD).of(p1));
         assert!(game.last_rejection().is_none());
         Ok(())
     }
@@ -106,7 +106,7 @@ mod tests {
         game.play([p1.play_land(forest_1)])?;
         game.act(p1, actions::Action::PlayLand(forest_2.into()));
 
-        assert!(game.card(forest_1).is_in(BATTLEFIELD).of(p1));
+        assert!(game.moved(forest_1).to(BATTLEFIELD).of(p1));
         assert_eq!(
             game.last_rejection(),
             Some(&actions::Rejected::CannotPlayLand {
@@ -131,9 +131,9 @@ mod tests {
         game.play([p1.play_land(forest_3)])?;
         game.act(p1, actions::Action::PlayLand(forest_4.into()));
 
-        assert!(game.card(forest_1).is_in(BATTLEFIELD).of(p1));
-        assert!(game.card(forest_2).is_in(BATTLEFIELD).of(p1));
-        assert!(game.card(forest_3).is_in(BATTLEFIELD).of(p1));
+        assert!(game.moved(forest_1).to(BATTLEFIELD).of(p1));
+        assert!(game.moved(forest_2).to(BATTLEFIELD).of(p1));
+        assert!(game.moved(forest_3).to(BATTLEFIELD).of(p1));
         assert_eq!(
             game.last_rejection(),
             Some(&actions::Rejected::CannotPlayLand {
@@ -182,7 +182,7 @@ mod tests {
         game.play([p1.arrange_graveyard([forest_buried, mind_rot_buried])])?;
         game.play([p1.play_land(forest_buried)])?;
 
-        assert!(game.card(forest_buried).is_in(BATTLEFIELD).of(p1));
+        assert!(game.moved(forest_buried).to(BATTLEFIELD).of(p1));
         assert!(game.last_rejection().is_none());
         Ok(())
     }

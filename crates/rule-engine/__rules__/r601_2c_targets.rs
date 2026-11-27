@@ -1,6 +1,6 @@
 use bevy::ecs::schedule::{IntoScheduleConfigs, ScheduleConfigs};
 use bevy::ecs::system::ScheduleSystem;
-use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query};
+use bevy::prelude::{Commands, Entity, Has, MessageReader, MessageWriter, Query};
 
 use crate::actions;
 use crate::cards;
@@ -8,6 +8,19 @@ use crate::effects;
 use crate::stack;
 use crate::zones;
 use crate::{HAND, STACK};
+
+type AskedSpell<'w, 's> = Query<
+    'w,
+    's,
+    (
+        Entity,
+        &'static cards::CardDefinition,
+        &'static cards::Controller,
+        &'static cards::Owner,
+        &'static zones::InZone,
+        Has<cards::Token>,
+    ),
+>;
 
 /// 601.2c The player announces their choice of an appropriate object or player for each target the
 /// spell requires. A spell may require some targets only if an alternative or additional cost (such
@@ -41,13 +54,8 @@ fn ask_for_targets(
     mut rejected: MessageWriter<actions::Rejected>,
     mut asks: MessageWriter<actions::Ask>,
     mut commands: Commands,
-    cards: Query<(
-        Entity,
-        &cards::CardDefinition,
-        &cards::Controller,
-        &cards::Owner,
-        &zones::InZone,
-    )>,
+    cards: AskedSpell<'_, '_>,
+    moved: Query<&zones::LeftZone>,
     zones: zones::ZoneLookup,
     targeting: stack::Targeting,
 ) {
@@ -55,8 +63,11 @@ fn ask_for_targets(
         let actions::Action::Cast(spell) = &action.action else {
             continue;
         };
-        let spell = *spell;
-        let Ok((_, definition, controller, owner, in_zone)) = cards.get(spell) else {
+        let mut spell = *spell;
+        while let Ok(next) = moved.get(spell) {
+            spell = **next;
+        }
+        let Ok((_, definition, controller, owner, in_zone, has_token)) = cards.get(spell) else {
             continue;
         };
         if !zones.contains(STACK, **in_zone) {
@@ -73,11 +84,19 @@ fn ask_for_targets(
         };
         let legal = targeting.legal_targets(spell, target, controller);
         if legal.is_empty() {
-            rejected.write(actions::Rejected::NoLegalTargets { spell });
             if let Some(hand) = zones.find(HAND, Some(**owner)) {
-                commands.entity(spell).insert(zones::InZone(hand));
+                let moved = zones::move_object(
+                    &mut commands,
+                    spell,
+                    definition.clone(),
+                    *owner,
+                    has_token.then_some(cards::Token),
+                    hand,
+                );
+                rejected.write(actions::Rejected::NoLegalTargets { spell: moved });
+            } else {
+                rejected.write(actions::Rejected::NoLegalTargets { spell });
             }
-            commands.entity(spell).remove::<stack::CastingStage>();
             continue;
         }
         asks.write(actions::Ask(actions::Choice::Target(
@@ -138,13 +157,14 @@ mod tests {
         let (mut game, [p1, ..]) = MockGame::new([P1.hand([MURDER]).mana_pool(mana![1, B, B]), P2]);
         let [murder] = game.player(p1).cards_in(HAND).exactly::<1>(MURDER)?;
         let err = game.play([p1.cast(murder)]).unwrap_err();
+        let [murder_back] = game.player(p1).cards_in(HAND).exactly::<1>(MURDER)?;
         assert_eq!(
             err.rejection(),
             Some(&actions::Rejected::NoLegalTargets {
-                spell: murder.into()
+                spell: murder_back.into()
             })
         );
-        assert!(game.card(murder).is_in(HAND).of(p1));
+        assert!(game.moved(murder).to(HAND).of(p1));
         Ok(())
     }
 
@@ -170,10 +190,11 @@ mod tests {
         let [blade] = game.player(p1).cards_in(HAND).exactly::<1>(DOOM_BLADE)?;
         let [corpse] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(WALKING_CORPSE)?;
         let err = game.play([p1.cast(blade).targeting(corpse)]).unwrap_err();
+        let [blade_on_stack] = game.stack().exactly::<1>(DOOM_BLADE)?;
         assert_eq!(
             err.rejection(),
             Some(&actions::Rejected::InvalidTargets {
-                spell: blade.into()
+                spell: blade_on_stack.into()
             })
         );
         Ok(())
@@ -187,13 +208,14 @@ mod tests {
         ]);
         let [blade] = game.player(p1).cards_in(HAND).exactly::<1>(DOOM_BLADE)?;
         let err = game.play([p1.cast(blade)]).unwrap_err();
+        let [blade_back] = game.player(p1).cards_in(HAND).exactly::<1>(DOOM_BLADE)?;
         assert_eq!(
             err.rejection(),
             Some(&actions::Rejected::NoLegalTargets {
-                spell: blade.into()
+                spell: blade_back.into()
             })
         );
-        assert!(game.card(blade).is_in(HAND).of(p1));
+        assert!(game.moved(blade).to(HAND).of(p1));
         Ok(())
     }
 
@@ -209,13 +231,18 @@ mod tests {
 
         game.play([p1.cast(bolt).targeting(p2), p1.cast(cancel)])?;
 
-        assert_eq!(game.target_choice(), Some(pick(1).from([bolt.into()])));
+        let [bolt_on_stack] = game.stack().exactly::<1>(LIGHTNING_BOLT)?;
+        assert_eq!(
+            game.target_choice(),
+            Some(pick(1).from([bolt_on_stack.into()]))
+        );
 
         game.act(p1, actions::Action::ChooseTargets(vec![bears.into()]));
+        let [cancel_on_stack] = game.stack().exactly::<1>(CANCEL)?;
         assert_eq!(
             game.last_rejection(),
             Some(&actions::Rejected::InvalidTargets {
-                spell: cancel.into()
+                spell: cancel_on_stack.into()
             })
         );
         Ok(())
@@ -237,14 +264,15 @@ mod tests {
             ])
             .unwrap_err();
 
+        let [scatter_back] = game.player(p2).cards_in(HAND).exactly::<1>(ESSENCE_SCATTER)?;
         assert_eq!(
             err.rejection(),
             Some(&actions::Rejected::NoLegalTargets {
-                spell: scatter.into()
+                spell: scatter_back.into()
             })
         );
-        assert!(game.card(scatter).is_in(HAND).of(p2));
-        assert!(!game.stack().matching(bolt).is_empty());
+        assert!(game.moved(scatter).to(HAND).of(p2));
+        assert!(game.stack().has(LIGHTNING_BOLT));
         Ok(())
     }
 
@@ -259,14 +287,15 @@ mod tests {
 
         let err = game.play([p1.cast(bears).pass_priority(), p2.cast(negate)]).unwrap_err();
 
+        let [negate_back] = game.player(p2).cards_in(HAND).exactly::<1>(NEGATE)?;
         assert_eq!(
             err.rejection(),
             Some(&actions::Rejected::NoLegalTargets {
-                spell: negate.into()
+                spell: negate_back.into()
             })
         );
-        assert!(game.card(negate).is_in(HAND).of(p2));
-        assert!(!game.stack().matching(bears).is_empty());
+        assert!(game.moved(negate).to(HAND).of(p2));
+        assert!(game.stack().has(GRIZZLY_BEARS));
         Ok(())
     }
 
@@ -281,14 +310,15 @@ mod tests {
 
         let err = game.play([p1.cast(divination).pass_priority(), p2.cast(dispel)]).unwrap_err();
 
+        let [dispel_back] = game.player(p2).cards_in(HAND).exactly::<1>(DISPEL)?;
         assert_eq!(
             err.rejection(),
             Some(&actions::Rejected::NoLegalTargets {
-                spell: dispel.into()
+                spell: dispel_back.into()
             })
         );
-        assert!(game.card(dispel).is_in(HAND).of(p2));
-        assert!(!game.stack().matching(divination).is_empty());
+        assert!(game.moved(dispel).to(HAND).of(p2));
+        assert!(game.stack().has(DIVINATION));
         Ok(())
     }
 
@@ -325,13 +355,14 @@ mod tests {
         assert!(game.card(bears).is_in(BATTLEFIELD).of(p2));
 
         let err = game.play([p1.cast(blade)]).unwrap_err();
+        let [blade_back] = game.player(p1).cards_in(HAND).exactly::<1>(DOOM_BLADE)?;
         assert_eq!(
             err.rejection(),
             Some(&actions::Rejected::NoLegalTargets {
-                spell: blade.into()
+                spell: blade_back.into()
             })
         );
-        assert!(game.card(blade).is_in(HAND).of(p1));
+        assert!(game.moved(blade).to(HAND).of(p1));
         Ok(())
     }
 

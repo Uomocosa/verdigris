@@ -1,5 +1,5 @@
 use crate::HAND;
-use bevy::prelude::{Commands, Entity, MessageWriter, Query};
+use bevy::prelude::{Commands, Entity, Has, MessageWriter, Query};
 
 use crate::Attempt;
 use crate::actions;
@@ -9,6 +9,19 @@ use crate::players;
 use crate::rules;
 use crate::stack;
 use crate::zones;
+
+type PayingSpell<'w, 's> = Query<
+    'w,
+    's,
+    (
+        Entity,
+        &'static cards::CardDefinition,
+        &'static cards::Controller,
+        &'static cards::Owner,
+        &'static stack::CastingStage,
+        Has<cards::Token>,
+    ),
+>;
 
 /// 119.4. If a cost or effect allows a player to pay an amount of life greater than 0, the player
 /// may do so only if their life total is greater than or equal to the amount of the payment. If a
@@ -36,19 +49,13 @@ pub fn r119_4_r119_8_pay_life(
     mut rejected: MessageWriter<actions::Rejected>,
     mut life_lost: MessageWriter<Attempt<events::LoseLife>>,
     mut commands: Commands,
-    cards: Query<(
-        Entity,
-        &cards::CardDefinition,
-        &cards::Controller,
-        &cards::Owner,
-        &stack::CastingStage,
-    )>,
+    cards: PayingSpell<'_, '_>,
     pools: Query<&cards::ManaPool>,
     lives: Query<&players::Life>,
     zones: zones::ZoneLookup,
     answers: rules::Rules,
 ) {
-    for (spell, definition, controller, owner, stage) in cards.iter() {
+    for (spell, definition, controller, owner, stage, has_token) in cards.iter() {
         if *stage != stack::CastingStage::AwaitingPayment {
             continue;
         }
@@ -70,11 +77,19 @@ pub fn r119_4_r119_8_pay_life(
             amount: 2,
         };
         if **life < 2 || !answers.legal(&payment) {
-            rejected.write(actions::Rejected::CannotPay { spell });
             if let Some(hand) = zones.find(HAND, Some(**owner)) {
-                commands.entity(spell).insert(zones::InZone(hand));
+                let moved = zones::move_object(
+                    &mut commands,
+                    spell,
+                    definition.clone(),
+                    *owner,
+                    has_token.then_some(cards::Token),
+                    hand,
+                );
+                rejected.write(actions::Rejected::CannotPay { spell: moved });
+            } else {
+                rejected.write(actions::Rejected::CannotPay { spell });
             }
-            commands.entity(spell).remove::<stack::CastingStage>();
             continue;
         }
         life_lost.write(Attempt(payment));
@@ -106,15 +121,16 @@ mod tests {
         let [gut_shot] = game.player(p1).cards_in(HAND).exactly::<1>(GUT_SHOT)?;
 
         let err = game.play([p1.cast(gut_shot).targeting(p2)]).unwrap_err();
+        let [gut_shot_back] = game.player(p1).cards_in(HAND).exactly::<1>(GUT_SHOT)?;
 
         assert_eq!(
             err.rejection(),
             Some(&actions::Rejected::CannotPay {
-                spell: gut_shot.into()
+                spell: gut_shot_back.into()
             })
         );
         assert_eq!(game.life(p1), 1);
-        assert!(game.card(gut_shot).is_in(HAND).of(p1));
+        assert!(game.moved(gut_shot).to(HAND).of(p1));
         Ok(())
     }
 
@@ -125,15 +141,16 @@ mod tests {
         let [gut_shot] = game.player(p1).cards_in(HAND).exactly::<1>(GUT_SHOT)?;
 
         let err = game.play([p1.cast(gut_shot).targeting(p2)]).unwrap_err();
+        let [gut_shot_back] = game.player(p1).cards_in(HAND).exactly::<1>(GUT_SHOT)?;
 
         assert_eq!(
             err.rejection(),
             Some(&actions::Rejected::CannotPay {
-                spell: gut_shot.into()
+                spell: gut_shot_back.into()
             })
         );
         assert_eq!(game.life(p1), 20);
-        assert!(game.card(gut_shot).is_in(HAND).of(p1));
+        assert!(game.moved(gut_shot).to(HAND).of(p1));
         Ok(())
     }
 }

@@ -1,9 +1,22 @@
 use crate::{GRAVEYARD, STACK};
-use bevy::prelude::{Commands, MessageReader, Query};
+use bevy::prelude::{Commands, Has, MessageReader, Query};
 
 use crate::cards;
 use crate::stack;
 use crate::zones;
+
+type FizzlingSpell<'w, 's> = Query<
+    'w,
+    's,
+    (
+        &'static cards::CardDefinition,
+        &'static cards::Controller,
+        &'static cards::Owner,
+        &'static zones::InZone,
+        Option<&'static stack::ChosenTarget>,
+        Has<cards::Token>,
+    ),
+>;
 
 /// 608.2b If the spell or ability specifies targets, it checks whether the targets are still legal.
 /// A target that’s no longer in the zone it was in when it was targeted is illegal. Other changes
@@ -22,19 +35,14 @@ use crate::zones;
 pub fn r608_2b_illegal_targets(
     mut resolutions: MessageReader<stack::Resolution>,
     mut commands: Commands,
-    cards: Query<(
-        &cards::CardDefinition,
-        &cards::Controller,
-        &cards::Owner,
-        &zones::InZone,
-        Option<&stack::ChosenTarget>,
-    )>,
+    cards: FizzlingSpell<'_, '_>,
     zones: zones::ZoneLookup,
     targeting: stack::Targeting,
 ) {
     for resolution in resolutions.read() {
         let spell = **resolution;
-        let Ok((definition, controller, owner, in_zone, chosen)) = cards.get(spell) else {
+        let Ok((definition, controller, owner, in_zone, chosen, has_token)) = cards.get(spell)
+        else {
             continue;
         };
         if !zones.contains(STACK, **in_zone) {
@@ -53,7 +61,14 @@ pub fn r608_2b_illegal_targets(
             continue;
         }
         if let Some(graveyard) = zones.find(GRAVEYARD, Some(**owner)) {
-            commands.entity(spell).insert(zones::InZone(graveyard));
+            zones::move_object(
+                &mut commands,
+                spell,
+                definition.clone(),
+                *owner,
+                has_token.then_some(cards::Token),
+                graveyard,
+            );
         }
     }
 }
@@ -97,10 +112,10 @@ mod tests {
         ])?;
         assert!(game.moved(bears).to(GRAVEYARD).of(p2));
         assert!(game.moved(murder).to(GRAVEYARD).of(p1));
-        assert!(!game.stack().matching(bolt).is_empty());
+        assert!(game.stack().has(LIGHTNING_BOLT));
 
         game.play([p1.pass_priority(), p2.pass_priority()])?;
-        assert!(game.card(bolt).is_in(GRAVEYARD).of(p1));
+        assert!(game.moved(bolt).to(GRAVEYARD).of(p1));
         assert_eq!(game.life(p2), 20);
         Ok(())
     }
@@ -122,7 +137,7 @@ mod tests {
         ])?;
         game.play([p1.pass_priority(), p2.pass_priority()])?;
         assert!(game.card(bears).is_in(BATTLEFIELD).of(p2));
-        assert!(game.card(blade).is_in(GRAVEYARD).of(p1));
+        assert!(game.moved(blade).to(GRAVEYARD).of(p1));
         Ok(())
     }
 
@@ -144,7 +159,7 @@ mod tests {
 
         game.play([p1.pass_priority(), p2.pass_priority()])?;
         assert!(game.card(bears).is_in(BATTLEFIELD).of(p2));
-        assert!(game.card(blade).is_in(GRAVEYARD).of(p1));
+        assert!(game.moved(blade).to(GRAVEYARD).of(p1));
         Ok(())
     }
 }

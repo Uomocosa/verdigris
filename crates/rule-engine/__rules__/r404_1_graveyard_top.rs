@@ -58,9 +58,10 @@ mod tests {
         let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
         let [cancel] = game.player(p1).cards_in(HAND).exactly::<1>(CANCEL)?;
 
+        game.play([p1.cast(bolt).targeting(p2)])?;
+        let [bolt_on_stack] = game.stack().exactly::<1>(LIGHTNING_BOLT)?;
         game.play([
-            p1.cast(bolt).targeting(p2),
-            p1.cast(cancel).targeting(bolt).pass_priority(),
+            p1.cast(cancel).targeting(bolt_on_stack).pass_priority(),
             p2.pass_priority(),
         ])?;
         let [cancel_buried] = game.player(p1).cards_in(GRAVEYARD).exactly::<1>(CANCEL)?;

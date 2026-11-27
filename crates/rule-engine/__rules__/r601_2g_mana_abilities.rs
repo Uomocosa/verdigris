@@ -1,10 +1,23 @@
 use crate::HAND;
-use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query};
+use bevy::prelude::{Commands, Entity, Has, MessageReader, MessageWriter, Query};
 
 use crate::actions;
 use crate::cards;
 use crate::stack;
 use crate::zones;
+
+type CastingSpell<'w, 's> = Query<
+    'w,
+    's,
+    (
+        Entity,
+        &'static stack::CastingStage,
+        &'static cards::Controller,
+        &'static cards::Owner,
+        &'static cards::CardDefinition,
+        Has<cards::Token>,
+    ),
+>;
 
 /// 601.2g If the total cost includes a mana payment, the player then has a chance to activate
 /// mana abilities (see rule 605, “Mana Abilities”). Mana abilities must be activated before
@@ -13,13 +26,7 @@ pub fn r601_2g_mana_abilities(
     mut actions: MessageReader<actions::PlayerAction>,
     mut rejected: MessageWriter<actions::Rejected>,
     mut commands: Commands,
-    casting: Query<(
-        Entity,
-        &stack::CastingStage,
-        &cards::Controller,
-        &cards::Owner,
-        &cards::CardDefinition,
-    )>,
+    casting: CastingSpell<'_, '_>,
     mut pools: Query<&mut cards::ManaPool>,
     zones: zones::ZoneLookup,
 ) {
@@ -30,7 +37,7 @@ pub fn r601_2g_mana_abilities(
         if !is_mana_activation && !is_pass {
             continue;
         }
-        for (spell, stage, controller, owner, definition) in casting.iter() {
+        for (spell, stage, controller, owner, definition, has_token) in casting.iter() {
             if *stage != stack::CastingStage::AwaitingPayment || **controller != action.player {
                 continue;
             }
@@ -41,12 +48,18 @@ pub fn r601_2g_mana_abilities(
                 if pool.pay(definition.cost) {
                     commands.entity(spell).remove::<stack::CastingStage>();
                 }
+            } else if let Some(hand) = zones.find(HAND, Some(**owner)) {
+                let moved = zones::move_object(
+                    &mut commands,
+                    spell,
+                    definition.clone(),
+                    *owner,
+                    has_token.then_some(cards::Token),
+                    hand,
+                );
+                rejected.write(actions::Rejected::CannotPay { spell: moved });
             } else {
                 rejected.write(actions::Rejected::CannotPay { spell });
-                if let Some(hand) = zones.find(HAND, Some(**owner)) {
-                    commands.entity(spell).insert(zones::InZone(hand));
-                }
-                commands.entity(spell).remove::<stack::CastingStage>();
             }
         }
     }
@@ -72,7 +85,7 @@ mod tests {
 
         game.play([p1.cast(bears).activate_ability(forest.ability())])?;
 
-        assert!(!game.stack().matching(bears).is_empty());
+        assert!(game.stack().has(GRIZZLY_BEARS));
         assert!(game.is_tapped(forest));
         assert_eq!(game.mana_pool(p1), cards::ManaPool::EMPTY);
         Ok(())
@@ -88,14 +101,15 @@ mod tests {
 
         game.play([p1.cast(bears)])?;
         let err = game.play([p1.pass_priority()]).unwrap_err();
+        let [bears_back] = game.player(p1).cards_in(HAND).exactly::<1>(GRIZZLY_BEARS)?;
 
         assert_eq!(
             err.rejection(),
             Some(&actions::Rejected::CannotPay {
-                spell: bears.into()
+                spell: bears_back.into()
             })
         );
-        assert!(game.card(bears).is_in(HAND).of(p1));
+        assert!(game.moved(bears).to(HAND).of(p1));
         assert!(game.stack().matching(bears).is_empty());
         assert_eq!(game.mana_pool(p1), mana![1]);
         Ok(())

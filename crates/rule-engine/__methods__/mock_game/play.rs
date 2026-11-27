@@ -146,13 +146,16 @@ mod tests {
             [p1.cast(bolt).targeting(p2).end_turn(), p2.end_turn()],
         )
         .unwrap_err();
+        let [bolt_back] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
 
         assert_eq!(
             error,
             PlayError::Rejected {
                 index: 1,
                 step: PlayStep::Act(*p1, actions::Action::ChooseTargets(vec![*p2])),
-                rejection: actions::Rejected::CannotPay { spell: bolt.into() },
+                rejection: actions::Rejected::CannotPay {
+                    spell: bolt_back.into()
+                },
             }
         );
         Ok(())
@@ -167,9 +170,11 @@ mod tests {
         let [bolt] = game.player(p1).cards_in(HAND).exactly::<1>(LIGHTNING_BOLT)?;
         let [negate] = game.player(p2).cards_in(HAND).exactly::<1>(NEGATE)?;
 
+        game.play([p1.cast(bolt).targeting(p2).pass_priority()])?;
+        let [bolt_on_stack] = game.stack().exactly::<1>(LIGHTNING_BOLT)?;
         game.play([
-            p1.cast(bolt).targeting(p2).end_turn(),
-            p2.cast(negate).targeting(bolt).end_turn(),
+            p2.cast(negate).targeting(bolt_on_stack).end_turn(),
+            p1.end_turn(),
         ])?;
 
         assert_eq!(game.player(p2).life(), 20);
@@ -191,10 +196,12 @@ mod tests {
         let [dispel] = game.player(p1).cards_in(HAND).exactly::<1>(DISPEL)?;
         let [cancel] = game.player(p2).cards_in(HAND).exactly::<1>(CANCEL)?;
 
+        game.play([p1.cast(bolt).targeting(p2).pass_priority()])?;
+        let [bolt_on_stack] = game.stack().exactly::<1>(LIGHTNING_BOLT)?;
+        game.play([p2.cast(cancel).targeting(bolt_on_stack).pass_priority()])?;
+        let [cancel_on_stack] = game.stack().exactly::<1>(CANCEL)?;
         game.play([
-            p1.cast(bolt).targeting(p2).pass_priority(),
-            p2.cast(cancel).targeting(bolt).pass_priority(),
-            p1.cast(dispel).targeting(cancel).end_turn(),
+            p1.cast(dispel).targeting(cancel_on_stack).end_turn(),
             p2.end_turn(),
         ])?;
 

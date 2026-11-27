@@ -235,10 +235,15 @@ mod tests {
             p2.pass_to(turns::Step::DeclareAttackers),
         ])?;
 
-        game.act(p1, actions::Action::DeclareAttackers(vec![goblin.into()]));
+        let [goblin_on_battlefield] =
+            game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(RAGING_GOBLIN)?;
+        game.act(
+            p1,
+            actions::Action::DeclareAttackers(vec![goblin_on_battlefield.into()]),
+        );
 
-        assert!(game.card(goblin).is_in(BATTLEFIELD).of(p1));
-        assert!(game.is_attacking(goblin));
+        assert!(game.moved(goblin).to(BATTLEFIELD).of(p1));
+        assert!(game.is_attacking(goblin_on_battlefield));
         assert_eq!(game.last_rejection(), None);
         Ok(())
     }
@@ -292,10 +297,15 @@ mod tests {
             p2.pass_to(turns::Step::DeclareAttackers),
         ])?;
 
-        game.act(p1, actions::Action::DeclareAttackers(vec![corpse.into()]));
+        let [corpse_on_battlefield] =
+            game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(WALKING_CORPSE)?;
+        game.act(
+            p1,
+            actions::Action::DeclareAttackers(vec![corpse_on_battlefield.into()]),
+        );
 
-        assert!(game.card(corpse).is_in(BATTLEFIELD).of(p1));
-        assert!(game.is_attacking(corpse));
+        assert!(game.moved(corpse).to(BATTLEFIELD).of(p1));
+        assert!(game.is_attacking(corpse_on_battlefield));
         assert_eq!(game.last_rejection(), None);
         Ok(())
     }
@@ -337,16 +347,24 @@ mod tests {
             p2.pass_to(turns::Step::DeclareAttackers),
         ])?;
 
-        game.act(p1, actions::Action::DeclareAttackers(vec![corpse.into()]));
+        let [corpse_on_battlefield] =
+            game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(WALKING_CORPSE)?;
+        game.act(
+            p1,
+            actions::Action::DeclareAttackers(vec![corpse_on_battlefield.into()]),
+        );
 
-        assert!(game.card(corpse).is_in(BATTLEFIELD).of(p1));
-        assert!(game.is_attacking(corpse));
+        assert!(game.moved(corpse).to(BATTLEFIELD).of(p1));
+        assert!(game.is_attacking(corpse_on_battlefield));
         assert_eq!(game.last_rejection(), None);
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
                 assert!(
-                    !answers.characteristics(corpse.into()).keywords.contains(&keywords::haste())
+                    !answers
+                        .characteristics(corpse_on_battlefield.into())
+                        .keywords
+                        .contains(&keywords::haste())
                 );
             })
             .unwrap();
