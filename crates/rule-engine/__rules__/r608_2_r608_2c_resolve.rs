@@ -7,6 +7,7 @@ use crate::counters;
 use crate::effects;
 use crate::keywords;
 use crate::players;
+use crate::rules;
 use crate::stack;
 use crate::turns;
 use crate::zones;
@@ -394,12 +395,13 @@ fn resolve_player_targets(
     effect: &effects::Effect,
     controller: players::PlayerId,
 ) -> Vec<players::PlayerId> {
-    let Some(player) = effect.target.and_then(|target| target.filter.controlled_by) else {
-        return Vec::new();
-    };
-    let players: Vec<players::PlayerId> =
+    let in_game: Vec<players::PlayerId> =
         lookups.lives.iter().map(|(player, _)| players::PlayerId(player)).collect();
-    player.resolve(Some(controller), &players)
+    match effect.affected {
+        Some(rules::Subject::Each(set)) => set.resolve(Some(controller), &in_game),
+        Some(rules::Subject::One(reference)) if reference == rules::YOU => vec![controller],
+        Some(rules::Subject::One(_) | rules::Subject::An(_)) | None => Vec::new(),
+    }
 }
 
 #[cfg(test)]

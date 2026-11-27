@@ -21,6 +21,7 @@ mod tests {
             kind: effects::EffectKind::Damage(3),
             follow_ups: [None, None, None, None],
             target: None,
+            affected: None,
         };
         let effect = to(untargeted, effects::target(1, ANY_TARGET));
         assert_eq!(effect.kind, effects::EffectKind::Damage(3));

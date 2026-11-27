@@ -8,6 +8,7 @@ pub struct Effect {
     pub kind: effects::EffectKind,
     pub follow_ups: [Option<effects::EffectKind>; 4],
     pub target: Option<effects::Target>,
+    pub affected: Option<rules::Subject>,
 }
 
 #[atomic_delegates]
@@ -26,27 +27,32 @@ impl Effect {
             kind,
             follow_ups,
             target,
+            affected,
         } = self;
         match follow_ups {
             [None, second, third, fourth] => Self {
                 kind,
                 follow_ups: [Some(next.kind), second, third, fourth],
                 target,
+                affected,
             },
             [first, None, third, fourth] => Self {
                 kind,
                 follow_ups: [first, Some(next.kind), third, fourth],
                 target,
+                affected,
             },
             [first, second, None, fourth] => Self {
                 kind,
                 follow_ups: [first, second, Some(next.kind), fourth],
                 target,
+                affected,
             },
             [first, second, third, None] => Self {
                 kind,
                 follow_ups: [first, second, third, Some(next.kind)],
                 target,
+                affected,
             },
             _ => {
                 Self::assert_chain_has_room(&follow_ups);
@@ -54,6 +60,7 @@ impl Effect {
                     kind,
                     follow_ups,
                     target,
+                    affected,
                 }
             }
         }

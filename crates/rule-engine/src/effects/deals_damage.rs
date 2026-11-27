@@ -13,6 +13,7 @@ impl DealsDamage {
             kind,
             follow_ups: [None, None, None, None],
             target: Some(target.into()),
+            affected: None,
         }
     }
 }
