@@ -6,9 +6,8 @@ use crate::statics;
 use crate::zones;
 
 pub fn play_lands_from(all: &statics::All, zone: zones::Zone) -> abilities::Continuous {
-    let filter: &effects::Filter = all;
     abilities::Continuous {
-        filter: filter.clone(),
+        filter: all.into(),
         as_long_as: None,
         modification: effects::Modification::Rule(rules::RuleChange {
             target: rules::Target::Restriction(events::play_land::FROM_HAND),

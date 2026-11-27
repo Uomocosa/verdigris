@@ -3,9 +3,8 @@ use crate::effects;
 use crate::statics;
 
 pub fn get_pt(all: &statics::All, power: i32, toughness: i32) -> abilities::Continuous {
-    let filter: &effects::Filter = all;
     abilities::Continuous {
-        filter: filter.clone(),
+        filter: all.into(),
         as_long_as: None,
         modification: effects::Modification::Characteristic(effects::Layered::ModifyPT {
             power,

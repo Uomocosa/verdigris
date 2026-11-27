@@ -6,6 +6,7 @@ use crate::events;
 use crate::keywords;
 use crate::players;
 use crate::rules;
+use crate::statics;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Deref)]
 pub struct Filter(rules::Condition);
@@ -18,6 +19,16 @@ impl From<rules::Players> for Filter {
 #[rustfmt::skip]
 impl From<rules::You> for Filter {
     fn from(you: rules::You) -> Self { Self::from(rules::Players::from(you)) }
+}
+
+#[rustfmt::skip]
+impl From<&statics::All> for Filter {
+    fn from(all: &statics::All) -> Self { (**all).clone() }
+}
+
+#[rustfmt::skip]
+impl From<&keywords::EnchantFilter> for Filter {
+    fn from(enchant: &keywords::EnchantFilter) -> Self { (**enchant).clone() }
 }
 
 impl Filter {

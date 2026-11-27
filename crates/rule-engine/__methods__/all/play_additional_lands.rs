@@ -4,9 +4,8 @@ use crate::rules;
 use crate::statics;
 
 pub fn play_additional_lands(all: &statics::All, count: u32) -> abilities::Continuous {
-    let filter: &effects::Filter = all;
     abilities::Continuous {
-        filter: filter.clone(),
+        filter: all.into(),
         as_long_as: None,
         modification: effects::Modification::Rule(rules::RuleChange {
             target: rules::Target::value::<rules::LandPlays>(),

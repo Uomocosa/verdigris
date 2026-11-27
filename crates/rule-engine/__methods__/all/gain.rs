@@ -4,9 +4,8 @@ use crate::keywords;
 use crate::statics;
 
 pub fn gain(all: &statics::All, keyword: keywords::Keyword) -> abilities::Continuous {
-    let filter: &effects::Filter = all;
     abilities::Continuous {
-        filter: filter.clone(),
+        filter: all.into(),
         as_long_as: None,
         modification: effects::Modification::Characteristic(effects::Layered::GainKeyword(keyword)),
     }

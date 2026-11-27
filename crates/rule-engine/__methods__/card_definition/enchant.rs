@@ -3,9 +3,9 @@ use crate::effects;
 use crate::keywords;
 
 pub fn enchant(definition: &cards::CardDefinition) -> Option<effects::Filter> {
-    definition.keywords().find_map(|keyword| {
-        keyword.params::<keywords::EnchantFilter>().map(|filter| (**filter).clone())
-    })
+    definition
+        .keywords()
+        .find_map(|keyword| keyword.params::<keywords::EnchantFilter>().map(effects::Filter::from))
 }
 
 #[cfg(test)]

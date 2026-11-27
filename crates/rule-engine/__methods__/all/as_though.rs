@@ -8,9 +8,8 @@ pub fn as_though(
     restriction: rules::RestrictionId,
     holder: impl Into<rules::ArgRef>,
 ) -> abilities::Continuous {
-    let filter: &effects::Filter = all;
     abilities::Continuous {
-        filter: filter.clone(),
+        filter: all.into(),
         as_long_as: None,
         modification: effects::Modification::Rule(rules::RuleChange {
             target: rules::Target::Restriction(restriction),

@@ -5,9 +5,8 @@ use crate::rules;
 use crate::statics;
 
 pub fn cast_spells_as_though_they_had_flash(all: &statics::All) -> abilities::Continuous {
-    let filter: &effects::Filter = all;
     abilities::Continuous {
-        filter: filter.clone(),
+        filter: all.into(),
         as_long_as: None,
         modification: effects::Modification::Rule(rules::RuleChange {
             target: rules::Target::Restriction(events::cast_spell::TIMING),

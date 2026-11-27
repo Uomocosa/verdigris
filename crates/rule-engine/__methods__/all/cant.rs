@@ -9,9 +9,8 @@ pub fn cant<E: Event>(
     holder: impl Into<rules::ArgRef>,
     id: rules::RestrictionId,
 ) -> abilities::Continuous {
-    let filter: &effects::Filter = all;
     abilities::Continuous {
-        filter: filter.clone(),
+        filter: all.into(),
         as_long_as: None,
         modification: effects::Modification::Rule(rules::RuleChange {
             target: rules::Target::event::<E>(),
