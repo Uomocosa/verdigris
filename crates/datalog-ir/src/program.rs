@@ -82,4 +82,74 @@ mod tests {
         .canonical();
         assert_eq!(forward, backward);
     }
+
+    #[test]
+    fn test_examples_stratify() {
+        use crate::Literal;
+        let reachable = Rule {
+            head: Atom {
+                rel: Rel("reachable"),
+                terms: vec![Term::Var("Y")],
+            },
+            body: vec![
+                Literal::Pos(Atom {
+                    rel: Rel("reachable"),
+                    terms: vec![Term::Var("X")],
+                }),
+                Literal::Pos(Atom {
+                    rel: Rel("edge"),
+                    terms: vec![Term::Var("X"), Term::Var("Y")],
+                }),
+            ],
+        };
+        let blocked = Rule {
+            head: Atom {
+                rel: Rel("blocked"),
+                terms: vec![Term::Var("X")],
+            },
+            body: vec![
+                Literal::Pos(Atom {
+                    rel: Rel("node"),
+                    terms: vec![Term::Var("X")],
+                }),
+                Literal::Neg(Atom {
+                    rel: Rel("reachable"),
+                    terms: vec![Term::Var("X")],
+                }),
+            ],
+        };
+        let program = Program {
+            rules: vec![blocked.clone(), reachable.clone()],
+        };
+        println!("1. rules in:");
+        for rule in &program.rules {
+            println!("   {rule:?}");
+        }
+        let strata = program.stratify().unwrap();
+        println!("2. stratum 0 derives reachable from edge");
+        println!("3. stratum 1 derives blocked after reachable");
+        println!("   is complete, as blocked waits on not reachable");
+        for (index, stratum) in strata.iter().enumerate() {
+            println!("   stratum {index}: {} rule(s)", stratum.len());
+        }
+        assert_eq!(strata, vec![vec![reachable], vec![blocked]]);
+        let bad = Program {
+            rules: vec![Rule {
+                head: Atom {
+                    rel: Rel("p"),
+                    terms: vec![],
+                },
+                body: vec![Literal::Neg(Atom {
+                    rel: Rel("p"),
+                    terms: vec![],
+                })],
+            }],
+        };
+        let error = bad.stratify().unwrap_err();
+        println!("4. rejected: {error}");
+        assert_eq!(
+            error,
+            crate::EngineError::Unstratifiable { relation: Rel("p") }
+        );
+    }
 }

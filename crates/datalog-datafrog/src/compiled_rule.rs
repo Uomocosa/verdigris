@@ -132,4 +132,49 @@ mod tests {
             vec![Value::Int(0), Value::Int(9)]
         );
     }
+
+    #[test]
+    fn test_examples_compiled_plan() {
+        use verdigris_datalog_ir::CmpOp;
+        let rule = Rule {
+            head: Atom {
+                rel: Rel("violates"),
+                terms: vec![Term::Var("C"), Term::Val(Value::Sym("sick"))],
+            },
+            body: vec![
+                Literal::Pos(Atom {
+                    rel: Rel("creature"),
+                    terms: vec![Term::Var("C")],
+                }),
+                Literal::Pos(Atom {
+                    rel: Rel("sick"),
+                    terms: vec![Term::Var("C")],
+                }),
+                Literal::Neg(Atom {
+                    rel: Rel("waived"),
+                    terms: vec![Term::Var("C"), Term::Val(Value::Sym("sick"))],
+                }),
+                Literal::Cmp(Term::Var("C"), CmpOp::Ne, Term::Val(Value::Sym("none"))),
+            ],
+        };
+        let compiled = CompiledRule::from(&rule);
+        println!("1. rule: {rule:?}");
+        println!("2. variables in join order: {:?}", compiled.variables);
+        println!("   positions: {:?}", compiled.positions);
+        println!("3. join steps in order:");
+        for (index, atom) in compiled.positives.iter().enumerate() {
+            println!("   step {index}: join {:?} on {:?}", *atom.rel, atom.terms);
+        }
+        for atom in &compiled.negatives {
+            println!("   antijoin: skip rows matching {atom:?}");
+        }
+        for (left, op, right) in &compiled.comparisons {
+            println!("   filter: {left:?} {op:?} {right:?}");
+        }
+        assert_eq!(compiled.variables, vec!["C"]);
+        assert_eq!(compiled.positives.len(), 2);
+        assert_eq!(compiled.negatives.len(), 1);
+        assert_eq!(compiled.comparisons.len(), 1);
+        assert!(!compiled.dead);
+    }
 }

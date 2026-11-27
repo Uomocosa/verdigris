@@ -91,4 +91,42 @@ mod tests {
         wired.pump();
         assert_eq!(wired.steps.len(), 1);
     }
+
+    #[test]
+    fn test_examples_wired_plan() {
+        let plan = CompiledRule::from(&Rule {
+            head: Atom {
+                rel: Rel("path"),
+                terms: vec![Term::Var("X"), Term::Var("Z")],
+            },
+            body: vec![
+                Literal::Pos(Atom {
+                    rel: Rel("path"),
+                    terms: vec![Term::Var("X"), Term::Var("Y")],
+                }),
+                Literal::Pos(Atom {
+                    rel: Rel("edge"),
+                    terms: vec![Term::Var("Y"), Term::Var("Z")],
+                }),
+            ],
+        });
+        let mut iteration = datafrog::Iteration::new();
+        let head_rows = iteration.variable::<Vec<Value>>("head");
+        let wired = WiredRule::from_plan(
+            plan,
+            &mut iteration,
+            &head_rows,
+            &[],
+            &std::collections::BTreeMap::default(),
+        );
+        println!("1. key columns per join step: {:?}", wired.key_columns);
+        println!("   next columns per join step: {:?}", wired.next_columns);
+        println!("   constant terms per step: {:?}", wired.constant_terms);
+        println!("   duplicate terms per step: {:?}", wired.duplicate_terms);
+        println!("2. step 0 has no key (first join seeds bindings)");
+        println!("   step 1 keys on Y, the variable step 0 bound");
+        assert_eq!(wired.key_columns, vec![vec![], vec![0]]);
+        assert_eq!(wired.next_columns, vec![vec![1], vec![]]);
+        assert_eq!(wired.steps.len(), 2);
+    }
 }

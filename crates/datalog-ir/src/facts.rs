@@ -43,4 +43,26 @@ mod tests {
         assert!(facts.contains(&Rel("edge"), &[Value::Int(1), Value::Int(2)]));
         assert!(!facts.contains(&Rel("edge"), &[Value::Int(2), Value::Int(1)]));
     }
+
+    #[test]
+    fn test_examples_facts() {
+        use crate::Term;
+        let mut facts = Facts::default();
+        assert!(facts.add(Rel("creature"), vec![Value::Sym("bears")]));
+        assert!(facts.add(Rel("creature"), vec![Value::Sym("goblin")]));
+        assert!(facts.add(Rel("tapped"), vec![Value::Sym("bears")]));
+        println!("1. facts in:");
+        for (relation, tuple) in facts.iter() {
+            println!("   {}({tuple:?})", *relation);
+        }
+        let matched = facts.matching(&Rel("tapped"), &[Term::Var("C")]);
+        println!("2. matching tapped(C) finds {} row(s):", matched.len());
+        for row in &matched {
+            println!("   tapped({row:?})");
+        }
+        assert_eq!(matched, vec![&vec![Value::Sym("bears")]]);
+        let none = facts.matching(&Rel("tapped"), &[Term::Val(Value::Sym("goblin"))]);
+        println!("3. matching tapped(goblin) finds {} row(s)", none.len());
+        assert_eq!(none, Vec::<&Vec<Value>>::new());
+    }
 }

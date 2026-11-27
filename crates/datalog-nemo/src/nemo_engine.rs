@@ -89,4 +89,93 @@ mod tests {
         assert_eq!(NemoEngine::render_term_text(&Term::Var("X")), "?X");
         assert_eq!(NemoEngine::render_term_text(&Term::Val(Value::Int(3))), "3");
     }
+
+    #[test]
+    fn test_examples_attack() {
+        use verdigris_datalog_ir::Literal;
+        use verdigris_datalog_ir::Rule;
+        let bears = Value::Sym("bears");
+        let goblin = Value::Sym("goblin");
+        let mut facts = Facts::default();
+        for (relation, tuple) in [
+            (Rel("creature"), vec![bears]),
+            (Rel("creature"), vec![goblin]),
+            (Rel("tapped"), vec![bears]),
+            (Rel("sick"), vec![goblin]),
+            (Rel("has_haste"), vec![goblin]),
+        ] {
+            assert!(facts.add(relation, tuple));
+        }
+        let pos1 = |rel: Rel, var: &'static str| {
+            Literal::Pos(Atom {
+                rel,
+                terms: vec![Term::Var(var)],
+            })
+        };
+        let tagged = |rel: Rel, var: &'static str, tag: &'static str| Atom {
+            rel,
+            terms: vec![Term::Var(var), Term::Val(Value::Sym(tag))],
+        };
+        let program = Program {
+            rules: vec![
+                Rule {
+                    head: tagged(Rel("waived"), "G", "sick"),
+                    body: vec![pos1(Rel("has_haste"), "G")],
+                },
+                Rule {
+                    head: tagged(Rel("violates"), "C", "untapped"),
+                    body: vec![pos1(Rel("creature"), "C"), pos1(Rel("tapped"), "C")],
+                },
+                Rule {
+                    head: tagged(Rel("violates"), "C", "sick"),
+                    body: vec![
+                        pos1(Rel("creature"), "C"),
+                        pos1(Rel("sick"), "C"),
+                        Literal::Neg(tagged(Rel("waived"), "C", "sick")),
+                    ],
+                },
+                Rule {
+                    head: Atom {
+                        rel: Rel("can_attack"),
+                        terms: vec![Term::Var("C")],
+                    },
+                    body: vec![
+                        pos1(Rel("creature"), "C"),
+                        Literal::Neg(tagged(Rel("violates"), "C", "untapped")),
+                        Literal::Neg(tagged(Rel("violates"), "C", "sick")),
+                    ],
+                },
+            ],
+        };
+        let text = NemoEngine::render_program_text(&program, &facts);
+        println!("1. nemo program sent:");
+        for line in text.lines() {
+            println!("   {line}");
+        }
+        let engine = NemoEngine;
+        let derived = engine.evaluate(&program, &facts).unwrap();
+        println!("2. rows read back per predicate:");
+        for predicate in ["waived", "violates", "can_attack"] {
+            let rows = derived.matching(&Rel(predicate), &[Term::Var("A"), Term::Var("B")]);
+            let single = derived.matching(&Rel(predicate), &[Term::Var("A")]);
+            if rows.is_empty() {
+                for row in &single {
+                    println!("   {predicate}({row:?})");
+                }
+            } else {
+                for row in &rows {
+                    println!("   {predicate}({row:?})");
+                }
+            }
+        }
+        let mut expected = facts.clone();
+        assert!(expected.add(Rel("waived"), vec![goblin, Value::Sym("sick")]));
+        assert!(expected.add(Rel("violates"), vec![bears, Value::Sym("untapped")]));
+        assert!(expected.add(Rel("can_attack"), vec![goblin]));
+        println!("3. pinned set is the datafrog result on");
+        println!("   the same input, checked by running both");
+        assert_eq!(derived, expected);
+        assert!(derived.contains(&Rel("can_attack"), &[goblin]));
+        assert!(!derived.contains(&Rel("can_attack"), &[bears]));
+    }
 }
