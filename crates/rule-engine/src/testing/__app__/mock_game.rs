@@ -2,12 +2,16 @@ use std::collections::BTreeMap;
 
 use atomic_delegate_macros::atomic_delegates;
 use bevy::ecs::query::QueryData;
+use bevy::ecs::system::RunSystemOnce;
 use bevy::prelude::{App, Component, Entity, Query};
 
+use crate::Game;
 use crate::actions;
 use crate::cards;
 use crate::damage;
+use crate::events;
 use crate::players;
+use crate::rules;
 use crate::testing;
 use crate::turns;
 use crate::zones;
@@ -169,6 +173,8 @@ impl MockGame {
         with: impl FnOnce(Query<'_, '_, D::ReadOnly>, Query<'_, '_, E::ReadOnly>) -> R,
     ) -> R {
     }
+
+    pub fn assert_legal_actions_agree(&mut self) -> testing::TestResult {}
 }
 
 #[atomic_delegates]
@@ -185,6 +191,56 @@ impl MockGame {
     pub(crate) fn rejection_count(&self) -> usize {}
 }
 
+impl MockGame {
+    pub(crate) fn oracle_engine_accepts(
+        &mut self,
+        holder: players::PlayerId,
+        action: &actions::Action,
+    ) -> bool {
+        match action.clone() {
+            actions::Action::Play(card) => self
+                .app
+                .world_mut()
+                .run_system_once(move |answers: rules::Rules| {
+                    answers.legality(&events::Play {
+                        card,
+                        player: holder,
+                    })
+                })
+                .is_ok_and(|outcome| outcome == rules::Legality::Legal),
+            actions::Action::Cast(spell) => self
+                .app
+                .world_mut()
+                .run_system_once(move |answers: rules::Rules| {
+                    answers.legality(&events::Cast {
+                        spell,
+                        caster: holder,
+                    })
+                })
+                .is_ok_and(|outcome| outcome == rules::Legality::Legal),
+            actions::Action::DeclareAttackers(attackers) => self
+                .app
+                .world_mut()
+                .run_system_once(move |turn: Game, answers: rules::Rules| {
+                    answers.validate_attackers(&turn, holder, &attackers).is_ok()
+                })
+                .is_ok_and(|outcome| outcome),
+            actions::Action::DeclareBlockers(assignments) => self
+                .app
+                .world_mut()
+                .run_system_once(move |turn: Game, answers: rules::Rules| {
+                    answers.validate_blockers(&turn, holder, &assignments).is_ok()
+                })
+                .is_ok_and(|outcome| outcome),
+            actions::Action::ActivateManaAbility { .. }
+            | actions::Action::PassPriority
+            | actions::Action::Concede
+            | actions::Action::Choose(_)
+            | actions::Action::AssignCombatDamage(_) => true,
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use bevy::prelude::Entity;
@@ -197,6 +253,17 @@ mod tests {
     use crate::{BATTLEFIELD, HAND, LIBRARY};
 
     use super::MockGame;
+
+    #[test]
+    fn oracle_engine_accepts_checks_play_and_cast() -> TestResult {
+        let (mut game, [p1, ..]) = MockGame::new([P1.hand([FOREST]), P2]);
+        let [forest] = game.player(p1).cards_in(HAND).exactly::<1>(FOREST)?;
+        game.app.update();
+
+        assert!(game.oracle_engine_accepts(p1.id, &actions::Action::Play(forest.into())));
+        assert!(!game.oracle_engine_accepts(p1.id, &actions::Action::Cast(forest.into())));
+        Ok(())
+    }
 
     #[test]
     fn test_usage() -> TestResult {

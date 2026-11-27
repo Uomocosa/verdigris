@@ -1,3 +1,4 @@
+mod assert_legal_actions_agree;
 mod cards_in_zone;
 mod last_rejection;
 mod p;
@@ -9,6 +10,7 @@ mod target_choice;
 mod trigger_sources;
 mod with_queries;
 mod with_query;
+pub use assert_legal_actions_agree::assert_legal_actions_agree;
 pub use cards_in_zone::cards_in_zone;
 pub use last_rejection::last_rejection;
 pub use p::p;

@@ -205,6 +205,7 @@ mod tests {
             },
             rules::Legality::Illegal(vec![rules::Why::Restriction(keywords::flying::BLOCKERS)])
         )));
+        game.assert_legal_actions_agree()?;
 
         game.act(p2, actions::Action::DeclareBlockers(assignments.clone()));
 

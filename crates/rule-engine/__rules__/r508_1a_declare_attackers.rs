@@ -141,6 +141,7 @@ mod tests {
             p1.pass_to(turns::Step::DeclareAttackers),
             p2.pass_to(turns::Step::DeclareAttackers),
         ])?;
+        game.assert_legal_actions_agree()?;
 
         game.act(p1, actions::Action::DeclareAttackers(vec![bears.into()]));
 

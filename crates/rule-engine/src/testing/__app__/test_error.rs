@@ -6,4 +6,6 @@ pub enum TestError {
     Cards(#[from] testing::CardsError),
     #[error(transparent)]
     Play(#[from] testing::PlayError),
+    #[error("legal actions disagree with the engine:\n{0}")]
+    OracleDisagreement(String),
 }

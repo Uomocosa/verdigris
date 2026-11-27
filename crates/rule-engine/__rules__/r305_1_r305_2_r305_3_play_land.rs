@@ -139,6 +139,7 @@ mod tests {
         );
 
         game.play([p1.play_land(forest_1)])?;
+        game.assert_legal_actions_agree()?;
         game.act(p1, actions::Action::Play(forest_2.into()));
 
         assert!(game.moved(forest_1).to(BATTLEFIELD).of(p1));
