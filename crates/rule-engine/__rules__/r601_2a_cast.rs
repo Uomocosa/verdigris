@@ -143,7 +143,7 @@ mod tests {
             })
         );
         assert!(game.card(forest).is_in(HAND).of(p1));
-        assert!(game.stack().matching(forest).is_empty());
+        assert!(!game.card(forest).is_on_the_stack());
         Ok(())
     }
 
@@ -163,7 +163,7 @@ mod tests {
             })
         );
         assert!(game.card(divination).is_in(HAND).of(p1));
-        assert!(game.stack().matching(divination).is_empty());
+        assert!(!game.card(divination).is_on_the_stack());
         Ok(())
     }
 
@@ -239,7 +239,7 @@ mod tests {
             })
         );
         assert!(game.card(divination).is_in(HAND).of(p2));
-        assert!(game.stack().matching(divination).is_empty());
+        assert!(!game.card(divination).is_on_the_stack());
         Ok(())
     }
 
@@ -258,7 +258,7 @@ mod tests {
             })
         );
         assert!(game.card(forest).is_in(HAND).of(p1));
-        assert!(game.stack().matching(forest).is_empty());
+        assert!(!game.card(forest).is_on_the_stack());
         Ok(())
     }
 }

@@ -165,7 +165,7 @@ mod tests {
             Some(&actions::Rejected::CannotCast { spell: bolt.into() })
         );
         assert!(game.card(bolt).is_in(HAND).of(p1));
-        assert!(game.stack().matching(bolt).is_empty());
+        assert!(!game.card(bolt).is_on_the_stack());
         Ok(())
     }
 

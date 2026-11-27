@@ -1,9 +1,12 @@
+use atomic_delegate_macros::atomic_delegates;
+
 use crate::testing;
 use crate::zones;
 
+#[derive(Clone, Copy)]
 pub struct CardCheck<'g> {
-    game: &'g testing::MockGame,
-    card: testing::TestCard,
+    pub(crate) game: &'g testing::MockGame,
+    pub(crate) card: testing::TestCard,
 }
 
 impl<'g> CardCheck<'g> {
@@ -13,6 +16,12 @@ impl<'g> CardCheck<'g> {
     ) -> Self {
         Self { game, card }
     }
+}
+
+#[atomic_delegates]
+impl CardCheck<'_> {
+    #[must_use]
+    pub fn is_on_the_stack(self) -> bool {}
 }
 
 #[rustfmt::skip]

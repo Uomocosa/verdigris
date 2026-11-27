@@ -110,7 +110,7 @@ mod tests {
             })
         );
         assert!(game.moved(bears).to(HAND).of(p1));
-        assert!(game.stack().matching(bears).is_empty());
+        assert!(!game.card(bears).is_on_the_stack());
         assert_eq!(game.mana_pool(p1), mana![1]);
         Ok(())
     }

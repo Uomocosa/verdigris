@@ -4,6 +4,8 @@ pub mod action;
 pub mod all;
 pub mod assign_combat_damage;
 pub mod attempt;
+#[cfg(feature = "testing")]
+pub mod card_check;
 pub mod card_definition;
 #[cfg(feature = "testing")]
 pub mod cards;

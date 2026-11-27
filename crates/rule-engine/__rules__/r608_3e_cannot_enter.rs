@@ -59,7 +59,7 @@ mod tests {
         game.play([p1.cast(bears).pass_priority(), p2.pass_priority()])?;
         assert!(game.moved(bears).to(GRAVEYARD).of(p1));
         assert!(!game.card(bears).is_in(BATTLEFIELD).of(p1));
-        assert!(game.stack().matching(bears).is_empty());
+        assert!(!game.card(bears).is_on_the_stack());
         Ok(())
     }
 }
