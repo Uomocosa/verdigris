@@ -20,16 +20,6 @@ pub fn accepts(choice: &actions::Choice, answer: &actions::Action) -> bool {
             };
             choice.check(picked).is_ok()
         }
-        actions::Choice::Target(choice) => {
-            let actions::Action::ChooseTargets(chosen) = answer else {
-                return false;
-            };
-            let chosen_set: BTreeSet<Entity> = chosen.iter().copied().collect();
-            !chosen.is_empty()
-                && u32::try_from(chosen.len()).unwrap_or(u32::MAX) == choice.count
-                && chosen_set.len() == chosen.len()
-                && chosen_set.is_subset(&choice.legal)
-        }
         actions::Choice::DefendingPlayer(choice) => {
             let actions::Action::ChooseDefendingPlayer(chosen) = answer else {
                 return false;

@@ -7,7 +7,7 @@ use crate::cards;
 use crate::effects;
 use crate::stack;
 use crate::zones;
-use crate::{HAND, STACK};
+use crate::{HAND, STACK, TARGET};
 
 type AskedSpell<'w, 's> = Query<
     'w,
@@ -99,30 +99,36 @@ fn ask_for_targets(
             }
             continue;
         }
-        asks.write(actions::Ask(actions::Choice::Target(
-            actions::TargetChoice {
-                player: controller,
-                spell,
-                count: target.count,
-                legal,
-            },
-        )));
+        asks.write(actions::Ask(actions::Choice::Pick(actions::PickChoice {
+            id: TARGET,
+            player: controller,
+            source: Some(spell),
+            among: legal,
+            count: actions::Count::exactly(target.count),
+            ordered: false,
+        })));
         commands.entity(spell).insert(stack::CastingStage::AwaitingTargets);
     }
 }
 
 fn take_the_chosen_targets(mut answers: MessageReader<actions::Answered>, mut commands: Commands) {
     for answered in answers.read() {
-        let actions::Choice::Target(choice) = &answered.choice else {
+        let actions::Choice::Pick(choice) = &answered.choice else {
             continue;
         };
-        let actions::Action::ChooseTargets(targets) = &answered.answer else {
+        if choice.id != TARGET {
+            continue;
+        }
+        let actions::Action::Choose(targets) = &answered.answer else {
             continue;
         };
         let Some(first) = targets.first() else {
             continue;
         };
-        commands.entity(choice.spell).insert((
+        let Some(spell) = choice.source else {
+            continue;
+        };
+        commands.entity(spell).insert((
             stack::ChosenTarget(*first),
             stack::CastingStage::AwaitingPayment,
         ));
@@ -190,11 +196,11 @@ mod tests {
         let [blade] = game.player(p1).cards_in(HAND).exactly::<1>(DOOM_BLADE)?;
         let [corpse] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(WALKING_CORPSE)?;
         let err = game.play([p1.cast(blade).targeting(corpse)]).unwrap_err();
-        let [blade_on_stack] = game.stack().exactly::<1>(DOOM_BLADE)?;
         assert_eq!(
             err.rejection(),
-            Some(&actions::Rejected::InvalidTargets {
-                spell: blade_on_stack.into()
+            Some(&actions::Rejected::InvalidChoice {
+                player: p1.id,
+                why: actions::ChoiceWhy::NotAllowed(corpse.into())
             })
         );
         Ok(())
@@ -237,12 +243,12 @@ mod tests {
             Some(pick(1).from([bolt_on_stack.into()]))
         );
 
-        game.act(p1, actions::Action::ChooseTargets(vec![bears.into()]));
-        let [cancel_on_stack] = game.stack().exactly::<1>(CANCEL)?;
+        game.act(p1, actions::Action::Choose(vec![bears.into()]));
         assert_eq!(
             game.last_rejection(),
-            Some(&actions::Rejected::InvalidTargets {
-                spell: cancel_on_stack.into()
+            Some(&actions::Rejected::InvalidChoice {
+                player: p1.id,
+                why: actions::ChoiceWhy::NotAllowed(bears.into())
             })
         );
         Ok(())

@@ -5,14 +5,6 @@ use std::collections::{BTreeMap, BTreeSet};
 use crate::players;
 use crate::rules;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct TargetChoice {
-    pub player: players::PlayerId,
-    pub spell: Entity,
-    pub count: u32,
-    pub legal: BTreeSet<Entity>,
-}
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct BlockAssignment {
     pub blocker: Entity,

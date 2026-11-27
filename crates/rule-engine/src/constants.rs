@@ -41,3 +41,5 @@ pub const ASSIGNS_AGAIN: rules::DefinitionId = rules::DefinitionId("510.4/assign
 pub const RESOLUTION_CAUSE: rules::EventId = rules::EventId("608.2/resolve");
 
 pub const LEGEND: actions::ChoiceId = actions::ChoiceId("704.5j");
+
+pub const TARGET: actions::ChoiceId = actions::ChoiceId("601.2c");

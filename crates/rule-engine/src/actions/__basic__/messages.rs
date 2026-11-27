@@ -44,9 +44,6 @@ pub enum Rejected {
     CannotPay {
         spell: Entity,
     },
-    InvalidTargets {
-        spell: Entity,
-    },
     InvalidChoice {
         player: players::PlayerId,
         why: actions::ChoiceWhy,

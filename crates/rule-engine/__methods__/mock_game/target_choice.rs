@@ -1,12 +1,13 @@
+use crate::TARGET;
 use crate::actions;
 use crate::testing;
 
 pub fn target_choice(game: &testing::MockGame) -> Option<testing::ExpectedTargets> {
     let pending = game.app.world().get_resource::<actions::PendingChoice>()?.as_ref()?;
     match pending {
-        actions::Choice::Target(choice) => Some(testing::ExpectedTargets {
-            count: choice.count,
-            legal: choice.legal.clone(),
+        actions::Choice::Pick(choice) if choice.id == TARGET => Some(testing::ExpectedTargets {
+            count: choice.count.max,
+            legal: choice.among.clone(),
         }),
         actions::Choice::Pick(_)
         | actions::Choice::May(_)

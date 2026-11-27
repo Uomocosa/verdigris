@@ -23,9 +23,6 @@ impl TestPlayerActions {
 #[atomic_delegates]
 impl TestPlayerActions {
     #[must_use]
-    pub fn targeting(self, targets: impl Into<testing::Targets>) -> Self {}
-
-    #[must_use]
     pub fn declare_attackers<const N: usize>(self, attackers: [testing::TestCard; N]) -> Self {}
 
     #[must_use]
@@ -54,6 +51,9 @@ impl TestPlayerActions {
 
 #[rustfmt::skip]
 impl TestPlayerActions {
+    #[must_use]
+    pub fn targeting(self, targets: impl Into<testing::Targets>) -> Self { self.act(actions::Action::Choose(targets.into().into_entities())) }
+
     #[must_use]
     pub fn pass_priority(self) -> Self { self.act(actions::Action::PassPriority) }
 
@@ -137,6 +137,7 @@ impl TestPlayerActions {
 mod tests {
     use bevy::prelude::World;
 
+    use crate::actions;
     use crate::testing;
     use crate::turns;
 
@@ -155,6 +156,26 @@ mod tests {
                 player: caster,
                 until: testing::AutoPassUntil::StepStarts(turns::Step::PostcombatMain),
             }]
+        );
+    }
+
+    #[test]
+    fn targeting_answers_with_the_chosen_targets() {
+        let mut world = World::new();
+        let caster = world.spawn_empty().id();
+        let target = world.spawn_empty().id();
+
+        assert_eq!(
+            testing::TestPlayerActions::of(testing::TestPlayer::from_entity_and_seat(
+                caster,
+                testing::PlayerSeat(1)
+            ))
+            .targeting(target)
+            .steps,
+            vec![testing::PlayStep::Act(
+                caster,
+                actions::Action::Choose(vec![target])
+            )]
         );
     }
 }

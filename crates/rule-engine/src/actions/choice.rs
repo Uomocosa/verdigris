@@ -1,13 +1,13 @@
 use atomic_delegate_macros::atomic_delegates;
 
 use crate::LEGEND;
+use crate::TARGET;
 use crate::actions;
 use crate::players;
 use crate::rules;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Choice {
-    Target(actions::TargetChoice),
     May(actions::MayChoice),
     Pick(actions::PickChoice),
     CombatDamage(actions::CombatDamageChoice),
@@ -40,7 +40,6 @@ impl Choice {
     #[must_use]
     pub const fn player(&self) -> players::PlayerId {
         match self {
-            Self::Target(choice) => choice.player,
             Self::May(choice) => choice.player,
             Self::Pick(choice) => choice.player,
             Self::CombatDamage(choice) => choice.player,
@@ -65,10 +64,14 @@ impl Choice {
     }
 }
 
-#[rustfmt::skip]
 impl Choice {
     #[must_use]
-    pub(crate) const fn blocks_priority(&self) -> bool { !matches!(self, Self::Target(_)) }
+    pub(crate) fn blocks_priority(&self) -> bool {
+        match self {
+            Self::Pick(choice) => choice.id != TARGET,
+            _ => true,
+        }
+    }
 }
 
 #[cfg(test)]
@@ -78,6 +81,7 @@ mod tests {
     use crate::BATTLEFIELD;
     use crate::HAND;
     use crate::LEGEND;
+    use crate::TARGET;
     use crate::actions;
     use crate::players;
     use crate::rules;
@@ -102,11 +106,13 @@ mod tests {
         let chooser = p1.id;
         let event = rules::EventId("may");
         let choices = [
-            actions::Choice::Target(actions::TargetChoice {
+            actions::Choice::Pick(actions::PickChoice {
+                id: TARGET,
                 player: chooser,
-                spell: first,
-                count: 1,
-                legal: BTreeSet::from([first]),
+                source: Some(first),
+                among: BTreeSet::from([first]),
+                count: actions::Count::exactly(1),
+                ordered: false,
             }),
             actions::Choice::May(actions::MayChoice {
                 player: chooser,

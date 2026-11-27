@@ -15,7 +15,7 @@ pub use basic::newtypes::ChoiceId;
 pub use basic::resources::{AcceptedMays, PendingMayAsks};
 pub use basic::structs::{
     ArrangeGraveyardChoice, BlockAssignment, DamageAssignment, DefendingPlayerChoice, MayChoice,
-    OrderTriggersChoice, RequiredCombatDamage, TargetChoice,
+    OrderTriggersChoice, RequiredCombatDamage,
 };
 pub use choice::Choice;
 pub use count::Count;

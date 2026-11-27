@@ -13,7 +13,6 @@ pub enum Action {
     },
     Cast(Entity),
     Play(Entity),
-    ChooseTargets(Vec<Entity>),
     ChooseMay(Vec<Entity>),
     Choose(Vec<Entity>),
     ChooseDefendingPlayer(players::PlayerId),
@@ -73,14 +72,9 @@ mod tests {
         assert_eq!(actions::Action::Choose(Vec::new()).rejection(p1.id), None);
         assert!(actions::Action::ChooseMay(Vec::new()).answers_a_choice());
         assert!(actions::Action::Choose(Vec::new()).answers_a_choice());
-        assert!(actions::Action::ChooseTargets(Vec::new()).answers_a_choice());
         assert!(actions::Action::Choose(vec![legend]).answers_a_choice());
         assert!(!actions::Action::PassPriority.answers_a_choice());
         assert_eq!(actions::Action::Choose(vec![legend]).rejection(p1.id), None);
-        assert_eq!(
-            actions::Action::ChooseTargets(Vec::new()).rejection(p1.id),
-            None
-        );
         assert_eq!(actions::Action::PassPriority.rejection(p1.id), None);
     }
 }

@@ -7,9 +7,6 @@ pub fn rejection(
     answer: &actions::Action,
 ) -> Option<actions::Rejected> {
     match choice {
-        actions::Choice::Target(choice) => Some(actions::Rejected::InvalidTargets {
-            spell: choice.spell,
-        }),
         actions::Choice::May(_) => Some(actions::Rejected::InvalidMay { player }),
         actions::Choice::Pick(choice) => {
             let picked = match answer {

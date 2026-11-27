@@ -152,7 +152,7 @@ mod tests {
             error,
             PlayError::Rejected {
                 index: 1,
-                step: PlayStep::Act(*p1, actions::Action::ChooseTargets(vec![*p2])),
+                step: PlayStep::Act(*p1, actions::Action::Choose(vec![*p2])),
                 rejection: actions::Rejected::CannotPay {
                     spell: bolt_back.into()
                 },
