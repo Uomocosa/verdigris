@@ -1,3 +1,4 @@
+use bevy::prelude::Entity;
 use bevy::prelude::Resource;
 use derive_more::{Deref, DerefMut};
 
@@ -17,4 +18,5 @@ pub struct AcceptedMays<E: Event>(pub Vec<May<E>>);
 pub struct LegalActions {
     pub player: Option<players::PlayerId>,
     pub actions: Vec<(actions::Action, rules::Legality)>,
+    pub attackers: Vec<(Entity, rules::Legality)>,
 }

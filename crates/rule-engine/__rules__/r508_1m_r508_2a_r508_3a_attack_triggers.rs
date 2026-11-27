@@ -42,7 +42,9 @@ pub fn r508_1m_r508_2a_r508_3a_attack_triggers(
 #[cfg(test)]
 mod tests {
     use crate::BATTLEFIELD;
+    use crate::actions;
     use crate::pt;
+    use crate::rules;
     use crate::testing::*;
     use crate::turns;
 
@@ -89,8 +91,6 @@ mod tests {
 
     #[test]
     fn an_illegal_declaration_triggers_nothing() -> TestResult {
-        use crate::actions;
-
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield([BORDERLAND_MARAUDER]),
             P2.battlefield([BORDERLAND_MARAUDER]),
@@ -106,7 +106,11 @@ mod tests {
         assert_eq!(
             game.last_rejection(),
             Some(&actions::Rejected::CannotAttack {
-                attackers: vec![marauder.into()]
+                attackers: vec![marauder.into()],
+                why: vec![actions::DeclarationWhy {
+                    creature: Some(marauder.into()),
+                    why: rules::Why::NotYours,
+                }],
             })
         );
         assert_eq!(game.trigger_sources().len(), 0);

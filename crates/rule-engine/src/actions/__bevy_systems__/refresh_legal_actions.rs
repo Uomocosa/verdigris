@@ -1,10 +1,12 @@
-use bevy::prelude::{Res, ResMut};
+use bevy::prelude::{Entity, Res, ResMut};
 
 use crate::Game;
 use crate::ORDER_TRIGGERS;
 use crate::actions;
+use crate::cards;
 use crate::events;
 use crate::rules;
+use crate::turns;
 
 pub fn refresh_legal_actions(
     mut legal: ResMut<actions::LegalActions>,
@@ -20,6 +22,7 @@ pub fn refresh_legal_actions(
                 *legal = actions::LegalActions {
                     player: Some(pick.player),
                     actions: Vec::new(),
+                    attackers: Vec::new(),
                 };
             }
             actions::Choice::Pick(pick) => {
@@ -36,12 +39,14 @@ pub fn refresh_legal_actions(
                 *legal = actions::LegalActions {
                     player: Some(pick.player),
                     actions: previews,
+                    attackers: Vec::new(),
                 };
             }
             actions::Choice::CombatDamage(_) => {
                 *legal = actions::LegalActions {
                     player: Some(choice.player()),
                     actions: Vec::new(),
+                    attackers: Vec::new(),
                 };
             }
         }
@@ -51,6 +56,7 @@ pub fn refresh_legal_actions(
         *legal = actions::LegalActions {
             player: None,
             actions: Vec::new(),
+            attackers: Vec::new(),
         };
         return;
     };
@@ -70,8 +76,33 @@ pub fn refresh_legal_actions(
     ) {
         refreshed.push((actions::Action::Cast(event.spell), legality));
     }
+    let mut attackers: Vec<(Entity, rules::Legality)> = Vec::new();
+    if game.active_player().is_some_and(|active_player| active_player.id == player)
+        && game.turn().step() == Some(turns::Step::DeclareAttackers)
+    {
+        for candidate in answers.entities.iter() {
+            if candidate.get::<cards::Creature>().is_some()
+                && candidate
+                    .get::<cards::Controller>()
+                    .is_some_and(|controller| **controller == player)
+            {
+                let creature = candidate.id();
+                let legality = match answers.validate_attackers(&game, player, &[creature]) {
+                    Ok(()) => rules::Legality::Legal,
+                    Err(whys) => rules::Legality::Illegal(
+                        whys.into_iter()
+                            .filter(|why| why.creature == Some(creature))
+                            .map(|why| why.why)
+                            .collect(),
+                    ),
+                };
+                attackers.push((creature, legality));
+            }
+        }
+    }
     *legal = actions::LegalActions {
         player: Some(player),
         actions: refreshed,
+        attackers,
     };
 }

@@ -1,12 +1,10 @@
-use bevy::prelude::{Entity, MessageReader, MessageWriter, Query, With};
+use bevy::prelude::{MessageReader, MessageWriter};
 
 use crate::Attempt;
 use crate::Game;
 use crate::actions;
-use crate::cards;
 use crate::events;
 use crate::rules;
-use crate::turns;
 
 /// 508.1a The active player chooses which creatures that they control, if any, will attack. The
 /// chosen creatures must be untapped, they can’t also be battles, and each one must either have
@@ -42,49 +40,16 @@ pub fn r508_1a_declare_attackers(
     mut rejected: MessageWriter<actions::Rejected>,
     mut declared: MessageWriter<Attempt<events::DeclareAttackers>>,
     game: Game,
-    candidates: Query<(Entity, &cards::Controller), With<cards::Creature>>,
     answers: rules::Rules,
 ) {
     for action in actions.read() {
         let actions::Action::DeclareAttackers(attackers) = &action.action else {
             continue;
         };
-        if game.turn().step() != Some(turns::Step::DeclareAttackers)
-            || game.priority_holder().is_none_or(|holder| holder.id != action.player)
-            || game.active_player().is_none_or(|active_player| active_player.id != action.player)
-        {
+        if let Err(why) = answers.validate_attackers(&game, action.player, attackers) {
             rejected.write(actions::Rejected::CannotAttack {
                 attackers: attackers.clone(),
-            });
-            continue;
-        }
-        let all_legal = attackers.iter().all(|attacker| {
-            candidates
-                .iter()
-                .any(|(entity, controller)| entity == *attacker && **controller == action.player)
-                && answers.legal(&events::DeclareAttackers {
-                    attackers: vec![*attacker],
-                })
-        });
-        let requirement_unmet = candidates.iter().any(|(entity, controller)| {
-            **controller == action.player
-                && answers.required::<events::DeclareAttackers>(entity)
-                && answers.legal(&events::DeclareAttackers {
-                    attackers: vec![entity],
-                })
-                && !attackers.contains(&entity)
-        });
-        if !all_legal || requirement_unmet {
-            rejected.write(actions::Rejected::CannotAttack {
-                attackers: attackers.clone(),
-            });
-            continue;
-        }
-        if !answers.legal(&events::DeclareAttackers {
-            attackers: attackers.clone(),
-        }) {
-            rejected.write(actions::Rejected::CannotAttack {
-                attackers: attackers.clone(),
+                why,
             });
             continue;
         }
@@ -101,6 +66,8 @@ mod tests {
     use crate::BATTLEFIELD;
     use crate::actions;
     use crate::events;
+    use crate::keywords;
+    use crate::rules;
     use crate::testing::*;
     use crate::turns;
 
@@ -121,7 +88,11 @@ mod tests {
         assert_eq!(
             game.last_rejection(),
             Some(&actions::Rejected::CannotAttack {
-                attackers: vec![bears.into()]
+                attackers: vec![bears.into()],
+                why: vec![actions::DeclarationWhy {
+                    creature: Some(bears.into()),
+                    why: rules::Why::NotYours,
+                }],
             })
         );
         assert!(!game.is_attacking(bears));
@@ -142,7 +113,21 @@ mod tests {
         assert_eq!(
             game.last_rejection(),
             Some(&actions::Rejected::CannotAttack {
-                attackers: vec![tundra.into()]
+                attackers: vec![tundra.into()],
+                why: vec![
+                    actions::DeclarationWhy {
+                        creature: Some(tundra.into()),
+                        why: rules::Why::NotYours,
+                    },
+                    actions::DeclarationWhy {
+                        creature: Some(tundra.into()),
+                        why: rules::Why::Restriction(events::declare_attackers::CREATURE),
+                    },
+                    actions::DeclarationWhy {
+                        creature: None,
+                        why: rules::Why::Restriction(events::declare_attackers::CREATURE),
+                    },
+                ],
             })
         );
         assert!(!game.is_attacking(tundra));
@@ -163,10 +148,28 @@ mod tests {
 
         game.act(p1, actions::Action::DeclareAttackers(vec![bears.into()]));
 
+        game.app.update();
+        let legal = game.app.world().resource::<actions::LegalActions>().clone();
+        assert!(legal.attackers.contains(&(
+            bears.into(),
+            rules::Legality::Illegal(vec![rules::Why::Restriction(
+                events::declare_attackers::UNTAPPED
+            )])
+        )));
         assert_eq!(
             game.last_rejection(),
             Some(&actions::Rejected::CannotAttack {
-                attackers: vec![bears.into()]
+                attackers: vec![bears.into()],
+                why: vec![
+                    actions::DeclarationWhy {
+                        creature: Some(bears.into()),
+                        why: rules::Why::Restriction(events::declare_attackers::UNTAPPED),
+                    },
+                    actions::DeclarationWhy {
+                        creature: None,
+                        why: rules::Why::Restriction(events::declare_attackers::UNTAPPED),
+                    },
+                ],
             })
         );
         assert!(!game.is_attacking(bears));
@@ -192,7 +195,29 @@ mod tests {
         assert_eq!(
             game.last_rejection(),
             Some(&actions::Rejected::CannotAttack {
-                attackers: vec![corpse.into()]
+                attackers: vec![corpse.into()],
+                why: vec![
+                    actions::DeclarationWhy {
+                        creature: Some(corpse.into()),
+                        why: rules::Why::NotYours,
+                    },
+                    actions::DeclarationWhy {
+                        creature: Some(corpse.into()),
+                        why: rules::Why::Restriction(events::declare_attackers::CREATURE),
+                    },
+                    actions::DeclarationWhy {
+                        creature: Some(corpse.into()),
+                        why: rules::Why::Restriction(events::declare_attackers::CONTROLS),
+                    },
+                    actions::DeclarationWhy {
+                        creature: None,
+                        why: rules::Why::Restriction(events::declare_attackers::CREATURE),
+                    },
+                    actions::DeclarationWhy {
+                        creature: None,
+                        why: rules::Why::Restriction(events::declare_attackers::CONTROLS),
+                    },
+                ],
             })
         );
         assert!(!game.is_attacking(corpse));
@@ -213,7 +238,17 @@ mod tests {
         assert_eq!(
             game.last_rejection(),
             Some(&actions::Rejected::CannotAttack {
-                attackers: vec![wall.into()]
+                attackers: vec![wall.into()],
+                why: vec![
+                    actions::DeclarationWhy {
+                        creature: Some(wall.into()),
+                        why: rules::Why::Restriction(keywords::defender::CANT_ATTACK),
+                    },
+                    actions::DeclarationWhy {
+                        creature: None,
+                        why: rules::Why::Restriction(keywords::defender::CANT_ATTACK),
+                    },
+                ],
             })
         );
         assert!(!game.is_attacking(wall));
@@ -253,7 +288,11 @@ mod tests {
         assert_eq!(
             game.last_rejection(),
             Some(&actions::Rejected::CannotAttack {
-                attackers: vec![goblin_on_battlefield.into(), corpse_on_battlefield.into()]
+                attackers: vec![goblin_on_battlefield.into(), corpse_on_battlefield.into()],
+                why: vec![actions::DeclarationWhy {
+                    creature: Some(corpse_on_battlefield.into()),
+                    why: rules::Why::Restriction(events::declare_attackers::SUMMONING_SICK),
+                }],
             })
         );
         assert!(!game.is_attacking(goblin_on_battlefield));
@@ -285,7 +324,13 @@ mod tests {
         game.act(p1, actions::Action::DeclareAttackers(vec![]));
         assert_eq!(
             game.last_rejection(),
-            Some(&actions::Rejected::CannotAttack { attackers: vec![] })
+            Some(&actions::Rejected::CannotAttack {
+                attackers: vec![],
+                why: vec![actions::DeclarationWhy {
+                    creature: Some(feast.into()),
+                    why: rules::Why::Required,
+                }],
+            })
         );
         assert!(!game.is_attacking(feast));
 
@@ -293,7 +338,11 @@ mod tests {
         assert_eq!(
             game.last_rejection(),
             Some(&actions::Rejected::CannotAttack {
-                attackers: vec![bears.into()]
+                attackers: vec![bears.into()],
+                why: vec![actions::DeclarationWhy {
+                    creature: Some(feast.into()),
+                    why: rules::Why::Required,
+                }],
             })
         );
         assert!(!game.is_attacking(bears));
@@ -407,7 +456,13 @@ mod tests {
         game.act(p1, actions::Action::DeclareAttackers(vec![]));
         assert_eq!(
             game.last_rejection(),
-            Some(&actions::Rejected::CannotAttack { attackers: vec![] })
+            Some(&actions::Rejected::CannotAttack {
+                attackers: vec![],
+                why: vec![actions::DeclarationWhy {
+                    creature: Some(bears.into()),
+                    why: rules::Why::Required,
+                }],
+            })
         );
         assert!(!game.is_attacking(bears));
 
@@ -435,7 +490,13 @@ mod tests {
         game.act(p1, actions::Action::DeclareAttackers(vec![]));
         assert_eq!(
             game.last_rejection(),
-            Some(&actions::Rejected::CannotAttack { attackers: vec![] })
+            Some(&actions::Rejected::CannotAttack {
+                attackers: vec![],
+                why: vec![actions::DeclarationWhy {
+                    creature: Some(bears.into()),
+                    why: rules::Why::Required,
+                }],
+            })
         );
         assert!(!game.is_attacking(bears));
 
@@ -500,7 +561,11 @@ mod tests {
         assert_eq!(
             game.last_rejection(),
             Some(&actions::Rejected::CannotAttack {
-                attackers: vec![bears_1.into(), bears_2.into()]
+                attackers: vec![bears_1.into(), bears_2.into()],
+                why: vec![actions::DeclarationWhy {
+                    creature: None,
+                    why: rules::Why::Restriction(rules::RestrictionId("test/silent-arbiter")),
+                }],
             })
         );
         assert!(!game.is_attacking(bears_1));

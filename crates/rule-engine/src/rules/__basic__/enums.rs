@@ -61,6 +61,9 @@ pub enum Legality {
 pub enum Why {
     Restriction(rules::RestrictionId),
     NotPerformable,
+    NotYours,
+    Required,
+    WrongTiming,
 }
 
 #[must_use]

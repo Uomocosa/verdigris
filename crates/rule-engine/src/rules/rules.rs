@@ -3,6 +3,8 @@ use bevy::ecs::resource::IsResource;
 use bevy::ecs::system::SystemParam;
 use bevy::prelude::{Entity, EntityRef, Query, Without};
 
+use crate::Game;
+use crate::actions;
 use crate::cards;
 use crate::effects;
 use crate::keywords;
@@ -60,6 +62,15 @@ impl Rules<'_, '_> {
 
     #[must_use]
     pub fn value<V: rules::traits::value_rule::ValueRule>(&self, entity: Entity) -> rules::Limit {}
+
+    #[must_use]
+    pub fn validate_attackers(
+        &self,
+        game: &Game,
+        player: players::PlayerId,
+        attackers: &[Entity],
+    ) -> Result<(), Vec<actions::DeclarationWhy>> {
+    }
 
     #[must_use]
     pub fn defines<E: rules::traits::event::Event>(

@@ -32,6 +32,7 @@ mod tests {
     use crate::actions;
     use crate::cards;
     use crate::mana;
+    use crate::rules;
     use crate::testing::*;
     use crate::turns;
     use crate::{BATTLEFIELD, GRAVEYARD, HAND};
@@ -226,7 +227,11 @@ mod tests {
         assert_eq!(
             game.last_rejection(),
             Some(&actions::Rejected::CannotAttack {
-                attackers: vec![bears.into()]
+                attackers: vec![bears.into()],
+                why: vec![actions::DeclarationWhy {
+                    creature: None,
+                    why: rules::Why::WrongTiming,
+                }],
             })
         );
         assert!(!game.is_attacking(bears));

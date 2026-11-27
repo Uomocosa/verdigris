@@ -715,7 +715,29 @@ mod tests {
         assert_eq!(
             fresh.last_rejection(),
             Some(&actions::Rejected::CannotAttack {
-                attackers: vec![resting.into()]
+                attackers: vec![resting.into()],
+                why: vec![
+                    actions::DeclarationWhy {
+                        creature: Some(resting.into()),
+                        why: rules::Why::NotYours,
+                    },
+                    actions::DeclarationWhy {
+                        creature: Some(resting.into()),
+                        why: rules::Why::Restriction(events::declare_attackers::CREATURE),
+                    },
+                    actions::DeclarationWhy {
+                        creature: Some(resting.into()),
+                        why: rules::Why::Restriction(events::declare_attackers::CONTROLS),
+                    },
+                    actions::DeclarationWhy {
+                        creature: None,
+                        why: rules::Why::Restriction(events::declare_attackers::CREATURE),
+                    },
+                    actions::DeclarationWhy {
+                        creature: None,
+                        why: rules::Why::Restriction(events::declare_attackers::CONTROLS),
+                    },
+                ],
             })
         );
         assert!(!fresh.is_attacking(resting));

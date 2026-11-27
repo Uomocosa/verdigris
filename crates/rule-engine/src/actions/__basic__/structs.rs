@@ -2,6 +2,14 @@ use bevy::prelude::Entity;
 
 use std::collections::{BTreeMap, BTreeSet};
 
+use crate::rules;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct DeclarationWhy {
+    pub creature: Option<Entity>,
+    pub why: rules::Why,
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct BlockAssignment {
     pub blocker: Entity,

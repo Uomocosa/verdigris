@@ -13,7 +13,7 @@ pub use basic::enums::ChoiceWhy;
 pub use basic::messages::{Answered, Ask, DiscardRequest, PlayerAction, Rejected};
 pub use basic::newtypes::ChoiceId;
 pub use basic::resources::{AcceptedMays, LegalActions, PendingMayAsks};
-pub use basic::structs::{BlockAssignment, DamageAssignment, RequiredCombatDamage};
+pub use basic::structs::{BlockAssignment, DamageAssignment, DeclarationWhy, RequiredCombatDamage};
 pub use choice::Choice;
 pub use count::Count;
 pub use pending_choice::PendingChoice;

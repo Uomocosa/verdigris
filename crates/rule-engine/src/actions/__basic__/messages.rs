@@ -53,6 +53,7 @@ pub enum Rejected {
     },
     CannotAttack {
         attackers: Vec<Entity>,
+        why: Vec<actions::DeclarationWhy>,
     },
     CannotBlock {
         assignments: Vec<actions::BlockAssignment>,
