@@ -128,6 +128,11 @@ mod tests {
     #[test]
     fn a_player_who_has_lost_cannot_be_chosen_as_the_defending_player() -> TestResult {
         let (mut game, [p1, p2, p3, p4]) = MockGame::new([P1, P2, P3, P4.life(0)]);
+        game.act(p1, actions::Action::Choose(vec![p4.into()]));
+        assert_eq!(
+            game.last_rejection(),
+            Some(&actions::Rejected::NothingToChoose { player: p1.id })
+        );
         game.play([
             p1.pass_to(turns::Step::BeginningOfCombat),
             p2.pass_to(turns::Step::BeginningOfCombat),

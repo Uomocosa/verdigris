@@ -32,6 +32,7 @@ impl Action {
     #[must_use]
     pub const fn rejection(&self, player: players::PlayerId) -> Option<actions::Rejected> {
         match self {
+            Self::Choose(_) => Some(actions::Rejected::NothingToChoose { player }),
             Self::OrderTriggers(_) => Some(actions::Rejected::InvalidTriggerOrder { player }),
             Self::AssignCombatDamage(_) => Some(actions::Rejected::InvalidCombatDamage { player }),
             _ => None,
@@ -50,7 +51,10 @@ mod tests {
     fn test_usage() {
         let (game, [p1, ..]) = MockGame::new([P1, P2]);
         let action = actions::Action::Choose(Vec::new());
-        assert_eq!(action.rejection(p1.id), None);
+        assert_eq!(
+            action.rejection(p1.id),
+            Some(actions::Rejected::NothingToChoose { player: p1.id })
+        );
         assert!(game.player(p1).cards_in(HAND).has_no(GRIZZLY_BEARS));
     }
 
@@ -58,12 +62,18 @@ mod tests {
     fn only_shared_choices_carry_a_rejection() {
         let (game, [p1, ..]) = MockGame::new([P1, P2]);
         let legend = game.zone_entity(p1, BATTLEFIELD).unwrap();
-        assert_eq!(actions::Action::Choose(Vec::new()).rejection(p1.id), None);
+        assert_eq!(
+            actions::Action::Choose(Vec::new()).rejection(p1.id),
+            Some(actions::Rejected::NothingToChoose { player: p1.id })
+        );
         assert!(actions::Action::Choose(Vec::new()).answers_a_choice());
         assert!(actions::Action::Choose(Vec::new()).answers_a_choice());
         assert!(actions::Action::Choose(vec![legend]).answers_a_choice());
         assert!(!actions::Action::PassPriority.answers_a_choice());
-        assert_eq!(actions::Action::Choose(vec![legend]).rejection(p1.id), None);
+        assert_eq!(
+            actions::Action::Choose(vec![legend]).rejection(p1.id),
+            Some(actions::Rejected::NothingToChoose { player: p1.id })
+        );
         assert_eq!(actions::Action::PassPriority.rejection(p1.id), None);
     }
 }

@@ -63,4 +63,7 @@ pub enum Rejected {
     NoPriority {
         player: players::PlayerId,
     },
+    NothingToChoose {
+        player: players::PlayerId,
+    },
 }
