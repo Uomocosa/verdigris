@@ -9,9 +9,9 @@ pub fn cast_spells_as_though_they_had_flash(all: &statics::All) -> abilities::Co
         filter: all.into(),
         as_long_as: None,
         modification: effects::Modification::Rule(rules::RuleChange {
-            target: rules::Target::Restriction(events::cast_spell::TIMING),
+            target: rules::Target::Restriction(events::cast::TIMING),
             change: rules::Change::AsThough {
-                holder: events::CastSpell::PLAYER.into(),
+                holder: events::Cast::SPELL.controller(),
             },
         }),
     }
@@ -37,9 +37,9 @@ mod tests {
         assert_eq!(
             ability.modification,
             effects::Modification::Rule(rules::RuleChange {
-                target: rules::Target::Restriction(events::cast_spell::TIMING),
+                target: rules::Target::Restriction(events::cast::TIMING),
                 change: rules::Change::AsThough {
-                    holder: events::CastSpell::PLAYER.into(),
+                    holder: events::Cast::SPELL.controller(),
                 },
             })
         );

@@ -1,5 +1,5 @@
-pub mod cast_spell;
-pub use cast_spell::CastSpell;
+pub mod cast;
+pub use cast::Cast;
 
 mod ability_context;
 pub use ability_context::AbilityContext;

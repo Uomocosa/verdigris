@@ -1,4 +1,6 @@
 use crate::STACK;
+use bevy::ecs::schedule::{IntoScheduleConfigs, ScheduleConfigs};
+use bevy::ecs::system::ScheduleSystem;
 use bevy::prelude::{Commands, Has, MessageReader, MessageWriter, Query};
 
 use crate::actions;
@@ -32,7 +34,20 @@ use crate::zones;
 /// have an unpayable cost if its cost is based on the mana cost of an object with no mana cost.
 /// Attempting to cast a spell or activate an ability that has an unpayable cost is a legal
 /// action. However, attempting to pay an unpayable cost is an illegal action.
-pub fn r601_2a_cast(
+pub fn r601_2a_cast() -> ScheduleConfigs<ScheduleSystem> {
+    (propose_cast, check_cast).chain()
+}
+
+fn propose_cast(mut actions: MessageReader<actions::PlayerAction>, mut commands: Commands) {
+    for action in actions.read() {
+        let actions::Action::Cast(spell) = &action.action else {
+            continue;
+        };
+        commands.entity(*spell).insert(cards::Controller(action.player));
+    }
+}
+
+fn check_cast(
     mut actions: MessageReader<actions::PlayerAction>,
     mut rejected: MessageWriter<actions::Rejected>,
     mut commands: Commands,
@@ -44,10 +59,8 @@ pub fn r601_2a_cast(
             continue;
         };
         let spell = *spell;
-        if !answers.legal::<events::CastSpell>(&events::CastSpell {
-            spell,
-            player: action.player,
-        }) {
+        if !answers.legal::<events::Cast>(&events::Cast { spell }) {
+            commands.entity(spell).remove::<cards::Controller>();
             rejected.write(actions::Rejected::CannotCast { spell });
             continue;
         }
@@ -70,7 +83,6 @@ pub fn r601_2a_cast(
         commands.entity(moved).insert(cards::Controller(action.player));
     }
 }
-
 #[cfg(test)]
 mod tests {
     use crate::HAND;

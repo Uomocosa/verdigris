@@ -2,8 +2,6 @@ use atomic_delegate_macros::atomic_delegate;
 use bevy::prelude::Entity;
 use verdigris_event_derive::EventArgs;
 
-use crate::players;
-
 use crate::rules;
 use crate::rules::traits::event::Event;
 
@@ -14,17 +12,15 @@ pub const NOT_A_LAND: rules::RestrictionId = rules::RestrictionId("601.2a/not-a-
 pub const TIMING: rules::RestrictionId = rules::RestrictionId("601.2a/timing");
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EventArgs)]
-pub struct CastSpell {
+pub struct Cast {
     #[arg]
     pub spell: Entity,
-    #[arg]
-    pub player: players::PlayerId,
 }
 
-impl Event for CastSpell {
-    const ID: rules::EventId = rules::EventId("601.2a/cast-spell");
+impl Event for Cast {
+    const ID: rules::EventId = rules::EventId("601.2a/cast");
 
-    #[atomic_delegate(CastSpell, Event)]
+    #[atomic_delegate(Cast, Event)]
     fn restrictions() -> Vec<rules::Restriction> {}
 }
 
@@ -36,7 +32,7 @@ mod tests {
     use crate::rules::traits::event::Event;
     use crate::rules::traits::event_args::EventArgs;
 
-    use super::CastSpell;
+    use super::Cast;
     use super::FROM_HAND;
     use super::NOT_A_LAND;
     use super::OWNS;
@@ -45,51 +41,51 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        assert_eq!(CastSpell::ID, rules::EventId("601.2a/cast-spell"));
-        let restrictions = CastSpell::restrictions();
+        assert_eq!(Cast::ID, rules::EventId("601.2a/cast"));
+        let restrictions = Cast::restrictions();
         assert_eq!(restrictions.len(), 5);
         assert_eq!(restrictions[0].id, PRIORITY);
         assert_eq!(
             restrictions[0].condition,
-            rules::has_priority(CastSpell::PLAYER)
+            rules::has_priority(Cast::SPELL.controller())
         );
         assert_eq!(restrictions[1].id, FROM_HAND);
         assert_eq!(
             restrictions[1].condition,
-            rules::in_zone(HAND, CastSpell::PLAYER).of(CastSpell::SPELL)
+            rules::in_zone(HAND, Cast::SPELL.controller()).of(Cast::SPELL)
         );
         assert_eq!(restrictions[2].id, OWNS);
         assert_eq!(
             restrictions[2].condition,
-            rules::points_to::<cards::Owner>(CastSpell::PLAYER).of(CastSpell::SPELL)
+            rules::points_to::<cards::Owner>(Cast::SPELL.controller()).of(Cast::SPELL)
         );
         assert_eq!(restrictions[3].id, NOT_A_LAND);
         assert_eq!(
             restrictions[3].condition,
-            (!rules::card_type(cards::CardType::Land)).of(CastSpell::SPELL)
+            (!rules::card_type(cards::CardType::Land)).of(Cast::SPELL)
         );
         assert!(restrictions[3].unwaivable);
         assert_eq!(restrictions[4].id, TIMING);
         assert_eq!(
             restrictions[4].condition,
-            rules::card_type(cards::CardType::Instant).of(CastSpell::SPELL)
+            rules::card_type(cards::CardType::Instant).of(Cast::SPELL)
                 | (rules::main_phase()
                     & rules::stack_empty()
-                    & rules::active_player(CastSpell::PLAYER))
+                    & rules::active_player(Cast::SPELL.controller()))
         );
         assert!(
-            CastSpell::restrictions()
+            Cast::restrictions()
                 .iter()
                 .filter(|restriction| restriction.id != NOT_A_LAND)
                 .all(|restriction| !restriction.unwaivable)
         );
-        assert_eq!(CastSpell::args(), &[CastSpell::SPELL, CastSpell::PLAYER,]);
+        assert_eq!(Cast::args(), &[Cast::SPELL,]);
     }
 
     #[test]
     fn restriction_rule_numbers_occur_in_comprehensive_rules() {
         const RULES_TEXT: &str = include_str!("../../../docs/MagicCompRules-20250919.txt");
-        for restriction in CastSpell::restrictions() {
+        for restriction in Cast::restrictions() {
             let id: &str = *restriction.id;
             if id.starts_with("test/") || id.starts_with("statics/") || id.starts_with("glossary/")
             {
