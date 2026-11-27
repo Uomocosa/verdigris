@@ -30,7 +30,7 @@ pub fn add_resolution_systems(app: &mut App) {
                         events::Mill,
                     >,
                     comprehensive_rules::r614_1a_r616_1_replacement_effects::r614_1a_r616_1_replacement_effects::<
-                        events::CreateTokens,
+                        events::Create,
                     >,
                     comprehensive_rules::r614_1a_r616_1_replacement_effects::r614_1a_r616_1_replacement_effects::<
                         events::Counter,

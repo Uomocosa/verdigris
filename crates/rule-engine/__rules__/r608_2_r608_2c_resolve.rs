@@ -1,9 +1,11 @@
 use crate::events;
 use crate::{BATTLEFIELD, STACK};
-use bevy::prelude::{Entity, MessageReader, MessageWriter, ParamSet};
+use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, ParamSet};
 
 use crate::Attempt;
+use crate::cards;
 use crate::counters;
+use crate::damage;
 use crate::effects;
 use crate::keywords;
 use crate::players;
@@ -16,16 +18,17 @@ type EffectMessageWriters<'a, 'b, 'c, 'd> = (
     MessageWriter<'a, effects::PowerToughnessModified>,
     MessageWriter<'b, effects::KeywordGranted>,
     MessageWriter<'c, Attempt<events::Mill>>,
-    MessageWriter<'d, Attempt<events::CreateTokens>>,
+    MessageWriter<'d, Attempt<events::Create>>,
 );
 
-type PlayerEffectWriters<'a, 'b, 'c, 'd, 'e, 'f> = (
+type PlayerEffectWriters<'a, 'b, 'c, 'd, 'e, 'f, 'g> = (
     MessageWriter<'a, Attempt<events::LoseLife>>,
     MessageWriter<'b, Attempt<events::Discard>>,
     MessageWriter<'c, Attempt<events::GainLife>>,
     MessageWriter<'d, Attempt<events::Draw>>,
     MessageWriter<'e, Attempt<events::WinGame>>,
     MessageWriter<'f, Attempt<events::AddPhase>>,
+    MessageWriter<'g, Attempt<events::PutCounters>>,
 );
 
 /// 608.2. If the object that’s resolving is an instant spell, a sorcery spell, or an ability, its
@@ -45,8 +48,8 @@ pub fn r608_2_r608_2c_resolve(
     mut destructions: MessageWriter<Attempt<events::Destroy>>,
     mut countered: MessageWriter<Attempt<events::Counter>>,
     mut exiles: MessageWriter<Attempt<events::Exile>>,
-    mut poison_counters: MessageWriter<Attempt<events::PutCounters>>,
-    mut player_effects: ParamSet<PlayerEffectWriters<'_, '_, '_, '_, '_, '_>>,
+    mut commands: Commands,
+    mut player_effects: ParamSet<PlayerEffectWriters<'_, '_, '_, '_, '_, '_, '_>>,
     mut effect_messages: ParamSet<EffectMessageWriters<'_, '_, '_, '_>>,
     lookups: stack::ResolutionLookups<'_, '_>,
     answers: rules::Rules,
@@ -91,7 +94,13 @@ pub fn r608_2_r608_2c_resolve(
                     request_counter(&mut countered, chosen_target, target_zone, &answers.zones);
                 }
                 effects::EffectKind::CreateTokens { count, definition } => {
-                    request_tokens(&mut effect_messages.p3(), controller, count, definition);
+                    request_tokens(
+                        &mut commands,
+                        &mut effect_messages.p3(),
+                        controller,
+                        count,
+                        definition,
+                    );
                 }
                 effects::EffectKind::Draw(count) => {
                     request_draws(&mut player_effects.p3(), &player_targets, controller, count);
@@ -108,7 +117,7 @@ pub fn r608_2_r608_2c_resolve(
                     request_life_loss(&mut player_effects.p0(), &player_targets, amount);
                 }
                 effects::EffectKind::Poison(amount) => {
-                    request_poison(&mut poison_counters, &player_targets, amount);
+                    request_poison(&mut player_effects.p6(), &player_targets, amount);
                 }
                 effects::EffectKind::GainLife(amount) => {
                     request_life_gain(
@@ -365,16 +374,24 @@ fn request_additional_phase(
 }
 
 fn request_tokens(
-    tokens: &mut MessageWriter<Attempt<events::CreateTokens>>,
+    commands: &mut Commands,
+    tokens: &mut MessageWriter<Attempt<events::Create>>,
     controller: players::PlayerId,
     count: u32,
     definition: effects::TokenDefinition,
 ) {
-    tokens.write(Attempt(events::CreateTokens {
-        controller,
-        amount: count,
-        token: definition,
-    }));
+    for _ in 0..count {
+        let token = commands
+            .spawn((
+                definition.definition(),
+                cards::Owner(controller),
+                cards::Controller(controller),
+                damage::Damage(0),
+                cards::Token,
+            ))
+            .id();
+        tokens.write(Attempt(events::Create { token }));
+    }
 }
 
 fn players_or_fallback(

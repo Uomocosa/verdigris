@@ -67,6 +67,7 @@ pub fn r110_1_enter_the_battlefield(
 
 #[cfg(test)]
 mod tests {
+    use crate::cards;
     use crate::mana;
     use crate::testing::*;
     use crate::{BATTLEFIELD, HAND};
@@ -83,6 +84,7 @@ mod tests {
 
         assert!(game.player(p1).cards_in(BATTLEFIELD).has_no(SOLDIER_TOKEN));
         assert_eq!(game.player(p1).cards_in(BATTLEFIELD).count(), 1);
+        assert!(game.app.world().iter_entities().all(|entity| !entity.contains::<cards::Token>()));
         Ok(())
     }
 }

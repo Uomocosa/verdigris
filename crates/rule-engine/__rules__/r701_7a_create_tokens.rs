@@ -1,12 +1,8 @@
-use crate::events;
-use bevy::prelude::{Commands, MessageReader, MessageWriter};
+use bevy::prelude::{MessageReader, MessageWriter};
 
 use crate::Attempt;
-use crate::GRAVEYARD;
 use crate::Resolve;
-use crate::cards;
-use crate::damage;
-use crate::zones;
+use crate::events;
 
 /// 701.7a To create one or more tokens with certain characteristics, put the specified number of
 /// tokens with the specified characteristics onto the battlefield.
@@ -17,28 +13,13 @@ use crate::zones;
 /// characteristics. No replacement effect exists yet, so a token is put onto the battlefield with
 /// the characteristics its creation effect defines.
 pub fn r701_7a_create_tokens(
-    mut requested: MessageReader<Resolve<events::CreateTokens>>,
+    mut requested: MessageReader<Resolve<events::Create>>,
     mut entering: MessageWriter<Attempt<events::EnterTheBattlefield>>,
-    mut commands: Commands,
-    zones: zones::ZoneLookup,
 ) {
     for request in requested.read() {
-        let Some(staging) = zones.find(GRAVEYARD, Some(request.controller)) else {
-            continue;
-        };
-        for _ in 0..request.amount {
-            let token = commands
-                .spawn((
-                    request.token.definition(),
-                    zones::InZone(staging),
-                    cards::Owner(request.controller),
-                    cards::Controller(request.controller),
-                    damage::Damage(0),
-                    cards::Token,
-                ))
-                .id();
-            entering.write(Attempt(events::EnterTheBattlefield { permanent: token }));
-        }
+        entering.write(Attempt(events::EnterTheBattlefield {
+            permanent: request.token,
+        }));
     }
 }
 

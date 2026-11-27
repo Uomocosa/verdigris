@@ -27,7 +27,7 @@ pub fn register_messages_and_resources(app: &mut App) {
     events::GainLife::register(app);
     events::PutCounters::register(app);
     events::Mill::register(app);
-    events::CreateTokens::register(app);
+    events::Create::register(app);
     events::Destroy::register(app);
     events::Counter::register(app);
     events::DealDamage::register(app);

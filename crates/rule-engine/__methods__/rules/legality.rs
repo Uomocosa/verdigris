@@ -35,7 +35,6 @@ mod tests {
 
     use crate::BATTLEFIELD;
     use crate::cards;
-    use crate::effects;
     use crate::events;
     use crate::keywords;
     use crate::rules;
@@ -322,29 +321,17 @@ mod tests {
         let (mut game, [p1, p2]) = MockGame::new([P1.battlefield([TEST_CANT_DISCARD]), P2]);
         game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(TEST_CANT_DISCARD)?;
         game.pass_priority();
+        let own_token = game.app.world_mut().spawn(cards::Controller(p1.id)).id();
+        let other_token = game.app.world_mut().spawn(cards::Controller(p2.id)).id();
         game.app
             .world_mut()
             .run_system_once(move |answers: rules::Rules| {
                 assert_eq!(
-                    legality::<events::CreateTokens>(
-                        &answers,
-                        &events::CreateTokens {
-                            controller: p1.id,
-                            amount: 2,
-                            token: effects::TokenDefinition::from(SOLDIER_TOKEN.definition),
-                        }
-                    ),
+                    legality::<events::Create>(&answers, &events::Create { token: own_token }),
                     rules::Legality::Illegal
                 );
                 assert_eq!(
-                    legality::<events::CreateTokens>(
-                        &answers,
-                        &events::CreateTokens {
-                            controller: p2.id,
-                            amount: 2,
-                            token: effects::TokenDefinition::from(SOLDIER_TOKEN.definition),
-                        }
-                    ),
+                    legality::<events::Create>(&answers, &events::Create { token: other_token }),
                     rules::Legality::Legal
                 );
             })

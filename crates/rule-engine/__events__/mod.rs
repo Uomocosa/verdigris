@@ -19,8 +19,8 @@ pub use begin_the_game_on_the_battlefield::BeginTheGameOnTheBattlefield;
 pub mod opening_hand_action;
 pub use opening_hand_action::OpeningHandAction;
 
-mod create_tokens;
-pub use create_tokens::CreateTokens;
+mod create;
+pub use create::Create;
 
 mod counter;
 pub use counter::Counter;

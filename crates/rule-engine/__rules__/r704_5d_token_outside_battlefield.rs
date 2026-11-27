@@ -1,21 +1,37 @@
-use bevy::prelude::{Commands, Entity, Query, ResMut, With};
+use bevy::prelude::{Commands, Entity, Query, ResMut, With, Without};
 
 use crate::BATTLEFIELD;
 use crate::StateBasedActionsPerformed;
 use crate::cards;
 use crate::zones;
 
+type ZonelessToken<'w, 's> = Query<
+    'w,
+    's,
+    Entity,
+    (
+        With<cards::Token>,
+        Without<zones::InZone>,
+        Without<zones::LeftZone>,
+    ),
+>;
+
 /// 704.5d If a token is in a zone other than the battlefield, it ceases to exist.
 pub fn r704_5d_token_outside_battlefield(
     mut commands: Commands,
     mut state_based_actions_performed: ResMut<StateBasedActionsPerformed>,
     tokens: Query<(Entity, &zones::InZone), With<cards::Token>>,
+    zoneless_tokens: ZonelessToken<'_, '_>,
     zones: zones::ZoneLookup,
 ) {
     for (token, in_zone) in tokens.iter() {
         if zones.contains(BATTLEFIELD, **in_zone) {
             continue;
         }
+        commands.entity(token).despawn();
+        **state_based_actions_performed = true;
+    }
+    for token in &zoneless_tokens {
         commands.entity(token).despawn();
         **state_based_actions_performed = true;
     }

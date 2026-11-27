@@ -23,8 +23,8 @@ pub const TEST_CANT_DISCARD: testing::Card = testing::Card {
                 events::Mill::PLAYER,
                 rules::RestrictionId("test/test-cant-discard"),
             ),
-            statics::you().cant::<events::CreateTokens>(
-                events::CreateTokens::CONTROLLER,
+            statics::you().cant::<events::Create>(
+                events::Create::TOKEN.controller(),
                 rules::RestrictionId("test/test-cant-discard"),
             ),
         }
