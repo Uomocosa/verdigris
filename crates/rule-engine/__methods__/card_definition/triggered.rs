@@ -24,7 +24,7 @@ mod tests {
         let ability = abilities::TriggeredAbility {
             event: ANOTHER_CREATURE.enters(),
             intervening_if: None,
-            effect: YOU.gains_life(1),
+            effect: YOU.gain_life(1),
         };
         assert_eq!(
             triggered(definition, ability.clone())

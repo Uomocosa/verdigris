@@ -9,9 +9,8 @@ pub const CARESS_OF_PHYREXIA: testing::Card = testing::Card {
     name: testing::TestCardName("Caress of Phyrexia"),
     definition: || {
         cards::sorcery("Caress of Phyrexia", cost![3, B, B]).spell(
-            effects::target(1, PLAYER).does(
-                effects::draw(3) & effects::lose_life(3) & effects::gets(3 * counters::POISON),
-            ),
+            effects::target(1, PLAYER)
+                .do_(effects::draw(3) & effects::lose_life(3) & effects::get(3 * counters::POISON)),
         )
     },
 };

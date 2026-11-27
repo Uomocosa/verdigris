@@ -22,9 +22,9 @@ impl This {
     #[must_use]
     pub fn deals<D: Dealt>(self, dealt: D) -> D::Builder { dealt.build() }
     #[must_use]
-    pub fn gets(self, got: impl Gets) -> effects::Effect { effects::gets(got).to(self) }
+    pub fn get(self, got: impl Gets) -> effects::Effect { effects::get(got).to(self) }
     #[must_use]
-    pub fn gains(self, kw: keywords::Keyword) -> effects::Effect { effects::gains(kw).to(self) }
+    pub fn gain(self, kw: keywords::Keyword) -> effects::Effect { effects::gain(kw).to(self) }
 }
 
 #[cfg(test)]

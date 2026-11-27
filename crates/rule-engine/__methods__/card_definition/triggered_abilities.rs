@@ -23,7 +23,7 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let ability = abilities::whenever(ANOTHER_CREATURE.enters(), YOU.gains_life(1));
+        let ability = abilities::whenever(ANOTHER_CREATURE.enters(), YOU.gain_life(1));
         let definition =
             cards::creature("Grizzly Bears", cost![1, G], pt!(2, 2)).triggered(ability.clone());
         assert_eq!(

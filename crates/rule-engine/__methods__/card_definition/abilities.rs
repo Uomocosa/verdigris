@@ -23,7 +23,7 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let triggered = abilities::whenever(ANOTHER_CREATURE.enters(), YOU.gains_life(1));
+        let triggered = abilities::whenever(ANOTHER_CREATURE.enters(), YOU.gain_life(1));
         let definition = (testing::GRIZZLY_BEARS.definition)();
         let static_ability = statics::all(CREATURE).gain(keywords::vigilance());
         let definition = apply_abilities(

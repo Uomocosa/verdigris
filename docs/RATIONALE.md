@@ -10,7 +10,7 @@ checked against the Oracle text line by line.
 ```rust
 card! {
     cards::creature("Soul Warden", cost![W], pt!(1, 1));
-    abilities::whenever(ANOTHER_CREATURE.enters(), effects::gain_life(1).to_player(YOU)),
+    abilities::whenever(ANOTHER_CREATURE.enters(), YOU.gain_life(1)),
 }
 ```
 
@@ -53,7 +53,7 @@ assert_eq!(
     [abilities::TriggeredAbility {
         event: ANOTHER_CREATURE.enters(),
         intervening_if: None,
-        effect: effects::gain_life(1).to_player(YOU),
+        effect: YOU.gain_life(1),
     }]
 );
 ```

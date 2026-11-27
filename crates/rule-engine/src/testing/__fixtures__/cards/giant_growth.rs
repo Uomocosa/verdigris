@@ -8,6 +8,6 @@ use crate::testing;
 pub const GIANT_GROWTH: testing::Card = testing::Card {
     name: testing::TestCardName("Giant Growth"),
     definition: || {
-        cards::instant("Giant Growth", cost![G]).spell(effects::target(1, CREATURE).gets(pt!(3, 3)))
+        cards::instant("Giant Growth", cost![G]).spell(effects::target(1, CREATURE).get(pt!(3, 3)))
     },
 };

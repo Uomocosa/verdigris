@@ -94,7 +94,7 @@ mod tests {
             sequence.follow_ups[0],
             Some(effects::EffectKind::LoseLife(2))
         );
-        let longer = sequence & effects::gets(3 * counters::POISON);
+        let longer = sequence & effects::get(3 * counters::POISON);
         assert_eq!(
             longer.follow_ups[1],
             Some(effects::EffectKind::Poison(3 * counters::POISON))
@@ -110,8 +110,8 @@ mod tests {
         let _ = effects::draw(1)
             & effects::lose_life(1)
             & effects::gain_life(1)
-            & effects::mills(1)
+            & effects::mill(1)
             & effects::discard(1)
-            & effects::gets(1 * counters::POISON);
+            & effects::get(1 * counters::POISON);
     }
 }

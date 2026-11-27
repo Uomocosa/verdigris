@@ -10,24 +10,24 @@ pub struct Each(pub rules::Players);
 #[rustfmt::skip]
 impl Each {
     #[must_use]
-    pub fn draws(self, count: u32) -> effects::Effect { self.does(effects::draw(count)) }
+    pub fn draw(self, count: u32) -> effects::Effect { self.do_(effects::draw(count)) }
     #[must_use]
-    pub fn discards(self, count: u32) -> effects::Effect { self.does(effects::discard(count)) }
+    pub fn discard(self, count: u32) -> effects::Effect { self.do_(effects::discard(count)) }
     #[must_use]
-    pub fn gains_life(self, life: u32) -> effects::Effect { self.does(effects::gain_life(life)) }
+    pub fn gain_life(self, life: u32) -> effects::Effect { self.do_(effects::gain_life(life)) }
     #[must_use]
-    pub fn loses_life(self, life: u32) -> effects::Effect { self.does(effects::lose_life(life)) }
+    pub fn lose_life(self, life: u32) -> effects::Effect { self.do_(effects::lose_life(life)) }
     #[must_use]
-    pub fn mills(self, count: u32) -> effects::Effect { self.does(effects::mills(count)) }
+    pub fn mill(self, count: u32) -> effects::Effect { self.do_(effects::mill(count)) }
     #[must_use]
-    pub fn wins_the_game(self) -> effects::Effect { self.does(effects::win_the_game()) }
+    pub fn win_the_game(self) -> effects::Effect { self.do_(effects::win_the_game()) }
     #[must_use]
-    pub fn gets(self, got: impl Gets) -> effects::Effect { self.does(effects::gets(got)) }
+    pub fn get(self, got: impl Gets) -> effects::Effect { self.do_(effects::get(got)) }
 }
 
 impl Each {
     #[must_use]
-    pub fn does(self, effect: effects::Effect) -> effects::Effect {
+    pub fn do_(self, effect: effects::Effect) -> effects::Effect {
         if effect.affected.is_some() {
             effect
         } else {
@@ -49,7 +49,7 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let effect = rules::each(OPPONENT).draws(1);
+        let effect = rules::each(OPPONENT).draw(1);
         assert_eq!(effect.kind, effects::EffectKind::Draw(1));
         assert_eq!(
             effect.affected,
@@ -57,13 +57,13 @@ mod tests {
         );
         assert_eq!(effect.target, None);
         let each = Each(rules::Players::All);
-        assert_eq!(each.discards(2).kind, effects::EffectKind::Discard(2));
-        assert_eq!(each.gains_life(1).kind, effects::EffectKind::GainLife(1));
-        assert_eq!(each.loses_life(2).kind, effects::EffectKind::LoseLife(2));
-        assert_eq!(each.mills(5).kind, effects::EffectKind::Mill(5));
-        assert_eq!(each.wins_the_game().kind, effects::EffectKind::WinTheGame);
+        assert_eq!(each.discard(2).kind, effects::EffectKind::Discard(2));
+        assert_eq!(each.gain_life(1).kind, effects::EffectKind::GainLife(1));
+        assert_eq!(each.lose_life(2).kind, effects::EffectKind::LoseLife(2));
+        assert_eq!(each.mill(5).kind, effects::EffectKind::Mill(5));
+        assert_eq!(each.win_the_game().kind, effects::EffectKind::WinTheGame);
         let chained = effects::draw(1) & effects::lose_life(1);
-        let done = each.does(chained);
+        let done = each.do_(chained);
         assert_eq!(
             done.affected,
             Some(rules::Subject::Each(rules::Players::All))

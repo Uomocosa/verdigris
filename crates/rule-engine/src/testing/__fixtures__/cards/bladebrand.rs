@@ -10,6 +10,6 @@ pub const BLADEBRAND: testing::Card = testing::Card {
     name: testing::TestCardName("Bladebrand"),
     definition: || {
         cards::instant("Bladebrand", cost![1, B])
-            .spell(effects::target(1, CREATURE).gains(keywords::deathtouch()) & YOU.draws(1))
+            .spell(effects::target(1, CREATURE).gain(keywords::deathtouch()) & YOU.draw(1))
     },
 };

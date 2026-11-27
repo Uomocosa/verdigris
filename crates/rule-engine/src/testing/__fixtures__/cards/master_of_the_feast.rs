@@ -21,7 +21,7 @@ pub const MASTER_OF_THE_FEAST: testing::Card = testing::Card {
             statics::this().must_attack(),
             abilities::at(
                 turns::beginning_of(UPKEEP).of(YOU),
-                rules::each(OPPONENT).draws(1),
+                rules::each(OPPONENT).draw(1),
             ),
         }
     },

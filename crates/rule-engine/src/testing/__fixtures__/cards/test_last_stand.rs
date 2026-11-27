@@ -15,7 +15,7 @@ pub const TEST_LAST_STAND: testing::Card = testing::Card {
             cards::creature("Test Last Stand", cost![2, B], pt!(3, 3));
             abilities::when(
                 THIS.dies().if_(rules::power().of(THIS).is(rules::Value(3).or_more())),
-                YOU.draws(1),
+                YOU.draw(1),
             ),
         }
     },

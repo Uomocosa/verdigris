@@ -12,7 +12,7 @@ pub const RANGERS_GUILE: testing::Card = testing::Card {
     definition: || {
         cards::instant("Ranger's Guile", cost![G]).spell(
             effects::target(1, CREATURE.controlled_by(YOU))
-                .does(effects::gets(pt!(1, 1)) & effects::gains(keywords::hexproof())),
+                .do_(effects::get(pt!(1, 1)) & effects::gain(keywords::hexproof())),
         )
     },
 };

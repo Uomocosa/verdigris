@@ -54,7 +54,7 @@ pub const fn draw(count: u32) -> effects::Effect {
 }
 
 #[must_use]
-pub const fn mills(count: u32) -> effects::Effect {
+pub const fn mill(count: u32) -> effects::Effect {
     effects::Effect {
         kind: effects::EffectKind::Mill(count),
         follow_ups: [None, None, None, None],
@@ -74,7 +74,7 @@ pub const fn lose_life(amount: u32) -> effects::Effect {
 }
 
 #[must_use]
-pub fn gets(got: impl Gets) -> effects::Effect {
+pub fn get(got: impl Gets) -> effects::Effect {
     effects::Effect {
         kind: got.kind(),
         follow_ups: [None, None, None, None],
@@ -104,7 +104,7 @@ pub const fn discard(count: u32) -> effects::Effect {
 }
 
 #[must_use]
-pub const fn gains(keyword: keywords::Keyword) -> effects::Effect {
+pub const fn gain(keyword: keywords::Keyword) -> effects::Effect {
     effects::Effect {
         kind: effects::EffectKind::GainKeyword(keyword),
         follow_ups: [None, None, None, None],

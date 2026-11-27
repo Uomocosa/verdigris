@@ -8,11 +8,11 @@ The chain hides the base/abilities split and invites logic between calls.
 
 ```rust
 // Bad
-cards::creature("Soul Warden", cost![W], pt!(1, 1)).whenever(ANOTHER_CREATURE.enters(), effects::gain_life(1).to_player(YOU))
+cards::creature("Soul Warden", cost![W], pt!(1, 1)).whenever(ANOTHER_CREATURE.enters(), YOU.gain_life(1))
 // Good
 card! {
     cards::creature("Soul Warden", cost![W], pt!(1, 1));
-    abilities::whenever(ANOTHER_CREATURE.enters(), effects::gain_life(1).to_player(YOU)),
+    abilities::whenever(ANOTHER_CREATURE.enters(), YOU.gain_life(1)),
 }
 ```
 
@@ -49,12 +49,12 @@ The body is data only; branching belongs in the engine or a domain constructor.
 // Bad
 card! {
     cards::creature("Soul Warden", cost![W], pt!(1, 1));
-    if lifegain { abilities::whenever(ANOTHER_CREATURE.enters(), effects::gain_life(1).to_player(YOU)) },
+    if lifegain { abilities::whenever(ANOTHER_CREATURE.enters(), YOU.gain_life(1)) },
 }
 // Good: pick the data before the block, or add a domain item.
 card! {
     cards::creature("Soul Warden", cost![W], pt!(1, 1));
-    abilities::whenever(ANOTHER_CREATURE.enters(), effects::gain_life(1).to_player(YOU)),
+    abilities::whenever(ANOTHER_CREATURE.enters(), YOU.gain_life(1)),
 }
 ```
 
@@ -86,9 +86,9 @@ Short names hide which domain each item comes from; keep every path fully qualif
 ```rust
 // Bad
 use crate::abilities::*;
-whenever(ANOTHER_CREATURE.enters(), gain_life(1).to_player(YOU))
+whenever(ANOTHER_CREATURE.enters(), YOU.gain_life(1))
 // Good
-abilities::whenever(ANOTHER_CREATURE.enters(), effects::gain_life(1).to_player(YOU))
+abilities::whenever(ANOTHER_CREATURE.enters(), YOU.gain_life(1))
 ```
 
 **A test card test weakened to check only a field or two.**
@@ -103,7 +103,7 @@ assert_eq!(
     [abilities::TriggeredAbility {
         event: ANOTHER_CREATURE.enters(),
         intervening_if: None,
-        effect: effects::gain_life(1).to_player(YOU),
+        effect: YOU.gain_life(1),
     }]
 );
 ```

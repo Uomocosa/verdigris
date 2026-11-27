@@ -31,7 +31,7 @@ mod tests {
 
     #[test]
     fn to_this_targets_the_sources_own_creature() {
-        let effect = to(effects::gets(pt!(3, 3)), THIS);
+        let effect = to(effects::get(pt!(3, 3)), THIS);
         let target = effect.target.unwrap();
         assert_eq!(target.count, 1);
         assert_eq!(target.filter.kind, effects::FilterKind::Creature);

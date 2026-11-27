@@ -28,26 +28,26 @@ impl From<rules::This> for Target {
 #[rustfmt::skip]
 impl Target {
     #[must_use]
-    pub fn draws(self, count: u32) -> effects::Effect { self.does(effects::draw(count)) }
+    pub fn draw(self, count: u32) -> effects::Effect { self.do_(effects::draw(count)) }
     #[must_use]
-    pub fn discards(self, count: u32) -> effects::Effect { self.does(effects::discard(count)) }
+    pub fn discard(self, count: u32) -> effects::Effect { self.do_(effects::discard(count)) }
     #[must_use]
-    pub fn gains_life(self, life: u32) -> effects::Effect { self.does(effects::gain_life(life)) }
+    pub fn gain_life(self, life: u32) -> effects::Effect { self.do_(effects::gain_life(life)) }
     #[must_use]
-    pub fn loses_life(self, life: u32) -> effects::Effect { self.does(effects::lose_life(life)) }
+    pub fn lose_life(self, life: u32) -> effects::Effect { self.do_(effects::lose_life(life)) }
     #[must_use]
-    pub fn mills(self, count: u32) -> effects::Effect { self.does(effects::mills(count)) }
+    pub fn mill(self, count: u32) -> effects::Effect { self.do_(effects::mill(count)) }
     #[must_use]
-    pub fn wins_the_game(self) -> effects::Effect { self.does(effects::win_the_game()) }
+    pub fn win_the_game(self) -> effects::Effect { self.do_(effects::win_the_game()) }
     #[must_use]
-    pub fn gets(self, got: impl Gets) -> effects::Effect { self.does(effects::gets(got)) }
+    pub fn get(self, got: impl Gets) -> effects::Effect { self.do_(effects::get(got)) }
     #[must_use]
-    pub fn gains(self, kw: keywords::Keyword) -> effects::Effect { self.does(effects::gains(kw)) }
+    pub fn gain(self, kw: keywords::Keyword) -> effects::Effect { self.do_(effects::gain(kw)) }
 }
 
 impl Target {
     #[must_use]
-    pub fn does(self, effect: effects::Effect) -> effects::Effect {
+    pub fn do_(self, effect: effects::Effect) -> effects::Effect {
         if effect.target.is_some() {
             effect
         } else {
@@ -72,22 +72,22 @@ mod tests {
     #[test]
     fn test_usage() {
         let target = effects::target(1, PLAYER);
-        let effect = target.discards(2);
+        let effect = target.discard(2);
         assert_eq!(effect.kind, effects::EffectKind::Discard(2));
         assert_eq!(effect.target, Some(target));
         assert_eq!(effect.affected, None);
-        let drawn = effects::target(1, PLAYER).draws(3);
+        let drawn = effects::target(1, PLAYER).draw(3);
         assert_eq!(drawn.kind, effects::EffectKind::Draw(3));
         assert_eq!(drawn.target, Some(effects::target(1, PLAYER)));
-        let gained = effects::target(1, PLAYER).gains_life(1);
+        let gained = effects::target(1, PLAYER).gain_life(1);
         assert_eq!(gained.kind, effects::EffectKind::GainLife(1));
-        let lost = effects::target(1, PLAYER).loses_life(3);
+        let lost = effects::target(1, PLAYER).lose_life(3);
         assert_eq!(lost.kind, effects::EffectKind::LoseLife(3));
-        let milled = effects::target(1, PLAYER).mills(5);
+        let milled = effects::target(1, PLAYER).mill(5);
         assert_eq!(milled.kind, effects::EffectKind::Mill(5));
-        let won = effects::target(1, PLAYER).wins_the_game();
+        let won = effects::target(1, PLAYER).win_the_game();
         assert_eq!(won.kind, effects::EffectKind::WinTheGame);
-        let grown = effects::target(1, CREATURE).gets(pt!(3, 3));
+        let grown = effects::target(1, CREATURE).get(pt!(3, 3));
         assert_eq!(
             grown.kind,
             effects::EffectKind::ModifyPowerToughness {
@@ -95,7 +95,7 @@ mod tests {
                 toughness: 3
             }
         );
-        let granted = effects::target(1, CREATURE).gains(keywords::hexproof());
+        let granted = effects::target(1, CREATURE).gain(keywords::hexproof());
         assert_eq!(
             granted.target,
             Some(Target {
@@ -104,7 +104,7 @@ mod tests {
             })
         );
         let chained = effects::draw(3) & effects::lose_life(3);
-        let done = effects::target(1, PLAYER).does(chained);
+        let done = effects::target(1, PLAYER).do_(chained);
         assert_eq!(done.target, Some(effects::target(1, PLAYER)));
         assert_eq!(done.follow_ups[0], Some(effects::EffectKind::LoseLife(3)));
     }

@@ -11,7 +11,7 @@ pub const RUSH_OF_ADRENALINE: testing::Card = testing::Card {
     definition: || {
         cards::instant("Rush of Adrenaline", cost![R]).spell(
             effects::target(1, CREATURE)
-                .does(effects::gets(pt!(+2, +1)) & effects::gains(keywords::trample())),
+                .do_(effects::get(pt!(+2, +1)) & effects::gain(keywords::trample())),
         )
     },
 };

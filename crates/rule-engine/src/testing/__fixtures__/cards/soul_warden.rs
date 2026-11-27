@@ -12,7 +12,7 @@ pub const SOUL_WARDEN: testing::Card = testing::Card {
     definition: || {
         card! {
             cards::creature("Soul Warden", cost![W], pt!(1, 1));
-            abilities::whenever(ANOTHER_CREATURE.enters(), YOU.gains_life(1)),
+            abilities::whenever(ANOTHER_CREATURE.enters(), YOU.gain_life(1)),
         }
     },
 };
