@@ -13,8 +13,8 @@ pub enum Condition {
     PointsTo(rules::ComponentRef, rules::ArgRef),
     Is(rules::ArgRef),
     CardType(cards::CardType),
-    Characteristic(rules::Characteristic, rules::Comparison, i32),
-    PlayerValue(rules::PlayerQuantity, rules::Comparison, i32),
+    Characteristic(rules::Characteristic, rules::Comparison),
+    PlayerValue(rules::PlayerQuantity, rules::Comparison),
     Of(rules::ArgRef, Box<Self>),
     Each(rules::Players, Box<Self>),
     AnyPlayer(rules::Players, Box<Self>),
@@ -27,9 +27,9 @@ pub enum Condition {
     StackEmpty,
     ActivePlayer(rules::ArgRef),
     HasPriority(rules::ArgRef),
-    ArgAmount(rules::ArgId, rules::Comparison, u32),
+    ArgAmount(rules::ArgId, rules::Comparison),
     ArgAtLeastRemainingToughness(rules::ArgId),
-    Count(rules::ArgId, rules::Comparison, u32),
+    Count(rules::ArgId, rules::Comparison),
 }
 
 #[rustfmt::skip]

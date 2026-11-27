@@ -28,11 +28,11 @@ pub fn eval<E: EventArgs>(
         }
         rules::Condition::Is(reference) => entity(reference) == viewpoint,
         rules::Condition::CardType(card) => answers.eval_card_type(*card, viewpoint),
-        rules::Condition::Characteristic(characteristic, comparison, threshold) => {
-            answers.eval_characteristic(*characteristic, *comparison, *threshold, viewpoint)
+        rules::Condition::Characteristic(characteristic, comparison) => {
+            answers.eval_characteristic(*characteristic, *comparison, viewpoint)
         }
-        rules::Condition::PlayerValue(quantity, comparison, threshold) => {
-            answers.eval_player_value(*quantity, *comparison, *threshold, viewpoint)
+        rules::Condition::PlayerValue(quantity, comparison) => {
+            answers.eval_player_value(*quantity, *comparison, viewpoint)
         }
         rules::Condition::Of(reference, inner) => {
             entity(reference).is_some_and(|candidate| eval(answers, inner, event, Some(candidate)))
@@ -66,9 +66,10 @@ pub fn eval<E: EventArgs>(
                 .single()
                 .is_ok_and(|state| state.priority.holder.is_some_and(|id| *id == holder))
         }),
-        rules::Condition::ArgAmount(id, comparison, threshold)
-        | rules::Condition::Count(id, comparison, threshold) => {
-            amount(id).is_some_and(|value| comparison.holds(&value, threshold))
+        rules::Condition::ArgAmount(id, comparison) | rules::Condition::Count(id, comparison) => {
+            amount(id).is_some_and(|value| {
+                i32::try_from(value).is_ok_and(|narrow| comparison.holds(narrow))
+            })
         }
         rules::Condition::ArgAtLeastRemainingToughness(id) => viewpoint.is_some_and(|subject| {
             amount(id).is_some_and(|found| found >= answers.remaining_toughness(subject))

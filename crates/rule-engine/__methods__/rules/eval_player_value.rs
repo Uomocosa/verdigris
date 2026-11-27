@@ -8,7 +8,6 @@ pub fn eval_player_value(
     answers: &rules::Rules,
     quantity: rules::PlayerQuantity,
     comparison: rules::Comparison,
-    threshold: i32,
     viewpoint: Option<Entity>,
 ) -> bool {
     viewpoint.is_some_and(|subject| {
@@ -19,16 +18,14 @@ pub fn eval_player_value(
             .and_then(|entity| {
                 entity.get::<players::Player>()?;
                 match quantity {
-                    rules::PlayerQuantity::Life => entity
-                        .get::<players::Life>()
-                        .map(|life| comparison.holds(&**life, &threshold)),
+                    rules::PlayerQuantity::Life => {
+                        entity.get::<players::Life>().map(|life| comparison.holds(**life))
+                    }
                     rules::PlayerQuantity::PoisonCounters => {
                         let counters = entity
                             .get::<players::PoisonCounters>()
                             .map_or(0, |counters| **counters);
-                        i32::try_from(counters)
-                            .ok()
-                            .map(|value| comparison.holds(&value, &threshold))
+                        i32::try_from(counters).ok().map(|value| comparison.holds(value))
                     }
                     rules::PlayerQuantity::CardsInHand | rules::PlayerQuantity::CardsInLibrary => {
                         let wanted = if quantity == rules::PlayerQuantity::CardsInHand {
@@ -46,7 +43,7 @@ pub fn eval_player_value(
                                 })
                             })
                             .count();
-                        i32::try_from(found).ok().map(|value| comparison.holds(&value, &threshold))
+                        i32::try_from(found).ok().map(|value| comparison.holds(value))
                     }
                 }
             })
@@ -74,43 +71,37 @@ mod tests {
                 assert!(eval_player_value(
                     &answers,
                     rules::PlayerQuantity::Life,
-                    rules::Comparison::AtLeast,
-                    20,
+                    rules::Comparison::OrMore(20),
                     Some(*p1.id),
                 ));
                 assert!(!eval_player_value(
                     &answers,
                     rules::PlayerQuantity::Life,
-                    rules::Comparison::AtLeast,
-                    21,
+                    rules::Comparison::OrMore(21),
                     Some(*p1.id),
                 ));
                 assert!(eval_player_value(
                     &answers,
                     rules::PlayerQuantity::CardsInLibrary,
-                    rules::Comparison::AtLeast,
-                    12,
+                    rules::Comparison::OrMore(12),
                     Some(*p1.id),
                 ));
                 assert!(!eval_player_value(
                     &answers,
                     rules::PlayerQuantity::CardsInHand,
-                    rules::Comparison::AtLeast,
-                    1,
+                    rules::Comparison::OrMore(1),
                     Some(*p1.id),
                 ));
                 assert!(!eval_player_value(
                     &answers,
                     rules::PlayerQuantity::Life,
-                    rules::Comparison::AtLeast,
-                    1,
+                    rules::Comparison::OrMore(1),
                     Some(*bears),
                 ));
                 assert!(!eval_player_value(
                     &answers,
                     rules::PlayerQuantity::Life,
-                    rules::Comparison::AtLeast,
-                    1,
+                    rules::Comparison::OrMore(1),
                     None,
                 ));
             })

@@ -1,21 +1,21 @@
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Comparison {
-    AtLeast,
-    AtMost,
-    EqualTo,
-    GreaterThan,
-    LessThan,
+    OrMore(i32),
+    OrLess(i32),
+    Exactly(i32),
+    GreaterThan(i32),
+    LessThan(i32),
 }
 
 impl Comparison {
     #[must_use]
-    pub fn holds<V: PartialOrd>(self, value: &V, threshold: &V) -> bool {
+    pub const fn holds(self, value: i32) -> bool {
         match self {
-            Self::AtLeast => value >= threshold,
-            Self::AtMost => value <= threshold,
-            Self::EqualTo => value == threshold,
-            Self::GreaterThan => value > threshold,
-            Self::LessThan => value < threshold,
+            Self::OrMore(threshold) => value >= threshold,
+            Self::OrLess(threshold) => value <= threshold,
+            Self::Exactly(threshold) => value == threshold,
+            Self::GreaterThan(threshold) => value > threshold,
+            Self::LessThan(threshold) => value < threshold,
         }
     }
 }
@@ -26,11 +26,11 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        assert!(Comparison::AtLeast.holds(&2, &2));
-        assert!(!Comparison::AtLeast.holds(&1, &2));
-        assert!(Comparison::GreaterThan.holds(&3, &2));
-        assert!(Comparison::EqualTo.holds(&2, &2));
-        assert!(Comparison::AtMost.holds(&1, &2));
-        assert!(Comparison::LessThan.holds(&1, &2));
+        assert!(Comparison::OrMore(2).holds(2));
+        assert!(!Comparison::OrMore(2).holds(1));
+        assert!(Comparison::GreaterThan(2).holds(3));
+        assert!(Comparison::Exactly(2).holds(2));
+        assert!(Comparison::OrLess(2).holds(1));
+        assert!(Comparison::LessThan(2).holds(1));
     }
 }

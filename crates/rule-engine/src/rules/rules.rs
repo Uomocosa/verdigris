@@ -140,7 +140,6 @@ impl Rules<'_, '_> {
         &self,
         characteristic: rules::Characteristic,
         comparison: rules::Comparison,
-        threshold: i32,
         viewpoint: Option<Entity>,
     ) -> bool {
     }
@@ -149,7 +148,6 @@ impl Rules<'_, '_> {
         &self,
         quantity: rules::PlayerQuantity,
         comparison: rules::Comparison,
-        threshold: i32,
         viewpoint: Option<Entity>,
     ) -> bool {
     }

@@ -7,7 +7,6 @@ pub fn eval_characteristic(
     answers: &rules::Rules,
     characteristic: rules::Characteristic,
     comparison: rules::Comparison,
-    threshold: i32,
     viewpoint: Option<Entity>,
 ) -> bool {
     viewpoint.is_some_and(|subject| {
@@ -17,13 +16,10 @@ pub fn eval_characteristic(
             .ok()
             .and_then(|entity| entity.get::<cards::EffectivePT>())
             .is_some_and(|effective| {
-                comparison.holds(
-                    &match characteristic {
-                        rules::Characteristic::Power => effective.power,
-                        rules::Characteristic::Toughness => effective.toughness,
-                    },
-                    &threshold,
-                )
+                comparison.holds(match characteristic {
+                    rules::Characteristic::Power => effective.power,
+                    rules::Characteristic::Toughness => effective.toughness,
+                })
             })
     })
 }
@@ -49,15 +45,13 @@ mod tests {
                 assert!(eval_characteristic(
                     &answers,
                     rules::Characteristic::Power,
-                    rules::Comparison::AtLeast,
-                    2,
+                    rules::Comparison::OrMore(2),
                     Some(*bears),
                 ));
                 assert!(!eval_characteristic(
                     &answers,
                     rules::Characteristic::Power,
-                    rules::Comparison::AtLeast,
-                    3,
+                    rules::Comparison::OrMore(3),
                     Some(*bears),
                 ));
             })

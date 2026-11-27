@@ -23,17 +23,32 @@ pub const fn card_type(card: cards::CardType) -> rules::Condition {
 
 #[must_use]
 pub const fn at_least(characteristic: rules::Characteristic, threshold: i32) -> rules::Condition {
-    rules::Condition::Characteristic(characteristic, rules::Comparison::AtLeast, threshold)
+    rules::Condition::Characteristic(characteristic, rules::Comparison::OrMore(threshold))
 }
 
 #[must_use]
 pub const fn at_most(characteristic: rules::Characteristic, threshold: i32) -> rules::Condition {
-    rules::Condition::Characteristic(characteristic, rules::Comparison::AtMost, threshold)
+    rules::Condition::Characteristic(characteristic, rules::Comparison::OrLess(threshold))
 }
 
 #[must_use]
 pub const fn equal_to(characteristic: rules::Characteristic, threshold: i32) -> rules::Condition {
-    rules::Condition::Characteristic(characteristic, rules::Comparison::EqualTo, threshold)
+    rules::Condition::Characteristic(characteristic, rules::Comparison::Exactly(threshold))
+}
+
+#[must_use]
+pub const fn exactly(threshold: i32) -> rules::Comparison {
+    rules::Comparison::Exactly(threshold)
+}
+
+#[must_use]
+pub const fn greater_than(threshold: i32) -> rules::Comparison {
+    rules::Comparison::GreaterThan(threshold)
+}
+
+#[must_use]
+pub const fn less_than(threshold: i32) -> rules::Comparison {
+    rules::Comparison::LessThan(threshold)
 }
 
 #[must_use]

@@ -12,17 +12,17 @@ pub enum PlayerQuantity {
 impl PlayerQuantity {
     #[must_use]
     pub const fn at_least(self, threshold: i32) -> rules::Condition {
-        rules::Condition::PlayerValue(self, rules::Comparison::AtLeast, threshold)
+        rules::Condition::PlayerValue(self, rules::Comparison::OrMore(threshold))
     }
 
     #[must_use]
     pub const fn at_most(self, threshold: i32) -> rules::Condition {
-        rules::Condition::PlayerValue(self, rules::Comparison::AtMost, threshold)
+        rules::Condition::PlayerValue(self, rules::Comparison::OrLess(threshold))
     }
 
     #[must_use]
     pub const fn equal_to(self, threshold: i32) -> rules::Condition {
-        rules::Condition::PlayerValue(self, rules::Comparison::EqualTo, threshold)
+        rules::Condition::PlayerValue(self, rules::Comparison::Exactly(threshold))
     }
 }
 
@@ -36,22 +36,20 @@ mod tests {
     fn test_usage() {
         assert_eq!(
             rules::life().at_least(20),
-            rules::Condition::PlayerValue(PlayerQuantity::Life, rules::Comparison::AtLeast, 20)
+            rules::Condition::PlayerValue(PlayerQuantity::Life, rules::Comparison::OrMore(20))
         );
         assert_eq!(
             rules::poison_counters().at_most(0),
             rules::Condition::PlayerValue(
                 PlayerQuantity::PoisonCounters,
-                rules::Comparison::AtMost,
-                0
+                rules::Comparison::OrLess(0),
             )
         );
         assert_eq!(
             PlayerQuantity::CardsInHand.equal_to(0),
             rules::Condition::PlayerValue(
                 PlayerQuantity::CardsInHand,
-                rules::Comparison::EqualTo,
-                0
+                rules::Comparison::Exactly(0),
             )
         );
     }

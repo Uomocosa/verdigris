@@ -36,6 +36,10 @@ comprehensive_rules = "docs/MagicCompRules-20250919.txt"
 path = "crates/rule-engine/src/keywords/__traits__/keyword_params.rs"
 reason = "Trait file named after the trait (KeywordParams), not a method file of Keyword."
 
+[[lele.rules.lint.atomic_file.exempt]]
+path = "crates/rule-engine/src/rules/__traits__/value_rule.rs"
+reason = "Trait file named after the trait (ValueRule), not a method file of Value; Value carries comparison thresholds for Condition (C1: Comparison carries its value)."
+
 # LELECORE002 · locked · File and folder names are snake_case.
 [lele.rules.lint.snake_case_files]
 
@@ -45,6 +49,10 @@ reason = "Trait file named after the trait (KeywordParams), not a method file of
 [[lele.rules.lint.method_file_co_location.exempt]]
 path = "crates/rule-engine/src/keywords/__traits__/keyword_params.rs"
 reason = "Trait file named after the trait (KeywordParams), not a method file of Keyword."
+
+[[lele.rules.lint.method_file_co_location.exempt]]
+path = "crates/rule-engine/src/rules/__traits__/value_rule.rs"
+reason = "Trait file named after the trait (ValueRule), not a method file of Value; it lives with the other rules traits."
 
 # LELECORE004 · locked · Unit tests live in the same file as the code (no `tests/` folders under `src/`, no…
 [lele.rules.lint.test_inline]
