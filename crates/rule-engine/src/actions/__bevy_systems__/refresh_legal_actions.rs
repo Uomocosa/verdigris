@@ -23,6 +23,7 @@ pub fn refresh_legal_actions(
                     player: Some(pick.player),
                     actions: Vec::new(),
                     attackers: Vec::new(),
+                    blocks: Vec::new(),
                 };
             }
             actions::Choice::Pick(pick) => {
@@ -40,6 +41,7 @@ pub fn refresh_legal_actions(
                     player: Some(pick.player),
                     actions: previews,
                     attackers: Vec::new(),
+                    blocks: Vec::new(),
                 };
             }
             actions::Choice::CombatDamage(_) => {
@@ -47,6 +49,7 @@ pub fn refresh_legal_actions(
                     player: Some(choice.player()),
                     actions: Vec::new(),
                     attackers: Vec::new(),
+                    blocks: Vec::new(),
                 };
             }
         }
@@ -57,6 +60,7 @@ pub fn refresh_legal_actions(
             player: None,
             actions: Vec::new(),
             attackers: Vec::new(),
+            blocks: Vec::new(),
         };
         return;
     };
@@ -100,9 +104,11 @@ pub fn refresh_legal_actions(
             }
         }
     }
+    let blocks = answers.legal_block_previews(&game, player);
     *legal = actions::LegalActions {
         player: Some(player),
         actions: refreshed,
         attackers,
+        blocks,
     };
 }

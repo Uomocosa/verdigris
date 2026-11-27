@@ -57,6 +57,7 @@ pub enum Rejected {
     },
     CannotBlock {
         assignments: Vec<actions::BlockAssignment>,
+        why: Vec<actions::DeclarationWhy>,
     },
     NoPriority {
         player: players::PlayerId,

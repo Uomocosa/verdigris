@@ -62,6 +62,8 @@ pub enum Why {
     Restriction(rules::RestrictionId),
     NotPerformable,
     NotYours,
+    NotAttacking,
+    BlocksMoreThanOne,
     Required,
     WrongTiming,
 }

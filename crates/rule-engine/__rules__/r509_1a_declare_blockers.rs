@@ -1,12 +1,10 @@
-use bevy::prelude::{Entity, MessageReader, MessageWriter, Query, With};
+use bevy::prelude::{MessageReader, MessageWriter};
 
 use crate::Attempt;
 use crate::Game;
 use crate::actions;
-use crate::cards;
 use crate::events;
 use crate::rules;
-use crate::turns;
 
 /// 509.1a The defending player chooses which creatures they control, if any, will block. The chosen
 /// creatures must be untapped and they can’t also be battles. For each of the chosen creatures, the
@@ -36,50 +34,16 @@ pub fn r509_1a_declare_blockers(
     mut rejected: MessageWriter<actions::Rejected>,
     mut declared: MessageWriter<Attempt<events::DeclareBlocker>>,
     game: Game,
-    blockers: Query<(Entity, &cards::Controller), With<cards::Creature>>,
-    attacking: Query<Entity, With<cards::Attacking>>,
     answers: rules::Rules,
 ) {
     for action in actions.read() {
         let actions::Action::DeclareBlockers(assignments) = &action.action else {
             continue;
         };
-        if game.turn().step() != Some(turns::Step::DeclareBlockers)
-            || game.priority_holder().is_none_or(|holder| holder.id != action.player)
-            || game.active_player().is_some_and(|active| active.id == action.player)
-        {
+        if let Err(why) = answers.validate_blockers(&game, action.player, assignments) {
             rejected.write(actions::Rejected::CannotBlock {
                 assignments: assignments.clone(),
-            });
-            continue;
-        }
-        let all_legal = assignments.iter().all(|assignment| {
-            attacking.get(assignment.attacker).is_ok()
-                && blockers.iter().any(|(entity, controller)| {
-                    entity == assignment.blocker && **controller == action.player
-                })
-                && answers.legal::<events::DeclareBlocker>(&events::DeclareBlocker {
-                    blocker: assignment.blocker,
-                    attacker: assignment.attacker,
-                })
-        });
-        let blocks_one_creature = assignments.iter().all(|assignment| {
-            assignments.iter().filter(|other| other.blocker == assignment.blocker).count() == 1
-        });
-        let requirement_unmet = blockers.iter().any(|(entity, controller)| {
-            **controller == action.player
-                && answers.required::<events::DeclareBlocker>(entity)
-                && !assignments.iter().any(|assignment| assignment.blocker == entity)
-                && attacking.iter().any(|attacker| {
-                    answers.legal::<events::DeclareBlocker>(&events::DeclareBlocker {
-                        blocker: entity,
-                        attacker,
-                    })
-                })
-        });
-        if !all_legal || !blocks_one_creature || requirement_unmet {
-            rejected.write(actions::Rejected::CannotBlock {
-                assignments: assignments.clone(),
+                why,
             });
             continue;
         }
@@ -99,6 +63,8 @@ mod tests {
     use crate::actions;
     use crate::cards;
     use crate::events;
+    use crate::keywords;
+    use crate::rules;
     use crate::testing::*;
     use crate::turns;
 
@@ -130,7 +96,13 @@ mod tests {
 
         assert_eq!(
             game.last_rejection(),
-            Some(&actions::Rejected::CannotBlock { assignments })
+            Some(&actions::Rejected::CannotBlock {
+                assignments,
+                why: vec![actions::DeclarationWhy {
+                    creature: Some(bears.into()),
+                    why: rules::Why::Restriction(events::declare_blocker::UNTAPPED),
+                }],
+            })
         );
         assert!(!game.is_blocking(bears));
         Ok(())
@@ -190,7 +162,13 @@ mod tests {
 
         assert_eq!(
             game.last_rejection(),
-            Some(&actions::Rejected::CannotBlock { assignments })
+            Some(&actions::Rejected::CannotBlock {
+                assignments,
+                why: vec![actions::DeclarationWhy {
+                    creature: Some(bears_1.into()),
+                    why: rules::Why::NotAttacking,
+                }],
+            })
         );
         Ok(())
     }
@@ -218,11 +196,27 @@ mod tests {
             attacker: drake.into(),
         }];
 
+        game.app.update();
+        let legal = game.app.world().resource::<actions::LegalActions>().clone();
+        assert!(legal.blocks.contains(&(
+            actions::BlockAssignment {
+                blocker: bears.into(),
+                attacker: drake.into()
+            },
+            rules::Legality::Illegal(vec![rules::Why::Restriction(keywords::flying::BLOCKERS)])
+        )));
+
         game.act(p2, actions::Action::DeclareBlockers(assignments.clone()));
 
         assert_eq!(
             game.last_rejection(),
-            Some(&actions::Rejected::CannotBlock { assignments })
+            Some(&actions::Rejected::CannotBlock {
+                assignments,
+                why: vec![actions::DeclarationWhy {
+                    creature: Some(bears.into()),
+                    why: rules::Why::Restriction(keywords::flying::BLOCKERS),
+                }],
+            })
         );
         assert!(!game.is_blocking(bears));
 
@@ -251,7 +245,13 @@ mod tests {
 
         assert_eq!(
             game.last_rejection(),
-            Some(&actions::Rejected::CannotBlock { assignments })
+            Some(&actions::Rejected::CannotBlock {
+                assignments,
+                why: vec![actions::DeclarationWhy {
+                    creature: Some(bears.into()),
+                    why: rules::Why::Restriction(keywords::flying::BLOCKERS),
+                }],
+            })
         );
         assert!(!game.is_blocking(bears));
         Ok(())
@@ -294,7 +294,13 @@ mod tests {
 
         assert_eq!(
             game.last_rejection(),
-            Some(&actions::Rejected::CannotBlock { assignments })
+            Some(&actions::Rejected::CannotBlock {
+                assignments,
+                why: vec![actions::DeclarationWhy {
+                    creature: Some(bears_2.into()),
+                    why: rules::Why::Restriction(keywords::flying::BLOCKERS),
+                }],
+            })
         );
         assert!(!game.is_blocking(bears_2));
         Ok(())
@@ -323,7 +329,11 @@ mod tests {
         assert_eq!(
             game.last_rejection(),
             Some(&actions::Rejected::CannotBlock {
-                assignments: vec![]
+                assignments: vec![],
+                why: vec![actions::DeclarationWhy {
+                    creature: Some(golem.into()),
+                    why: rules::Why::Required,
+                }],
             })
         );
         assert!(!game.is_blocking(golem));
@@ -356,7 +366,11 @@ mod tests {
         assert_eq!(
             game.last_rejection(),
             Some(&actions::Rejected::CannotBlock {
-                assignments: vec![]
+                assignments: vec![],
+                why: vec![actions::DeclarationWhy {
+                    creature: Some(bears_2.into()),
+                    why: rules::Why::Required,
+                }],
             })
         );
         assert!(!game.is_blocking(bears_2));
@@ -393,7 +407,11 @@ mod tests {
         assert_eq!(
             game.last_rejection(),
             Some(&actions::Rejected::CannotBlock {
-                assignments: vec![]
+                assignments: vec![],
+                why: vec![actions::DeclarationWhy {
+                    creature: Some(bears_2.into()),
+                    why: rules::Why::Required,
+                }],
             })
         );
         assert!(!game.is_blocking(bears_2));
@@ -460,7 +478,13 @@ mod tests {
 
         assert_eq!(
             game.last_rejection(),
-            Some(&actions::Rejected::CannotBlock { assignments })
+            Some(&actions::Rejected::CannotBlock {
+                assignments,
+                why: vec![actions::DeclarationWhy {
+                    creature: Some(bears.into()),
+                    why: rules::Why::Restriction(rules::RestrictionId("test/test-timid-field")),
+                }],
+            })
         );
         assert!(!game.is_blocking(bears));
 
@@ -497,7 +521,13 @@ mod tests {
 
         assert_eq!(
             game.last_rejection(),
-            Some(&actions::Rejected::CannotBlock { assignments })
+            Some(&actions::Rejected::CannotBlock {
+                assignments,
+                why: vec![actions::DeclarationWhy {
+                    creature: Some(drake.into()),
+                    why: rules::Why::Restriction(rules::RestrictionId("test/test-sky-court")),
+                }],
+            })
         );
         assert!(!game.is_blocking(drake));
 
@@ -557,7 +587,13 @@ mod tests {
 
         assert_eq!(
             game.last_rejection(),
-            Some(&actions::Rejected::CannotBlock { assignments })
+            Some(&actions::Rejected::CannotBlock {
+                assignments,
+                why: vec![actions::DeclarationWhy {
+                    creature: Some(bears_1.into()),
+                    why: rules::Why::NotYours,
+                }],
+            })
         );
         assert!(!game.is_blocking(bears_1));
         Ok(())

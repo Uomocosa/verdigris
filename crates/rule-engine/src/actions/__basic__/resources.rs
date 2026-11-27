@@ -19,4 +19,5 @@ pub struct LegalActions {
     pub player: Option<players::PlayerId>,
     pub actions: Vec<(actions::Action, rules::Legality)>,
     pub attackers: Vec<(Entity, rules::Legality)>,
+    pub blocks: Vec<(actions::BlockAssignment, rules::Legality)>,
 }

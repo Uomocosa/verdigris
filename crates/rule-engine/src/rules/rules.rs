@@ -73,6 +73,23 @@ impl Rules<'_, '_> {
     }
 
     #[must_use]
+    pub fn legal_block_previews(
+        &self,
+        game: &Game,
+        player: players::PlayerId,
+    ) -> Vec<(actions::BlockAssignment, rules::Legality)> {
+    }
+
+    #[must_use]
+    pub fn validate_blockers(
+        &self,
+        game: &Game,
+        player: players::PlayerId,
+        assignments: &[actions::BlockAssignment],
+    ) -> Result<(), Vec<actions::DeclarationWhy>> {
+    }
+
+    #[must_use]
     pub fn defines<E: rules::traits::event::Event>(
         &self,
         definition: &rules::Definition,

@@ -22,6 +22,7 @@ pub fn r509_1h_becomes_blocked(
 mod tests {
     use crate::BATTLEFIELD;
     use crate::actions;
+    use crate::rules;
     use crate::testing::*;
     use crate::turns;
 
@@ -60,7 +61,13 @@ mod tests {
 
         assert_eq!(
             game.last_rejection(),
-            Some(&actions::Rejected::CannotBlock { assignments })
+            Some(&actions::Rejected::CannotBlock {
+                assignments,
+                why: vec![actions::DeclarationWhy {
+                    creature: Some(bears.into()),
+                    why: rules::Why::BlocksMoreThanOne,
+                }],
+            })
         );
         assert!(!game.is_blocking(bears));
         game.play([p2.declare_blockers([(bears, rats)])])?;
