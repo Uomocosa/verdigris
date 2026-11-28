@@ -1,10 +1,6 @@
-use crate::PLAYER;
-use crate::cards;
-use crate::cost;
-use crate::effects;
-use crate::testing;
+use crate::testing::prelude::*;
 
-pub const TOME_SCOUR: testing::Card = testing::Card {
-    name: testing::TestCardName("Tome Scour"),
-    definition: || cards::sorcery("Tome Scour", cost![U]).spell(effects::target(1, PLAYER).mill(5)),
+pub const TOME_SCOUR: Card = Card {
+    name: TestCardName("Tome Scour"),
+    definition: || cards::sorcery("Tome Scour", cost![U]).spell(target(1, PLAYER).mill(5)),
 };

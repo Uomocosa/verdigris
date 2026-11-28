@@ -1,9 +1,6 @@
-use crate::cards;
-use crate::cost;
-use crate::pt;
-use crate::testing;
+use crate::testing::prelude::*;
 
-pub const ENDLESS_ONE: testing::Card = testing::Card {
-    name: testing::TestCardName("Endless One"),
+pub const ENDLESS_ONE: Card = Card {
+    name: TestCardName("Endless One"),
     definition: || cards::creature("Endless One", cost![X], pt!(0, 0)),
 };

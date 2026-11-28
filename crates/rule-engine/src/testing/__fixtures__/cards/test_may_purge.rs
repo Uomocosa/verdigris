@@ -1,19 +1,13 @@
-use crate::abilities;
-use crate::card;
-use crate::cards;
-use crate::cost;
-use crate::events;
-use crate::rules;
-use crate::testing;
+use crate::testing::prelude::*;
 
-pub const TEST_MAY_PURGE: testing::Card = testing::Card {
-    name: testing::TestCardName("Test May Purge"),
+pub const TEST_MAY_PURGE: Card = Card {
+    name: TestCardName("Test May Purge"),
     definition: || {
         card! {
             cards::CardDefinition::from_enchantment("Test May Purge", cost![2]);
-            abilities::opening_hand_action(rules::may(rules::EventTemplate::Discard {
-                who: rules::Hooked::<events::OpeningHandAction>::PLAYER.into(),
-                amount: rules::Amount::Fixed(7),
+            opening_hand_action(may(EventTemplate::Discard {
+                who: Hooked::<OpeningHandAction>::PLAYER.into(),
+                amount: Amount::Fixed(7),
             })),
         }
     },

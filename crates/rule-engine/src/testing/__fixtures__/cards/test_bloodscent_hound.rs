@@ -1,19 +1,11 @@
-use crate::OPPONENT;
-use crate::card;
-use crate::cards;
-use crate::cost;
-use crate::keywords;
-use crate::pt;
-use crate::rules;
-use crate::statics;
-use crate::testing;
+use crate::testing::prelude::*;
 
-pub const TEST_BLOODSCENT_HOUND: testing::Card = testing::Card {
-    name: testing::TestCardName("Test Bloodscent Hound"),
+pub const TEST_BLOODSCENT_HOUND: Card = Card {
+    name: TestCardName("Test Bloodscent Hound"),
     definition: || {
         card! {
             cards::creature("Test Bloodscent Hound", cost![1, R], pt!(2, 1));
-            statics::this().gain(keywords::haste()).as_long_as(rules::life().of(rules::an(OPPONENT)).is(rules::Value(10).or_less())),
+            this().gain(haste()).as_long_as(life().of(an(OPPONENT)).is(Value(10).or_less())),
         }
     },
 };

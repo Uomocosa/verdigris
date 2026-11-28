@@ -1,13 +1,8 @@
-use crate::cards;
-use crate::cost;
-use crate::effects;
-use crate::nonblack_creature;
-use crate::testing;
+use crate::testing::prelude::*;
 
-pub const DOOM_BLADE: testing::Card = testing::Card {
-    name: testing::TestCardName("Doom Blade"),
+pub const DOOM_BLADE: Card = Card {
+    name: TestCardName("Doom Blade"),
     definition: || {
-        cards::instant("Doom Blade", cost![1, B])
-            .spell(effects::destroy(effects::target(1, nonblack_creature())))
+        cards::instant("Doom Blade", cost![1, B]).spell(destroy(target(1, nonblack_creature())))
     },
 };

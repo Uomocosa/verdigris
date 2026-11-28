@@ -1,15 +1,11 @@
-use crate::card;
-use crate::cards;
-use crate::cost;
-use crate::statics;
-use crate::testing;
+use crate::testing::prelude::*;
 
-pub const TEST_PLAYER_WAIVER: testing::Card = testing::Card {
-    name: testing::TestCardName("Test Player Waiver"),
+pub const TEST_PLAYER_WAIVER: Card = Card {
+    name: TestCardName("Test Player Waiver"),
     definition: || {
         card! {
             cards::CardDefinition::from_enchantment("Test Player Waiver", cost![2, U]);
-            statics::you().as_though(testing::UNTAPPED, testing::TestRule::ATTACKER),
+            you().as_though(UNTAPPED, TestRule::ATTACKER),
         }
     },
 };

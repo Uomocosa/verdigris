@@ -1,23 +1,15 @@
-use crate::card;
-use crate::cards;
-use crate::cost;
-use crate::creature;
-use crate::events;
-use crate::keywords;
-use crate::rules;
-use crate::statics;
-use crate::testing;
+use crate::testing::prelude::*;
 
-pub const TEST_SKY_COURT: testing::Card = testing::Card {
-    name: testing::TestCardName("Test Sky Court"),
+pub const TEST_SKY_COURT: Card = Card {
+    name: TestCardName("Test Sky Court"),
     definition: || {
         card! {
             cards::CardDefinition::from_enchantment("Test Sky Court", cost![2, U]);
-            statics::all(creature()).restriction::<events::DeclareBlocker>(
-                events::DeclareBlocker::BLOCKER,
-                rules::RestrictionId("test/test-sky-court"),
-                (!rules::has_keyword(keywords::flying::ID)).of(events::DeclareBlocker::BLOCKER)
-                    | rules::has_keyword(keywords::flying::ID).of(events::DeclareBlocker::ATTACKER),
+            all(creature()).restriction::<DeclareBlocker>(
+                DeclareBlocker::BLOCKER,
+                RestrictionId("test/test-sky-court"),
+                (!has_keyword(flying::ID)).of(DeclareBlocker::BLOCKER)
+                    | has_keyword(flying::ID).of(DeclareBlocker::ATTACKER),
             ),
         }
     },

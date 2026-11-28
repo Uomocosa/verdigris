@@ -1,18 +1,10 @@
-use crate::YOU;
-use crate::cards;
-use crate::cost;
-use crate::creature;
-use crate::effects;
-use crate::keywords;
-use crate::pt;
-use crate::testing;
+use crate::testing::prelude::*;
 
-pub const RANGERS_GUILE: testing::Card = testing::Card {
-    name: testing::TestCardName("Ranger's Guile"),
+pub const RANGERS_GUILE: Card = Card {
+    name: TestCardName("Ranger's Guile"),
     definition: || {
         cards::instant("Ranger's Guile", cost![G]).spell(
-            effects::target(1, creature() & effects::Filter::controlled_by(YOU))
-                .do_(effects::get(pt!(1, 1)) & effects::gain(keywords::hexproof())),
+            target(1, creature().and(controlled_by(YOU))).do_(get(pt!(1, 1)) & gain(hexproof())),
         )
     },
 };

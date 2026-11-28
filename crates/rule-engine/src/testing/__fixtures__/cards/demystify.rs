@@ -1,13 +1,6 @@
-use crate::cards;
-use crate::cost;
-use crate::effects;
-use crate::enchantment;
-use crate::testing;
+use crate::testing::prelude::*;
 
-pub const DEMYSTIFY: testing::Card = testing::Card {
-    name: testing::TestCardName("Demystify"),
-    definition: || {
-        cards::instant("Demystify", cost![W])
-            .spell(effects::destroy(effects::target(1, enchantment())))
-    },
+pub const DEMYSTIFY: Card = Card {
+    name: TestCardName("Demystify"),
+    definition: || cards::instant("Demystify", cost![W]).spell(destroy(target(1, enchantment()))),
 };

@@ -17,6 +17,11 @@ require    = "honest"
 path   = "crates/rule-engine/__rules__"
 reason = "Holds only Comprehensive Rules Bevy systems, one file per rule; shared items live at the crate root."
 
+[[lele.project.glob_import]]
+module  = "testing::prelude"
+folders = ["crates/rule-engine/src/testing/__fixtures__/cards"]
+reason  = "Card fixtures read like oracle text; DSL names are used bare."
+
 [[lele.project.prelude]]
 path   = "crates/rule-engine/src/prelude"
 reason = "Card DSL names in one place, for card fixtures."

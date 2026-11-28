@@ -1,18 +1,11 @@
-use crate::OPPONENT;
-use crate::card;
-use crate::cards;
-use crate::cost;
-use crate::creature;
-use crate::effects;
-use crate::statics;
-use crate::testing;
+use crate::testing::prelude::*;
 
-pub const TEST_CALL_TO_ARMS: testing::Card = testing::Card {
-    name: testing::TestCardName("Test Call to Arms"),
+pub const TEST_CALL_TO_ARMS: Card = Card {
+    name: TestCardName("Test Call to Arms"),
     definition: || {
         card! {
             cards::CardDefinition::from_enchantment("Test Call to Arms", cost![1, R]);
-            statics::all(creature() & effects::Filter::controlled_by(OPPONENT)).must_attack(),
+            all(creature().and(controlled_by(OPPONENT))).must_attack(),
         }
     },
 };

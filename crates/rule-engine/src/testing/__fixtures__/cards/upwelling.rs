@@ -1,16 +1,11 @@
-use crate::PLAYER;
-use crate::card;
-use crate::cards;
-use crate::cost;
-use crate::statics;
-use crate::testing;
+use crate::testing::prelude::*;
 
-pub const UPWELLING: testing::Card = testing::Card {
-    name: testing::TestCardName("Upwelling"),
+pub const UPWELLING: Card = Card {
+    name: TestCardName("Upwelling"),
     definition: || {
         card! {
             cards::CardDefinition::from_enchantment("Upwelling", cost![3, G]);
-            statics::all(PLAYER).dont_lose_unspent_mana(),
+            all(PLAYER).dont_lose_unspent_mana(),
         }
     },
 };

@@ -1,13 +1,8 @@
-use crate::cards;
-use crate::cost;
-use crate::creature_spell;
-use crate::effects;
-use crate::testing;
+use crate::testing::prelude::*;
 
-pub const ESSENCE_SCATTER: testing::Card = testing::Card {
-    name: testing::TestCardName("Essence Scatter"),
+pub const ESSENCE_SCATTER: Card = Card {
+    name: TestCardName("Essence Scatter"),
     definition: || {
-        cards::instant("Essence Scatter", cost![1, U])
-            .spell(effects::counter(effects::target(1, creature_spell())))
+        cards::instant("Essence Scatter", cost![1, U]).spell(counter(target(1, creature_spell())))
     },
 };

@@ -1,13 +1,8 @@
-use crate::cards;
-use crate::cost;
-use crate::effects;
-use crate::noncreature_spell;
-use crate::testing;
+use crate::testing::prelude::*;
 
-pub const NEGATE: testing::Card = testing::Card {
-    name: testing::TestCardName("Negate"),
+pub const NEGATE: Card = Card {
+    name: TestCardName("Negate"),
     definition: || {
-        cards::instant("Negate", cost![1, U])
-            .spell(effects::counter(effects::target(1, noncreature_spell())))
+        cards::instant("Negate", cost![1, U]).spell(counter(target(1, noncreature_spell())))
     },
 };

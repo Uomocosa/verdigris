@@ -1,19 +1,13 @@
-use crate::abilities;
-use crate::card;
-use crate::cards;
-use crate::cost;
-use crate::events;
-use crate::rules;
-use crate::testing;
+use crate::testing::prelude::*;
 
-pub const TEST_OPENING_TOLL: testing::Card = testing::Card {
-    name: testing::TestCardName("Test Opening Toll"),
+pub const TEST_OPENING_TOLL: Card = Card {
+    name: TestCardName("Test Opening Toll"),
     definition: || {
         card! {
             cards::CardDefinition::from_enchantment("Test Opening Toll", cost![2]);
-            abilities::opening_hand_action(vec![rules::EventTemplate::Discard {
-                who: rules::Hooked::<events::OpeningHandAction>::PLAYER.into(),
-                amount: rules::Amount::Fixed(1),
+            opening_hand_action(vec![EventTemplate::Discard {
+                who: Hooked::<OpeningHandAction>::PLAYER.into(),
+                amount: Amount::Fixed(1),
             }]),
         }
     },

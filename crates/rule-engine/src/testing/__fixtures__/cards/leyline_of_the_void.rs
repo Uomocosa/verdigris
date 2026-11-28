@@ -1,24 +1,17 @@
-use crate::abilities;
-use crate::card;
-use crate::cards;
-use crate::cost;
-use crate::events;
-use crate::rules;
 use crate::rules::traits::event::Event;
-use crate::statics;
-use crate::testing;
+use crate::testing::prelude::*;
 
-pub const LEYLINE_OF_THE_VOID: testing::Card = testing::Card {
-    name: testing::TestCardName("Leyline of the Void"),
+pub const LEYLINE_OF_THE_VOID: Card = Card {
+    name: TestCardName("Leyline of the Void"),
     definition: || {
         card! {
             cards::CardDefinition::from_enchantment("Leyline of the Void", cost![2, B, B]);
-            abilities::begin_the_game_with_it_on_the_battlefield(),
-            statics::each_opponent().instead(
-                events::PutIntoGraveyard::ID,
-                events::PutIntoGraveyard::OBJECT.controller(),
-                rules::Condition::True,
-                vec![rules::EventTemplate::Exile { what: events::PutIntoGraveyard::OBJECT.into() }],
+            begin_the_game_with_it_on_the_battlefield(),
+            each_opponent().instead(
+                PutIntoGraveyard::ID,
+                PutIntoGraveyard::OBJECT.controller(),
+                Condition::True,
+                vec![EventTemplate::Exile { what: PutIntoGraveyard::OBJECT.into() }],
             ),
         }
     },

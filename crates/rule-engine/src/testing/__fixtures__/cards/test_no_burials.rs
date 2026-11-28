@@ -1,22 +1,13 @@
-use crate::YOU;
-use crate::card;
-use crate::cards;
-use crate::cost;
-use crate::creature;
-use crate::effects;
-use crate::events;
-use crate::rules;
-use crate::statics;
-use crate::testing;
+use crate::testing::prelude::*;
 
-pub const TEST_NO_BURIALS: testing::Card = testing::Card {
-    name: testing::TestCardName("Test No Burials"),
+pub const TEST_NO_BURIALS: Card = Card {
+    name: TestCardName("Test No Burials"),
     definition: || {
         card! {
             cards::CardDefinition::from_enchantment("Test No Burials", cost![2]);
-            statics::all(creature() & effects::Filter::controlled_by(YOU)).cant::<events::PutIntoGraveyard>(
-                events::PutIntoGraveyard::OBJECT,
-                rules::RestrictionId("test/test-no-burials"),
+            all(creature().and(controlled_by(YOU))).cant::<PutIntoGraveyard>(
+                PutIntoGraveyard::OBJECT,
+                RestrictionId("test/test-no-burials"),
             ),
         }
     },

@@ -1,17 +1,12 @@
-use crate::abilities;
-use crate::card;
-use crate::cards;
-use crate::cost;
-use crate::statics;
-use crate::testing;
+use crate::testing::prelude::*;
 
-pub const LEYLINE_OF_ANTICIPATION: testing::Card = testing::Card {
-    name: testing::TestCardName("Leyline of Anticipation"),
+pub const LEYLINE_OF_ANTICIPATION: Card = Card {
+    name: TestCardName("Leyline of Anticipation"),
     definition: || {
         card! {
             cards::CardDefinition::from_enchantment("Leyline of Anticipation", cost![2, U, U]);
-            abilities::begin_the_game_with_it_on_the_battlefield(),
-            statics::you().cast_spells_as_though_they_had_flash(),
+            begin_the_game_with_it_on_the_battlefield(),
+            you().cast_spells_as_though_they_had_flash(),
         }
     },
 };

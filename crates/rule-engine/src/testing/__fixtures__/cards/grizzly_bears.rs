@@ -1,9 +1,6 @@
-use crate::cards;
-use crate::cost;
-use crate::pt;
-use crate::testing;
+use crate::testing::prelude::*;
 
-pub const GRIZZLY_BEARS: testing::Card = testing::Card {
-    name: testing::TestCardName("Grizzly Bears"),
+pub const GRIZZLY_BEARS: Card = Card {
+    name: TestCardName("Grizzly Bears"),
     definition: || cards::creature("Grizzly Bears", cost![1, G], pt!(2, 2)),
 };

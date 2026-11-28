@@ -1,9 +1,6 @@
-use crate::cards;
-use crate::cost;
-use crate::pt;
-use crate::testing;
+use crate::testing::prelude::*;
 
-pub const WATCHWOLF: testing::Card = testing::Card {
-    name: testing::TestCardName("Watchwolf"),
+pub const WATCHWOLF: Card = Card {
+    name: TestCardName("Watchwolf"),
     definition: || cards::creature("Watchwolf", cost![G, W], pt!(3, 3)),
 };

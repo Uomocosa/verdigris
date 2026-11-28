@@ -1,31 +1,25 @@
-use crate::card;
-use crate::cards;
-use crate::cost;
-use crate::events;
-use crate::rules;
-use crate::statics;
-use crate::testing;
+use crate::testing::prelude::*;
 
-pub const TEST_CANT_DISCARD: testing::Card = testing::Card {
-    name: testing::TestCardName("Test Cant Discard"),
+pub const TEST_CANT_DISCARD: Card = Card {
+    name: TestCardName("Test Cant Discard"),
     definition: || {
         card! {
             cards::CardDefinition::from_enchantment("Test Cant Discard", cost![2]);
-            statics::you().cant::<events::Discard>(
-                events::Discard::CARDS.owner(),
-                rules::RestrictionId("test/test-cant-discard"),
+            you().cant::<Discard>(
+                Discard::CARDS.owner(),
+                RestrictionId("test/test-cant-discard"),
             ),
-            statics::you().cant::<events::GainLife>(
-                events::GainLife::PLAYER,
-                rules::RestrictionId("test/test-cant-discard"),
+            you().cant::<GainLife>(
+                GainLife::PLAYER,
+                RestrictionId("test/test-cant-discard"),
             ),
-            statics::you().cant::<events::Mill>(
-                events::Mill::PLAYER,
-                rules::RestrictionId("test/test-cant-discard"),
+            you().cant::<Mill>(
+                Mill::PLAYER,
+                RestrictionId("test/test-cant-discard"),
             ),
-            statics::you().cant::<events::Create>(
-                events::Create::TOKEN.controller(),
-                rules::RestrictionId("test/test-cant-discard"),
+            you().cant::<Create>(
+                Create::TOKEN.controller(),
+                RestrictionId("test/test-cant-discard"),
             ),
         }
     },

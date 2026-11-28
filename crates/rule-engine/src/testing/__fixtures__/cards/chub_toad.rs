@@ -1,18 +1,12 @@
-use crate::THIS;
-use crate::abilities;
-use crate::card;
-use crate::cards;
-use crate::cost;
-use crate::pt;
-use crate::testing;
+use crate::testing::prelude::*;
 
-pub const CHUB_TOAD: testing::Card = testing::Card {
-    name: testing::TestCardName("Chub Toad"),
+pub const CHUB_TOAD: Card = Card {
+    name: TestCardName("Chub Toad"),
     definition: || {
         card! {
             cards::creature("Chub Toad", cost![2, G], pt!(1, 1));
-            abilities::whenever(THIS.blocks(), THIS.get(pt!(3, 3))),
-            abilities::whenever(THIS.becomes_blocked(), THIS.get(pt!(3, 3))),
+            whenever(THIS.blocks(), THIS.get(pt!(3, 3))),
+            whenever(THIS.becomes_blocked(), THIS.get(pt!(3, 3))),
         }
     },
 };

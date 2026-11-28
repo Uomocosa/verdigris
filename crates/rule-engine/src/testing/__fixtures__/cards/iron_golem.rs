@@ -1,19 +1,13 @@
-use crate::card;
-use crate::cards;
-use crate::cost;
-use crate::keywords;
-use crate::pt;
-use crate::statics;
-use crate::testing;
+use crate::testing::prelude::*;
 
-pub const IRON_GOLEM: testing::Card = testing::Card {
-    name: testing::TestCardName("Iron Golem"),
+pub const IRON_GOLEM: Card = Card {
+    name: TestCardName("Iron Golem"),
     definition: || {
         card! {
             cards::artifact_creature("Iron Golem", cost![4], pt!(5, 3));
-            keywords::vigilance(),
-            statics::this().must_attack(),
-            statics::this().must_block(),
+            vigilance(),
+            this().must_attack(),
+            this().must_block(),
         }
     },
 };

@@ -1,13 +1,6 @@
-use crate::cards;
-use crate::cost;
-use crate::creature;
-use crate::effects;
-use crate::testing;
+use crate::testing::prelude::*;
 
-pub const MURDER: testing::Card = testing::Card {
-    name: testing::TestCardName("Murder"),
-    definition: || {
-        cards::instant("Murder", cost![1, B, B])
-            .spell(effects::destroy(effects::target(1, creature())))
-    },
+pub const MURDER: Card = Card {
+    name: TestCardName("Murder"),
+    definition: || cards::instant("Murder", cost![1, B, B]).spell(destroy(target(1, creature()))),
 };

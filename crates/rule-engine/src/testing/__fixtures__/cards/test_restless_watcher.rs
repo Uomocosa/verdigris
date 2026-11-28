@@ -1,17 +1,11 @@
-use crate::card;
-use crate::cards;
-use crate::cost;
-use crate::events;
-use crate::pt;
-use crate::statics;
-use crate::testing;
+use crate::testing::prelude::*;
 
-pub const TEST_RESTLESS_WATCHER: testing::Card = testing::Card {
-    name: testing::TestCardName("Test Restless Watcher"),
+pub const TEST_RESTLESS_WATCHER: Card = Card {
+    name: TestCardName("Test Restless Watcher"),
     definition: || {
         card! {
             cards::creature("Test Restless Watcher", cost![2, U], pt!(2, 2));
-            statics::this().as_though(events::attack::UNTAPPED, events::Attack::ATTACKER),
+            this().as_though(attack::UNTAPPED, Attack::ATTACKER),
         }
     },
 };

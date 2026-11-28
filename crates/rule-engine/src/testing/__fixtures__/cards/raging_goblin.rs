@@ -1,16 +1,11 @@
-use crate::card;
-use crate::cards;
-use crate::cost;
-use crate::keywords;
-use crate::pt;
-use crate::testing;
+use crate::testing::prelude::*;
 
-pub const RAGING_GOBLIN: testing::Card = testing::Card {
-    name: testing::TestCardName("Raging Goblin"),
+pub const RAGING_GOBLIN: Card = Card {
+    name: TestCardName("Raging Goblin"),
     definition: || {
         card! {
             cards::creature("Raging Goblin", cost![R], pt!(1, 1));
-            keywords::haste(),
+            haste(),
         }
     },
 };

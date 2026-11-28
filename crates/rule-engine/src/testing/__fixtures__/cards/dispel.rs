@@ -1,13 +1,6 @@
-use crate::cards;
-use crate::cost;
-use crate::effects;
-use crate::instant_spell;
-use crate::testing;
+use crate::testing::prelude::*;
 
-pub const DISPEL: testing::Card = testing::Card {
-    name: testing::TestCardName("Dispel"),
-    definition: || {
-        cards::instant("Dispel", cost![U])
-            .spell(effects::counter(effects::target(1, instant_spell())))
-    },
+pub const DISPEL: Card = Card {
+    name: TestCardName("Dispel"),
+    definition: || cards::instant("Dispel", cost![U]).spell(counter(target(1, instant_spell()))),
 };

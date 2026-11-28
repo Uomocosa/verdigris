@@ -1,18 +1,12 @@
-use crate::abilities;
-use crate::card;
-use crate::cards;
-use crate::cost;
-use crate::keywords;
-use crate::statics;
-use crate::testing;
+use crate::testing::prelude::*;
 
-pub const LEYLINE_OF_SANCTITY: testing::Card = testing::Card {
-    name: testing::TestCardName("Leyline of Sanctity"),
+pub const LEYLINE_OF_SANCTITY: Card = Card {
+    name: TestCardName("Leyline of Sanctity"),
     definition: || {
         card! {
             cards::CardDefinition::from_enchantment("Leyline of Sanctity", cost![2, W, W]);
-            abilities::begin_the_game_with_it_on_the_battlefield(),
-            statics::you().gain(keywords::hexproof()),
+            begin_the_game_with_it_on_the_battlefield(),
+            you().gain(hexproof()),
         }
     },
 };

@@ -1,13 +1,6 @@
-use crate::cards;
-use crate::cost;
-use crate::effects;
-use crate::spell;
-use crate::testing;
+use crate::testing::prelude::*;
 
-pub const CANCEL: testing::Card = testing::Card {
-    name: testing::TestCardName("Cancel"),
-    definition: || {
-        cards::instant("Cancel", cost![1, U, U])
-            .spell(effects::counter(effects::target(1, spell())))
-    },
+pub const CANCEL: Card = Card {
+    name: TestCardName("Cancel"),
+    definition: || cards::instant("Cancel", cost![1, U, U]).spell(counter(target(1, spell()))),
 };

@@ -1,18 +1,11 @@
-use crate::OPPONENT;
-use crate::card;
-use crate::cards;
-use crate::cost;
-use crate::creature;
-use crate::effects;
-use crate::statics;
-use crate::testing;
+use crate::testing::prelude::*;
 
-pub const TEST_LURE_OF_BATTLE: testing::Card = testing::Card {
-    name: testing::TestCardName("Test Lure of Battle"),
+pub const TEST_LURE_OF_BATTLE: Card = Card {
+    name: TestCardName("Test Lure of Battle"),
     definition: || {
         card! {
             cards::CardDefinition::from_enchantment("Test Lure of Battle", cost![1, G]);
-            statics::all(creature() & effects::Filter::controlled_by(OPPONENT)).must_block(),
+            all(creature().and(controlled_by(OPPONENT))).must_block(),
         }
     },
 };

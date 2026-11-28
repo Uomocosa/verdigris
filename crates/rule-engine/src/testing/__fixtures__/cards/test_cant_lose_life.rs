@@ -1,19 +1,13 @@
-use crate::card;
-use crate::cards;
-use crate::cost;
-use crate::events;
-use crate::rules;
-use crate::statics;
-use crate::testing;
+use crate::testing::prelude::*;
 
-pub const TEST_CANT_LOSE_LIFE: testing::Card = testing::Card {
-    name: testing::TestCardName("Test Can't Lose Life"),
+pub const TEST_CANT_LOSE_LIFE: Card = Card {
+    name: TestCardName("Test Can't Lose Life"),
     definition: || {
         card! {
             cards::CardDefinition::from_enchantment("Test Can't Lose Life", cost![2]);
-            statics::you().cant::<events::LoseLife>(
-                events::LoseLife::PLAYER,
-                rules::RestrictionId("test/test-cant-lose-life"),
+            you().cant::<LoseLife>(
+                LoseLife::PLAYER,
+                RestrictionId("test/test-cant-lose-life"),
             ),
         }
     },

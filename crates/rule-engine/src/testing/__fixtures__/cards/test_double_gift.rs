@@ -1,23 +1,17 @@
-use crate::abilities;
-use crate::card;
-use crate::cards;
-use crate::cost;
-use crate::events;
-use crate::rules;
-use crate::testing;
+use crate::testing::prelude::*;
 
-pub const TEST_DOUBLE_GIFT: testing::Card = testing::Card {
-    name: testing::TestCardName("Test Double Gift"),
+pub const TEST_DOUBLE_GIFT: Card = Card {
+    name: TestCardName("Test Double Gift"),
     definition: || {
         card! {
             cards::CardDefinition::from_enchantment("Test Double Gift", cost![2]);
-            abilities::opening_hand_action(vec![rules::EventTemplate::GainLife {
-                who: rules::Hooked::<events::OpeningHandAction>::PLAYER.into(),
-                amount: rules::Amount::Fixed(1),
+            opening_hand_action(vec![EventTemplate::GainLife {
+                who: Hooked::<OpeningHandAction>::PLAYER.into(),
+                amount: Amount::Fixed(1),
             }]),
-            abilities::opening_hand_action(vec![rules::EventTemplate::GainLife {
-                who: rules::Hooked::<events::OpeningHandAction>::PLAYER.into(),
-                amount: rules::Amount::Fixed(2),
+            opening_hand_action(vec![EventTemplate::GainLife {
+                who: Hooked::<OpeningHandAction>::PLAYER.into(),
+                amount: Amount::Fixed(2),
             }]),
         }
     },

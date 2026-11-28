@@ -1,13 +1,9 @@
-use crate::PLAYER;
-use crate::cards;
-use crate::cost;
-use crate::effects;
-use crate::testing;
+use crate::testing::prelude::*;
 
-pub const SIGN_IN_BLOOD: testing::Card = testing::Card {
-    name: testing::TestCardName("Sign in Blood"),
+pub const SIGN_IN_BLOOD: Card = Card {
+    name: TestCardName("Sign in Blood"),
     definition: || {
         cards::sorcery("Sign in Blood", cost![B, B])
-            .spell(effects::target(1, PLAYER).do_(effects::draw(2) & effects::lose_life(2)))
+            .spell(target(1, PLAYER).do_(draw(2) & lose_life(2)))
     },
 };

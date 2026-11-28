@@ -1,7 +1,6 @@
-use crate::cards;
-use crate::testing;
+use crate::testing::prelude::*;
 
-pub const TUNDRA: testing::Card = testing::Card {
-    name: testing::TestCardName("Tundra"),
+pub const TUNDRA: Card = Card {
+    name: TestCardName("Tundra"),
     definition: || cards::land("Tundra", [cards::LandType::Plains, cards::LandType::Island]),
 };

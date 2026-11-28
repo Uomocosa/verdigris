@@ -1,16 +1,11 @@
-use crate::GRAVEYARD;
-use crate::card;
-use crate::cards;
-use crate::cost;
-use crate::statics;
-use crate::testing;
+use crate::testing::prelude::*;
 
-pub const CRUCIBLE_OF_WORLDS: testing::Card = testing::Card {
-    name: testing::TestCardName("Crucible of Worlds"),
+pub const CRUCIBLE_OF_WORLDS: Card = Card {
+    name: TestCardName("Crucible of Worlds"),
     definition: || {
         card! {
             cards::CardDefinition::from_artifact("Crucible of Worlds", cost![3]);
-            statics::you().play_lands_from(GRAVEYARD),
+            you().play_lands_from(GRAVEYARD),
         }
     },
 };

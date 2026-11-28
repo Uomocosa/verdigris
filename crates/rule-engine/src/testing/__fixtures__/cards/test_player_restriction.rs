@@ -1,25 +1,18 @@
-use crate::YOU;
-use crate::abilities;
-use crate::card;
-use crate::cards;
-use crate::cost;
-use crate::effects;
-use crate::rules;
-use crate::testing;
+use crate::testing::prelude::*;
 
-pub const TEST_PLAYER_RESTRICTION: testing::Card = testing::Card {
-    name: testing::TestCardName("Test Player Restriction"),
+pub const TEST_PLAYER_RESTRICTION: Card = Card {
+    name: TestCardName("Test Player Restriction"),
     definition: || {
         card! {
             cards::CardDefinition::from_enchantment("Test Player Restriction", cost![2]);
-            abilities::Continuous {
-                filter: effects::Filter::player() & effects::Filter::controlled_by(YOU),
+            Continuous {
+                filter: player().and(controlled_by(YOU)),
                 as_long_as: None,
-                modification: effects::Modification::Rule(rules::RuleChange {
-                    target: rules::Target::event::<testing::TestRule>(),
-                    change: rules::Change::Restrict {
-                        holder: testing::TestRule::PLAYER.into(),
-                        restriction: rules::RestrictionId("test/player-restriction").restriction(!rules::Condition::True,
+                modification: Modification::Rule(RuleChange {
+                    target: Target::event::<TestRule>(),
+                    change: Change::Restrict {
+                        holder: TestRule::PLAYER.into(),
+                        restriction: RestrictionId("test/player-restriction").restriction(!Condition::True,
                         ),
                     },
                 }),

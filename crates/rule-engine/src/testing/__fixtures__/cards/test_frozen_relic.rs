@@ -1,22 +1,14 @@
-use crate::UNTAP;
-use crate::card;
-use crate::cards;
-use crate::cost;
-use crate::events;
-use crate::pt;
-use crate::rules;
-use crate::statics;
-use crate::testing;
+use crate::testing::prelude::*;
 
-pub const TEST_FROZEN_RELIC: testing::Card = testing::Card {
-    name: testing::TestCardName("Test Frozen Relic"),
+pub const TEST_FROZEN_RELIC: Card = Card {
+    name: TestCardName("Test Frozen Relic"),
     definition: || {
         card! {
             cards::creature("Test Frozen Relic", cost![2], pt!(1, 1));
-            statics::this().restriction::<events::Untap>(
-                events::Untap::PERMANENT,
-                rules::RestrictionId("test/test-frozen-relic"),
-                !(rules::step_is(UNTAP) & rules::active_player(events::Untap::PERMANENT.controller())),
+            this().restriction::<Untap>(
+                Untap::PERMANENT,
+                RestrictionId("test/test-frozen-relic"),
+                !(step_is(UNTAP) & active_player(Untap::PERMANENT.controller())),
             ),
         }
     },

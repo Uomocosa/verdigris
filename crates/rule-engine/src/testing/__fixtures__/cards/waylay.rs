@@ -1,29 +1,21 @@
-use crate::THIS;
-use crate::abilities;
-use crate::card;
-use crate::cards;
-use crate::cost;
-use crate::effects;
-use crate::pt;
-use crate::testing;
+use crate::testing::prelude::*;
 
-pub const KNIGHT_TOKEN: testing::Card = testing::Card {
-    name: testing::TestCardName("Knight"),
+pub const KNIGHT_TOKEN: Card = Card {
+    name: TestCardName("Knight"),
     definition: || {
         card! {
             cards::creature("Knight", cost![W], pt!(2, 2));
-            abilities::at(
-                abilities::TriggerEvent::beginning_of_next_cleanup(),
-                effects::exile(THIS),
+            at(
+                TriggerEvent::beginning_of_next_cleanup(),
+                exile(THIS),
             ),
         }
     },
 };
 
-pub const WAYLAY: testing::Card = testing::Card {
-    name: testing::TestCardName("Waylay"),
+pub const WAYLAY: Card = Card {
+    name: TestCardName("Waylay"),
     definition: || {
-        cards::instant("Waylay", cost![2, W])
-            .spell(effects::creates(3, KNIGHT_TOKEN.definition.into()))
+        cards::instant("Waylay", cost![2, W]).spell(creates(3, KNIGHT_TOKEN.definition.into()))
     },
 };

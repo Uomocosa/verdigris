@@ -1,16 +1,12 @@
-use crate::abilities;
-use crate::card;
-use crate::cards;
-use crate::statics;
-use crate::testing;
+use crate::testing::prelude::*;
 
-pub const RELIQUARY_TOWER: testing::Card = testing::Card {
-    name: testing::TestCardName("Reliquary Tower"),
+pub const RELIQUARY_TOWER: Card = Card {
+    name: TestCardName("Reliquary Tower"),
     definition: || {
         card! {
             cards::land("Reliquary Tower", []);
-            abilities::tap_add(cards::ManaType::Colorless),
-            statics::you().no_maximum_hand_size(),
+            tap_add(cards::ManaType::Colorless),
+            you().no_maximum_hand_size(),
         }
     },
 };

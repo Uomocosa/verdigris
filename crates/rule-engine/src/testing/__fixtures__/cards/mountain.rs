@@ -1,8 +1,7 @@
-use crate::cards;
-use crate::testing;
+use crate::testing::prelude::*;
 
-pub const MOUNTAIN: testing::Card = testing::Card {
-    name: testing::TestCardName("Mountain"),
+pub const MOUNTAIN: Card = Card {
+    name: TestCardName("Mountain"),
     definition: || {
         cards::land("Mountain", [cards::LandType::Mountain]).supertype(cards::Supertype::Basic)
     },
