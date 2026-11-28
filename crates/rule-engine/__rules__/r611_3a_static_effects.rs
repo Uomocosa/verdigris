@@ -4,7 +4,6 @@ use crate::BATTLEFIELD;
 use crate::abilities;
 use crate::cards;
 use crate::effects;
-use crate::events;
 use crate::players;
 use crate::rules;
 use crate::turns;
@@ -89,9 +88,6 @@ pub fn r611_3a_static_effects(
         }
         let stamp = stamp_for(source, &mut commands, &stamped, &mut timestamp);
         for ability in definition.continuous_abilities() {
-            if !condition_holds(ability, source, &answers) {
-                continue;
-            }
             spawn_creature_effects(
                 &mut commands,
                 source,
@@ -124,32 +120,7 @@ fn ability_still_applies(
     if ability.modification != effect.modification {
         return false;
     }
-    if !condition_holds(ability, source, answers) {
-        return false;
-    }
-    answers.eval(
-        &ability.filter,
-        &events::AbilityContext {
-            spell_or_ability: source,
-        },
-        Some(effect.affected),
-    )
-}
-
-fn condition_holds(
-    ability: &abilities::Continuous,
-    source: Entity,
-    answers: &rules::Rules,
-) -> bool {
-    ability.as_long_as.as_ref().is_none_or(|condition| {
-        answers.eval(
-            condition,
-            &events::AbilityContext {
-                spell_or_ability: source,
-            },
-            None,
-        )
-    })
+    ability.applies(answers, source, effect.affected)
 }
 
 fn spawn_creature_effects(
@@ -162,14 +133,11 @@ fn spawn_creature_effects(
     stamp: u64,
     answers: &rules::Rules,
 ) {
-    let context = events::AbilityContext {
-        spell_or_ability: source,
-    };
     for (candidate, _, _, zone, _, _) in candidates.iter() {
         if !zones.contains(BATTLEFIELD, **zone) {
             continue;
         }
-        if !answers.eval(&ability.filter, &context, Some(candidate)) {
+        if !ability.applies(answers, source, candidate) {
             continue;
         }
         if already_applied(applied, source, candidate, &ability.modification) {
@@ -194,11 +162,8 @@ fn spawn_player_effects(
     stamp: u64,
     answers: &rules::Rules,
 ) {
-    let context = events::AbilityContext {
-        spell_or_ability: source,
-    };
     for candidate in players {
-        if !answers.eval(&ability.filter, &context, Some(**candidate)) {
+        if !ability.applies(answers, source, **candidate) {
             continue;
         }
         if already_applied(applied, source, **candidate, &ability.modification) {

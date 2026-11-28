@@ -1,4 +1,5 @@
 use atomic_delegate_macros::atomic_delegates;
+use bevy::prelude::Entity;
 
 use crate::effects;
 use crate::rules;
@@ -14,6 +15,9 @@ pub struct Continuous {
 impl Continuous {
     #[must_use]
     pub fn as_long_as(self, condition: rules::Condition) -> Self {}
+
+    #[must_use]
+    pub fn applies(&self, answers: &rules::Rules, source: Entity, affected: Entity) -> bool {}
 }
 
 #[cfg(test)]
