@@ -108,6 +108,9 @@ impl PlayDatalog {
     pub(crate) const WAIVED: Rel = Rel("waived");
     pub(crate) const VIOLATES: Rel = Rel("violates");
     pub(crate) const ADDED: Rel = Rel("added");
+    pub(crate) const HAS_KEYWORD: Rel = Rel("has_keyword");
+    pub(crate) const CHARACTERISTIC: Rel = Rel("characteristic");
+    pub(crate) const POINTS_TO: Rel = Rel("points_to");
     pub(crate) const LAND: &'static str = "Land";
     pub(crate) const HAND_ZONE: &'static str = "Hand";
     pub(crate) const HOLDS_NAMES: [&str; 64] = [
