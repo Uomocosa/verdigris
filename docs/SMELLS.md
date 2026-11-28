@@ -168,3 +168,39 @@ card! {
 the right CR 113.3 category — `StaticAbility::Keyword`, `StaticAbility::Replacement` or
 `StaticAbility::Continuous`. For filter flags on one axis, use one enum-valued field such as
 `object: Option<effects::ObjectRelation>` instead of parallel bools.
+
+**Domain prefixes in a card fixture.**
+The testing prelude already carries the domains (RATIONALE §6); a prefix in a fixture is
+noise. The only prefix left is `cards::` on the card builder.
+
+```rust
+// Bad
+statics::all(creature().and(controlled_by(YOU))).gain(keywords::vigilance()),
+// Good
+all(creature().and(controlled_by(YOU))).gain(vigilance()),
+```
+
+**`&` / `|` / `!` on filters.**
+Operators read like engine code, not card text; filters combine with words.
+
+```rust
+// Bad
+all(creature() & controlled_by(YOU) & !token()).gain(vigilance()),
+// Good
+all(creature().and(controlled_by(YOU)).and(not(token()))).gain(vigilance()),
+```
+
+**A `let` that hides oracle wording.**
+Binding a repeated condition gives it a name the card never uses; repeat the condition
+the way the oracle text repeats it (as in
+`crates/rule-engine/src/testing/__fixtures__/cards/always_watching.rs:8-9`).
+
+```rust
+// Bad
+let nontoken = not(token());
+all(creature().and(controlled_by(YOU)).and(nontoken)).get_pt(1, 1),
+all(creature().and(controlled_by(YOU)).and(nontoken)).gain(vigilance()),
+// Good
+all(creature().and(controlled_by(YOU)).and(not(token()))).get_pt(1, 1),
+all(creature().and(controlled_by(YOU)).and(not(token()))).gain(vigilance()),
+```

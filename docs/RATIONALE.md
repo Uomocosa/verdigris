@@ -87,3 +87,29 @@ land subtype.
 **Why:** the card text maps 1:1 to the struct, so a definition can be checked line by line
 against the Oracle text. The CR is the spec: every field and every `Ability` variant has a
 printed counterpart or a CR rule that owns it, and no field exists without one.
+
+**6. Card fixtures read like oracle text.**
+This refines §3 for fixtures
+(`crates/rule-engine/src/testing/__fixtures__/cards/`): the prelude carries the domains,
+so the fixture reads like the printed card. A fixture starts with
+`use crate::testing::prelude::*;` and uses DSL names bare; the only prefix left is
+`cards::` on the card builder (`cards::creature(...)`,
+`cards::Supertype::Legendary`), because the bare `creature()` is the filter. Filters
+combine with words, not operators: `a.and(b)`, `a.or(b)`, `not(a)`. Card text stays as
+close as possible to the oracle text: repeat a condition rather than binding it with
+`let`. A name a fixture needs goes into `crates/rule-engine/src/prelude/mod.rs`, listed
+by name; testing-only items go into `src/testing/prelude/mod.rs`. A name clash is decided
+by the user.
+
+```rust
+// crates/rule-engine/src/testing/__fixtures__/cards/always_watching.rs:1-9
+use crate::testing::prelude::*;
+
+card! {
+    cards::CardDefinition::from_enchantment("Always Watching", cost![1, W, W]);
+    all(creature().and(controlled_by(YOU)).and(not(token()))).get_pt(1, 1),
+    all(creature().and(controlled_by(YOU)).and(not(token()))).gain(vigilance()),
+}
+```
+
+**Why:** shorter code reads clearer.

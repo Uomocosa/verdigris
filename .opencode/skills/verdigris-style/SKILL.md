@@ -227,6 +227,11 @@ bookkeeping becomes one on what players see. A refactor that uncovers a CR bug b
 its own commit, red first. Commit only on the full suite
 (`cargo nextest run ... --no-fail-fast`): `just test` stops at the first failure.
 
+## 7. Card fixtures read like oracle text
+
+Card fixtures use the testing prelude and bare DSL names; filters combine with words —
+`a.and(b)`, `a.or(b)`, `not(a)`, never `&` / `|` / `!` (RATIONALE §6, SMELLS).
+
 ## Adding rules here
 
 Add a section per decision the user makes about how verdigris code should look: a one-line
