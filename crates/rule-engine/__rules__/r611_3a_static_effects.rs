@@ -88,6 +88,9 @@ pub fn r611_3a_static_effects(
         }
         let stamp = stamp_for(source, &mut commands, &stamped, &mut timestamp);
         for ability in definition.continuous_abilities() {
+            if matches!(&ability.modification, effects::Modification::Rule(_)) {
+                continue;
+            }
             spawn_creature_effects(
                 &mut commands,
                 source,
@@ -221,6 +224,7 @@ mod tests {
     use crate::keywords;
     use crate::mana;
     use crate::rules;
+    use crate::rules::traits::event::Event;
     use crate::testing::*;
     use crate::turns;
 
@@ -484,20 +488,37 @@ mod tests {
             p1.declare_attackers([bears]),
         ])?;
         assert!(game.is_attacking(bears));
-        let shielding = game.with_query::<&effects::ContinuousEffect, usize>(|granted| {
-            granted.iter().filter(|effect| effect.affected == bears).count()
+        let shielding = effects::Modification::Rule(rules::RuleChange {
+            target: rules::Target::event::<events::Tap>(),
+            change: rules::Change::Skip {
+                when: rules::Condition::CausedBy(events::Attack::ID),
+            },
         });
-        assert_eq!(shielding, 1);
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                assert!(answers.mods(*bears).contains(&shielding));
+            })
+            .unwrap();
         game.play([
             p1.pass_to(turns::Step::PostcombatMain),
             p2.pass_to(turns::Step::PostcombatMain),
         ])?;
         assert_eq!(game.turn().step, turns::Step::PostcombatMain);
         assert!(!game.is_attacking(bears));
-        let lingering = game.with_query::<&effects::ContinuousEffect, usize>(|granted| {
-            granted.iter().filter(|effect| effect.affected == bears).count()
-        });
-        assert_eq!(lingering, 0);
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                assert!(!answers.mods(*bears).contains(&effects::Modification::Rule(
+                    rules::RuleChange {
+                        target: rules::Target::event::<events::Tap>(),
+                        change: rules::Change::Skip {
+                            when: rules::Condition::CausedBy(events::Attack::ID),
+                        },
+                    }
+                )));
+            })
+            .unwrap();
         Ok(())
     }
 

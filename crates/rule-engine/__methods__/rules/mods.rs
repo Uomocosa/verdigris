@@ -24,6 +24,8 @@ pub fn mods(answers: &rules::Rules, entity: Entity) -> Vec<effects::Modification
                 _ => None,
             }),
     );
+    modifications
+        .extend(answers.static_changes(entity).into_iter().map(effects::Modification::Rule));
     let mut ordered: Vec<effects::ContinuousEffect> =
         answers.effects.iter().filter(|effect| effect.affected == entity).cloned().collect();
     ordered.sort_by_key(|effect| effect.timestamp);

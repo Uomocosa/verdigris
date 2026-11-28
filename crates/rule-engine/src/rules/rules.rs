@@ -21,6 +21,15 @@ pub struct Rules<'w, 's> {
     pub state: Query<'w, 's, &'static turns::TurnState>,
     pub zones: zones::ZoneLookup<'w, 's>,
     pub in_zone: Query<'w, 's, &'static zones::InZone>,
+    pub static_sources: Query<
+        'w,
+        's,
+        (
+            Entity,
+            &'static cards::CardDefinition,
+            &'static zones::InZone,
+        ),
+    >,
 }
 
 #[atomic_delegates]
@@ -266,6 +275,8 @@ impl Rules<'_, '_> {
     }
 
     pub(crate) fn mods(&self, entity: Entity) -> Vec<effects::Modification> {}
+
+    pub(crate) fn static_changes(&self, entity: Entity) -> Vec<rules::RuleChange> {}
 
     pub(crate) fn remaining_toughness(&self, subject: Entity) -> u32 {}
 

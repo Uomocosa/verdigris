@@ -84,4 +84,18 @@ mod tests {
         assert!(!game.card(bolt).is_in(GRAVEYARD).of(p1));
         Ok(())
     }
+
+    #[test]
+    fn leyline_of_the_void_exiles_an_opponents_discarded_card() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.hand([MIND_ROT]).mana_pool(mana![2, B]).battlefield([LEYLINE_OF_THE_VOID]),
+            P2.hand([GRIZZLY_BEARS]),
+        ]);
+        let [mind_rot] = game.player(p1).cards_in(HAND).exactly::<1>(MIND_ROT)?;
+        let [bears] = game.player(p2).cards_in(HAND).exactly::<1>(GRIZZLY_BEARS)?;
+        game.play([p1.cast(mind_rot).targeting(p2).end_turn(), p2.end_turn()])?;
+        assert!(game.moved(bears).to(EXILE).of(p2));
+        assert!(!game.card(bears).is_in(GRAVEYARD).of(p2));
+        Ok(())
+    }
 }
