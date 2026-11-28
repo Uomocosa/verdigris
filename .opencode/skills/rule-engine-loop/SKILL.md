@@ -28,11 +28,13 @@ Implement one more CR rule (or finish a partly implemented one), red first
 
 1. Research: 5 FREE_MODEL lanes in parallel, `--agent plan`, prompt
    `/propose-next-mtg-rules <lane> --out <work dir>`; lanes `1xx-3xx`, `4xx-5xx`, `6xx`, `7xx`,
-   `partial` (rules already partly implemented). Each writes `<lane>.md`.
+   `partial` (rules already partly implemented). Plan agents cannot write files: when a lane
+   ends, save its final message as `<lane>.md` yourself (last text part of its jsonl).
 2. Rank yourself into one table in `report.md`: CR, title, worker score, lane, decision
    (IMPLEMENT / DEFERRED / CANNOT TODAY / DROPPED) and the reason. Check each claim before you
-   rank: the card exists and is real (drop made-up cards), the proposed test is really red, no
-   rule file or system already covers it.
+   rank: the card exists and is real (drop made-up cards), the proposed test is red, no
+   rule file or system already covers it. In `propose` mode "red" is checked by reading (say so);
+   in a sprint the item's plan step proves it by running the extended test before any fix.
 3. The next item is the best IMPLEMENT row. Re-rank between items.
 
 ## ORACLE
