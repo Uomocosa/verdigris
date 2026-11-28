@@ -16,6 +16,7 @@ pub struct TestStep {
 
 impl Event for TestStep {
     const ID: rules::EventId = rules::EventId("test/step");
+    const HOLDER: rules::ArgRef = rules::ArgRef::Arg(Self::CONTROLLER);
 }
 
 #[cfg(test)]
@@ -46,6 +47,7 @@ mod tests {
             Some(rules::ArgValue::Player(controller))
         );
         assert_eq!(TestStep::ID, rules::EventId("test/step"));
+        assert_eq!(TestStep::HOLDER, rules::ArgRef::Arg(TestStep::CONTROLLER));
         assert_eq!(TestStep::restrictions(), Vec::new());
         assert_eq!(
             TestStep::args(),

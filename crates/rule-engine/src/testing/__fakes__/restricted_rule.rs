@@ -18,6 +18,7 @@ pub struct RestrictedRule {
 #[rustfmt::skip]
 impl Event for RestrictedRule {
     const ID: rules::EventId = rules::EventId("test/restriction");
+    const HOLDER: rules::ArgRef = rules::ArgRef::Arg(Self::PLAYER);
     fn restrictions() -> Vec<rules::Restriction> {
         vec![testing::UNTAPPED.restriction(rules::always())]
     }
@@ -35,6 +36,10 @@ mod tests {
     #[test]
     fn test_usage() {
         assert_eq!(RestrictedRule::ID, rules::EventId("test/restriction"));
+        assert_eq!(
+            RestrictedRule::HOLDER,
+            rules::ArgRef::Arg(RestrictedRule::PLAYER)
+        );
         let restrictions = RestrictedRule::restrictions();
         assert_eq!(restrictions.len(), 1);
         assert_eq!(restrictions[0].id, testing::UNTAPPED);

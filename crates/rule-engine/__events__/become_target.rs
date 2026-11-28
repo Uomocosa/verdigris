@@ -14,6 +14,7 @@ pub struct BecomeTarget {
 
 impl Event for BecomeTarget {
     const ID: rules::EventId = rules::EventId("601.2c/become-target");
+    const HOLDER: rules::ArgRef = rules::ArgRef::Arg(Self::TARGET);
 }
 
 #[cfg(test)]
@@ -43,6 +44,10 @@ mod tests {
             Some(rules::ArgValue::Entity(spell))
         );
         assert_eq!(BecomeTarget::ID, rules::EventId("601.2c/become-target"));
+        assert_eq!(
+            BecomeTarget::HOLDER,
+            rules::ArgRef::Arg(BecomeTarget::TARGET)
+        );
         assert_eq!(BecomeTarget::restrictions(), Vec::new());
         assert_eq!(
             BecomeTarget::args(),

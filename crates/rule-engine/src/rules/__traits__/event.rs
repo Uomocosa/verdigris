@@ -9,6 +9,7 @@ use crate::rules::traits::event_args::EventArgs;
 
 pub trait Event: EventArgs + Clone + Send + Sync + 'static {
     const ID: rules::EventId;
+    const HOLDER: rules::ArgRef;
     #[must_use]
     fn restrictions() -> Vec<rules::Restriction> {
         Vec::new()
@@ -51,6 +52,14 @@ mod tests {
         );
         assert_eq!(event.affected(), vec![*player]);
         assert_eq!(events::LoseGame::ID, rules::EventId("104.3/lose-game"));
+    }
+
+    #[test]
+    fn lose_game_holder_is_the_player() {
+        assert_eq!(
+            events::LoseGame::HOLDER,
+            rules::ArgRef::Arg(events::LoseGame::PLAYER)
+        );
     }
 
     #[test]

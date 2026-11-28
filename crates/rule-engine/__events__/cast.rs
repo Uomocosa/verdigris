@@ -22,6 +22,7 @@ pub struct Cast {
 
 impl Event for Cast {
     const ID: rules::EventId = rules::EventId("601.2a/cast");
+    const HOLDER: rules::ArgRef = rules::ArgRef::Arg(Self::CASTER);
 
     #[atomic_delegate(Cast, Event)]
     fn restrictions() -> Vec<rules::Restriction> {}
@@ -45,6 +46,7 @@ mod tests {
     #[test]
     fn test_usage() {
         assert_eq!(Cast::ID, rules::EventId("601.2a/cast"));
+        assert_eq!(Cast::HOLDER, rules::ArgRef::Arg(Cast::CASTER));
         let restrictions = Cast::restrictions();
         assert_eq!(restrictions.len(), 5);
         assert_eq!(restrictions[0].id, PRIORITY);

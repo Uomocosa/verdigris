@@ -13,6 +13,7 @@ pub struct LoseUnspentMana {
 #[rustfmt::skip]
 impl Event for LoseUnspentMana {
     const ID: rules::EventId = rules::EventId("106.4/lose-unspent-mana");
+    const HOLDER: rules::ArgRef = rules::ArgRef::Arg(Self::PLAYER);
 }
 
 #[cfg(test)]
@@ -41,6 +42,10 @@ mod tests {
         assert_eq!(
             LoseUnspentMana::ID,
             rules::EventId("106.4/lose-unspent-mana")
+        );
+        assert_eq!(
+            LoseUnspentMana::HOLDER,
+            rules::ArgRef::Arg(LoseUnspentMana::PLAYER)
         );
         assert_eq!(LoseUnspentMana::restrictions(), Vec::new());
         assert_eq!(LoseUnspentMana::args(), &[LoseUnspentMana::PLAYER]);

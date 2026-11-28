@@ -16,6 +16,7 @@ pub struct PutCounters {
 
 impl Event for PutCounters {
     const ID: rules::EventId = rules::EventId("122.6/put-counters");
+    const HOLDER: rules::ArgRef = rules::ArgRef::Arg(Self::RECIPIENT);
 }
 
 #[cfg(test)]
@@ -46,6 +47,10 @@ mod tests {
             Some(rules::ArgValue::Amount(3))
         );
         assert_eq!(PutCounters::ID, rules::EventId("122.6/put-counters"));
+        assert_eq!(
+            PutCounters::HOLDER,
+            rules::ArgRef::Arg(PutCounters::RECIPIENT)
+        );
         assert_eq!(PutCounters::restrictions(), Vec::new());
         assert_eq!(
             PutCounters::args(),

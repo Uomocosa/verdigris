@@ -16,6 +16,7 @@ pub struct Mill {
 
 impl Event for Mill {
     const ID: rules::EventId = rules::EventId("701.17a/mill");
+    const HOLDER: rules::ArgRef = rules::ArgRef::Arg(Self::PLAYER);
 }
 
 #[cfg(test)]
@@ -50,6 +51,7 @@ mod tests {
             Some(rules::ArgValue::Event(rules::EventId("608.2/resolve")))
         );
         assert_eq!(Mill::ID, rules::EventId("701.17a/mill"));
+        assert_eq!(Mill::HOLDER, rules::ArgRef::Arg(Mill::PLAYER));
         assert_eq!(Mill::restrictions(), Vec::new());
         assert_eq!(Mill::args(), &[Mill::PLAYER, Mill::AMOUNT, Mill::CAUSE,]);
     }

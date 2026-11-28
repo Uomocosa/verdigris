@@ -14,6 +14,7 @@ pub struct Untap {
 
 impl Event for Untap {
     const ID: rules::EventId = rules::EventId("701.26b/untap");
+    const HOLDER: rules::ArgRef = rules::ArgRef::Arg(Self::PERMANENT);
 }
 
 #[cfg(test)]
@@ -42,6 +43,7 @@ mod tests {
             Some(rules::ArgValue::Event(rules::EventId("502.3/untap-step")))
         );
         assert_eq!(Untap::ID, rules::EventId("701.26b/untap"));
+        assert_eq!(Untap::HOLDER, rules::ArgRef::Arg(Untap::PERMANENT));
         assert_eq!(Untap::restrictions(), Vec::new());
         assert_eq!(Untap::args(), &[Untap::PERMANENT, Untap::CAUSE,]);
     }

@@ -12,6 +12,7 @@ pub struct DeclareAttackers {
 
 impl Event for DeclareAttackers {
     const ID: rules::EventId = rules::EventId("508.1a/declare-attackers");
+    const HOLDER: rules::ArgRef = rules::ArgRef::Arg(Self::ATTACKERS);
 }
 
 #[cfg(test)]
@@ -30,6 +31,10 @@ mod tests {
         assert_eq!(
             DeclareAttackers::ID,
             rules::EventId("508.1a/declare-attackers")
+        );
+        assert_eq!(
+            DeclareAttackers::HOLDER,
+            rules::ArgRef::Arg(DeclareAttackers::ATTACKERS)
         );
         assert_eq!(
             DeclareAttackers::restrictions(),

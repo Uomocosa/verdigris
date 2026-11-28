@@ -17,6 +17,7 @@ pub struct Discard {
 
 impl Event for Discard {
     const ID: rules::EventId = rules::EventId("701.9a/discard");
+    const HOLDER: rules::ArgRef = Self::CARDS.owner();
 }
 
 #[cfg(test)]
@@ -45,6 +46,7 @@ mod tests {
             Some(rules::ArgValue::Event(rules::EventId("608.2/resolve")))
         );
         assert_eq!(Discard::ID, rules::EventId("701.9a/discard"));
+        assert_eq!(Discard::HOLDER, Discard::CARDS.owner());
         assert_eq!(Discard::restrictions(), Vec::new());
         assert_eq!(Discard::args(), &[Discard::CARDS, Discard::CAUSE,]);
     }

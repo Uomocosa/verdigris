@@ -12,6 +12,7 @@ pub struct Create {
 
 impl Event for Create {
     const ID: rules::EventId = rules::EventId("111.1/create");
+    const HOLDER: rules::ArgRef = rules::ArgRef::Arg(Self::TOKEN);
 }
 
 #[cfg(test)]
@@ -33,6 +34,7 @@ mod tests {
             Some(rules::ArgValue::Entity(token))
         );
         assert_eq!(Create::ID, rules::EventId("111.1/create"));
+        assert_eq!(Create::HOLDER, rules::ArgRef::Arg(Create::TOKEN));
         assert_eq!(Create::restrictions(), Vec::new());
         assert_eq!(Create::args(), &[Create::TOKEN,]);
     }

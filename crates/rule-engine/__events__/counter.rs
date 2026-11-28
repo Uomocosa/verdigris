@@ -14,6 +14,7 @@ pub struct Counter {
 
 impl Event for Counter {
     const ID: rules::EventId = rules::EventId("701.6a/counter");
+    const HOLDER: rules::ArgRef = rules::ArgRef::Arg(Self::SPELL);
 }
 
 #[cfg(test)]
@@ -42,6 +43,7 @@ mod tests {
             Some(rules::ArgValue::Event(rules::EventId("608.2/resolve")))
         );
         assert_eq!(Counter::ID, rules::EventId("701.6a/counter"));
+        assert_eq!(Counter::HOLDER, rules::ArgRef::Arg(Counter::SPELL));
         assert_eq!(Counter::restrictions(), Vec::new());
         assert_eq!(Counter::args(), &[Counter::SPELL, Counter::CAUSE,]);
     }

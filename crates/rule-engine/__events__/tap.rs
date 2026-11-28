@@ -14,6 +14,7 @@ pub struct Tap {
 
 impl Event for Tap {
     const ID: rules::EventId = rules::EventId("701.26a/tap");
+    const HOLDER: rules::ArgRef = rules::ArgRef::Arg(Self::PERMANENT);
 }
 
 #[cfg(test)]
@@ -44,6 +45,7 @@ mod tests {
             )))
         );
         assert_eq!(Tap::ID, rules::EventId("701.26a/tap"));
+        assert_eq!(Tap::HOLDER, rules::ArgRef::Arg(Tap::PERMANENT));
         assert_eq!(Tap::restrictions(), Vec::new());
         assert_eq!(Tap::args(), &[Tap::PERMANENT, Tap::CAUSE,]);
     }

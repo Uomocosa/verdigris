@@ -14,6 +14,7 @@ pub struct Destroy {
 
 impl Event for Destroy {
     const ID: rules::EventId = rules::EventId("701.8a/destroy");
+    const HOLDER: rules::ArgRef = rules::ArgRef::Arg(Self::PERMANENT);
 }
 
 #[cfg(test)]
@@ -44,6 +45,7 @@ mod tests {
             )))
         );
         assert_eq!(Destroy::ID, rules::EventId("701.8a/destroy"));
+        assert_eq!(Destroy::HOLDER, rules::ArgRef::Arg(Destroy::PERMANENT));
         assert_eq!(Destroy::restrictions(), Vec::new());
         assert_eq!(Destroy::args(), &[Destroy::PERMANENT, Destroy::CAUSE,]);
     }

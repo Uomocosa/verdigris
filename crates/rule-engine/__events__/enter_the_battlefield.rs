@@ -12,6 +12,7 @@ pub struct EnterTheBattlefield {
 
 impl Event for EnterTheBattlefield {
     const ID: rules::EventId = rules::EventId("110.1/enter-the-battlefield");
+    const HOLDER: rules::ArgRef = rules::ArgRef::Arg(Self::PERMANENT);
 }
 
 #[cfg(test)]
@@ -35,6 +36,10 @@ mod tests {
         assert_eq!(
             EnterTheBattlefield::ID,
             rules::EventId("110.1/enter-the-battlefield")
+        );
+        assert_eq!(
+            EnterTheBattlefield::HOLDER,
+            rules::ArgRef::Arg(EnterTheBattlefield::PERMANENT)
         );
         assert_eq!(EnterTheBattlefield::restrictions(), Vec::new());
         assert_eq!(

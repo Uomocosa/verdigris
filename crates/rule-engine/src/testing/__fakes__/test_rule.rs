@@ -19,6 +19,7 @@ pub struct TestRule {
 
 impl Event for TestRule {
     const ID: rules::EventId = rules::EventId("test/legality");
+    const HOLDER: rules::ArgRef = rules::ArgRef::Arg(Self::PLAYER);
 
     #[atomic_delegate(TestRule, Event)]
     fn restrictions() -> Vec<rules::Restriction> {}
@@ -37,6 +38,7 @@ mod tests {
     #[test]
     fn test_usage() {
         assert_eq!(TestRule::ID, rules::EventId("test/legality"));
+        assert_eq!(TestRule::HOLDER, rules::ArgRef::Arg(TestRule::PLAYER));
         let restrictions = TestRule::restrictions();
         assert_eq!(restrictions.len(), 1);
         assert_eq!(restrictions[0].id, UNTAPPED);

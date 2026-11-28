@@ -13,6 +13,7 @@ pub struct AbilityContext {
 #[rustfmt::skip]
 impl Event for AbilityContext {
     const ID: rules::EventId = rules::EventId("603.4/ability-context");
+    const HOLDER: rules::ArgRef = rules::ArgRef::Arg(Self::SPELL_OR_ABILITY);
 }
 
 #[cfg(test)]
@@ -36,6 +37,10 @@ mod tests {
             Some(rules::ArgValue::Entity(ability))
         );
         assert_eq!(AbilityContext::ID, rules::EventId("603.4/ability-context"));
+        assert_eq!(
+            AbilityContext::HOLDER,
+            rules::ArgRef::Arg(AbilityContext::SPELL_OR_ABILITY)
+        );
         assert_eq!(AbilityContext::restrictions(), Vec::new());
         assert_eq!(AbilityContext::args(), &[AbilityContext::SPELL_OR_ABILITY]);
     }

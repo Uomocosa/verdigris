@@ -19,6 +19,7 @@ pub struct DeclareBlocker {
 
 impl Event for DeclareBlocker {
     const ID: rules::EventId = rules::EventId("509.1a/declare-blocker");
+    const HOLDER: rules::ArgRef = rules::ArgRef::Arg(Self::BLOCKER);
 
     #[atomic_delegate(DeclareBlocker, Event)]
     fn restrictions() -> Vec<rules::Restriction> {}
@@ -44,6 +45,10 @@ mod tests {
     #[test]
     fn test_usage() {
         assert_eq!(DeclareBlocker::ID, rules::EventId("509.1a/declare-blocker"));
+        assert_eq!(
+            DeclareBlocker::HOLDER,
+            rules::ArgRef::Arg(DeclareBlocker::BLOCKER)
+        );
         let restrictions = DeclareBlocker::restrictions();
         assert_eq!(restrictions.len(), 3);
         assert_eq!(restrictions[0].id, CREATURE);

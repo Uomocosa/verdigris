@@ -14,6 +14,7 @@ pub struct Exile {
 
 impl Event for Exile {
     const ID: rules::EventId = rules::EventId("701.13a/exile");
+    const HOLDER: rules::ArgRef = rules::ArgRef::Arg(Self::OBJECT);
 }
 
 #[cfg(test)]
@@ -42,6 +43,7 @@ mod tests {
             Some(rules::ArgValue::Event(rules::EventId("608.2/resolve")))
         );
         assert_eq!(Exile::ID, rules::EventId("701.13a/exile"));
+        assert_eq!(Exile::HOLDER, rules::ArgRef::Arg(Exile::OBJECT));
         assert_eq!(Exile::restrictions(), Vec::new());
         assert_eq!(Exile::args(), &[Exile::OBJECT, Exile::CAUSE,]);
     }

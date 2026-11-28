@@ -19,6 +19,7 @@ pub struct Attack {
 
 impl Event for Attack {
     const ID: rules::EventId = rules::EventId("508.1a/attack");
+    const HOLDER: rules::ArgRef = rules::ArgRef::Arg(Self::ATTACKER);
 
     #[atomic_delegate(Attack, Event)]
     fn restrictions() -> Vec<rules::Restriction> {}
@@ -45,6 +46,7 @@ mod tests {
     #[test]
     fn test_usage() {
         assert_eq!(Attack::ID, rules::EventId("508.1a/attack"));
+        assert_eq!(Attack::HOLDER, rules::ArgRef::Arg(Attack::ATTACKER));
         let restrictions = Attack::restrictions();
         assert_eq!(restrictions.len(), 4);
         assert_eq!(restrictions[0].id, CREATURE);

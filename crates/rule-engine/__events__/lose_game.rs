@@ -13,6 +13,7 @@ pub struct LoseGame {
 #[rustfmt::skip]
 impl Event for LoseGame {
     const ID: rules::EventId = rules::EventId("104.3/lose-game");
+    const HOLDER: rules::ArgRef = rules::ArgRef::Arg(Self::PLAYER);
 }
 
 #[cfg(test)]
@@ -39,6 +40,7 @@ mod tests {
             Some(rules::ArgValue::Player(player))
         );
         assert_eq!(LoseGame::ID, rules::EventId("104.3/lose-game"));
+        assert_eq!(LoseGame::HOLDER, rules::ArgRef::Arg(LoseGame::PLAYER));
         assert_eq!(LoseGame::restrictions(), Vec::new());
         assert_eq!(LoseGame::args(), &[LoseGame::PLAYER]);
     }

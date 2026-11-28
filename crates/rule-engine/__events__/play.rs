@@ -25,6 +25,7 @@ pub struct Play {
 
 impl Event for Play {
     const ID: rules::EventId = rules::EventId("305.1/play");
+    const HOLDER: rules::ArgRef = rules::ArgRef::Arg(Self::PLAYER);
 
     #[atomic_delegate(Play, Event)]
     fn restrictions() -> Vec<rules::Restriction> {}
@@ -51,6 +52,7 @@ mod tests {
     #[test]
     fn test_usage() {
         assert_eq!(Play::ID, rules::EventId("305.1/play"));
+        assert_eq!(Play::HOLDER, rules::ArgRef::Arg(Play::PLAYER));
         let restrictions = Play::restrictions();
         assert_eq!(restrictions.len(), 8);
         assert_eq!(restrictions[0].id, PRIORITY);

@@ -12,6 +12,7 @@ pub struct BeginTheGameOnTheBattlefield {
 
 impl Event for BeginTheGameOnTheBattlefield {
     const ID: rules::EventId = rules::EventId("103.6a/begin-the-game-on-the-battlefield");
+    const HOLDER: rules::ArgRef = rules::ArgRef::Arg(Self::CARD);
 }
 
 #[cfg(test)]
@@ -35,6 +36,10 @@ mod tests {
         assert_eq!(
             BeginTheGameOnTheBattlefield::ID,
             rules::EventId("103.6a/begin-the-game-on-the-battlefield")
+        );
+        assert_eq!(
+            BeginTheGameOnTheBattlefield::HOLDER,
+            rules::ArgRef::Arg(BeginTheGameOnTheBattlefield::CARD)
         );
         assert_eq!(BeginTheGameOnTheBattlefield::restrictions(), Vec::new());
         assert_eq!(

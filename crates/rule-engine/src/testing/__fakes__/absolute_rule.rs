@@ -17,6 +17,7 @@ pub struct AbsoluteRule {
 
 impl Event for AbsoluteRule {
     const ID: rules::EventId = rules::EventId("test/absolute");
+    const HOLDER: rules::ArgRef = rules::ArgRef::Arg(Self::PLAYER);
 
     #[atomic_delegate(AbsoluteRule, Event)]
     fn restrictions() -> Vec<rules::Restriction> {}
@@ -34,6 +35,10 @@ mod tests {
     #[test]
     fn test_usage() {
         assert_eq!(AbsoluteRule::ID, rules::EventId("test/absolute"));
+        assert_eq!(
+            AbsoluteRule::HOLDER,
+            rules::ArgRef::Arg(AbsoluteRule::PLAYER)
+        );
         let restrictions = AbsoluteRule::restrictions();
         assert_eq!(restrictions.len(), 1);
         assert_eq!(restrictions[0].id, testing::UNTAPPED);

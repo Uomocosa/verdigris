@@ -32,6 +32,7 @@ impl<E: HookEvent> Hooked<E> {
 #[rustfmt::skip]
 impl<E: HookEvent> rules::traits::event::Event for Hooked<E> {
     const ID: rules::EventId = E::ID;
+    const HOLDER: rules::ArgRef = rules::ArgRef::Arg(Self::CARD);
     fn restrictions() -> Vec<rules::Restriction> { E::restrictions() }
 }
 
@@ -83,6 +84,10 @@ mod tests {
         assert_eq!(
             Hooked::<events::OpeningHandAction>::ID,
             rules::EventId("103.6/opening-hand-action")
+        );
+        assert_eq!(
+            Hooked::<events::OpeningHandAction>::HOLDER,
+            rules::ArgRef::Arg(Hooked::<events::OpeningHandAction>::CARD)
         );
         assert_eq!(
             Hooked::<events::OpeningHandAction>::restrictions(),

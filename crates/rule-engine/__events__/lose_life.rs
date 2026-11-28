@@ -14,6 +14,7 @@ pub struct LoseLife {
 
 impl Event for LoseLife {
     const ID: rules::EventId = rules::EventId("119.3/lose-life");
+    const HOLDER: rules::ArgRef = rules::ArgRef::Arg(Self::PLAYER);
 }
 
 #[cfg(test)]
@@ -40,6 +41,7 @@ mod tests {
             Some(rules::ArgValue::Player(player))
         );
         assert_eq!(LoseLife::ID, rules::EventId("119.3/lose-life"));
+        assert_eq!(LoseLife::HOLDER, rules::ArgRef::Arg(LoseLife::PLAYER));
         assert_eq!(LoseLife::restrictions(), Vec::new());
         assert_eq!(LoseLife::args(), &[LoseLife::PLAYER, LoseLife::AMOUNT,]);
     }

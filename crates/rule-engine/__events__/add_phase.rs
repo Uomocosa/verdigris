@@ -14,6 +14,7 @@ pub struct AddPhase {
 
 impl Event for AddPhase {
     const ID: rules::EventId = rules::EventId("500.8/add-phase");
+    const HOLDER: rules::ArgRef = rules::ArgRef::Arg(Self::PLAYER);
 }
 
 #[cfg(test)]
@@ -44,6 +45,7 @@ mod tests {
             Some(rules::ArgValue::Player(player))
         );
         assert_eq!(AddPhase::ID, rules::EventId("500.8/add-phase"));
+        assert_eq!(AddPhase::HOLDER, rules::ArgRef::Arg(AddPhase::PLAYER));
         assert_eq!(AddPhase::restrictions(), Vec::new());
         assert_eq!(event.phase, turns::Phase::Beginning);
         assert_eq!(AddPhase::args(), &[AddPhase::PLAYER]);

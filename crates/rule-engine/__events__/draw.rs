@@ -16,6 +16,7 @@ pub struct Draw {
 
 impl Event for Draw {
     const ID: rules::EventId = rules::EventId("121.1/draw");
+    const HOLDER: rules::ArgRef = rules::ArgRef::Arg(Self::PLAYER);
 }
 
 #[cfg(test)]
@@ -50,6 +51,7 @@ mod tests {
             Some(rules::ArgValue::Event(rules::EventId("608.2/resolve")))
         );
         assert_eq!(Draw::ID, rules::EventId("121.1/draw"));
+        assert_eq!(Draw::HOLDER, rules::ArgRef::Arg(Draw::PLAYER));
         assert_eq!(Draw::restrictions(), Vec::new());
         assert_eq!(Draw::args(), &[Draw::PLAYER, Draw::AMOUNT, Draw::CAUSE,]);
     }

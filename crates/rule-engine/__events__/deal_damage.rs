@@ -19,6 +19,7 @@ pub struct DealDamage {
 
 impl Event for DealDamage {
     const ID: rules::EventId = rules::EventId("120.3/deal-damage");
+    const HOLDER: rules::ArgRef = rules::ArgRef::Arg(Self::SOURCE);
 
     #[rustfmt::skip]
     fn affected(&self) -> Vec<Entity> { vec![self.recipient] }
@@ -51,6 +52,7 @@ mod tests {
             Some(rules::ArgValue::Entity(recipient))
         );
         assert_eq!(DealDamage::ID, rules::EventId("120.3/deal-damage"));
+        assert_eq!(DealDamage::HOLDER, rules::ArgRef::Arg(DealDamage::SOURCE));
         let restrictions = DealDamage::restrictions();
         assert_eq!(restrictions.len(), 1);
         assert_eq!(restrictions[0].id, super::NONZERO_DAMAGE);

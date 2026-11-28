@@ -14,6 +14,7 @@ pub struct PutIntoGraveyard {
 
 impl Event for PutIntoGraveyard {
     const ID: rules::EventId = rules::EventId("404.1/put-into-graveyard");
+    const HOLDER: rules::ArgRef = rules::ArgRef::Arg(Self::OBJECT);
 }
 
 #[cfg(test)]
@@ -44,6 +45,10 @@ mod tests {
         assert_eq!(
             PutIntoGraveyard::ID,
             rules::EventId("404.1/put-into-graveyard")
+        );
+        assert_eq!(
+            PutIntoGraveyard::HOLDER,
+            rules::ArgRef::Arg(PutIntoGraveyard::OBJECT)
         );
         assert_eq!(PutIntoGraveyard::restrictions(), Vec::new());
         assert_eq!(

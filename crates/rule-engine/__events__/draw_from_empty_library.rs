@@ -13,6 +13,7 @@ pub struct DrawFromEmptyLibrary {
 #[rustfmt::skip]
 impl Event for DrawFromEmptyLibrary {
     const ID: rules::EventId = rules::EventId("121.4/draw-from-empty-library");
+    const HOLDER: rules::ArgRef = rules::ArgRef::Arg(Self::PLAYER);
 }
 
 #[cfg(test)]
@@ -41,6 +42,10 @@ mod tests {
         assert_eq!(
             DrawFromEmptyLibrary::ID,
             rules::EventId("121.4/draw-from-empty-library")
+        );
+        assert_eq!(
+            DrawFromEmptyLibrary::HOLDER,
+            rules::ArgRef::Arg(DrawFromEmptyLibrary::PLAYER)
         );
         assert_eq!(DrawFromEmptyLibrary::restrictions(), Vec::new());
         assert_eq!(

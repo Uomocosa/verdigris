@@ -14,6 +14,7 @@ pub struct GainLife {
 
 impl Event for GainLife {
     const ID: rules::EventId = rules::EventId("119.3/gain-life");
+    const HOLDER: rules::ArgRef = rules::ArgRef::Arg(Self::PLAYER);
 }
 
 #[cfg(test)]
@@ -40,6 +41,7 @@ mod tests {
             Some(rules::ArgValue::Player(player))
         );
         assert_eq!(GainLife::ID, rules::EventId("119.3/gain-life"));
+        assert_eq!(GainLife::HOLDER, rules::ArgRef::Arg(GainLife::PLAYER));
         assert_eq!(GainLife::restrictions(), Vec::new());
         assert_eq!(GainLife::args(), &[GainLife::PLAYER, GainLife::AMOUNT,]);
     }

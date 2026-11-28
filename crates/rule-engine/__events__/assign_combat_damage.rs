@@ -19,6 +19,7 @@ pub struct AssignCombatDamage {
 
 impl Event for AssignCombatDamage {
     const ID: rules::EventId = rules::EventId("510.1c/assign-combat-damage");
+    const HOLDER: rules::ArgRef = rules::ArgRef::Arg(Self::SOURCE);
 
     #[atomic_delegate(AssignCombatDamage, Event)]
     fn restrictions() -> Vec<rules::Restriction> {}
@@ -55,6 +56,10 @@ mod tests {
         assert_eq!(
             AssignCombatDamage::ID,
             rules::EventId("510.1c/assign-combat-damage")
+        );
+        assert_eq!(
+            AssignCombatDamage::HOLDER,
+            rules::ArgRef::Arg(AssignCombatDamage::SOURCE)
         );
         let restrictions = AssignCombatDamage::restrictions();
         assert_eq!(restrictions.len(), 1);

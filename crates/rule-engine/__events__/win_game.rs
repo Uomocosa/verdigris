@@ -13,6 +13,7 @@ pub struct WinGame {
 #[rustfmt::skip]
 impl Event for WinGame {
     const ID: rules::EventId = rules::EventId("104.2/win-game");
+    const HOLDER: rules::ArgRef = rules::ArgRef::Arg(Self::PLAYER);
 }
 
 #[cfg(test)]
@@ -39,6 +40,7 @@ mod tests {
             Some(rules::ArgValue::Player(player))
         );
         assert_eq!(WinGame::ID, rules::EventId("104.2/win-game"));
+        assert_eq!(WinGame::HOLDER, rules::ArgRef::Arg(WinGame::PLAYER));
         assert_eq!(WinGame::restrictions(), Vec::new());
         assert_eq!(WinGame::args(), &[WinGame::PLAYER]);
     }
