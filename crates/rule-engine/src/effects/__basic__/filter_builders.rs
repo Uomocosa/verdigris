@@ -67,6 +67,11 @@ pub fn controlled_by(players: impl Into<rules::Players>) -> effects::Filter {
 }
 
 #[must_use]
+pub fn owned_by(players: impl Into<rules::Players>) -> effects::Filter {
+    effects::Filter::owned_by(players)
+}
+
+#[must_use]
 pub fn token() -> effects::Filter {
     effects::Filter::token()
 }

@@ -86,6 +86,11 @@ impl Filter {
     }
 
     #[must_use]
+    pub fn owned_by(players: impl Into<rules::Players>) -> Self {
+        Self(rules::owned_by(players))
+    }
+
+    #[must_use]
     pub fn from_in_zone(zone: zones::Zone, role: impl Into<rules::ArgRef>) -> Self {
         Self(rules::in_zone(zone, role))
     }
@@ -161,5 +166,9 @@ mod tests {
         assert_eq!(!effects::Filter::token(), !effects::Filter::token());
         assert_eq!(effects::Filter::card(), effects::Filter::card());
         assert_ne!(effects::Filter::card(), effects::Filter::token());
+        assert_eq!(
+            effects::Filter::owned_by(rules::Players::You),
+            effects::Filter::owned_by(rules::Players::You)
+        );
     }
 }

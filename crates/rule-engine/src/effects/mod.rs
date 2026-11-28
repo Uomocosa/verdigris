@@ -9,7 +9,8 @@ pub use basic::components::ContinuousEffect;
 pub use basic::enums::{Duration, EffectKind, Layered, Modification};
 pub use basic::filter_builders::{
     another_creature, any_target, attacking, card, controlled_by, creature, creature_spell,
-    enchantment, instant_spell, nonblack_creature, noncreature_spell, player, spell, token,
+    enchantment, instant_spell, nonblack_creature, noncreature_spell, owned_by, player, spell,
+    token,
 };
 pub use basic::messages::{KeywordGranted, PowerToughnessModified};
 
