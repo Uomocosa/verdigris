@@ -154,11 +154,12 @@ mod tests {
             p1.pass_to(turns::Step::CombatDamage),
             p2.pass_to(turns::Step::CombatDamage),
         ])?;
-        game.play([p2.assign_combat_damage([(bears_1.into(), 2), (bears_2.into(), 2)])])?;
+        game.play([p2.assign_combat_damage([(bears_1.into(), 3), (bears_2.into(), 1)])])?;
         game.play([p1.pass_priority(), p2.pass_priority()])?;
 
         assert!(game.moved(bears_1).to(GRAVEYARD).of(p1));
-        assert!(game.moved(bears_2).to(GRAVEYARD).of(p1));
+        assert!(game.card(bears_2).is_in(BATTLEFIELD).of(p1));
+        assert_eq!(game.damage(bears_2), 1);
         Ok(())
     }
 }

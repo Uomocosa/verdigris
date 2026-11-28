@@ -54,7 +54,13 @@ pub fn assigned_blocked_damage(
         else {
             continue;
         };
-        if attackers.len() > 1 && !blocker_needed.iter().any(|needed| needed.source == blocker) {
+        if attackers.len() == 1 {
+            writes.push(damage::AssignedDamage {
+                source: blocker,
+                target: source,
+                amount: blocker_amount,
+            });
+        } else if !blocker_needed.iter().any(|needed| needed.source == blocker) {
             blocker_needed.push(actions::RequiredCombatDamage {
                 source: blocker,
                 amount: blocker_amount,
@@ -62,13 +68,7 @@ pub fn assigned_blocked_damage(
                 trample_defender: None,
                 lethal_by_target: BTreeMap::new(),
             });
-            continue;
         }
-        writes.push(damage::AssignedDamage {
-            source: blocker,
-            target: source,
-            amount: blocker_amount,
-        });
     }
     if amount == 0 || !participants.contains(&source) {
         return writes;
