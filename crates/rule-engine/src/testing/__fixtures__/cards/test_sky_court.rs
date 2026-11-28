@@ -8,7 +8,7 @@ pub const TEST_SKY_COURT: Card = Card {
             all(creature()).restriction::<DeclareBlocker>(
                 DeclareBlocker::BLOCKER,
                 RestrictionId("test/test-sky-court"),
-                !DeclareBlocker::BLOCKER.has(&flying()) | DeclareBlocker::ATTACKER.has(&flying()),
+                !DeclareBlocker::BLOCKER.has(flying()) | DeclareBlocker::ATTACKER.has(flying()),
             ),
         }
     },

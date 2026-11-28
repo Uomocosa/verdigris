@@ -54,4 +54,27 @@ mod tests {
             })
         );
     }
+
+    #[test]
+    fn bare_template_is_not_optional() {
+        let ability = instead(
+            statics::Would::<events::DrawFromEmptyLibrary>::of(creature()),
+            rules::EventTemplate::WinGame {
+                who: events::DrawFromEmptyLibrary::PLAYER.into(),
+            },
+        );
+        assert_eq!(
+            ability.modification,
+            effects::Modification::Rule(rules::RuleChange {
+                target: rules::Target::event::<events::DrawFromEmptyLibrary>(),
+                change: rules::Change::Instead {
+                    holder: events::DrawFromEmptyLibrary::PLAYER.into(),
+                    when: rules::Condition::True,
+                    then: rules::Then::Events(vec![rules::EventTemplate::WinGame {
+                        who: events::DrawFromEmptyLibrary::PLAYER.into(),
+                    }]),
+                },
+            })
+        );
+    }
 }

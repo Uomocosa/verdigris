@@ -1,5 +1,6 @@
 use crate::effects;
 use crate::effects::traits::gets::Gets;
+use crate::rules;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct You;
@@ -17,7 +18,9 @@ impl You {
     #[must_use]
     pub fn mill(self, count: u32) -> effects::Effect { self.do_(effects::mill(count)) }
     #[must_use]
-    pub fn win_the_game(self) -> effects::Effect { self.do_(effects::win_the_game()) }
+    pub const fn win_the_game(self) -> rules::EventTemplate {
+        rules::EventTemplate::WinGame { who: rules::YOU }
+    }
     #[must_use]
     pub fn get(self, got: impl Gets) -> effects::Effect { self.do_(effects::get(got)) }
 }
@@ -55,7 +58,10 @@ mod tests {
         assert_eq!(You.gain_life(1).kind, effects::EffectKind::GainLife(1));
         assert_eq!(You.lose_life(2).kind, effects::EffectKind::LoseLife(2));
         assert_eq!(You.mill(5).kind, effects::EffectKind::Mill(5));
-        assert_eq!(You.win_the_game().kind, effects::EffectKind::WinTheGame);
+        assert_eq!(
+            You.win_the_game(),
+            rules::EventTemplate::WinGame { who: rules::YOU }
+        );
         assert_eq!(
             YOU.get(pt!(3, 3)).kind,
             effects::EffectKind::ModifyPowerToughness {

@@ -2,6 +2,7 @@
 pub mod absolute_rule;
 pub mod action;
 pub mod all;
+pub mod arg_id;
 pub mod assign_combat_damage;
 pub mod attack;
 pub mod attempt;

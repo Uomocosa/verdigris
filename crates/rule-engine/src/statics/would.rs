@@ -28,7 +28,11 @@ impl<E: rules::traits::event::Event> Would<E> {
 
     #[must_use]
     pub fn when(mut self, when: rules::Condition) -> Self {
-        self.when = self.when & when;
+        if self.when == rules::Condition::True {
+            self.when = when;
+        } else {
+            self.when = self.when & when;
+        }
         self
     }
 
@@ -69,10 +73,12 @@ mod tests {
         assert_eq!(pending.filter, creature());
         assert_eq!(pending.holder, rules::ArgRef::Arg(events::Draw::PLAYER));
         assert_eq!(pending.when, rules::Condition::True);
-        let narrowed = pending.when(rules::Condition::True);
+        let narrowed = pending.when(rules::Condition::StackEmpty);
+        assert_eq!(narrowed.when, rules::Condition::StackEmpty);
+        let twice = narrowed.when(rules::Condition::StackEmpty);
         assert_eq!(
-            narrowed.when,
-            rules::Condition::True & rules::Condition::True
+            twice.when,
+            rules::Condition::StackEmpty & rules::Condition::StackEmpty
         );
     }
 

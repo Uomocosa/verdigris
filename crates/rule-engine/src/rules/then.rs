@@ -1,16 +1,27 @@
 use atomic_delegate_macros::atomic_delegates;
 use bevy::prelude::{Commands, MessageWriter};
-use derive_more::From;
 
 use crate::May;
 use crate::StateBasedActionsPerformed;
 use crate::rules;
 use crate::rules::traits::event::Event;
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash, From)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Then {
     Events(Vec<rules::EventTemplate>),
     May(rules::EventTemplate),
+}
+
+impl From<Vec<rules::EventTemplate>> for Then {
+    fn from(then: Vec<rules::EventTemplate>) -> Self {
+        Self::Events(then)
+    }
+}
+
+impl From<rules::EventTemplate> for Then {
+    fn from(then: rules::EventTemplate) -> Self {
+        Self::Events(vec![then])
+    }
 }
 
 #[atomic_delegates]

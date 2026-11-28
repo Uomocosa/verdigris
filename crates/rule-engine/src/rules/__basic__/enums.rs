@@ -1,3 +1,5 @@
+use derive_more::From;
+
 use crate::rules;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -9,7 +11,7 @@ pub enum ArgKind {
     Event,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, From)]
 pub enum Amount {
     Fixed(u32),
     FromArg(rules::ArgId),
