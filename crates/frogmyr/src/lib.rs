@@ -2,6 +2,7 @@
 mod basic;
 mod case;
 pub(crate) mod compiled_rule;
+mod constants;
 mod facts;
 mod program;
 pub(crate) mod wired_rule;
@@ -17,6 +18,7 @@ pub use basic::term::Term;
 pub use basic::value::Value;
 pub use case::Case;
 pub(crate) use compiled_rule::CompiledRule;
+pub(crate) use constants::COUNT_RELATION;
 pub use facts::Facts;
 pub use program::Program;
 pub(crate) use wired_rule::WiredRule;

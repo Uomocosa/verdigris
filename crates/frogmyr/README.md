@@ -6,7 +6,7 @@ data, plus our engine evaluating it.
 ## Goal
 
 frogmyr is a small, generic, deterministic stratified Datalog engine on datafrog: rules as
-runtime data, no game knowledge. Aggregation (counting) may come later; not promised.
+runtime data, no game knowledge. It supports one stratified `count` aggregation per rule.
 
 Evaluate runtime-built rules quickly, deterministically and with no runtime dependencies, so that it can
 run on every state change, on every peer, and later in wasm.
@@ -16,7 +16,7 @@ run on every state change, on every peer, and later in wasm.
 | Item | Purpose |
 |---|---|
 | `Value` (`Entity`, `Sym`, `Int`) | A ground value. `Ord`, so all collections stay sorted. |
-| `Term` (`Var`, `Val`), `Atom`, `Literal` (`Pos`, `Neg`, `Cmp`), `Rule`, `Rel`, `CmpOp` | The rule language: Horn clauses with negation and comparisons. |
+| `Term` (`Var`, `Val`), `Atom`, `Literal` (`Pos`, `Neg`, `Cmp`, `Count`), `Rule`, `Rel`, `CmpOp` | The rule language: Horn clauses with negation, comparisons and stratified count. |
 | `Program` | A set of rules. `canonical()` sorts and dedups them; `stratify()` orders them into strata; `evaluate(&facts)` runs them with the datafrog engine. |
 | `Facts` | Ground facts per relation (`BTreeMap<Rel, BTreeSet<Vec<Value>>>`): `add`, `contains`, `matching`, `iter`. |
 | `EngineError` | `Unstratifiable`, `Unsafe`, `Backend(String)`. |
@@ -26,12 +26,14 @@ run on every state change, on every peer, and later in wasm.
 
 ## How it works
 
-1. `Program::stratify()` splits the rules into strata; negation only reads lower, completed strata.
+1. `Program::stratify()` splits the rules into strata; negation and `count` read only lower, completed strata.
 2. Each rule is compiled once (`CompiledRule`, `WiredRule`) into a join plan over generic tuples
    `(key, Payload)`, where the key columns are the variables shared between body atoms.
 3. Per stratum, a `datafrog::Iteration` runs until nothing changes:
    - positive atoms: `Variable::from_join`
    - negated atoms: `Variable::from_antijoin` against the completed lower strata
+   - `count N: body`: distinct body bindings grouped by the head's group variables, joined through
+     the synthetic `__frogmyr_count` relation
    - comparisons: `PrefixFilter`; comparisons between constants are folded at compile time
 4. The completed relations are absorbed into the output `Facts`.
 
@@ -52,20 +54,27 @@ run on every state change, on every peer, and later in wasm.
 
 ## Important rules
 
-- **Stratified negation only.** A cycle through a negated literal is rejected (`Unstratifiable`). Stratification
-  gives one well-defined result per program, the same requirement GDL (General Game Playing) puts on game rules.
+- **Stratified negation and count.** A cycle through a negated literal or a `Count` literal is rejected
+  (`Unstratifiable`); a count reads only completed lower strata. Stratification gives one well-defined result per
+  program, the same requirement GDL (General Game Playing) puts on game rules.
 - **Safety** (GDL spec): every variable in a rule head, in a negated atom or in a comparison must also appear in a
-  positive atom of the same body; otherwise `Unsafe`.
+  positive atom of the same body, or be bound by a `Count` literal (its output variable and the head variables it
+  groups by); otherwise `Unsafe`.
+- **One count per rule.** A second `Literal::Count` in the same body is rejected as `Unsafe`, naming that count's
+  output variable.
 - **Deterministic.** Only sorted collections reach any output: same input, same result, on every peer.
 - **Conformance is the contract.** `Case::check()` passes. The suite covers
   transitive closure, negation, comparisons, constants, independent strata, empty negated relations, entities
-  (lossless round-trip), evaluating twice, and the two rejection errors. Add a case here, not inside one backend.
+  (lossless round-trip), count grouping, evaluating twice, and the three rejection errors. Add a case here, not
+  inside one backend.
 
 ## Limits and known behaviour
 
 - Comparisons between different `Value` variants follow the IR's derived `Ord` (`Entity < Sym < Int`).
 - Relations are expected to keep one arity.
-- No aggregation yet.
+- A `count` body holds positive atoms only: no negation, comparison or nested count.
+- Groups with no body rows produce no row: zero counts are not derived.
+- `__frogmyr_count` is an engine-internal relation; a user relation of that name is shadowed in a rule with a count.
 
 ## Not in scope
 

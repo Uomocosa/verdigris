@@ -28,6 +28,10 @@ impl Case {
     #[must_use]
     pub fn constants_in_head_and_body() -> Case {}
     #[must_use]
+    pub fn count_grouped_by_head() -> Case {}
+    #[must_use]
+    pub fn count_unstratifiable() -> Case {}
+    #[must_use]
     pub fn two_independent_strata() -> Case {}
     #[must_use]
     pub fn negated_relation_empty() -> Case {}
@@ -44,7 +48,7 @@ mod tests {
     #[test]
     fn test_usage() {
         let all = Case::cases();
-        assert_eq!(all.len(), 9);
+        assert_eq!(all.len(), 11);
         assert_eq!(all[0].name, "transitive_closure");
     }
 }

@@ -5,9 +5,11 @@ use datafrog::Iteration;
 use datafrog::Relation;
 use datafrog::Variable;
 
+use crate::COUNT_RELATION;
 use crate::CompiledRule;
 use crate::EngineError;
 use crate::Facts;
+use crate::Literal;
 use crate::Program;
 use crate::Rel;
 use crate::Value;
@@ -49,9 +51,22 @@ pub fn evaluate(program: &Program, facts: &Facts) -> Result<Facts, EngineError> 
             let Some(head_rows) = rows.get(&plan.head.rel) else {
                 continue;
             };
+            let aggregate =
+                if rule.body.iter().any(|literal| matches!(literal, Literal::Count { .. })) {
+                    let variable = iteration.variable::<Vec<Value>>("aggregate");
+                    variable.extend(Program::count_rows(rule, &completed));
+                    Some(variable)
+                } else {
+                    None
+                };
             let mut sources = Vec::with_capacity(plan.positives.len());
             for atom in &plan.positives {
-                if heads.contains(&atom.rel) {
+                if atom.rel == COUNT_RELATION {
+                    let Some(source) = aggregate.as_ref() else {
+                        continue;
+                    };
+                    sources.push(source.clone());
+                } else if heads.contains(&atom.rel) {
                     let Some(source) = rows.get(&atom.rel) else {
                         continue;
                     };

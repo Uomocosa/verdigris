@@ -1,6 +1,7 @@
 use std::collections::BTreeMap;
 use std::collections::BTreeSet;
 
+use crate::Atom;
 use crate::EngineError;
 use crate::Literal;
 use crate::Program;
@@ -9,41 +10,44 @@ use crate::Rule;
 use crate::Term;
 
 pub fn stratify(program: &Program) -> Result<Vec<Vec<Rule>>, EngineError> {
+    let variable_name = |term: &Term| match term {
+        Term::Var(name) => Some(*name),
+        Term::Val(_) => None,
+    };
+    let bind_vars = |atoms: &[Atom], into: &mut BTreeSet<&'static str>| {
+        for atom in atoms {
+            into.extend(atom.terms.iter().filter_map(variable_name));
+        }
+    };
     let mut ordered: Vec<Rule> = program.rules.clone();
     ordered.sort();
     for rule in &ordered {
         let mut bound: BTreeSet<&'static str> = BTreeSet::new();
-        for literal in &rule.body {
-            if let Literal::Pos(atom) = literal {
-                for term in &atom.terms {
-                    if let Term::Var(name) = term {
-                        bound.insert(*name);
-                    }
-                }
-            }
-        }
-        let mut checked: Vec<&Term> = Vec::new();
-        for term in &rule.head.terms {
-            checked.push(term);
-        }
+        let mut checked: BTreeSet<&'static str> = BTreeSet::new();
+        checked.extend(rule.head.terms.iter().filter_map(variable_name));
+        let mut has_count = false;
         for literal in &rule.body {
             match literal {
-                Literal::Pos(_) => {}
-                Literal::Neg(atom) => {
-                    for term in &atom.terms {
-                        checked.push(term);
-                    }
-                }
+                Literal::Pos(atom) => bind_vars(std::slice::from_ref(atom), &mut bound),
+                Literal::Neg(atom) => bind_vars(std::slice::from_ref(atom), &mut checked),
                 Literal::Cmp(left, _, right) => {
-                    checked.push(left);
-                    checked.push(right);
+                    checked.extend([*left, *right].iter().filter_map(variable_name));
+                }
+                Literal::Count { output, .. } => {
+                    if has_count {
+                        return Err(EngineError::Unsafe {
+                            relation: rule.head.rel,
+                            variable: output,
+                        });
+                    }
+                    has_count = true;
+                    bound.insert(output);
+                    bound.extend(Program::count_group_variables(rule));
                 }
             }
         }
-        for term in checked {
-            if let Term::Var(name) = term
-                && !bound.contains(name)
-            {
+        for name in checked {
+            if !bound.contains(name) {
                 return Err(EngineError::Unsafe {
                     relation: rule.head.rel,
                     variable: name,
@@ -55,32 +59,30 @@ pub fn stratify(program: &Program) -> Result<Vec<Vec<Rule>>, EngineError> {
     for rule in &ordered {
         strata.entry(rule.head.rel).or_insert(0);
         for literal in &rule.body {
-            match literal {
-                Literal::Pos(atom) | Literal::Neg(atom) => {
-                    strata.entry(atom.rel).or_insert(0);
-                }
-                Literal::Cmp(..) => {}
+            let atoms: Vec<&Atom> = match literal {
+                Literal::Pos(atom) | Literal::Neg(atom) => vec![atom],
+                Literal::Count { body, .. } => body.iter().collect(),
+                Literal::Cmp(..) => Vec::new(),
+            };
+            for atom in atoms {
+                strata.entry(atom.rel).or_insert(0);
             }
         }
     }
     let required = |rule: &Rule, strata: &BTreeMap<Rel, u64>| -> u64 {
         let mut level: u64 = strata.get(&rule.head.rel).copied().unwrap_or(0);
         for literal in &rule.body {
-            match literal {
-                Literal::Pos(atom) => {
-                    if let Some(dependency) = strata.get(&atom.rel)
-                        && *dependency > level
-                    {
-                        level = *dependency;
-                    }
+            let (atoms, offset): (&[Atom], u64) = match literal {
+                Literal::Pos(atom) => (std::slice::from_ref(atom), 0),
+                Literal::Neg(atom) => (std::slice::from_ref(atom), 1),
+                Literal::Count { body, .. } => (body.as_slice(), 1),
+                Literal::Cmp(..) => (&[], 0),
+            };
+            for atom in atoms {
+                let dependency = strata.get(&atom.rel).copied().unwrap_or(0).saturating_add(offset);
+                if dependency > level {
+                    level = dependency;
                 }
-                Literal::Neg(atom) => {
-                    let dependency = strata.get(&atom.rel).copied().unwrap_or(0).saturating_add(1);
-                    if dependency > level {
-                        level = dependency;
-                    }
-                }
-                Literal::Cmp(..) => {}
             }
         }
         level
@@ -88,8 +90,7 @@ pub fn stratify(program: &Program) -> Result<Vec<Vec<Rule>>, EngineError> {
     let relation_count = strata.len();
     for _ in 0..relation_count {
         for rule in &ordered {
-            let level = required(rule, &strata);
-            strata.insert(rule.head.rel, level);
+            strata.insert(rule.head.rel, required(rule, &strata));
         }
     }
     for rule in &ordered {

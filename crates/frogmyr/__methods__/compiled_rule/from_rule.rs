@@ -1,7 +1,10 @@
 use std::collections::BTreeSet;
 
+use crate::Atom;
+use crate::COUNT_RELATION;
 use crate::CmpOp;
 use crate::Literal;
+use crate::Program;
 use crate::Rule;
 use crate::Term;
 
@@ -10,12 +13,21 @@ use crate::CompiledRule;
 pub fn from_rule(rule: &Rule) -> CompiledRule {
     let mut ordered: BTreeSet<&'static str> = BTreeSet::new();
     for literal in &rule.body {
-        if let Literal::Pos(atom) = literal {
-            for term in &atom.terms {
-                if let Term::Var(name) = term {
-                    ordered.insert(*name);
+        match literal {
+            Literal::Pos(atom) => {
+                for term in &atom.terms {
+                    if let Term::Var(name) = term {
+                        ordered.insert(*name);
+                    }
                 }
             }
+            Literal::Count { output, .. } => {
+                ordered.insert(*output);
+                for name in Program::count_group_variables(rule) {
+                    ordered.insert(name);
+                }
+            }
+            Literal::Neg(_) | Literal::Cmp(..) => {}
         }
     }
     let variables: Vec<&'static str> = ordered.into_iter().collect();
@@ -47,6 +59,20 @@ pub fn from_rule(rule: &Rule) -> CompiledRule {
                 }
                 _ => comparisons.push((*left, *op, *right)),
             },
+            Literal::Count { output, .. } => {
+                let terms = Program::count_group_variables(rule)
+                    .into_iter()
+                    .map(Term::Var)
+                    .chain([Term::Var(output)])
+                    .collect();
+                positives.insert(
+                    0,
+                    Atom {
+                        rel: COUNT_RELATION,
+                        terms,
+                    },
+                );
+            }
         }
     }
     CompiledRule {

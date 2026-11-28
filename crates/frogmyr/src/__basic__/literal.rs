@@ -7,4 +7,8 @@ pub enum Literal {
     Pos(Atom),
     Neg(Atom),
     Cmp(Term, CmpOp, Term),
+    Count {
+        output: &'static str,
+        body: Vec<Atom>,
+    },
 }

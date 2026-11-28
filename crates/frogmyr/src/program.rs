@@ -1,9 +1,14 @@
+use std::collections::BTreeMap;
+
 use atomic_delegate_macros::atomic_delegates;
+use datafrog::Relation;
 use derive_more::Deref;
 
 use crate::EngineError;
 use crate::Facts;
+use crate::Rel;
 use crate::Rule;
+use crate::Value;
 
 #[derive(Debug, Clone, Default, PartialEq, Eq, Deref)]
 pub struct Program {
@@ -22,6 +27,16 @@ impl Program {
         self.rules.sort();
         self.rules.dedup();
         self
+    }
+}
+
+#[atomic_delegates]
+impl Program {
+    pub(crate) fn count_group_variables(rule: &Rule) -> Vec<&'static str> {}
+    pub(crate) fn count_rows(
+        rule: &Rule,
+        completed: &BTreeMap<Rel, Relation<Vec<Value>>>,
+    ) -> Vec<Vec<Value>> {
     }
 }
 
