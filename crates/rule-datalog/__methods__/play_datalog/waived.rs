@@ -1,11 +1,11 @@
-use verdigris_rule_engine::events;
 use verdigris_rule_engine::rules;
+use verdigris_rule_engine::rules::traits::event::Event;
 
 use crate::PlayDatalog;
 
-pub fn waived(
+pub fn waived<E: Event>(
     answers: &rules::Rules,
-    event: &events::Play,
+    event: &E,
     id: rules::RestrictionId,
     unwaivable: bool,
 ) -> bool {

@@ -1,14 +1,13 @@
-use verdigris_rule_engine::events;
 use verdigris_rule_engine::rules;
-use verdigris_rule_engine::rules::traits::event_args::EventArgs;
+use verdigris_rule_engine::rules::traits::event::Event;
 
-pub fn holder_changes(
+pub fn holder_changes<E: Event>(
     answers: &rules::Rules,
-    event: &events::Play,
+    event: &E,
     target: rules::Target,
 ) -> Vec<rules::Change> {
     let mut kept = Vec::new();
-    for id in events::Play::args() {
+    for id in E::args() {
         for reference in [
             rules::ArgRef::Arg(*id),
             rules::ArgRef::ControllerOf(*id),

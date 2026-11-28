@@ -9,15 +9,6 @@ use verdigris_rule_engine::zones;
 use crate::PlayDatalog;
 
 pub fn entity_facts(answers: &rules::Rules, facts: &mut Facts, entity: Entity) {
-    let card_name = |card_type: cards::CardType| match card_type {
-        cards::CardType::Creature => "Creature",
-        cards::CardType::Instant => "Instant",
-        cards::CardType::Sorcery => "Sorcery",
-        cards::CardType::Land => "Land",
-        cards::CardType::Artifact => "Artifact",
-        cards::CardType::Enchantment => "Enchantment",
-        cards::CardType::Planeswalker => "Planeswalker",
-    };
     let zone_name = |zone: zones::Zone| match zone {
         zones::Zone::Library => "Library",
         zones::Zone::Hand => "Hand",
@@ -33,7 +24,7 @@ pub fn entity_facts(answers: &rules::Rules, facts: &mut Facts, entity: Entity) {
                 PlayDatalog::CARD_TYPE,
                 vec![
                     Value::Entity(entity.to_bits()),
-                    Value::Sym(card_name(*card_type)),
+                    Value::Sym(PlayDatalog::card_type_name(*card_type)),
                 ],
             );
         }

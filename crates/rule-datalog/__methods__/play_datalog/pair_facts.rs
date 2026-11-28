@@ -1,11 +1,9 @@
 use bevy::prelude::Entity;
 
 use verdigris_datalog_ir::Facts;
-use verdigris_datalog_ir::Value;
 use verdigris_rule_engine::events;
 use verdigris_rule_engine::players;
 use verdigris_rule_engine::rules;
-use verdigris_rule_engine::rules::traits::event::Event;
 
 use crate::PlayDatalog;
 
@@ -16,43 +14,14 @@ pub fn pair_facts(
     player: players::PlayerId,
 ) {
     let event = events::Play { card, player };
-    for restriction in events::Play::restrictions() {
-        if !restriction.unwaivable
-            && PlayDatalog::waived(answers, &event, restriction.id, restriction.unwaivable)
-        {
-            let _ = facts.add(
-                PlayDatalog::WAIVED,
-                vec![
-                    Value::Sym(PlayDatalog::PLAY),
-                    Value::Entity(card.to_bits()),
-                    Value::Entity(player.to_bits()),
-                    Value::Sym(*restriction.id),
-                ],
-            );
-        }
-    }
-    for change in
-        PlayDatalog::holder_changes(answers, &event, rules::Target::event::<events::Play>())
-    {
-        if let rules::Change::Restrict { restriction, .. } = change
-            && !PlayDatalog::waived(answers, &event, restriction.id, restriction.unwaivable)
-            && !answers.eval(&restriction.condition.bind(&event), &event, None)
-        {
-            let _ = facts.add(
-                PlayDatalog::ADDED,
-                vec![
-                    Value::Entity(card.to_bits()),
-                    Value::Entity(player.to_bits()),
-                    Value::Sym(*restriction.id),
-                ],
-            );
-        }
-    }
+    PlayDatalog::pair_facts_for(answers, facts, &event, card, player, PlayDatalog::PLAY);
     if answers.eval(
         &rules::land_play_available(rules::ArgRef::Arg(events::Play::PLAYER)),
         &event,
         None,
     ) {
+        use verdigris_datalog_ir::Value;
+
         let _ = facts.add(
             PlayDatalog::LAND_PLAY_AVAILABLE,
             vec![Value::Entity(player.to_bits())],

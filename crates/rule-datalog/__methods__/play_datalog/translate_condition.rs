@@ -3,7 +3,7 @@ use verdigris_datalog_ir::Literal;
 use verdigris_datalog_ir::Term;
 use verdigris_datalog_ir::Value;
 use verdigris_rule_engine::HAND;
-use verdigris_rule_engine::cards;
+use verdigris_rule_engine::cards::Owner;
 use verdigris_rule_engine::rules;
 
 use crate::PlayDatalog;
@@ -56,15 +56,13 @@ pub fn translate_condition(
             translate_condition(inner, card, holder)
                 .map_err(|_| TranslationError::Untranslatable(condition.clone()))
         }
-        rules::Condition::CardType(card_type) if *card_type == cards::CardType::Land => {
-            Ok(positive(
-                PlayDatalog::CARD_TYPE,
-                vec![
-                    Term::Var(PlayDatalog::CARD_VAR),
-                    Term::Val(Value::Sym(PlayDatalog::LAND)),
-                ],
-            ))
-        }
+        rules::Condition::CardType(card_type) => Ok(positive(
+            PlayDatalog::CARD_TYPE,
+            vec![
+                Term::Var(PlayDatalog::CARD_VAR),
+                Term::Val(Value::Sym(PlayDatalog::card_type_name(*card_type))),
+            ],
+        )),
         rules::Condition::InZone(zone, zone_holder) if *zone == HAND && is_holder(zone_holder) => {
             Ok(positive(
                 PlayDatalog::IN_ZONE,
@@ -76,8 +74,7 @@ pub fn translate_condition(
             ))
         }
         rules::Condition::PointsTo(component, owner)
-            if *component == rules::ComponentRef::relation::<cards::Owner>()
-                && is_holder(owner) =>
+            if *component == rules::ComponentRef::relation::<Owner>() && is_holder(owner) =>
         {
             Ok(positive(
                 PlayDatalog::OWNER,
@@ -150,6 +147,26 @@ mod tests {
                     terms: vec![Term::Var("S")],
                 }),
             ])
+        );
+    }
+
+    #[test]
+    fn card_types_other_than_land_translate() {
+        let card = rules::ArgRef::Arg(events::Play::CARD);
+        let holder = rules::ArgRef::Arg(events::Play::PLAYER);
+        assert_eq!(
+            translate_condition(
+                &rules::card_type(cards::CardType::Instant).of(events::Play::CARD),
+                &card,
+                &holder
+            ),
+            Ok(vec![Literal::Pos(Atom {
+                rel: PlayDatalog::CARD_TYPE,
+                terms: vec![
+                    Term::Var(PlayDatalog::CARD_VAR),
+                    Term::Val(Value::Sym("Instant")),
+                ],
+            })])
         );
     }
 

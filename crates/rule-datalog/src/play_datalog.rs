@@ -35,9 +35,9 @@ impl PlayDatalog {
     ) -> Vec<Entity> {
     }
     #[must_use]
-    pub(crate) fn holder_changes(
+    pub(crate) fn holder_changes<E: verdigris_rule_engine::rules::traits::event::Event>(
         answers: &rules::Rules,
-        event: &verdigris_rule_engine::events::Play,
+        event: &E,
         target: rules::Target,
     ) -> Vec<rules::Change> {
     }
@@ -54,10 +54,19 @@ impl PlayDatalog {
         player: players::PlayerId,
     ) {
     }
-    #[must_use]
-    pub(crate) fn waived(
+    pub(crate) fn pair_facts_for<E: verdigris_rule_engine::rules::traits::event::Event>(
         answers: &rules::Rules,
-        event: &verdigris_rule_engine::events::Play,
+        facts: &mut Facts,
+        event: &E,
+        card: bevy::prelude::Entity,
+        holder: players::PlayerId,
+        event_name: &'static str,
+    ) {
+    }
+    #[must_use]
+    pub(crate) fn waived<E: verdigris_rule_engine::rules::traits::event::Event>(
+        answers: &rules::Rules,
+        event: &E,
         id: rules::RestrictionId,
         unwaivable: bool,
     ) -> bool {
@@ -116,6 +125,23 @@ impl PlayDatalog {
     ];
 }
 
+impl PlayDatalog {
+    #[must_use]
+    pub(crate) const fn card_type_name(
+        card_type: verdigris_rule_engine::cards::CardType,
+    ) -> &'static str {
+        match card_type {
+            verdigris_rule_engine::cards::CardType::Creature => "Creature",
+            verdigris_rule_engine::cards::CardType::Instant => "Instant",
+            verdigris_rule_engine::cards::CardType::Sorcery => "Sorcery",
+            verdigris_rule_engine::cards::CardType::Land => Self::LAND,
+            verdigris_rule_engine::cards::CardType::Artifact => "Artifact",
+            verdigris_rule_engine::cards::CardType::Enchantment => "Enchantment",
+            verdigris_rule_engine::cards::CardType::Planeswalker => "Planeswalker",
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use verdigris_datalog_ir::Rel;
@@ -128,5 +154,13 @@ mod tests {
         assert_eq!(*PlayDatalog::PLAY_CANDIDATE, "play_candidate");
         assert_eq!(PlayDatalog::PLAY, "play");
         assert_eq!(Rel(PlayDatalog::PLAY), Rel("play"));
+        assert_eq!(
+            PlayDatalog::card_type_name(verdigris_rule_engine::cards::CardType::Instant),
+            "Instant"
+        );
+        assert_eq!(
+            PlayDatalog::card_type_name(verdigris_rule_engine::cards::CardType::Land),
+            "Land"
+        );
     }
 }
