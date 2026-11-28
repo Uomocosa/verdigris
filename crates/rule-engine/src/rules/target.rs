@@ -1,4 +1,5 @@
 use crate::rules;
+use vocabulary::rules::traits::value_rule::ValueRule;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Target {
@@ -16,7 +17,7 @@ impl Target {
     }
 
     #[must_use]
-    pub const fn value<V: rules::traits::value_rule::ValueRule>() -> Self {
+    pub const fn value<V: ValueRule>() -> Self {
         Self::Value(V::ID)
     }
 }
@@ -26,7 +27,7 @@ mod tests {
     use crate::events;
     use crate::rules;
     use crate::rules::traits::event::Event;
-    use crate::rules::traits::value_rule::ValueRule;
+    use vocabulary::rules::traits::value_rule::ValueRule;
 
     #[test]
     fn test_usage() {

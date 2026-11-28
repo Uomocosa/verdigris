@@ -36,8 +36,7 @@ pub use cost::Cost;
 mod controller;
 pub use controller::Controller;
 
-mod land_type;
-pub use land_type::LandType;
+pub use vocabulary::cards::LandType;
 
 mod mana_pool;
 pub use mana_pool::ManaPool;
@@ -48,5 +47,4 @@ pub use mana_type::ManaType;
 mod owner;
 pub use owner::Owner;
 
-mod type_line;
-pub use type_line::TypeLine;
+pub use vocabulary::cards::TypeLine;

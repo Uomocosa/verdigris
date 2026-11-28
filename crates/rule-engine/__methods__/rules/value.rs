@@ -1,11 +1,9 @@
 use bevy::prelude::Entity;
 
 use crate::rules;
+use vocabulary::rules::traits::value_rule::ValueRule;
 
-pub fn value<V: rules::traits::value_rule::ValueRule>(
-    answers: &rules::Rules,
-    entity: Entity,
-) -> rules::Limit {
+pub fn value<V: ValueRule>(answers: &rules::Rules, entity: Entity) -> rules::Limit {
     let mut limit = V::default();
     for change in answers.changes(entity, rules::Target::value::<V>()) {
         limit = match change {

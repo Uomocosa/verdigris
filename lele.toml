@@ -49,7 +49,7 @@ path = "crates/rule-engine/src/keywords/__traits__/keyword_params.rs"
 reason = "Trait file named after the trait (KeywordParams), not a method file of Keyword."
 
 [[lele.rules.lint.atomic_file.exempt]]
-path = "crates/rule-engine/src/rules/__traits__/value_rule.rs"
+path = "crates/vocabulary/src/rules/__traits__/value_rule.rs"
 reason = "Trait file named after the trait (ValueRule), not a method file of Value; Value carries comparison thresholds for Condition (C1: Comparison carries its value)."
 
 # LELECORE002 · locked · File and folder names are snake_case.
@@ -63,7 +63,7 @@ path = "crates/rule-engine/src/keywords/__traits__/keyword_params.rs"
 reason = "Trait file named after the trait (KeywordParams), not a method file of Keyword."
 
 [[lele.rules.lint.method_file_co_location.exempt]]
-path = "crates/rule-engine/src/rules/__traits__/value_rule.rs"
+path = "crates/vocabulary/src/rules/__traits__/value_rule.rs"
 reason = "Trait file named after the trait (ValueRule), not a method file of Value; it lives with the other rules traits."
 
 # LELECORE004 · locked · Unit tests live in the same file as the code (no `tests/` folders under `src/`, no…

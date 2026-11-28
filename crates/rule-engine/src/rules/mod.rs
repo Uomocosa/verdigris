@@ -7,26 +7,24 @@ pub use basic::condition_builders::{
     in_zone, is, land_play_available, less_than, life, main_phase, points_to, power, spell,
     stack_empty, step_is, subtype, supertype, toughness,
 };
-pub use basic::enums::{Amount, ArgKind, Change, Legality, Why, may};
-pub use basic::newtypes::{An, EventId, ResultId, RuleId};
+pub use basic::enums::{Amount, Change, Legality, Why, may};
+pub use basic::newtypes::An;
 pub use basic::structs::RuleChange;
 pub use basic::type_aliases::{Definition, Restriction};
+pub use vocabulary::rules::{ArgKind, EventId, ResultId, RuleId};
 
-mod value;
-pub use value::Value;
+pub use vocabulary::rules::Value;
 
 mod arg_id;
 pub use arg_id::ArgId;
 
-mod comparison;
-pub use comparison::Comparison;
+pub use vocabulary::rules::Comparison;
 
 mod arg_ref;
 pub use arg_ref::ArgRef;
 pub(crate) use arg_ref::YOU;
 
-mod arg_value;
-pub use arg_value::ArgValue;
+pub use vocabulary::rules::ArgValue;
 
 #[path = "__traits__/mod.rs"]
 pub mod traits;
@@ -55,14 +53,14 @@ pub use definition_id::{DefinitionId, LETHAL_DAMAGE};
 mod restriction_id;
 pub use restriction_id::RestrictionId;
 
-pub mod land_plays;
-pub use land_plays::LandPlays;
+pub use vocabulary::rules::LandPlays;
+pub use vocabulary::rules::land_plays;
 
-pub mod limit;
-pub use limit::Limit;
+pub use vocabulary::rules::Limit;
+pub use vocabulary::rules::limit;
 
-pub mod maximum_hand_size;
-pub use maximum_hand_size::MaximumHandSize;
+pub use vocabulary::rules::MaximumHandSize;
+pub use vocabulary::rules::maximum_hand_size;
 
 mod component_ref;
 pub use component_ref::ComponentRef;

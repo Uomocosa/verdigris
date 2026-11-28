@@ -12,6 +12,7 @@ use crate::players;
 use crate::rules;
 use crate::turns;
 use crate::zones;
+use vocabulary::rules::traits::value_rule::ValueRule;
 
 #[derive(SystemParam, Clone, Copy)]
 pub struct Rules<'w, 's> {
@@ -61,7 +62,7 @@ impl Rules<'_, '_> {
     pub fn changes(&self, entity: Entity, target: rules::Target) -> Vec<rules::Change> {}
 
     #[must_use]
-    pub fn value<V: rules::traits::value_rule::ValueRule>(&self, entity: Entity) -> rules::Limit {}
+    pub fn value<V: ValueRule>(&self, entity: Entity) -> rules::Limit {}
 
     #[must_use]
     pub fn validate_attackers(

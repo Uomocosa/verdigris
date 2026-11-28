@@ -5,10 +5,10 @@ use crate::events;
 use crate::rules;
 use crate::rules::traits::event::Event;
 use crate::rules::traits::hook_event::HookEvent;
-use crate::rules::traits::value_rule::ValueRule;
 #[cfg(any(test, feature = "testing"))]
 use crate::testing;
 use crate::{ASSIGNS_AGAIN, FIRST_COMBAT_DAMAGE_STEP};
+use vocabulary::rules::traits::value_rule::ValueRule;
 
 pub fn engine() -> rules::RuleRegistry {
     let mut events = HashSet::<rules::EventId>::new();
@@ -111,7 +111,7 @@ mod tests {
     use crate::events;
     use crate::rules;
     use crate::rules::traits::event::Event;
-    use crate::rules::traits::value_rule::ValueRule;
+    use vocabulary::rules::traits::value_rule::ValueRule;
 
     use super::engine;
 
