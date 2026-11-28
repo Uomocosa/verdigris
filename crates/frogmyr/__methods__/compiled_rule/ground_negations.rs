@@ -1,9 +1,9 @@
 use std::collections::BTreeMap;
 
+use crate::Atom;
+use crate::Rel;
+use crate::Value;
 use datafrog::Relation;
-use verdigris_datalog_ir::Atom;
-use verdigris_datalog_ir::Rel;
-use verdigris_datalog_ir::Value;
 
 use crate::CompiledRule;
 
@@ -22,11 +22,11 @@ pub fn ground_negations(
 
 #[cfg(test)]
 mod tests {
-    use verdigris_datalog_ir::Atom;
-    use verdigris_datalog_ir::Literal;
-    use verdigris_datalog_ir::Rel;
-    use verdigris_datalog_ir::Rule;
-    use verdigris_datalog_ir::Term;
+    use crate::Atom;
+    use crate::Literal;
+    use crate::Rel;
+    use crate::Rule;
+    use crate::Term;
 
     use super::ground_negations;
     use crate::CompiledRule;

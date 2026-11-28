@@ -1,5 +1,5 @@
-use verdigris_datalog_ir::Facts;
-use verdigris_datalog_ir::Value;
+use frogmyr::Facts;
+use frogmyr::Value;
 use verdigris_rule_engine::cards;
 use verdigris_rule_engine::events;
 use verdigris_rule_engine::players;
@@ -67,7 +67,7 @@ pub fn snapshot(answers: &rules::Rules, viewer: players::PlayerId) -> Facts {
 
 #[cfg(test)]
 mod tests {
-    use verdigris_datalog_ir::Value;
+    use frogmyr::Value;
     use verdigris_rule_engine::BATTLEFIELD;
     use verdigris_rule_engine::players;
     use verdigris_rule_engine::testing::GRIZZLY_BEARS;

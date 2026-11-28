@@ -5,7 +5,7 @@ Translates verdigris game legality into Datalog and checks the answers against t
 ## Goal
 
 Answer "may this player do this, and if not, why?" with Datalog instead of the imperative checks in
-`verdigris-rule-engine`, on any engine implementing `verdigris_datalog_ir::traits::Engine`. It aims to agree with the
+`verdigris-rule-engine`, on any engine implementing `frogmyr::traits::Engine`. It aims to agree with the
 rule engine on every test state.
 
 This is **one-step legality only**, the same scope as GDL's `legal/2`. Ordering (the stack, replacement effects,

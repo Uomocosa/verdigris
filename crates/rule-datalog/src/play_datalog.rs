@@ -1,8 +1,8 @@
 use atomic_delegate_macros::atomic_delegates;
 use bevy::prelude::Entity;
-use verdigris_datalog_ir::Facts;
-use verdigris_datalog_ir::Program;
-use verdigris_datalog_ir::Rel;
+use frogmyr::Facts;
+use frogmyr::Program;
+use frogmyr::Rel;
 use verdigris_rule_engine::players;
 use verdigris_rule_engine::rules;
 
@@ -17,7 +17,7 @@ impl PlayDatalog {
     pub fn snapshot(answers: &rules::Rules, viewer: players::PlayerId) -> Facts {}
     #[must_use]
     pub fn play_program() -> Result<Program, TranslationError> {}
-    pub fn legality<G: verdigris_datalog_ir::traits::engine::Engine>(
+    pub fn legality<G: frogmyr::traits::engine::Engine>(
         engine: &G,
         answers: &rules::Rules,
         card: Entity,
@@ -75,19 +75,18 @@ impl PlayDatalog {
         condition: &rules::Condition,
         card: &rules::ArgRef,
         holder: &rules::ArgRef,
-    ) -> Result<Vec<verdigris_datalog_ir::Literal>, TranslationError> {
+    ) -> Result<Vec<frogmyr::Literal>, TranslationError> {
     }
     pub(crate) fn translate_holds(
         condition: &rules::Condition,
         card: &rules::ArgRef,
         holder: &rules::ArgRef,
-        candidate: &verdigris_datalog_ir::Atom,
-        holds: &mut Vec<verdigris_datalog_ir::Rule>,
+        candidate: &frogmyr::Atom,
+        holds: &mut Vec<frogmyr::Rule>,
         next_hold: &mut usize,
-    ) -> Result<verdigris_datalog_ir::Atom, TranslationError> {
+    ) -> Result<frogmyr::Atom, TranslationError> {
     }
-    pub(crate) fn holds_head(index: usize) -> Result<verdigris_datalog_ir::Atom, TranslationError> {
-    }
+    pub(crate) fn holds_head(index: usize) -> Result<frogmyr::Atom, TranslationError> {}
 }
 
 impl PlayDatalog {
@@ -144,7 +143,7 @@ impl PlayDatalog {
 
 #[cfg(test)]
 mod tests {
-    use verdigris_datalog_ir::Rel;
+    use frogmyr::Rel;
 
     use super::PlayDatalog;
 

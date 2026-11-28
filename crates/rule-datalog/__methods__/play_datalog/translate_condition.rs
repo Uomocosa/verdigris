@@ -1,7 +1,7 @@
-use verdigris_datalog_ir::Atom;
-use verdigris_datalog_ir::Literal;
-use verdigris_datalog_ir::Term;
-use verdigris_datalog_ir::Value;
+use frogmyr::Atom;
+use frogmyr::Literal;
+use frogmyr::Term;
+use frogmyr::Value;
 use verdigris_rule_engine::HAND;
 use verdigris_rule_engine::cards;
 use verdigris_rule_engine::rules;
@@ -34,7 +34,7 @@ pub fn translate_condition(
         })]);
     }
     let is_holder = |reference: &rules::ArgRef| *reference == *holder;
-    let positive = |relation: verdigris_datalog_ir::Rel, terms: Vec<Term>| {
+    let positive = |relation: frogmyr::Rel, terms: Vec<Term>| {
         vec![Literal::Pos(Atom {
             rel: relation,
             terms,
@@ -112,10 +112,10 @@ pub fn translate_condition(
 
 #[cfg(test)]
 mod tests {
-    use verdigris_datalog_ir::Atom;
-    use verdigris_datalog_ir::Literal;
-    use verdigris_datalog_ir::Term;
-    use verdigris_datalog_ir::Value;
+    use frogmyr::Atom;
+    use frogmyr::Literal;
+    use frogmyr::Term;
+    use frogmyr::Value;
     use verdigris_rule_engine::cards;
     use verdigris_rule_engine::events;
     use verdigris_rule_engine::rules;

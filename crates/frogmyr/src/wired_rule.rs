@@ -1,12 +1,12 @@
 use std::collections::BTreeMap;
 
+use crate::Atom;
+use crate::Rel;
+use crate::Value;
 use atomic_delegate_macros::atomic_delegates;
 use datafrog::Iteration;
 use datafrog::Relation;
 use datafrog::Variable;
-use verdigris_datalog_ir::Atom;
-use verdigris_datalog_ir::Rel;
-use verdigris_datalog_ir::Value;
 
 use crate::CompiledRule;
 use crate::Payload;
@@ -57,12 +57,12 @@ impl WiredRule {
 
 #[cfg(test)]
 mod tests {
-    use verdigris_datalog_ir::Atom;
-    use verdigris_datalog_ir::Literal;
-    use verdigris_datalog_ir::Rel;
-    use verdigris_datalog_ir::Rule;
-    use verdigris_datalog_ir::Term;
-    use verdigris_datalog_ir::Value;
+    use crate::Atom;
+    use crate::Literal;
+    use crate::Rel;
+    use crate::Rule;
+    use crate::Term;
+    use crate::Value;
 
     use super::WiredRule;
     use crate::CompiledRule;

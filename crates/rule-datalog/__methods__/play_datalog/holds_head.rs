@@ -1,6 +1,6 @@
-use verdigris_datalog_ir::Atom;
-use verdigris_datalog_ir::Rel;
-use verdigris_datalog_ir::Term;
+use frogmyr::Atom;
+use frogmyr::Rel;
+use frogmyr::Term;
 
 use crate::PlayDatalog;
 use crate::TranslationError;
@@ -21,9 +21,9 @@ pub fn holds_head(index: usize) -> Result<Atom, TranslationError> {
 
 #[cfg(test)]
 mod tests {
-    use verdigris_datalog_ir::Atom;
-    use verdigris_datalog_ir::Rel;
-    use verdigris_datalog_ir::Term;
+    use frogmyr::Atom;
+    use frogmyr::Rel;
+    use frogmyr::Term;
 
     use super::holds_head;
     use crate::PlayDatalog;

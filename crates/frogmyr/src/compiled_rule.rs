@@ -1,13 +1,13 @@
 use std::collections::BTreeMap;
 
+use crate::Atom;
+use crate::CmpOp;
+use crate::Rel;
+use crate::Rule;
+use crate::Term;
+use crate::Value;
 use atomic_delegate_macros::atomic_delegates;
 use datafrog::Relation;
-use verdigris_datalog_ir::Atom;
-use verdigris_datalog_ir::CmpOp;
-use verdigris_datalog_ir::Rel;
-use verdigris_datalog_ir::Rule;
-use verdigris_datalog_ir::Term;
-use verdigris_datalog_ir::Value;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CompiledRule {
@@ -65,12 +65,12 @@ impl CompiledRule {
 
 #[cfg(test)]
 mod tests {
-    use verdigris_datalog_ir::Atom;
-    use verdigris_datalog_ir::Literal;
-    use verdigris_datalog_ir::Rel;
-    use verdigris_datalog_ir::Rule;
-    use verdigris_datalog_ir::Term;
-    use verdigris_datalog_ir::Value;
+    use crate::Atom;
+    use crate::Literal;
+    use crate::Rel;
+    use crate::Rule;
+    use crate::Term;
+    use crate::Value;
 
     use super::CompiledRule;
 
@@ -135,7 +135,7 @@ mod tests {
 
     #[test]
     fn test_examples_compiled_plan() {
-        use verdigris_datalog_ir::CmpOp;
+        use crate::CmpOp;
         let rule = Rule {
             head: Atom {
                 rel: Rel("violates"),

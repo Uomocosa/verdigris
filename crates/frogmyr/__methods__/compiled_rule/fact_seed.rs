@@ -1,6 +1,6 @@
+use crate::Atom;
+use crate::Value;
 use datafrog::Relation;
-use verdigris_datalog_ir::Atom;
-use verdigris_datalog_ir::Value;
 
 use crate::CompiledRule;
 
@@ -22,12 +22,12 @@ pub fn fact_seed(
 
 #[cfg(test)]
 mod tests {
-    use verdigris_datalog_ir::Atom;
-    use verdigris_datalog_ir::Literal;
-    use verdigris_datalog_ir::Rel;
-    use verdigris_datalog_ir::Rule;
-    use verdigris_datalog_ir::Term;
-    use verdigris_datalog_ir::Value;
+    use crate::Atom;
+    use crate::Literal;
+    use crate::Rel;
+    use crate::Rule;
+    use crate::Term;
+    use crate::Value;
 
     use super::fact_seed;
     use crate::CompiledRule;

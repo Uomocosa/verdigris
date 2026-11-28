@@ -6,8 +6,7 @@ members = [
     "crates/parser",
     "crates/game",
     "crates/verdigris-lint",
-    "crates/datalog-ir",
-    "crates/datalog-datafrog",
+    "crates/frogmyr",
     "crates/rule-datalog",
 ]
 

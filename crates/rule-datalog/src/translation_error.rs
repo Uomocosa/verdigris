@@ -1,4 +1,4 @@
-use verdigris_datalog_ir::EngineError;
+use frogmyr::EngineError;
 use verdigris_rule_engine::rules;
 
 #[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]

@@ -1,6 +1,6 @@
-use verdigris_datalog_ir::CmpOp;
-use verdigris_datalog_ir::Term;
-use verdigris_datalog_ir::Value;
+use crate::CmpOp;
+use crate::Term;
+use crate::Value;
 
 use crate::CompiledRule;
 
@@ -28,13 +28,13 @@ pub fn comparison_holds(
 
 #[cfg(test)]
 mod tests {
-    use verdigris_datalog_ir::Atom;
-    use verdigris_datalog_ir::CmpOp;
-    use verdigris_datalog_ir::Literal;
-    use verdigris_datalog_ir::Rel;
-    use verdigris_datalog_ir::Rule;
-    use verdigris_datalog_ir::Term;
-    use verdigris_datalog_ir::Value;
+    use crate::Atom;
+    use crate::CmpOp;
+    use crate::Literal;
+    use crate::Rel;
+    use crate::Rule;
+    use crate::Term;
+    use crate::Value;
 
     use super::comparison_holds;
     use crate::CompiledRule;

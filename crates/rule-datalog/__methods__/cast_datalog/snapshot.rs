@@ -1,4 +1,4 @@
-use verdigris_datalog_ir::Facts;
+use frogmyr::Facts;
 use verdigris_rule_engine::events;
 use verdigris_rule_engine::players;
 use verdigris_rule_engine::rules;
@@ -32,7 +32,7 @@ pub fn snapshot(answers: &rules::Rules, viewer: players::PlayerId) -> Facts {
 mod tests {
     use bevy::ecs::system::RunSystemOnce;
     use bevy::prelude::App;
-    use verdigris_datalog_ir::Value;
+    use frogmyr::Value;
     use verdigris_rule_engine::cards;
     use verdigris_rule_engine::players;
     use verdigris_rule_engine::rules;

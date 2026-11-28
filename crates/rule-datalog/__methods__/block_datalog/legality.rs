@@ -1,6 +1,6 @@
 use bevy::prelude::Entity;
 
-use verdigris_datalog_ir::Value;
+use frogmyr::Value;
 use verdigris_rule_engine::events;
 use verdigris_rule_engine::players;
 use verdigris_rule_engine::rules;
@@ -10,7 +10,7 @@ use crate::BlockDatalog;
 use crate::PlayDatalog;
 use crate::TranslationError;
 
-pub fn legality<G: verdigris_datalog_ir::traits::engine::Engine>(
+pub fn legality<G: frogmyr::traits::engine::Engine>(
     engine: &G,
     answers: &rules::Rules,
     blocker: Entity,
@@ -66,7 +66,7 @@ mod tests {
     use std::time::Duration;
     use std::time::Instant;
 
-    use verdigris_datalog_datafrog::DatafrogEngine;
+    use frogmyr::DatafrogEngine;
     use verdigris_rule_engine::BATTLEFIELD;
     use verdigris_rule_engine::HAND;
     use verdigris_rule_engine::cards;

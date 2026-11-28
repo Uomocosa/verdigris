@@ -1,4 +1,4 @@
-use verdigris_datalog_ir::Value;
+use crate::Value;
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Payload {

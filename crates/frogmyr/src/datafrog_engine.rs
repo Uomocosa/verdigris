@@ -1,8 +1,8 @@
+use crate::EngineError;
+use crate::Facts;
+use crate::Program;
+use crate::traits::engine::Engine;
 use atomic_delegate_macros::atomic_delegates;
-use verdigris_datalog_ir::EngineError;
-use verdigris_datalog_ir::Facts;
-use verdigris_datalog_ir::Program;
-use verdigris_datalog_ir::traits::engine::Engine;
 
 #[derive(Debug, Clone, Copy)]
 pub struct DatafrogEngine;
@@ -20,9 +20,9 @@ impl DatafrogEngine {
 
 #[cfg(test)]
 mod tests {
-    use verdigris_datalog_ir::Facts;
-    use verdigris_datalog_ir::Program;
-    use verdigris_datalog_ir::traits::engine::Engine;
+    use crate::Facts;
+    use crate::Program;
+    use crate::traits::engine::Engine;
 
     use super::DatafrogEngine;
 
@@ -35,13 +35,13 @@ mod tests {
 
     #[test]
     fn test_examples_attack() {
+        use crate::Atom;
+        use crate::Literal;
+        use crate::Rel;
+        use crate::Rule;
+        use crate::Term;
+        use crate::Value;
         use crate::methods::datafrog_engine::evaluate_program;
-        use verdigris_datalog_ir::Atom;
-        use verdigris_datalog_ir::Literal;
-        use verdigris_datalog_ir::Rel;
-        use verdigris_datalog_ir::Rule;
-        use verdigris_datalog_ir::Term;
-        use verdigris_datalog_ir::Value;
         let (bears, goblin) = (Value::Sym("bears"), Value::Sym("goblin"));
         let mut facts = Facts::default();
         for name in [bears, goblin] {

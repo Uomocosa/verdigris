@@ -1,5 +1,5 @@
-use verdigris_datalog_ir::Atom;
-use verdigris_datalog_ir::Term;
+use frogmyr::Atom;
+use frogmyr::Term;
 
 use crate::PlayDatalog;
 
@@ -16,8 +16,8 @@ pub fn play_candidate() -> Atom {
 
 #[cfg(test)]
 mod tests {
-    use verdigris_datalog_ir::Atom;
-    use verdigris_datalog_ir::Term;
+    use frogmyr::Atom;
+    use frogmyr::Term;
 
     use super::play_candidate;
     use crate::PlayDatalog;

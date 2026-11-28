@@ -1,8 +1,8 @@
 use atomic_delegate_macros::atomic_delegates;
 use bevy::prelude::Entity;
-use verdigris_datalog_ir::Facts;
-use verdigris_datalog_ir::Program;
-use verdigris_datalog_ir::Rel;
+use frogmyr::Facts;
+use frogmyr::Program;
+use frogmyr::Rel;
 use verdigris_rule_engine::players;
 use verdigris_rule_engine::rules;
 
@@ -17,7 +17,7 @@ impl AttackDatalog {
     pub fn snapshot(answers: &rules::Rules, viewer: players::PlayerId) -> Facts {}
     #[must_use]
     pub fn attack_program() -> Result<Program, TranslationError> {}
-    pub fn legality<G: verdigris_datalog_ir::traits::engine::Engine>(
+    pub fn legality<G: frogmyr::traits::engine::Engine>(
         engine: &G,
         answers: &rules::Rules,
         attacker: Entity,
@@ -38,7 +38,7 @@ impl AttackDatalog {
 
 #[cfg(test)]
 mod tests {
-    use verdigris_datalog_ir::Rel;
+    use frogmyr::Rel;
 
     use super::AttackDatalog;
 

@@ -1,14 +1,14 @@
 use std::collections::BTreeMap;
 use std::collections::BTreeSet;
 
+use crate::EngineError;
+use crate::Facts;
+use crate::Program;
+use crate::Rel;
+use crate::Value;
 use datafrog::Iteration;
 use datafrog::Relation;
 use datafrog::Variable;
-use verdigris_datalog_ir::EngineError;
-use verdigris_datalog_ir::Facts;
-use verdigris_datalog_ir::Program;
-use verdigris_datalog_ir::Rel;
-use verdigris_datalog_ir::Value;
 
 use crate::CompiledRule;
 use crate::WiredRule;
@@ -95,13 +95,15 @@ pub fn evaluate_program(program: &Program, facts: &Facts) -> Result<Facts, Engin
 
 #[cfg(test)]
 mod tests {
-    use verdigris_datalog_ir::Atom;
-    use verdigris_datalog_ir::Literal;
-    use verdigris_datalog_ir::Program;
-    use verdigris_datalog_ir::Rel;
-    use verdigris_datalog_ir::Rule;
-    use verdigris_datalog_ir::Term;
-    use verdigris_datalog_ir::Value;
+    use crate::Atom;
+    use crate::Case;
+    use crate::Facts;
+    use crate::Literal;
+    use crate::Program;
+    use crate::Rel;
+    use crate::Rule;
+    use crate::Term;
+    use crate::Value;
 
     use super::evaluate_program;
     use crate::datafrog_engine::DatafrogEngine;
@@ -140,7 +142,7 @@ mod tests {
                 },
             ],
         };
-        let mut facts = verdigris_datalog_ir::Facts::default();
+        let mut facts = Facts::default();
         assert!(facts.add(edge, vec![Value::Int(1), Value::Int(2)]));
         assert!(facts.add(edge, vec![Value::Int(2), Value::Int(3)]));
         let derived = evaluate_program(&program, &facts).unwrap();
@@ -152,14 +154,14 @@ mod tests {
     fn shared_conformance_cases_pass() {
         let engine = DatafrogEngine;
         let started = std::time::Instant::now();
-        let outcome = verdigris_datalog_ir::Case::check(&engine);
+        let outcome = Case::check(&engine);
         let elapsed = started.elapsed();
         println!(
             "shared conformance: {outcome:?} in {}ms",
             elapsed.as_millis()
         );
         assert!(outcome.is_ok());
-        let mut chain: verdigris_datalog_ir::Facts = verdigris_datalog_ir::Facts::default();
+        let mut chain: Facts = Facts::default();
         for end in 1..300 {
             assert!(chain.add(
                 Rel("edge"),

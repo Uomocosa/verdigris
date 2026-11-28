@@ -1,7 +1,7 @@
 use bevy::prelude::Entity;
 
-use verdigris_datalog_ir::Facts;
-use verdigris_datalog_ir::Value;
+use frogmyr::Facts;
+use frogmyr::Value;
 use verdigris_rule_engine::cards;
 use verdigris_rule_engine::rules;
 use verdigris_rule_engine::zones;
@@ -67,8 +67,8 @@ pub fn entity_facts(answers: &rules::Rules, facts: &mut Facts, entity: Entity) {
 mod tests {
     use bevy::ecs::system::RunSystemOnce;
     use bevy::prelude::App;
-    use verdigris_datalog_ir::Facts;
-    use verdigris_datalog_ir::Value;
+    use frogmyr::Facts;
+    use frogmyr::Value;
     use verdigris_rule_engine::cards;
     use verdigris_rule_engine::players;
     use verdigris_rule_engine::rules;

@@ -1,9 +1,9 @@
-use verdigris_datalog_ir::Atom;
-use verdigris_datalog_ir::Literal;
-use verdigris_datalog_ir::Program;
-use verdigris_datalog_ir::Rule;
-use verdigris_datalog_ir::Term;
-use verdigris_datalog_ir::Value;
+use frogmyr::Atom;
+use frogmyr::Literal;
+use frogmyr::Program;
+use frogmyr::Rule;
+use frogmyr::Term;
+use frogmyr::Value;
 use verdigris_rule_engine::events;
 use verdigris_rule_engine::rules;
 use verdigris_rule_engine::rules::traits::event::Event;

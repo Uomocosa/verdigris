@@ -1,12 +1,12 @@
 use std::collections::BTreeMap;
 use std::collections::BTreeSet;
 
+use crate::Rel;
+use crate::Term;
+use crate::Value;
 use datafrog::Iteration;
 use datafrog::Relation;
 use datafrog::Variable;
-use verdigris_datalog_ir::Rel;
-use verdigris_datalog_ir::Term;
-use verdigris_datalog_ir::Value;
 
 use crate::Payload;
 
@@ -119,12 +119,12 @@ pub fn from_plan(
 
 #[cfg(test)]
 mod tests {
-    use verdigris_datalog_ir::Atom;
-    use verdigris_datalog_ir::Literal;
-    use verdigris_datalog_ir::Rel;
-    use verdigris_datalog_ir::Rule;
-    use verdigris_datalog_ir::Term;
-    use verdigris_datalog_ir::Value;
+    use crate::Atom;
+    use crate::Literal;
+    use crate::Rel;
+    use crate::Rule;
+    use crate::Term;
+    use crate::Value;
 
     use super::from_plan;
     use crate::CompiledRule;

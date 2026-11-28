@@ -1,5 +1,5 @@
-use verdigris_datalog_ir::Atom;
-use verdigris_datalog_ir::Term;
+use frogmyr::Atom;
+use frogmyr::Term;
 
 use crate::BlockDatalog;
 use crate::PlayDatalog;
@@ -17,8 +17,8 @@ pub fn block_candidate() -> Atom {
 
 #[cfg(test)]
 mod tests {
-    use verdigris_datalog_ir::Atom;
-    use verdigris_datalog_ir::Term;
+    use frogmyr::Atom;
+    use frogmyr::Term;
 
     use super::block_candidate;
     use crate::BlockDatalog;

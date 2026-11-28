@@ -1,6 +1,6 @@
-use verdigris_datalog_ir::Atom;
-use verdigris_datalog_ir::Literal;
-use verdigris_datalog_ir::Rule;
+use frogmyr::Atom;
+use frogmyr::Literal;
+use frogmyr::Rule;
 use verdigris_rule_engine::rules;
 
 use crate::PlayDatalog;
@@ -81,10 +81,10 @@ pub fn translate_holds(
 
 #[cfg(test)]
 mod tests {
-    use verdigris_datalog_ir::Atom;
-    use verdigris_datalog_ir::Literal;
-    use verdigris_datalog_ir::Term;
-    use verdigris_datalog_ir::Value;
+    use frogmyr::Atom;
+    use frogmyr::Literal;
+    use frogmyr::Term;
+    use frogmyr::Value;
     use verdigris_rule_engine::cards;
     use verdigris_rule_engine::events;
     use verdigris_rule_engine::rules;
@@ -114,7 +114,7 @@ mod tests {
         assert_eq!(next_hold, 1);
         assert_eq!(
             holds,
-            vec![verdigris_datalog_ir::Rule {
+            vec![frogmyr::Rule {
                 head: PlayDatalog::holds_head(0).unwrap(),
                 body: vec![
                     Literal::Pos(candidate),
@@ -148,7 +148,7 @@ mod tests {
         assert_eq!(holds.len(), 3);
         assert_eq!(
             holds[2],
-            verdigris_datalog_ir::Rule {
+            frogmyr::Rule {
                 head: PlayDatalog::holds_head(0).unwrap(),
                 body: vec![
                     Literal::Pos(candidate),
@@ -180,7 +180,7 @@ mod tests {
         assert_eq!(holds.len(), 4);
         assert_eq!(
             holds[1],
-            verdigris_datalog_ir::Rule {
+            frogmyr::Rule {
                 head: PlayDatalog::holds_head(0).unwrap(),
                 body: vec![
                     Literal::Pos(candidate.clone()),
@@ -190,7 +190,7 @@ mod tests {
         );
         assert_eq!(
             holds[3],
-            verdigris_datalog_ir::Rule {
+            frogmyr::Rule {
                 head: PlayDatalog::holds_head(0).unwrap(),
                 body: vec![
                     Literal::Pos(candidate),
@@ -220,7 +220,7 @@ mod tests {
         assert_eq!(holds.len(), 2);
         assert_eq!(
             holds[1],
-            verdigris_datalog_ir::Rule {
+            frogmyr::Rule {
                 head: PlayDatalog::holds_head(0).unwrap(),
                 body: vec![
                     Literal::Pos(candidate),
@@ -250,7 +250,7 @@ mod tests {
         assert_eq!(holds.len(), 2);
         assert_eq!(
             holds[0],
-            verdigris_datalog_ir::Rule {
+            frogmyr::Rule {
                 head: PlayDatalog::holds_head(1).unwrap(),
                 body: vec![
                     Literal::Pos(candidate.clone()),
@@ -266,7 +266,7 @@ mod tests {
         );
         assert_eq!(
             holds[1],
-            verdigris_datalog_ir::Rule {
+            frogmyr::Rule {
                 head: PlayDatalog::holds_head(0).unwrap(),
                 body: vec![
                     Literal::Pos(candidate),

@@ -31,13 +31,13 @@ pub fn pump_heads(rule: &WiredRule) {
 
 #[cfg(test)]
 mod tests {
+    use crate::Atom;
+    use crate::Literal;
+    use crate::Rel;
+    use crate::Rule;
+    use crate::Term;
+    use crate::Value;
     use datafrog::Iteration;
-    use verdigris_datalog_ir::Atom;
-    use verdigris_datalog_ir::Literal;
-    use verdigris_datalog_ir::Rel;
-    use verdigris_datalog_ir::Rule;
-    use verdigris_datalog_ir::Term;
-    use verdigris_datalog_ir::Value;
 
     use super::pump_heads;
     use crate::CompiledRule;
