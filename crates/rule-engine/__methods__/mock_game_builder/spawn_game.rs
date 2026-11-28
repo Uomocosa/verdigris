@@ -69,6 +69,16 @@ pub fn spawn_game(
                 damage::Damage(0),
             ));
         }
+        for (owner_seat, definition) in setup.battlefield_owned_by.iter().cloned() {
+            let owner = entities.get(owner_seat.saturating_sub(1)).copied().unwrap_or(*player);
+            let _ = app.world_mut().spawn((
+                definition,
+                zones::InZone(battlefield),
+                cards::Owner(owner),
+                cards::Controller(*player),
+                damage::Damage(0),
+            ));
+        }
         testing::MockGameBuilder::spawn_tapped_battlefield(&mut app, *player, setup, battlefield);
 
         let library = player_zones.get(&LIBRARY).copied().unwrap_or(Entity::PLACEHOLDER);

@@ -5,6 +5,7 @@ pub struct PlayerSetup {
     pub(crate) seat: usize,
     pub(crate) hand: Vec<cards::CardDefinition>,
     pub(crate) battlefield: Vec<cards::CardDefinition>,
+    pub(crate) battlefield_owned_by: Vec<(usize, cards::CardDefinition)>,
     pub(crate) tapped_battlefield: Vec<cards::CardDefinition>,
     pub(crate) library: Option<Vec<cards::CardDefinition>>,
     pub(crate) mana_pool: cards::ManaPool,
@@ -19,6 +20,7 @@ impl PlayerSetup {
             seat,
             hand: Vec::new(),
             battlefield: Vec::new(),
+            battlefield_owned_by: Vec::new(),
             tapped_battlefield: Vec::new(),
             library: None,
             mana_pool: cards::ManaPool::EMPTY,
@@ -53,6 +55,17 @@ impl PlayerSetup {
         definitions: impl IntoIterator<Item = impl Into<cards::CardDefinition>>,
     ) -> Self {
         self.tapped_battlefield.extend(definitions.into_iter().map(Into::into));
+        self
+    }
+
+    #[must_use]
+    pub fn battlefield_owned_by(
+        mut self,
+        owner: &Self,
+        definitions: impl IntoIterator<Item = impl Into<cards::CardDefinition>>,
+    ) -> Self {
+        self.battlefield_owned_by
+            .extend(definitions.into_iter().map(|definition| (owner.seat, definition.into())));
         self
     }
 
@@ -104,6 +117,7 @@ mod tests {
             .mana_pool(mana![2, U])
             .hand([DIVINATION])
             .battlefield([GRIZZLY_BEARS])
+            .battlefield_owned_by(&P1, [MURDER])
             .library([MURDER]);
 
         assert_eq!(setup.seat, 3);
@@ -117,6 +131,10 @@ mod tests {
         assert_eq!(
             setup.library,
             Some(vec![cards::CardDefinition::from(MURDER)])
+        );
+        assert_eq!(
+            setup.battlefield_owned_by,
+            vec![(1, cards::CardDefinition::from(MURDER))]
         );
         assert!(!setup.active);
         assert_eq!(P1.empty_library().library, Some(vec![]));

@@ -53,7 +53,7 @@ pub fn r608_2n_graveyard(
 mod tests {
     use crate::mana;
     use crate::testing::*;
-    use crate::{EXILE, GRAVEYARD, HAND};
+    use crate::{BATTLEFIELD, EXILE, GRAVEYARD, HAND};
 
     #[test]
     fn resolved_instant_goes_to_graveyard() -> TestResult {
@@ -96,6 +96,43 @@ mod tests {
         game.play([p1.cast(mind_rot).targeting(p2).end_turn(), p2.end_turn()])?;
         assert!(game.moved(bears).to(EXILE).of(p2));
         assert!(!game.card(bears).is_in(GRAVEYARD).of(p2));
+        Ok(())
+    }
+
+    #[test]
+    fn leyline_of_the_void_exiles_a_card_an_opponent_owns_but_you_control() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.hand([MURDER]).mana_pool(mana![1, B, B]),
+            P2.battlefield([LEYLINE_OF_THE_VOID]).battlefield_owned_by(&P1, [GRIZZLY_BEARS]),
+        ]);
+        let [murder] = game.player(p1).cards_in(HAND).exactly::<1>(MURDER)?;
+        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        game.play([
+            p1.cast(murder).targeting(bears).pass_priority(),
+            p2.pass_priority(),
+        ])?;
+        assert!(game.moved(bears).to(EXILE).of(p1));
+        assert!(!game.card(bears).is_in(GRAVEYARD).of(p1));
+        Ok(())
+    }
+
+    #[test]
+    fn leyline_of_the_void_buries_a_card_you_own_that_an_opponent_controls() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.battlefield([LEYLINE_OF_THE_VOID]),
+            P2.hand([MURDER])
+                .mana_pool(mana![1, B, B])
+                .battlefield_owned_by(&P1, [GRIZZLY_BEARS])
+                .active(),
+        ]);
+        let [murder] = game.player(p2).cards_in(HAND).exactly::<1>(MURDER)?;
+        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        game.play([
+            p2.cast(murder).targeting(bears).pass_priority(),
+            p1.pass_priority(),
+        ])?;
+        assert!(game.moved(bears).to(GRAVEYARD).of(p1));
+        assert!(!game.card(bears).is_in(EXILE).of(p1));
         Ok(())
     }
 }
