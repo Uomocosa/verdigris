@@ -7,7 +7,6 @@ pub const TEST_CANT_LOSE_LIFE: Card = Card {
             cards::CardDefinition::from_enchantment("Test Can't Lose Life", cost![2]);
             you().cant::<LoseLife>(
                 LoseLife::PLAYER,
-                RestrictionId("test/test-cant-lose-life"),
             ),
         }
     },

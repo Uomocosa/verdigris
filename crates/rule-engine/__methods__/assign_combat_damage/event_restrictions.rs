@@ -25,7 +25,7 @@ mod tests {
         assert_eq!(restrictions.len(), 1);
         assert_eq!(
             restrictions[0].id,
-            rules::RestrictionId("510.1c/only-blockers")
+            events::assign_combat_damage::ONLY_BLOCKERS
         );
         assert_eq!(
             restrictions[0].condition,

@@ -6,7 +6,7 @@ pub fn continuous_abilities(
 ) -> impl Iterator<Item = &abilities::Continuous> {
     definition.text.iter().filter_map(|ability| match ability {
         abilities::Ability::Static(abilities::StaticAbility::Continuous(continuous)) => {
-            Some(continuous)
+            Some(continuous.as_ref())
         }
         _ => None,
     })

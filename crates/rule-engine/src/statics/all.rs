@@ -43,7 +43,6 @@ impl All {
     pub fn cant<E: rules::traits::event::Event>(
         &self,
         holder: impl Into<rules::ArgRef>,
-        id: rules::RestrictionId,
     ) -> abilities::Continuous {
     }
 
@@ -77,7 +76,6 @@ impl All {
     pub fn restriction<E: rules::traits::event::Event>(
         &self,
         holder: impl Into<rules::ArgRef>,
-        id: rules::RestrictionId,
         requirement: rules::Condition,
     ) -> abilities::Continuous {
     }

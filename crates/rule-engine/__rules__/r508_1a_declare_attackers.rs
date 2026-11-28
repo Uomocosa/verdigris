@@ -534,7 +534,9 @@ mod tests {
                 attackers: vec![bears_1.into(), bears_2.into()],
                 why: vec![actions::DeclarationWhy {
                     creature: None,
-                    why: rules::Why::Restriction(rules::RestrictionId("test/silent-arbiter")),
+                    why: rules::Why::Restriction(
+                        TEST_SILENT_ARBITER.restriction::<events::DeclareAttackers>().unwrap(),
+                    ),
                 }],
             })
         );

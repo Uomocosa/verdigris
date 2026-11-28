@@ -156,6 +156,9 @@ impl CardDefinition {
         needed: &mut Vec<actions::RequiredCombatDamage>,
     ) -> Vec<damage::AssignedDamage> {
     }
+
+    #[must_use]
+    pub(crate) fn with_card(self, module: &'static str) -> Self {}
 }
 
 #[cfg(test)]
@@ -165,6 +168,7 @@ mod tests {
     use crate::cost;
     use crate::creature;
     use crate::effects;
+    use crate::events;
     use crate::keywords;
     use crate::pt;
     use crate::statics;
@@ -226,5 +230,16 @@ mod tests {
             statics::enters_tapped(),
         };
         assert!(definition.enters_tapped());
+    }
+
+    #[test]
+    #[should_panic(expected = "write one RestrictionId by hand")]
+    fn card_macro_rejects_two_cants_on_one_event() {
+        let definition = card! {
+            cards::creature("Test Double Cant", cost![2], pt!(1, 1));
+            statics::all(creature()).cant::<events::Draw>(events::Draw::PLAYER),
+            statics::all(creature()).cant::<events::Draw>(events::Draw::PLAYER),
+        };
+        assert_eq!(definition.continuous_abilities().count(), 2);
     }
 }

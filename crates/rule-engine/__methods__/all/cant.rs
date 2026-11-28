@@ -7,7 +7,6 @@ use crate::statics;
 pub fn cant<E: Event>(
     all: &statics::All,
     holder: impl Into<rules::ArgRef>,
-    id: rules::RestrictionId,
 ) -> abilities::Continuous {
     abilities::Continuous {
         filter: all.into(),
@@ -16,7 +15,12 @@ pub fn cant<E: Event>(
             target: rules::Target::event::<E>(),
             change: rules::Change::Restrict {
                 holder: holder.into(),
-                restriction: id.restriction(!rules::Condition::True),
+                restriction: rules::RestrictionId {
+                    card: rules::RestrictionId::UNSET,
+                    kind: "cant",
+                    event: E::ID,
+                }
+                .restriction(!rules::Condition::True),
             },
         }),
     }
@@ -28,17 +32,14 @@ mod tests {
     use crate::effects;
     use crate::events;
     use crate::rules;
+    use crate::rules::traits::event::Event;
     use crate::statics;
 
     use super::cant;
 
     #[test]
     fn test_usage() {
-        let ability = cant::<events::Draw>(
-            &statics::all(PLAYER),
-            events::Draw::PLAYER,
-            rules::RestrictionId("test/cant"),
-        );
+        let ability = cant::<events::Draw>(&statics::all(PLAYER), events::Draw::PLAYER);
         assert_eq!(
             ability.filter,
             effects::Filter::player() & effects::Filter::controlled_by(PLAYER)
@@ -49,8 +50,12 @@ mod tests {
                 target: rules::Target::event::<events::Draw>(),
                 change: rules::Change::Restrict {
                     holder: events::Draw::PLAYER.into(),
-                    restriction: rules::RestrictionId("test/cant")
-                        .restriction(!rules::Condition::True),
+                    restriction: rules::RestrictionId {
+                        card: rules::RestrictionId::UNSET,
+                        kind: "cant",
+                        event: events::Draw::ID,
+                    }
+                    .restriction(!rules::Condition::True),
                 },
             })
         );

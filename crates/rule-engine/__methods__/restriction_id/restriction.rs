@@ -20,9 +20,9 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let id = rules::RestrictionId("509.1a/untapped");
+        let id = rules::RestrictionId::rule("509.1a/untapped");
         let built = restriction(id, !rules::has::<cards::Tapped>());
-        assert_eq!(built.id, rules::RestrictionId("509.1a/untapped"));
+        assert_eq!(built.id, rules::RestrictionId::rule("509.1a/untapped"));
         assert_eq!(built.condition, !rules::has::<cards::Tapped>());
     }
 }

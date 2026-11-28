@@ -5,7 +5,8 @@ use crate::cards;
 use crate::rules;
 use crate::rules::traits::hook_event::HookEvent;
 
-pub const FROM_OPENING_HAND: rules::RestrictionId = rules::RestrictionId("103.6/from-opening-hand");
+pub const FROM_OPENING_HAND: rules::RestrictionId =
+    rules::RestrictionId::rule("103.6/from-opening-hand");
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EventArgs)]
 pub struct OpeningHandAction {
@@ -62,7 +63,7 @@ mod tests {
     fn restriction_rule_numbers_occur_in_comprehensive_rules() {
         const RULES_TEXT: &str = include_str!("../../../docs/MagicCompRules-20250919.txt");
         for restriction in OpeningHandAction::restrictions() {
-            let id: &str = *restriction.id;
+            let id = restriction.id.to_string();
             if id.starts_with("test/") || id.starts_with("statics/") || id.starts_with("glossary/")
             {
                 continue;

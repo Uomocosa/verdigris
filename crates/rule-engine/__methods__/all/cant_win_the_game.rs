@@ -2,10 +2,10 @@ use crate::abilities;
 use crate::effects;
 use crate::events;
 use crate::rules;
+use crate::rules::traits::event::Event;
 use crate::statics;
 
 pub fn cant_win_the_game(all: &statics::All) -> abilities::Continuous {
-    const ID: rules::RestrictionId = rules::RestrictionId("statics/cant-win-the-game");
     abilities::Continuous {
         filter: all.into(),
         as_long_as: None,
@@ -13,7 +13,12 @@ pub fn cant_win_the_game(all: &statics::All) -> abilities::Continuous {
             target: rules::Target::event::<events::WinGame>(),
             change: rules::Change::Restrict {
                 holder: events::WinGame::PLAYER.into(),
-                restriction: ID.restriction(!rules::Condition::True),
+                restriction: rules::RestrictionId {
+                    card: rules::RestrictionId::UNSET,
+                    kind: "cant",
+                    event: events::WinGame::ID,
+                }
+                .restriction(!rules::Condition::True),
             },
         }),
     }
@@ -25,6 +30,7 @@ mod tests {
     use crate::effects;
     use crate::events;
     use crate::rules;
+    use crate::rules::traits::event::Event;
     use crate::statics;
 
     use super::cant_win_the_game;
@@ -42,8 +48,12 @@ mod tests {
                 target: rules::Target::event::<events::WinGame>(),
                 change: rules::Change::Restrict {
                     holder: events::WinGame::PLAYER.into(),
-                    restriction: rules::RestrictionId("statics/cant-win-the-game")
-                        .restriction(!rules::Condition::True),
+                    restriction: rules::RestrictionId {
+                        card: rules::RestrictionId::UNSET,
+                        kind: "cant",
+                        event: events::WinGame::ID,
+                    }
+                    .restriction(!rules::Condition::True),
                 },
             })
         );

@@ -1,3 +1,4 @@
+pub mod ability;
 #[cfg(feature = "testing")]
 pub mod absolute_rule;
 pub mod action;
@@ -6,6 +7,8 @@ pub mod arg_id;
 pub mod assign_combat_damage;
 pub mod attack;
 pub mod attempt;
+#[cfg(feature = "testing")]
+pub mod card;
 #[cfg(feature = "testing")]
 pub mod card_check;
 pub mod card_definition;

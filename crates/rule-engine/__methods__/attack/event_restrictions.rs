@@ -27,25 +27,22 @@ mod tests {
     fn test_usage() {
         let restrictions = event_restrictions();
         assert_eq!(restrictions.len(), 4);
-        assert_eq!(restrictions[0].id, rules::RestrictionId("508.1a/creature"));
+        assert_eq!(restrictions[0].id, events::attack::CREATURE);
         assert_eq!(
             restrictions[0].condition,
             rules::has::<cards::Creature>().of(events::Attack::ATTACKER)
         );
-        assert_eq!(restrictions[1].id, rules::RestrictionId("508.1a/controls"));
+        assert_eq!(restrictions[1].id, events::attack::CONTROLS);
         assert_eq!(
             restrictions[1].condition,
             rules::has::<cards::OnBattlefield>().of(events::Attack::ATTACKER)
         );
-        assert_eq!(restrictions[2].id, rules::RestrictionId("508.1a/untapped"));
+        assert_eq!(restrictions[2].id, events::attack::UNTAPPED);
         assert_eq!(
             restrictions[2].condition,
             (!rules::has::<cards::Tapped>()).of(events::Attack::ATTACKER)
         );
-        assert_eq!(
-            restrictions[3].id,
-            rules::RestrictionId("508.1a/controlled-since-turn-began")
-        );
+        assert_eq!(restrictions[3].id, events::attack::SUMMONING_SICK);
         assert_eq!(
             restrictions[3].condition,
             (!rules::has::<cards::SummoningSick>()).of(events::Attack::ATTACKER)

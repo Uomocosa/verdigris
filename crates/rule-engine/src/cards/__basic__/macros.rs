@@ -77,6 +77,6 @@ macro_rules! pt {
 #[macro_export]
 macro_rules! card {
     ($base:expr; $($ability:expr),* $(,)?) => {
-        ($base).abilities([$($crate::abilities::Ability::from($ability)),*])
+        ($base).abilities([$($crate::abilities::Ability::from($ability)),*]).with_card(module_path!())
     };
 }

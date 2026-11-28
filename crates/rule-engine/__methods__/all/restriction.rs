@@ -7,7 +7,6 @@ use crate::statics;
 pub fn restriction<E: Event>(
     all: &statics::All,
     holder: impl Into<rules::ArgRef>,
-    id: rules::RestrictionId,
     requirement: rules::Condition,
 ) -> abilities::Continuous {
     abilities::Continuous {
@@ -17,7 +16,12 @@ pub fn restriction<E: Event>(
             target: rules::Target::event::<E>(),
             change: rules::Change::Restrict {
                 holder: holder.into(),
-                restriction: id.restriction(requirement),
+                restriction: rules::RestrictionId {
+                    card: rules::RestrictionId::UNSET,
+                    kind: "restriction",
+                    event: E::ID,
+                }
+                .restriction(requirement),
             },
         }),
     }
@@ -28,6 +32,7 @@ mod tests {
     use crate::creature;
     use crate::effects;
     use crate::rules;
+    use crate::rules::traits::event::Event;
     use crate::statics;
     use crate::testing;
 
@@ -38,7 +43,6 @@ mod tests {
         let ability = restriction::<testing::RestrictedRule>(
             &statics::all(creature()),
             testing::RestrictedRule::ATTACKER,
-            rules::RestrictionId("test/restriction"),
             rules::Condition::True,
         );
         assert_eq!(ability.filter, creature());
@@ -48,8 +52,12 @@ mod tests {
                 target: rules::Target::event::<testing::RestrictedRule>(),
                 change: rules::Change::Restrict {
                     holder: testing::RestrictedRule::ATTACKER.into(),
-                    restriction: rules::RestrictionId("test/restriction")
-                        .restriction(rules::Condition::True),
+                    restriction: rules::RestrictionId {
+                        card: rules::RestrictionId::UNSET,
+                        kind: "restriction",
+                        event: testing::RestrictedRule::ID,
+                    }
+                    .restriction(rules::Condition::True),
                 },
             })
         );

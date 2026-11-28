@@ -5,7 +5,7 @@ use verdigris_event_derive::EventArgs;
 use crate::rules;
 use crate::rules::traits::event::Event;
 
-pub const ONLY_BLOCKERS: rules::RestrictionId = rules::RestrictionId("510.1c/only-blockers");
+pub const ONLY_BLOCKERS: rules::RestrictionId = rules::RestrictionId::rule("510.1c/only-blockers");
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EventArgs)]
 pub struct AssignCombatDamage {
@@ -83,7 +83,7 @@ mod tests {
     fn restriction_rule_numbers_occur_in_comprehensive_rules() {
         const RULES_TEXT: &str = include_str!("../../../docs/MagicCompRules-20250919.txt");
         for restriction in AssignCombatDamage::restrictions() {
-            let id: &str = *restriction.id;
+            let id = restriction.id.to_string();
             if id.starts_with("test/") || id.starts_with("statics/") || id.starts_with("glossary/")
             {
                 continue;

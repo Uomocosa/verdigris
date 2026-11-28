@@ -34,14 +34,14 @@ mod tests {
     fn test_usage() {
         let ability = as_though(
             &statics::all(creature()),
-            rules::RestrictionId("test/untapped"),
+            testing::UNTAPPED,
             testing::TestRule::ATTACKER,
         );
         assert_eq!(ability.filter, creature());
         assert_eq!(
             ability.modification,
             effects::Modification::Rule(rules::RuleChange {
-                target: rules::Target::Restriction(rules::RestrictionId("test/untapped")),
+                target: rules::Target::Restriction(testing::UNTAPPED),
                 change: rules::Change::AsThough {
                     holder: testing::TestRule::ATTACKER.into(),
                 },

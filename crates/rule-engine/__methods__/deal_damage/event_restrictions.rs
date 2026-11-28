@@ -19,7 +19,7 @@ mod tests {
     fn test_usage() {
         let restrictions = event_restrictions();
         assert_eq!(restrictions.len(), 1);
-        assert_eq!(restrictions[0].id, rules::RestrictionId("120.8/nonzero"));
+        assert_eq!(restrictions[0].id, events::deal_damage::NONZERO_DAMAGE);
         assert_eq!(
             restrictions[0].condition,
             events::DealDamage::AMOUNT.is(rules::Value(1).or_more())

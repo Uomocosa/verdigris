@@ -10,7 +10,7 @@ pub fn r702_3a_defender() -> keywords::Keyword {
 }
 
 pub const ID: keywords::KeywordId = keywords::KeywordId("702.3/defender");
-pub const CANT_ATTACK: rules::RestrictionId = rules::RestrictionId("702.3b/defender");
+pub const CANT_ATTACK: rules::RestrictionId = rules::RestrictionId::rule("702.3b/defender");
 
 fn abilities() -> Vec<effects::Modification> {
     vec![effects::Modification::Rule(rules::RuleChange {

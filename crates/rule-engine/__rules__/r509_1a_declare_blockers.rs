@@ -483,7 +483,9 @@ mod tests {
                 assignments,
                 why: vec![actions::DeclarationWhy {
                     creature: Some(bears.into()),
-                    why: rules::Why::Restriction(rules::RestrictionId("test/test-timid-field")),
+                    why: rules::Why::Restriction(
+                        TEST_TIMID_FIELD.restriction::<events::DeclareBlocker>().unwrap(),
+                    ),
                 }],
             })
         );
@@ -526,7 +528,9 @@ mod tests {
                 assignments,
                 why: vec![actions::DeclarationWhy {
                     creature: Some(drake.into()),
-                    why: rules::Why::Restriction(rules::RestrictionId("test/test-sky-court")),
+                    why: rules::Why::Restriction(
+                        TEST_SKY_COURT.restriction::<events::DeclareBlocker>().unwrap(),
+                    ),
                 }],
             })
         );

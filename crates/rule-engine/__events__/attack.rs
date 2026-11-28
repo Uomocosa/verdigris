@@ -5,11 +5,11 @@ use verdigris_event_derive::EventArgs;
 use crate::rules;
 use crate::rules::traits::event::Event;
 
-pub const CREATURE: rules::RestrictionId = rules::RestrictionId("508.1a/creature");
-pub const CONTROLS: rules::RestrictionId = rules::RestrictionId("508.1a/controls");
-pub const UNTAPPED: rules::RestrictionId = rules::RestrictionId("508.1a/untapped");
+pub const CREATURE: rules::RestrictionId = rules::RestrictionId::rule("508.1a/creature");
+pub const CONTROLS: rules::RestrictionId = rules::RestrictionId::rule("508.1a/controls");
+pub const UNTAPPED: rules::RestrictionId = rules::RestrictionId::rule("508.1a/untapped");
 pub const SUMMONING_SICK: rules::RestrictionId =
-    rules::RestrictionId("508.1a/controlled-since-turn-began");
+    rules::RestrictionId::rule("508.1a/controlled-since-turn-began");
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EventArgs)]
 pub struct Attack {
@@ -111,7 +111,7 @@ mod tests {
             .chain(Attack::restrictions())
             .chain(keyword_restrictions)
         {
-            let id: &str = *restriction.id;
+            let id = restriction.id.to_string();
             if id.starts_with("test/") || id.starts_with("statics/") || id.starts_with("glossary/")
             {
                 continue;

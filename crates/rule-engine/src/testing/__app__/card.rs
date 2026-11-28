@@ -1,10 +1,19 @@
+use atomic_delegate_macros::atomic_delegates;
+
 use crate::cards;
+use crate::rules;
 use crate::testing;
 
 #[derive(Clone, Copy, Debug)]
 pub struct Card {
     pub name: testing::TestCardName,
     pub definition: fn() -> cards::CardDefinition,
+}
+
+#[atomic_delegates]
+impl Card {
+    #[must_use]
+    pub fn restriction<E: rules::traits::event::Event>(&self) -> Option<rules::RestrictionId> {}
 }
 
 #[rustfmt::skip]

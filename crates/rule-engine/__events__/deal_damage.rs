@@ -5,7 +5,7 @@ use verdigris_event_derive::EventArgs;
 use crate::rules;
 use crate::rules::traits::event::Event;
 
-pub const NONZERO_DAMAGE: rules::RestrictionId = rules::RestrictionId("120.8/nonzero");
+pub const NONZERO_DAMAGE: rules::RestrictionId = rules::RestrictionId::rule("120.8/nonzero");
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EventArgs)]
 pub struct DealDamage {
@@ -82,7 +82,7 @@ mod tests {
     fn restriction_rule_numbers_occur_in_comprehensive_rules() {
         const RULES_TEXT: &str = include_str!("../../../docs/MagicCompRules-20250919.txt");
         for restriction in DealDamage::restrictions() {
-            let id: &str = *restriction.id;
+            let id = restriction.id.to_string();
             if id.starts_with("test/") || id.starts_with("statics/") || id.starts_with("glossary/")
             {
                 continue;

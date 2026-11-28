@@ -36,31 +36,28 @@ mod tests {
     fn test_usage() {
         let restrictions = event_restrictions();
         assert_eq!(restrictions.len(), 5);
-        assert_eq!(restrictions[0].id, rules::RestrictionId("601.2a/priority"));
+        assert_eq!(restrictions[0].id, events::cast::PRIORITY);
         assert_eq!(
             restrictions[0].condition,
             rules::has_priority(events::Cast::CASTER)
         );
-        assert_eq!(restrictions[1].id, rules::RestrictionId("601.2a/from-hand"));
+        assert_eq!(restrictions[1].id, events::cast::FROM_HAND);
         assert_eq!(
             restrictions[1].condition,
             rules::in_zone(HAND, events::Cast::CASTER).of(events::Cast::SPELL)
         );
-        assert_eq!(restrictions[2].id, rules::RestrictionId("601.2a/owns"));
+        assert_eq!(restrictions[2].id, events::cast::OWNS);
         assert_eq!(
             restrictions[2].condition,
             rules::points_to::<cards::Owner>(events::Cast::CASTER).of(events::Cast::SPELL)
         );
-        assert_eq!(
-            restrictions[3].id,
-            rules::RestrictionId("601.2a/not-a-land")
-        );
+        assert_eq!(restrictions[3].id, events::cast::NOT_A_LAND);
         assert_eq!(
             restrictions[3].condition,
             (!rules::card_type(cards::CardType::Land)).of(events::Cast::SPELL)
         );
         assert!(restrictions[3].unwaivable);
-        assert_eq!(restrictions[4].id, rules::RestrictionId("601.2a/timing"));
+        assert_eq!(restrictions[4].id, events::cast::TIMING);
         assert_eq!(
             restrictions[4].condition,
             rules::card_type(cards::CardType::Instant).of(events::Cast::SPELL)

@@ -8,7 +8,6 @@ pub const TEST_NO_TOKENS: Card = Card {
             you()
                 .cant::<EnterTheBattlefield>(
                     EnterTheBattlefield::PERMANENT.controller(),
-                    RestrictionId("test/test-no-tokens"),
                 ),
         }
     },

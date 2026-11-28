@@ -5,9 +5,9 @@ use verdigris_event_derive::EventArgs;
 use crate::rules;
 use crate::rules::traits::event::Event;
 
-pub const CREATURE: rules::RestrictionId = rules::RestrictionId("509.1a/creature");
-pub const CONTROLS: rules::RestrictionId = rules::RestrictionId("509.1a/controls");
-pub const UNTAPPED: rules::RestrictionId = rules::RestrictionId("509.1a/untapped");
+pub const CREATURE: rules::RestrictionId = rules::RestrictionId::rule("509.1a/creature");
+pub const CONTROLS: rules::RestrictionId = rules::RestrictionId::rule("509.1a/controls");
+pub const UNTAPPED: rules::RestrictionId = rules::RestrictionId::rule("509.1a/untapped");
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EventArgs)]
 pub struct DeclareBlocker {

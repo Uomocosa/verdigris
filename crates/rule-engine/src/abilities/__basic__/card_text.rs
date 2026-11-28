@@ -43,14 +43,16 @@ pub const fn tap_add(produces: cards::ManaType) -> abilities::ActivatedAbility {
 
 #[must_use]
 pub fn opening_hand_action(then: impl Into<rules::Then>) -> abilities::StaticAbility {
-    abilities::StaticAbility::Replacement(abilities::Replacement::Rule(rules::RuleChange {
-        target: rules::Target::event::<rules::Hooked<events::OpeningHandAction>>(),
-        change: rules::Change::Hook {
-            holder: rules::Hooked::<events::OpeningHandAction>::CARD.into(),
-            when: rules::always(),
-            then: then.into(),
+    abilities::StaticAbility::Replacement(abilities::Replacement::Rule(Box::new(
+        rules::RuleChange {
+            target: rules::Target::event::<rules::Hooked<events::OpeningHandAction>>(),
+            change: rules::Change::Hook {
+                holder: rules::Hooked::<events::OpeningHandAction>::CARD.into(),
+                when: rules::always(),
+                then: then.into(),
+            },
         },
-    }))
+    )))
 }
 
 #[must_use]

@@ -8,7 +8,6 @@ pub const TEST_TIMID_FIELD: Card = Card {
             all(creature())
                 .restriction::<DeclareBlocker>(
                     DeclareBlocker::BLOCKER,
-                    RestrictionId("test/test-timid-field"),
                     power()
                         .of(DeclareBlocker::BLOCKER)
                         .is(Value(3).or_more()),

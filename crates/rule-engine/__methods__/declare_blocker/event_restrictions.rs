@@ -25,17 +25,17 @@ mod tests {
     fn test_usage() {
         let restrictions = event_restrictions();
         assert_eq!(restrictions.len(), 3);
-        assert_eq!(restrictions[0].id, rules::RestrictionId("509.1a/creature"));
+        assert_eq!(restrictions[0].id, events::declare_blocker::CREATURE);
         assert_eq!(
             restrictions[0].condition,
             rules::has::<cards::Creature>().of(events::DeclareBlocker::BLOCKER)
         );
-        assert_eq!(restrictions[1].id, rules::RestrictionId("509.1a/controls"));
+        assert_eq!(restrictions[1].id, events::declare_blocker::CONTROLS);
         assert_eq!(
             restrictions[1].condition,
             rules::has::<cards::OnBattlefield>().of(events::DeclareBlocker::BLOCKER)
         );
-        assert_eq!(restrictions[2].id, rules::RestrictionId("509.1a/untapped"));
+        assert_eq!(restrictions[2].id, events::declare_blocker::UNTAPPED);
         assert_eq!(
             restrictions[2].condition,
             (!rules::has::<cards::Tapped>()).of(events::DeclareBlocker::BLOCKER)

@@ -7,7 +7,6 @@ pub const TEST_PLAYER_RESTRICTION: Card = Card {
             cards::CardDefinition::from_enchantment("Test Player Restriction", cost![2]);
             you().restriction::<TestRule>(
                 TestRule::PLAYER,
-                RestrictionId("test/player-restriction"),
                 never(),
             ),
         }

@@ -25,7 +25,7 @@ mod tests {
         assert_eq!(restrictions.len(), 1);
         assert_eq!(
             restrictions[0].id,
-            rules::RestrictionId("103.6/from-opening-hand")
+            events::opening_hand_action::FROM_OPENING_HAND
         );
         assert_eq!(
             restrictions[0].condition,

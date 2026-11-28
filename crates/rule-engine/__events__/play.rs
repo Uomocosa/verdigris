@@ -6,14 +6,14 @@ use crate::players;
 use crate::rules;
 use crate::rules::traits::event::Event;
 
-pub const PRIORITY: rules::RestrictionId = rules::RestrictionId("305.1/priority");
-pub const FROM_HAND: rules::RestrictionId = rules::RestrictionId("305.1/from-hand");
-pub const LAND_CARD: rules::RestrictionId = rules::RestrictionId("305.1/land-card");
-pub const MAIN_PHASE: rules::RestrictionId = rules::RestrictionId("305.1/main-phase");
-pub const EMPTY_STACK: rules::RestrictionId = rules::RestrictionId("305.1/empty-stack");
-pub const OWNS: rules::RestrictionId = rules::RestrictionId("305.1/owns");
-pub const OWN_TURN: rules::RestrictionId = rules::RestrictionId("305.3/own-turn");
-pub const LAND_PLAYS: rules::RestrictionId = rules::RestrictionId("305.2/land-plays");
+pub const PRIORITY: rules::RestrictionId = rules::RestrictionId::rule("305.1/priority");
+pub const FROM_HAND: rules::RestrictionId = rules::RestrictionId::rule("305.1/from-hand");
+pub const LAND_CARD: rules::RestrictionId = rules::RestrictionId::rule("305.1/land-card");
+pub const MAIN_PHASE: rules::RestrictionId = rules::RestrictionId::rule("305.1/main-phase");
+pub const EMPTY_STACK: rules::RestrictionId = rules::RestrictionId::rule("305.1/empty-stack");
+pub const OWNS: rules::RestrictionId = rules::RestrictionId::rule("305.1/owns");
+pub const OWN_TURN: rules::RestrictionId = rules::RestrictionId::rule("305.3/own-turn");
+pub const LAND_PLAYS: rules::RestrictionId = rules::RestrictionId::rule("305.2/land-plays");
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EventArgs)]
 pub struct Play {
@@ -101,7 +101,7 @@ mod tests {
     fn restriction_rule_numbers_occur_in_comprehensive_rules() {
         const RULES_TEXT: &str = include_str!("../../../docs/MagicCompRules-20250919.txt");
         for restriction in Play::restrictions() {
-            let id: &str = *restriction.id;
+            let id = restriction.id.to_string();
             if id.starts_with("test/") || id.starts_with("statics/") || id.starts_with("glossary/")
             {
                 continue;

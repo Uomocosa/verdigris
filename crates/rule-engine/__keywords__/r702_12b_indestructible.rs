@@ -12,7 +12,8 @@ pub fn r702_12b_indestructible() -> keywords::Keyword {
 }
 
 pub const ID: keywords::KeywordId = keywords::KeywordId("702.12/indestructible");
-pub const CANT_BE_DESTROYED: rules::RestrictionId = rules::RestrictionId("702.12b/indestructible");
+pub const CANT_BE_DESTROYED: rules::RestrictionId =
+    rules::RestrictionId::rule("702.12b/indestructible");
 
 fn abilities() -> Vec<effects::Modification> {
     vec![effects::Modification::Rule(rules::RuleChange {

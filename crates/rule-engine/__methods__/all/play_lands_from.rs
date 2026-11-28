@@ -40,7 +40,7 @@ mod tests {
         assert_eq!(
             ability.modification,
             effects::Modification::Rule(rules::RuleChange {
-                target: rules::Target::Restriction(rules::RestrictionId("305.1/from-hand")),
+                target: rules::Target::Restriction(events::play::FROM_HAND),
                 change: rules::Change::Allow {
                     holder: events::Play::PLAYER.into(),
                     when: rules::in_zone(GRAVEYARD, events::Play::PLAYER).of(events::Play::CARD),

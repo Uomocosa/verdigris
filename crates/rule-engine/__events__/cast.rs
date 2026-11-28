@@ -6,11 +6,11 @@ use crate::players;
 use crate::rules;
 use crate::rules::traits::event::Event;
 
-pub const PRIORITY: rules::RestrictionId = rules::RestrictionId("601.2a/priority");
-pub const FROM_HAND: rules::RestrictionId = rules::RestrictionId("601.2a/from-hand");
-pub const OWNS: rules::RestrictionId = rules::RestrictionId("601.2a/owns");
-pub const NOT_A_LAND: rules::RestrictionId = rules::RestrictionId("601.2a/not-a-land");
-pub const TIMING: rules::RestrictionId = rules::RestrictionId("601.2a/timing");
+pub const PRIORITY: rules::RestrictionId = rules::RestrictionId::rule("601.2a/priority");
+pub const FROM_HAND: rules::RestrictionId = rules::RestrictionId::rule("601.2a/from-hand");
+pub const OWNS: rules::RestrictionId = rules::RestrictionId::rule("601.2a/owns");
+pub const NOT_A_LAND: rules::RestrictionId = rules::RestrictionId::rule("601.2a/not-a-land");
+pub const TIMING: rules::RestrictionId = rules::RestrictionId::rule("601.2a/timing");
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EventArgs)]
 pub struct Cast {
@@ -86,7 +86,7 @@ mod tests {
     fn restriction_rule_numbers_occur_in_comprehensive_rules() {
         const RULES_TEXT: &str = include_str!("../../../docs/MagicCompRules-20250919.txt");
         for restriction in Cast::restrictions() {
-            let id: &str = *restriction.id;
+            let id = restriction.id.to_string();
             if id.starts_with("test/") || id.starts_with("statics/") || id.starts_with("glossary/")
             {
                 continue;

@@ -30,12 +30,18 @@ mod tests {
 
     #[test]
     fn test_usage() {
-        let restriction =
-            rules::RestrictionId("509.1a/untapped").restriction(!rules::has::<cards::Tapped>());
-        assert_eq!(restriction.id, rules::RestrictionId("509.1a/untapped"));
+        let restriction = rules::RestrictionId::rule("509.1a/untapped")
+            .restriction(!rules::has::<cards::Tapped>());
+        assert_eq!(
+            restriction.id,
+            rules::RestrictionId::rule("509.1a/untapped")
+        );
         assert!(!restriction.unwaivable);
         let made_unwaivable: Statement<rules::RestrictionId> = restriction.unwaivable();
         assert!(made_unwaivable.unwaivable);
-        assert_eq!(made_unwaivable.id, rules::RestrictionId("509.1a/untapped"));
+        assert_eq!(
+            made_unwaivable.id,
+            rules::RestrictionId::rule("509.1a/untapped")
+        );
     }
 }

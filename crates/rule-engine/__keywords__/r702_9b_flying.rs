@@ -12,7 +12,7 @@ pub fn r702_9b_flying() -> keywords::Keyword {
 }
 
 pub const ID: keywords::KeywordId = keywords::KeywordId("702.9/flying");
-pub const BLOCKERS: rules::RestrictionId = rules::RestrictionId("702.9b/blockers");
+pub const BLOCKERS: rules::RestrictionId = rules::RestrictionId::rule("702.9b/blockers");
 
 fn abilities() -> Vec<effects::Modification> {
     vec![effects::Modification::Rule(rules::RuleChange {

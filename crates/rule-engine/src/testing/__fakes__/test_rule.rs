@@ -7,7 +7,7 @@ use crate::players;
 use crate::rules;
 use crate::rules::traits::event::Event;
 
-pub const UNTAPPED: rules::RestrictionId = rules::RestrictionId("test/untapped");
+pub const UNTAPPED: rules::RestrictionId = rules::RestrictionId::rule("test/untapped");
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EventArgs)]
 pub struct TestRule {

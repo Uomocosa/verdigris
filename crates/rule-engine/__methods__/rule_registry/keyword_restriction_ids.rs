@@ -35,7 +35,6 @@ pub fn keyword_restriction_ids() -> HashSet<rules::RestrictionId> {
 #[cfg(test)]
 mod tests {
     use crate::keywords;
-    use crate::rules;
 
     use super::keyword_restriction_ids;
 
@@ -47,7 +46,7 @@ mod tests {
         assert!(ids.contains(&keywords::hexproof::CANT_BE_TARGETED));
         assert!(ids.contains(&keywords::indestructible::CANT_BE_DESTROYED));
         assert!(
-            ids.contains(&rules::RestrictionId("702.3b/defender")),
+            ids.contains(&keywords::defender::CANT_ATTACK),
             "keyword ids carry the moved event restriction ids: {ids:?}"
         );
     }

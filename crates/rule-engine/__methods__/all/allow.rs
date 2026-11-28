@@ -37,7 +37,7 @@ mod tests {
     fn test_usage() {
         let ability = allow(
             &statics::all(creature()),
-            rules::RestrictionId("test/untapped"),
+            testing::UNTAPPED,
             rules::has_keyword(keywords::flying::ID).of(testing::TestRule::ATTACKER),
             testing::TestRule::ATTACKER,
         );
@@ -45,7 +45,7 @@ mod tests {
         assert_eq!(
             ability.modification,
             effects::Modification::Rule(rules::RuleChange {
-                target: rules::Target::Restriction(rules::RestrictionId("test/untapped")),
+                target: rules::Target::Restriction(testing::UNTAPPED),
                 change: rules::Change::Allow {
                     holder: testing::TestRule::ATTACKER.into(),
                     when: rules::has_keyword(keywords::flying::ID).of(testing::TestRule::ATTACKER),

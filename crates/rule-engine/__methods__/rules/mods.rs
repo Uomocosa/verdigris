@@ -20,7 +20,7 @@ pub fn mods(answers: &rules::Rules, entity: Entity) -> Vec<effects::Modification
             .filter_map(|ability| match ability {
                 abilities::Ability::Static(abilities::StaticAbility::Replacement(
                     abilities::Replacement::Rule(change),
-                )) => Some(effects::Modification::Rule(change.clone())),
+                )) => Some(effects::Modification::Rule(change.as_ref().clone())),
                 _ => None,
             }),
     );

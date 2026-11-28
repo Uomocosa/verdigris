@@ -41,6 +41,7 @@ impl RuleRegistry {
 #[cfg(test)]
 mod tests {
     use std::collections::HashMap;
+    use std::collections::HashSet;
 
     use crate::abilities;
     use crate::effects;
@@ -75,7 +76,8 @@ mod tests {
                         }
                         abilities::StaticAbility::Replacement(replacement) => {
                             if let abilities::Replacement::Rule(change) = replacement {
-                                modifications.push(effects::Modification::Rule(change.clone()));
+                                modifications
+                                    .push(effects::Modification::Rule(change.as_ref().clone()));
                             }
                         }
                     }
@@ -90,6 +92,41 @@ mod tests {
                         );
                     }
                 }
+            }
+        }
+    }
+
+    #[test]
+    fn every_fixture_card_restriction_is_stamped_and_unique() {
+        for card in testing::ALL_CARDS {
+            let definition = (card.definition)();
+            let mut stamped = HashSet::new();
+            for ability in &definition.text {
+                let abilities::Ability::Static(abilities::StaticAbility::Continuous(continuous)) =
+                    ability
+                else {
+                    continue;
+                };
+                let effects::Modification::Rule(rules::RuleChange {
+                    change: rules::Change::Restrict { restriction, .. },
+                    ..
+                }) = &continuous.modification
+                else {
+                    continue;
+                };
+                assert_ne!(
+                    restriction.id.card,
+                    rules::RestrictionId::UNSET,
+                    "card {} has an unstamped restriction",
+                    card.name,
+                );
+                assert!(
+                    stamped.insert((restriction.id.kind, restriction.id.event)),
+                    "card {} stamps {} on {} twice",
+                    card.name,
+                    restriction.id.kind,
+                    *restriction.id.event,
+                );
             }
         }
     }
@@ -111,7 +148,8 @@ mod tests {
                         }
                         abilities::StaticAbility::Replacement(replacement) => {
                             if let abilities::Replacement::Rule(change) = replacement {
-                                modifications.push(effects::Modification::Rule(change.clone()));
+                                modifications
+                                    .push(effects::Modification::Rule(change.as_ref().clone()));
                             }
                         }
                     }

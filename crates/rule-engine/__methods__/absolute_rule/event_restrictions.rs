@@ -22,7 +22,7 @@ mod tests {
     fn test_usage() {
         let restrictions = event_restrictions();
         assert_eq!(restrictions.len(), 1);
-        assert_eq!(restrictions[0].id, rules::RestrictionId("test/untapped"));
+        assert_eq!(restrictions[0].id, testing::UNTAPPED);
         assert_eq!(
             restrictions[0].condition,
             (!rules::has::<cards::Tapped>()).of(testing::AbsoluteRule::ATTACKER)

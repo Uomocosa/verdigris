@@ -12,7 +12,7 @@ pub fn r702_11b_hexproof() -> keywords::Keyword {
 }
 
 pub const ID: keywords::KeywordId = keywords::KeywordId("702.11/hexproof");
-pub const CANT_BE_TARGETED: rules::RestrictionId = rules::RestrictionId("702.11b/hexproof");
+pub const CANT_BE_TARGETED: rules::RestrictionId = rules::RestrictionId::rule("702.11b/hexproof");
 
 fn abilities() -> Vec<effects::Modification> {
     vec![effects::Modification::Rule(rules::RuleChange {

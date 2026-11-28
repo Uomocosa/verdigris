@@ -7,7 +7,6 @@ pub const TEST_FROZEN_RELIC: Card = Card {
             cards::creature("Test Frozen Relic", cost![2], pt!(1, 1));
             this().restriction::<Untap>(
                 Untap::PERMANENT,
-                RestrictionId("test/test-frozen-relic"),
                 !(step_is(UNTAP) & active_player(Untap::PERMANENT.controller())),
             ),
         }
