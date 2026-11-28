@@ -11,6 +11,11 @@ disable-model-invocation: true
 
 Request: $ARGUMENTS
 
+**Working directory.** The repo is `/home/uomocosa/Syncthing/[R] Rust/verdigris`, wherever the
+session started. Every shell call starts with `cd "/home/uomocosa/Syncthing/[R] Rust/verdigris" &&`;
+every relative path in this skill and its briefs (`.opencode/...`, `.local-run/...`, `just ...`)
+is relative to that root, and workers are launched from it.
+
 Run on your own from start to report. You and the workers may commit and push as you see fit,
 always on the current branch.
 
