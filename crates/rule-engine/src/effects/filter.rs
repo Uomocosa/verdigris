@@ -96,6 +96,11 @@ impl Filter {
     }
 
     #[must_use]
+    pub fn card() -> Self {
+        Self(rules::has::<cards::CardDefinition>()) & !Self::token()
+    }
+
+    #[must_use]
     pub fn attacking() -> Self {
         Self(rules::has::<cards::Attacking>())
     }
@@ -154,5 +159,7 @@ mod tests {
             effects::Filter::player() & effects::Filter::controlled_by(rules::Players::You)
         );
         assert_eq!(!effects::Filter::token(), !effects::Filter::token());
+        assert_eq!(effects::Filter::card(), effects::Filter::card());
+        assert_ne!(effects::Filter::card(), effects::Filter::token());
     }
 }

@@ -72,6 +72,11 @@ pub fn token() -> effects::Filter {
 }
 
 #[must_use]
+pub fn card() -> effects::Filter {
+    effects::Filter::card()
+}
+
+#[must_use]
 pub fn attacking() -> effects::Filter {
     effects::Filter::attacking()
 }

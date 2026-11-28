@@ -104,9 +104,11 @@ mod tests {
     use bevy::ecs::system::RunSystemOnce;
 
     use crate::BATTLEFIELD;
+    use crate::GRAVEYARD;
     use crate::HAND;
     use crate::cards;
     use crate::counters;
+    use crate::effects;
     use crate::events;
     use crate::keywords;
     use crate::mana;
@@ -660,6 +662,32 @@ mod tests {
                 let priority = rules::has_priority(TestRule::PLAYER);
                 assert!(eval(&answers, &priority, &own, None));
                 assert!(!eval(&answers, &priority, &foreign, None));
+            })
+            .unwrap();
+        Ok(())
+    }
+
+    #[test]
+    fn card_matches_a_card_in_any_zone_but_never_a_token() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.hand([RAISE_THE_ALARM, GRIZZLY_BEARS]).mana_pool(mana![1, W]),
+            P2,
+        ]);
+        let [alarm] = game.player(p1).cards_in(HAND).exactly::<1>(RAISE_THE_ALARM)?;
+        let [bears] = game.player(p1).cards_in(HAND).exactly::<1>(GRIZZLY_BEARS)?;
+        game.play([p1.cast(alarm).pass_priority(), p2.pass_priority()])?;
+        let [soldier, _] = game.player(p1).cards_in(BATTLEFIELD).exactly::<2>(SOLDIER_TOKEN)?;
+        let [alarm] = game.player(p1).cards_in(GRAVEYARD).exactly::<1>(RAISE_THE_ALARM)?;
+        let context = events::AbilityContext {
+            spell_or_ability: *bears,
+        };
+        game.app
+            .world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                assert!(eval(&answers, &effects::card(), &context, Some(*bears)));
+                assert!(eval(&answers, &effects::card(), &context, Some(*alarm)));
+                assert!(!eval(&answers, &effects::card(), &context, Some(*soldier)));
+                assert!(!eval(&answers, &effects::card(), &context, None));
             })
             .unwrap();
         Ok(())

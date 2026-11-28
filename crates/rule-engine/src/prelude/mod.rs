@@ -5,10 +5,10 @@ pub use crate::abilities::{
 pub use crate::cards;
 pub use crate::counters::POISON;
 pub use crate::effects::{
-    Filter, Modification, additional_phase, another_creature, any_target, attacking, controlled_by,
-    counter, creates, creature, creature_spell, destroy, draw, enchantment, exile, gain, get,
-    instant_spell, lose_life, nonblack_creature, noncreature_spell, player, spell, target, token,
-    win_the_game,
+    Filter, Modification, additional_phase, another_creature, any_target, attacking, card,
+    controlled_by, counter, creates, creature, creature_spell, destroy, draw, enchantment, exile,
+    gain, get, instant_spell, lose_life, nonblack_creature, noncreature_spell, player, spell,
+    target, token, win_the_game,
 };
 pub use crate::events::{
     Attack, Counter, Create, DealDamage, DeclareAttackers, DeclareBlocker, Destroy, Discard, Draw,
