@@ -125,4 +125,9 @@ mod tests {
             "Play gained a restriction; the program must cover it"
         );
     }
+
+    #[test]
+    fn building_the_program_twice_gives_equal_programs() {
+        assert_eq!(play_program().unwrap(), play_program().unwrap());
+    }
 }

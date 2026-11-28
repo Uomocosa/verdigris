@@ -24,7 +24,7 @@ pub fn translate_holds(
     ) -> Result<Atom, TranslationError> {
         match condition {
             rules::Condition::All(children) => {
-                let head = PlayDatalog::holds_head(*next_hold);
+                let head = PlayDatalog::holds_head(*next_hold)?;
                 *next_hold = next_hold.saturating_add(1);
                 let mut body = vec![Literal::Pos(candidate.clone())];
                 for child in children {
@@ -39,7 +39,7 @@ pub fn translate_holds(
                 Ok(head)
             }
             rules::Condition::Any(children) if *condition != rules::main_phase() => {
-                let head = PlayDatalog::holds_head(*next_hold);
+                let head = PlayDatalog::holds_head(*next_hold)?;
                 *next_hold = next_hold.saturating_add(1);
                 for child in children {
                     let child_head = recursion(child, card, holder, candidate, holds, next_hold)?;
@@ -51,7 +51,7 @@ pub fn translate_holds(
                 Ok(head)
             }
             rules::Condition::Not(inner) => {
-                let head = PlayDatalog::holds_head(*next_hold);
+                let head = PlayDatalog::holds_head(*next_hold)?;
                 *next_hold = next_hold.saturating_add(1);
                 let child_head = recursion(inner, card, holder, candidate, holds, next_hold)?;
                 holds.push(Rule {
@@ -64,7 +64,7 @@ pub fn translate_holds(
                 recursion(inner, card, holder, candidate, holds, next_hold)
             }
             _ => {
-                let head = PlayDatalog::holds_head(*next_hold);
+                let head = PlayDatalog::holds_head(*next_hold)?;
                 *next_hold = next_hold.saturating_add(1);
                 let mut body = vec![Literal::Pos(candidate.clone())];
                 body.extend(PlayDatalog::translate_condition(condition, card, holder)?);
@@ -110,12 +110,12 @@ mod tests {
             &mut next_hold,
         )
         .unwrap();
-        assert_eq!(root, PlayDatalog::holds_head(0));
+        assert_eq!(root, PlayDatalog::holds_head(0).unwrap());
         assert_eq!(next_hold, 1);
         assert_eq!(
             holds,
             vec![verdigris_datalog_ir::Rule {
-                head: PlayDatalog::holds_head(0),
+                head: PlayDatalog::holds_head(0).unwrap(),
                 body: vec![
                     Literal::Pos(candidate),
                     Literal::Pos(Atom {
@@ -143,17 +143,17 @@ mod tests {
             &mut next_hold,
         )
         .unwrap();
-        assert_eq!(root, PlayDatalog::holds_head(0));
+        assert_eq!(root, PlayDatalog::holds_head(0).unwrap());
         assert_eq!(next_hold, 3);
         assert_eq!(holds.len(), 3);
         assert_eq!(
             holds[2],
             verdigris_datalog_ir::Rule {
-                head: PlayDatalog::holds_head(0),
+                head: PlayDatalog::holds_head(0).unwrap(),
                 body: vec![
                     Literal::Pos(candidate),
-                    Literal::Pos(PlayDatalog::holds_head(1)),
-                    Literal::Pos(PlayDatalog::holds_head(2)),
+                    Literal::Pos(PlayDatalog::holds_head(1).unwrap()),
+                    Literal::Pos(PlayDatalog::holds_head(2).unwrap()),
                 ],
             }
         );
@@ -175,26 +175,26 @@ mod tests {
             &mut next_hold,
         )
         .unwrap();
-        assert_eq!(root, PlayDatalog::holds_head(0));
+        assert_eq!(root, PlayDatalog::holds_head(0).unwrap());
         assert_eq!(next_hold, 3);
         assert_eq!(holds.len(), 4);
         assert_eq!(
             holds[1],
             verdigris_datalog_ir::Rule {
-                head: PlayDatalog::holds_head(0),
+                head: PlayDatalog::holds_head(0).unwrap(),
                 body: vec![
                     Literal::Pos(candidate.clone()),
-                    Literal::Pos(PlayDatalog::holds_head(1)),
+                    Literal::Pos(PlayDatalog::holds_head(1).unwrap()),
                 ],
             }
         );
         assert_eq!(
             holds[3],
             verdigris_datalog_ir::Rule {
-                head: PlayDatalog::holds_head(0),
+                head: PlayDatalog::holds_head(0).unwrap(),
                 body: vec![
                     Literal::Pos(candidate),
-                    Literal::Pos(PlayDatalog::holds_head(2)),
+                    Literal::Pos(PlayDatalog::holds_head(2).unwrap()),
                 ],
             }
         );
@@ -215,16 +215,16 @@ mod tests {
             &mut next_hold,
         )
         .unwrap();
-        assert_eq!(root, PlayDatalog::holds_head(0));
+        assert_eq!(root, PlayDatalog::holds_head(0).unwrap());
         assert_eq!(next_hold, 2);
         assert_eq!(holds.len(), 2);
         assert_eq!(
             holds[1],
             verdigris_datalog_ir::Rule {
-                head: PlayDatalog::holds_head(0),
+                head: PlayDatalog::holds_head(0).unwrap(),
                 body: vec![
                     Literal::Pos(candidate),
-                    Literal::Neg(PlayDatalog::holds_head(1)),
+                    Literal::Neg(PlayDatalog::holds_head(1).unwrap()),
                 ],
             }
         );
@@ -245,13 +245,13 @@ mod tests {
             &mut next_hold,
         )
         .unwrap();
-        assert_eq!(root, PlayDatalog::holds_head(0));
+        assert_eq!(root, PlayDatalog::holds_head(0).unwrap());
         assert_eq!(next_hold, 2);
         assert_eq!(holds.len(), 2);
         assert_eq!(
             holds[0],
             verdigris_datalog_ir::Rule {
-                head: PlayDatalog::holds_head(1),
+                head: PlayDatalog::holds_head(1).unwrap(),
                 body: vec![
                     Literal::Pos(candidate.clone()),
                     Literal::Pos(Atom {
@@ -267,10 +267,10 @@ mod tests {
         assert_eq!(
             holds[1],
             verdigris_datalog_ir::Rule {
-                head: PlayDatalog::holds_head(0),
+                head: PlayDatalog::holds_head(0).unwrap(),
                 body: vec![
                     Literal::Pos(candidate),
-                    Literal::Neg(PlayDatalog::holds_head(1)),
+                    Literal::Neg(PlayDatalog::holds_head(1).unwrap()),
                 ],
             }
         );

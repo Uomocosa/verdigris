@@ -77,7 +77,8 @@ impl PlayDatalog {
         next_hold: &mut usize,
     ) -> Result<verdigris_datalog_ir::Atom, TranslationError> {
     }
-    pub(crate) fn holds_head(index: usize) -> verdigris_datalog_ir::Atom {}
+    pub(crate) fn holds_head(index: usize) -> Result<verdigris_datalog_ir::Atom, TranslationError> {
+    }
 }
 
 impl PlayDatalog {
@@ -102,6 +103,17 @@ impl PlayDatalog {
     pub(crate) const ADDED: Rel = Rel("added");
     pub(crate) const LAND: &'static str = "Land";
     pub(crate) const HAND_ZONE: &'static str = "Hand";
+    pub(crate) const HOLDS_NAMES: [&str; 64] = [
+        "holds_0", "holds_1", "holds_2", "holds_3", "holds_4", "holds_5", "holds_6", "holds_7",
+        "holds_8", "holds_9", "holds_10", "holds_11", "holds_12", "holds_13", "holds_14",
+        "holds_15", "holds_16", "holds_17", "holds_18", "holds_19", "holds_20", "holds_21",
+        "holds_22", "holds_23", "holds_24", "holds_25", "holds_26", "holds_27", "holds_28",
+        "holds_29", "holds_30", "holds_31", "holds_32", "holds_33", "holds_34", "holds_35",
+        "holds_36", "holds_37", "holds_38", "holds_39", "holds_40", "holds_41", "holds_42",
+        "holds_43", "holds_44", "holds_45", "holds_46", "holds_47", "holds_48", "holds_49",
+        "holds_50", "holds_51", "holds_52", "holds_53", "holds_54", "holds_55", "holds_56",
+        "holds_57", "holds_58", "holds_59", "holds_60", "holds_61", "holds_62", "holds_63",
+    ];
 }
 
 #[cfg(test)]
