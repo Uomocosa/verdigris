@@ -9,6 +9,7 @@ members = [
     "crates/frogmyr",
     "crates/frogmyr-macros",
     "crates/frogify",
+    "crates/vocabulary",
 ]
 
 [workspace.package]

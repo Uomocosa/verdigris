@@ -1,8 +1,4 @@
-#[path = "__basic__/mod.rs"]
-mod basic;
-
-pub use basic::components::{InZone, LeftZone, ZoneContents};
-pub use basic::enums::SharedZone;
+pub use vocabulary::zones::{InZone, LeftZone, SharedZone, ZoneContents};
 
 mod move_object;
 pub use move_object::move_object;

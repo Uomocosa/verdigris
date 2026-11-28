@@ -39,8 +39,9 @@ check-crate CRATE:
         verdigris-lint) dir=crates/verdigris-lint ;;
         frogmyr) dir=crates/frogmyr ;;
         frogmyr-macros) dir=crates/frogmyr-macros ;;
+        vocabulary) dir=crates/vocabulary ;;
         *)
-            echo "check-crate: unknown crate '{{ CRATE }}'; known: verdigris-event-derive verdigris-rule-engine verdigris-parser verdigris-game verdigris-lint frogmyr frogmyr-macros frogify" >&2
+            echo "check-crate: unknown crate '{{ CRATE }}'; known: verdigris-event-derive verdigris-rule-engine verdigris-parser verdigris-game verdigris-lint frogmyr frogmyr-macros frogify vocabulary" >&2
             exit 1
             ;;
     esac
@@ -70,6 +71,7 @@ lint:
     cargo run --quiet -p verdigris-lint -- --config lele.toml crates/frogmyr
     cargo run --quiet -p verdigris-lint -- --config lele.toml crates/frogmyr-macros
     cargo run --quiet -p verdigris-lint -- --config lele.toml crates/frogify
+    cargo run --quiet -p verdigris-lint -- --config lele.toml crates/vocabulary
 
 # Regenerate the __methods__ indexes after adding or removing #[atomic_delegates] shells.
 [group('dev')]
