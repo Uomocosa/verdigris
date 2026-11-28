@@ -4,11 +4,13 @@ use bevy::prelude::{Component, Entity, EntityRef};
 
 use crate::rules::traits::entity_component::EntityComponent;
 
+type ReadTargets = for<'a> fn(&'a EntityRef<'a>) -> Option<Vec<Entity>>;
+
 #[derive(Clone, Copy)]
 pub struct ComponentRef {
     pub type_id: TypeId,
     pub name: &'static str,
-    pub target: Option<for<'a> fn(&'a EntityRef<'a>) -> Option<Entity>>,
+    pub target: Option<ReadTargets>,
 }
 
 impl ComponentRef {
@@ -26,7 +28,7 @@ impl ComponentRef {
         Self {
             type_id: TypeId::of::<C>(),
             name: std::any::type_name::<C>(),
-            target: Some(|entity| entity.get::<C>().map(C::target)),
+            target: Some(|entity| entity.get::<C>().map(C::targets)),
         }
     }
 }

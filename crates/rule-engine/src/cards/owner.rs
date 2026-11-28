@@ -9,5 +9,5 @@ pub struct Owner(pub players::PlayerId);
 
 #[rustfmt::skip]
 impl rules::traits::entity_component::EntityComponent for Owner {
-    fn target(&self) -> Entity { ***self }
+    fn targets(&self) -> Vec<Entity> { vec![***self] }
 }

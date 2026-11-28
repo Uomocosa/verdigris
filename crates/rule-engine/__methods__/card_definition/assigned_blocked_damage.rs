@@ -1,6 +1,6 @@
 use bevy::prelude::{Entity, Query};
 
-use std::collections::BTreeSet;
+use std::collections::{BTreeMap, BTreeSet};
 
 use crate::actions;
 use crate::cards;
@@ -21,17 +21,17 @@ pub fn assigned_blocked_damage(
     )>,
     participants: &BTreeSet<Entity>,
     needed: &mut Vec<actions::RequiredCombatDamage>,
+    blocker_needed: &mut Vec<actions::RequiredCombatDamage>,
 ) -> Vec<damage::AssignedDamage> {
     let mut writes = Vec::new();
     let mut blockers_of: Vec<(Entity, u32)> = Vec::new();
     for (blocker, blocking, marked, effective) in blockers.iter() {
-        if **blocking != source {
+        let attackers = blocking.attackers();
+        if !attackers.contains(&source) {
             continue;
         }
         let remaining = effective
-            .map_or(0, |power_toughness| {
-                u32::try_from(power_toughness.toughness).unwrap_or_default()
-            })
+            .map_or(0, |pt| u32::try_from(pt.toughness).unwrap_or_default())
             .saturating_sub(marked.map_or(0, |damage| **damage));
         let lethal = (1..=remaining)
             .find(|amount| {
@@ -49,15 +49,21 @@ pub fn assigned_blocked_damage(
         if !participants.contains(&blocker) {
             continue;
         }
-        let Some(blocker_power_toughness) = effective.copied() else {
+        let Some(blocker_amount) =
+            effective.and_then(|pt| u32::try_from(pt.power).ok()).filter(|amount| *amount > 0)
+        else {
             continue;
         };
-        if blocker_power_toughness.power <= 0 {
+        if attackers.len() > 1 && !blocker_needed.iter().any(|needed| needed.source == blocker) {
+            blocker_needed.push(actions::RequiredCombatDamage {
+                source: blocker,
+                amount: blocker_amount,
+                legal: attackers.into_iter().collect(),
+                trample_defender: None,
+                lethal_by_target: BTreeMap::new(),
+            });
             continue;
         }
-        let Ok(blocker_amount) = u32::try_from(blocker_power_toughness.power) else {
-            continue;
-        };
         writes.push(damage::AssignedDamage {
             source: blocker,
             target: source,
@@ -67,12 +73,11 @@ pub fn assigned_blocked_damage(
     if amount == 0 || !participants.contains(&source) {
         return writes;
     }
-    let defender_probe = events::AssignCombatDamage {
+    let may_assign_to_defending = answers.legal(&events::AssignCombatDamage {
         target: defending,
         source,
         amount,
-    };
-    let may_assign_to_defending = answers.legal(&defender_probe);
+    });
     match blockers_of.as_slice() {
         [(blocker, lethal)] => {
             let into_blocker = if may_assign_to_defending {
@@ -80,21 +85,20 @@ pub fn assigned_blocked_damage(
             } else {
                 amount
             };
-            if into_blocker > 0 {
-                writes.push(damage::AssignedDamage {
-                    source,
-                    target: *blocker,
-                    amount: into_blocker,
-                });
-            }
             let into_defender = amount.saturating_sub(into_blocker);
-            if into_defender > 0 {
-                writes.push(damage::AssignedDamage {
+            writes.extend(
+                [
+                    (source, *blocker, into_blocker),
+                    (source, defending, into_defender),
+                ]
+                .into_iter()
+                .filter(|(_, _, amount)| *amount > 0)
+                .map(|(source, target, amount)| damage::AssignedDamage {
                     source,
-                    target: defending,
-                    amount: into_defender,
-                });
-            }
+                    target,
+                    amount,
+                }),
+            );
         }
         [] if may_assign_to_defending => {
             writes.push(damage::AssignedDamage {
@@ -164,7 +168,7 @@ mod tests {
         let bears_blocking = Entity::from(bears);
         let participants = BTreeSet::from([source, bears_blocking]);
 
-        let (writes, needed) = game
+        let (writes, needed, blocker_needed) = game
             .app
             .world_mut()
             .run_system_once(
@@ -176,6 +180,7 @@ mod tests {
                 )>,
                       answers: rules::Rules| {
                     let mut needed = Vec::new();
+                    let mut blocker_needed = Vec::new();
                     let writes = cards::CardDefinition::assigned_blocked_damage(
                         answers,
                         source,
@@ -184,8 +189,9 @@ mod tests {
                         &blockers,
                         &participants,
                         &mut needed,
+                        &mut blocker_needed,
                     );
-                    (writes, needed)
+                    (writes, needed, blocker_needed)
                 },
             )
             .unwrap();
@@ -211,6 +217,7 @@ mod tests {
             ]
         );
         assert_eq!(needed.len(), 0);
+        assert_eq!(blocker_needed.len(), 0);
         Ok(())
     }
 
@@ -246,7 +253,7 @@ mod tests {
         let spider_blocking = Entity::from(spider);
         let participants = BTreeSet::from([source, spider_blocking]);
 
-        let (writes, needed) = game
+        let (writes, needed, blocker_needed) = game
             .app
             .world_mut()
             .run_system_once(
@@ -258,6 +265,7 @@ mod tests {
                 )>,
                       answers: rules::Rules| {
                     let mut needed = Vec::new();
+                    let mut blocker_needed = Vec::new();
                     let writes = cards::CardDefinition::assigned_blocked_damage(
                         answers,
                         source,
@@ -266,8 +274,9 @@ mod tests {
                         &blockers,
                         &participants,
                         &mut needed,
+                        &mut blocker_needed,
                     );
-                    (writes, needed)
+                    (writes, needed, blocker_needed)
                 },
             )
             .unwrap();
@@ -293,6 +302,7 @@ mod tests {
             ]
         );
         assert_eq!(needed.len(), 0);
+        assert_eq!(blocker_needed.len(), 0);
         Ok(())
     }
 }

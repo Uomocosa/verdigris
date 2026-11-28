@@ -74,7 +74,7 @@ mod tests {
 
         assert_eq!(
             game.get::<crate::cards::Blocking>(bears),
-            Some(crate::cards::Blocking(rats.into()))
+            Some(crate::cards::Blocking::One(rats.into()))
         );
         assert!(game.has::<crate::cards::Blocked>(rats));
         Ok(())

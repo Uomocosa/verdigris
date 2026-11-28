@@ -73,6 +73,7 @@ fn announce_combat_damage(
         Option<&cards::EffectivePT>,
     )>,
     answers: rules::Rules,
+    players: players::Players,
     defenders: Query<Entity, With<players::DefendingPlayer>>,
     state: Res<turns::TurnState>,
     participants: Res<turns::CombatDamageParticipants>,
@@ -82,7 +83,11 @@ fn announce_combat_damage(
     let Some(defending) = defenders.iter().next() else {
         return;
     };
+    let Some(defending_player) = players.as_player(defending) else {
+        return;
+    };
     let mut needed: Vec<actions::RequiredCombatDamage> = Vec::new();
+    let mut blocker_needed: Vec<actions::RequiredCombatDamage> = Vec::new();
     for (attacker, blocked, markers) in attackers.iter() {
         let Some(effective) = markers.effective else {
             continue;
@@ -106,6 +111,7 @@ fn announce_combat_damage(
                 &lookups,
                 participants,
                 &mut needed,
+                &mut blocker_needed,
             ) {
                 dealt.write(announce_damage(write));
             }
@@ -116,6 +122,14 @@ fn announce_combat_damage(
             actions::CombatDamageChoice {
                 player: state.turn.active,
                 needed,
+            },
+        )));
+    }
+    if !blocker_needed.is_empty() {
+        asks.write(actions::Ask(actions::Choice::CombatDamage(
+            actions::CombatDamageChoice {
+                player: defending_player,
+                needed: blocker_needed,
             },
         )));
     }

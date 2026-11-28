@@ -8,5 +8,5 @@ pub struct Enchanting(pub Entity);
 
 #[rustfmt::skip]
 impl rules::traits::entity_component::EntityComponent for Enchanting {
-    fn target(&self) -> Entity { **self }
+    fn targets(&self) -> Vec<Entity> { vec![**self] }
 }

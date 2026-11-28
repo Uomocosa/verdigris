@@ -23,7 +23,7 @@ pub fn eval_points_to<E: EventArgs>(
                 .get(subject)
                 .ok()
                 .and_then(|entity| component.target.and_then(|read| read(&entity)))
-                .is_some_and(|found| found == *wanted)
+                .is_some_and(|found| found.contains(wanted))
         })
     })
 }

@@ -1,4 +1,6 @@
-use bevy::prelude::{Commands, MessageReader, MessageWriter};
+use std::collections::{BTreeMap, BTreeSet};
+
+use bevy::prelude::{Commands, Entity, MessageReader, MessageWriter, Query};
 
 use crate::Did;
 use crate::Resolve;
@@ -13,10 +15,20 @@ pub fn r509_1g_becomes_blocking(
     mut declared: MessageReader<Resolve<events::DeclareBlocker>>,
     mut did_declare: MessageWriter<Did<events::DeclareBlocker>>,
     mut commands: Commands,
+    blockers: Query<&cards::Blocking>,
 ) {
+    let mut by_blocker: BTreeMap<Entity, BTreeSet<Entity>> = BTreeMap::new();
     for declared in declared.read() {
-        commands.entity(declared.blocker).insert(cards::Blocking(declared.attacker));
+        by_blocker.entry(declared.blocker).or_default().insert(declared.attacker);
         did_declare.write(Did(**declared));
+    }
+    for (blocker, mut attackers) in by_blocker {
+        if let Ok(existing) = blockers.get(blocker) {
+            attackers.extend(existing.attackers());
+        }
+        if let Some(blocking) = cards::Blocking::from_attackers(attackers) {
+            commands.entity(blocker).insert(blocking);
+        }
     }
 }
 
@@ -45,7 +57,7 @@ mod tests {
 
         assert_eq!(
             game.get::<crate::cards::Blocking>(spider),
-            Some(crate::cards::Blocking(drake.into()))
+            Some(crate::cards::Blocking::One(drake.into()))
         );
         Ok(())
     }

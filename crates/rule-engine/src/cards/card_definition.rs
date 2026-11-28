@@ -154,6 +154,7 @@ impl CardDefinition {
         )>,
         participants: &BTreeSet<Entity>,
         needed: &mut Vec<actions::RequiredCombatDamage>,
+        blocker_needed: &mut Vec<actions::RequiredCombatDamage>,
     ) -> Vec<damage::AssignedDamage> {
     }
 

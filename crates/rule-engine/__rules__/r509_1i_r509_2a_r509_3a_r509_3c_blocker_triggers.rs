@@ -63,6 +63,7 @@ pub fn r509_1i_r509_2a_r509_3a_r509_3c_blocker_triggers(
 #[cfg(test)]
 mod tests {
     use crate::BATTLEFIELD;
+    use crate::GRAVEYARD;
     use crate::pt;
     use crate::testing::*;
     use crate::turns;
@@ -148,6 +149,16 @@ mod tests {
         game.play([p2.pass_priority(), p1.pass_priority()])?;
 
         assert_eq!(game.pt(toad), Some(pt!(4, 4)));
+
+        game.play([
+            p1.pass_to(turns::Step::CombatDamage),
+            p2.pass_to(turns::Step::CombatDamage),
+        ])?;
+        game.play([p2.assign_combat_damage([(bears_1.into(), 2), (bears_2.into(), 2)])])?;
+        game.play([p1.pass_priority(), p2.pass_priority()])?;
+
+        assert!(game.moved(bears_1).to(GRAVEYARD).of(p1));
+        assert!(game.moved(bears_2).to(GRAVEYARD).of(p1));
         Ok(())
     }
 }
