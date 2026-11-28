@@ -1,15 +1,14 @@
 # frogmyr
 
-Small stratified semi-naive Datalog engine on datafrog: the shared Datalog language every backend in this
-workspace speaks, plus our own engine evaluating it.
+Small stratified semi-naive Datalog engine on datafrog: the Datalog rule language as runtime
+data, plus our engine evaluating it.
 
 ## Goal
 
-Rules for verdigris legality are built **at runtime** from card text and the Comprehensive Rules, not written in
-a macro at compile time. This crate is that runtime form: plain Rust data that any engine can evaluate, so the
-same program and the same tests run on every backend.
+frogmyr is a small, generic, deterministic stratified Datalog engine on datafrog: rules as
+runtime data, no game knowledge. Aggregation (counting) may come later; not promised.
 
-Evaluate runtime-built verdigris rules quickly, deterministically and with no runtime dependencies, so that it can
+Evaluate runtime-built rules quickly, deterministically and with no runtime dependencies, so that it can
 run on every state change, on every peer, and later in wasm.
 
 ## What is in it
@@ -70,4 +69,4 @@ run on every state change, on every peer, and later in wasm.
 
 ## Not in scope
 
-Anything MTG-specific (see `verdigris-rule-datalog`).
+Anything MTG-specific (see `frogify`).

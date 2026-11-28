@@ -7,7 +7,7 @@ members = [
     "crates/game",
     "crates/verdigris-lint",
     "crates/frogmyr",
-    "crates/rule-datalog",
+    "crates/frogify",
 ]
 
 [workspace.package]

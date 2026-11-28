@@ -1,12 +1,12 @@
 [package]
-name = "verdigris-rule-datalog"
+name = "frogify"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
 description = "Play legality as Datalog, agreeing with the rule engine"
 
 [lib]
-name = "rule_datalog"
+name = "frogify"
 
 [lints]
 workspace = true
