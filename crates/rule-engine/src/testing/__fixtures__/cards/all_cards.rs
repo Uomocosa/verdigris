@@ -2,6 +2,7 @@ use crate::testing;
 
 pub const ALL_CARDS: &[testing::Card] = &[
     testing::ALWAYS_WATCHING,
+    testing::AMBUSH_VIPER,
     testing::AZUSA_LOST_BUT_SEEKING,
     testing::BLADEBRAND,
     testing::BORDERLAND_MARAUDER,

@@ -1,4 +1,5 @@
 mod always_watching;
+mod ambush_viper;
 mod azusa_lost_but_seeking;
 mod bladebrand;
 mod borderland_marauder;
@@ -103,6 +104,7 @@ mod waylay;
 mod wind_drake;
 
 pub use always_watching::ALWAYS_WATCHING;
+pub use ambush_viper::AMBUSH_VIPER;
 pub use azusa_lost_but_seeking::AZUSA_LOST_BUT_SEEKING;
 pub use bladebrand::BLADEBRAND;
 pub use borderland_marauder::BORDERLAND_MARAUDER;

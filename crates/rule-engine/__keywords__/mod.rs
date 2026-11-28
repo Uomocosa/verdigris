@@ -10,5 +10,6 @@ pub mod r702_3a_defender;
 pub mod r702_4b_double_strike;
 pub mod r702_5a_enchant;
 pub mod r702_7b_first_strike;
+pub mod r702_8a_r702_8b_flash;
 pub mod r702_90b_infect;
 pub mod r702_9b_flying;

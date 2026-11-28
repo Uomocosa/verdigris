@@ -89,11 +89,14 @@ mod tests {
     }
 
     #[test]
-    fn sorcery_cannot_be_cast_on_an_opponents_turn() -> TestResult {
-        let (mut game, [p1, p2]) = MockGame::builder()
-            .turn(2, turns::Step::PrecombatMain)
-            .players([P1.hand([DIVINATION]).mana_pool(mana![2, U]), P2.active()]);
+    fn flash_lets_a_creature_be_cast_on_an_opponents_turn_while_a_sorcery_cannot() -> TestResult {
+        let (mut game, [p1, p2]) =
+            MockGame::builder().turn(2, turns::Step::PrecombatMain).players([
+                P1.hand([DIVINATION, AMBUSH_VIPER]).mana_pool(mana![2, U, 1, G]),
+                P2.active(),
+            ]);
         let [divination] = game.player(p1).cards_in(HAND).exactly::<1>(DIVINATION)?;
+        let [ambush_viper] = game.player(p1).cards_in(HAND).exactly::<1>(AMBUSH_VIPER)?;
 
         game.play([p2.pass_priority()])?;
         let err = game.play([p1.cast(divination)]).unwrap_err();
@@ -104,6 +107,9 @@ mod tests {
             })
         );
         assert!(game.card(divination).is_in(HAND).of(p1));
+
+        game.play([p1.cast(ambush_viper)])?;
+        assert!(game.stack().has(AMBUSH_VIPER));
         Ok(())
     }
 

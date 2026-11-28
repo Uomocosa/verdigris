@@ -62,6 +62,11 @@ pub fn first_strike() -> keywords::Keyword {
 }
 
 #[must_use]
+pub fn flash() -> keywords::Keyword {
+    keywords::flash::r702_8a_r702_8b_flash()
+}
+
+#[must_use]
 pub fn double_strike() -> keywords::Keyword {
     keywords::double_strike::r702_4b_double_strike()
 }

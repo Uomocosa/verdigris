@@ -16,7 +16,7 @@ pub use crate::events::{
     PutIntoGraveyard, Untap, attack, declare_blocker,
 };
 pub use crate::keywords::{
-    deathtouch, defender, double_strike, enchant, first_strike, flying, haste, hexproof,
+    deathtouch, defender, double_strike, enchant, first_strike, flash, flying, haste, hexproof,
     indestructible, infect, lifelink, reach, trample, vigilance,
 };
 pub use crate::rules::{

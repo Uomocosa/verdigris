@@ -2,7 +2,7 @@
 mod basic;
 
 pub use basic::card_text::{
-    deathtouch, defender, double_strike, enchant, first_strike, flying, haste, hexproof,
+    deathtouch, defender, double_strike, enchant, first_strike, flash, flying, haste, hexproof,
     indestructible, infect, lifelink, reach, trample, vigilance,
 };
 pub use basic::enchant_filter::EnchantFilter;
@@ -18,6 +18,7 @@ pub(crate) use comprehensive_keywords::r702_3a_defender as defender;
 pub(crate) use comprehensive_keywords::r702_4b_double_strike as double_strike;
 pub(crate) use comprehensive_keywords::r702_5a_enchant as enchant;
 pub(crate) use comprehensive_keywords::r702_7b_first_strike as first_strike;
+pub(crate) use comprehensive_keywords::r702_8a_r702_8b_flash as flash;
 pub(crate) use comprehensive_keywords::r702_9b_flying as flying;
 pub(crate) use comprehensive_keywords::r702_10a_haste as haste;
 pub(crate) use comprehensive_keywords::r702_11b_hexproof as hexproof;
