@@ -50,6 +50,9 @@ impl Players<'_, '_> {
     pub fn still_in_the_game(&self) -> Vec<players::PlayerView<'_, '_>> {}
 
     #[must_use]
+    pub fn players_who_left(&self) -> Vec<players::PlayerId> {}
+
+    #[must_use]
     pub fn affected_by(
         &self,
         event: &impl rules::traits::event::Event,
