@@ -64,8 +64,20 @@ impl PlayDatalog {
     }
     pub(crate) fn translate_condition(
         condition: &rules::Condition,
+        card: &rules::ArgRef,
+        holder: &rules::ArgRef,
     ) -> Result<Vec<verdigris_datalog_ir::Literal>, TranslationError> {
     }
+    pub(crate) fn translate_holds(
+        condition: &rules::Condition,
+        card: &rules::ArgRef,
+        holder: &rules::ArgRef,
+        candidate: &verdigris_datalog_ir::Atom,
+        holds: &mut Vec<verdigris_datalog_ir::Rule>,
+        next_hold: &mut usize,
+    ) -> Result<verdigris_datalog_ir::Atom, TranslationError> {
+    }
+    pub(crate) fn holds_head(index: usize) -> verdigris_datalog_ir::Atom {}
 }
 
 impl PlayDatalog {
@@ -83,6 +95,7 @@ impl PlayDatalog {
     pub(crate) const STEP: Rel = Rel("step");
     pub(crate) const MAIN_STEP: Rel = Rel("main_step");
     pub(crate) const ON_STACK: Rel = Rel("on_stack");
+    pub(crate) const STACK_EMPTY: Rel = Rel("stack_empty");
     pub(crate) const LAND_PLAY_AVAILABLE: Rel = Rel("land_play_available");
     pub(crate) const WAIVED: Rel = Rel("waived");
     pub(crate) const VIOLATES: Rel = Rel("violates");

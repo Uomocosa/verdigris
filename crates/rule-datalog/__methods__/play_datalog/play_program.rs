@@ -5,6 +5,7 @@ use verdigris_datalog_ir::Rule;
 use verdigris_datalog_ir::Term;
 use verdigris_datalog_ir::Value;
 use verdigris_rule_engine::events;
+use verdigris_rule_engine::rules;
 use verdigris_rule_engine::rules::traits::event::Event;
 
 use crate::PlayDatalog;
@@ -31,9 +32,19 @@ pub fn play_program() -> Result<Program, TranslationError> {
             }),
         ],
     }];
+    let card = rules::ArgRef::Arg(events::Play::CARD);
+    let holder = rules::ArgRef::Arg(events::Play::PLAYER);
+    let mut next_hold = 0;
     for restriction in events::Play::restrictions() {
-        let mut body = vec![Literal::Pos(candidate.clone())];
-        body.extend(PlayDatalog::translate_condition(&restriction.condition)?);
+        let root = PlayDatalog::translate_holds(
+            &restriction.condition,
+            &card,
+            &holder,
+            &candidate,
+            &mut program_rules,
+            &mut next_hold,
+        )?;
+        let mut body = vec![Literal::Pos(candidate.clone()), Literal::Neg(root)];
         if !restriction.unwaivable {
             body.push(Literal::Neg(Atom {
                 rel: PlayDatalog::WAIVED,
@@ -96,8 +107,18 @@ mod tests {
     #[test]
     fn test_usage() {
         let program = play_program().unwrap();
-        assert_eq!(program.rules.len(), 10);
+        assert_eq!(program.rules.len(), 18);
         assert!(program.rules.iter().any(|rule| *rule.head.rel == "play_candidate"));
+        assert_eq!(
+            program.rules.iter().filter(|rule| *rule.head.rel == "violates").count(),
+            9,
+            "one violates rule per restriction plus the card-side veto"
+        );
+        assert_eq!(
+            program.rules.iter().filter(|rule| rule.head.rel.starts_with("holds_")).count(),
+            8,
+            "one holds rule per single-atom Play restriction"
+        );
         assert_eq!(
             events::Play::restrictions().len(),
             8,

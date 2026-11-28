@@ -3,6 +3,7 @@ use verdigris_datalog_ir::Value;
 use verdigris_rule_engine::players;
 use verdigris_rule_engine::rules;
 use verdigris_rule_engine::turns;
+use verdigris_rule_engine::zones;
 
 use crate::PlayDatalog;
 
@@ -49,6 +50,18 @@ pub fn snapshot(answers: &rules::Rules, viewer: players::PlayerId) -> Facts {
     }
     let _ = facts.add(PlayDatalog::MAIN_STEP, vec![Value::Sym("PrecombatMain")]);
     let _ = facts.add(PlayDatalog::MAIN_STEP, vec![Value::Sym("PostcombatMain")]);
+    if answers
+        .zones
+        .find(zones::SharedZone::Stack, None)
+        .is_none_or(|stack| !answers.in_zone.iter().any(|in_zone| **in_zone == stack))
+    {
+        for player in &players_in_game {
+            let _ = facts.add(
+                PlayDatalog::STACK_EMPTY,
+                vec![Value::Entity(player.to_bits())],
+            );
+        }
+    }
     for entity in &visible {
         for player in &players_in_game {
             PlayDatalog::pair_facts(answers, &mut facts, *entity, *player);
@@ -122,6 +135,9 @@ mod tests {
                 );
                 assert!(facts.contains(&PlayDatalog::PRIORITY, &[Value::Entity(first.to_bits())]));
                 assert!(facts.contains(&PlayDatalog::ACTIVE, &[Value::Entity(first.to_bits())]));
+                assert!(
+                    facts.contains(&PlayDatalog::STACK_EMPTY, &[Value::Entity(first.to_bits())])
+                );
             })
             .unwrap();
     }

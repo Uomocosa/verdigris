@@ -4,20 +4,23 @@ use verdigris_datalog_ir::Term;
 use verdigris_datalog_ir::Value;
 use verdigris_rule_engine::HAND;
 use verdigris_rule_engine::cards;
-use verdigris_rule_engine::events;
 use verdigris_rule_engine::rules;
 
 use crate::PlayDatalog;
 use crate::TranslationError;
 
-pub fn translate_condition(condition: &rules::Condition) -> Result<Vec<Literal>, TranslationError> {
+pub fn translate_condition(
+    condition: &rules::Condition,
+    card: &rules::ArgRef,
+    holder: &rules::ArgRef,
+) -> Result<Vec<Literal>, TranslationError> {
     if *condition == rules::main_phase() {
         return Ok(vec![
             Literal::Pos(Atom {
                 rel: PlayDatalog::STEP,
                 terms: vec![Term::Var("S")],
             }),
-            Literal::Neg(Atom {
+            Literal::Pos(Atom {
                 rel: PlayDatalog::MAIN_STEP,
                 terms: vec![Term::Var("S")],
             }),
@@ -25,66 +28,64 @@ pub fn translate_condition(condition: &rules::Condition) -> Result<Vec<Literal>,
     }
     if *condition == rules::stack_empty() {
         return Ok(vec![Literal::Pos(Atom {
-            rel: PlayDatalog::ON_STACK,
-            terms: vec![Term::Var("X")],
+            rel: PlayDatalog::STACK_EMPTY,
+            terms: vec![Term::Var(PlayDatalog::PLAYER_VAR)],
         })]);
     }
-    let is_player =
-        |reference: &rules::ArgRef| *reference == rules::ArgRef::Arg(events::Play::PLAYER);
-    let negated = |relation: verdigris_datalog_ir::Rel, terms: Vec<Term>| {
-        vec![Literal::Neg(Atom {
+    let is_holder = |reference: &rules::ArgRef| *reference == *holder;
+    let positive = |relation: verdigris_datalog_ir::Rel, terms: Vec<Term>| {
+        vec![Literal::Pos(Atom {
             rel: relation,
             terms,
         })]
     };
     match condition {
-        rules::Condition::HasPriority(reference) if is_player(reference) => Ok(negated(
+        rules::Condition::HasPriority(reference) if is_holder(reference) => Ok(positive(
             PlayDatalog::PRIORITY,
             vec![Term::Var(PlayDatalog::PLAYER_VAR)],
         )),
-        rules::Condition::ActivePlayer(reference) if is_player(reference) => Ok(negated(
+        rules::Condition::ActivePlayer(reference) if is_holder(reference) => Ok(positive(
             PlayDatalog::ACTIVE,
             vec![Term::Var(PlayDatalog::PLAYER_VAR)],
         )),
-        rules::Condition::LandPlayAvailable(reference) if is_player(reference) => Ok(negated(
+        rules::Condition::LandPlayAvailable(reference) if is_holder(reference) => Ok(positive(
             PlayDatalog::LAND_PLAY_AVAILABLE,
             vec![Term::Var(PlayDatalog::PLAYER_VAR)],
         )),
-        rules::Condition::Of(card, inner) if *card == rules::ArgRef::Arg(events::Play::CARD) => {
-            match inner.as_ref() {
-                rules::Condition::CardType(card_type) if *card_type == cards::CardType::Land => {
-                    Ok(negated(
-                        PlayDatalog::CARD_TYPE,
-                        vec![
-                            Term::Var(PlayDatalog::CARD_VAR),
-                            Term::Val(Value::Sym(PlayDatalog::LAND)),
-                        ],
-                    ))
-                }
-                rules::Condition::InZone(zone, holder) if *zone == HAND && is_player(holder) => {
-                    Ok(negated(
-                        PlayDatalog::IN_ZONE,
-                        vec![
-                            Term::Var(PlayDatalog::CARD_VAR),
-                            Term::Val(Value::Sym(PlayDatalog::HAND_ZONE)),
-                            Term::Var(PlayDatalog::PLAYER_VAR),
-                        ],
-                    ))
-                }
-                rules::Condition::PointsTo(component, holder)
-                    if *component == rules::ComponentRef::relation::<cards::Owner>()
-                        && is_player(holder) =>
-                {
-                    Ok(negated(
-                        PlayDatalog::OWNER,
-                        vec![
-                            Term::Var(PlayDatalog::CARD_VAR),
-                            Term::Var(PlayDatalog::PLAYER_VAR),
-                        ],
-                    ))
-                }
-                _ => Err(TranslationError::Untranslatable(condition.clone())),
-            }
+        rules::Condition::Of(entity, inner) if *entity == *card => {
+            translate_condition(inner, card, holder)
+                .map_err(|_| TranslationError::Untranslatable(condition.clone()))
+        }
+        rules::Condition::CardType(card_type) if *card_type == cards::CardType::Land => {
+            Ok(positive(
+                PlayDatalog::CARD_TYPE,
+                vec![
+                    Term::Var(PlayDatalog::CARD_VAR),
+                    Term::Val(Value::Sym(PlayDatalog::LAND)),
+                ],
+            ))
+        }
+        rules::Condition::InZone(zone, zone_holder) if *zone == HAND && is_holder(zone_holder) => {
+            Ok(positive(
+                PlayDatalog::IN_ZONE,
+                vec![
+                    Term::Var(PlayDatalog::CARD_VAR),
+                    Term::Val(Value::Sym(PlayDatalog::HAND_ZONE)),
+                    Term::Var(PlayDatalog::PLAYER_VAR),
+                ],
+            ))
+        }
+        rules::Condition::PointsTo(component, owner)
+            if *component == rules::ComponentRef::relation::<cards::Owner>()
+                && is_holder(owner) =>
+        {
+            Ok(positive(
+                PlayDatalog::OWNER,
+                vec![
+                    Term::Var(PlayDatalog::CARD_VAR),
+                    Term::Var(PlayDatalog::PLAYER_VAR),
+                ],
+            ))
         }
         _ => Err(TranslationError::Untranslatable(condition.clone())),
     }
@@ -107,16 +108,22 @@ mod tests {
 
     #[test]
     fn test_usage() {
+        let card = rules::ArgRef::Arg(events::Play::CARD);
+        let holder = rules::ArgRef::Arg(events::Play::PLAYER);
         assert_eq!(
-            translate_condition(&rules::has_priority(events::Play::PLAYER)),
-            Ok(vec![Literal::Neg(Atom {
+            translate_condition(&rules::has_priority(events::Play::PLAYER), &card, &holder),
+            Ok(vec![Literal::Pos(Atom {
                 rel: PlayDatalog::PRIORITY,
                 terms: vec![Term::Var(PlayDatalog::PLAYER_VAR)],
             })])
         );
         assert_eq!(
-            translate_condition(&rules::card_type(cards::CardType::Land).of(events::Play::CARD)),
-            Ok(vec![Literal::Neg(Atom {
+            translate_condition(
+                &rules::card_type(cards::CardType::Land).of(events::Play::CARD),
+                &card,
+                &holder
+            ),
+            Ok(vec![Literal::Pos(Atom {
                 rel: PlayDatalog::CARD_TYPE,
                 terms: vec![
                     Term::Var(PlayDatalog::CARD_VAR),
@@ -125,20 +132,20 @@ mod tests {
             })])
         );
         assert_eq!(
-            translate_condition(&rules::stack_empty()),
+            translate_condition(&rules::stack_empty(), &card, &holder),
             Ok(vec![Literal::Pos(Atom {
-                rel: PlayDatalog::ON_STACK,
-                terms: vec![Term::Var("X")],
+                rel: PlayDatalog::STACK_EMPTY,
+                terms: vec![Term::Var(PlayDatalog::PLAYER_VAR)],
             })])
         );
         assert_eq!(
-            translate_condition(&rules::main_phase()),
+            translate_condition(&rules::main_phase(), &card, &holder),
             Ok(vec![
                 Literal::Pos(Atom {
                     rel: PlayDatalog::STEP,
                     terms: vec![Term::Var("S")],
                 }),
-                Literal::Neg(Atom {
+                Literal::Pos(Atom {
                     rel: PlayDatalog::MAIN_STEP,
                     terms: vec![Term::Var("S")],
                 }),
@@ -148,16 +155,64 @@ mod tests {
 
     #[test]
     fn an_untranslatable_atom_is_an_explicit_error() {
+        let card = rules::ArgRef::Arg(events::Play::CARD);
+        let holder = rules::ArgRef::Arg(events::Play::PLAYER);
         let tapped = rules::has::<cards::Tapped>().of(events::Play::CARD);
         assert_eq!(
-            translate_condition(&tapped),
+            translate_condition(&tapped, &card, &holder),
             Err(TranslationError::Untranslatable(tapped.clone()))
         );
         assert_eq!(
-            translate_condition(&rules::step_is(turns::Step::Upkeep)),
+            translate_condition(&rules::step_is(turns::Step::Upkeep), &card, &holder),
             Err(TranslationError::Untranslatable(rules::step_is(
                 turns::Step::Upkeep
             )))
+        );
+    }
+
+    #[test]
+    fn compounds_are_not_atoms() {
+        let card = rules::ArgRef::Arg(events::Play::CARD);
+        let holder = rules::ArgRef::Arg(events::Play::PLAYER);
+        let both =
+            rules::has_priority(events::Play::PLAYER) & rules::active_player(events::Play::PLAYER);
+        assert_eq!(
+            translate_condition(&both, &card, &holder),
+            Err(TranslationError::Untranslatable(both.clone()))
+        );
+        let either =
+            rules::has_priority(events::Play::PLAYER) | rules::active_player(events::Play::PLAYER);
+        assert_eq!(
+            translate_condition(&either, &card, &holder),
+            Err(TranslationError::Untranslatable(either.clone()))
+        );
+        let negated = !rules::has_priority(events::Play::PLAYER);
+        assert_eq!(
+            translate_condition(&negated, &card, &holder),
+            Err(TranslationError::Untranslatable(negated.clone()))
+        );
+    }
+
+    #[test]
+    fn other_arg_refs_do_not_match() {
+        let card = rules::ArgRef::Arg(events::Play::CARD);
+        let holder = rules::ArgRef::Arg(events::Play::PLAYER);
+        let foreign = rules::has_priority(rules::ArgId("other"));
+        assert_eq!(
+            translate_condition(&foreign, &card, &holder),
+            Err(TranslationError::Untranslatable(foreign.clone()))
+        );
+    }
+
+    #[test]
+    fn of_a_foreign_card_does_not_match() {
+        let card = rules::ArgRef::Arg(events::Play::CARD);
+        let holder = rules::ArgRef::Arg(events::Play::PLAYER);
+        let foreign_card = rules::ArgRef::Arg(rules::ArgId("other"));
+        let condition = rules::card_type(cards::CardType::Land).of(foreign_card);
+        assert_eq!(
+            translate_condition(&condition, &card, &holder),
+            Err(TranslationError::Untranslatable(condition.clone()))
         );
     }
 }

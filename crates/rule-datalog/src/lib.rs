@@ -1,4 +1,6 @@
 mod play_datalog;
+#[cfg(test)]
+mod testing;
 mod translation_error;
 
 pub use play_datalog::PlayDatalog;
