@@ -135,4 +135,20 @@ mod tests {
         assert!(!game.card(bears).is_in(EXILE).of(p1));
         Ok(())
     }
+
+    #[test]
+    fn a_creature_only_replacement_exiles_a_nontoken_creature_an_opponent_controls() -> TestResult {
+        let (mut game, [p1, p2]) = MockGame::new([
+            P1.hand([MURDER]).mana_pool(mana![1, B, B]).battlefield([TEST_KALITAS]),
+            P2.battlefield([GRIZZLY_BEARS]),
+        ]);
+        let [murder] = game.player(p1).cards_in(HAND).exactly::<1>(MURDER)?;
+        let [bears] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS)?;
+        game.play([
+            p1.cast(murder).targeting(bears).pass_priority(),
+            p2.pass_priority(),
+        ])?;
+        assert!(game.moved(bears).to(EXILE).of(p2));
+        Ok(())
+    }
 }
