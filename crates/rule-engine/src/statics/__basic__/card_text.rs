@@ -35,3 +35,23 @@ pub fn enchanted() -> statics::All {
 pub const fn enters_tapped() -> abilities::Replacement {
     abilities::Replacement::EntersTapped
 }
+
+#[must_use]
+pub fn if_a(filter: impl Into<effects::Filter>) -> statics::If {
+    statics::If(all(filter.into()))
+}
+
+#[must_use]
+pub fn if_you() -> statics::If {
+    statics::If(you())
+}
+
+#[must_use]
+pub fn if_a_player() -> statics::If {
+    statics::If(all(effects::Filter::player()))
+}
+
+#[must_use]
+pub fn if_an_opponent() -> statics::If {
+    statics::If(each_opponent())
+}

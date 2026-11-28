@@ -24,6 +24,8 @@ pub use crate::rules::{
     Target, Then, Value, a, active_player, always, an, count, damage, each, has_keyword, life, may,
     never, power, step_is,
 };
-pub use crate::statics::{all, each_opponent, enchanted, this, you};
+pub use crate::statics::{
+    all, each_opponent, enchanted, if_a, if_a_player, if_an_opponent, if_you, this, you,
+};
 pub use crate::turns::{Phase, beginning_of};
 pub use crate::{GRAVEYARD, MAIN_2, OPPONENT, PLAYER, THIS, UNTAP, UPKEEP, YOU, card, cost, pt};
