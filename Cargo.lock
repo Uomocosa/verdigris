@@ -692,17 +692,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "77ce24cb58228fbb8aa041425bb1050850ac19177686ea6e0f41a70416f56fdb"
 
 [[package]]
-name = "frogify"
-version = "0.0.2"
-dependencies = [
- "atomic-delegate-macros",
- "bevy",
- "frogmyr",
- "thiserror 2.0.21",
- "verdigris-rule-engine",
-]
-
-[[package]]
 name = "frogmyr"
 version = "0.0.2"
 dependencies = [
@@ -1581,6 +1570,7 @@ dependencies = [
  "atomic-delegate-macros",
  "bevy",
  "derive_more",
+ "frogmyr",
  "thiserror 2.0.21",
  "verdigris-event-derive",
  "verdigris-rule-engine",

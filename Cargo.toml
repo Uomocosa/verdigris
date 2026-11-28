@@ -8,7 +8,6 @@ members = [
     "crates/verdigris-lint",
     "crates/frogmyr",
     "crates/frogmyr-macros",
-    "crates/frogify",
     "crates/vocabulary",
 ]
 

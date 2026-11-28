@@ -12,6 +12,7 @@ workspace = true
 atomic-delegate-macros.workspace = true
 bevy.workspace = true
 derive_more = { workspace = true, features = ["deref", "display", "from"] }
+frogmyr = { path = "../frogmyr" }
 thiserror.workspace = true
 verdigris-event-derive.workspace = true
 vocabulary = { path = "../vocabulary" }

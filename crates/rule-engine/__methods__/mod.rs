@@ -4,7 +4,9 @@ pub mod action;
 pub mod all;
 pub mod assign_combat_damage;
 pub mod attack;
+pub mod attack_datalog;
 pub mod attempt;
+pub mod block_datalog;
 #[cfg(feature = "testing")]
 pub mod card_check;
 pub mod card_definition;
@@ -13,6 +15,7 @@ pub mod cards;
 #[cfg(feature = "testing")]
 pub mod cards_in_zone;
 pub mod cast;
+pub mod cast_datalog;
 pub mod characteristic;
 pub mod characteristics;
 pub mod choice;
@@ -42,6 +45,7 @@ pub mod opening_hand_action;
 pub mod pass_budget;
 pub mod pick_choice;
 pub mod play;
+pub mod play_datalog;
 pub mod player_quantity;
 pub mod player_view;
 pub mod players;

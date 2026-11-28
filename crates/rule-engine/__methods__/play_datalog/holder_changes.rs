@@ -1,0 +1,84 @@
+use crate::rules;
+use crate::rules::traits::event::Event;
+
+pub fn holder_changes<E: Event>(
+    answers: &rules::Rules,
+    event: &E,
+    target: rules::Target,
+) -> Vec<rules::Change> {
+    let mut kept = Vec::new();
+    for id in E::args() {
+        for reference in [
+            rules::ArgRef::Arg(*id),
+            rules::ArgRef::ControllerOf(*id),
+            rules::ArgRef::OwnerOf(*id),
+        ] {
+            let Some(entity) = answers.resolve(reference, event).and_then(|value| match value {
+                rules::ArgValue::Entity(found) => Some(found),
+                rules::ArgValue::Player(found) => Some(*found),
+                rules::ArgValue::Entities(_)
+                | rules::ArgValue::Amount(_)
+                | rules::ArgValue::Event(_) => None,
+            }) else {
+                continue;
+            };
+            for change in answers.changes(entity, target) {
+                let held = match &change {
+                    rules::Change::Restrict { holder, .. }
+                    | rules::Change::AsThough { holder }
+                    | rules::Change::Allow { holder, .. }
+                    | rules::Change::Instead { holder, .. }
+                    | rules::Change::Hook { holder, .. } => *holder == reference,
+                    _ => false,
+                };
+                if held {
+                    kept.push(change);
+                }
+            }
+        }
+    }
+    kept
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::cards;
+    use crate::events;
+    use crate::players;
+    use crate::rules;
+    use crate::testing::FOREST;
+    use crate::zones;
+    use bevy::ecs::system::RunSystemOnce;
+    use bevy::prelude::App;
+
+    use super::holder_changes;
+
+    #[test]
+    fn test_usage() {
+        let mut app = App::new();
+        let first = players::PlayerId(
+            app.world_mut().spawn((players::Player, players::LandsPlayedThisTurn::NONE)).id(),
+        );
+        let hand = app.world_mut().spawn((zones::Zone::Hand, cards::Owner(first))).id();
+        let forest = app
+            .world_mut()
+            .spawn((
+                (FOREST.definition)(),
+                zones::InZone(hand),
+                cards::Owner(first),
+            ))
+            .id();
+        app.world_mut()
+            .run_system_once(move |answers: rules::Rules| {
+                let event = events::Play {
+                    card: forest,
+                    player: first,
+                };
+                assert_eq!(
+                    holder_changes(&answers, &event, rules::Target::event::<events::Play>()),
+                    []
+                );
+            })
+            .unwrap();
+    }
+}

@@ -15,6 +15,7 @@ pub mod events;
 mod game;
 mod game_mut;
 pub mod keywords;
+pub mod legality;
 pub mod players;
 pub mod rules;
 mod rules_plugin;

@@ -1,5 +1,6 @@
 mod cards;
 mod expected_targets;
+mod legality;
 mod pick;
 
 pub use cards::{
@@ -25,4 +26,5 @@ pub use cards::{
     UPWELLING, WALKING_CORPSE, WALL_OF_STONE, WATCHWOLF, WAYLAY, WIND_DRAKE,
 };
 pub use expected_targets::ExpectedTargets;
+pub use legality::{attack_candidate, block_candidate, play_candidate};
 pub use pick::pick;
