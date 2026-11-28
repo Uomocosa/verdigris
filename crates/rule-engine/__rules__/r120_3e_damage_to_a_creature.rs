@@ -1,7 +1,10 @@
 use crate::events;
-use bevy::prelude::{Commands, MessageReader, Query};
+use bevy::prelude::{Commands, MessageReader, MessageWriter, Query, ResMut};
 
+use crate::DAMAGE_MARKED;
+use crate::May;
 use crate::Resolve;
+use crate::StateBasedActionsPerformed;
 use crate::damage;
 use crate::keywords;
 use crate::players;
@@ -12,6 +15,8 @@ use crate::rules;
 pub fn r120_3e_damage_to_a_creature(
     mut damage_dealt: MessageReader<Resolve<events::DealDamage>>,
     mut commands: Commands,
+    mut asks: MessageWriter<May<events::DealDamage>>,
+    mut state_based_actions_performed: ResMut<StateBasedActionsPerformed>,
     players: players::Players,
     answers: rules::Rules,
     targets: Query<Option<&damage::Damage>>,
@@ -20,16 +25,26 @@ pub fn r120_3e_damage_to_a_creature(
         if players.as_player(event.recipient).is_some() {
             continue;
         }
-        let marked = targets.get(event.recipient).ok().flatten().map_or(0, |damage| **damage);
-        commands
-            .entity(event.recipient)
-            .insert(damage::Damage(marked.saturating_add(event.amount)));
-        if answers.eval(
-            &rules::has_keyword(keywords::deathtouch::ID).of(events::DealDamage::SOURCE),
-            &**event,
-            None,
-        ) {
-            commands.entity(event.recipient).insert(damage::DealtByDeathtouch);
+        if let Some(then) = answers.replaced(DAMAGE_MARKED, &**event) {
+            then.announce(
+                &**event,
+                &answers,
+                &mut commands,
+                &mut asks,
+                &mut state_based_actions_performed,
+            );
+        } else {
+            let marked = targets.get(event.recipient).ok().flatten().map_or(0, |damage| **damage);
+            commands
+                .entity(event.recipient)
+                .insert(damage::Damage(marked.saturating_add(event.amount)));
+            if answers.eval(
+                &rules::has_keyword(keywords::deathtouch::ID).of(events::DealDamage::SOURCE),
+                &**event,
+                None,
+            ) {
+                commands.entity(event.recipient).insert(damage::DealtByDeathtouch);
+            }
         }
     }
 }

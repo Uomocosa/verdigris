@@ -34,6 +34,7 @@ pub const CLEANUP: turns::Step = turns::Step::Cleanup;
 pub const THIS: rules::This = rules::This;
 
 pub const LOSES_LIFE: rules::ResultId = rules::ResultId("120.3a/loses-life");
+pub const DAMAGE_MARKED: rules::ResultId = rules::ResultId("120.3e/damage-marked");
 
 pub const FIRST_COMBAT_DAMAGE_STEP: rules::DefinitionId = rules::DefinitionId("510.4/first-step");
 pub const ASSIGNS_AGAIN: rules::DefinitionId = rules::DefinitionId("510.4/assigns-again");

@@ -1,5 +1,6 @@
 use std::collections::HashSet;
 
+use crate::DAMAGE_MARKED;
 use crate::LOSES_LIFE;
 use crate::events;
 use crate::rules;
@@ -92,7 +93,7 @@ pub fn engine() -> rules::RuleRegistry {
         restrictions.extend(list.iter().map(|restriction| restriction.id));
     }
     restrictions.extend(rules::RuleRegistry::keyword_restriction_ids());
-    let results = HashSet::from([LOSES_LIFE]);
+    let results = HashSet::from([LOSES_LIFE, DAMAGE_MARKED]);
     let mut definitions = HashSet::from([rules::LETHAL_DAMAGE]);
     definitions.extend([FIRST_COMBAT_DAMAGE_STEP, ASSIGNS_AGAIN]);
     let values = HashSet::from([
