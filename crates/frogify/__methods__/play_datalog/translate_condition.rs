@@ -2,9 +2,9 @@ use frogmyr::Atom;
 use frogmyr::Literal;
 use frogmyr::Term;
 use frogmyr::Value;
-use verdigris_rule_engine::HAND;
 use verdigris_rule_engine::cards;
 use verdigris_rule_engine::rules;
+use verdigris_rule_engine::zones;
 
 use crate::PlayDatalog;
 use crate::TranslationError;
@@ -65,12 +65,20 @@ pub fn translate_condition(
                 .map_err(|_| TranslationError::Untranslatable(condition.clone()))
         }
         rules::Condition::True => Ok(Vec::new()),
-        rules::Condition::InZone(zone, zone_holder) if *zone == HAND && is_holder(zone_holder) => {
+        rules::Condition::InZone(zone, zone_holder) if is_holder(zone_holder) => {
+            let name = match *zone {
+                zones::Zone::Library => "Library",
+                zones::Zone::Hand => "Hand",
+                zones::Zone::Battlefield => "Battlefield",
+                zones::Zone::Graveyard => "Graveyard",
+                zones::Zone::Exile => "Exile",
+                zones::Zone::Stack => "Stack",
+            };
             Ok(positive(
                 PlayDatalog::IN_ZONE,
                 vec![
                     Term::Var(subject),
-                    Term::Val(Value::Sym(PlayDatalog::HAND_ZONE)),
+                    Term::Val(Value::Sym(name)),
                     Term::Var(PlayDatalog::PLAYER_VAR),
                 ],
             ))
@@ -98,6 +106,7 @@ mod tests {
     use verdigris_rule_engine::events;
     use verdigris_rule_engine::rules;
     use verdigris_rule_engine::turns;
+    use verdigris_rule_engine::zones;
 
     use super::translate_condition;
     use crate::PlayDatalog;
@@ -143,6 +152,18 @@ mod tests {
         assert_eq!(
             translate_condition(&always, &card, &holder, PlayDatalog::CARD_VAR),
             Ok(Vec::new())
+        );
+        let graveyard = rules::in_zone(zones::Zone::Graveyard, events::Play::PLAYER);
+        assert_eq!(
+            translate_condition(&graveyard, &card, &holder, PlayDatalog::CARD_VAR),
+            Ok(vec![Literal::Pos(Atom {
+                rel: PlayDatalog::IN_ZONE,
+                terms: vec![
+                    Term::Var(PlayDatalog::CARD_VAR),
+                    Term::Val(Value::Sym("Graveyard")),
+                    Term::Var(PlayDatalog::PLAYER_VAR),
+                ],
+            })])
         );
     }
 

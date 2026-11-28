@@ -19,36 +19,6 @@ pub fn pair_facts_for<E: Event>(
     card_ref: &rules::ArgRef,
     holder_ref: &rules::ArgRef,
 ) {
-    for restriction in E::restrictions() {
-        if !restriction.unwaivable
-            && PlayDatalog::waived(answers, event, restriction.id, restriction.unwaivable)
-        {
-            let _ = facts.add(
-                PlayDatalog::WAIVED,
-                vec![
-                    Value::Sym(event_name),
-                    Value::Entity(card.to_bits()),
-                    Value::Entity(holder.to_bits()),
-                    Value::Sym(*restriction.id),
-                ],
-            );
-        }
-    }
-    for change in PlayDatalog::holder_changes(answers, event, rules::Target::event::<E>()) {
-        if let rules::Change::Restrict { restriction, .. } = change
-            && PlayDatalog::waived(answers, event, restriction.id, restriction.unwaivable)
-        {
-            let _ = facts.add(
-                PlayDatalog::WAIVED,
-                vec![
-                    Value::Sym(event_name),
-                    Value::Entity(card.to_bits()),
-                    Value::Entity(holder.to_bits()),
-                    Value::Sym(*restriction.id),
-                ],
-            );
-        }
-    }
     let candidate = Atom {
         rel: PlayDatalog::PLAY_CANDIDATE,
         terms: vec![
@@ -56,9 +26,53 @@ pub fn pair_facts_for<E: Event>(
             Term::Var(PlayDatalog::PLAYER_VAR),
         ],
     };
+    for restriction in E::restrictions() {
+        if !restriction.unwaivable
+            && PlayDatalog::untranslated_waiver(
+                answers,
+                event,
+                restriction.id,
+                card_ref,
+                holder_ref,
+                &candidate,
+            )
+        {
+            let _ = facts.add(
+                PlayDatalog::WAIVED,
+                vec![
+                    Value::Sym(event_name),
+                    Value::Entity(card.to_bits()),
+                    Value::Entity(holder.to_bits()),
+                    Value::Sym(*restriction.id),
+                ],
+            );
+        }
+    }
     for change in PlayDatalog::holder_changes(answers, event, rules::Target::event::<E>()) {
         if let rules::Change::Restrict { restriction, .. } = change
-            && !PlayDatalog::waived(answers, event, restriction.id, restriction.unwaivable)
+            && !restriction.unwaivable
+            && PlayDatalog::untranslated_waiver(
+                answers,
+                event,
+                restriction.id,
+                card_ref,
+                holder_ref,
+                &candidate,
+            )
+        {
+            let _ = facts.add(
+                PlayDatalog::WAIVED,
+                vec![
+                    Value::Sym(event_name),
+                    Value::Entity(card.to_bits()),
+                    Value::Entity(holder.to_bits()),
+                    Value::Sym(*restriction.id),
+                ],
+            );
+        }
+    }
+    for change in PlayDatalog::holder_changes(answers, event, rules::Target::event::<E>()) {
+        if let rules::Change::Restrict { restriction, .. } = change
             && !PlayDatalog::translatable_restriction(
                 event,
                 &restriction,

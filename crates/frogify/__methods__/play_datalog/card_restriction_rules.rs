@@ -53,6 +53,17 @@ pub fn card_restriction_rules<E: Event>(
                     Term::Val(Value::Sym(*restriction.id)),
                 ],
             }));
+            PlayDatalog::waiver_rules(
+                answers,
+                event,
+                restriction.id,
+                candidate,
+                card,
+                holder,
+                event_name,
+                &mut *rules,
+                &mut *next_hold,
+            )?;
         }
         rules.push(Rule {
             head: Atom {

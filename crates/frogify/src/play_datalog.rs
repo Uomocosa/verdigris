@@ -68,6 +68,17 @@ impl PlayDatalog {
         holder_ref: &rules::ArgRef,
     ) {
     }
+    pub(crate) fn base_restriction_rules<E: verdigris_rule_engine::rules::traits::event::Event>(
+        answers: &rules::Rules,
+        event: &E,
+        candidate: &frogmyr::Atom,
+        card: &rules::ArgRef,
+        holder: &rules::ArgRef,
+        event_name: &'static str,
+        rules: &mut Vec<frogmyr::Rule>,
+        next_hold: &mut usize,
+    ) -> Result<(), TranslationError> {
+    }
     pub(crate) fn card_restriction_rules<E: verdigris_rule_engine::rules::traits::event::Event>(
         answers: &rules::Rules,
         event: &E,
@@ -90,14 +101,6 @@ impl PlayDatalog {
         candidate: &frogmyr::Atom,
     ) -> bool {
     }
-    #[must_use]
-    pub(crate) fn waived<E: verdigris_rule_engine::rules::traits::event::Event>(
-        answers: &rules::Rules,
-        event: &E,
-        id: rules::RestrictionId,
-        unwaivable: bool,
-    ) -> bool {
-    }
     pub(crate) fn translate_condition(
         condition: &rules::Condition,
         card: &rules::ArgRef,
@@ -109,6 +112,28 @@ impl PlayDatalog {
         condition: &rules::Condition,
         subject: &'static str,
     ) -> Result<Option<Vec<frogmyr::Literal>>, TranslationError> {
+    }
+    #[must_use]
+    pub(crate) fn untranslated_waiver<E: verdigris_rule_engine::rules::traits::event::Event>(
+        answers: &rules::Rules,
+        event: &E,
+        id: rules::RestrictionId,
+        card: &rules::ArgRef,
+        holder: &rules::ArgRef,
+        candidate: &frogmyr::Atom,
+    ) -> bool {
+    }
+    pub(crate) fn waiver_rules<E: verdigris_rule_engine::rules::traits::event::Event>(
+        answers: &rules::Rules,
+        event: &E,
+        id: rules::RestrictionId,
+        candidate: &frogmyr::Atom,
+        card: &rules::ArgRef,
+        holder: &rules::ArgRef,
+        event_name: &'static str,
+        rules: &mut Vec<frogmyr::Rule>,
+        next_hold: &mut usize,
+    ) -> Result<(), TranslationError> {
     }
     pub(crate) fn translate_holds(
         condition: &rules::Condition,
@@ -147,7 +172,6 @@ impl PlayDatalog {
     pub(crate) const CHARACTERISTIC: Rel = Rel("characteristic");
     pub(crate) const POINTS_TO: Rel = Rel("points_to");
     pub(crate) const LAND: &'static str = "Land";
-    pub(crate) const HAND_ZONE: &'static str = "Hand";
     pub(crate) const HOLDS_NAMES: [&str; 64] = [
         "holds_0", "holds_1", "holds_2", "holds_3", "holds_4", "holds_5", "holds_6", "holds_7",
         "holds_8", "holds_9", "holds_10", "holds_11", "holds_12", "holds_13", "holds_14",

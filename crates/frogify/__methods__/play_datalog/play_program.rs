@@ -6,7 +6,6 @@ use frogmyr::Term;
 use frogmyr::Value;
 use verdigris_rule_engine::events;
 use verdigris_rule_engine::rules;
-use verdigris_rule_engine::rules::traits::event::Event;
 
 use crate::PlayDatalog;
 use crate::TranslationError;
@@ -38,41 +37,16 @@ pub fn play_program(
     let card = rules::ArgRef::Arg(events::Play::CARD);
     let holder = rules::ArgRef::Arg(events::Play::PLAYER);
     let mut next_hold = 0;
-    for restriction in events::Play::restrictions() {
-        let root = PlayDatalog::translate_holds(
-            &restriction.condition,
-            &card,
-            &holder,
-            PlayDatalog::CARD_VAR,
-            &candidate,
-            &mut program_rules,
-            &mut next_hold,
-        )?;
-        let mut body = vec![Literal::Pos(candidate.clone()), Literal::Neg(root)];
-        if !restriction.unwaivable {
-            body.push(Literal::Neg(Atom {
-                rel: PlayDatalog::WAIVED,
-                terms: vec![
-                    Term::Val(Value::Sym(PlayDatalog::PLAY)),
-                    Term::Var(PlayDatalog::CARD_VAR),
-                    Term::Var(PlayDatalog::PLAYER_VAR),
-                    Term::Val(Value::Sym(*restriction.id)),
-                ],
-            }));
-        }
-        program_rules.push(Rule {
-            head: Atom {
-                rel: PlayDatalog::VIOLATES,
-                terms: vec![
-                    Term::Val(Value::Sym(PlayDatalog::PLAY)),
-                    Term::Var(PlayDatalog::CARD_VAR),
-                    Term::Var(PlayDatalog::PLAYER_VAR),
-                    Term::Val(Value::Sym(*restriction.id)),
-                ],
-            },
-            body,
-        });
-    }
+    PlayDatalog::base_restriction_rules(
+        answers,
+        event,
+        &candidate,
+        &card,
+        &holder,
+        PlayDatalog::PLAY,
+        &mut program_rules,
+        &mut next_hold,
+    )?;
     PlayDatalog::card_restriction_rules(
         answers,
         event,
@@ -98,6 +72,15 @@ pub fn play_program(
             Literal::Pos(Atom {
                 rel: PlayDatalog::ADDED,
                 terms: vec![
+                    Term::Var(PlayDatalog::CARD_VAR),
+                    Term::Var(PlayDatalog::PLAYER_VAR),
+                    Term::Var("I"),
+                ],
+            }),
+            Literal::Neg(Atom {
+                rel: PlayDatalog::WAIVED,
+                terms: vec![
+                    Term::Val(Value::Sym(PlayDatalog::PLAY)),
                     Term::Var(PlayDatalog::CARD_VAR),
                     Term::Var(PlayDatalog::PLAYER_VAR),
                     Term::Var("I"),

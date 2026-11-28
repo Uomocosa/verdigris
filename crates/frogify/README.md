@@ -53,8 +53,12 @@ What is still done in Rust instead of Datalog today:
   `answers` and the event, and `PlayDatalog::card_restriction_rules`
   (`crates/frogify/__methods__/play_datalog/card_restriction_rules.rs`) turns every
   `Restrict` from `holder_changes` into a `violates` rule from the bound condition, the same
-  shape as the base-restriction rules. Waivers for those card ids are still grounded in Rust:
-  `pair_facts_for` emits `waived` facts for them from `waived()`, exactly as for base ids.
+  shape as the base-restriction rules from `PlayDatalog::base_restriction_rules`
+  (`crates/frogify/__methods__/play_datalog/base_restriction_rules.rs`), which holds the
+  per-base-restriction loop (translate, `violates` rule with `not waived` when `!unwaivable`,
+  `waiver_rules` call) shared by all four programs. Waivers for card ids are derived in
+  Datalog too: `card_restriction_rules` calls `waiver_rules` for each translated card
+  restriction that is `!unwaivable`.
 - Still Rust: a card condition the translator rejects (`Untranslatable`, `TooManyConditions`)
   falls back to an `added` fact from `pair_facts_for` (`translatable_restriction` gates it, so a
   translatable condition never double-reports). No current test card hits the fallback: every
@@ -63,10 +67,20 @@ What is still done in Rust instead of Datalog today:
   Datalog program (hexproof, indestructible, Silent Arbiter on `DeclareAttackers`, Frozen Relic
   on `Untap`, Platinum Angel on win/lose). `Count`/`ArgAmount` are pre-folded by `bind(event)`
   in Rust before translation.
-- `Allow` whens / `AsThough` are grounded by `waived()` as `waived` facts
-  (`crates/frogify/__methods__/play_datalog/waived.rs:15-21`): the `answers.eval(..)` call at
-  line 18 evaluates each `Allow`'s `when` in Rust, and `AsThough` is always true, so the program
-  only ever reads pre-decided `waived` facts, never the waiver conditions.
+- `Allow` whens / `AsThough` are derived in Datalog per queried event:
+  `PlayDatalog::waiver_rules`
+  (`crates/frogify/__methods__/play_datalog/waiver_rules.rs`) turns every `AsThough` for a
+  `Restriction(id)` into `waived(ev, C, P, id) :- candidate`, and every `Allow` whose bound
+  `when` translates into `waived(ev, C, P, id) :- candidate, root`. Still Rust: an `Allow`
+  whose `when` the translator rejects (`Untranslatable`, `TooManyConditions`) falls back to a
+  `waived` fact from `pair_facts_for` when `PlayDatalog::untranslated_waiver` (same file) finds
+  the `when` holds; no current oracle card hits that fallback (checked once with a temporary
+  `eprintln`, removed: zero hits over all 48 oracles, e.g. Crucible's `InZone(Graveyard)`
+  translates since F5). The card-side `added` veto rule carries `not waived(ev, C, P, I)`, so
+  an untranslatable restriction never double-reports when a waiver holds; `added` facts carry
+  no unwaivable flag because none is needed — waiver rules and `waived` facts are never
+  produced for `unwaivable` ids, so the guard is vacuous for them. `PlayDatalog::waived()`
+  (`crates/frogify/__methods__/play_datalog/waived.rs`) is deleted: it has no caller left.
 - Legality is still reached through the rule engine's own `Rules::legality`, not through a
   `Legality` trait the rule engine defines: `PlayDatalog::legality`
   (`crates/frogify/__methods__/play_datalog/legality.rs:12-61`) takes `&rules::Rules` directly,
