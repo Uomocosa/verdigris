@@ -36,7 +36,7 @@ mod tests {
                 assert_eq!(
                     replacement(&answers, &events::DrawFromEmptyLibrary { player }),
                     Some(rules::Then::Events(vec![rules::EventTemplate::WinGame {
-                        who: events::DrawFromEmptyLibrary::PLAYER.into(),
+                        who: rules::YOU,
                     }]))
                 );
                 assert_eq!(replacement(&answers, &events::LoseGame { player }), None);

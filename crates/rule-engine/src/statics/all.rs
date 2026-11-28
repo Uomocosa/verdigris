@@ -19,16 +19,6 @@ impl All {
     pub fn get_pt(&self, power: i32, toughness: i32) -> abilities::Continuous {}
 
     #[must_use]
-    pub fn instead(
-        &self,
-        event: rules::EventId,
-        holder: impl Into<rules::ArgRef>,
-        when: rules::Condition,
-        then: impl Into<rules::Then>,
-    ) -> abilities::Continuous {
-    }
-
-    #[must_use]
     pub fn lose(&self, keyword: keywords::Keyword) -> abilities::Continuous {}
 
     #[must_use]

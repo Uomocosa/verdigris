@@ -1,4 +1,3 @@
-use crate::rules::traits::event::Event;
 use crate::testing::prelude::*;
 
 pub const LABORATORY_MANIAC: Card = Card {
@@ -8,14 +7,8 @@ pub const LABORATORY_MANIAC: Card = Card {
             cards::creature("Laboratory Maniac", cost![2, U], pt!(2, 2))
                 .subtype(cards::HUMAN)
                 .subtype(cards::WIZARD);
-            you().instead(
-                DrawFromEmptyLibrary::ID,
-                DrawFromEmptyLibrary::PLAYER,
-                always(),
-                vec![EventTemplate::WinGame {
-                    who: DrawFromEmptyLibrary::PLAYER.into(),
-                }],
-            ),
+            begin_the_game_with_it_on_the_battlefield(),
+            if_you().would::<DrawFromEmptyLibrary>().instead(YOU.win_the_game()),
         }
     },
 };

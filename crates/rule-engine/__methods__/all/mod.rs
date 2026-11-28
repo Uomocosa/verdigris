@@ -9,7 +9,6 @@ mod cast_spells_as_though_they_had_flash;
 mod dont_lose_unspent_mana;
 mod gain;
 mod get_pt;
-mod instead;
 mod lose;
 mod must_attack;
 mod must_block;
@@ -32,7 +31,6 @@ pub use cast_spells_as_though_they_had_flash::cast_spells_as_though_they_had_fla
 pub use dont_lose_unspent_mana::dont_lose_unspent_mana;
 pub use gain::gain;
 pub use get_pt::get_pt;
-pub use instead::instead;
 pub use lose::lose;
 pub use must_attack::must_attack;
 pub use must_block::must_block;
