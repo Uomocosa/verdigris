@@ -16,7 +16,11 @@ impl CastDatalog {
     #[must_use]
     pub fn snapshot(answers: &rules::Rules, viewer: players::PlayerId) -> Facts {}
     #[must_use]
-    pub fn cast_program() -> Result<Program, TranslationError> {}
+    pub fn cast_program(
+        answers: &rules::Rules,
+        event: &verdigris_rule_engine::events::Cast,
+    ) -> Result<Program, TranslationError> {
+    }
     pub fn legality(
         answers: &rules::Rules,
         spell: Entity,

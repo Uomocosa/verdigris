@@ -16,7 +16,11 @@ impl PlayDatalog {
     #[must_use]
     pub fn snapshot(answers: &rules::Rules, viewer: players::PlayerId) -> Facts {}
     #[must_use]
-    pub fn play_program() -> Result<Program, TranslationError> {}
+    pub fn play_program(
+        answers: &rules::Rules,
+        event: &verdigris_rule_engine::events::Play,
+    ) -> Result<Program, TranslationError> {
+    }
     pub fn legality(
         answers: &rules::Rules,
         card: Entity,
@@ -60,7 +64,31 @@ impl PlayDatalog {
         card: bevy::prelude::Entity,
         holder: bevy::prelude::Entity,
         event_name: &'static str,
+        card_ref: &rules::ArgRef,
+        holder_ref: &rules::ArgRef,
     ) {
+    }
+    pub(crate) fn card_restriction_rules<E: verdigris_rule_engine::rules::traits::event::Event>(
+        answers: &rules::Rules,
+        event: &E,
+        candidate: &frogmyr::Atom,
+        card: &rules::ArgRef,
+        holder: &rules::ArgRef,
+        event_name: &'static str,
+        rules: &mut Vec<frogmyr::Rule>,
+        next_hold: &mut usize,
+    ) -> Result<(), TranslationError> {
+    }
+    #[must_use]
+    pub(crate) fn translatable_restriction<
+        E: verdigris_rule_engine::rules::traits::event::Event,
+    >(
+        event: &E,
+        restriction: &rules::Restriction,
+        card: &rules::ArgRef,
+        holder: &rules::ArgRef,
+        candidate: &frogmyr::Atom,
+    ) -> bool {
     }
     #[must_use]
     pub(crate) fn waived<E: verdigris_rule_engine::rules::traits::event::Event>(

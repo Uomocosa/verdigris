@@ -22,6 +22,8 @@ pub fn snapshot(answers: &rules::Rules, viewer: players::PlayerId) -> Facts {
                 card,
                 **player,
                 CastDatalog::CAST,
+                &rules::ArgRef::Arg(events::Cast::SPELL),
+                &rules::ArgRef::Arg(events::Cast::CASTER),
             );
         }
     }

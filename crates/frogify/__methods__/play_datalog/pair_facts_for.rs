@@ -1,6 +1,8 @@
 use bevy::prelude::Entity;
 
+use frogmyr::Atom;
 use frogmyr::Facts;
+use frogmyr::Term;
 use frogmyr::Value;
 use verdigris_rule_engine::rules;
 use verdigris_rule_engine::rules::traits::event::Event;
@@ -14,6 +16,8 @@ pub fn pair_facts_for<E: Event>(
     card: Entity,
     holder: Entity,
     event_name: &'static str,
+    card_ref: &rules::ArgRef,
+    holder_ref: &rules::ArgRef,
 ) {
     for restriction in E::restrictions() {
         if !restriction.unwaivable
@@ -32,7 +36,36 @@ pub fn pair_facts_for<E: Event>(
     }
     for change in PlayDatalog::holder_changes(answers, event, rules::Target::event::<E>()) {
         if let rules::Change::Restrict { restriction, .. } = change
+            && PlayDatalog::waived(answers, event, restriction.id, restriction.unwaivable)
+        {
+            let _ = facts.add(
+                PlayDatalog::WAIVED,
+                vec![
+                    Value::Sym(event_name),
+                    Value::Entity(card.to_bits()),
+                    Value::Entity(holder.to_bits()),
+                    Value::Sym(*restriction.id),
+                ],
+            );
+        }
+    }
+    let candidate = Atom {
+        rel: PlayDatalog::PLAY_CANDIDATE,
+        terms: vec![
+            Term::Var(PlayDatalog::CARD_VAR),
+            Term::Var(PlayDatalog::PLAYER_VAR),
+        ],
+    };
+    for change in PlayDatalog::holder_changes(answers, event, rules::Target::event::<E>()) {
+        if let rules::Change::Restrict { restriction, .. } = change
             && !PlayDatalog::waived(answers, event, restriction.id, restriction.unwaivable)
+            && !PlayDatalog::translatable_restriction(
+                event,
+                &restriction,
+                card_ref,
+                holder_ref,
+                &candidate,
+            )
             && !answers.eval(&restriction.condition.bind(event), event, None)
         {
             let _ = facts.add(
@@ -101,6 +134,8 @@ mod tests {
                     forest,
                     *first,
                     PlayDatalog::PLAY,
+                    &rules::ArgRef::Arg(events::Play::CARD),
+                    &rules::ArgRef::Arg(events::Play::PLAYER),
                 );
                 let waived: Vec<&Vec<Value>> = facts.matching(
                     &PlayDatalog::WAIVED,

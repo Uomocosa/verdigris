@@ -12,7 +12,10 @@ use crate::AttackDatalog;
 use crate::PlayDatalog;
 use crate::TranslationError;
 
-pub fn attack_program() -> Result<Program, TranslationError> {
+pub fn attack_program(
+    answers: &rules::Rules,
+    event: events::Attack,
+) -> Result<Program, TranslationError> {
     let candidate = Atom {
         rel: AttackDatalog::ATTACK_CANDIDATE,
         terms: vec![
@@ -71,6 +74,16 @@ pub fn attack_program() -> Result<Program, TranslationError> {
             body,
         });
     }
+    PlayDatalog::card_restriction_rules(
+        answers,
+        &event,
+        &candidate,
+        &card,
+        &holder,
+        AttackDatalog::ATTACK,
+        &mut program_rules,
+        &mut next_hold,
+    )?;
     program_rules.push(Rule {
         head: Atom {
             rel: PlayDatalog::VIOLATES,
@@ -101,36 +114,60 @@ pub fn attack_program() -> Result<Program, TranslationError> {
 
 #[cfg(test)]
 mod tests {
+    use verdigris_rule_engine::BATTLEFIELD;
     use verdigris_rule_engine::events;
     use verdigris_rule_engine::rules::traits::event::Event;
+    use verdigris_rule_engine::testing::GRIZZLY_BEARS;
+    use verdigris_rule_engine::testing::MockGame;
+    use verdigris_rule_engine::testing::P1;
+    use verdigris_rule_engine::testing::P2;
 
     use super::attack_program;
     use crate::testing;
 
     #[test]
     fn test_usage() {
-        let program = attack_program().unwrap();
-        assert_eq!(
-            events::Attack::restrictions().len(),
-            4,
-            "Attack gained a restriction; the program must cover it"
-        );
-        assert_eq!(program.rules.len(), 12);
-        assert!(program.rules.iter().any(|rule| rule.head == testing::attack_candidate()));
-        assert_eq!(
-            program.rules.iter().filter(|rule| *rule.head.rel == "violates").count(),
-            5,
-            "one violates rule per restriction plus the card-side veto"
-        );
-        assert_eq!(
-            program.rules.iter().filter(|rule| rule.head.rel.starts_with("holds_")).count(),
-            6,
-            "one holds rule per single-atom restriction, two per negated one"
-        );
+        let (mut game, [p1, _p2]) = MockGame::new([P1.battlefield([GRIZZLY_BEARS]), P2]);
+        let [attacker] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
+        game.read_rules(|answers, _legal| {
+            let event = events::Attack {
+                attacker: *attacker,
+            };
+            let program = attack_program(answers, event).unwrap();
+            assert_eq!(
+                events::Attack::restrictions().len(),
+                4,
+                "Attack gained a restriction; the program must cover it"
+            );
+            assert_eq!(program.rules.len(), 12);
+            assert!(program.rules.iter().any(|rule| rule.head == testing::attack_candidate()));
+            assert_eq!(
+                program.rules.iter().filter(|rule| *rule.head.rel == "violates").count(),
+                5,
+                "one violates rule per restriction plus the card-side veto"
+            );
+            assert_eq!(
+                program.rules.iter().filter(|rule| rule.head.rel.starts_with("holds_")).count(),
+                6,
+                "one holds rule per single-atom restriction, two per negated one"
+            );
+        })
+        .unwrap();
     }
 
     #[test]
     fn building_the_program_twice_gives_equal_programs() {
-        assert_eq!(attack_program().unwrap(), attack_program().unwrap());
+        let (mut game, [p1, _p2]) = MockGame::new([P1.battlefield([GRIZZLY_BEARS]), P2]);
+        let [attacker] = game.player(p1).cards_in(BATTLEFIELD).exactly::<1>(GRIZZLY_BEARS).unwrap();
+        game.read_rules(|answers, _legal| {
+            let event = events::Attack {
+                attacker: *attacker,
+            };
+            assert_eq!(
+                attack_program(answers, event).unwrap(),
+                attack_program(answers, event).unwrap()
+            );
+        })
+        .unwrap();
     }
 }

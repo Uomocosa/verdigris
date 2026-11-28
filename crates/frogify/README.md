@@ -49,10 +49,20 @@ oracle.
 
 What is still done in Rust instead of Datalog today:
 
-- Card `Restrict` conditions are evaluated eagerly by `pair_facts_for` and grounded as `added`
-  facts (`crates/frogify/__methods__/play_datalog/pair_facts_for.rs:33-47`): the `!answers.eval(..)`
-  check at line 36 runs the restriction's condition in Rust, so only restrictions that already
-  hold reach the Datalog program. The program never sees the `Restrict` condition itself.
+- Card `Restrict` conditions are translated per queried event: each `*_program()` takes
+  `answers` and the event, and `PlayDatalog::card_restriction_rules`
+  (`crates/frogify/__methods__/play_datalog/card_restriction_rules.rs`) turns every
+  `Restrict` from `holder_changes` into a `violates` rule from the bound condition, the same
+  shape as the base-restriction rules. Waivers for those card ids are still grounded in Rust:
+  `pair_facts_for` emits `waived` facts for them from `waived()`, exactly as for base ids.
+- Still Rust: a card condition the translator rejects (`Untranslatable`, `TooManyConditions`)
+  falls back to an `added` fact from `pair_facts_for` (`translatable_restriction` gates it, so a
+  translatable condition never double-reports). No current test card hits the fallback: every
+  `Restrict` on the four Datalog events translates (flying `702.9b/blockers`, defender
+  `702.3b/defender`, Timid Field, Sky Court); the other card `Restrict`s target events with no
+  Datalog program (hexproof, indestructible, Silent Arbiter on `DeclareAttackers`, Frozen Relic
+  on `Untap`, Platinum Angel on win/lose). `Count`/`ArgAmount` are pre-folded by `bind(event)`
+  in Rust before translation.
 - `Allow` whens / `AsThough` are grounded by `waived()` as `waived` facts
   (`crates/frogify/__methods__/play_datalog/waived.rs:15-21`): the `answers.eval(..)` call at
   line 18 evaluates each `Allow`'s `when` in Rust, and `AsThough` is always true, so the program

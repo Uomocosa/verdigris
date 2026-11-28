@@ -20,10 +20,10 @@ pub fn legality(
     if !visible.contains(&blocker) || !visible.contains(&attacker) {
         return Ok(None);
     }
-    let program = BlockDatalog::block_program()?;
+    let event = events::DeclareBlocker { blocker, attacker };
+    let program = BlockDatalog::block_program(answers, &event)?;
     let facts = BlockDatalog::snapshot(answers, viewer);
     let derived = program.evaluate(&facts)?;
-    let event = events::DeclareBlocker { blocker, attacker };
     let violated = |id: rules::RestrictionId| {
         derived.contains(
             &PlayDatalog::VIOLATES,

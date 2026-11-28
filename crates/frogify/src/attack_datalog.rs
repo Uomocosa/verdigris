@@ -16,7 +16,11 @@ impl AttackDatalog {
     #[must_use]
     pub fn snapshot(answers: &rules::Rules, viewer: players::PlayerId) -> Facts {}
     #[must_use]
-    pub fn attack_program() -> Result<Program, TranslationError> {}
+    pub fn attack_program(
+        answers: &rules::Rules,
+        event: verdigris_rule_engine::events::Attack,
+    ) -> Result<Program, TranslationError> {
+    }
     pub fn legality(
         answers: &rules::Rules,
         attacker: Entity,

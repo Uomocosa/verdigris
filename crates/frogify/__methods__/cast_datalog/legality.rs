@@ -20,10 +20,10 @@ pub fn legality(
     {
         return Ok(None);
     }
-    let program = CastDatalog::cast_program()?;
+    let event = events::Cast { spell, caster };
+    let program = CastDatalog::cast_program(answers, &event)?;
     let facts = CastDatalog::snapshot(answers, caster);
     let derived = program.evaluate(&facts)?;
-    let event = events::Cast { spell, caster };
     let violated = |id: rules::RestrictionId| {
         derived.contains(
             &PlayDatalog::VIOLATES,

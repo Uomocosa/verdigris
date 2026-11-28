@@ -19,10 +19,10 @@ pub fn legality(
     {
         return Ok(None);
     }
-    let program = PlayDatalog::play_program()?;
+    let event = events::Play { card, player };
+    let program = PlayDatalog::play_program(answers, &event)?;
     let facts = PlayDatalog::snapshot(answers, player);
     let derived = program.evaluate(&facts)?;
-    let event = events::Play { card, player };
     let violated = |id: rules::RestrictionId| {
         derived.contains(
             &PlayDatalog::VIOLATES,

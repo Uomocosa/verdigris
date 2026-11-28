@@ -59,6 +59,8 @@ pub fn snapshot(answers: &rules::Rules, viewer: players::PlayerId) -> Facts {
                 card,
                 **player,
                 AttackDatalog::ATTACK,
+                &rules::ArgRef::Arg(events::Attack::ATTACKER),
+                &rules::ArgRef::Arg(events::Attack::ATTACKER),
             );
         }
     }

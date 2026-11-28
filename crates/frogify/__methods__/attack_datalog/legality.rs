@@ -20,10 +20,10 @@ pub fn legality(
     {
         return Ok(None);
     }
-    let program = AttackDatalog::attack_program()?;
+    let event = events::Attack { attacker };
+    let program = AttackDatalog::attack_program(answers, event)?;
     let facts = AttackDatalog::snapshot(answers, viewer);
     let derived = program.evaluate(&facts)?;
-    let event = events::Attack { attacker };
     let violated = |id: rules::RestrictionId| {
         derived.contains(
             &PlayDatalog::VIOLATES,

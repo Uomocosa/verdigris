@@ -56,6 +56,8 @@ pub fn snapshot(answers: &rules::Rules, viewer: players::PlayerId) -> Facts {
                 *blocker,
                 *attacker,
                 BlockDatalog::BLOCK,
+                &rules::ArgRef::Arg(events::DeclareBlocker::BLOCKER),
+                &rules::ArgRef::Arg(events::DeclareBlocker::ATTACKER),
             );
         }
     }
