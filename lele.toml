@@ -17,6 +17,14 @@ require    = "honest"
 path   = "crates/rule-engine/__rules__"
 reason = "Holds only Comprehensive Rules Bevy systems, one file per rule; shared items live at the crate root."
 
+[[lele.project.prelude]]
+path   = "crates/rule-engine/src/prelude"
+reason = "Card DSL names in one place, for card fixtures."
+
+[[lele.project.prelude]]
+path   = "crates/rule-engine/src/testing/prelude"
+reason = "Testing prelude extends the crate prelude."
+
 [[lele.project.entry_points]]
 file = "crates/event-derive/src/lib.rs"
 fn = "derive_event_args"

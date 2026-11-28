@@ -1,5 +1,6 @@
 use crate::cards;
 use crate::effects;
+use crate::rules;
 
 /// A creature is a permanent of the creature card type on the battlefield.
 ///
@@ -58,4 +59,29 @@ pub fn noncreature_spell() -> effects::Filter {
 #[must_use]
 pub fn instant_spell() -> effects::Filter {
     effects::Filter::spell() & effects::Filter::card_type(cards::CardType::Instant)
+}
+
+#[must_use]
+pub fn controlled_by(players: impl Into<rules::Players>) -> effects::Filter {
+    effects::Filter::controlled_by(players)
+}
+
+#[must_use]
+pub fn token() -> effects::Filter {
+    effects::Filter::token()
+}
+
+#[must_use]
+pub fn attacking() -> effects::Filter {
+    effects::Filter::attacking()
+}
+
+#[must_use]
+pub fn player() -> effects::Filter {
+    effects::Filter::player()
+}
+
+#[must_use]
+pub fn not(filter: effects::Filter) -> effects::Filter {
+    !filter
 }

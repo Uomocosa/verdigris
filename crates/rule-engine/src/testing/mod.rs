@@ -6,6 +6,7 @@ mod basic;
 mod fakes;
 #[path = "__fixtures__/mod.rs"]
 mod fixtures;
+pub mod prelude;
 
 pub use app::{
     AutoPassUntil, Card, CardCheck, CardQuery, Cards, CardsError, CardsInZone, MockGame,

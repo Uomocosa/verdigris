@@ -16,6 +16,7 @@ mod game;
 mod game_mut;
 pub mod keywords;
 pub mod players;
+pub mod prelude;
 pub mod rules;
 mod rules_plugin;
 pub mod stack;
@@ -44,8 +45,8 @@ pub use constants::{
     THIS, UNTAP, UPKEEP, YOU,
 };
 pub use effects::{
-    another_creature, any_target, creature, creature_spell, enchantment, instant_spell,
-    nonblack_creature, noncreature_spell, spell,
+    another_creature, any_target, attacking, controlled_by, creature, creature_spell, enchantment,
+    instant_spell, nonblack_creature, noncreature_spell, not, player, spell, token,
 };
 
 #[path = "../__methods__/mod.rs"]
