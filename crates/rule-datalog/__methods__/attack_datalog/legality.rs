@@ -10,8 +10,7 @@ use crate::AttackDatalog;
 use crate::PlayDatalog;
 use crate::TranslationError;
 
-pub fn legality<G: frogmyr::traits::engine::Engine>(
-    engine: &G,
+pub fn legality(
     answers: &rules::Rules,
     attacker: Entity,
     viewer: players::PlayerId,
@@ -23,7 +22,7 @@ pub fn legality<G: frogmyr::traits::engine::Engine>(
     }
     let program = AttackDatalog::attack_program()?;
     let facts = AttackDatalog::snapshot(answers, viewer);
-    let derived = engine.evaluate(&program, &facts)?;
+    let derived = program.evaluate(&facts)?;
     let event = events::Attack { attacker };
     let violated = |id: rules::RestrictionId| {
         derived.contains(
@@ -67,7 +66,6 @@ mod tests {
     use std::time::Duration;
     use std::time::Instant;
 
-    use frogmyr::DatafrogEngine;
     use verdigris_rule_engine::BATTLEFIELD;
     use verdigris_rule_engine::HAND;
     use verdigris_rule_engine::events;
@@ -109,18 +107,18 @@ mod tests {
         let other = players::PlayerId(*p2);
         game.read_rules(|answers, _legal| {
             assert_eq!(
-                legality(&DatafrogEngine, answers, *bears, viewer).unwrap(),
+                legality(answers, *bears, viewer).unwrap(),
                 Some(answers.legality(&events::Attack { attacker: *bears }))
             );
             assert_eq!(
-                legality(&DatafrogEngine, answers, *bears, other).unwrap(),
+                legality(answers, *bears, other).unwrap(),
                 Some(answers.legality(&events::Attack { attacker: *bears }))
             );
             assert_eq!(
-                legality(&DatafrogEngine, answers, *forest, viewer).unwrap(),
+                legality(answers, *forest, viewer).unwrap(),
                 Some(answers.legality(&events::Attack { attacker: *forest }))
             );
-            assert_eq!(legality(&DatafrogEngine, answers, *forest, other), Ok(None));
+            assert_eq!(legality(answers, *forest, other), Ok(None));
         })
         .unwrap();
     }
@@ -144,8 +142,7 @@ mod tests {
                 for card in PlayDatalog::visible_entities(answers, viewer) {
                     let expected = answers.legality(&events::Attack { attacker: card });
                     let started = Instant::now();
-                    let datafrogged =
-                        AttackDatalog::legality(&DatafrogEngine, answers, card, viewer).unwrap();
+                    let datafrogged = AttackDatalog::legality(answers, card, viewer).unwrap();
                     datafrog_time += started.elapsed();
                     assert_eq!(datafrogged, Some(expected));
                     candidates += 1;
@@ -175,8 +172,7 @@ mod tests {
                 for card in PlayDatalog::visible_entities(answers, viewer) {
                     let expected = answers.legality(&events::Attack { attacker: card });
                     let started = Instant::now();
-                    let datafrogged =
-                        AttackDatalog::legality(&DatafrogEngine, answers, card, viewer).unwrap();
+                    let datafrogged = AttackDatalog::legality(answers, card, viewer).unwrap();
                     datafrog_time += started.elapsed();
                     assert_eq!(datafrogged, Some(expected));
                     candidates += 1;
@@ -209,8 +205,7 @@ mod tests {
                 for card in PlayDatalog::visible_entities(answers, viewer) {
                     let expected = answers.legality(&events::Attack { attacker: card });
                     let started = Instant::now();
-                    let datafrogged =
-                        AttackDatalog::legality(&DatafrogEngine, answers, card, viewer).unwrap();
+                    let datafrogged = AttackDatalog::legality(answers, card, viewer).unwrap();
                     datafrog_time += started.elapsed();
                     assert_eq!(datafrogged, Some(expected));
                     candidates += 1;
@@ -241,8 +236,7 @@ mod tests {
                 for card in PlayDatalog::visible_entities(answers, viewer) {
                     let expected = answers.legality(&events::Attack { attacker: card });
                     let started = Instant::now();
-                    let datafrogged =
-                        AttackDatalog::legality(&DatafrogEngine, answers, card, viewer).unwrap();
+                    let datafrogged = AttackDatalog::legality(answers, card, viewer).unwrap();
                     datafrog_time += started.elapsed();
                     assert_eq!(datafrogged, Some(expected));
                     candidates += 1;
@@ -272,8 +266,7 @@ mod tests {
                 for card in PlayDatalog::visible_entities(answers, viewer) {
                     let expected = answers.legality(&events::Attack { attacker: card });
                     let started = Instant::now();
-                    let datafrogged =
-                        AttackDatalog::legality(&DatafrogEngine, answers, card, viewer).unwrap();
+                    let datafrogged = AttackDatalog::legality(answers, card, viewer).unwrap();
                     datafrog_time += started.elapsed();
                     assert_eq!(datafrogged, Some(expected));
                     candidates += 1;
@@ -308,8 +301,7 @@ mod tests {
                 for card in PlayDatalog::visible_entities(answers, viewer) {
                     let expected = answers.legality(&events::Attack { attacker: card });
                     let started = Instant::now();
-                    let datafrogged =
-                        AttackDatalog::legality(&DatafrogEngine, answers, card, viewer).unwrap();
+                    let datafrogged = AttackDatalog::legality(answers, card, viewer).unwrap();
                     datafrog_time += started.elapsed();
                     assert_eq!(datafrogged, Some(expected));
                     candidates += 1;
@@ -338,8 +330,7 @@ mod tests {
                 for card in PlayDatalog::visible_entities(answers, viewer) {
                     let expected = answers.legality(&events::Attack { attacker: card });
                     let started = Instant::now();
-                    let datafrogged =
-                        AttackDatalog::legality(&DatafrogEngine, answers, card, viewer).unwrap();
+                    let datafrogged = AttackDatalog::legality(answers, card, viewer).unwrap();
                     datafrog_time += started.elapsed();
                     assert_eq!(datafrogged, Some(expected));
                     candidates += 1;
@@ -374,8 +365,7 @@ mod tests {
                 for card in PlayDatalog::visible_entities(answers, viewer) {
                     let expected = answers.legality(&events::Attack { attacker: card });
                     let started = Instant::now();
-                    let datafrogged =
-                        AttackDatalog::legality(&DatafrogEngine, answers, card, viewer).unwrap();
+                    let datafrogged = AttackDatalog::legality(answers, card, viewer).unwrap();
                     datafrog_time += started.elapsed();
                     assert_eq!(datafrogged, Some(expected));
                     candidates += 1;
@@ -408,8 +398,7 @@ mod tests {
                 for card in PlayDatalog::visible_entities(answers, viewer) {
                     let expected = answers.legality(&events::Attack { attacker: card });
                     let started = Instant::now();
-                    let datafrogged =
-                        AttackDatalog::legality(&DatafrogEngine, answers, card, viewer).unwrap();
+                    let datafrogged = AttackDatalog::legality(answers, card, viewer).unwrap();
                     datafrog_time += started.elapsed();
                     assert_eq!(datafrogged, Some(expected));
                     candidates += 1;
@@ -444,8 +433,7 @@ mod tests {
                 for card in PlayDatalog::visible_entities(answers, viewer) {
                     let expected = answers.legality(&events::Attack { attacker: card });
                     let started = Instant::now();
-                    let datafrogged =
-                        AttackDatalog::legality(&DatafrogEngine, answers, card, viewer).unwrap();
+                    let datafrogged = AttackDatalog::legality(answers, card, viewer).unwrap();
                     datafrog_time += started.elapsed();
                     assert_eq!(datafrogged, Some(expected));
                     candidates += 1;
@@ -476,8 +464,7 @@ mod tests {
                 for card in PlayDatalog::visible_entities(answers, viewer) {
                     let expected = answers.legality(&events::Attack { attacker: card });
                     let started = Instant::now();
-                    let datafrogged =
-                        AttackDatalog::legality(&DatafrogEngine, answers, card, viewer).unwrap();
+                    let datafrogged = AttackDatalog::legality(answers, card, viewer).unwrap();
                     datafrog_time += started.elapsed();
                     assert_eq!(datafrogged, Some(expected));
                     candidates += 1;
@@ -510,8 +497,7 @@ mod tests {
                 for card in PlayDatalog::visible_entities(answers, viewer) {
                     let expected = answers.legality(&events::Attack { attacker: card });
                     let started = Instant::now();
-                    let datafrogged =
-                        AttackDatalog::legality(&DatafrogEngine, answers, card, viewer).unwrap();
+                    let datafrogged = AttackDatalog::legality(answers, card, viewer).unwrap();
                     datafrog_time += started.elapsed();
                     assert_eq!(datafrogged, Some(expected));
                     candidates += 1;
@@ -542,8 +528,7 @@ mod tests {
                 for card in PlayDatalog::visible_entities(answers, viewer) {
                     let expected = answers.legality(&events::Attack { attacker: card });
                     let started = Instant::now();
-                    let datafrogged =
-                        AttackDatalog::legality(&DatafrogEngine, answers, card, viewer).unwrap();
+                    let datafrogged = AttackDatalog::legality(answers, card, viewer).unwrap();
                     datafrog_time += started.elapsed();
                     assert_eq!(datafrogged, Some(expected));
                     candidates += 1;
@@ -573,8 +558,7 @@ mod tests {
                 for card in PlayDatalog::visible_entities(answers, viewer) {
                     let expected = answers.legality(&events::Attack { attacker: card });
                     let started = Instant::now();
-                    let datafrogged =
-                        AttackDatalog::legality(&DatafrogEngine, answers, card, viewer).unwrap();
+                    let datafrogged = AttackDatalog::legality(answers, card, viewer).unwrap();
                     datafrog_time += started.elapsed();
                     assert_eq!(datafrogged, Some(expected));
                     candidates += 1;
@@ -607,8 +591,7 @@ mod tests {
                 for card in PlayDatalog::visible_entities(answers, viewer) {
                     let expected = answers.legality(&events::Attack { attacker: card });
                     let started = Instant::now();
-                    let datafrogged =
-                        AttackDatalog::legality(&DatafrogEngine, answers, card, viewer).unwrap();
+                    let datafrogged = AttackDatalog::legality(answers, card, viewer).unwrap();
                     datafrog_time += started.elapsed();
                     assert_eq!(datafrogged, Some(expected));
                     candidates += 1;
@@ -640,8 +623,7 @@ mod tests {
                 for card in PlayDatalog::visible_entities(answers, viewer) {
                     let expected = answers.legality(&events::Attack { attacker: card });
                     let started = Instant::now();
-                    let datafrogged =
-                        AttackDatalog::legality(&DatafrogEngine, answers, card, viewer).unwrap();
+                    let datafrogged = AttackDatalog::legality(answers, card, viewer).unwrap();
                     datafrog_time += started.elapsed();
                     assert_eq!(datafrogged, Some(expected));
                     candidates += 1;
@@ -663,8 +645,7 @@ mod tests {
                 for card in PlayDatalog::visible_entities(answers, viewer) {
                     let expected = answers.legality(&events::Attack { attacker: card });
                     let started = Instant::now();
-                    let datafrogged =
-                        AttackDatalog::legality(&DatafrogEngine, answers, card, viewer).unwrap();
+                    let datafrogged = AttackDatalog::legality(answers, card, viewer).unwrap();
                     datafrog_time += started.elapsed();
                     assert_eq!(datafrogged, Some(expected));
                     candidates += 1;

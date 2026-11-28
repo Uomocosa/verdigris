@@ -18,12 +18,10 @@ run on every state change, on every peer, and later in wasm.
 |---|---|
 | `Value` (`Entity`, `Sym`, `Int`) | A ground value. `Ord`, so all collections stay sorted. |
 | `Term` (`Var`, `Val`), `Atom`, `Literal` (`Pos`, `Neg`, `Cmp`), `Rule`, `Rel`, `CmpOp` | The rule language: Horn clauses with negation and comparisons. |
-| `Program` | A set of rules. `canonical()` sorts and dedups them; `stratify()` orders them into strata. |
+| `Program` | A set of rules. `canonical()` sorts and dedups them; `stratify()` orders them into strata; `evaluate(&facts)` runs them with the datafrog engine. |
 | `Facts` | Ground facts per relation (`BTreeMap<Rel, BTreeSet<Vec<Value>>>`): `add`, `contains`, `matching`, `iter`. |
-| `traits::Engine` | `fn evaluate(&self, &Program, &Facts) -> Result<Facts, EngineError>`. Every backend implements it. |
 | `EngineError` | `Unstratifiable`, `Unsafe`, `Backend(String)`. |
-| `Case` | The shared conformance suite: `Case::cases()` + `Case::check(&engine)`. |
-| `DatafrogEngine` | `traits::Engine` on top of [datafrog](https://docs.rs/datafrog/2.0.1/datafrog/): stratified semi-naive evaluation. |
+| `Case` | The shared conformance suite: `Case::cases()` + `Case::check()`. |
 | `CompiledRule`, `WiredRule` | One rule compiled into a join plan over generic `(key, Payload)` tuples. |
 | `Payload` | The non-key columns carried through a join. |
 
@@ -60,7 +58,7 @@ run on every state change, on every peer, and later in wasm.
 - **Safety** (GDL spec): every variable in a rule head, in a negated atom or in a comparison must also appear in a
   positive atom of the same body; otherwise `Unsafe`.
 - **Deterministic.** Only sorted collections reach any output: same input, same result, on every peer.
-- **Conformance is the contract.** A new backend is accepted when `Case::check(&MyEngine)` passes. The suite covers
+- **Conformance is the contract.** `Case::check()` passes. The suite covers
   transitive closure, negation, comparisons, constants, independent strata, empty negated relations, entities
   (lossless round-trip), evaluating twice, and the two rejection errors. Add a case here, not inside one backend.
 

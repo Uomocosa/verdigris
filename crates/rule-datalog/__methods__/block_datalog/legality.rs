@@ -10,8 +10,7 @@ use crate::BlockDatalog;
 use crate::PlayDatalog;
 use crate::TranslationError;
 
-pub fn legality<G: frogmyr::traits::engine::Engine>(
-    engine: &G,
+pub fn legality(
     answers: &rules::Rules,
     blocker: Entity,
     attacker: Entity,
@@ -23,7 +22,7 @@ pub fn legality<G: frogmyr::traits::engine::Engine>(
     }
     let program = BlockDatalog::block_program()?;
     let facts = BlockDatalog::snapshot(answers, viewer);
-    let derived = engine.evaluate(&program, &facts)?;
+    let derived = program.evaluate(&facts)?;
     let event = events::DeclareBlocker { blocker, attacker };
     let violated = |id: rules::RestrictionId| {
         derived.contains(
@@ -66,7 +65,6 @@ mod tests {
     use std::time::Duration;
     use std::time::Instant;
 
-    use frogmyr::DatafrogEngine;
     use verdigris_rule_engine::BATTLEFIELD;
     use verdigris_rule_engine::HAND;
     use verdigris_rule_engine::cards;
@@ -112,41 +110,35 @@ mod tests {
         let other = players::PlayerId(*p2);
         game.read_rules(|answers, _legal| {
             assert_eq!(
-                legality(&DatafrogEngine, answers, *bears_1, *bears_2, viewer).unwrap(),
+                legality(answers, *bears_1, *bears_2, viewer).unwrap(),
                 Some(answers.legality(&events::DeclareBlocker {
                     blocker: *bears_1,
                     attacker: *bears_2,
                 }))
             );
             assert_eq!(
-                legality(&DatafrogEngine, answers, *bears_2, *bears_1, viewer).unwrap(),
+                legality(answers, *bears_2, *bears_1, viewer).unwrap(),
                 Some(answers.legality(&events::DeclareBlocker {
                     blocker: *bears_2,
                     attacker: *bears_1,
                 }))
             );
             assert_eq!(
-                legality(&DatafrogEngine, answers, *bears_1, *bears_2, other).unwrap(),
+                legality(answers, *bears_1, *bears_2, other).unwrap(),
                 Some(answers.legality(&events::DeclareBlocker {
                     blocker: *bears_1,
                     attacker: *bears_2,
                 }))
             );
             assert_eq!(
-                legality(&DatafrogEngine, answers, *forest, *bears_2, viewer).unwrap(),
+                legality(answers, *forest, *bears_2, viewer).unwrap(),
                 Some(answers.legality(&events::DeclareBlocker {
                     blocker: *forest,
                     attacker: *bears_2,
                 }))
             );
-            assert_eq!(
-                legality(&DatafrogEngine, answers, *forest, *bears_2, other),
-                Ok(None)
-            );
-            assert_eq!(
-                legality(&DatafrogEngine, answers, *bears_2, *forest, other),
-                Ok(None)
-            );
+            assert_eq!(legality(answers, *forest, *bears_2, other), Ok(None));
+            assert_eq!(legality(answers, *bears_2, *forest, other), Ok(None));
         })
         .unwrap();
     }
@@ -200,14 +192,8 @@ mod tests {
                             attacker: *attacker,
                         });
                         let started = Instant::now();
-                        let datafrogged = BlockDatalog::legality(
-                            &DatafrogEngine,
-                            answers,
-                            *blocker,
-                            *attacker,
-                            viewer,
-                        )
-                        .unwrap();
+                        let datafrogged =
+                            BlockDatalog::legality(answers, *blocker, *attacker, viewer).unwrap();
                         datafrog_time += started.elapsed();
                         assert_eq!(datafrogged, Some(expected));
                         pairs += 1;
@@ -269,14 +255,8 @@ mod tests {
                             attacker: *attacker,
                         });
                         let started = Instant::now();
-                        let datafrogged = BlockDatalog::legality(
-                            &DatafrogEngine,
-                            answers,
-                            *blocker,
-                            *attacker,
-                            viewer,
-                        )
-                        .unwrap();
+                        let datafrogged =
+                            BlockDatalog::legality(answers, *blocker, *attacker, viewer).unwrap();
                         datafrog_time += started.elapsed();
                         assert_eq!(datafrogged, Some(expected));
                         pairs += 1;
@@ -338,14 +318,8 @@ mod tests {
                             attacker: *attacker,
                         });
                         let started = Instant::now();
-                        let datafrogged = BlockDatalog::legality(
-                            &DatafrogEngine,
-                            answers,
-                            *blocker,
-                            *attacker,
-                            viewer,
-                        )
-                        .unwrap();
+                        let datafrogged =
+                            BlockDatalog::legality(answers, *blocker, *attacker, viewer).unwrap();
                         datafrog_time += started.elapsed();
                         assert_eq!(datafrogged, Some(expected));
                         pairs += 1;
@@ -407,14 +381,8 @@ mod tests {
                             attacker: *attacker,
                         });
                         let started = Instant::now();
-                        let datafrogged = BlockDatalog::legality(
-                            &DatafrogEngine,
-                            answers,
-                            *blocker,
-                            *attacker,
-                            viewer,
-                        )
-                        .unwrap();
+                        let datafrogged =
+                            BlockDatalog::legality(answers, *blocker, *attacker, viewer).unwrap();
                         datafrog_time += started.elapsed();
                         assert_eq!(datafrogged, Some(expected));
                         pairs += 1;
@@ -477,14 +445,8 @@ mod tests {
                             attacker: *attacker,
                         });
                         let started = Instant::now();
-                        let datafrogged = BlockDatalog::legality(
-                            &DatafrogEngine,
-                            answers,
-                            *blocker,
-                            *attacker,
-                            viewer,
-                        )
-                        .unwrap();
+                        let datafrogged =
+                            BlockDatalog::legality(answers, *blocker, *attacker, viewer).unwrap();
                         datafrog_time += started.elapsed();
                         assert_eq!(datafrogged, Some(expected));
                         pairs += 1;
@@ -556,14 +518,8 @@ mod tests {
                             attacker: *attacker,
                         });
                         let started = Instant::now();
-                        let datafrogged = BlockDatalog::legality(
-                            &DatafrogEngine,
-                            answers,
-                            *blocker,
-                            *attacker,
-                            viewer,
-                        )
-                        .unwrap();
+                        let datafrogged =
+                            BlockDatalog::legality(answers, *blocker, *attacker, viewer).unwrap();
                         datafrog_time += started.elapsed();
                         assert_eq!(datafrogged, Some(expected));
                         pairs += 1;
@@ -625,14 +581,8 @@ mod tests {
                             attacker: *attacker,
                         });
                         let started = Instant::now();
-                        let datafrogged = BlockDatalog::legality(
-                            &DatafrogEngine,
-                            answers,
-                            *blocker,
-                            *attacker,
-                            viewer,
-                        )
-                        .unwrap();
+                        let datafrogged =
+                            BlockDatalog::legality(answers, *blocker, *attacker, viewer).unwrap();
                         datafrog_time += started.elapsed();
                         assert_eq!(datafrogged, Some(expected));
                         pairs += 1;
@@ -694,14 +644,8 @@ mod tests {
                             attacker: *attacker,
                         });
                         let started = Instant::now();
-                        let datafrogged = BlockDatalog::legality(
-                            &DatafrogEngine,
-                            answers,
-                            *blocker,
-                            *attacker,
-                            viewer,
-                        )
-                        .unwrap();
+                        let datafrogged =
+                            BlockDatalog::legality(answers, *blocker, *attacker, viewer).unwrap();
                         datafrog_time += started.elapsed();
                         assert_eq!(datafrogged, Some(expected));
                         pairs += 1;
@@ -763,14 +707,8 @@ mod tests {
                             attacker: *attacker,
                         });
                         let started = Instant::now();
-                        let datafrogged = BlockDatalog::legality(
-                            &DatafrogEngine,
-                            answers,
-                            *blocker,
-                            *attacker,
-                            viewer,
-                        )
-                        .unwrap();
+                        let datafrogged =
+                            BlockDatalog::legality(answers, *blocker, *attacker, viewer).unwrap();
                         datafrog_time += started.elapsed();
                         assert_eq!(datafrogged, Some(expected));
                         pairs += 1;
@@ -832,14 +770,8 @@ mod tests {
                             attacker: *attacker,
                         });
                         let started = Instant::now();
-                        let datafrogged = BlockDatalog::legality(
-                            &DatafrogEngine,
-                            answers,
-                            *blocker,
-                            *attacker,
-                            viewer,
-                        )
-                        .unwrap();
+                        let datafrogged =
+                            BlockDatalog::legality(answers, *blocker, *attacker, viewer).unwrap();
                         datafrog_time += started.elapsed();
                         assert_eq!(datafrogged, Some(expected));
                         pairs += 1;
@@ -901,14 +833,8 @@ mod tests {
                             attacker: *attacker,
                         });
                         let started = Instant::now();
-                        let datafrogged = BlockDatalog::legality(
-                            &DatafrogEngine,
-                            answers,
-                            *blocker,
-                            *attacker,
-                            viewer,
-                        )
-                        .unwrap();
+                        let datafrogged =
+                            BlockDatalog::legality(answers, *blocker, *attacker, viewer).unwrap();
                         datafrog_time += started.elapsed();
                         assert_eq!(datafrogged, Some(expected));
                         pairs += 1;
@@ -970,14 +896,8 @@ mod tests {
                             attacker: *attacker,
                         });
                         let started = Instant::now();
-                        let datafrogged = BlockDatalog::legality(
-                            &DatafrogEngine,
-                            answers,
-                            *blocker,
-                            *attacker,
-                            viewer,
-                        )
-                        .unwrap();
+                        let datafrogged =
+                            BlockDatalog::legality(answers, *blocker, *attacker, viewer).unwrap();
                         datafrog_time += started.elapsed();
                         assert_eq!(datafrogged, Some(expected));
                         pairs += 1;
@@ -1040,14 +960,8 @@ mod tests {
                             attacker: *attacker,
                         });
                         let started = Instant::now();
-                        let datafrogged = BlockDatalog::legality(
-                            &DatafrogEngine,
-                            answers,
-                            *blocker,
-                            *attacker,
-                            viewer,
-                        )
-                        .unwrap();
+                        let datafrogged =
+                            BlockDatalog::legality(answers, *blocker, *attacker, viewer).unwrap();
                         datafrog_time += started.elapsed();
                         assert_eq!(datafrogged, Some(expected));
                         pairs += 1;
@@ -1109,14 +1023,8 @@ mod tests {
                             attacker: *attacker,
                         });
                         let started = Instant::now();
-                        let datafrogged = BlockDatalog::legality(
-                            &DatafrogEngine,
-                            answers,
-                            *blocker,
-                            *attacker,
-                            viewer,
-                        )
-                        .unwrap();
+                        let datafrogged =
+                            BlockDatalog::legality(answers, *blocker, *attacker, viewer).unwrap();
                         datafrog_time += started.elapsed();
                         assert_eq!(datafrogged, Some(expected));
                         pairs += 1;

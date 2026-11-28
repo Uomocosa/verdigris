@@ -17,8 +17,7 @@ impl BlockDatalog {
     pub fn snapshot(answers: &rules::Rules, viewer: players::PlayerId) -> Facts {}
     #[must_use]
     pub fn block_program() -> Result<Program, TranslationError> {}
-    pub fn legality<G: frogmyr::traits::engine::Engine>(
-        engine: &G,
+    pub fn legality(
         answers: &rules::Rules,
         blocker: Entity,
         attacker: Entity,

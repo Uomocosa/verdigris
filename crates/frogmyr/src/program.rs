@@ -2,6 +2,7 @@ use atomic_delegate_macros::atomic_delegates;
 use derive_more::Deref;
 
 use crate::EngineError;
+use crate::Facts;
 use crate::Rule;
 
 #[derive(Debug, Clone, Default, PartialEq, Eq, Deref)]
@@ -11,6 +12,7 @@ pub struct Program {
 
 #[atomic_delegates]
 impl Program {
+    pub fn evaluate(&self, facts: &Facts) -> Result<Facts, EngineError> {}
     pub fn stratify(&self) -> Result<Vec<Vec<Rule>>, EngineError> {}
 }
 

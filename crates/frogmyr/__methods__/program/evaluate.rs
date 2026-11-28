@@ -1,19 +1,19 @@
 use std::collections::BTreeMap;
 use std::collections::BTreeSet;
 
-use crate::EngineError;
-use crate::Facts;
-use crate::Program;
-use crate::Rel;
-use crate::Value;
 use datafrog::Iteration;
 use datafrog::Relation;
 use datafrog::Variable;
 
 use crate::CompiledRule;
+use crate::EngineError;
+use crate::Facts;
+use crate::Program;
+use crate::Rel;
+use crate::Value;
 use crate::WiredRule;
 
-pub fn evaluate_program(program: &Program, facts: &Facts) -> Result<Facts, EngineError> {
+pub fn evaluate(program: &Program, facts: &Facts) -> Result<Facts, EngineError> {
     let strata = program.stratify()?;
     let mut state: BTreeMap<Rel, BTreeSet<Vec<Value>>> = BTreeMap::new();
     for (relation, tuple) in facts.iter() {
@@ -105,11 +105,20 @@ mod tests {
     use crate::Term;
     use crate::Value;
 
-    use super::evaluate_program;
-    use crate::datafrog_engine::DatafrogEngine;
+    use super::evaluate;
 
     #[test]
     fn test_usage() {
+        let derived = evaluate(&Program::default(), &Facts::default()).unwrap();
+        assert_eq!(derived, Facts::default());
+        assert_eq!(
+            Program::default().evaluate(&Facts::default()).unwrap(),
+            Facts::default()
+        );
+    }
+
+    #[test]
+    fn transitive_closure_derives_paths() {
         let edge = Rel("edge");
         let path = Rel("path");
         let program = Program {
@@ -145,16 +154,15 @@ mod tests {
         let mut facts = Facts::default();
         assert!(facts.add(edge, vec![Value::Int(1), Value::Int(2)]));
         assert!(facts.add(edge, vec![Value::Int(2), Value::Int(3)]));
-        let derived = evaluate_program(&program, &facts).unwrap();
+        let derived = evaluate(&program, &facts).unwrap();
         assert!(derived.contains(&path, &[Value::Int(1), Value::Int(3)]));
         assert!(!derived.contains(&path, &[Value::Int(3), Value::Int(1)]));
     }
 
     #[test]
     fn shared_conformance_cases_pass() {
-        let engine = DatafrogEngine;
         let started = std::time::Instant::now();
-        let outcome = Case::check(&engine);
+        let outcome = Case::check();
         let elapsed = started.elapsed();
         println!(
             "shared conformance: {outcome:?} in {}ms",
@@ -201,7 +209,7 @@ mod tests {
             ],
         };
         let probe_started = std::time::Instant::now();
-        let derived = evaluate_program(&program, &chain).unwrap();
+        let derived = evaluate(&program, &chain).unwrap();
         let probe_elapsed = probe_started.elapsed();
         println!(
             "chain of 300: {} path tuples in {}ms",
@@ -209,5 +217,101 @@ mod tests {
             probe_elapsed.as_millis()
         );
         assert!(derived.contains(&path, &[Value::Int(1), Value::Int(300)]));
+    }
+
+    #[test]
+    fn test_examples_attack() {
+        let (bears, goblin) = (Value::Sym("bears"), Value::Sym("goblin"));
+        let mut facts = Facts::default();
+        for name in [bears, goblin] {
+            assert!(facts.add(Rel("creature"), vec![name]));
+        }
+        assert!(facts.add(Rel("tapped"), vec![bears]));
+        assert!(facts.add(Rel("sick"), vec![goblin]));
+        assert!(facts.add(Rel("has_haste"), vec![goblin]));
+        println!("1. facts in:");
+        for (relation, tuple) in facts.iter() {
+            println!("   {}({tuple:?})", *relation);
+        }
+        let pos1 = |rel, var| {
+            Literal::Pos(Atom {
+                rel,
+                terms: vec![Term::Var(var)],
+            })
+        };
+        let tagged = |rel, var, tag| Atom {
+            rel,
+            terms: vec![Term::Var(var), Term::Val(Value::Sym(tag))],
+        };
+        let program = Program {
+            rules: vec![
+                Rule {
+                    head: tagged(Rel("waived"), "G", "sick"),
+                    body: vec![pos1(Rel("has_haste"), "G")],
+                },
+                Rule {
+                    head: tagged(Rel("violates"), "C", "untapped"),
+                    body: vec![pos1(Rel("creature"), "C"), pos1(Rel("tapped"), "C")],
+                },
+                Rule {
+                    head: tagged(Rel("violates"), "C", "sick"),
+                    body: vec![
+                        pos1(Rel("creature"), "C"),
+                        pos1(Rel("sick"), "C"),
+                        Literal::Neg(tagged(Rel("waived"), "C", "sick")),
+                    ],
+                },
+                Rule {
+                    head: Atom {
+                        rel: Rel("can_attack"),
+                        terms: vec![Term::Var("C")],
+                    },
+                    body: vec![
+                        pos1(Rel("creature"), "C"),
+                        Literal::Neg(tagged(Rel("violates"), "C", "untapped")),
+                        Literal::Neg(tagged(Rel("violates"), "C", "sick")),
+                    ],
+                },
+            ],
+        };
+        let mut known = facts.clone();
+        for (index, stratum) in program.stratify().unwrap().iter().enumerate() {
+            println!("2. stratum {index}:");
+            for rule in stratum {
+                let mut waits: Vec<&str> = Vec::new();
+                for literal in &rule.body {
+                    if let Literal::Neg(atom) = literal {
+                        waits.push(*atom.rel);
+                    }
+                }
+                println!("   {:?} waits on {waits:?}", *rule.head.rel);
+            }
+            let sub = Program {
+                rules: stratum.clone(),
+            };
+            let derived = evaluate(&sub, &known).unwrap();
+            println!("3. stratum {index} new facts:");
+            for (relation, tuple) in derived.iter() {
+                if !known.contains(&relation, tuple) {
+                    println!("   {}({tuple:?})", *relation);
+                }
+            }
+            known = derived;
+        }
+        println!("4. verdict per creature:");
+        for creature in [bears, goblin] {
+            if known.contains(&Rel("can_attack"), &[creature]) {
+                println!("   {creature:?} can attack");
+            } else {
+                println!("   {creature:?} cannot attack");
+            }
+        }
+        let reasons = known.matching(&Rel("violates"), &[Term::Var("C"), Term::Var("R")]);
+        println!("   why not: {reasons:?}");
+        assert!(known.contains(&Rel("waived"), &[goblin, Value::Sym("sick")]));
+        assert!(known.contains(&Rel("violates"), &[bears, Value::Sym("untapped")]));
+        assert!(!known.contains(&Rel("violates"), &[goblin, Value::Sym("sick")]));
+        assert!(known.contains(&Rel("can_attack"), &[goblin]));
+        assert!(!known.contains(&Rel("can_attack"), &[bears]));
     }
 }

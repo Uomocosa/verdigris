@@ -36,7 +36,7 @@ Restriction ids come from the rule engine's `events::play::*` constants, so they
 ## The oracle
 
 Tests replay the real r305 `MockGame` scenarios (read through the testing-only `MockGame::read_rules`) and compare
-`rule_datalog` against `rules::Rules::legality` for every visible card of the priority player, on `DatafrogEngine`.
+`rule_datalog` against `rules::Rules::legality` for every visible card of the priority player.
 Status after F1: 21 of 21 candidates agree, and a hidden hand card gives `None`.
 
 ## Next

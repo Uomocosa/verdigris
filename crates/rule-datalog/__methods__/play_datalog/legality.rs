@@ -9,8 +9,7 @@ use verdigris_rule_engine::rules::traits::event::Event;
 use crate::PlayDatalog;
 use crate::TranslationError;
 
-pub fn legality<G: frogmyr::traits::engine::Engine>(
-    engine: &G,
+pub fn legality(
     answers: &rules::Rules,
     card: Entity,
     player: players::PlayerId,
@@ -22,7 +21,7 @@ pub fn legality<G: frogmyr::traits::engine::Engine>(
     }
     let program = PlayDatalog::play_program()?;
     let facts = PlayDatalog::snapshot(answers, player);
-    let derived = engine.evaluate(&program, &facts)?;
+    let derived = program.evaluate(&facts)?;
     let event = events::Play { card, player };
     let violated = |id: rules::RestrictionId| {
         derived.contains(
@@ -68,7 +67,6 @@ mod tests {
 
     use bevy::ecs::system::RunSystemOnce;
     use bevy::prelude::App;
-    use frogmyr::DatafrogEngine;
     use verdigris_rule_engine::BATTLEFIELD;
     use verdigris_rule_engine::GRAVEYARD;
     use verdigris_rule_engine::HAND;
@@ -124,14 +122,14 @@ mod tests {
         app.world_mut()
             .run_system_once(move |answers: rules::Rules| {
                 assert_eq!(
-                    legality(&DatafrogEngine, &answers, forest, first).unwrap(),
+                    legality(&answers, forest, first).unwrap(),
                     Some(answers.legality(&events::Play {
                         card: forest,
                         player: first,
                     }))
                 );
                 assert_eq!(
-                    legality(&DatafrogEngine, &answers, bears, first).unwrap(),
+                    legality(&answers, bears, first).unwrap(),
                     Some(rules::Legality::Illegal(vec![rules::Why::Restriction(
                         events::play::LAND_CARD
                     )]))
@@ -146,7 +144,7 @@ mod tests {
         let [forest] = game.player(p1).cards_in(HAND).exactly::<1>(FOREST).unwrap();
         game.read_rules(|answers, _legal| {
             assert_eq!(
-                PlayDatalog::legality(&DatafrogEngine, answers, *forest, players::PlayerId(*p2)),
+                PlayDatalog::legality(answers, *forest, players::PlayerId(*p2)),
                 Ok(None)
             );
         })
@@ -164,8 +162,7 @@ mod tests {
                         player: holder,
                     });
                     let started = Instant::now();
-                    let datafrogged =
-                        PlayDatalog::legality(&DatafrogEngine, answers, card, holder).unwrap();
+                    let datafrogged = PlayDatalog::legality(answers, card, holder).unwrap();
                     datafrog_time += started.elapsed();
                     assert_eq!(datafrogged, Some(expected));
                     candidates += 1;
@@ -184,7 +181,7 @@ mod tests {
         let [_bears] = game.player(p1).cards_in(HAND).exactly::<1>(GRIZZLY_BEARS).unwrap();
         game.read_rules(|answers, _legal| {
             assert_eq!(
-                PlayDatalog::legality(&DatafrogEngine, answers, *forest_1, players::PlayerId(*p2)),
+                PlayDatalog::legality(answers, *forest_1, players::PlayerId(*p2)),
                 Ok(None)
             );
         })
@@ -202,17 +199,13 @@ mod tests {
                         player: holder,
                     });
                     let started = Instant::now();
-                    let datafrogged =
-                        PlayDatalog::legality(&DatafrogEngine, answers, card, holder).unwrap();
+                    let datafrogged = PlayDatalog::legality(answers, card, holder).unwrap();
                     datafrog_time += started.elapsed();
                     assert_eq!(datafrogged, Some(expected));
                     candidates += 1;
                 }
                 let hidden = (*forest_2, players::PlayerId(*p2));
-                assert_eq!(
-                    PlayDatalog::legality(&DatafrogEngine, answers, hidden.0, hidden.1),
-                    Ok(None)
-                );
+                assert_eq!(PlayDatalog::legality(answers, hidden.0, hidden.1), Ok(None));
                 (candidates, datafrog_time)
             })
             .unwrap();
@@ -229,7 +222,7 @@ mod tests {
             game.player(p1).cards_in(HAND).exactly::<4>(FOREST).unwrap();
         game.read_rules(|answers, _legal| {
             assert_eq!(
-                PlayDatalog::legality(&DatafrogEngine, answers, *forest_1, players::PlayerId(*p2)),
+                PlayDatalog::legality(answers, *forest_1, players::PlayerId(*p2)),
                 Ok(None)
             );
         })
@@ -249,19 +242,13 @@ mod tests {
                         player: holder,
                     });
                     let started = Instant::now();
-                    let datafrogged =
-                        PlayDatalog::legality(&DatafrogEngine, answers, card, holder).unwrap();
+                    let datafrogged = PlayDatalog::legality(answers, card, holder).unwrap();
                     datafrog_time += started.elapsed();
                     assert_eq!(datafrogged, Some(expected));
                     candidates += 1;
                 }
                 assert_eq!(
-                    PlayDatalog::legality(
-                        &DatafrogEngine,
-                        answers,
-                        *forest_4,
-                        players::PlayerId(*p2)
-                    ),
+                    PlayDatalog::legality(answers, *forest_4, players::PlayerId(*p2)),
                     Ok(None)
                 );
                 (candidates, datafrog_time)
@@ -279,7 +266,7 @@ mod tests {
         let [forest] = game.player(p1).cards_in(HAND).exactly::<1>(FOREST).unwrap();
         game.read_rules(|answers, _legal| {
             assert_eq!(
-                PlayDatalog::legality(&DatafrogEngine, answers, *forest, players::PlayerId(*p2)),
+                PlayDatalog::legality(answers, *forest, players::PlayerId(*p2)),
                 Ok(None)
             );
         })
@@ -296,8 +283,7 @@ mod tests {
                         player: holder,
                     });
                     let started = Instant::now();
-                    let datafrogged =
-                        PlayDatalog::legality(&DatafrogEngine, answers, card, holder).unwrap();
+                    let datafrogged = PlayDatalog::legality(answers, card, holder).unwrap();
                     datafrog_time += started.elapsed();
                     assert_eq!(datafrogged, Some(expected));
                     candidates += 1;
@@ -319,7 +305,7 @@ mod tests {
         let [forest] = game.player(p1).cards_in(HAND).exactly::<1>(FOREST).unwrap();
         game.read_rules(|answers, _legal| {
             assert_eq!(
-                PlayDatalog::legality(&DatafrogEngine, answers, *mind_rot, players::PlayerId(*p2)),
+                PlayDatalog::legality(answers, *mind_rot, players::PlayerId(*p2)),
                 Ok(None)
             );
         })
@@ -344,8 +330,7 @@ mod tests {
                         player: holder,
                     });
                     let started = Instant::now();
-                    let datafrogged =
-                        PlayDatalog::legality(&DatafrogEngine, answers, card, holder).unwrap();
+                    let datafrogged = PlayDatalog::legality(answers, card, holder).unwrap();
                     datafrog_time += started.elapsed();
                     assert_eq!(datafrogged, Some(expected));
                     candidates += 1;
@@ -367,7 +352,7 @@ mod tests {
         let [forest] = game.player(p1).cards_in(HAND).exactly::<1>(FOREST).unwrap();
         game.read_rules(|answers, _legal| {
             assert_eq!(
-                PlayDatalog::legality(&DatafrogEngine, answers, *forest, players::PlayerId(*p2)),
+                PlayDatalog::legality(answers, *forest, players::PlayerId(*p2)),
                 Ok(None)
             );
         })
@@ -392,8 +377,7 @@ mod tests {
                         player: holder,
                     });
                     let started = Instant::now();
-                    let datafrogged =
-                        PlayDatalog::legality(&DatafrogEngine, answers, card, holder).unwrap();
+                    let datafrogged = PlayDatalog::legality(answers, card, holder).unwrap();
                     datafrog_time += started.elapsed();
                     assert_eq!(datafrogged, Some(expected));
                     candidates += 1;
@@ -417,7 +401,7 @@ mod tests {
         let [forest] = game.player(p2).cards_in(HAND).exactly::<1>(FOREST).unwrap();
         game.read_rules(|answers, _legal| {
             assert_eq!(
-                PlayDatalog::legality(&DatafrogEngine, answers, *forest, players::PlayerId(*p1)),
+                PlayDatalog::legality(answers, *forest, players::PlayerId(*p1)),
                 Ok(None)
             );
         })
@@ -439,8 +423,7 @@ mod tests {
                         player: holder,
                     });
                     let started = Instant::now();
-                    let datafrogged =
-                        PlayDatalog::legality(&DatafrogEngine, answers, card, holder).unwrap();
+                    let datafrogged = PlayDatalog::legality(answers, card, holder).unwrap();
                     datafrog_time += started.elapsed();
                     assert_eq!(datafrogged, Some(expected));
                     candidates += 1;
@@ -464,7 +447,7 @@ mod tests {
         let [forest] = game.player(p1).cards_in(HAND).exactly::<1>(FOREST).unwrap();
         game.read_rules(|answers, _legal| {
             assert_eq!(
-                PlayDatalog::legality(&DatafrogEngine, answers, *mind_rot, players::PlayerId(*p2)),
+                PlayDatalog::legality(answers, *mind_rot, players::PlayerId(*p2)),
                 Ok(None)
             );
         })
@@ -490,8 +473,7 @@ mod tests {
                         player: holder,
                     });
                     let started = Instant::now();
-                    let datafrogged =
-                        PlayDatalog::legality(&DatafrogEngine, answers, card, holder).unwrap();
+                    let datafrogged = PlayDatalog::legality(answers, card, holder).unwrap();
                     datafrog_time += started.elapsed();
                     assert_eq!(datafrogged, Some(expected));
                     candidates += 1;

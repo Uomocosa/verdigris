@@ -2,7 +2,6 @@ use atomic_delegate_macros::atomic_delegates;
 
 use crate::Facts;
 use crate::Program;
-use crate::traits::engine::Engine;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Case {
@@ -17,7 +16,7 @@ impl Case {
     #[must_use]
     pub fn cases() -> Vec<Case> {}
     #[must_use]
-    pub fn check<G: Engine>(engine: &G) -> Result<(), String> {}
+    pub fn check() -> Result<(), String> {}
     #[must_use]
     pub fn transitive_closure() -> Case {}
     #[must_use]

@@ -17,8 +17,7 @@ impl PlayDatalog {
     pub fn snapshot(answers: &rules::Rules, viewer: players::PlayerId) -> Facts {}
     #[must_use]
     pub fn play_program() -> Result<Program, TranslationError> {}
-    pub fn legality<G: frogmyr::traits::engine::Engine>(
-        engine: &G,
+    pub fn legality(
         answers: &rules::Rules,
         card: Entity,
         player: players::PlayerId,

@@ -1,10 +1,9 @@
 use crate::Case;
-use crate::traits::engine::Engine;
 
-pub fn check<G: Engine>(engine: &G) -> Result<(), String> {
+pub fn check() -> Result<(), String> {
     for case in Case::cases() {
         if let Err(expected) = case.program.stratify() {
-            match engine.evaluate(&case.program, &case.facts) {
+            match case.program.evaluate(&case.facts) {
                 Err(actual) if actual == expected => {}
                 Err(actual) => {
                     return Err(format!(
@@ -20,11 +19,13 @@ pub fn check<G: Engine>(engine: &G) -> Result<(), String> {
                 }
             }
         } else {
-            let first = engine
-                .evaluate(&case.program, &case.facts)
+            let first = case
+                .program
+                .evaluate(&case.facts)
                 .map_err(|error| format!("{}: first evaluation failed: {error:?}", case.name))?;
-            let second = engine
-                .evaluate(&case.program, &case.facts)
+            let second = case
+                .program
+                .evaluate(&case.facts)
                 .map_err(|error| format!("{}: second evaluation failed: {error:?}", case.name))?;
             if first != second {
                 return Err(format!("{}: evaluations differ", case.name));
