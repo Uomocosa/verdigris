@@ -1,0 +1,47 @@
+use atomic_delegate_macros::atomic_delegates;
+use bevy::prelude::Entity;
+use verdigris_datalog_ir::Facts;
+use verdigris_datalog_ir::Program;
+use verdigris_datalog_ir::Rel;
+use verdigris_rule_engine::players;
+use verdigris_rule_engine::rules;
+
+use crate::TranslationError;
+
+#[derive(Debug, Clone, Copy)]
+pub struct BlockDatalog;
+
+#[atomic_delegates]
+impl BlockDatalog {
+    #[must_use]
+    pub fn snapshot(answers: &rules::Rules, viewer: players::PlayerId) -> Facts {}
+    #[must_use]
+    pub fn block_program() -> Result<Program, TranslationError> {}
+    pub fn legality<G: verdigris_datalog_ir::traits::engine::Engine>(
+        engine: &G,
+        answers: &rules::Rules,
+        blocker: Entity,
+        attacker: Entity,
+        viewer: players::PlayerId,
+    ) -> Result<Option<rules::Legality>, TranslationError> {
+    }
+}
+
+impl BlockDatalog {
+    pub(crate) const BLOCK: &'static str = "block";
+    pub(crate) const BLOCK_CANDIDATE: Rel = Rel("block_candidate");
+}
+
+#[cfg(test)]
+mod tests {
+    use verdigris_datalog_ir::Rel;
+
+    use super::BlockDatalog;
+
+    #[test]
+    fn test_usage() {
+        assert_eq!(*BlockDatalog::BLOCK_CANDIDATE, "block_candidate");
+        assert_eq!(BlockDatalog::BLOCK, "block");
+        assert_eq!(Rel(BlockDatalog::BLOCK), Rel("block"));
+    }
+}

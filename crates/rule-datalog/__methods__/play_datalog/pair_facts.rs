@@ -14,7 +14,7 @@ pub fn pair_facts(
     player: players::PlayerId,
 ) {
     let event = events::Play { card, player };
-    PlayDatalog::pair_facts_for(answers, facts, &event, card, player, PlayDatalog::PLAY);
+    PlayDatalog::pair_facts_for(answers, facts, &event, card, *player, PlayDatalog::PLAY);
     if answers.eval(
         &rules::land_play_available(rules::ArgRef::Arg(events::Play::PLAYER)),
         &event,

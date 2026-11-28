@@ -2,7 +2,6 @@ use bevy::prelude::Entity;
 
 use verdigris_datalog_ir::Facts;
 use verdigris_datalog_ir::Value;
-use verdigris_rule_engine::players;
 use verdigris_rule_engine::rules;
 use verdigris_rule_engine::rules::traits::event::Event;
 
@@ -13,7 +12,7 @@ pub fn pair_facts_for<E: Event>(
     facts: &mut Facts,
     event: &E,
     card: Entity,
-    holder: players::PlayerId,
+    holder: Entity,
     event_name: &'static str,
 ) {
     for restriction in E::restrictions() {
@@ -100,7 +99,7 @@ mod tests {
                     &mut facts,
                     &event,
                     forest,
-                    first,
+                    *first,
                     PlayDatalog::PLAY,
                 );
                 let waived: Vec<&Vec<Value>> = facts.matching(

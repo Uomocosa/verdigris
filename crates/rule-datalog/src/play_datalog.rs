@@ -59,7 +59,7 @@ impl PlayDatalog {
         facts: &mut Facts,
         event: &E,
         card: bevy::prelude::Entity,
-        holder: players::PlayerId,
+        holder: bevy::prelude::Entity,
         event_name: &'static str,
     ) {
     }
