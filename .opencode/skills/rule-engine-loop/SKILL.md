@@ -26,6 +26,9 @@ Implement one more CR rule (or finish a partly implemented one), red first
 
 ## PICKER
 
+0. Reuse: if a ranked `report.md` from an earlier run of this loop exists and no commit since
+   it touched `crates/` (other than that run's own items), reuse its ranking and skip research.
+   Say so in plan.md. Gaps a previous report lists ("engine gaps found") are candidates too.
 1. Research: 5 FREE_MODEL lanes in parallel, `--agent plan`, prompt
    `/propose-next-mtg-rules <lane> --out <work dir>`; lanes `1xx-3xx`, `4xx-5xx`, `6xx`, `7xx`,
    `partial` (rules already partly implemented). Plan agents cannot write files: when a lane
