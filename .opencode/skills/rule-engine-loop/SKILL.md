@@ -1,6 +1,6 @@
 ---
 name: rule-engine-loop
-description: verdigris loop — FREE_MODEL proposers over /propose-next-mtg-rules, rank, implement the next CR rules red-first with workers, gate, commit, push on the current branch, report. Follows loop-core. User-invoked only (/rule-engine-loop [--mode sprint N|drain|propose] [tier overrides] [extra notes]).
+description: verdigris loop — FREE_MODEL proposers over /propose-next-mtg-rules, rank, implement the next CR rules red-first with workers, gate, commit, push on the current branch, report. Follows loop-core. User-invoked only (/rule-engine-loop [--hours H] [--mode propose] [tier overrides] [extra notes]).
 disable-model-invocation: true
 ---
 
@@ -37,14 +37,14 @@ Implement one more CR rule (or finish a partly implemented one), red first
    (IMPLEMENT / DEFERRED / CANNOT TODAY / DROPPED) and the reason. Check each claim before you
    rank: the card exists and is real (drop made-up cards), the proposed test is red, no
    rule file or system already covers it. In `propose` mode "red" is checked by reading (say so);
-   in a sprint the item's plan step proves it by running the extended test before any fix.
+   in a normal run the item's plan step proves it by running the extended test before any fix.
 3. The next item is the best IMPLEMENT row. Re-rank between items.
 
 ## ORACLE
 
 - Fast: the test the item extended is red before the change and green after; `just fmt`,
   `just clippy`, `just lint` green for the touched crates.
-- Full (loop-core step 2): `just test` with no filter, then push.
+- Full: the pre-push hook runs `just test`; a push is the full gate.
 
 ## Briefs (verdigris specifics)
 
@@ -64,7 +64,7 @@ Implement one more CR rule (or finish a partly implemented one), red first
 - New card syntax is allowed; list every addition in the report for review.
 - "Nothing worth implementing today" is a normal end; say why in the report.
 
-## MODE
+## Run length
 
-`sprint 3`. A dirty tree at start: work out whose changes they are, commit or stash them as you
-judge, and say so in the report.
+loop-core default (up to 3 h). A dirty tree at start: work out whose changes they are, commit or
+stash them as you judge, and say so in the report.
