@@ -209,6 +209,14 @@ impl Rules<'_, '_> {
     ) -> bool {
     }
 
+    pub(crate) fn eval_owned_by<E: rules::traits::event_args::EventArgs>(
+        &self,
+        set: rules::Players,
+        event: &E,
+        viewpoint: Option<Entity>,
+    ) -> bool {
+    }
+
     pub(crate) fn eval_characteristic(
         &self,
         characteristic: rules::Characteristic,

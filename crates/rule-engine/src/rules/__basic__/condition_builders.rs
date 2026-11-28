@@ -57,6 +57,10 @@ pub fn controlled_by(players: impl Into<rules::Players>) -> rules::Condition {
     rules::Condition::ControlledBy(players.into())
 }
 
+pub fn owned_by(players: impl Into<rules::Players>) -> rules::Condition {
+    rules::Condition::OwnedBy(players.into())
+}
+
 #[must_use]
 pub const fn enchanted() -> rules::Condition {
     rules::Condition::Enchanted

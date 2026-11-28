@@ -41,6 +41,7 @@ pub fn eval<E: EventArgs>(
         rules::Condition::Supertype(supertype) => answers.eval_supertype(*supertype, viewpoint),
         rules::Condition::Spell => answers.eval_spell(viewpoint),
         rules::Condition::ControlledBy(set) => answers.eval_controlled_by(*set, event, viewpoint),
+        rules::Condition::OwnedBy(set) => answers.eval_owned_by(*set, event, viewpoint),
         rules::Condition::Enchanted => answers.eval_enchanted(event, viewpoint),
         rules::Condition::Characteristic(characteristic, comparison) => {
             answers.eval_characteristic(*characteristic, *comparison, viewpoint)

@@ -4,8 +4,8 @@ mod basic;
 pub use basic::condition_builders::{
     a, active_player, always, an, card_type, cards_in_hand, cards_in_library, color, controlled_by,
     count, counters, damage, each, enchanted, exactly, greater_than, has, has_keyword,
-    has_priority, in_zone, is, land_play_available, less_than, life, main_phase, never, points_to,
-    power, spell, stack_empty, step_is, subtype, supertype, toughness,
+    has_priority, in_zone, is, land_play_available, less_than, life, main_phase, never, owned_by,
+    points_to, power, spell, stack_empty, step_is, subtype, supertype, toughness,
 };
 pub use basic::enums::{Amount, ArgKind, Change, Legality, Why, may};
 pub use basic::newtypes::{An, EventId, ResultId, RuleId};

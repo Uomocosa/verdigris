@@ -18,6 +18,7 @@ pub enum Condition {
     Supertype(cards::Supertype),
     Spell,
     ControlledBy(rules::Players),
+    OwnedBy(rules::Players),
     Enchanted,
     Characteristic(rules::Characteristic, rules::Comparison),
     PlayerValue(rules::PlayerQuantity, rules::Comparison),
