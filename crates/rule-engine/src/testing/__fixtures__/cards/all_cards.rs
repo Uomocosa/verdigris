@@ -28,6 +28,7 @@ pub const ALL_CARDS: &[testing::Card] = &[
     testing::GLADECOVER_SCOUT,
     testing::GRIZZLY_BEARS,
     testing::GUT_SHOT,
+    testing::HIGH_GROUND,
     testing::HOLY_STRENGTH,
     testing::IRON_GOLEM,
     testing::ISAMARU_HOUND_OF_KONDA,

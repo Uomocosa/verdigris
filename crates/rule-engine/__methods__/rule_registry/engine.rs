@@ -95,7 +95,11 @@ pub fn engine() -> rules::RuleRegistry {
     let results = HashSet::from([LOSES_LIFE]);
     let mut definitions = HashSet::from([rules::LETHAL_DAMAGE]);
     definitions.extend([FIRST_COMBAT_DAMAGE_STEP, ASSIGNS_AGAIN]);
-    let values = HashSet::from([rules::LandPlays::ID, rules::MaximumHandSize::ID]);
+    let values = HashSet::from([
+        rules::LandPlays::ID,
+        rules::MaximumHandSize::ID,
+        rules::BlocksPerCreature::ID,
+    ]);
     rules::RuleRegistry {
         events,
         results,

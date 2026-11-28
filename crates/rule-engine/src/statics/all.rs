@@ -97,6 +97,9 @@ impl All {
 
     #[must_use]
     pub fn play_additional_lands(&self, count: u32) -> abilities::Continuous {}
+
+    #[must_use]
+    pub fn can_block_an_additional_creature(&self) -> abilities::Continuous {}
 }
 
 #[cfg(test)]

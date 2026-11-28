@@ -55,6 +55,9 @@ pub use definition_id::{DefinitionId, LETHAL_DAMAGE};
 mod restriction_id;
 pub use restriction_id::RestrictionId;
 
+pub mod blocks_per_creature;
+pub use blocks_per_creature::BlocksPerCreature;
+
 pub mod land_plays;
 pub use land_plays::LandPlays;
 

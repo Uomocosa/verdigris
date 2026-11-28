@@ -70,7 +70,8 @@ pub fn validate_blockers(
         }
     }
     for assignment in assignments {
-        if assignments.iter().filter(|other| other.blocker == assignment.blocker).count() > 1 {
+        let count = assignments.iter().filter(|other| other.blocker == assignment.blocker).count();
+        if answers.value::<rules::BlocksPerCreature>(assignment.blocker).excess(count) > 0 {
             let why = actions::DeclarationWhy {
                 creature: Some(assignment.blocker),
                 why: rules::Why::BlocksMoreThanOne,
