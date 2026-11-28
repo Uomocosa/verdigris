@@ -11,5 +11,6 @@ workspace = true
 [dependencies]
 atomic-delegate-macros.workspace = true
 datafrog = "=2.0.1"
-derive_more = { workspace = true, features = ["deref"] }
+derive_more = { workspace = true, features = ["deref", "from"] }
+frogmyr-macros.workspace = true
 thiserror.workspace = true

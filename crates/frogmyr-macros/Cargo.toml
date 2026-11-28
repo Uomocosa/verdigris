@@ -1,0 +1,19 @@
+[package]
+name = "frogmyr-macros"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "The rules! macro for frogmyr"
+
+[lib]
+proc-macro = true
+
+[lints]
+workspace = true
+
+[dependencies]
+atomic-delegate-macros.workspace = true
+derive_more = { workspace = true, features = ["deref"] }
+proc-macro2.workspace = true
+quote.workspace = true
+syn.workspace = true

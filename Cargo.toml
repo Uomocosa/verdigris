@@ -7,6 +7,7 @@ members = [
     "crates/game",
     "crates/verdigris-lint",
     "crates/frogmyr",
+    "crates/frogmyr-macros",
     "crates/frogify",
 ]
 
@@ -25,6 +26,7 @@ rstest = { version = "=0.28.0" }
 syn = { version = "=2.0.119", features = ["full"] }
 tempfile = "=3.27.0"
 thiserror = "=2.0.21"
+frogmyr-macros = { path = "crates/frogmyr-macros" }
 verdigris-event-derive = { path = "crates/event-derive" }
 atomic-delegate-macros = { git = "https://github.com/Uomocosa/lele-rust-linter", tag = "v0.0.16" }
 lele-bevy-lint = { git = "https://github.com/Uomocosa/lele-rust-linter", tag = "v0.0.16" }

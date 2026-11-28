@@ -709,7 +709,19 @@ dependencies = [
  "atomic-delegate-macros",
  "datafrog",
  "derive_more",
+ "frogmyr-macros",
  "thiserror 2.0.21",
+]
+
+[[package]]
+name = "frogmyr-macros"
+version = "0.0.2"
+dependencies = [
+ "atomic-delegate-macros",
+ "derive_more",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.119",
 ]
 
 [[package]]

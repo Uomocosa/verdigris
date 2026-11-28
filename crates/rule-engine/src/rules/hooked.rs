@@ -8,18 +8,9 @@ pub struct Hooked<E: HookEvent> {
     pub player: players::PlayerId,
 }
 
+#[rustfmt::skip]
 impl<E: HookEvent> rules::traits::event_args::EventArgs for Hooked<E> {
-    fn arg(&self, id: rules::ArgId) -> Option<rules::ArgValue> {
-        if id == Self::CARD {
-            Some(rules::ArgValue::from(self.hook.card()))
-        } else if id == Self::PLAYER {
-            Some(rules::ArgValue::Player(self.player))
-        } else {
-            None
-        }
-    }
-
-    #[rustfmt::skip]
+    fn arg(&self, id: rules::ArgId) -> Option<rules::ArgValue> { self.arg_value(id) }
     fn args() -> &'static [rules::ArgId] { &[Self::CARD, Self::PLAYER] }
 }
 
@@ -33,6 +24,18 @@ impl<E: HookEvent> Hooked<E> {
 impl<E: HookEvent> rules::traits::event::Event for Hooked<E> {
     const ID: rules::EventId = E::ID;
     fn restrictions() -> Vec<rules::Restriction> { E::restrictions() }
+}
+
+impl<E: HookEvent> Hooked<E> {
+    pub(crate) fn arg_value(&self, id: rules::ArgId) -> Option<rules::ArgValue> {
+        if id == Self::CARD {
+            Some(rules::ArgValue::from(self.hook.card()))
+        } else if id == Self::PLAYER {
+            Some(rules::ArgValue::Player(self.player))
+        } else {
+            None
+        }
+    }
 }
 
 #[cfg(test)]
