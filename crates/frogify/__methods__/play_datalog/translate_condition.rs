@@ -6,7 +6,6 @@ use verdigris_rule_engine::HAND;
 use verdigris_rule_engine::cards;
 use verdigris_rule_engine::rules;
 
-use crate::AttackDatalog;
 use crate::PlayDatalog;
 use crate::TranslationError;
 
@@ -14,7 +13,11 @@ pub fn translate_condition(
     condition: &rules::Condition,
     card: &rules::ArgRef,
     holder: &rules::ArgRef,
+    subject: &'static str,
 ) -> Result<Vec<Literal>, TranslationError> {
+    if let Some(literals) = PlayDatalog::translate_subject_condition(condition, subject)? {
+        return Ok(literals);
+    }
     if *condition == rules::main_phase() {
         return Ok(vec![
             Literal::Pos(Atom {
@@ -54,21 +57,19 @@ pub fn translate_condition(
             vec![Term::Var(PlayDatalog::PLAYER_VAR)],
         )),
         rules::Condition::Of(entity, inner) if *entity == *card => {
-            translate_condition(inner, card, holder)
+            translate_condition(inner, card, holder, PlayDatalog::CARD_VAR)
                 .map_err(|_| TranslationError::Untranslatable(condition.clone()))
         }
-        rules::Condition::CardType(card_type) => Ok(positive(
-            PlayDatalog::CARD_TYPE,
-            vec![
-                Term::Var(PlayDatalog::CARD_VAR),
-                Term::Val(Value::Sym(PlayDatalog::card_type_name(*card_type))),
-            ],
-        )),
+        rules::Condition::Of(entity, inner) if *entity == *holder => {
+            translate_condition(inner, card, holder, PlayDatalog::PLAYER_VAR)
+                .map_err(|_| TranslationError::Untranslatable(condition.clone()))
+        }
+        rules::Condition::True => Ok(Vec::new()),
         rules::Condition::InZone(zone, zone_holder) if *zone == HAND && is_holder(zone_holder) => {
             Ok(positive(
                 PlayDatalog::IN_ZONE,
                 vec![
-                    Term::Var(PlayDatalog::CARD_VAR),
+                    Term::Var(subject),
                     Term::Val(Value::Sym(PlayDatalog::HAND_ZONE)),
                     Term::Var(PlayDatalog::PLAYER_VAR),
                 ],
@@ -80,30 +81,7 @@ pub fn translate_condition(
         {
             Ok(positive(
                 PlayDatalog::OWNER,
-                vec![
-                    Term::Var(PlayDatalog::CARD_VAR),
-                    Term::Var(PlayDatalog::PLAYER_VAR),
-                ],
-            ))
-        }
-        rules::Condition::Has(component) => {
-            let component_name = if *component == rules::ComponentRef::of::<cards::Creature>() {
-                AttackDatalog::CREATURE
-            } else if *component == rules::ComponentRef::of::<cards::OnBattlefield>() {
-                AttackDatalog::ON_BATTLEFIELD
-            } else if *component == rules::ComponentRef::of::<cards::Tapped>() {
-                AttackDatalog::TAPPED
-            } else if *component == rules::ComponentRef::of::<cards::SummoningSick>() {
-                AttackDatalog::SUMMONING_SICK
-            } else {
-                return Err(TranslationError::Untranslatable(condition.clone()));
-            };
-            Ok(positive(
-                AttackDatalog::HAS,
-                vec![
-                    Term::Var(PlayDatalog::CARD_VAR),
-                    Term::Val(Value::Sym(component_name)),
-                ],
+                vec![Term::Var(subject), Term::Var(PlayDatalog::PLAYER_VAR)],
             ))
         }
         _ => Err(TranslationError::Untranslatable(condition.clone())),
@@ -130,35 +108,26 @@ mod tests {
         let card = rules::ArgRef::Arg(events::Play::CARD);
         let holder = rules::ArgRef::Arg(events::Play::PLAYER);
         assert_eq!(
-            translate_condition(&rules::has_priority(events::Play::PLAYER), &card, &holder),
+            translate_condition(
+                &rules::has_priority(events::Play::PLAYER),
+                &card,
+                &holder,
+                PlayDatalog::CARD_VAR
+            ),
             Ok(vec![Literal::Pos(Atom {
                 rel: PlayDatalog::PRIORITY,
                 terms: vec![Term::Var(PlayDatalog::PLAYER_VAR)],
             })])
         );
         assert_eq!(
-            translate_condition(
-                &rules::card_type(cards::CardType::Land).of(events::Play::CARD),
-                &card,
-                &holder
-            ),
-            Ok(vec![Literal::Pos(Atom {
-                rel: PlayDatalog::CARD_TYPE,
-                terms: vec![
-                    Term::Var(PlayDatalog::CARD_VAR),
-                    Term::Val(Value::Sym(PlayDatalog::LAND)),
-                ],
-            })])
-        );
-        assert_eq!(
-            translate_condition(&rules::stack_empty(), &card, &holder),
+            translate_condition(&rules::stack_empty(), &card, &holder, PlayDatalog::CARD_VAR),
             Ok(vec![Literal::Pos(Atom {
                 rel: PlayDatalog::STACK_EMPTY,
                 terms: vec![Term::Var(PlayDatalog::PLAYER_VAR)],
             })])
         );
         assert_eq!(
-            translate_condition(&rules::main_phase(), &card, &holder),
+            translate_condition(&rules::main_phase(), &card, &holder, PlayDatalog::CARD_VAR),
             Ok(vec![
                 Literal::Pos(Atom {
                     rel: PlayDatalog::STEP,
@@ -170,6 +139,11 @@ mod tests {
                 }),
             ])
         );
+        let always = rules::Condition::True;
+        assert_eq!(
+            translate_condition(&always, &card, &holder, PlayDatalog::CARD_VAR),
+            Ok(Vec::new())
+        );
     }
 
     #[test]
@@ -180,7 +154,8 @@ mod tests {
             translate_condition(
                 &rules::card_type(cards::CardType::Instant).of(events::Play::CARD),
                 &card,
-                &holder
+                &holder,
+                PlayDatalog::CARD_VAR
             ),
             Ok(vec![Literal::Pos(Atom {
                 rel: PlayDatalog::CARD_TYPE,
@@ -198,11 +173,16 @@ mod tests {
         let holder = rules::ArgRef::Arg(events::Play::PLAYER);
         let attacking = rules::has::<cards::Attacking>().of(events::Play::CARD);
         assert_eq!(
-            translate_condition(&attacking, &card, &holder),
+            translate_condition(&attacking, &card, &holder, PlayDatalog::CARD_VAR),
             Err(TranslationError::Untranslatable(attacking.clone()))
         );
         assert_eq!(
-            translate_condition(&rules::step_is(turns::Step::Upkeep), &card, &holder),
+            translate_condition(
+                &rules::step_is(turns::Step::Upkeep),
+                &card,
+                &holder,
+                PlayDatalog::CARD_VAR
+            ),
             Err(TranslationError::Untranslatable(rules::step_is(
                 turns::Step::Upkeep
             )))
@@ -216,18 +196,18 @@ mod tests {
         let both =
             rules::has_priority(events::Play::PLAYER) & rules::active_player(events::Play::PLAYER);
         assert_eq!(
-            translate_condition(&both, &card, &holder),
+            translate_condition(&both, &card, &holder, PlayDatalog::CARD_VAR),
             Err(TranslationError::Untranslatable(both.clone()))
         );
         let either =
             rules::has_priority(events::Play::PLAYER) | rules::active_player(events::Play::PLAYER);
         assert_eq!(
-            translate_condition(&either, &card, &holder),
+            translate_condition(&either, &card, &holder, PlayDatalog::CARD_VAR),
             Err(TranslationError::Untranslatable(either.clone()))
         );
         let negated = !rules::has_priority(events::Play::PLAYER);
         assert_eq!(
-            translate_condition(&negated, &card, &holder),
+            translate_condition(&negated, &card, &holder, PlayDatalog::CARD_VAR),
             Err(TranslationError::Untranslatable(negated.clone()))
         );
     }
@@ -238,7 +218,7 @@ mod tests {
         let holder = rules::ArgRef::Arg(events::Play::PLAYER);
         let foreign = rules::has_priority(rules::ArgId("other"));
         assert_eq!(
-            translate_condition(&foreign, &card, &holder),
+            translate_condition(&foreign, &card, &holder, PlayDatalog::CARD_VAR),
             Err(TranslationError::Untranslatable(foreign.clone()))
         );
     }
@@ -250,7 +230,7 @@ mod tests {
         let foreign_card = rules::ArgRef::Arg(rules::ArgId("other"));
         let condition = rules::card_type(cards::CardType::Land).of(foreign_card);
         assert_eq!(
-            translate_condition(&condition, &card, &holder),
+            translate_condition(&condition, &card, &holder, PlayDatalog::CARD_VAR),
             Err(TranslationError::Untranslatable(condition.clone()))
         );
     }

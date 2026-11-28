@@ -74,12 +74,19 @@ impl PlayDatalog {
         condition: &rules::Condition,
         card: &rules::ArgRef,
         holder: &rules::ArgRef,
+        subject: &'static str,
     ) -> Result<Vec<frogmyr::Literal>, TranslationError> {
+    }
+    pub(crate) fn translate_subject_condition(
+        condition: &rules::Condition,
+        subject: &'static str,
+    ) -> Result<Option<Vec<frogmyr::Literal>>, TranslationError> {
     }
     pub(crate) fn translate_holds(
         condition: &rules::Condition,
         card: &rules::ArgRef,
         holder: &rules::ArgRef,
+        subject: &'static str,
         candidate: &frogmyr::Atom,
         holds: &mut Vec<frogmyr::Rule>,
         next_hold: &mut usize,

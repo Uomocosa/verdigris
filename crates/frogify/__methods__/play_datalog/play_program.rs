@@ -40,6 +40,7 @@ pub fn play_program() -> Result<Program, TranslationError> {
             &restriction.condition,
             &card,
             &holder,
+            PlayDatalog::CARD_VAR,
             &candidate,
             &mut program_rules,
             &mut next_hold,

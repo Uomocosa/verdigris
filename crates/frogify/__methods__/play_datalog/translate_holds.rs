@@ -10,6 +10,7 @@ pub fn translate_holds(
     condition: &rules::Condition,
     card: &rules::ArgRef,
     holder: &rules::ArgRef,
+    subject: &'static str,
     candidate: &Atom,
     holds: &mut Vec<Rule>,
     next_hold: &mut usize,
@@ -18,6 +19,7 @@ pub fn translate_holds(
         condition: &rules::Condition,
         card: &rules::ArgRef,
         holder: &rules::ArgRef,
+        subject: &'static str,
         candidate: &Atom,
         holds: &mut Vec<Rule>,
         next_hold: &mut usize,
@@ -29,7 +31,7 @@ pub fn translate_holds(
                 let mut body = vec![Literal::Pos(candidate.clone())];
                 for child in children {
                     body.push(Literal::Pos(recursion(
-                        child, card, holder, candidate, holds, next_hold,
+                        child, card, holder, subject, candidate, holds, next_hold,
                     )?));
                 }
                 holds.push(Rule {
@@ -42,7 +44,8 @@ pub fn translate_holds(
                 let head = PlayDatalog::holds_head(*next_hold)?;
                 *next_hold = next_hold.saturating_add(1);
                 for child in children {
-                    let child_head = recursion(child, card, holder, candidate, holds, next_hold)?;
+                    let child_head =
+                        recursion(child, card, holder, subject, candidate, holds, next_hold)?;
                     holds.push(Rule {
                         head: head.clone(),
                         body: vec![Literal::Pos(candidate.clone()), Literal::Pos(child_head)],
@@ -53,21 +56,39 @@ pub fn translate_holds(
             rules::Condition::Not(inner) => {
                 let head = PlayDatalog::holds_head(*next_hold)?;
                 *next_hold = next_hold.saturating_add(1);
-                let child_head = recursion(inner, card, holder, candidate, holds, next_hold)?;
+                let child_head =
+                    recursion(inner, card, holder, subject, candidate, holds, next_hold)?;
                 holds.push(Rule {
                     head: head.clone(),
                     body: vec![Literal::Pos(candidate.clone()), Literal::Neg(child_head)],
                 });
                 Ok(head)
             }
-            rules::Condition::Of(entity, inner) if *entity == *card => {
-                recursion(inner, card, holder, candidate, holds, next_hold)
-            }
+            rules::Condition::Of(entity, inner) if *entity == *card => recursion(
+                inner,
+                card,
+                holder,
+                PlayDatalog::CARD_VAR,
+                candidate,
+                holds,
+                next_hold,
+            ),
+            rules::Condition::Of(entity, inner) if *entity == *holder => recursion(
+                inner,
+                card,
+                holder,
+                PlayDatalog::PLAYER_VAR,
+                candidate,
+                holds,
+                next_hold,
+            ),
             _ => {
                 let head = PlayDatalog::holds_head(*next_hold)?;
                 *next_hold = next_hold.saturating_add(1);
                 let mut body = vec![Literal::Pos(candidate.clone())];
-                body.extend(PlayDatalog::translate_condition(condition, card, holder)?);
+                body.extend(PlayDatalog::translate_condition(
+                    condition, card, holder, subject,
+                )?);
                 holds.push(Rule {
                     head: head.clone(),
                     body,
@@ -76,7 +97,9 @@ pub fn translate_holds(
             }
         }
     }
-    recursion(condition, card, holder, candidate, holds, next_hold)
+    recursion(
+        condition, card, holder, subject, candidate, holds, next_hold,
+    )
 }
 
 #[cfg(test)]
@@ -87,6 +110,7 @@ mod tests {
     use frogmyr::Value;
     use verdigris_rule_engine::cards;
     use verdigris_rule_engine::events;
+    use verdigris_rule_engine::keywords;
     use verdigris_rule_engine::rules;
 
     use super::translate_holds;
@@ -105,6 +129,7 @@ mod tests {
             &rules::has_priority(events::Play::PLAYER),
             &CARD,
             &HOLDER,
+            PlayDatalog::CARD_VAR,
             &candidate,
             &mut holds,
             &mut next_hold,
@@ -125,6 +150,57 @@ mod tests {
                 ],
             }]
         );
+        let blocker = rules::ArgRef::Arg(events::DeclareBlocker::BLOCKER);
+        let attacker = rules::ArgRef::Arg(events::DeclareBlocker::ATTACKER);
+        let sky_court = (!rules::has_keyword(keywords::flying().id))
+            .of(events::DeclareBlocker::BLOCKER)
+            | rules::has_keyword(keywords::flying().id).of(events::DeclareBlocker::ATTACKER);
+        let candidate = testing::play_candidate();
+        let mut sky_holds = Vec::new();
+        let mut sky_next = 0;
+        let sky_root = translate_holds(
+            &sky_court,
+            &blocker,
+            &attacker,
+            PlayDatalog::CARD_VAR,
+            &candidate,
+            &mut sky_holds,
+            &mut sky_next,
+        )
+        .unwrap();
+        assert_eq!(sky_root, PlayDatalog::holds_head(0).unwrap());
+        assert!(
+            sky_holds.iter().any(|rule| rule.body.contains(&Literal::Pos(Atom {
+                rel: PlayDatalog::HAS_KEYWORD,
+                terms: vec![
+                    Term::Var(PlayDatalog::PLAYER_VAR),
+                    Term::Val(Value::Sym(*keywords::flying().id)),
+                ],
+            }))),
+            "the attacker's keyword is read on the second argument"
+        );
+        let mut sky_rules = vec![frogmyr::Rule {
+            head: candidate.clone(),
+            body: vec![Literal::Pos(candidate.clone())],
+        }];
+        sky_rules.extend(sky_holds);
+        let program = frogmyr::Program { rules: sky_rules };
+        let mut facts = frogmyr::Facts::default();
+        let _ = facts.add(
+            PlayDatalog::PLAY_CANDIDATE,
+            vec![Value::Sym("ground"), Value::Sym("sky")],
+        );
+        let _ = facts.add(
+            PlayDatalog::PLAY_CANDIDATE,
+            vec![Value::Sym("sky"), Value::Sym("ground")],
+        );
+        let _ = facts.add(
+            PlayDatalog::HAS_KEYWORD,
+            vec![Value::Sym("sky"), Value::Sym(*keywords::flying().id)],
+        );
+        let derived = program.evaluate(&facts).unwrap();
+        assert!(derived.contains(&sky_root.rel, &[Value::Sym("ground"), Value::Sym("sky")]));
+        assert!(!derived.contains(&sky_root.rel, &[Value::Sym("sky"), Value::Sym("ground")]));
     }
 
     #[test]
@@ -138,6 +214,7 @@ mod tests {
             &condition,
             &CARD,
             &HOLDER,
+            PlayDatalog::CARD_VAR,
             &candidate,
             &mut holds,
             &mut next_hold,
@@ -170,6 +247,7 @@ mod tests {
             &condition,
             &CARD,
             &HOLDER,
+            PlayDatalog::CARD_VAR,
             &candidate,
             &mut holds,
             &mut next_hold,
@@ -210,6 +288,7 @@ mod tests {
             &condition,
             &CARD,
             &HOLDER,
+            PlayDatalog::CARD_VAR,
             &candidate,
             &mut holds,
             &mut next_hold,
@@ -240,6 +319,7 @@ mod tests {
             &condition,
             &CARD,
             &HOLDER,
+            PlayDatalog::CARD_VAR,
             &candidate,
             &mut holds,
             &mut next_hold,
