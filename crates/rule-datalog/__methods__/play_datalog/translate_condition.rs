@@ -3,9 +3,10 @@ use verdigris_datalog_ir::Literal;
 use verdigris_datalog_ir::Term;
 use verdigris_datalog_ir::Value;
 use verdigris_rule_engine::HAND;
-use verdigris_rule_engine::cards::Owner;
+use verdigris_rule_engine::cards;
 use verdigris_rule_engine::rules;
 
+use crate::AttackDatalog;
 use crate::PlayDatalog;
 use crate::TranslationError;
 
@@ -74,13 +75,34 @@ pub fn translate_condition(
             ))
         }
         rules::Condition::PointsTo(component, owner)
-            if *component == rules::ComponentRef::relation::<Owner>() && is_holder(owner) =>
+            if *component == rules::ComponentRef::relation::<cards::Owner>()
+                && is_holder(owner) =>
         {
             Ok(positive(
                 PlayDatalog::OWNER,
                 vec![
                     Term::Var(PlayDatalog::CARD_VAR),
                     Term::Var(PlayDatalog::PLAYER_VAR),
+                ],
+            ))
+        }
+        rules::Condition::Has(component) => {
+            let component_name = if *component == rules::ComponentRef::of::<cards::Creature>() {
+                AttackDatalog::CREATURE
+            } else if *component == rules::ComponentRef::of::<cards::OnBattlefield>() {
+                AttackDatalog::ON_BATTLEFIELD
+            } else if *component == rules::ComponentRef::of::<cards::Tapped>() {
+                AttackDatalog::TAPPED
+            } else if *component == rules::ComponentRef::of::<cards::SummoningSick>() {
+                AttackDatalog::SUMMONING_SICK
+            } else {
+                return Err(TranslationError::Untranslatable(condition.clone()));
+            };
+            Ok(positive(
+                AttackDatalog::HAS,
+                vec![
+                    Term::Var(PlayDatalog::CARD_VAR),
+                    Term::Val(Value::Sym(component_name)),
                 ],
             ))
         }
@@ -174,10 +196,10 @@ mod tests {
     fn an_untranslatable_atom_is_an_explicit_error() {
         let card = rules::ArgRef::Arg(events::Play::CARD);
         let holder = rules::ArgRef::Arg(events::Play::PLAYER);
-        let tapped = rules::has::<cards::Tapped>().of(events::Play::CARD);
+        let attacking = rules::has::<cards::Attacking>().of(events::Play::CARD);
         assert_eq!(
-            translate_condition(&tapped, &card, &holder),
-            Err(TranslationError::Untranslatable(tapped.clone()))
+            translate_condition(&attacking, &card, &holder),
+            Err(TranslationError::Untranslatable(attacking.clone()))
         );
         assert_eq!(
             translate_condition(&rules::step_is(turns::Step::Upkeep), &card, &holder),
