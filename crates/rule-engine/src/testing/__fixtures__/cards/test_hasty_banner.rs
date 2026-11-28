@@ -5,7 +5,7 @@ pub const TEST_HASTY_BANNER: Card = Card {
     definition: || {
         card! {
             cards::CardDefinition::from_enchantment("Test Hasty Banner", cost![1, R]);
-            all(creature().and(controlled_by(YOU))).gain(haste()),
+            all(creature() & controlled_by(YOU)).gain(haste()),
         }
     },
 };

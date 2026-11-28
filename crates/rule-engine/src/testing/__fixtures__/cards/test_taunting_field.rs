@@ -5,7 +5,7 @@ pub const TEST_TAUNTING_FIELD: Card = Card {
     definition: || {
         card! {
             cards::CardDefinition::from_enchantment("Test Taunting Field", cost![1, G]);
-            all(creature().and(controlled_by(OPPONENT))).must_block(),
+            all(creature() & controlled_by(OPPONENT)).must_block(),
         }
     },
 };

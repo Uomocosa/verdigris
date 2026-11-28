@@ -46,7 +46,7 @@ pub use constants::{
 };
 pub use effects::{
     another_creature, any_target, attacking, controlled_by, creature, creature_spell, enchantment,
-    instant_spell, nonblack_creature, noncreature_spell, not, player, spell, token,
+    instant_spell, nonblack_creature, noncreature_spell, player, spell, token,
 };
 
 #[path = "../__methods__/mod.rs"]

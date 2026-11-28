@@ -9,7 +9,7 @@ pub const TEST_NEVER_BURIED: Card = Card {
                 target: Target::event::<PutIntoGraveyard>(),
                 change: Change::Instead {
                     holder: PutIntoGraveyard::OBJECT.into(),
-                    when: Condition::True,
+                    when: always(),
                     then: Then::Events(Vec::new()),
                 },
             }),

@@ -38,6 +38,16 @@ pub const fn supertype(supertype: cards::Supertype) -> rules::Condition {
 }
 
 #[must_use]
+pub const fn always() -> rules::Condition {
+    rules::Condition::True
+}
+
+#[must_use]
+pub fn never() -> rules::Condition {
+    !rules::Condition::True
+}
+
+#[must_use]
 pub const fn spell() -> rules::Condition {
     rules::Condition::Spell
 }

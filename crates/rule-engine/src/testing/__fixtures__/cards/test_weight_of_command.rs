@@ -5,7 +5,7 @@ pub const TEST_WEIGHT_OF_COMMAND: Card = Card {
     definition: || {
         card! {
             cards::CardDefinition::from_enchantment("Test Weight of Command", cost![2, U]);
-            all(creature().and(controlled_by(OPPONENT))).tap_when_attacking(),
+            all(creature() & controlled_by(OPPONENT)).tap_when_attacking(),
         }
     },
 };

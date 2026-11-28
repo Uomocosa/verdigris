@@ -5,7 +5,7 @@ pub const TEST_SAFE_HAVEN: Card = Card {
     definition: || {
         card! {
             cards::CardDefinition::from_enchantment("Test Safe Haven", cost![2]);
-            all(creature().and(controlled_by(YOU))).cant::<Destroy>(
+            all(creature() & controlled_by(YOU)).cant::<Destroy>(
                 Destroy::PERMANENT,
                 RestrictionId("test/test-safe-haven"),
             ),
@@ -13,7 +13,7 @@ pub const TEST_SAFE_HAVEN: Card = Card {
                 Counter::SPELL.controller(),
                 RestrictionId("test/test-safe-haven"),
             ),
-            all(creature().and(controlled_by(YOU))).cant::<DealDamage>(
+            all(creature() & controlled_by(YOU)).cant::<DealDamage>(
                 DealDamage::RECIPIENT,
                 RestrictionId("test/test-safe-haven"),
             ),

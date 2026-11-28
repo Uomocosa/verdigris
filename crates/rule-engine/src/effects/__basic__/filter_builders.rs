@@ -80,8 +80,3 @@ pub fn attacking() -> effects::Filter {
 pub fn player() -> effects::Filter {
     effects::Filter::player()
 }
-
-#[must_use]
-pub fn not(filter: effects::Filter) -> effects::Filter {
-    !filter
-}

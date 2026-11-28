@@ -94,12 +94,12 @@ This refines §3 for fixtures
 so the fixture reads like the printed card. A fixture starts with
 `use crate::testing::prelude::*;` and uses DSL names bare; the only prefix left is
 `cards::` on the card builder (`cards::creature(...)`,
-`cards::Supertype::Legendary`), because the bare `creature()` is the filter. Filters
-combine with words, not operators: `a.and(b)`, `a.or(b)`, `not(a)`. Card text stays as
-close as possible to the oracle text: repeat a condition rather than binding it with
-`let`. A name a fixture needs goes into `crates/rule-engine/src/prelude/mod.rs`, listed
-by name; testing-only items go into `src/testing/prelude/mod.rs`. A name clash is decided
-by the user.
+`cards::Supertype::Legendary`), because the bare `creature()` is the filter. Filters,
+effects and conditions combine with operators, never with methods: `a & b`, `a | b`,
+`!a`. Card text stays as close as possible to the oracle text: repeat a condition
+rather than binding it with `let`. A name a fixture needs goes into
+`crates/rule-engine/src/prelude/mod.rs`, listed by name; testing-only items go into
+`src/testing/prelude/mod.rs`. A name clash is decided by the user.
 
 ```rust
 // crates/rule-engine/src/testing/__fixtures__/cards/always_watching.rs:1-9
@@ -107,8 +107,8 @@ use crate::testing::prelude::*;
 
 card! {
     cards::CardDefinition::from_enchantment("Always Watching", cost![1, W, W]);
-    all(creature().and(controlled_by(YOU)).and(not(token()))).get_pt(1, 1),
-    all(creature().and(controlled_by(YOU)).and(not(token()))).gain(vigilance()),
+    all(creature() & controlled_by(YOU) & !token()).get_pt(1, 1),
+    all(creature() & controlled_by(YOU) & !token()).gain(vigilance()),
 }
 ```
 

@@ -10,7 +10,7 @@ pub const LEYLINE_OF_THE_VOID: Card = Card {
             each_opponent().instead(
                 PutIntoGraveyard::ID,
                 PutIntoGraveyard::OBJECT.controller(),
-                Condition::True,
+                always(),
                 vec![EventTemplate::Exile { what: PutIntoGraveyard::OBJECT.into() }],
             ),
         }

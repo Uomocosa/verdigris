@@ -5,7 +5,7 @@ pub const TEST_LURE_OF_BATTLE: Card = Card {
     definition: || {
         card! {
             cards::CardDefinition::from_enchantment("Test Lure of Battle", cost![1, G]);
-            all(creature().and(controlled_by(OPPONENT))).must_block(),
+            all(creature() & controlled_by(OPPONENT)).must_block(),
         }
     },
 };

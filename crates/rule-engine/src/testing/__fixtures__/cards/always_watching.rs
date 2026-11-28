@@ -5,8 +5,8 @@ pub const ALWAYS_WATCHING: Card = Card {
     definition: || {
         card! {
             cards::CardDefinition::from_enchantment("Always Watching", cost![1, W, W]);
-            all(creature().and(controlled_by(YOU)).and(not(token()))).get_pt(1, 1),
-            all(creature().and(controlled_by(YOU)).and(not(token()))).gain(vigilance()),
+            all(creature() & controlled_by(YOU) & !token()).get_pt(1, 1),
+            all(creature() & controlled_by(YOU) & !token()).gain(vigilance()),
         }
     },
 };

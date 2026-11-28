@@ -5,7 +5,7 @@ pub const TEST_WALL_OF_DREAD: Card = Card {
     definition: || {
         card! {
             cards::CardDefinition::from_enchantment("Test Wall of Dread", cost![2, B]);
-            all(creature().and(controlled_by(OPPONENT))).lose(defender()),
+            all(creature() & controlled_by(OPPONENT)).lose(defender()),
         }
     },
 };

@@ -175,19 +175,20 @@ noise. The only prefix left is `cards::` on the card builder.
 
 ```rust
 // Bad
-statics::all(creature().and(controlled_by(YOU))).gain(keywords::vigilance()),
+statics::all(creature() & controlled_by(YOU)).gain(keywords::vigilance()),
 // Good
-all(creature().and(controlled_by(YOU))).gain(vigilance()),
+all(creature() & controlled_by(YOU)).gain(vigilance()),
 ```
 
-**`&` / `|` / `!` on filters.**
-Operators read like engine code, not card text; filters combine with words.
+**Word combinators on filters, effects or conditions.**
+Filters, effects and conditions combine with `&` `|` `!`, never with methods; words read
+like engine code, not card text.
 
 ```rust
 // Bad
-all(creature() & controlled_by(YOU) & !token()).gain(vigilance()),
-// Good
 all(creature().and(controlled_by(YOU)).and(not(token()))).gain(vigilance()),
+// Good
+all(creature() & controlled_by(YOU) & !token()).gain(vigilance()),
 ```
 
 **A `let` that hides oracle wording.**
@@ -197,10 +198,10 @@ the way the oracle text repeats it (as in
 
 ```rust
 // Bad
-let nontoken = not(token());
-all(creature().and(controlled_by(YOU)).and(nontoken)).get_pt(1, 1),
-all(creature().and(controlled_by(YOU)).and(nontoken)).gain(vigilance()),
+let nontoken = !token();
+all(creature() & controlled_by(YOU) & nontoken).get_pt(1, 1),
+all(creature() & controlled_by(YOU) & nontoken).gain(vigilance()),
 // Good
-all(creature().and(controlled_by(YOU)).and(not(token()))).get_pt(1, 1),
-all(creature().and(controlled_by(YOU)).and(not(token()))).gain(vigilance()),
+all(creature() & controlled_by(YOU) & !token()).get_pt(1, 1),
+all(creature() & controlled_by(YOU) & !token()).gain(vigilance()),
 ```

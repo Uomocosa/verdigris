@@ -5,7 +5,7 @@ pub const TEST_COVER_OF_DUSK: Card = Card {
     definition: || {
         card! {
             cards::CardDefinition::from_enchantment("Test Cover of Dusk", cost![2, W]);
-            all(creature().and(controlled_by(YOU)).and(attacking())).attack_without_tapping(),
+            all(creature() & controlled_by(YOU) & attacking()).attack_without_tapping(),
         }
     },
 };

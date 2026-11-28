@@ -47,7 +47,7 @@ pub fn opening_hand_action(then: impl Into<rules::Then>) -> abilities::StaticAbi
         target: rules::Target::event::<rules::Hooked<events::OpeningHandAction>>(),
         change: rules::Change::Hook {
             holder: rules::Hooked::<events::OpeningHandAction>::CARD.into(),
-            when: rules::Condition::True,
+            when: rules::always(),
             then: then.into(),
         },
     }))

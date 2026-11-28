@@ -11,7 +11,7 @@ pub const LABORATORY_MANIAC: Card = Card {
             you().instead(
                 DrawFromEmptyLibrary::ID,
                 DrawFromEmptyLibrary::PLAYER,
-                Condition::True,
+                always(),
                 vec![EventTemplate::WinGame {
                     who: DrawFromEmptyLibrary::PLAYER.into(),
                 }],

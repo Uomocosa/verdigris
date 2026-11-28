@@ -132,12 +132,6 @@ impl Filter {
     }
 
     #[must_use]
-    pub fn and(self, other: Self) -> Self { self & other }
-
-    #[must_use]
-    pub fn or(self, other: Self) -> Self { self | other }
-
-    #[must_use]
     pub const fn enters(self) -> abilities::TriggerEvent { abilities::TriggerEvent::Enters(self) }
 }
 

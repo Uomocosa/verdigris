@@ -229,8 +229,8 @@ its own commit, red first. Commit only on the full suite
 
 ## 7. Card fixtures read like oracle text
 
-Card fixtures use the testing prelude and bare DSL names; filters combine with words —
-`a.and(b)`, `a.or(b)`, `not(a)`, never `&` / `|` / `!` (RATIONALE §6, SMELLS).
+Card fixtures use the testing prelude and bare DSL names; filters, effects and
+conditions combine with `&` / `|` / `!`, never with methods (RATIONALE §6, SMELLS).
 
 ## Adding rules here
 

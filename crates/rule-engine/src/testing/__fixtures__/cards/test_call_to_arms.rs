@@ -5,7 +5,7 @@ pub const TEST_CALL_TO_ARMS: Card = Card {
     definition: || {
         card! {
             cards::CardDefinition::from_enchantment("Test Call to Arms", cost![1, R]);
-            all(creature().and(controlled_by(OPPONENT))).must_attack(),
+            all(creature() & controlled_by(OPPONENT)).must_attack(),
         }
     },
 };

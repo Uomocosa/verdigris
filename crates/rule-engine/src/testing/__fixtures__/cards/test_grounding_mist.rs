@@ -5,7 +5,7 @@ pub const TEST_GROUNDING_MIST: Card = Card {
     definition: || {
         card! {
             cards::CardDefinition::from_enchantment("Test Grounding Mist", cost![1, G]);
-            all(creature().and(controlled_by(OPPONENT))).lose(flying()),
+            all(creature() & controlled_by(OPPONENT)).lose(flying()),
         }
     },
 };
