@@ -52,6 +52,9 @@ pub use gain_life::GainLife;
 mod put_counters;
 pub use put_counters::PutCounters;
 
+mod remove_counters;
+pub use remove_counters::RemoveCounters;
+
 mod join_combat_damage_step;
 pub use join_combat_damage_step::JoinCombatDamageStep;
 

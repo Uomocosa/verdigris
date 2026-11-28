@@ -28,4 +28,7 @@ pub use crate::statics::{
     all, each_opponent, enchanted, if_a, if_a_player, if_an_opponent, if_you, this, you,
 };
 pub use crate::turns::{Phase, beginning_of};
-pub use crate::{GRAVEYARD, MAIN_2, OPPONENT, PLAYER, THIS, UNTAP, UPKEEP, YOU, card, cost, pt};
+pub use crate::{
+    GRAVEYARD, MAIN_2, OPPONENT, PLAYER, PLUS_ONE_PLUS_ONE, THIS, UNTAP, UPKEEP, YOU, card, cost,
+    pt,
+};

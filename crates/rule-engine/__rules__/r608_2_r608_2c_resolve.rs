@@ -118,9 +118,8 @@ pub fn r608_2_r608_2c_resolve(
                 effects::EffectKind::LoseLife(amount) => {
                     request_life_loss(&mut player_effects.p0(), &player_targets, amount);
                 }
-                effects::EffectKind::Poison(amount) => {
-                    request_poison(&mut player_effects.p6(), &player_targets, amount);
-                }
+                #[rustfmt::skip]
+                effects::EffectKind::Poison(amount) => request_counters(&mut player_effects.p6(), &player_targets, battlefield_target, amount),
                 effects::EffectKind::GainLife(amount) => {
                     request_life_gain(
                         &mut player_effects.p2(),
@@ -271,14 +270,22 @@ fn request_gain_keyword(
     }
 }
 
-fn request_poison(
-    poison_counters: &mut MessageWriter<Attempt<events::PutCounters>>,
+fn request_counters(
+    put_counters: &mut MessageWriter<Attempt<events::PutCounters>>,
     players: &[players::PlayerId],
+    battlefield_target: Option<Entity>,
     amount: counters::CounterAmount,
 ) {
     for player in players {
-        poison_counters.write(Attempt(events::PutCounters {
+        put_counters.write(Attempt(events::PutCounters {
             recipient: **player,
+            kind: amount.kind,
+            amount: amount.count,
+        }));
+    }
+    if let Some(recipient) = battlefield_target {
+        put_counters.write(Attempt(events::PutCounters {
+            recipient,
             kind: amount.kind,
             amount: amount.count,
         }));

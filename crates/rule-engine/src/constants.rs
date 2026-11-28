@@ -1,4 +1,5 @@
 use crate::actions;
+use crate::counters;
 use crate::rules;
 use crate::turns;
 use crate::zones;
@@ -35,6 +36,10 @@ pub const THIS: rules::This = rules::This;
 
 pub const LOSES_LIFE: rules::ResultId = rules::ResultId("120.3a/loses-life");
 pub const DAMAGE_MARKED: rules::ResultId = rules::ResultId("120.3e/damage-marked");
+
+pub const PLUS_ONE_PLUS_ONE: counters::CounterId = counters::CounterId("122.1a/plus-one-plus-one");
+pub const MINUS_ONE_MINUS_ONE: counters::CounterId =
+    counters::CounterId("122.1a/minus-one-minus-one");
 
 pub const FIRST_COMBAT_DAMAGE_STEP: rules::DefinitionId = rules::DefinitionId("510.4/first-step");
 pub const ASSIGNS_AGAIN: rules::DefinitionId = rules::DefinitionId("510.4/assigns-again");

@@ -26,6 +26,7 @@ pub fn register_messages_and_resources(app: &mut App) {
     app.add_message::<actions::DiscardRequest>();
     events::GainLife::register(app);
     events::PutCounters::register(app);
+    events::RemoveCounters::register(app);
     events::Mill::register(app);
     events::Create::register(app);
     events::Destroy::register(app);

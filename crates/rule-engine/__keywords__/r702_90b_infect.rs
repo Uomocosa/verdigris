@@ -1,5 +1,6 @@
 use crate::DAMAGE_MARKED;
 use crate::LOSES_LIFE;
+use crate::MINUS_ONE_MINUS_ONE;
 use crate::counters;
 use crate::effects;
 use crate::events;
@@ -45,7 +46,7 @@ fn abilities() -> Vec<effects::Modification> {
                 when: rules::Condition::True,
                 then: rules::Then::Events(vec![rules::EventTemplate::PutCounters {
                     who: events::DealDamage::RECIPIENT.into(),
-                    kind: counters::MINUS_ONE_MINUS_ONE,
+                    kind: MINUS_ONE_MINUS_ONE,
                     amount: rules::Amount::FromArg(events::DealDamage::AMOUNT),
                 }]),
             },
@@ -56,6 +57,8 @@ fn abilities() -> Vec<effects::Modification> {
 #[cfg(test)]
 mod tests {
     use crate::BATTLEFIELD;
+    use crate::HAND;
+    use crate::PLUS_ONE_PLUS_ONE;
     use crate::counters;
     use crate::damage;
     use crate::testing::*;
@@ -71,11 +74,13 @@ mod tests {
     fn infect_damage_gives_poison_counters_instead_of_losing_life() -> TestResult {
         let (mut game, [p1, p2]) = MockGame::new([
             P1.battlefield([PLAGUE_STINGER, PLAGUE_STINGER]),
-            P2.battlefield([GRIZZLY_BEARS, GIANT_SPIDER]),
+            P2.battlefield([GRIZZLY_BEARS, GIANT_SPIDER, FOREST]).hand([BATTLEGROWTH]),
         ]);
         let [stinger_1, stinger_2] =
             game.player(p1).cards_in(BATTLEFIELD).exactly::<2>(PLAGUE_STINGER)?;
         let [spider] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(GIANT_SPIDER)?;
+        let [forest] = game.player(p2).cards_in(BATTLEFIELD).exactly::<1>(FOREST)?;
+        let [battlegrowth] = game.player(p2).cards_in(HAND).exactly::<1>(BATTLEGROWTH)?;
         game.play([
             p1.pass_to(turns::Step::DeclareAttackers),
             p2.pass_to(turns::Step::DeclareAttackers),
@@ -90,6 +95,16 @@ mod tests {
             p2.declare_blockers([(spider, stinger_1)]),
         ])?;
         game.play([
+            p2.activate_ability(forest.ability())
+                .cast(battlegrowth)
+                .targeting(spider)
+                .pass_priority(),
+            p1.pass_priority(),
+        ])?;
+        let mut plus_one = counters::Counters::default();
+        plus_one.add(PLUS_ONE_PLUS_ONE, 1);
+        assert_eq!(game.get::<counters::Counters>(spider), Some(plus_one));
+        game.play([
             p1.pass_to(turns::Step::CombatDamage),
             p2.pass_to(turns::Step::CombatDamage),
             p1.pass_priority(),
@@ -100,11 +115,9 @@ mod tests {
         let mut expected = counters::Counters::default();
         expected.add(counters::POISON, 1);
         assert_eq!(game.get::<counters::Counters>(p2), Some(expected));
-        let mut expected_spider = counters::Counters::default();
-        expected_spider.add(counters::MINUS_ONE_MINUS_ONE, 1);
         assert_eq!(
             game.get::<counters::Counters>(spider),
-            Some(expected_spider)
+            Some(counters::Counters::default())
         );
         assert_eq!(game.get::<damage::Damage>(spider), Some(damage::Damage(0)));
         Ok(())
