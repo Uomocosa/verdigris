@@ -205,3 +205,58 @@ all(creature() & controlled_by(YOU) & nontoken).gain(vigilance()),
 all(creature() & controlled_by(YOU) & !token()).get_pt(1, 1),
 all(creature() & controlled_by(YOU) & !token()).gain(vigilance()),
 ```
+
+**The old four-argument `instead`.**
+Replacement effects read as one sentence now (RATIONALE §8); the positional
+`instead(event, holder, cond, vec![..])` hid which part was which.
+
+```rust
+// Bad
+all(player()).instead(Draw, Draw::PLAYER, cond, vec![lose_life]),
+// Good
+if_a_player().would::<Draw>().when(cond).instead(Draw::PLAYER.lose_life(Draw::AMOUNT)),
+```
+
+**`controlled_by` for a graveyard owner.**
+Outside the battlefield a card has an owner, not a controller (RATIONALE §9, CR
+400.3); asking who controls it names the wrong player.
+
+```rust
+// Bad
+if_a(card() & controlled_by(OPPONENT)).would::<PutIntoGraveyard>()
+    .instead(PutIntoGraveyard::OBJECT.exile()),
+// Good
+if_a(card() & owned_by(OPPONENT)).would::<PutIntoGraveyard>()
+    .instead(PutIntoGraveyard::OBJECT.exile()),
+```
+
+**A hand-written `RestrictionId` in a fixture.**
+`card!` derives `card/kind/event` from the module and the `cant`/`restriction` call
+(RATIONALE §10); a literal ID repeats that and drifts from it.
+
+```rust
+// Bad
+all(creature() & controlled_by(YOU)).cant::<Destroy>(
+    Destroy::PERMANENT,
+    RestrictionId("test/test-safe-haven"),
+),
+// Good
+all(creature() & controlled_by(YOU)).cant::<Destroy>(Destroy::PERMANENT),
+```
+
+**An ability the oracle text lacks.**
+Every fixture line matches a printed line (RATIONALE §11); an extra ability grants
+the card something it never had.
+
+```rust
+// Bad: Laboratory Maniac does not begin the game on the battlefield.
+card! {
+    cards::creature("Laboratory Maniac", cost![2, U], pt!(2, 2));
+    begin_the_game_with_it_on_the_battlefield(),
+    if_you().would::<DrawFromEmptyLibrary>().instead(YOU.win_the_game()),
+}
+// Good
+card! {
+    cards::creature("Laboratory Maniac", cost![2, U], pt!(2, 2));
+    if_you().would::<DrawFromEmptyLibrary>().instead(YOU.win_the_game()),
+}

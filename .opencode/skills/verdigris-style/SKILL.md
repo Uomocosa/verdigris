@@ -231,6 +231,13 @@ its own commit, red first. Commit only on the full suite
 
 Card fixtures use the testing prelude and bare DSL names; filters, effects and
 conditions combine with `&` / `|` / `!`, never with methods (RATIONALE §6, SMELLS).
+Checklist before committing a fixture:
+
+- Pronouns: oracle "you" → `YOU`, "that player"/"it" → the event role (§7).
+- Replacements read `if … would … instead`, bare template unless `may(..)` (§8).
+- `card()` for any-zone cards, never tokens; `owned_by` off the battlefield (§9).
+- No `RestrictionId` in a fixture; rule IDs via `RestrictionId::rule` (§10).
+- Every line matches the printed oracle text; no extra abilities (§11).
 
 ## Adding rules here
 
