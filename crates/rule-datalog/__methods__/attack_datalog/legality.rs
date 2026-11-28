@@ -68,7 +68,6 @@ mod tests {
     use std::time::Instant;
 
     use verdigris_datalog_datafrog::DatafrogEngine;
-    use verdigris_datalog_nemo::NemoEngine;
     use verdigris_rule_engine::BATTLEFIELD;
     use verdigris_rule_engine::HAND;
     use verdigris_rule_engine::events;
@@ -114,15 +113,7 @@ mod tests {
                 Some(answers.legality(&events::Attack { attacker: *bears }))
             );
             assert_eq!(
-                legality(&NemoEngine, answers, *bears, viewer).unwrap(),
-                Some(answers.legality(&events::Attack { attacker: *bears }))
-            );
-            assert_eq!(
                 legality(&DatafrogEngine, answers, *bears, other).unwrap(),
-                Some(answers.legality(&events::Attack { attacker: *bears }))
-            );
-            assert_eq!(
-                legality(&NemoEngine, answers, *bears, other).unwrap(),
                 Some(answers.legality(&events::Attack { attacker: *bears }))
             );
             assert_eq!(
@@ -130,7 +121,6 @@ mod tests {
                 Some(answers.legality(&events::Attack { attacker: *forest }))
             );
             assert_eq!(legality(&DatafrogEngine, answers, *forest, other), Ok(None));
-            assert_eq!(legality(&NemoEngine, answers, *forest, other), Ok(None));
         })
         .unwrap();
     }
@@ -147,30 +137,24 @@ mod tests {
         ])
         .unwrap();
         let viewer = players::PlayerId(*p1);
-        let (candidates, datafrog_time, nemo_time) = game
+        let (candidates, datafrog_time) = game
             .read_rules(|answers, _legal| {
                 let mut candidates = 0;
                 let mut datafrog_time = Duration::ZERO;
-                let mut nemo_time = Duration::ZERO;
                 for card in PlayDatalog::visible_entities(answers, viewer) {
                     let expected = answers.legality(&events::Attack { attacker: card });
                     let started = Instant::now();
                     let datafrogged =
                         AttackDatalog::legality(&DatafrogEngine, answers, card, viewer).unwrap();
                     datafrog_time += started.elapsed();
-                    let started = Instant::now();
-                    let nemoed =
-                        AttackDatalog::legality(&NemoEngine, answers, card, viewer).unwrap();
-                    nemo_time += started.elapsed();
-                    assert_eq!(datafrogged, Some(expected.clone()));
-                    assert_eq!(nemoed, Some(expected));
+                    assert_eq!(datafrogged, Some(expected));
                     candidates += 1;
                 }
-                (candidates, datafrog_time, nemo_time)
+                (candidates, datafrog_time)
             })
             .unwrap();
         eprintln!(
-            "ORACLE attack-opponent-creature candidates={candidates} datafrog_time={datafrog_time:?} nemo_time={nemo_time:?}"
+            "ORACLE attack-opponent-creature candidates={candidates} datafrog_time={datafrog_time:?}"
         );
         assert_eq!(candidates, 2);
     }
@@ -184,30 +168,24 @@ mod tests {
         ])
         .unwrap();
         let viewer = players::PlayerId(*p1);
-        let (candidates, datafrog_time, nemo_time) = game
+        let (candidates, datafrog_time) = game
             .read_rules(|answers, _legal| {
                 let mut candidates = 0;
                 let mut datafrog_time = Duration::ZERO;
-                let mut nemo_time = Duration::ZERO;
                 for card in PlayDatalog::visible_entities(answers, viewer) {
                     let expected = answers.legality(&events::Attack { attacker: card });
                     let started = Instant::now();
                     let datafrogged =
                         AttackDatalog::legality(&DatafrogEngine, answers, card, viewer).unwrap();
                     datafrog_time += started.elapsed();
-                    let started = Instant::now();
-                    let nemoed =
-                        AttackDatalog::legality(&NemoEngine, answers, card, viewer).unwrap();
-                    nemo_time += started.elapsed();
-                    assert_eq!(datafrogged, Some(expected.clone()));
-                    assert_eq!(nemoed, Some(expected));
+                    assert_eq!(datafrogged, Some(expected));
                     candidates += 1;
                 }
-                (candidates, datafrog_time, nemo_time)
+                (candidates, datafrog_time)
             })
             .unwrap();
         eprintln!(
-            "ORACLE attack-noncreature candidates={candidates} datafrog_time={datafrog_time:?} nemo_time={nemo_time:?}"
+            "ORACLE attack-noncreature candidates={candidates} datafrog_time={datafrog_time:?}"
         );
         assert_eq!(candidates, 1);
     }
@@ -224,31 +202,23 @@ mod tests {
         ])
         .unwrap();
         let viewer = players::PlayerId(*p1);
-        let (candidates, datafrog_time, nemo_time) = game
+        let (candidates, datafrog_time) = game
             .read_rules(|answers, _legal| {
                 let mut candidates = 0;
                 let mut datafrog_time = Duration::ZERO;
-                let mut nemo_time = Duration::ZERO;
                 for card in PlayDatalog::visible_entities(answers, viewer) {
                     let expected = answers.legality(&events::Attack { attacker: card });
                     let started = Instant::now();
                     let datafrogged =
                         AttackDatalog::legality(&DatafrogEngine, answers, card, viewer).unwrap();
                     datafrog_time += started.elapsed();
-                    let started = Instant::now();
-                    let nemoed =
-                        AttackDatalog::legality(&NemoEngine, answers, card, viewer).unwrap();
-                    nemo_time += started.elapsed();
-                    assert_eq!(datafrogged, Some(expected.clone()));
-                    assert_eq!(nemoed, Some(expected));
+                    assert_eq!(datafrogged, Some(expected));
                     candidates += 1;
                 }
-                (candidates, datafrog_time, nemo_time)
+                (candidates, datafrog_time)
             })
             .unwrap();
-        eprintln!(
-            "ORACLE attack-tapped candidates={candidates} datafrog_time={datafrog_time:?} nemo_time={nemo_time:?}"
-        );
+        eprintln!("ORACLE attack-tapped candidates={candidates} datafrog_time={datafrog_time:?}");
         assert_eq!(candidates, 2);
     }
 
@@ -264,30 +234,24 @@ mod tests {
         ])
         .unwrap();
         let viewer = players::PlayerId(*p1);
-        let (candidates, datafrog_time, nemo_time) = game
+        let (candidates, datafrog_time) = game
             .read_rules(|answers, _legal| {
                 let mut candidates = 0;
                 let mut datafrog_time = Duration::ZERO;
-                let mut nemo_time = Duration::ZERO;
                 for card in PlayDatalog::visible_entities(answers, viewer) {
                     let expected = answers.legality(&events::Attack { attacker: card });
                     let started = Instant::now();
                     let datafrogged =
                         AttackDatalog::legality(&DatafrogEngine, answers, card, viewer).unwrap();
                     datafrog_time += started.elapsed();
-                    let started = Instant::now();
-                    let nemoed =
-                        AttackDatalog::legality(&NemoEngine, answers, card, viewer).unwrap();
-                    nemo_time += started.elapsed();
-                    assert_eq!(datafrogged, Some(expected.clone()));
-                    assert_eq!(nemoed, Some(expected));
+                    assert_eq!(datafrogged, Some(expected));
                     candidates += 1;
                 }
-                (candidates, datafrog_time, nemo_time)
+                (candidates, datafrog_time)
             })
             .unwrap();
         eprintln!(
-            "ORACLE attack-summoning-sick candidates={candidates} datafrog_time={datafrog_time:?} nemo_time={nemo_time:?}"
+            "ORACLE attack-summoning-sick candidates={candidates} datafrog_time={datafrog_time:?}"
         );
         assert_eq!(candidates, 1);
     }
@@ -301,31 +265,23 @@ mod tests {
         ])
         .unwrap();
         let viewer = players::PlayerId(*p1);
-        let (candidates, datafrog_time, nemo_time) = game
+        let (candidates, datafrog_time) = game
             .read_rules(|answers, _legal| {
                 let mut candidates = 0;
                 let mut datafrog_time = Duration::ZERO;
-                let mut nemo_time = Duration::ZERO;
                 for card in PlayDatalog::visible_entities(answers, viewer) {
                     let expected = answers.legality(&events::Attack { attacker: card });
                     let started = Instant::now();
                     let datafrogged =
                         AttackDatalog::legality(&DatafrogEngine, answers, card, viewer).unwrap();
                     datafrog_time += started.elapsed();
-                    let started = Instant::now();
-                    let nemoed =
-                        AttackDatalog::legality(&NemoEngine, answers, card, viewer).unwrap();
-                    nemo_time += started.elapsed();
-                    assert_eq!(datafrogged, Some(expected.clone()));
-                    assert_eq!(nemoed, Some(expected));
+                    assert_eq!(datafrogged, Some(expected));
                     candidates += 1;
                 }
-                (candidates, datafrog_time, nemo_time)
+                (candidates, datafrog_time)
             })
             .unwrap();
-        eprintln!(
-            "ORACLE attack-defender candidates={candidates} datafrog_time={datafrog_time:?} nemo_time={nemo_time:?}"
-        );
+        eprintln!("ORACLE attack-defender candidates={candidates} datafrog_time={datafrog_time:?}");
         assert_eq!(candidates, 1);
     }
 
@@ -345,31 +301,23 @@ mod tests {
         ])
         .unwrap();
         let viewer = players::PlayerId(*p1);
-        let (candidates, datafrog_time, nemo_time) = game
+        let (candidates, datafrog_time) = game
             .read_rules(|answers, _legal| {
                 let mut candidates = 0;
                 let mut datafrog_time = Duration::ZERO;
-                let mut nemo_time = Duration::ZERO;
                 for card in PlayDatalog::visible_entities(answers, viewer) {
                     let expected = answers.legality(&events::Attack { attacker: card });
                     let started = Instant::now();
                     let datafrogged =
                         AttackDatalog::legality(&DatafrogEngine, answers, card, viewer).unwrap();
                     datafrog_time += started.elapsed();
-                    let started = Instant::now();
-                    let nemoed =
-                        AttackDatalog::legality(&NemoEngine, answers, card, viewer).unwrap();
-                    nemo_time += started.elapsed();
-                    assert_eq!(datafrogged, Some(expected.clone()));
-                    assert_eq!(nemoed, Some(expected));
+                    assert_eq!(datafrogged, Some(expected));
                     candidates += 1;
                 }
-                (candidates, datafrog_time, nemo_time)
+                (candidates, datafrog_time)
             })
             .unwrap();
-        eprintln!(
-            "ORACLE attack-haste candidates={candidates} datafrog_time={datafrog_time:?} nemo_time={nemo_time:?}"
-        );
+        eprintln!("ORACLE attack-haste candidates={candidates} datafrog_time={datafrog_time:?}");
         assert_eq!(candidates, 2);
     }
 
@@ -383,30 +331,24 @@ mod tests {
         ])
         .unwrap();
         let viewer = players::PlayerId(*p1);
-        let (candidates, datafrog_time, nemo_time) = game
+        let (candidates, datafrog_time) = game
             .read_rules(|answers, _legal| {
                 let mut candidates = 0;
                 let mut datafrog_time = Duration::ZERO;
-                let mut nemo_time = Duration::ZERO;
                 for card in PlayDatalog::visible_entities(answers, viewer) {
                     let expected = answers.legality(&events::Attack { attacker: card });
                     let started = Instant::now();
                     let datafrogged =
                         AttackDatalog::legality(&DatafrogEngine, answers, card, viewer).unwrap();
                     datafrog_time += started.elapsed();
-                    let started = Instant::now();
-                    let nemoed =
-                        AttackDatalog::legality(&NemoEngine, answers, card, viewer).unwrap();
-                    nemo_time += started.elapsed();
-                    assert_eq!(datafrogged, Some(expected.clone()));
-                    assert_eq!(nemoed, Some(expected));
+                    assert_eq!(datafrogged, Some(expected));
                     candidates += 1;
                 }
-                (candidates, datafrog_time, nemo_time)
+                (candidates, datafrog_time)
             })
             .unwrap();
         eprintln!(
-            "ORACLE attack-must-attack candidates={candidates} datafrog_time={datafrog_time:?} nemo_time={nemo_time:?}"
+            "ORACLE attack-must-attack candidates={candidates} datafrog_time={datafrog_time:?}"
         );
         assert_eq!(candidates, 2);
     }
@@ -425,30 +367,24 @@ mod tests {
         ])
         .unwrap();
         let viewer = players::PlayerId(*p1);
-        let (candidates, datafrog_time, nemo_time) = game
+        let (candidates, datafrog_time) = game
             .read_rules(|answers, _legal| {
                 let mut candidates = 0;
                 let mut datafrog_time = Duration::ZERO;
-                let mut nemo_time = Duration::ZERO;
                 for card in PlayDatalog::visible_entities(answers, viewer) {
                     let expected = answers.legality(&events::Attack { attacker: card });
                     let started = Instant::now();
                     let datafrogged =
                         AttackDatalog::legality(&DatafrogEngine, answers, card, viewer).unwrap();
                     datafrog_time += started.elapsed();
-                    let started = Instant::now();
-                    let nemoed =
-                        AttackDatalog::legality(&NemoEngine, answers, card, viewer).unwrap();
-                    nemo_time += started.elapsed();
-                    assert_eq!(datafrogged, Some(expected.clone()));
-                    assert_eq!(nemoed, Some(expected));
+                    assert_eq!(datafrogged, Some(expected));
                     candidates += 1;
                 }
-                (candidates, datafrog_time, nemo_time)
+                (candidates, datafrog_time)
             })
             .unwrap();
         eprintln!(
-            "ORACLE attack-hasty-banner candidates={candidates} datafrog_time={datafrog_time:?} nemo_time={nemo_time:?}"
+            "ORACLE attack-hasty-banner candidates={candidates} datafrog_time={datafrog_time:?}"
         );
         assert_eq!(candidates, 2);
     }
@@ -465,30 +401,24 @@ mod tests {
         ])
         .unwrap();
         let viewer = players::PlayerId(*p1);
-        let (candidates, datafrog_time, nemo_time) = game
+        let (candidates, datafrog_time) = game
             .read_rules(|answers, _legal| {
                 let mut candidates = 0;
                 let mut datafrog_time = Duration::ZERO;
-                let mut nemo_time = Duration::ZERO;
                 for card in PlayDatalog::visible_entities(answers, viewer) {
                     let expected = answers.legality(&events::Attack { attacker: card });
                     let started = Instant::now();
                     let datafrogged =
                         AttackDatalog::legality(&DatafrogEngine, answers, card, viewer).unwrap();
                     datafrog_time += started.elapsed();
-                    let started = Instant::now();
-                    let nemoed =
-                        AttackDatalog::legality(&NemoEngine, answers, card, viewer).unwrap();
-                    nemo_time += started.elapsed();
-                    assert_eq!(datafrogged, Some(expected.clone()));
-                    assert_eq!(nemoed, Some(expected));
+                    assert_eq!(datafrogged, Some(expected));
                     candidates += 1;
                 }
-                (candidates, datafrog_time, nemo_time)
+                (candidates, datafrog_time)
             })
             .unwrap();
         eprintln!(
-            "ORACLE attack-defender-loss candidates={candidates} datafrog_time={datafrog_time:?} nemo_time={nemo_time:?}"
+            "ORACLE attack-defender-loss candidates={candidates} datafrog_time={datafrog_time:?}"
         );
         assert_eq!(candidates, 2);
     }
@@ -507,30 +437,24 @@ mod tests {
         ])
         .unwrap();
         let viewer = players::PlayerId(*p1);
-        let (candidates, datafrog_time, nemo_time) = game
+        let (candidates, datafrog_time) = game
             .read_rules(|answers, _legal| {
                 let mut candidates = 0;
                 let mut datafrog_time = Duration::ZERO;
-                let mut nemo_time = Duration::ZERO;
                 for card in PlayDatalog::visible_entities(answers, viewer) {
                     let expected = answers.legality(&events::Attack { attacker: card });
                     let started = Instant::now();
                     let datafrogged =
                         AttackDatalog::legality(&DatafrogEngine, answers, card, viewer).unwrap();
                     datafrog_time += started.elapsed();
-                    let started = Instant::now();
-                    let nemoed =
-                        AttackDatalog::legality(&NemoEngine, answers, card, viewer).unwrap();
-                    nemo_time += started.elapsed();
-                    assert_eq!(datafrogged, Some(expected.clone()));
-                    assert_eq!(nemoed, Some(expected));
+                    assert_eq!(datafrogged, Some(expected));
                     candidates += 1;
                 }
-                (candidates, datafrog_time, nemo_time)
+                (candidates, datafrog_time)
             })
             .unwrap();
         eprintln!(
-            "ORACLE attack-as-though-haste candidates={candidates} datafrog_time={datafrog_time:?} nemo_time={nemo_time:?}"
+            "ORACLE attack-as-though-haste candidates={candidates} datafrog_time={datafrog_time:?}"
         );
         assert_eq!(candidates, 2);
     }
@@ -545,30 +469,24 @@ mod tests {
         ])
         .unwrap();
         let viewer = players::PlayerId(*p1);
-        let (candidates, datafrog_time, nemo_time) = game
+        let (candidates, datafrog_time) = game
             .read_rules(|answers, _legal| {
                 let mut candidates = 0;
                 let mut datafrog_time = Duration::ZERO;
-                let mut nemo_time = Duration::ZERO;
                 for card in PlayDatalog::visible_entities(answers, viewer) {
                     let expected = answers.legality(&events::Attack { attacker: card });
                     let started = Instant::now();
                     let datafrogged =
                         AttackDatalog::legality(&DatafrogEngine, answers, card, viewer).unwrap();
                     datafrog_time += started.elapsed();
-                    let started = Instant::now();
-                    let nemoed =
-                        AttackDatalog::legality(&NemoEngine, answers, card, viewer).unwrap();
-                    nemo_time += started.elapsed();
-                    assert_eq!(datafrogged, Some(expected.clone()));
-                    assert_eq!(nemoed, Some(expected));
+                    assert_eq!(datafrogged, Some(expected));
                     candidates += 1;
                 }
-                (candidates, datafrog_time, nemo_time)
+                (candidates, datafrog_time)
             })
             .unwrap();
         eprintln!(
-            "ORACLE attack-war-drums candidates={candidates} datafrog_time={datafrog_time:?} nemo_time={nemo_time:?}"
+            "ORACLE attack-war-drums candidates={candidates} datafrog_time={datafrog_time:?}"
         );
         assert_eq!(candidates, 2);
     }
@@ -585,30 +503,24 @@ mod tests {
         ])
         .unwrap();
         let viewer = players::PlayerId(*p1);
-        let (candidates, datafrog_time, nemo_time) = game
+        let (candidates, datafrog_time) = game
             .read_rules(|answers, _legal| {
                 let mut candidates = 0;
                 let mut datafrog_time = Duration::ZERO;
-                let mut nemo_time = Duration::ZERO;
                 for card in PlayDatalog::visible_entities(answers, viewer) {
                     let expected = answers.legality(&events::Attack { attacker: card });
                     let started = Instant::now();
                     let datafrogged =
                         AttackDatalog::legality(&DatafrogEngine, answers, card, viewer).unwrap();
                     datafrog_time += started.elapsed();
-                    let started = Instant::now();
-                    let nemoed =
-                        AttackDatalog::legality(&NemoEngine, answers, card, viewer).unwrap();
-                    nemo_time += started.elapsed();
-                    assert_eq!(datafrogged, Some(expected.clone()));
-                    assert_eq!(nemoed, Some(expected));
+                    assert_eq!(datafrogged, Some(expected));
                     candidates += 1;
                 }
-                (candidates, datafrog_time, nemo_time)
+                (candidates, datafrog_time)
             })
             .unwrap();
         eprintln!(
-            "ORACLE attack-call-to-arms candidates={candidates} datafrog_time={datafrog_time:?} nemo_time={nemo_time:?}"
+            "ORACLE attack-call-to-arms candidates={candidates} datafrog_time={datafrog_time:?}"
         );
         assert_eq!(candidates, 2);
     }
@@ -623,30 +535,24 @@ mod tests {
         ])
         .unwrap();
         let viewer = players::PlayerId(*p1);
-        let (candidates, datafrog_time, nemo_time) = game
+        let (candidates, datafrog_time) = game
             .read_rules(|answers, _legal| {
                 let mut candidates = 0;
                 let mut datafrog_time = Duration::ZERO;
-                let mut nemo_time = Duration::ZERO;
                 for card in PlayDatalog::visible_entities(answers, viewer) {
                     let expected = answers.legality(&events::Attack { attacker: card });
                     let started = Instant::now();
                     let datafrogged =
                         AttackDatalog::legality(&DatafrogEngine, answers, card, viewer).unwrap();
                     datafrog_time += started.elapsed();
-                    let started = Instant::now();
-                    let nemoed =
-                        AttackDatalog::legality(&NemoEngine, answers, card, viewer).unwrap();
-                    nemo_time += started.elapsed();
-                    assert_eq!(datafrogged, Some(expected.clone()));
-                    assert_eq!(nemoed, Some(expected));
+                    assert_eq!(datafrogged, Some(expected));
                     candidates += 1;
                 }
-                (candidates, datafrog_time, nemo_time)
+                (candidates, datafrog_time)
             })
             .unwrap();
         eprintln!(
-            "ORACLE attack-restless-watcher candidates={candidates} datafrog_time={datafrog_time:?} nemo_time={nemo_time:?}"
+            "ORACLE attack-restless-watcher candidates={candidates} datafrog_time={datafrog_time:?}"
         );
         assert_eq!(candidates, 1);
     }
@@ -660,30 +566,24 @@ mod tests {
         ])
         .unwrap();
         let viewer = players::PlayerId(*p1);
-        let (candidates, datafrog_time, nemo_time) = game
+        let (candidates, datafrog_time) = game
             .read_rules(|answers, _legal| {
                 let mut candidates = 0;
                 let mut datafrog_time = Duration::ZERO;
-                let mut nemo_time = Duration::ZERO;
                 for card in PlayDatalog::visible_entities(answers, viewer) {
                     let expected = answers.legality(&events::Attack { attacker: card });
                     let started = Instant::now();
                     let datafrogged =
                         AttackDatalog::legality(&DatafrogEngine, answers, card, viewer).unwrap();
                     datafrog_time += started.elapsed();
-                    let started = Instant::now();
-                    let nemoed =
-                        AttackDatalog::legality(&NemoEngine, answers, card, viewer).unwrap();
-                    nemo_time += started.elapsed();
-                    assert_eq!(datafrogged, Some(expected.clone()));
-                    assert_eq!(nemoed, Some(expected));
+                    assert_eq!(datafrogged, Some(expected));
                     candidates += 1;
                 }
-                (candidates, datafrog_time, nemo_time)
+                (candidates, datafrog_time)
             })
             .unwrap();
         eprintln!(
-            "ORACLE attack-eager-wall candidates={candidates} datafrog_time={datafrog_time:?} nemo_time={nemo_time:?}"
+            "ORACLE attack-eager-wall candidates={candidates} datafrog_time={datafrog_time:?}"
         );
         assert_eq!(candidates, 1);
     }
@@ -700,30 +600,24 @@ mod tests {
         ])
         .unwrap();
         let viewer = players::PlayerId(*p1);
-        let (candidates, datafrog_time, nemo_time) = game
+        let (candidates, datafrog_time) = game
             .read_rules(|answers, _legal| {
                 let mut candidates = 0;
                 let mut datafrog_time = Duration::ZERO;
-                let mut nemo_time = Duration::ZERO;
                 for card in PlayDatalog::visible_entities(answers, viewer) {
                     let expected = answers.legality(&events::Attack { attacker: card });
                     let started = Instant::now();
                     let datafrogged =
                         AttackDatalog::legality(&DatafrogEngine, answers, card, viewer).unwrap();
                     datafrog_time += started.elapsed();
-                    let started = Instant::now();
-                    let nemoed =
-                        AttackDatalog::legality(&NemoEngine, answers, card, viewer).unwrap();
-                    nemo_time += started.elapsed();
-                    assert_eq!(datafrogged, Some(expected.clone()));
-                    assert_eq!(nemoed, Some(expected));
+                    assert_eq!(datafrogged, Some(expected));
                     candidates += 1;
                 }
-                (candidates, datafrog_time, nemo_time)
+                (candidates, datafrog_time)
             })
             .unwrap();
         eprintln!(
-            "ORACLE attack-silent-arbiter candidates={candidates} datafrog_time={datafrog_time:?} nemo_time={nemo_time:?}"
+            "ORACLE attack-silent-arbiter candidates={candidates} datafrog_time={datafrog_time:?}"
         );
         assert_eq!(candidates, 3);
     }
@@ -739,59 +633,47 @@ mod tests {
         let [corpse] = game.player(p1).cards_in(HAND).exactly::<1>(WALKING_CORPSE).unwrap();
         game.play([p1.cast(corpse).pass_priority(), p2.pass_priority()]).unwrap();
         let viewer = players::PlayerId(*p1);
-        let (sick, sick_datafrog_time, sick_nemo_time) = game
+        let (sick, sick_datafrog_time) = game
             .read_rules(|answers, _legal| {
                 let mut candidates = 0;
                 let mut datafrog_time = Duration::ZERO;
-                let mut nemo_time = Duration::ZERO;
                 for card in PlayDatalog::visible_entities(answers, viewer) {
                     let expected = answers.legality(&events::Attack { attacker: card });
                     let started = Instant::now();
                     let datafrogged =
                         AttackDatalog::legality(&DatafrogEngine, answers, card, viewer).unwrap();
                     datafrog_time += started.elapsed();
-                    let started = Instant::now();
-                    let nemoed =
-                        AttackDatalog::legality(&NemoEngine, answers, card, viewer).unwrap();
-                    nemo_time += started.elapsed();
-                    assert_eq!(datafrogged, Some(expected.clone()));
-                    assert_eq!(nemoed, Some(expected));
+                    assert_eq!(datafrogged, Some(expected));
                     candidates += 1;
                 }
-                (candidates, datafrog_time, nemo_time)
+                (candidates, datafrog_time)
             })
             .unwrap();
         eprintln!(
-            "ORACLE attack-sickness-sick candidates={sick} datafrog_time={sick_datafrog_time:?} nemo_time={sick_nemo_time:?}"
+            "ORACLE attack-sickness-sick candidates={sick} datafrog_time={sick_datafrog_time:?}"
         );
         assert_eq!(sick, 2);
         game.play([p1.end_turn(), p2.end_turn()]).unwrap();
         game.play([p2.end_turn(), p1.end_turn()]).unwrap();
         game.play([p1.pass_to(turns::Step::Upkeep)]).unwrap();
-        let (lifted, lifted_datafrog_time, lifted_nemo_time) = game
+        let (lifted, lifted_datafrog_time) = game
             .read_rules(|answers, _legal| {
                 let mut candidates = 0;
                 let mut datafrog_time = Duration::ZERO;
-                let mut nemo_time = Duration::ZERO;
                 for card in PlayDatalog::visible_entities(answers, viewer) {
                     let expected = answers.legality(&events::Attack { attacker: card });
                     let started = Instant::now();
                     let datafrogged =
                         AttackDatalog::legality(&DatafrogEngine, answers, card, viewer).unwrap();
                     datafrog_time += started.elapsed();
-                    let started = Instant::now();
-                    let nemoed =
-                        AttackDatalog::legality(&NemoEngine, answers, card, viewer).unwrap();
-                    nemo_time += started.elapsed();
-                    assert_eq!(datafrogged, Some(expected.clone()));
-                    assert_eq!(nemoed, Some(expected));
+                    assert_eq!(datafrogged, Some(expected));
                     candidates += 1;
                 }
-                (candidates, datafrog_time, nemo_time)
+                (candidates, datafrog_time)
             })
             .unwrap();
         eprintln!(
-            "ORACLE attack-sickness-lifted candidates={lifted} datafrog_time={lifted_datafrog_time:?} nemo_time={lifted_nemo_time:?}"
+            "ORACLE attack-sickness-lifted candidates={lifted} datafrog_time={lifted_datafrog_time:?}"
         );
         assert_eq!(lifted, 2);
     }

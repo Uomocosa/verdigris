@@ -34,5 +34,5 @@ same program and the same tests run on every backend.
 
 ## Not in scope
 
-Evaluation (see `verdigris-datalog-datafrog`, `verdigris-datalog-nemo`) and anything MTG-specific (see
+Evaluation (see `verdigris-datalog-datafrog`) and anything MTG-specific (see
 `verdigris-rule-datalog`).

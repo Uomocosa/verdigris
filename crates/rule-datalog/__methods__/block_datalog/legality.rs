@@ -67,7 +67,6 @@ mod tests {
     use std::time::Instant;
 
     use verdigris_datalog_datafrog::DatafrogEngine;
-    use verdigris_datalog_nemo::NemoEngine;
     use verdigris_rule_engine::BATTLEFIELD;
     use verdigris_rule_engine::HAND;
     use verdigris_rule_engine::cards;
@@ -120,13 +119,6 @@ mod tests {
                 }))
             );
             assert_eq!(
-                legality(&NemoEngine, answers, *bears_1, *bears_2, viewer).unwrap(),
-                Some(answers.legality(&events::DeclareBlocker {
-                    blocker: *bears_1,
-                    attacker: *bears_2,
-                }))
-            );
-            assert_eq!(
                 legality(&DatafrogEngine, answers, *bears_2, *bears_1, viewer).unwrap(),
                 Some(answers.legality(&events::DeclareBlocker {
                     blocker: *bears_2,
@@ -134,21 +126,7 @@ mod tests {
                 }))
             );
             assert_eq!(
-                legality(&NemoEngine, answers, *bears_2, *bears_1, viewer).unwrap(),
-                Some(answers.legality(&events::DeclareBlocker {
-                    blocker: *bears_2,
-                    attacker: *bears_1,
-                }))
-            );
-            assert_eq!(
                 legality(&DatafrogEngine, answers, *bears_1, *bears_2, other).unwrap(),
-                Some(answers.legality(&events::DeclareBlocker {
-                    blocker: *bears_1,
-                    attacker: *bears_2,
-                }))
-            );
-            assert_eq!(
-                legality(&NemoEngine, answers, *bears_1, *bears_2, other).unwrap(),
                 Some(answers.legality(&events::DeclareBlocker {
                     blocker: *bears_1,
                     attacker: *bears_2,
@@ -166,15 +144,7 @@ mod tests {
                 Ok(None)
             );
             assert_eq!(
-                legality(&NemoEngine, answers, *forest, *bears_2, other),
-                Ok(None)
-            );
-            assert_eq!(
                 legality(&DatafrogEngine, answers, *bears_2, *forest, other),
-                Ok(None)
-            );
-            assert_eq!(
-                legality(&NemoEngine, answers, *bears_2, *forest, other),
                 Ok(None)
             );
         })
@@ -201,7 +171,7 @@ mod tests {
         .unwrap();
         game.play([p1.pass_priority()]).unwrap();
         let viewer = players::PlayerId(*p2);
-        let (pairs, datafrog_time, nemo_time) = game
+        let (pairs, datafrog_time) = game
             .read_rules(|answers, _legal| {
                 let visible = PlayDatalog::visible_entities(answers, viewer);
                 let mut blockers = Vec::new();
@@ -223,7 +193,6 @@ mod tests {
                 attackers.sort();
                 let mut pairs = 0;
                 let mut datafrog_time = Duration::ZERO;
-                let mut nemo_time = Duration::ZERO;
                 for blocker in &blockers {
                     for attacker in &attackers {
                         let expected = answers.legality(&events::DeclareBlocker {
@@ -240,27 +209,14 @@ mod tests {
                         )
                         .unwrap();
                         datafrog_time += started.elapsed();
-                        let started = Instant::now();
-                        let nemoed = BlockDatalog::legality(
-                            &NemoEngine,
-                            answers,
-                            *blocker,
-                            *attacker,
-                            viewer,
-                        )
-                        .unwrap();
-                        nemo_time += started.elapsed();
-                        assert_eq!(datafrogged, Some(expected.clone()));
-                        assert_eq!(nemoed, Some(expected));
+                        assert_eq!(datafrogged, Some(expected));
                         pairs += 1;
                     }
                 }
-                (pairs, datafrog_time, nemo_time)
+                (pairs, datafrog_time)
             })
             .unwrap();
-        eprintln!(
-            "ORACLE block-tapped-blocker candidates={pairs} datafrog_time={datafrog_time:?} nemo_time={nemo_time:?}"
-        );
+        eprintln!("ORACLE block-tapped-blocker candidates={pairs} datafrog_time={datafrog_time:?}");
         assert_eq!(pairs, 2);
     }
 
@@ -284,7 +240,7 @@ mod tests {
         .unwrap();
         game.play([p1.pass_priority()]).unwrap();
         let viewer = players::PlayerId(*p2);
-        let (pairs, datafrog_time, nemo_time) = game
+        let (pairs, datafrog_time) = game
             .read_rules(|answers, _legal| {
                 let visible = PlayDatalog::visible_entities(answers, viewer);
                 let mut blockers = Vec::new();
@@ -306,7 +262,6 @@ mod tests {
                 attackers.sort();
                 let mut pairs = 0;
                 let mut datafrog_time = Duration::ZERO;
-                let mut nemo_time = Duration::ZERO;
                 for blocker in &blockers {
                     for attacker in &attackers {
                         let expected = answers.legality(&events::DeclareBlocker {
@@ -323,27 +278,14 @@ mod tests {
                         )
                         .unwrap();
                         datafrog_time += started.elapsed();
-                        let started = Instant::now();
-                        let nemoed = BlockDatalog::legality(
-                            &NemoEngine,
-                            answers,
-                            *blocker,
-                            *attacker,
-                            viewer,
-                        )
-                        .unwrap();
-                        nemo_time += started.elapsed();
-                        assert_eq!(datafrogged, Some(expected.clone()));
-                        assert_eq!(nemoed, Some(expected));
+                        assert_eq!(datafrogged, Some(expected));
                         pairs += 1;
                     }
                 }
-                (pairs, datafrog_time, nemo_time)
+                (pairs, datafrog_time)
             })
             .unwrap();
-        eprintln!(
-            "ORACLE block-tapped-sentry candidates={pairs} datafrog_time={datafrog_time:?} nemo_time={nemo_time:?}"
-        );
+        eprintln!("ORACLE block-tapped-sentry candidates={pairs} datafrog_time={datafrog_time:?}");
         assert_eq!(pairs, 2);
     }
 
@@ -367,7 +309,7 @@ mod tests {
         .unwrap();
         game.play([p1.pass_priority()]).unwrap();
         let viewer = players::PlayerId(*p2);
-        let (pairs, datafrog_time, nemo_time) = game
+        let (pairs, datafrog_time) = game
             .read_rules(|answers, _legal| {
                 let visible = PlayDatalog::visible_entities(answers, viewer);
                 let mut blockers = Vec::new();
@@ -389,7 +331,6 @@ mod tests {
                 attackers.sort();
                 let mut pairs = 0;
                 let mut datafrog_time = Duration::ZERO;
-                let mut nemo_time = Duration::ZERO;
                 for blocker in &blockers {
                     for attacker in &attackers {
                         let expected = answers.legality(&events::DeclareBlocker {
@@ -406,27 +347,14 @@ mod tests {
                         )
                         .unwrap();
                         datafrog_time += started.elapsed();
-                        let started = Instant::now();
-                        let nemoed = BlockDatalog::legality(
-                            &NemoEngine,
-                            answers,
-                            *blocker,
-                            *attacker,
-                            viewer,
-                        )
-                        .unwrap();
-                        nemo_time += started.elapsed();
-                        assert_eq!(datafrogged, Some(expected.clone()));
-                        assert_eq!(nemoed, Some(expected));
+                        assert_eq!(datafrogged, Some(expected));
                         pairs += 1;
                     }
                 }
-                (pairs, datafrog_time, nemo_time)
+                (pairs, datafrog_time)
             })
             .unwrap();
-        eprintln!(
-            "ORACLE block-non-attacking candidates={pairs} datafrog_time={datafrog_time:?} nemo_time={nemo_time:?}"
-        );
+        eprintln!("ORACLE block-non-attacking candidates={pairs} datafrog_time={datafrog_time:?}");
         assert_eq!(pairs, 3);
     }
 
@@ -450,7 +378,7 @@ mod tests {
         .unwrap();
         game.play([p1.pass_priority()]).unwrap();
         let viewer = players::PlayerId(*p2);
-        let (pairs, datafrog_time, nemo_time) = game
+        let (pairs, datafrog_time) = game
             .read_rules(|answers, _legal| {
                 let visible = PlayDatalog::visible_entities(answers, viewer);
                 let mut blockers = Vec::new();
@@ -472,7 +400,6 @@ mod tests {
                 attackers.sort();
                 let mut pairs = 0;
                 let mut datafrog_time = Duration::ZERO;
-                let mut nemo_time = Duration::ZERO;
                 for blocker in &blockers {
                     for attacker in &attackers {
                         let expected = answers.legality(&events::DeclareBlocker {
@@ -489,27 +416,14 @@ mod tests {
                         )
                         .unwrap();
                         datafrog_time += started.elapsed();
-                        let started = Instant::now();
-                        let nemoed = BlockDatalog::legality(
-                            &NemoEngine,
-                            answers,
-                            *blocker,
-                            *attacker,
-                            viewer,
-                        )
-                        .unwrap();
-                        nemo_time += started.elapsed();
-                        assert_eq!(datafrogged, Some(expected.clone()));
-                        assert_eq!(nemoed, Some(expected));
+                        assert_eq!(datafrogged, Some(expected));
                         pairs += 1;
                     }
                 }
-                (pairs, datafrog_time, nemo_time)
+                (pairs, datafrog_time)
             })
             .unwrap();
-        eprintln!(
-            "ORACLE block-flying candidates={pairs} datafrog_time={datafrog_time:?} nemo_time={nemo_time:?}"
-        );
+        eprintln!("ORACLE block-flying candidates={pairs} datafrog_time={datafrog_time:?}");
         assert_eq!(pairs, 2);
     }
 
@@ -534,7 +448,7 @@ mod tests {
         .unwrap();
         game.play([p1.pass_priority()]).unwrap();
         let viewer = players::PlayerId(*p2);
-        let (pairs, datafrog_time, nemo_time) = game
+        let (pairs, datafrog_time) = game
             .read_rules(|answers, _legal| {
                 let visible = PlayDatalog::visible_entities(answers, viewer);
                 let mut blockers = Vec::new();
@@ -556,7 +470,6 @@ mod tests {
                 attackers.sort();
                 let mut pairs = 0;
                 let mut datafrog_time = Duration::ZERO;
-                let mut nemo_time = Duration::ZERO;
                 for blocker in &blockers {
                     for attacker in &attackers {
                         let expected = answers.legality(&events::DeclareBlocker {
@@ -573,27 +486,14 @@ mod tests {
                         )
                         .unwrap();
                         datafrog_time += started.elapsed();
-                        let started = Instant::now();
-                        let nemoed = BlockDatalog::legality(
-                            &NemoEngine,
-                            answers,
-                            *blocker,
-                            *attacker,
-                            viewer,
-                        )
-                        .unwrap();
-                        nemo_time += started.elapsed();
-                        assert_eq!(datafrogged, Some(expected.clone()));
-                        assert_eq!(nemoed, Some(expected));
+                        assert_eq!(datafrogged, Some(expected));
                         pairs += 1;
                     }
                 }
-                (pairs, datafrog_time, nemo_time)
+                (pairs, datafrog_time)
             })
             .unwrap();
-        eprintln!(
-            "ORACLE block-flying-reach candidates={pairs} datafrog_time={datafrog_time:?} nemo_time={nemo_time:?}"
-        );
+        eprintln!("ORACLE block-flying-reach candidates={pairs} datafrog_time={datafrog_time:?}");
         assert_eq!(pairs, 2);
     }
 
@@ -627,7 +527,7 @@ mod tests {
         .unwrap();
         game.play([p1.pass_priority()]).unwrap();
         let viewer = players::PlayerId(*p2);
-        let (pairs, datafrog_time, nemo_time) = game
+        let (pairs, datafrog_time) = game
             .read_rules(|answers, _legal| {
                 let visible = PlayDatalog::visible_entities(answers, viewer);
                 let mut blockers = Vec::new();
@@ -649,7 +549,6 @@ mod tests {
                 attackers.sort();
                 let mut pairs = 0;
                 let mut datafrog_time = Duration::ZERO;
-                let mut nemo_time = Duration::ZERO;
                 for blocker in &blockers {
                     for attacker in &attackers {
                         let expected = answers.legality(&events::DeclareBlocker {
@@ -666,27 +565,14 @@ mod tests {
                         )
                         .unwrap();
                         datafrog_time += started.elapsed();
-                        let started = Instant::now();
-                        let nemoed = BlockDatalog::legality(
-                            &NemoEngine,
-                            answers,
-                            *blocker,
-                            *attacker,
-                            viewer,
-                        )
-                        .unwrap();
-                        nemo_time += started.elapsed();
-                        assert_eq!(datafrogged, Some(expected.clone()));
-                        assert_eq!(nemoed, Some(expected));
+                        assert_eq!(datafrogged, Some(expected));
                         pairs += 1;
                     }
                 }
-                (pairs, datafrog_time, nemo_time)
+                (pairs, datafrog_time)
             })
             .unwrap();
-        eprintln!(
-            "ORACLE block-jump candidates={pairs} datafrog_time={datafrog_time:?} nemo_time={nemo_time:?}"
-        );
+        eprintln!("ORACLE block-jump candidates={pairs} datafrog_time={datafrog_time:?}");
         assert_eq!(pairs, 3);
     }
 
@@ -710,7 +596,7 @@ mod tests {
         .unwrap();
         game.play([p1.pass_priority()]).unwrap();
         let viewer = players::PlayerId(*p2);
-        let (pairs, datafrog_time, nemo_time) = game
+        let (pairs, datafrog_time) = game
             .read_rules(|answers, _legal| {
                 let visible = PlayDatalog::visible_entities(answers, viewer);
                 let mut blockers = Vec::new();
@@ -732,7 +618,6 @@ mod tests {
                 attackers.sort();
                 let mut pairs = 0;
                 let mut datafrog_time = Duration::ZERO;
-                let mut nemo_time = Duration::ZERO;
                 for blocker in &blockers {
                     for attacker in &attackers {
                         let expected = answers.legality(&events::DeclareBlocker {
@@ -749,27 +634,14 @@ mod tests {
                         )
                         .unwrap();
                         datafrog_time += started.elapsed();
-                        let started = Instant::now();
-                        let nemoed = BlockDatalog::legality(
-                            &NemoEngine,
-                            answers,
-                            *blocker,
-                            *attacker,
-                            viewer,
-                        )
-                        .unwrap();
-                        nemo_time += started.elapsed();
-                        assert_eq!(datafrogged, Some(expected.clone()));
-                        assert_eq!(nemoed, Some(expected));
+                        assert_eq!(datafrogged, Some(expected));
                         pairs += 1;
                     }
                 }
-                (pairs, datafrog_time, nemo_time)
+                (pairs, datafrog_time)
             })
             .unwrap();
-        eprintln!(
-            "ORACLE block-must-block candidates={pairs} datafrog_time={datafrog_time:?} nemo_time={nemo_time:?}"
-        );
+        eprintln!("ORACLE block-must-block candidates={pairs} datafrog_time={datafrog_time:?}");
         assert_eq!(pairs, 2);
     }
 
@@ -793,7 +665,7 @@ mod tests {
         .unwrap();
         game.play([p1.pass_priority()]).unwrap();
         let viewer = players::PlayerId(*p2);
-        let (pairs, datafrog_time, nemo_time) = game
+        let (pairs, datafrog_time) = game
             .read_rules(|answers, _legal| {
                 let visible = PlayDatalog::visible_entities(answers, viewer);
                 let mut blockers = Vec::new();
@@ -815,7 +687,6 @@ mod tests {
                 attackers.sort();
                 let mut pairs = 0;
                 let mut datafrog_time = Duration::ZERO;
-                let mut nemo_time = Duration::ZERO;
                 for blocker in &blockers {
                     for attacker in &attackers {
                         let expected = answers.legality(&events::DeclareBlocker {
@@ -832,27 +703,14 @@ mod tests {
                         )
                         .unwrap();
                         datafrog_time += started.elapsed();
-                        let started = Instant::now();
-                        let nemoed = BlockDatalog::legality(
-                            &NemoEngine,
-                            answers,
-                            *blocker,
-                            *attacker,
-                            viewer,
-                        )
-                        .unwrap();
-                        nemo_time += started.elapsed();
-                        assert_eq!(datafrogged, Some(expected.clone()));
-                        assert_eq!(nemoed, Some(expected));
+                        assert_eq!(datafrogged, Some(expected));
                         pairs += 1;
                     }
                 }
-                (pairs, datafrog_time, nemo_time)
+                (pairs, datafrog_time)
             })
             .unwrap();
-        eprintln!(
-            "ORACLE block-taunting-field candidates={pairs} datafrog_time={datafrog_time:?} nemo_time={nemo_time:?}"
-        );
+        eprintln!("ORACLE block-taunting-field candidates={pairs} datafrog_time={datafrog_time:?}");
         assert_eq!(pairs, 3);
     }
 
@@ -876,7 +734,7 @@ mod tests {
         .unwrap();
         game.play([p1.pass_priority()]).unwrap();
         let viewer = players::PlayerId(*p2);
-        let (pairs, datafrog_time, nemo_time) = game
+        let (pairs, datafrog_time) = game
             .read_rules(|answers, _legal| {
                 let visible = PlayDatalog::visible_entities(answers, viewer);
                 let mut blockers = Vec::new();
@@ -898,7 +756,6 @@ mod tests {
                 attackers.sort();
                 let mut pairs = 0;
                 let mut datafrog_time = Duration::ZERO;
-                let mut nemo_time = Duration::ZERO;
                 for blocker in &blockers {
                     for attacker in &attackers {
                         let expected = answers.legality(&events::DeclareBlocker {
@@ -915,27 +772,14 @@ mod tests {
                         )
                         .unwrap();
                         datafrog_time += started.elapsed();
-                        let started = Instant::now();
-                        let nemoed = BlockDatalog::legality(
-                            &NemoEngine,
-                            answers,
-                            *blocker,
-                            *attacker,
-                            viewer,
-                        )
-                        .unwrap();
-                        nemo_time += started.elapsed();
-                        assert_eq!(datafrogged, Some(expected.clone()));
-                        assert_eq!(nemoed, Some(expected));
+                        assert_eq!(datafrogged, Some(expected));
                         pairs += 1;
                     }
                 }
-                (pairs, datafrog_time, nemo_time)
+                (pairs, datafrog_time)
             })
             .unwrap();
-        eprintln!(
-            "ORACLE block-lure-of-battle candidates={pairs} datafrog_time={datafrog_time:?} nemo_time={nemo_time:?}"
-        );
+        eprintln!("ORACLE block-lure-of-battle candidates={pairs} datafrog_time={datafrog_time:?}");
         assert_eq!(pairs, 3);
     }
 
@@ -959,7 +803,7 @@ mod tests {
         .unwrap();
         game.play([p1.pass_priority()]).unwrap();
         let viewer = players::PlayerId(*p2);
-        let (pairs, datafrog_time, nemo_time) = game
+        let (pairs, datafrog_time) = game
             .read_rules(|answers, _legal| {
                 let visible = PlayDatalog::visible_entities(answers, viewer);
                 let mut blockers = Vec::new();
@@ -981,7 +825,6 @@ mod tests {
                 attackers.sort();
                 let mut pairs = 0;
                 let mut datafrog_time = Duration::ZERO;
-                let mut nemo_time = Duration::ZERO;
                 for blocker in &blockers {
                     for attacker in &attackers {
                         let expected = answers.legality(&events::DeclareBlocker {
@@ -998,27 +841,14 @@ mod tests {
                         )
                         .unwrap();
                         datafrog_time += started.elapsed();
-                        let started = Instant::now();
-                        let nemoed = BlockDatalog::legality(
-                            &NemoEngine,
-                            answers,
-                            *blocker,
-                            *attacker,
-                            viewer,
-                        )
-                        .unwrap();
-                        nemo_time += started.elapsed();
-                        assert_eq!(datafrogged, Some(expected.clone()));
-                        assert_eq!(nemoed, Some(expected));
+                        assert_eq!(datafrogged, Some(expected));
                         pairs += 1;
                     }
                 }
-                (pairs, datafrog_time, nemo_time)
+                (pairs, datafrog_time)
             })
             .unwrap();
-        eprintln!(
-            "ORACLE block-grounding-mist candidates={pairs} datafrog_time={datafrog_time:?} nemo_time={nemo_time:?}"
-        );
+        eprintln!("ORACLE block-grounding-mist candidates={pairs} datafrog_time={datafrog_time:?}");
         assert_eq!(pairs, 3);
     }
 
@@ -1042,7 +872,7 @@ mod tests {
         .unwrap();
         game.play([p1.pass_priority()]).unwrap();
         let viewer = players::PlayerId(*p2);
-        let (pairs, datafrog_time, nemo_time) = game
+        let (pairs, datafrog_time) = game
             .read_rules(|answers, _legal| {
                 let visible = PlayDatalog::visible_entities(answers, viewer);
                 let mut blockers = Vec::new();
@@ -1064,7 +894,6 @@ mod tests {
                 attackers.sort();
                 let mut pairs = 0;
                 let mut datafrog_time = Duration::ZERO;
-                let mut nemo_time = Duration::ZERO;
                 for blocker in &blockers {
                     for attacker in &attackers {
                         let expected = answers.legality(&events::DeclareBlocker {
@@ -1081,27 +910,14 @@ mod tests {
                         )
                         .unwrap();
                         datafrog_time += started.elapsed();
-                        let started = Instant::now();
-                        let nemoed = BlockDatalog::legality(
-                            &NemoEngine,
-                            answers,
-                            *blocker,
-                            *attacker,
-                            viewer,
-                        )
-                        .unwrap();
-                        nemo_time += started.elapsed();
-                        assert_eq!(datafrogged, Some(expected.clone()));
-                        assert_eq!(nemoed, Some(expected));
+                        assert_eq!(datafrogged, Some(expected));
                         pairs += 1;
                     }
                 }
-                (pairs, datafrog_time, nemo_time)
+                (pairs, datafrog_time)
             })
             .unwrap();
-        eprintln!(
-            "ORACLE block-timid-field candidates={pairs} datafrog_time={datafrog_time:?} nemo_time={nemo_time:?}"
-        );
+        eprintln!("ORACLE block-timid-field candidates={pairs} datafrog_time={datafrog_time:?}");
         assert_eq!(pairs, 4);
     }
 
@@ -1125,7 +941,7 @@ mod tests {
         .unwrap();
         game.play([p1.pass_priority()]).unwrap();
         let viewer = players::PlayerId(*p2);
-        let (pairs, datafrog_time, nemo_time) = game
+        let (pairs, datafrog_time) = game
             .read_rules(|answers, _legal| {
                 let visible = PlayDatalog::visible_entities(answers, viewer);
                 let mut blockers = Vec::new();
@@ -1147,7 +963,6 @@ mod tests {
                 attackers.sort();
                 let mut pairs = 0;
                 let mut datafrog_time = Duration::ZERO;
-                let mut nemo_time = Duration::ZERO;
                 for blocker in &blockers {
                     for attacker in &attackers {
                         let expected = answers.legality(&events::DeclareBlocker {
@@ -1164,27 +979,14 @@ mod tests {
                         )
                         .unwrap();
                         datafrog_time += started.elapsed();
-                        let started = Instant::now();
-                        let nemoed = BlockDatalog::legality(
-                            &NemoEngine,
-                            answers,
-                            *blocker,
-                            *attacker,
-                            viewer,
-                        )
-                        .unwrap();
-                        nemo_time += started.elapsed();
-                        assert_eq!(datafrogged, Some(expected.clone()));
-                        assert_eq!(nemoed, Some(expected));
+                        assert_eq!(datafrogged, Some(expected));
                         pairs += 1;
                     }
                 }
-                (pairs, datafrog_time, nemo_time)
+                (pairs, datafrog_time)
             })
             .unwrap();
-        eprintln!(
-            "ORACLE block-sky-court candidates={pairs} datafrog_time={datafrog_time:?} nemo_time={nemo_time:?}"
-        );
+        eprintln!("ORACLE block-sky-court candidates={pairs} datafrog_time={datafrog_time:?}");
         assert_eq!(pairs, 4);
     }
 
@@ -1209,7 +1011,7 @@ mod tests {
         .unwrap();
         game.play([p1.pass_priority()]).unwrap();
         let viewer = players::PlayerId(*p2);
-        let (pairs, datafrog_time, nemo_time) = game
+        let (pairs, datafrog_time) = game
             .read_rules(|answers, _legal| {
                 let visible = PlayDatalog::visible_entities(answers, viewer);
                 let mut blockers = Vec::new();
@@ -1231,7 +1033,6 @@ mod tests {
                 attackers.sort();
                 let mut pairs = 0;
                 let mut datafrog_time = Duration::ZERO;
-                let mut nemo_time = Duration::ZERO;
                 for blocker in &blockers {
                     for attacker in &attackers {
                         let expected = answers.legality(&events::DeclareBlocker {
@@ -1248,27 +1049,14 @@ mod tests {
                         )
                         .unwrap();
                         datafrog_time += started.elapsed();
-                        let started = Instant::now();
-                        let nemoed = BlockDatalog::legality(
-                            &NemoEngine,
-                            answers,
-                            *blocker,
-                            *attacker,
-                            viewer,
-                        )
-                        .unwrap();
-                        nemo_time += started.elapsed();
-                        assert_eq!(datafrogged, Some(expected.clone()));
-                        assert_eq!(nemoed, Some(expected));
+                        assert_eq!(datafrogged, Some(expected));
                         pairs += 1;
                     }
                 }
-                (pairs, datafrog_time, nemo_time)
+                (pairs, datafrog_time)
             })
             .unwrap();
-        eprintln!(
-            "ORACLE block-low-skimmer candidates={pairs} datafrog_time={datafrog_time:?} nemo_time={nemo_time:?}"
-        );
+        eprintln!("ORACLE block-low-skimmer candidates={pairs} datafrog_time={datafrog_time:?}");
         assert_eq!(pairs, 2);
     }
 
@@ -1292,7 +1080,7 @@ mod tests {
         .unwrap();
         game.play([p1.pass_priority()]).unwrap();
         let viewer = players::PlayerId(*p2);
-        let (pairs, datafrog_time, nemo_time) = game
+        let (pairs, datafrog_time) = game
             .read_rules(|answers, _legal| {
                 let visible = PlayDatalog::visible_entities(answers, viewer);
                 let mut blockers = Vec::new();
@@ -1314,7 +1102,6 @@ mod tests {
                 attackers.sort();
                 let mut pairs = 0;
                 let mut datafrog_time = Duration::ZERO;
-                let mut nemo_time = Duration::ZERO;
                 for blocker in &blockers {
                     for attacker in &attackers {
                         let expected = answers.legality(&events::DeclareBlocker {
@@ -1331,27 +1118,14 @@ mod tests {
                         )
                         .unwrap();
                         datafrog_time += started.elapsed();
-                        let started = Instant::now();
-                        let nemoed = BlockDatalog::legality(
-                            &NemoEngine,
-                            answers,
-                            *blocker,
-                            *attacker,
-                            viewer,
-                        )
-                        .unwrap();
-                        nemo_time += started.elapsed();
-                        assert_eq!(datafrogged, Some(expected.clone()));
-                        assert_eq!(nemoed, Some(expected));
+                        assert_eq!(datafrogged, Some(expected));
                         pairs += 1;
                     }
                 }
-                (pairs, datafrog_time, nemo_time)
+                (pairs, datafrog_time)
             })
             .unwrap();
-        eprintln!(
-            "ORACLE block-not-yours candidates={pairs} datafrog_time={datafrog_time:?} nemo_time={nemo_time:?}"
-        );
+        eprintln!("ORACLE block-not-yours candidates={pairs} datafrog_time={datafrog_time:?}");
         assert_eq!(pairs, 3);
     }
 }

@@ -70,7 +70,6 @@ mod tests {
     use bevy::ecs::system::RunSystemOnce;
     use bevy::prelude::App;
     use verdigris_datalog_datafrog::DatafrogEngine;
-    use verdigris_datalog_nemo::NemoEngine;
     use verdigris_rule_engine::HAND;
     use verdigris_rule_engine::cards;
     use verdigris_rule_engine::events;
@@ -123,13 +122,6 @@ mod tests {
                         caster: first,
                     }))
                 );
-                assert_eq!(
-                    legality(&NemoEngine, &answers, bolt, first).unwrap(),
-                    Some(answers.legality(&events::Cast {
-                        spell: bolt,
-                        caster: first,
-                    }))
-                );
             })
             .unwrap();
     }
@@ -144,20 +136,15 @@ mod tests {
                 CastDatalog::legality(&DatafrogEngine, answers, *bolt, players::PlayerId(*p2)),
                 Ok(None)
             );
-            assert_eq!(
-                CastDatalog::legality(&NemoEngine, answers, *bolt, players::PlayerId(*p2)),
-                Ok(None)
-            );
         })
         .unwrap();
         game.play([p1.cast(bolt)]).unwrap();
         assert!(game.stack().has(LIGHTNING_BOLT));
         let holder = game.priority_player().unwrap();
-        let (candidates, datafrog_time, nemo_time) = game
+        let (candidates, datafrog_time) = game
             .read_rules(|answers, _legal| {
                 let mut candidates = 0;
                 let mut datafrog_time = Duration::ZERO;
-                let mut nemo_time = Duration::ZERO;
                 for card in PlayDatalog::visible_entities(answers, holder) {
                     let expected = answers.legality(&events::Cast {
                         spell: card,
@@ -167,19 +154,13 @@ mod tests {
                     let datafrogged =
                         CastDatalog::legality(&DatafrogEngine, answers, card, holder).unwrap();
                     datafrog_time += started.elapsed();
-                    let started = Instant::now();
-                    let nemoed = CastDatalog::legality(&NemoEngine, answers, card, holder).unwrap();
-                    nemo_time += started.elapsed();
-                    assert_eq!(datafrogged, Some(expected.clone()));
-                    assert_eq!(nemoed, Some(expected));
+                    assert_eq!(datafrogged, Some(expected));
                     candidates += 1;
                 }
-                (candidates, datafrog_time, nemo_time)
+                (candidates, datafrog_time)
             })
             .unwrap();
-        eprintln!(
-            "ORACLE cast-instant candidates={candidates} datafrog_time={datafrog_time:?} nemo_time={nemo_time:?}"
-        );
+        eprintln!("ORACLE cast-instant candidates={candidates} datafrog_time={datafrog_time:?}");
         assert_eq!(candidates, 1);
     }
 
@@ -199,19 +180,14 @@ mod tests {
                 ),
                 Ok(None)
             );
-            assert_eq!(
-                CastDatalog::legality(&NemoEngine, answers, *divination, players::PlayerId(*p2)),
-                Ok(None)
-            );
         })
         .unwrap();
         game.play([p2.pass_priority()]).unwrap();
         let holder = game.priority_player().unwrap();
-        let (candidates, datafrog_time, nemo_time) = game
+        let (candidates, datafrog_time) = game
             .read_rules(|answers, _legal| {
                 let mut candidates = 0;
                 let mut datafrog_time = Duration::ZERO;
-                let mut nemo_time = Duration::ZERO;
                 for card in PlayDatalog::visible_entities(answers, holder) {
                     let expected = answers.legality(&events::Cast {
                         spell: card,
@@ -221,18 +197,14 @@ mod tests {
                     let datafrogged =
                         CastDatalog::legality(&DatafrogEngine, answers, card, holder).unwrap();
                     datafrog_time += started.elapsed();
-                    let started = Instant::now();
-                    let nemoed = CastDatalog::legality(&NemoEngine, answers, card, holder).unwrap();
-                    nemo_time += started.elapsed();
-                    assert_eq!(datafrogged, Some(expected.clone()));
-                    assert_eq!(nemoed, Some(expected));
+                    assert_eq!(datafrogged, Some(expected));
                     candidates += 1;
                 }
-                (candidates, datafrog_time, nemo_time)
+                (candidates, datafrog_time)
             })
             .unwrap();
         eprintln!(
-            "ORACLE cast-opponent-turn candidates={candidates} datafrog_time={datafrog_time:?} nemo_time={nemo_time:?}"
+            "ORACLE cast-opponent-turn candidates={candidates} datafrog_time={datafrog_time:?}"
         );
         assert_eq!(candidates, 1);
     }
@@ -250,20 +222,15 @@ mod tests {
                 CastDatalog::legality(&DatafrogEngine, answers, *bolt, players::PlayerId(*p2)),
                 Ok(None)
             );
-            assert_eq!(
-                CastDatalog::legality(&NemoEngine, answers, *bolt, players::PlayerId(*p2)),
-                Ok(None)
-            );
         })
         .unwrap();
         game.play([p1.cast(bolt).targeting(p2)]).unwrap();
         assert!(game.stack().has(LIGHTNING_BOLT));
         let holder = game.priority_player().unwrap();
-        let (candidates, datafrog_time, nemo_time) = game
+        let (candidates, datafrog_time) = game
             .read_rules(|answers, _legal| {
                 let mut candidates = 0;
                 let mut datafrog_time = Duration::ZERO;
-                let mut nemo_time = Duration::ZERO;
                 for card in PlayDatalog::visible_entities(answers, holder) {
                     let expected = answers.legality(&events::Cast {
                         spell: card,
@@ -273,11 +240,7 @@ mod tests {
                     let datafrogged =
                         CastDatalog::legality(&DatafrogEngine, answers, card, holder).unwrap();
                     datafrog_time += started.elapsed();
-                    let started = Instant::now();
-                    let nemoed = CastDatalog::legality(&NemoEngine, answers, card, holder).unwrap();
-                    nemo_time += started.elapsed();
-                    assert_eq!(datafrogged, Some(expected.clone()));
-                    assert_eq!(nemoed, Some(expected));
+                    assert_eq!(datafrogged, Some(expected));
                     candidates += 1;
                 }
                 assert_eq!(
@@ -289,20 +252,11 @@ mod tests {
                     ),
                     Ok(None)
                 );
-                assert_eq!(
-                    CastDatalog::legality(
-                        &NemoEngine,
-                        answers,
-                        *divination,
-                        players::PlayerId(*p2)
-                    ),
-                    Ok(None)
-                );
-                (candidates, datafrog_time, nemo_time)
+                (candidates, datafrog_time)
             })
             .unwrap();
         eprintln!(
-            "ORACLE cast-stack-nonempty candidates={candidates} datafrog_time={datafrog_time:?} nemo_time={nemo_time:?}"
+            "ORACLE cast-stack-nonempty candidates={candidates} datafrog_time={datafrog_time:?}"
         );
         assert_eq!(candidates, 2);
     }
@@ -316,18 +270,13 @@ mod tests {
                 CastDatalog::legality(&DatafrogEngine, answers, *forest, players::PlayerId(*p2)),
                 Ok(None)
             );
-            assert_eq!(
-                CastDatalog::legality(&NemoEngine, answers, *forest, players::PlayerId(*p2)),
-                Ok(None)
-            );
         })
         .unwrap();
         let holder = game.priority_player().unwrap_or(players::PlayerId(*p1));
-        let (candidates, datafrog_time, nemo_time) = game
+        let (candidates, datafrog_time) = game
             .read_rules(|answers, _legal| {
                 let mut candidates = 0;
                 let mut datafrog_time = Duration::ZERO;
-                let mut nemo_time = Duration::ZERO;
                 for card in PlayDatalog::visible_entities(answers, holder) {
                     let expected = answers.legality(&events::Cast {
                         spell: card,
@@ -337,19 +286,13 @@ mod tests {
                     let datafrogged =
                         CastDatalog::legality(&DatafrogEngine, answers, card, holder).unwrap();
                     datafrog_time += started.elapsed();
-                    let started = Instant::now();
-                    let nemoed = CastDatalog::legality(&NemoEngine, answers, card, holder).unwrap();
-                    nemo_time += started.elapsed();
-                    assert_eq!(datafrogged, Some(expected.clone()));
-                    assert_eq!(nemoed, Some(expected));
+                    assert_eq!(datafrogged, Some(expected));
                     candidates += 1;
                 }
-                (candidates, datafrog_time, nemo_time)
+                (candidates, datafrog_time)
             })
             .unwrap();
-        eprintln!(
-            "ORACLE cast-land candidates={candidates} datafrog_time={datafrog_time:?} nemo_time={nemo_time:?}"
-        );
+        eprintln!("ORACLE cast-land candidates={candidates} datafrog_time={datafrog_time:?}");
         assert_eq!(candidates, 1);
     }
 
@@ -369,18 +312,13 @@ mod tests {
                 ),
                 Ok(None)
             );
-            assert_eq!(
-                CastDatalog::legality(&NemoEngine, answers, *divination, players::PlayerId(*p2)),
-                Ok(None)
-            );
         })
         .unwrap();
         let holder = game.priority_player().unwrap_or(players::PlayerId(*p1));
-        let (candidates, datafrog_time, nemo_time) = game
+        let (candidates, datafrog_time) = game
             .read_rules(|answers, _legal| {
                 let mut candidates = 0;
                 let mut datafrog_time = Duration::ZERO;
-                let mut nemo_time = Duration::ZERO;
                 for card in PlayDatalog::visible_entities(answers, holder) {
                     let expected = answers.legality(&events::Cast {
                         spell: card,
@@ -390,19 +328,13 @@ mod tests {
                     let datafrogged =
                         CastDatalog::legality(&DatafrogEngine, answers, card, holder).unwrap();
                     datafrog_time += started.elapsed();
-                    let started = Instant::now();
-                    let nemoed = CastDatalog::legality(&NemoEngine, answers, card, holder).unwrap();
-                    nemo_time += started.elapsed();
-                    assert_eq!(datafrogged, Some(expected.clone()));
-                    assert_eq!(nemoed, Some(expected));
+                    assert_eq!(datafrogged, Some(expected));
                     candidates += 1;
                 }
-                (candidates, datafrog_time, nemo_time)
+                (candidates, datafrog_time)
             })
             .unwrap();
-        eprintln!(
-            "ORACLE cast-combat candidates={candidates} datafrog_time={datafrog_time:?} nemo_time={nemo_time:?}"
-        );
+        eprintln!("ORACLE cast-combat candidates={candidates} datafrog_time={datafrog_time:?}");
         assert_eq!(candidates, 1);
     }
 
@@ -424,21 +356,16 @@ mod tests {
                 ),
                 Ok(None)
             );
-            assert_eq!(
-                CastDatalog::legality(&NemoEngine, answers, *divination, players::PlayerId(*p2)),
-                Ok(None)
-            );
         })
         .unwrap();
         game.play([p2.pass_priority()]).unwrap();
         game.play([p1.cast(divination)]).unwrap();
         assert!(game.stack().has(DIVINATION));
         let holder = game.priority_player().unwrap();
-        let (candidates, datafrog_time, nemo_time) = game
+        let (candidates, datafrog_time) = game
             .read_rules(|answers, _legal| {
                 let mut candidates = 0;
                 let mut datafrog_time = Duration::ZERO;
-                let mut nemo_time = Duration::ZERO;
                 for card in PlayDatalog::visible_entities(answers, holder) {
                     let expected = answers.legality(&events::Cast {
                         spell: card,
@@ -448,18 +375,14 @@ mod tests {
                     let datafrogged =
                         CastDatalog::legality(&DatafrogEngine, answers, card, holder).unwrap();
                     datafrog_time += started.elapsed();
-                    let started = Instant::now();
-                    let nemoed = CastDatalog::legality(&NemoEngine, answers, card, holder).unwrap();
-                    nemo_time += started.elapsed();
-                    assert_eq!(datafrogged, Some(expected.clone()));
-                    assert_eq!(nemoed, Some(expected));
+                    assert_eq!(datafrogged, Some(expected));
                     candidates += 1;
                 }
-                (candidates, datafrog_time, nemo_time)
+                (candidates, datafrog_time)
             })
             .unwrap();
         eprintln!(
-            "ORACLE cast-leyline-opponent-turn candidates={candidates} datafrog_time={datafrog_time:?} nemo_time={nemo_time:?}"
+            "ORACLE cast-leyline-opponent-turn candidates={candidates} datafrog_time={datafrog_time:?}"
         );
         assert_eq!(candidates, 2);
     }
@@ -482,20 +405,15 @@ mod tests {
                 ),
                 Ok(None)
             );
-            assert_eq!(
-                CastDatalog::legality(&NemoEngine, answers, *divination, players::PlayerId(*p2)),
-                Ok(None)
-            );
         })
         .unwrap();
         game.play([p1.cast(divination)]).unwrap();
         assert!(game.stack().has(DIVINATION));
         let holder = game.priority_player().unwrap();
-        let (candidates, datafrog_time, nemo_time) = game
+        let (candidates, datafrog_time) = game
             .read_rules(|answers, _legal| {
                 let mut candidates = 0;
                 let mut datafrog_time = Duration::ZERO;
-                let mut nemo_time = Duration::ZERO;
                 for card in PlayDatalog::visible_entities(answers, holder) {
                     let expected = answers.legality(&events::Cast {
                         spell: card,
@@ -505,18 +423,14 @@ mod tests {
                     let datafrogged =
                         CastDatalog::legality(&DatafrogEngine, answers, card, holder).unwrap();
                     datafrog_time += started.elapsed();
-                    let started = Instant::now();
-                    let nemoed = CastDatalog::legality(&NemoEngine, answers, card, holder).unwrap();
-                    nemo_time += started.elapsed();
-                    assert_eq!(datafrogged, Some(expected.clone()));
-                    assert_eq!(nemoed, Some(expected));
+                    assert_eq!(datafrogged, Some(expected));
                     candidates += 1;
                 }
-                (candidates, datafrog_time, nemo_time)
+                (candidates, datafrog_time)
             })
             .unwrap();
         eprintln!(
-            "ORACLE cast-leyline-combat candidates={candidates} datafrog_time={datafrog_time:?} nemo_time={nemo_time:?}"
+            "ORACLE cast-leyline-combat candidates={candidates} datafrog_time={datafrog_time:?}"
         );
         assert_eq!(candidates, 2);
     }
@@ -538,15 +452,7 @@ mod tests {
                 Ok(None)
             );
             assert_eq!(
-                CastDatalog::legality(&NemoEngine, answers, *bolt, players::PlayerId(*p2)),
-                Ok(None)
-            );
-            assert_eq!(
                 CastDatalog::legality(&DatafrogEngine, answers, *dispel, players::PlayerId(*p1)),
-                Ok(None)
-            );
-            assert_eq!(
-                CastDatalog::legality(&NemoEngine, answers, *dispel, players::PlayerId(*p1)),
                 Ok(None)
             );
         })
@@ -557,11 +463,10 @@ mod tests {
         game.play([p2.pass_priority(), p1.cast(divination)]).unwrap();
         assert!(game.stack().has(DIVINATION));
         let holder = game.priority_player().unwrap();
-        let (candidates, datafrog_time, nemo_time) = game
+        let (candidates, datafrog_time) = game
             .read_rules(|answers, _legal| {
                 let mut candidates = 0;
                 let mut datafrog_time = Duration::ZERO;
-                let mut nemo_time = Duration::ZERO;
                 for card in PlayDatalog::visible_entities(answers, holder) {
                     let expected = answers.legality(&events::Cast {
                         spell: card,
@@ -571,18 +476,14 @@ mod tests {
                     let datafrogged =
                         CastDatalog::legality(&DatafrogEngine, answers, card, holder).unwrap();
                     datafrog_time += started.elapsed();
-                    let started = Instant::now();
-                    let nemoed = CastDatalog::legality(&NemoEngine, answers, card, holder).unwrap();
-                    nemo_time += started.elapsed();
-                    assert_eq!(datafrogged, Some(expected.clone()));
-                    assert_eq!(nemoed, Some(expected));
+                    assert_eq!(datafrogged, Some(expected));
                     candidates += 1;
                 }
-                (candidates, datafrog_time, nemo_time)
+                (candidates, datafrog_time)
             })
             .unwrap();
         eprintln!(
-            "ORACLE cast-leyline-stack candidates={candidates} datafrog_time={datafrog_time:?} nemo_time={nemo_time:?}"
+            "ORACLE cast-leyline-stack candidates={candidates} datafrog_time={datafrog_time:?}"
         );
         assert_eq!(candidates, 4);
     }
@@ -604,19 +505,14 @@ mod tests {
                 ),
                 Ok(None)
             );
-            assert_eq!(
-                CastDatalog::legality(&NemoEngine, answers, *divination, players::PlayerId(*p1)),
-                Ok(None)
-            );
         })
         .unwrap();
         game.play([p1.pass_priority()]).unwrap();
         let holder = game.priority_player().unwrap();
-        let (candidates, datafrog_time, nemo_time) = game
+        let (candidates, datafrog_time) = game
             .read_rules(|answers, _legal| {
                 let mut candidates = 0;
                 let mut datafrog_time = Duration::ZERO;
-                let mut nemo_time = Duration::ZERO;
                 for card in PlayDatalog::visible_entities(answers, holder) {
                     let expected = answers.legality(&events::Cast {
                         spell: card,
@@ -626,18 +522,14 @@ mod tests {
                     let datafrogged =
                         CastDatalog::legality(&DatafrogEngine, answers, card, holder).unwrap();
                     datafrog_time += started.elapsed();
-                    let started = Instant::now();
-                    let nemoed = CastDatalog::legality(&NemoEngine, answers, card, holder).unwrap();
-                    nemo_time += started.elapsed();
-                    assert_eq!(datafrogged, Some(expected.clone()));
-                    assert_eq!(nemoed, Some(expected));
+                    assert_eq!(datafrogged, Some(expected));
                     candidates += 1;
                 }
-                (candidates, datafrog_time, nemo_time)
+                (candidates, datafrog_time)
             })
             .unwrap();
         eprintln!(
-            "ORACLE cast-leyline-opponent candidates={candidates} datafrog_time={datafrog_time:?} nemo_time={nemo_time:?}"
+            "ORACLE cast-leyline-opponent candidates={candidates} datafrog_time={datafrog_time:?}"
         );
         assert_eq!(candidates, 2);
     }
@@ -652,18 +544,13 @@ mod tests {
                 CastDatalog::legality(&DatafrogEngine, answers, *forest, players::PlayerId(*p2)),
                 Ok(None)
             );
-            assert_eq!(
-                CastDatalog::legality(&NemoEngine, answers, *forest, players::PlayerId(*p2)),
-                Ok(None)
-            );
         })
         .unwrap();
         let holder = game.priority_player().unwrap_or(players::PlayerId(*p1));
-        let (candidates, datafrog_time, nemo_time) = game
+        let (candidates, datafrog_time) = game
             .read_rules(|answers, _legal| {
                 let mut candidates = 0;
                 let mut datafrog_time = Duration::ZERO;
-                let mut nemo_time = Duration::ZERO;
                 for card in PlayDatalog::visible_entities(answers, holder) {
                     let expected = answers.legality(&events::Cast {
                         spell: card,
@@ -673,18 +560,14 @@ mod tests {
                     let datafrogged =
                         CastDatalog::legality(&DatafrogEngine, answers, card, holder).unwrap();
                     datafrog_time += started.elapsed();
-                    let started = Instant::now();
-                    let nemoed = CastDatalog::legality(&NemoEngine, answers, card, holder).unwrap();
-                    nemo_time += started.elapsed();
-                    assert_eq!(datafrogged, Some(expected.clone()));
-                    assert_eq!(nemoed, Some(expected));
+                    assert_eq!(datafrogged, Some(expected));
                     candidates += 1;
                 }
-                (candidates, datafrog_time, nemo_time)
+                (candidates, datafrog_time)
             })
             .unwrap();
         eprintln!(
-            "ORACLE cast-land-leyline candidates={candidates} datafrog_time={datafrog_time:?} nemo_time={nemo_time:?}"
+            "ORACLE cast-land-leyline candidates={candidates} datafrog_time={datafrog_time:?}"
         );
         assert_eq!(candidates, 2);
     }

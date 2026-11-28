@@ -3,7 +3,7 @@ name = "verdigris-rule-datalog"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
-description = "Play legality as Datalog, agreeing with the rule engine on both engines"
+description = "Play legality as Datalog, agreeing with the rule engine"
 
 [lib]
 name = "rule_datalog"
@@ -20,5 +20,4 @@ verdigris-rule-engine = { path = "../rule-engine" }
 
 [dev-dependencies]
 verdigris-datalog-datafrog = { path = "../datalog-datafrog" }
-verdigris-datalog-nemo = { path = "../datalog-nemo" }
 verdigris-rule-engine = { path = "../rule-engine", features = ["testing"] }
