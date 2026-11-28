@@ -78,4 +78,4 @@ run on every state change, on every peer, and later in wasm.
 
 ## Not in scope
 
-Anything MTG-specific (see `frogify`).
+Anything MTG-specific (see `verdigris_rule_engine::legality`).
